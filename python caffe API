@@ -1,0 +1,83 @@
+import caffe
+from caffe import layers as L
+from caffe import params as P
+
+
+Data层定义
+lmdb/leveldb Data层定义
+
+L.Data( 
+        source=lmdb,
+        backend=P.Data.LMDB,
+        batch_size=batch_size, ntop=2,
+        transform_param=dict(
+                              crop_size=227,
+                              mean_value=[104, 117, 123],
+                              mirror=True
+                              )
+        )
+
+HDF5 Data层定义
+L.HDF5Data(
+            hdf5_data_param={
+                            'source': './training_data_paths.txt',  
+                            'batch_size': 64
+                            },
+            include={
+                    'phase': caffe.TRAIN
+                    }
+            )
+
+mageData Data层定义
+L.ImageData(
+                source=list_path,
+                batch_size=batch_size,
+                new_width=48,
+                new_height=48,
+                ntop=2,
+                ransform_param=dict(crop_size=40,mirror=True)
+                )
+
+Convloution层定义
+L.Convolution(  
+                bottom, 
+                kernel_size=ks, 
+                stride=stride,
+                num_output=nout, 
+                pad=pad, 
+                group=group
+                )
+LRN层定义
+L.LRN(
+        bottom, 
+        local_size=5, 
+        alpha=1e-4, 
+        beta=0.75
+        )
+Activation层定义
+L.ReLU(
+        bottom, 
+        in_place=True
+        )
+L.Pooling(
+            bottom,
+            pool=P.Pooling.MAX, 
+            kernel_size=ks, 
+            stride=stride
+            )
+FullConnect层定义
+L.InnerProduct(
+                bottom, 
+                num_output=nout
+                )
+Dropout层定义
+L.Dropout(
+            bottom, 
+            in_place=True
+            )
+Loss层定义
+L.SoftmaxWithLoss(
+                    bottom, 
+                    label
+                    )
+
