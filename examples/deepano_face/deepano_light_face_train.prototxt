@@ -46,7 +46,7 @@ layer {
 		}
 	}
 	data_param {
-		source: "../data/wider_fddb_train_lmdb/"
+		source: "../dataset/wider_fddb_train_lmdb/"
 		batch_size: 32
 		backend: LMDB
 	}
@@ -2443,6 +2443,8 @@ layer {
 	propagate_down: true
 	propagate_down: true
 	propagate_down: false
+	propagate_down: true
+	propagate_down: true
 	propagate_down: false
 	loss_param {
 		normalization: VALID
