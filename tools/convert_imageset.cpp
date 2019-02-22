@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
       enc = fn.substr(p);
       std::transform(enc.begin(), enc.end(), enc.begin(), ::tolower);
     }
-    status = ReadImageToDatum(root_folder + lines[line_id].first,
+    status = ReadImageToDatum(lines[line_id].first+".jpg",
         lines[line_id].second, resize_height, resize_width, is_color,
         enc, &datum);
     if (status == false) continue;

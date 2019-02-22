@@ -3,7 +3,8 @@ import os
 import shutil
 import subprocess
 import sys
-
+CAFFE_ROOT = "/home/resideo/workspace/deepano_face_train"
+sys.path.insert(0, CAFFE_ROOT+'/python')
 from caffe.proto import caffe_pb2
 from google.protobuf import text_format
 
@@ -85,14 +86,14 @@ if __name__ == "__main__":
   with open(list_file, "r") as lf:
     for line in lf.readlines():
       img_file, anno = line.strip("\n").split(" ")
-      if not os.path.exists(root_dir + img_file):
-        print("image file: {} does not exist".format(root_dir + img_file))
+      if not os.path.exists(img_file):
+        print("image file: {} does not exist".format(img_file))
       if anno_type == "classification":
         if not anno.isdigit():
           print("annotation: {} is not an integer".format(anno))
       elif anno_type == "detection":
-        if not os.path.exists(root_dir + anno):
-          print("annofation file: {} does not exist".format(root_dir + anno))
+        if not os.path.exists(anno):
+          print("annofation file: {} does not exist".format(anno))
           sys.exit()
       break
   # check if label map file exist

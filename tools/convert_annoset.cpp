@@ -154,13 +154,13 @@ int main(int argc, char** argv) {
       enc = fn.substr(p);
       std::transform(enc.begin(), enc.end(), enc.begin(), ::tolower);
     }
-    filename = root_folder + lines[line_id].first;
+    filename = lines[line_id].first;
     if (anno_type == "classification") {
       label = boost::get<int>(lines[line_id].second);
       status = ReadImageToDatum(filename, label, resize_height, resize_width,
           min_dim, max_dim, is_color, enc, datum);
     } else if (anno_type == "detection") {
-      labelname = root_folder + boost::get<std::string>(lines[line_id].second);
+      labelname = boost::get<std::string>(lines[line_id].second);
       status = ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
           resize_width, min_dim, max_dim, is_color, enc, type, label_type,
           name_to_label, &anno_datum);

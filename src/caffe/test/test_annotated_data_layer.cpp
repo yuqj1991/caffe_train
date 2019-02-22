@@ -68,6 +68,7 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
     blob_top_vec_.push_back(blob_top_label_);
   }
 
+
   // Fill the DB with data.
   //  - backend: can be either LevelDB or LMDB
   //  - unique_pixel: if true, each pixel is unique but all images are the same;
