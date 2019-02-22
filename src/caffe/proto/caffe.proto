@@ -123,9 +123,11 @@ message NormalizedBBox {
   optional float xmax = 3;
   optional float ymax = 4;
   optional int32 label = 5;
-  optional bool difficult = 6;
-  optional float score = 7;
-  optional float size = 8;
+  optional int32 blur = 6;
+  optional int32 occlusion = 7;
+  optional bool difficult = 8;
+  optional float score = 9;
+  optional float size = 10;
 }
 
 // Annotation for each object instance.

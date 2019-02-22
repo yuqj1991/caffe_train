@@ -93,7 +93,7 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
         // cpu_data and gpu_data for consistent prefetch thread. Thus we make
         // sure there is at least one bbox.
         label_shape[2] = std::max(num_bboxes, 1);
-        label_shape[3] = 8;
+        label_shape[3] = 10;
       } else {
         LOG(FATAL) << "Unknown annotation type.";
       }
