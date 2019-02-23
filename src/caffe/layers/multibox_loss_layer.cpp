@@ -16,6 +16,8 @@ void MultiBoxLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     this->layer_param_.add_propagate_down(true);
     this->layer_param_.add_propagate_down(true);
     this->layer_param_.add_propagate_down(false);
+    this->layer_param_.add_propagate_down(true);
+    this->layer_param_.add_propagate_down(true);
     this->layer_param_.add_propagate_down(false);
   }
   const MultiBoxLossParameter& multibox_loss_param =

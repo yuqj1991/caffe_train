@@ -1057,7 +1057,7 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       map<int, vector<NormalizedBBox> >* all_gt_bboxes) {
   all_gt_bboxes->clear();
   for (int i = 0; i < num_gt; ++i) {
-    int start_idx = i * 8;
+    int start_idx = i * 10;
     int item_id = gt_data[start_idx];
     if (item_id == -1) {
       continue;
