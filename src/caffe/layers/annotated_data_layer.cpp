@@ -84,10 +84,8 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
         // [item_id, group_label, instance_id, xmin, ymin, xmax, ymax, diff]
         // Note: Refer to caffe.proto for details about group_label and
         // instance_id.
-        LOG(INFO)<< "===========================anno_datum.annotation_group_size()====: "<<anno_datum.annotation_group_size();
         for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
           num_bboxes += anno_datum.annotation_group(g).annotation_size();
-          LOG(INFO)<< "============================anno_datum.annotation_group_size()=====: "<<num_bboxes;
         }
         label_shape[0] = 1;
         label_shape[1] = 1;
@@ -146,7 +144,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   map<int, vector<AnnotationGroup> > all_anno;
   int num_bboxes = 0;
 
-  LOG(INFO)<<"BATCH_SIZE===============================================: "<<batch_size;
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     timer.Start();
     // get a anno_datum
@@ -232,9 +229,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                                            &transformed_anno_vec);
         if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) {
           // Count the number of bboxes.
-          LOG(INFO)<< "transformed_anno_vec.size(): "<<transformed_anno_vec.size();
           for (int g = 0; g < transformed_anno_vec.size(); ++g) {
-            LOG(INFO)<< "num_boxes: "<<transformed_anno_vec[g].annotation_size();
             num_bboxes += transformed_anno_vec[g].annotation_size();
           }
         } else {
@@ -263,7 +258,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
     reader_.free().push(const_cast<AnnotatedDatum*>(&anno_datum));
   }
-  LOG_IF(INFO, Caffe::root_solver())<<"output_labels: "<<this->output_labels_ <<" has_anno_type: "<<has_anno_type_;
+
   // Store "rich" annotation if needed.
   if (this->output_labels_ && has_anno_type_) {
     vector<int> label_shape(4);
@@ -271,7 +266,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       label_shape[0] = 1;
       label_shape[1] = 1;
       label_shape[3] = 10;
-      LOG(INFO)<<"num_bboxes: "<<num_bboxes;
       if (num_bboxes == 0) {
         // Store all -1 in the label.
         label_shape[2] = 1;
@@ -285,10 +279,9 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         int idx = 0;
         for (int item_id = 0; item_id < batch_size; ++item_id) {
           const vector<AnnotationGroup>& anno_vec = all_anno[item_id];
-          LOG(INFO)<<"anno_group.annotation_size(): "<< anno_vec.size();
+          LOG(INFO) << "AnnotationGroup size is " << anno_vec.size();
           for (int g = 0; g < anno_vec.size(); ++g) {
             const AnnotationGroup& anno_group = anno_vec[g];
-            LOG(INFO)<<"anno_group.annotation_size(): "<< anno_group.annotation_size();
             for (int a = 0; a < anno_group.annotation_size(); ++a) {
               const Annotation& anno = anno_group.annotation(a);
               const NormalizedBBox& bbox = anno.bbox();
@@ -299,14 +292,9 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
               top_label[idx++] = bbox.ymin();
               top_label[idx++] = bbox.xmax();
               top_label[idx++] = bbox.ymax();
-              top_label[idx++] = bbox.difficult();
               top_label[idx++] = bbox.blur();
               top_label[idx++] = bbox.occlusion();
-              LOG(INFO)<<" label: "<<anno_group.group_label()<<" xmin: "<<bbox.xmin()
-                        <<" ymin: "<<bbox.ymin()<< "xmax: "<<bbox.xmax()
-                        <<" ymax: "<<bbox.ymax()
-                        <<" blur: "<<bbox.blur()
-                        <<" occlusion: "<<bbox.occlusion();
+              top_label[idx++] = bbox.difficult();
             }
           }
         }
@@ -317,12 +305,12 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   }
   timer.Stop();
   batch_timer.Stop();
-  LOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";
-  LOG(INFO) << "     Read time: " << read_time / 1000 << " ms.";
-  LOG(INFO) << "Transform time: " << trans_time / 1000 << " ms.";
+  DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";
+  DLOG(INFO) << "     Read time: " << read_time / 1000 << " ms.";
+  DLOG(INFO) << "Transform time: " << trans_time / 1000 << " ms.";
 }
 
 INSTANTIATE_CLASS(AnnotatedDataLayer);
 REGISTER_LAYER_CLASS(AnnotatedData);
 
-}  // namespace caffe
+} // namespace caffe
