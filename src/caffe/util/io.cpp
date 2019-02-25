@@ -15,12 +15,13 @@
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #endif  // USE_OPENCV
-#include <stdint.h>
 
+#include <iostream>
+#include <string>
+#include <stdint.h>
 #include <algorithm>
 #include <fstream>  // NOLINT(readability/streams)
 #include <map>
-#include <string>
 #include <vector>
 
 #include "caffe/common.hpp"
@@ -280,10 +281,13 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
   int instance_id = 0;
   BOOST_FOREACH(ptree::value_type &v1, pt.get_child("annotation")) {
     ptree pt1 = v1.second;
-    if (v1.first == "object") {
+    if (v1.first == "objects") {
       Annotation* anno = NULL;
       bool difficult = false;
       ptree object = v1.second;
+      int blured = object.get<int>("blur");
+      int occlusioned = object.get<int>("occlusion");
+      LOG(INFO)<<"filename: "<<pt.get<string>("annotation.filename")<<" blur: "<<blured<<" occusioned: "<<occlusioned;
       BOOST_FOREACH(ptree::value_type &v2, object.get_child("")) {
         ptree pt2 = v2.second;
         if (v2.first == "name") {
@@ -317,11 +321,12 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
           anno->set_instance_id(instance_id++);
         } else if (v2.first == "difficult") {
           difficult = pt2.data() == "1";
-        } else if (v2.first == "boundingbox") {
+        }else if (v2.first == "boundingbox") {
           int xmin = pt2.get("xmin", 0);
           int ymin = pt2.get("ymin", 0);
           int xmax = pt2.get("xmax", 0);
           int ymax = pt2.get("ymax", 0);
+          LOG(INFO)<< "xmin: "<<xmin<< " ymin: "<<ymin<< " xmax: "<<xmax<< " ymax: "<<ymax;
           CHECK_NOTNULL(anno);
           LOG_IF(WARNING, xmin > width) << labelfile <<
               " bounding box exceeds image boundary.";
@@ -349,7 +354,11 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
           bbox->set_ymin(static_cast<float>(ymin) / height);
           bbox->set_xmax(static_cast<float>(xmax) / width);
           bbox->set_ymax(static_cast<float>(ymax) / height);
+          bbox->set_blur(blured);
+          bbox->set_occlusion(occlusioned);
           bbox->set_difficult(difficult);
+          LOG(INFO) << "bbox->xmin"<<bbox->xmin()<<" bbox->ymin: "<<bbox->ymin()<<" bbox->xmax: "
+          <<bbox->xmax()<<" bbox->ymax: "<<bbox->ymax()<<" bbox->blur: "<<bbox->blur()<<" bbox->occlusion: "<<bbox->occlusion();
         }
       }
     }

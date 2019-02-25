@@ -489,7 +489,7 @@ $(LINT_OUTPUTS): $(LINT_OUTPUT_DIR)/%.lint.txt : % $(LINT_SCRIPT) | $(LINT_OUTPU
 
 test: $(TEST_ALL_BIN) $(TEST_ALL_DYNLINK_BIN) $(TEST_BINS)
 
-tools: $(TOOL_BINS) $(TOOL_BIN_LINKS)
+tools: $(TOOL_BINS) $(TOOL_BIN_LINKS) 
 
 examples: $(EXAMPLE_BINS)
 
