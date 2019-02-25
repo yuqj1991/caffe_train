@@ -1661,19 +1661,11 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
   // CHECK_EQ(num, all_match_indices.size());
   // CHECK_EQ(num, all_neg_indices.size());
   // Retrieve parameters.
-  CHECK(multibox_loss_param.has_num_classes()) << "Must provide num_classes.";
-  const int num_classes = multibox_loss_param.num_classes();
-  CHECK_GE(num_classes, 1) << "num_classes should not be less than 1.";
+  CHECK(multibox_loss_param.has_num_blur()) << "Must provide num_blur.";
+  const int num_blur = multibox_loss_param.num_blur();
+  CHECK_GE(num_blur, 1) << "num_blur should not be less than 1.";
   const int background_label_id = multibox_loss_param.background_label_id();
-  const bool map_object_to_agnostic =
-      multibox_loss_param.map_object_to_agnostic();
-  if (map_object_to_agnostic) {
-    if (background_label_id >= 0) {
-      CHECK_EQ(num_classes, 2);
-    } else {
-      CHECK_EQ(num_classes, 1);
-    }
-  }
+  
   const MiningType mining_type = multibox_loss_param.mining_type();
   bool do_neg_mining;
   if (multibox_loss_param.has_do_neg_mining()) {
