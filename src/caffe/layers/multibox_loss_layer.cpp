@@ -292,20 +292,20 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     conf_loss_.mutable_cpu_data()[0] = 0;
   }
   // blur confidence  
-  if (num_conf_ >= 1) {
+  if (do_neg_mining&&(num_conf_ >= 1)) {
     // Reshape the confidence data.
     vector<int> conf_blur_shape;
     if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
       conf_blur_shape.push_back(num_conf_);
       conf_gt_.Reshape(conf_blur_shape);
       conf_blur_shape.push_back(num_blur_);
-      conf_pred_.Reshape(conf_shape);
+      conf_blur_pred_.Reshape(conf_blur_shape);
     } else if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
-      conf_shape.push_back(1);
-      conf_shape.push_back(num_conf_);
-      conf_shape.push_back(num_classes_);
-      conf_gt_.Reshape(conf_shape);
-      conf_pred_.Reshape(conf_shape);
+      conf_blur_shape.push_back(1);
+      conf_blur_shape.push_back(num_conf_);
+      conf_blur_shape.push_back(num_blur_);
+      conf_blur_gt_.Reshape(conf_blur_shape);
+      conf_blur_pred_.Reshape(conf_blur_shape);
     } else {
       LOG(FATAL) << "Unknown confidence loss type.";
     }
@@ -321,8 +321,8 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     EncodeConfPrediction(conf_data, num_, num_priors_, multibox_loss_param_,
                          all_match_indices_, all_neg_indices_, all_gt_bboxes,
                          conf_pred_data, conf_gt_data);
-    conf_loss_layer_->Reshape(conf_bottom_vec_, conf_top_vec_);
-    conf_loss_layer_->Forward(conf_bottom_vec_, conf_top_vec_);
+    conf_blur_loss_layer_->Reshape(conf_bottom_vec_, conf_top_vec_);
+    conf_blur_loss_layer_->Forward(conf_bottom_vec_, conf_top_vec_);
   } else {
     conf_loss_.mutable_cpu_data()[0] = 0;
   }
