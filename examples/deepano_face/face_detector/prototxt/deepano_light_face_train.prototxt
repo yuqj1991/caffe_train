@@ -2452,8 +2452,12 @@ layer {
 	multibox_loss_param {
 		loc_loss_type: SMOOTH_L1
 		conf_loss_type: SOFTMAX
+		conf_blur_loss_type: SOFTMAX
+		conf_occlu_loss_type: SOFTMAX
 		loc_weight: 1.0
 		num_classes: 2
+		num_blur: 3
+		num_occlussion: 3
 		share_location: true
 		match_type: PER_PREDICTION
 		overlap_threshold: 0.5

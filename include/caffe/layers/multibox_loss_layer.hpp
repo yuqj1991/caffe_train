@@ -61,7 +61,7 @@ class MultiBoxLossLayer : public LossLayer<Dtype> {
   // localization loss.
   Blob<Dtype> loc_loss_;
 
-  // The internal confidence loss layer.
+  // The internal confidence category loss layer.
   shared_ptr<Layer<Dtype> > conf_loss_layer_;
   ConfLossType conf_loss_type_;
   // bottom vector holder used in Forward function.
@@ -75,8 +75,38 @@ class MultiBoxLossLayer : public LossLayer<Dtype> {
   // confidence loss.
   Blob<Dtype> conf_loss_;
 
+  // The internal confidence blur loss layer.
+  shared_ptr<Layer<Dtype> > conf_blur_loss_layer_;
+  ConfLossType conf_blur_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> conf_blur_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> conf_blur_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> conf_blur_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> conf_blur_gt_;
+  // confidence loss.
+  Blob<Dtype> conf_blur_loss_;
+
+  // The internal confidence occlussion loss layer.
+  shared_ptr<Layer<Dtype> > conf_occlussion_loss_layer_;
+  ConfLossType conf_occlussion_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> conf_occlussion_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> conf_occlussion_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> conf_occlussion_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> conf_occlussion_gt_;
+  // confidence loss.
+  Blob<Dtype> conf_occlussion_loss_;
+
   MultiBoxLossParameter multibox_loss_param_;
   int num_classes_;
+  int num_blur_;
+  int num_occlusion_;
   bool share_location_;
   MatchType match_type_;
   float overlap_threshold_;
