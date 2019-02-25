@@ -297,7 +297,7 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     vector<int> conf_blur_shape;
     if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
       conf_blur_shape.push_back(num_conf_);
-      conf_gt_.Reshape(conf_blur_shape);
+      conf_blur_gt_.Reshape(conf_blur_shape);
       conf_blur_shape.push_back(num_blur_);
       conf_blur_pred_.Reshape(conf_blur_shape);
     } else if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
@@ -315,10 +315,10 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       CHECK_EQ(conf_pred_.count(), bottom[1]->count());
       conf_pred_.ShareData(*(bottom[1]));
     }
-    Dtype* conf_pred_data = conf_pred_.mutable_cpu_data();
-    Dtype* conf_gt_data = conf_gt_.mutable_cpu_data();
-    caffe_set(conf_gt_.count(), Dtype(background_label_id_), conf_gt_data);
-    EncodeConfPrediction(conf_data, num_, num_priors_, multibox_loss_param_,
+    Dtype* conf_pred_data = conf_blur_pred_.mutable_cpu_data();
+    Dtype* conf_gt_data = conf_blur_gt_.mutable_cpu_data();
+    caffe_set(conf_blur_gt_.count(), Dtype(background_label_id_), conf_gt_data);
+    EncodeConfPrediction(blur_data, num_, num_priors_, multibox_loss_param_,
                          all_match_indices_, all_neg_indices_, all_gt_bboxes,
                          conf_pred_data, conf_gt_data);
     conf_blur_loss_layer_->Reshape(conf_bottom_vec_, conf_top_vec_);

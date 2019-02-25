@@ -330,6 +330,24 @@ void EncodeConfPrediction(const Dtype* conf_data, const int num,
       const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
       Dtype* conf_pred_data, Dtype* conf_gt_data);
 
+// Encode the confidence predictions and ground truth for each matched prior.
+//    conf_data: num x num_priors * num_blur blob.
+//    num: number of images.
+//    num_priors: number of priors (predictions) per image.
+//    multibox_loss_param: stores the parameters for MultiBoxLossLayer.
+//    all_match_indices: stores mapping between predictions and ground truth.
+//    all_neg_indices: stores the indices for negative samples.
+//    all_gt_bboxes: stores ground truth bboxes for the batch.
+//    conf_pred_data: stores the confidence prediction results.
+//    conf_gt_data: stores the confidence ground truth.
+template <typename Dtype>
+void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
+      const int num_priors, const MultiBoxLossParameter& multibox_loss_param,
+      const vector<map<int, vector<int> > >& all_match_indices,
+      const vector<vector<int> >& all_neg_indices,
+      const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
+      Dtype* conf_pred_data, Dtype* conf_gt_data);
+
 // Get prior bounding boxes from prior_data.
 //    prior_data: 1 x 2 x num_priors * 4 x 1 blob.
 //    num_priors: number of priors.
