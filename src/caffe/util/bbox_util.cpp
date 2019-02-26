@@ -1665,7 +1665,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
   const int num_blur = multibox_loss_param.num_blur();
   CHECK_GE(num_blur, 1) << "num_blur should not be less than 1.";
   const int background_label_id = multibox_loss_param.background_label_id();
-  
+
   const MiningType mining_type = multibox_loss_param.mining_type();
   bool do_neg_mining;
   if (multibox_loss_param.has_do_neg_mining()) {
@@ -1675,7 +1675,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
              mining_type != MultiBoxLossParameter_MiningType_NONE);
   }
   do_neg_mining = mining_type != MultiBoxLossParameter_MiningType_NONE;
-  const ConfLossType conf_loss_type = multibox_loss_param.conf_loss_type();
+  const ConfLossType conf_blur_loss_type = multibox_loss_param.conf_blur_loss_type();
   int count = 0;
   for (int i = 0; i < num; ++i) {
     if (all_gt_bboxes.find(i) != all_gt_bboxes.end()) {
@@ -1689,24 +1689,22 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
           if (match_index[j] <= -1) {
             continue;
           }
-          const int gt_label = map_object_to_agnostic ?
-            background_label_id + 1 :
-            all_gt_bboxes.find(i)->second[match_index[j]].label();
+          const int gt_blur_label = all_gt_bboxes.find(i)->second[match_index[j]].blur();
           int idx = do_neg_mining ? count : j;
-          switch (conf_loss_type) {
+          switch (conf_blur_loss_type) {
             case MultiBoxLossParameter_ConfLossType_SOFTMAX:
-              conf_gt_data[idx] = gt_label;
+              conf_gt_data[idx] = gt_blur_label;
               break;
             case MultiBoxLossParameter_ConfLossType_LOGISTIC:
-              conf_gt_data[idx * num_classes + gt_label] = 1;
+              conf_gt_data[idx * num_blur + gt_blur_label] = 1;
               break;
             default:
               LOG(FATAL) << "Unknown conf loss type.";
           }
           if (do_neg_mining) {
             // Copy scores for matched bboxes.
-            caffe_copy<Dtype>(num_classes, conf_data + j * num_classes,
-                conf_pred_data + count * num_classes);
+            caffe_copy<Dtype>(num_blur, conf_data + j * num_blur,
+                conf_pred_data + count * num_blur);
             ++count;
           }
         }
@@ -1717,16 +1715,16 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
         for (int n = 0; n < all_neg_indices[i].size(); ++n) {
           int j = all_neg_indices[i][n];
           CHECK_LT(j, num_priors);
-          caffe_copy<Dtype>(num_classes, conf_data + j * num_classes,
-              conf_pred_data + count * num_classes);
-          switch (conf_loss_type) {
+          caffe_copy<Dtype>(num_blur, conf_data + j * num_blur,
+              conf_pred_data + count * num_blur);
+          switch (conf_blur_loss_type) {
             case MultiBoxLossParameter_ConfLossType_SOFTMAX:
               conf_gt_data[count] = background_label_id;
               break;
             case MultiBoxLossParameter_ConfLossType_LOGISTIC:
               if (background_label_id >= 0 &&
-                  background_label_id < num_classes) {
-                conf_gt_data[count * num_classes + background_label_id] = 1;
+                  background_label_id < num_blur) {
+                conf_gt_data[count * num_blur + background_label_id] = 1;
               }
               break;
             default:
@@ -1737,7 +1735,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
       }
     }
     if (do_neg_mining) {
-      conf_data += num_priors * num_classes;
+      conf_data += num_priors * num_blur;
     } else {
       conf_gt_data += num_priors;
     }
@@ -1745,13 +1743,118 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
 }
 
 // Explicite initialization.
-template void EncodeConfPrediction(const float* conf_data, const int num,
+template void EncodeBlurConfPrediction(const float* conf_data, const int num,
       const int num_priors, const MultiBoxLossParameter& multibox_loss_param,
       const vector<map<int, vector<int> > >& all_match_indices,
       const vector<vector<int> >& all_neg_indices,
       const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
       float* conf_pred_data, float* conf_gt_data);
-template void EncodeConfPrediction(const double* conf_data, const int num,
+template void EncodeBlurConfPrediction(const double* conf_data, const int num,
+      const int num_priors, const MultiBoxLossParameter& multibox_loss_param,
+      const vector<map<int, vector<int> > >& all_match_indices,
+      const vector<vector<int> >& all_neg_indices,
+      const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
+      double* conf_pred_data, double* conf_gt_data);
+
+template <typename Dtype>
+void EncodeOcclusConfPrediction(const Dtype* conf_data, const int num,
+      const int num_priors, const MultiBoxLossParameter& multibox_loss_param,
+      const vector<map<int, vector<int> > >& all_match_indices,
+      const vector<vector<int> >& all_neg_indices,
+      const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
+      Dtype* conf_pred_data, Dtype* conf_gt_data) {
+  // CHECK_EQ(num, all_match_indices.size());
+  // CHECK_EQ(num, all_neg_indices.size());
+  // Retrieve parameters.
+  CHECK(multibox_loss_param.has_num_occlussion()) << "Must provide num_occlussion.";
+  const int num_occlussion = multibox_loss_param.num_occlussion();
+  CHECK_GE(num_occlussion, 1) << "num_occlussion should not be less than 1.";
+  const int background_occl_id = multibox_loss_param.background_occl_id();
+
+  const MiningType mining_type = multibox_loss_param.mining_type();
+  bool do_neg_mining;
+  if (multibox_loss_param.has_do_neg_mining()) {
+    LOG(WARNING) << "do_neg_mining is deprecated, use mining_type instead.";
+    do_neg_mining = multibox_loss_param.do_neg_mining();
+    CHECK_EQ(do_neg_mining,
+             mining_type != MultiBoxLossParameter_MiningType_NONE);
+  }
+  do_neg_mining = mining_type != MultiBoxLossParameter_MiningType_NONE;
+  const ConfLossType conf_occlu_loss_type = multibox_loss_param.conf_occlu_loss_type();
+  int count = 0;
+  for (int i = 0; i < num; ++i) {
+    if (all_gt_bboxes.find(i) != all_gt_bboxes.end()) {
+      // Save matched (positive) bboxes scores and labels.
+      const map<int, vector<int> >& match_indices = all_match_indices[i];
+      for (map<int, vector<int> >::const_iterator it =
+          match_indices.begin(); it != match_indices.end(); ++it) {
+        const vector<int>& match_index = it->second;
+        CHECK_EQ(match_index.size(), num_priors);
+        for (int j = 0; j < num_priors; ++j) {
+          if (match_index[j] <= -1) {
+            continue;
+          }
+          const int gt_occlu_label = all_gt_bboxes.find(i)->second[match_index[j]].occlusion();
+          int idx = do_neg_mining ? count : j;
+          switch (conf_occlu_loss_type) {
+            case MultiBoxLossParameter_ConfLossType_SOFTMAX:
+              conf_gt_data[idx] = gt_occlu_label;
+              break;
+            case MultiBoxLossParameter_ConfLossType_LOGISTIC:
+              conf_gt_data[idx * num_occlussion + gt_occlu_label] = 1;
+              break;
+            default:
+              LOG(FATAL) << "Unknown conf loss type.";
+          }
+          if (do_neg_mining) {
+            // Copy scores for matched bboxes.
+            caffe_copy<Dtype>(num_occlussion, conf_data + j * num_occlussion,
+                conf_pred_data + count * num_occlussion);
+            ++count;
+          }
+        }
+      }
+      // Go to next image.
+      if (do_neg_mining) {
+        // Save negative bboxes scores and labels.
+        for (int n = 0; n < all_neg_indices[i].size(); ++n) {
+          int j = all_neg_indices[i][n];
+          CHECK_LT(j, num_priors);
+          caffe_copy<Dtype>(num_occlussion, conf_data + j * num_occlussion,
+              conf_pred_data + count * num_occlussion);
+          switch (conf_occlu_loss_type) {
+            case MultiBoxLossParameter_ConfLossType_SOFTMAX:
+              conf_gt_data[count] = background_occl_id;
+              break;
+            case MultiBoxLossParameter_ConfLossType_LOGISTIC:
+              if (background_occl_id >= 0 &&
+                  background_occl_id < num_occlussion) {
+                conf_gt_data[count * num_occlussion + background_occl_id] = 1;
+              }
+              break;
+            default:
+              LOG(FATAL) << "Unknown conf loss type.";
+          }
+          ++count;
+        }
+      }
+    }
+    if (do_neg_mining) {
+      conf_data += num_priors * num_occlussion;
+    } else {
+      conf_gt_data += num_priors;
+    }
+  }
+}
+
+// Explicite initialization.
+template void EncodeOcclusConfPrediction(const float* conf_data, const int num,
+      const int num_priors, const MultiBoxLossParameter& multibox_loss_param,
+      const vector<map<int, vector<int> > >& all_match_indices,
+      const vector<vector<int> >& all_neg_indices,
+      const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
+      float* conf_pred_data, float* conf_gt_data);
+template void EncodeOcclusConfPrediction(const double* conf_data, const int num,
       const int num_priors, const MultiBoxLossParameter& multibox_loss_param,
       const vector<map<int, vector<int> > >& all_match_indices,
       const vector<vector<int> >& all_neg_indices,

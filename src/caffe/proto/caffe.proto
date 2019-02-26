@@ -1322,6 +1322,9 @@ message MultiBoxLossParameter {
   optional ConfLossType conf_blur_loss_type = 26;
   // occlusion conf loss types
   optional ConfLossType conf_occlu_loss_type = 27;
+  // add new background id realeated id r.w.t blur & occlusion
+  optional int32 background_blur_id = 28 [default = -1];
+  optional int32 background_occl_id = 29 [default = -1];
 }
 
 message MVNParameter {
