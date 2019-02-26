@@ -489,6 +489,119 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     }
   }
 
+  // Back propagate on blur confidence prediction.
+  if (propagate_down[3]) {
+    Dtype* conf_blur_bottom_diff = bottom[3]->mutable_cpu_diff();
+    caffe_set(bottom[3]->count(), Dtype(0), conf_blur_bottom_diff);
+    if (num_conf_ >= 1) {
+      vector<bool> conf_blur_propagate_down;
+      // Only back propagate on prediction, not ground truth.
+      conf_blur_propagate_down.push_back(true);
+      conf_blur_propagate_down.push_back(false);
+      conf_blur_loss_layer_->Backward(conf_blur_top_vec_, conf_blur_propagate_down,
+                                 conf_blur_bottom_vec_);
+      // Scale gradient.
+      Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+          normalization_, num_, num_priors_, num_matches_);
+      Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+      caffe_scal(conf_blur_pred_.count(), loss_weight,
+                 conf_blur_pred_.mutable_cpu_diff());
+      // Copy gradient back to bottom[1].
+      const Dtype* conf_blur_pred_diff = conf_blur_pred_.cpu_diff();
+      if (do_neg_mining_) {
+        int count = 0;
+        for (int i = 0; i < num_; ++i) {
+          // Copy matched (positive) bboxes scores' diff.
+          const map<int, vector<int> >& match_indices = all_match_indices_[i];
+          for (map<int, vector<int> >::const_iterator it =
+               match_indices.begin(); it != match_indices.end(); ++it) {
+            const vector<int>& match_index = it->second;
+            CHECK_EQ(match_index.size(), num_priors_);
+            for (int j = 0; j < num_priors_; ++j) {
+              if (match_index[j] <= -1) {
+                continue;
+              }
+              // Copy the diff to the right place.
+              caffe_copy<Dtype>(num_blur_,
+                                conf_blur_pred_diff + count * num_blur_,
+                                conf_blur_bottom_diff + j * num_blur_);
+              ++count;
+            }
+          }
+          // Copy negative bboxes scores' diff.
+          for (int n = 0; n < all_neg_indices_[i].size(); ++n) {
+            int j = all_neg_indices_[i][n];
+            CHECK_LT(j, num_priors_);
+            caffe_copy<Dtype>(num_blur_,
+                              conf_blur_pred_diff + count * num_blur_,
+                              conf_blur_bottom_diff + j * num_blur_);
+            ++count;
+          }
+          conf_blur_bottom_diff += bottom[3]->offset(1);
+        }
+      } else {
+        // The diff is already computed and stored.
+        bottom[3]->ShareDiff(conf_blur_pred_);
+      }
+    }
+  }
+
+  // Back propagate on occlussion confidence prediction.
+  if (propagate_down[4]) {
+    Dtype* conf_occl_bottom_diff = bottom[4]->mutable_cpu_diff();
+    caffe_set(bottom[4]->count(), Dtype(0), conf_occl_bottom_diff);
+    if (num_conf_ >= 1) {
+      vector<bool> conf_occl_propagate_down;
+      // Only back propagate on prediction, not ground truth.
+      conf_occl_propagate_down.push_back(true);
+      conf_occl_propagate_down.push_back(false);
+      conf_occlussion_loss_layer_->Backward(conf_occlussion_top_vec_, conf_occl_propagate_down,
+                                 conf_occlussion_bottom_vec_);
+      // Scale gradient.
+      Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+          normalization_, num_, num_priors_, num_matches_);
+      Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+      caffe_scal(conf_occlussion_pred_.count(), loss_weight,
+                 conf_occlussion_pred_.mutable_cpu_diff());
+      // Copy gradient back to bottom[1].
+      const Dtype* conf_occl_pred_diff = conf_occlussion_pred_.cpu_diff();
+      if (do_neg_mining_) {
+        int count = 0;
+        for (int i = 0; i < num_; ++i) {
+          // Copy matched (positive) bboxes scores' diff.
+          const map<int, vector<int> >& match_indices = all_match_indices_[i];
+          for (map<int, vector<int> >::const_iterator it =
+               match_indices.begin(); it != match_indices.end(); ++it) {
+            const vector<int>& match_index = it->second;
+            CHECK_EQ(match_index.size(), num_priors_);
+            for (int j = 0; j < num_priors_; ++j) {
+              if (match_index[j] <= -1) {
+                continue;
+              }
+              // Copy the diff to the right place.
+              caffe_copy<Dtype>(num_occlusion_,
+                                conf_occl_pred_diff + count * num_occlusion_,
+                                conf_occl_bottom_diff + j * num_occlusion_);
+              ++count;
+            }
+          }
+          // Copy negative bboxes scores' diff.
+          for (int n = 0; n < all_neg_indices_[i].size(); ++n) {
+            int j = all_neg_indices_[i][n];
+            CHECK_LT(j, num_priors_);
+            caffe_copy<Dtype>(num_occlusion_,
+                              conf_occl_pred_diff + count * num_occlusion_,
+                              conf_occl_bottom_diff + j * num_occlusion_);
+            ++count;
+          }
+          conf_occl_bottom_diff += bottom[4]->offset(1);
+        }
+      } else {
+        // The diff is already computed and stored.
+        bottom[4]->ShareDiff(conf_occlussion_pred_);
+      }
+    }
+  }
   // After backward, remove match statistics.
   all_match_indices_.clear();
   all_neg_indices_.clear();
