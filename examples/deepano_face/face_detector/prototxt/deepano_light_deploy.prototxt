@@ -1318,7 +1318,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1365,7 +1365,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1523,7 +1523,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1570,7 +1570,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1727,7 +1727,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1774,7 +1774,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1931,7 +1931,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1978,7 +1978,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -2135,7 +2135,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -2182,7 +2182,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -2311,6 +2311,8 @@ layer {
 	}
 	detection_output_param {
 		num_classes: 2
+		num_blur: 4
+		num_occlussion: 4
 		share_location: true
 		background_label_id: 0
 		background_blur_id: -1
