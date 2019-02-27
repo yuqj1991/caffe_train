@@ -19,9 +19,13 @@ void DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       this->layer_param_.detection_output_param();
   CHECK(detection_output_param.has_num_classes()) << "Must specify num_classes";
   num_classes_ = detection_output_param.num_classes();
+  num_blur_ = detection_output_param.num_blur();
+  num_occlussion_ = detection_output_param.num_occlussion();
   share_location_ = detection_output_param.share_location();
   num_loc_classes_ = share_location_ ? 1 : num_classes_;
   background_label_id_ = detection_output_param.background_label_id();
+  background_blur_id_ = detection_output_param.background_blur_id();
+  background_occlu_id_ = detection_output_param.background_occl_id();
   code_type_ = detection_output_param.code_type();
   variance_encoded_in_target_ =
       detection_output_param.variance_encoded_in_target();
@@ -171,8 +175,8 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   // set it to (fake) 1.
   top_shape.push_back(1);
   // Each row is a 7 dimension vector, which stores
-  // [image_id, label, confidence, xmin, ymin, xmax, ymax]
-  top_shape.push_back(7);
+  // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
+  top_shape.push_back(9);
   top[0]->Reshape(top_shape);
 }
 

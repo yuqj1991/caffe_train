@@ -2337,10 +2337,13 @@ layer {
   }
   detection_output_param {
     num_classes: 2
+	num_blur: 4
+	num_occlussion: 4
     share_location: true
     background_label_id: 0
     background_blur_id: -1
 	background_occl_id: -1
+	visualize: true
     nms_param {
       nms_threshold: 0.45
       top_k: 400

@@ -1039,6 +1039,8 @@ message DetectionOutputParameter {
   // add new background id realeated id r.w.t blur & occlusion
   optional int32 background_blur_id = 13 [default = -1];
   optional int32 background_occl_id = 14 [default = -1];
+  optional uint32 num_blur = 15;
+  optional uint32 num_occlussion = 16;
 }
 
 message DropoutParameter {
