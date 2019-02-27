@@ -461,24 +461,24 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
       loss += iter_loss;
     }
     for (int j = 0; j < result.size(); ++j) {
-      CHECK_EQ(result[j]->width(), 5);
+      CHECK_EQ(result[j]->width(), 10);
       const Dtype* result_vec = result[j]->cpu_data();
       int num_det = result[j]->height();
       for (int k = 0; k < num_det; ++k) {
-        int item_id = static_cast<int>(result_vec[k * 5]);
-        int label = static_cast<int>(result_vec[k * 5 + 1]);
+        int item_id = static_cast<int>(result_vec[k * 10]);
+        int label = static_cast<int>(result_vec[k * 10+ 1]);
         if (item_id == -1) {
           // Special row of storing number of positives for a label.
           if (all_num_pos[j].find(label) == all_num_pos[j].end()) {
-            all_num_pos[j][label] = static_cast<int>(result_vec[k * 5 + 2]);
+            all_num_pos[j][label] = static_cast<int>(result_vec[k * 10 + 2]);
           } else {
-            all_num_pos[j][label] += static_cast<int>(result_vec[k * 5 + 2]);
+            all_num_pos[j][label] += static_cast<int>(result_vec[k * 10 + 2]);
           }
         } else {
           // Normal row storing detection status.
-          float score = result_vec[k * 5 + 2];
-          int tp = static_cast<int>(result_vec[k * 5 + 3]);
-          int fp = static_cast<int>(result_vec[k * 5 + 4]);
+          float score = result_vec[k * 10 + 2];
+          int tp = static_cast<int>(result_vec[k * 10 + 3]);
+          int fp = static_cast<int>(result_vec[k * 10 + 4]);
           if (tp == 0 && fp == 0) {
             // Ignore such case. It happens when a detection bbox is matched to
             // a difficult gt bbox and we don't evaluate on difficult gt bbox.

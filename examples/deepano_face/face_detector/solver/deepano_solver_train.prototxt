@@ -8,7 +8,7 @@ max_iter: 120000
 lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.00005
-snapshot: 1000
+snapshot: 10000
 snapshot_prefix: "../snapshot"
 solver_mode: GPU
 debug_info: true

@@ -279,7 +279,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         int idx = 0;
         for (int item_id = 0; item_id < batch_size; ++item_id) {
           const vector<AnnotationGroup>& anno_vec = all_anno[item_id];
-          LOG(INFO) << "AnnotationGroup size is " << anno_vec.size();
+          //LOG(INFO) << "AnnotationGroup size is " << anno_vec.size();
           for (int g = 0; g < anno_vec.size(); ++g) {
             const AnnotationGroup& anno_group = anno_vec[g];
             for (int a = 0; a < anno_group.annotation_size(); ++a) {
@@ -295,9 +295,9 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
               top_label[idx++] = bbox.blur();
               top_label[idx++] = bbox.occlusion();
               top_label[idx++] = bbox.difficult();
-              LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
-                        <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                        <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion();
+              //LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
+              //          <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
+              //          <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion();
               //LOG(FATAL) << "Unknown annotation type.";
             }
           }

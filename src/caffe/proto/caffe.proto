@@ -1036,6 +1036,9 @@ message DetectionOutputParameter {
   optional float visualize_threshold = 11;
   // If provided, save outputs to video file.
   optional string save_file = 12;
+  // add new background id realeated id r.w.t blur & occlusion
+  optional int32 background_blur_id = 13 [default = -1];
+  optional int32 background_occl_id = 14 [default = -1];
 }
 
 message DropoutParameter {

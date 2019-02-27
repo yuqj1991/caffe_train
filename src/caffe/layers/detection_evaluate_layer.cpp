@@ -55,7 +55,7 @@ void DetectionEvaluateLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   CHECK_EQ(bottom[0]->width(), 7);
   CHECK_EQ(bottom[1]->num(), 1);
   CHECK_EQ(bottom[1]->channels(), 1);
-  CHECK_EQ(bottom[1]->width(), 8);
+  CHECK_EQ(bottom[1]->width(), 10);
 
   // num() and channels() are 1.
   vector<int> top_shape(2, 1);

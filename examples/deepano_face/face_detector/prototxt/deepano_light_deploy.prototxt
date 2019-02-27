@@ -1,36 +1,10 @@
 name: "DeepanoFace"
-layer {
-	name: "data"
-	type: "AnnotatedData"
-	top: "data"
-	top: "label"
-	include {
-		phase: TEST
-	}
-	transform_param {
-		scale: 0.007843
-		mirror: true
-		mean_value: 127.5
-		mean_value: 127.5
-		mean_value: 127.5
-		resize_param {
-			prob: 1.0
-			resize_mode: WARP
-			height: 300
-			width: 300
-			interp_mode: LINEAR
-		}
-	}
-	data_param {
-		source: "../../../../../dataset/facedata/wider_face/lmdbd/wider_face_wider_val_lmdb/"
-		batch_size: 4
-		backend: LMDB
-	}
-	annotated_data_param {
-		batch_sampler {
-		}
-		label_map_file: "../labelmap_face.prototxt"
-	}
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 300
+  dim: 300
 }
 layer {
 	name: "conv0"
@@ -2324,46 +2298,29 @@ layer {
 	}
 }
 layer {
-  name: "detection_out"
-  type: "DetectionOutput"
-  bottom: "mbox_loc"
-  bottom: "mbox_conf"
-  bottom: "mbox_priorbox"
-  bottom: "mbox_blur_conf"
-  bottom: "mbox_occlusion_conf"
-  top: "detection_out"
-  include {
-    phase: TEST
-  }
-  detection_output_param {
-    num_classes: 2
-    share_location: true
-    background_label_id: 0
-    background_blur_id: -1
-	background_occl_id: -1
-    nms_param {
-      nms_threshold: 0.45
-      top_k: 400
-    }
-    code_type: CENTER_SIZE
-    keep_top_k: 200
-    confidence_threshold: 0.01
-  }
+	name: "detection_out"
+	type: "DetectionOutput"
+	bottom: "mbox_loc"
+	bottom: "mbox_conf"
+	bottom: "mbox_priorbox"
+	bottom: "mbox_blur_conf"
+	bottom: "mbox_occlusion_conf"
+	top: "detection_out"
+	include {
+		phase: TEST
+	}
+	detection_output_param {
+		num_classes: 2
+		share_location: true
+		background_label_id: 0
+		background_blur_id: -1
+		background_occl_id: -1
+		nms_param {
+		  nms_threshold: 0.45
+		  top_k: 100
+		}
+		code_type: CENTER_SIZE
+		keep_top_k: 100
+		confidence_threshold: 0.25
+	}
 }
-layer {
-  name: "detection_eval"
-  type: "DetectionEvaluate"
-  bottom: "detection_out"
-  bottom: "label"
-  top: "detection_eval"
-  include {
-    phase: TEST
-  }
-  detection_evaluate_param {
-    num_classes: 2
-    background_label_id: 0
-    overlap_threshold: 0.5
-    evaluate_difficult_gt: false
-  }
-}
-
