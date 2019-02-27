@@ -1,12 +1,12 @@
-root_dir="/home/resideo/workspace/deepano_face_train"
+root_dir="/home/deepano/workspace/deepano_face_train"
 echo $cur_dir
 echo $root_dir
 cd $root_dir
 
 redo=1
-data_root_dir="/home/resideo/workspace/dataset/facedata"
+data_root_dir="/home/deepano/workspace/dataset/facedata"
 dataset_name="wider_face"
-mapfile="/home/resideo/workspace/deepano_face_train/examples/deepano_face/face_detector/labelmap_face.prototxt"
+mapfile="/home/deepano/workspace/deepano_face_train/examples/deepano_face/face_detector/labelmap_face.prototxt"
 anno_type="detection"
 db="lmdb"
 min_dim=0
