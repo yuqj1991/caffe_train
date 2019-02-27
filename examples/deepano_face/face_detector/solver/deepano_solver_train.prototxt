@@ -9,7 +9,7 @@ lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.00005
 snapshot: 1000
-snapshot_prefix: "../snapshot/"
+snapshot_prefix: "../snapshot"
 solver_mode: GPU
 debug_info: true
 snapshot_after_train: true

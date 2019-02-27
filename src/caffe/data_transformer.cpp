@@ -325,6 +325,8 @@ void DataTransformer<Dtype>::TransformAnnotation(
 						ExtrapolateBBox(param_.resize_param(), img_height, img_width,
 								crop_bbox, transformed_bbox);
 					}
+					transformed_bbox->set_blur(bbox.blur());
+					transformed_bbox->set_occlusion(bbox.occlusion());
 				}
 			}
 			// Save for output.
