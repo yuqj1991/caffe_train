@@ -1344,7 +1344,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1391,7 +1391,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1549,7 +1549,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1596,7 +1596,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1753,7 +1753,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1800,7 +1800,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1957,7 +1957,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -2004,7 +2004,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -2161,7 +2161,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -2208,7 +2208,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"

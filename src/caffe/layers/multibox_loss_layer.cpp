@@ -385,7 +385,7 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
     Dtype* conf_occl_pred_data = conf_occlussion_pred_.mutable_cpu_data();
     Dtype* conf_occl_gt_data = conf_occlussion_gt_.mutable_cpu_data();
-    caffe_set(conf_occlussion_gt_.count(), Dtype(background_label_id_), conf_occl_gt_data);
+    caffe_set(conf_occlussion_gt_.count(), Dtype(-1), conf_occl_gt_data);
     EncodeOcclusConfPrediction(occl_data, num_, num_priors_, multibox_loss_param_,
                          all_match_indices_, all_neg_indices_, all_gt_bboxes,
                          conf_occl_pred_data, conf_occl_gt_data);
