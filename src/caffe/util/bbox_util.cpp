@@ -1664,7 +1664,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
   CHECK(multibox_loss_param.has_num_blur()) << "Must provide num_blur.";
   const int num_blur = multibox_loss_param.num_blur();
   CHECK_GE(num_blur, 1) << "num_blur should not be less than 1.";
-  const int background_label_id = multibox_loss_param.background_label_id();
+  const int background_blur_id = multibox_loss_param.background_blur_id();
 
   const MiningType mining_type = multibox_loss_param.mining_type();
   bool do_neg_mining;
@@ -1719,11 +1719,11 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
               conf_pred_data + count * num_blur);
           switch (conf_blur_loss_type) {
             case MultiBoxLossParameter_ConfLossType_SOFTMAX:
-              conf_gt_data[count] = background_label_id;
+              conf_gt_data[count] = background_blur_id;
               break;
             case MultiBoxLossParameter_ConfLossType_LOGISTIC:
-              if (background_label_id >= 0 &&
-                  background_label_id < num_blur) {
+              if (background_blur_id ==-1 &&
+                  background_blur_id < num_blur) {
                 conf_gt_data[count * num_blur + background_label_id] = 1;
               }
               break;
@@ -1827,7 +1827,7 @@ void EncodeOcclusConfPrediction(const Dtype* conf_data, const int num,
               conf_gt_data[count] = background_occl_id;
               break;
             case MultiBoxLossParameter_ConfLossType_LOGISTIC:
-              if (background_occl_id >= 0 &&
+              if (background_occl_id == -1 &&
                   background_occl_id < num_occlussion) {
                 conf_gt_data[count * num_occlussion + background_occl_id] = 1;
               }

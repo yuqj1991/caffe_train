@@ -1448,7 +1448,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1495,7 +1495,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1653,7 +1653,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1700,7 +1700,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1857,7 +1857,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -1904,7 +1904,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -2061,7 +2061,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -2108,7 +2108,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param:{
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler: {
 			type: "xavier"
@@ -2456,8 +2456,8 @@ layer {
 		conf_occlu_loss_type: SOFTMAX
 		loc_weight: 1.0
 		num_classes: 2
-		num_blur: 3
-		num_occlussion: 3
+		num_blur: 4
+		num_occlussion: 4
 		share_location: true
 		match_type: PER_PREDICTION
 		overlap_threshold: 0.5
