@@ -1724,7 +1724,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
             case MultiBoxLossParameter_ConfLossType_LOGISTIC:
               if (background_blur_id ==-1 &&
                   background_blur_id < num_blur) {
-                conf_gt_data[count * num_blur + background_label_id] = 1;
+                conf_gt_data[count * num_blur + background_blur_id] = 1;
               }
               break;
             default:
