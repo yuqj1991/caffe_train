@@ -157,7 +157,7 @@ void MultiBoxLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     conf_blur_shape.push_back(num_blur_);
     conf_blur_pred_.Reshape(conf_blur_shape);
     conf_blur_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
-    conf_blur_loss_layer_->SetUp(conf_bottom_vec_, conf_top_vec_);
+    conf_blur_loss_layer_->SetUp(conf_blur_bottom_vec_, conf_blur_top_vec_);
   } else if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     LayerParameter layer_param;
     layer_param.set_name(this->layer_param_.name() + "_logistic_blur_conf");
@@ -169,7 +169,48 @@ void MultiBoxLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     conf_blur_gt_.Reshape(conf_blur_shape);
     conf_blur_pred_.Reshape(conf_blur_shape);
     conf_blur_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
-    conf_blur_loss_layer_->SetUp(conf_bottom_vec_, conf_top_vec_);
+    conf_blur_loss_layer_->SetUp(conf_blur_bottom_vec_, conf_blur_top_vec_);
+  } else {
+    LOG(FATAL) << "Unknown confidence loss type.";
+  }
+  // Set up occl confidence loss layer.
+  conf_occlussion_loss_type_ = multibox_loss_param.conf_occlu_loss_type();
+  conf_occlussion_bottom_vec_.push_back(&conf_occlussion_pred_);
+  conf_occlussion_bottom_vec_.push_back(&conf_occlussion_gt_);
+  conf_occlussion_loss_.Reshape(loss_shape);
+  conf_occlussion_top_vec_.push_back(&conf_occlussion_loss_);
+  if (conf_occlussion_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
+    CHECK_GE(background_label_id_, 0)
+        << "background_label_id should be within [0, num_classes) for Softmax.";
+    CHECK_LT(background_label_id_, num_classes_)
+        << "background_label_id should be within [0, num_classes) for Softmax.";
+    LayerParameter layer_param;
+    layer_param.set_name(this->layer_param_.name() + "_softmax_occlu_conf");
+    layer_param.set_type("SoftmaxWithLoss");
+    layer_param.add_loss_weight(Dtype(1.));
+    layer_param.mutable_loss_param()->set_normalization(
+        LossParameter_NormalizationMode_NONE);
+    SoftmaxParameter* softmax_param = layer_param.mutable_softmax_param();
+    softmax_param->set_axis(1);
+    // Fake reshape.
+    vector<int> conf_occlu_shape(1, 1);
+    conf_occlussion_gt_.Reshape(conf_occlu_shape);
+    conf_occlu_shape.push_back(num_occlusion_);
+    conf_occlussion_pred_.Reshape(conf_occlu_shape);
+    conf_occlussion_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+    conf_occlussion_loss_layer_->SetUp(conf_occlussion_bottom_vec_, conf_occlussion_top_vec_);
+  } else if (conf_occlussion_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
+    LayerParameter layer_param;
+    layer_param.set_name(this->layer_param_.name() + "_logistic_occlu_conf");
+    layer_param.set_type("SigmoidCrossEntropyLoss");
+    layer_param.add_loss_weight(Dtype(1.));
+    // Fake reshape.
+    vector<int> conf_occlu_shape(1, 1);
+    conf_occlu_shape.push_back(num_occlusion_);
+    conf_occlussion_gt_.Reshape(conf_occlu_shape);
+    conf_occlussion_pred_.Reshape(conf_occlu_shape);
+    conf_occlussion_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+    conf_occlussion_loss_layer_->SetUp(conf_occlussion_bottom_vec_, conf_occlussion_top_vec_);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -320,7 +361,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     conf_blur_loss_layer_->Reshape(conf_blur_bottom_vec_, conf_blur_top_vec_);
     conf_blur_loss_layer_->Forward(conf_blur_bottom_vec_, conf_blur_top_vec_);
 
-
     // conf occlussion layer
     vector<int> conf_occlussion_shape;
     if (conf_occlussion_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
@@ -346,7 +386,7 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     Dtype* conf_occl_pred_data = conf_occlussion_pred_.mutable_cpu_data();
     Dtype* conf_occl_gt_data = conf_occlussion_gt_.mutable_cpu_data();
     caffe_set(conf_occlussion_gt_.count(), Dtype(background_label_id_), conf_occl_gt_data);
-    EncodeConfPrediction(occl_data, num_, num_priors_, multibox_loss_param_,
+    EncodeOcclusConfPrediction(occl_data, num_, num_priors_, multibox_loss_param_,
                          all_match_indices_, all_neg_indices_, all_gt_bboxes,
                          conf_occl_pred_data, conf_occl_gt_data);
     conf_occlussion_loss_layer_->Reshape(conf_occlussion_bottom_vec_, conf_occlussion_top_vec_);
@@ -356,7 +396,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     conf_blur_loss_.mutable_cpu_data()[0] = 0;
     conf_occlussion_loss_.mutable_cpu_data()[0] = 0;
   }
-
   top[0]->mutable_cpu_data()[0] = 0;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_priors_, num_matches_);
@@ -376,6 +415,10 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 
           conf_occlussion_loss_.cpu_data()[0] / normalizer;
   }
+  LOG(INFO)<<" loc_weight_ * loc_loss_.cpu_data()[0] / normalizer: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
+          <<" conf_loss_.cpu_data()[0] / normalizer: "<<conf_loss_.cpu_data()[0] / normalizer
+          <<" conf_blur_loss_.cpu_data()[0] / normalizer: "<<conf_blur_loss_.cpu_data()[0] / normalizer
+          <<" conf_occlussion_loss_.cpu_data()[0] / normalizer: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
 }
 
 template <typename Dtype>

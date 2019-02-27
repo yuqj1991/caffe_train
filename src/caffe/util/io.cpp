@@ -287,7 +287,7 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
       ptree object = v1.second;
       int blured = object.get<int>("blur");
       int occlusioned = object.get<int>("occlusion");
-      LOG(INFO)<<"filename: "<<pt.get<string>("annotation.filename")<<" blur: "<<blured<<" occusioned: "<<occlusioned;
+      LOG(INFO)<<"filename: "<<pt.get<string>("annotation.filename");
       BOOST_FOREACH(ptree::value_type &v2, object.get_child("")) {
         ptree pt2 = v2.second;
         if (v2.first == "name") {
@@ -357,8 +357,9 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
           bbox->set_blur(blured);
           bbox->set_occlusion(occlusioned);
           bbox->set_difficult(difficult);
-          LOG(INFO) << "bbox->xmin"<<bbox->xmin()<<" bbox->ymin: "<<bbox->ymin()<<" bbox->xmax: "
-          <<bbox->xmax()<<" bbox->ymax: "<<bbox->ymax()<<" bbox->blur: "<<bbox->blur()<<" bbox->occlusion: "<<bbox->occlusion();
+          LOG(INFO) << "bbox->xmin: "<<bbox->xmin()<<" bbox->ymin: "<<bbox->ymin()
+                    <<" bbox->xmax: "<<bbox->xmax()<<" bbox->ymax: "<<bbox->ymax()
+                    <<" bbox->blur: "<<bbox->blur()<<" bbox->occlusion: "<<bbox->occlusion();
         }
       }
     }
