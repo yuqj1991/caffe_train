@@ -127,6 +127,8 @@ void ClipBBox(const NormalizedBBox& bbox, NormalizedBBox* clip_bbox) {
   clip_bbox->clear_size();
   clip_bbox->set_size(BBoxSize(*clip_bbox));
   clip_bbox->set_difficult(bbox.difficult());
+  clip_bbox->set_blur(bbox.blur());
+  clip_bbox->set_occlusion(bbox.occlusion());
 }
 
 void ClipBBox(const NormalizedBBox& bbox, const float height, const float width,
@@ -138,6 +140,8 @@ void ClipBBox(const NormalizedBBox& bbox, const float height, const float width,
   clip_bbox->clear_size();
   clip_bbox->set_size(BBoxSize(*clip_bbox));
   clip_bbox->set_difficult(bbox.difficult());
+  clip_bbox->set_blur(bbox.blur());
+  clip_bbox->set_occlusion(bbox.occlusion());
 }
 
 void ScaleBBox(const NormalizedBBox& bbox, const int height, const int width,
@@ -150,6 +154,8 @@ void ScaleBBox(const NormalizedBBox& bbox, const int height, const int width,
   bool normalized = !(width > 1 || height > 1);
   scale_bbox->set_size(BBoxSize(*scale_bbox, normalized));
   scale_bbox->set_difficult(bbox.difficult());
+  scale_bbox->set_blur(bbox.blur());
+  scale_bbox->set_occlusion(bbox.occlusion());
 }
 
 void OutputBBox(const NormalizedBBox& bbox, const pair<int, int>& img_size,
@@ -222,6 +228,8 @@ void LocateBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
   loc_bbox->set_xmax(src_bbox.xmin() + bbox.xmax() * src_width);
   loc_bbox->set_ymax(src_bbox.ymin() + bbox.ymax() * src_height);
   loc_bbox->set_difficult(bbox.difficult());
+  loc_bbox->set_blur(bbox.blur());
+  loc_bbox->set_occlusion(bbox.occlusion());
 }
 
 bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
@@ -237,6 +245,8 @@ bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
   proj_bbox->set_xmax((bbox.xmax() - src_bbox.xmin()) / src_width);
   proj_bbox->set_ymax((bbox.ymax() - src_bbox.ymin()) / src_height);
   proj_bbox->set_difficult(bbox.difficult());
+  proj_bbox->set_blur(bbox.blur());
+  proj_bbox->set_occlusion(bbox.occlusion());
   ClipBBox(*proj_bbox, proj_bbox);
   if (BBoxSize(*proj_bbox) > 0) {
     return true;
@@ -1099,7 +1109,7 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       map<int, LabelBBox>* all_gt_bboxes) {
   all_gt_bboxes->clear();
   for (int i = 0; i < num_gt; ++i) {
-    int start_idx = i * 8;
+    int start_idx = i * 10;
     int item_id = gt_data[start_idx];
     if (item_id == -1) {
       break;
@@ -1108,7 +1118,7 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
     int label = gt_data[start_idx + 1];
     CHECK_NE(background_label_id, label)
         << "Found background label in the dataset.";
-    bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
+    bool difficult = static_cast<bool>(gt_data[start_idx + 9]);
     if (!use_difficult_gt && difficult) {
       // Skip reading difficult ground truth.
       continue;
@@ -1117,6 +1127,8 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
     bbox.set_ymin(gt_data[start_idx + 4]);
     bbox.set_xmax(gt_data[start_idx + 5]);
     bbox.set_ymax(gt_data[start_idx + 6]);
+    bbox.set_blur(gt_data[start_idx + 7]);
+    bbox.set_occlusion(gt_data[start_idx +8]);
     bbox.set_difficult(difficult);
     float bbox_size = BBoxSize(bbox);
     bbox.set_size(bbox_size);
