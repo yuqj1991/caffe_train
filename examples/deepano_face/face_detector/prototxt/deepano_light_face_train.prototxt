@@ -2460,7 +2460,7 @@ layer {
 		num_occlussion: 4
 		share_location: true
 		match_type: PER_PREDICTION
-		overlap_threshold: 0.5
+		overlap_threshold: 0.65
 		use_prior_for_matching: true
 		background_label_id: 0
 		background_blur_id: -1
