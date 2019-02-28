@@ -20,7 +20,7 @@ void DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   CHECK(detection_output_param.has_num_classes()) << "Must specify num_classes";
   num_classes_ = detection_output_param.num_classes();
   num_blur_ = detection_output_param.num_blur();
-  num_occlussion_ = detection_output_param.num_occlussion();
+  num_occlusion_ = detection_output_param.num_occlussion();
   share_location_ = detection_output_param.share_location();
   num_loc_classes_ = share_location_ ? 1 : num_classes_;
   background_label_id_ = detection_output_param.background_label_id();
@@ -169,6 +169,10 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       << "Number of priors must match number of location predictions.";
   CHECK_EQ(num_priors_ * num_classes_, bottom[1]->channels())
       << "Number of priors must match number of confidence predictions.";
+  CHECK_EQ(num_priors_ * num_blur_, bottom[3]->channels())
+      << "Number of priors must match number of blur predictions.";
+  CHECK_EQ(num_priors_ * num_occlusion_, bottom[4]->channels())
+      << "Number of priors must match number of occlussion predictions.";
   // num() and channels() are 1.
   vector<int> top_shape(2, 1);
   // Since the number of bboxes to be kept is unknown before nms, we manually
@@ -186,6 +190,8 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
   const Dtype* loc_data = bottom[0]->cpu_data();
   const Dtype* conf_data = bottom[1]->cpu_data();
   const Dtype* prior_data = bottom[2]->cpu_data();
+  const Dtype* blur_data = bottom[3]->cpu_data();
+  const Dtype* occlu-data = bottom[4]->cpu_data();
   const int num = bottom[0]->num();
 
   // Retrieve all location predictions.

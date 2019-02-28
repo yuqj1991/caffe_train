@@ -2346,7 +2346,7 @@ layer {
 	visualize: true
     nms_param {
       nms_threshold: 0.45
-      top_k: 400
+      top_k: 100
     }
     code_type: CENTER_SIZE
     keep_top_k: 200

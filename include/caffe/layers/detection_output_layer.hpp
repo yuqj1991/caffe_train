@@ -75,7 +75,7 @@ class DetectionOutputLayer : public Layer<Dtype> {
 
   int num_classes_;
   int num_blur_;
-  int num_occlussion_;
+  int num_occlusion_;
   bool share_location_;
   int num_loc_classes_;
   int background_label_id_;
