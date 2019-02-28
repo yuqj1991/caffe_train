@@ -1065,7 +1065,7 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
     int label = gt_data[start_idx + 1];
     CHECK_NE(background_label_id, label)
         << "Found background label in the dataset.";
-    bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
+    bool difficult = static_cast<bool>(gt_data[start_idx + 9]);
     if (!use_difficult_gt && difficult) {
       // Skip reading difficult ground truth.
       continue;
@@ -1076,6 +1076,8 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
     bbox.set_ymin(gt_data[start_idx + 4]);
     bbox.set_xmax(gt_data[start_idx + 5]);
     bbox.set_ymax(gt_data[start_idx + 6]);
+    bbox.set_blur(gt_data[start_idx + 7]);
+    bbox.set_occlusion(gt_data[start_idx +8]);
     bbox.set_difficult(difficult);
     float bbox_size = BBoxSize(bbox);
     bbox.set_size(bbox_size);
