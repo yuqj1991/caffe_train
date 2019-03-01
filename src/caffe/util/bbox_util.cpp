@@ -1704,6 +1704,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
             continue;
           }
           const int gt_blur_label = all_gt_bboxes.find(i)->second[match_index[j]].blur();
+          // LOG(INFO)<<"gt_blur_label: "<< gt_blur_label;
           int idx = do_neg_mining ? count : j;
           switch (conf_blur_loss_type) {
             case MultiBoxLossParameter_ConfLossType_SOFTMAX:
@@ -1780,8 +1781,8 @@ void EncodeOcclusConfPrediction(const Dtype* conf_data, const int num,
   // CHECK_EQ(num, all_match_indices.size());
   // CHECK_EQ(num, all_neg_indices.size());
   // Retrieve parameters.
-  CHECK(multibox_loss_param.has_num_occlussion()) << "Must provide num_occlussion.";
-  const int num_occlussion = multibox_loss_param.num_occlussion();
+  CHECK(multibox_loss_param.has_num_occlusion()) << "Must provide num_occlussion.";
+  const int num_occlussion = multibox_loss_param.num_occlusion();
   CHECK_GE(num_occlussion, 1) << "num_occlussion should not be less than 1.";
   const int background_occl_id = multibox_loss_param.background_occl_id();
 
@@ -1809,6 +1810,7 @@ void EncodeOcclusConfPrediction(const Dtype* conf_data, const int num,
             continue;
           }
           const int gt_occlu_label = all_gt_bboxes.find(i)->second[match_index[j]].occlusion();
+          // LOG(INFO)<<"gt_occlu_label"<< gt_occlu_label;
           int idx = do_neg_mining ? count : j;
           switch (conf_occlu_loss_type) {
             case MultiBoxLossParameter_ConfLossType_SOFTMAX:
@@ -1917,7 +1919,7 @@ void GetDetectionResults(const Dtype* det_data, const int num_det,
       map<int, map<int, vector<NormalizedBBox> > >* all_detections) {
   all_detections->clear();
   for (int i = 0; i < num_det; ++i) {
-    int start_idx = i * 10;
+    int start_idx = i * 9;
     int item_id = det_data[start_idx];
     if (item_id == -1) {
       continue;
@@ -1932,7 +1934,7 @@ void GetDetectionResults(const Dtype* det_data, const int num_det,
     bbox.set_xmax(det_data[start_idx + 5]);
     bbox.set_ymax(det_data[start_idx + 6]);
     bbox.set_blur(det_data[start_idx + 7]);
-    bbox.set_occlussion(det_data[start_idx + 8]);
+    bbox.set_occlusion(det_data[start_idx + 8]);
     float bbox_size = BBoxSize(bbox);
     bbox.set_size(bbox_size);
     (*all_detections)[item_id][label].push_back(bbox);

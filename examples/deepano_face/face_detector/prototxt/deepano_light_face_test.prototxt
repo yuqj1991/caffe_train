@@ -2338,18 +2338,18 @@ layer {
   detection_output_param {
     num_classes: 2
 	num_blur: 4
-	num_occlussion: 4
+	num_occlusion: 4
     share_location: true
     background_label_id: 0
     background_blur_id: -1
 	background_occl_id: -1
 	visualize: true
     nms_param {
-      nms_threshold: 0.45
+      nms_threshold: 0.55
       top_k: 100
     }
     code_type: CENTER_SIZE
-    keep_top_k: 200
+    keep_top_k: 50
     confidence_threshold: 0.01
   }
 }

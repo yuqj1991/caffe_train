@@ -3,8 +3,8 @@ import sys
 import os
 import random
 wider_directory = ['wider_train', 'wider_val']
-root_dir ='/home/deepano/workspace/deepano_face_train/examples/deepano_face/face_detector/scripts/'
-root_dataset = '/home/deepano/workspace/dataset/facedata/wider_face/Annotations/'
+root_dir ='../../../../../deepano_face_train/examples/deepano_face/face_detector/scripts/'
+root_dataset = '../../../../../dataset/facedata/wider_face/Annotations/'
 def shuffle_file(filename):
 	f = open(filename, 'r+')
 	lines = f.readlines()
@@ -25,7 +25,9 @@ def generate_list(imageSetDir):
 				if imgline =='':
 					break
 				imgname =imgline.split('/')[-1].strip()
-				xmlline = root_dataset+imgname+'.xml'+'\n'
+				xmlline_ = root_dataset+imgname+'.xml'
+				xmlline = os.path.abspath(xmlline_) + '\n'
+				#print (os.path.abspath(xmlline_))
 				#print(xmlline)
 				newline = imgline.strip()+'.jpg'+' '+xmlline
 				#print(newline)
@@ -36,7 +38,7 @@ def generate_list(imageSetDir):
 		shuffle_file(newSetfilepath)
 
 def main():
-	generate_list("/home/deepano/workspace/dataset/facedata/wider_face/ImageSets/Main")
+	generate_list("../../../../../dataset/facedata/wider_face/ImageSets/Main")
 
 if __name__=='__main__':
 	main()

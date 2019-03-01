@@ -15,8 +15,8 @@ SOURCE_IMAGE_ROOT = '../'
 ANNOTATIONS_DIR = '../wider_face/Annotations'
 LABEL_DIR = '../wider_face/label'
 wider_directory = ['wider_train', 'wider_test', 'wider_val']
-Annotation_img_dir = 'wider_face/Annotation_img'
-root_dir = "/home/resideo/workspace/dataset/facedata/"
+Annotation_img_dir = '../wider_face/Annotation_img'
+root_dir = "../../../dataset/facedata/"
 anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
 class ConfigureHistogram(object):
 	def __init__(self):
@@ -287,12 +287,13 @@ def generate_pascal_image_set(wider_source_directory, save_folder):
 				#print("img_file_", img_file_)
 				img_no_jpg = img_file_.split('.jpg')[0]
 				#print("img-no-jpg",img_no_jpg)
-				full_img_file_ = wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env+'/'+img_no_jpg+'\n'
+				full_img_file_ = wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env+'/'+img_no_jpg
 				if sub_dir == 'wider_train' or sub_dir == 'wider_val':
 					generate_xml_from_wider_face(LABEL_DIR, wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env+'/'+img_file_,
 												 ANNOTATIONS_DIR)
 				#print(full_img_file_)
-				imgset_file.writelines(full_img_file_)
+				imgfileline = os.path.abspath(full_img_file_) + '\n'
+				imgset_file.writelines(imgfileline)
 		imgset_file.close()
 
 

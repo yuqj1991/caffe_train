@@ -20,7 +20,7 @@ void DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   CHECK(detection_output_param.has_num_classes()) << "Must specify num_classes";
   num_classes_ = detection_output_param.num_classes();
   num_blur_ = detection_output_param.num_blur();
-  num_occlusion_ = detection_output_param.num_occlussion();
+  num_occlusion_ = detection_output_param.num_occlusion();
   share_location_ = detection_output_param.share_location();
   num_loc_classes_ = share_location_ ? 1 : num_classes_;
   background_label_id_ = detection_output_param.background_label_id();
@@ -126,6 +126,8 @@ void DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     bbox_permute_.ReshapeLike(*(bottom[0]));
   }
   conf_permute_.ReshapeLike(*(bottom[1]));
+  blur_permute_.ReshapeLike(*(bottom[3]));
+  occlu_permute_.ReshapeLike(*(bottom[4]));
 }
 
 template <typename Dtype>
@@ -164,6 +166,14 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       conf_permute_.count(1) != bottom[1]->count(1)) {
     conf_permute_.ReshapeLike(*(bottom[1]));
   }
+  if (blur_permute_.num() != bottom[3]->num() ||
+      blur_permute_.count(1) != bottom[3]->count(1)) {
+    blur_permute_.ReshapeLike(*(bottom[3]));
+  }
+  if (occlu_permute_.num() != bottom[4]->num() ||
+      occlu_permute_.count(1) != bottom[4]->count(1)) {
+    occlu_permute_.ReshapeLike(*(bottom[4]));
+  }
   num_priors_ = bottom[2]->height() / 4;
   CHECK_EQ(num_priors_ * num_loc_classes_ * 4, bottom[0]->channels())
       << "Number of priors must match number of location predictions.";
@@ -191,7 +201,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
   const Dtype* conf_data = bottom[1]->cpu_data();
   const Dtype* prior_data = bottom[2]->cpu_data();
   const Dtype* blur_data = bottom[3]->cpu_data();
-  const Dtype* occlu-data = bottom[4]->cpu_data();
+  const Dtype* occlu_data = bottom[4]->cpu_data();
   const int num = bottom[0]->num();
 
   // Retrieve all location predictions.
@@ -203,7 +213,17 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
   vector<map<int, vector<float> > > all_conf_scores;
   GetConfidenceScores(conf_data, num, num_priors_, num_classes_,
                       &all_conf_scores);
-
+  
+  //Retrieve all blur_data confidences.
+  vector<map<int, vector<float> > > all_blur_scores;
+  GetConfidenceScores(blur_data, num, num_priors_, num_blur_,
+                      &all_blur_scores);
+  
+  //Retrieve all occlu_data confidences
+  vector<map<int, vector<float> > > all_occlu_scores;
+  GetConfidenceScores(occlu_data, num, num_priors_, num_occlusion_,
+                      &all_occlu_scores);
+  
   // Retrieve all prior bboxes. It is same within a batch since we assume all
   // images in a batch are of same dimension.
   vector<NormalizedBBox> prior_bboxes;
@@ -286,7 +306,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
 
   vector<int> top_shape(2, 1);
   top_shape.push_back(num_kept);
-  top_shape.push_back(7);
+  top_shape.push_back(9);
   Dtype* top_data;
   if (num_kept == 0) {
     LOG(INFO) << "Couldn't find any detections";
@@ -297,7 +317,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
     // Generate fake results per image.
     for (int i = 0; i < num; ++i) {
       top_data[0] = i;
-      top_data += 7;
+      top_data += 9;
     }
   } else {
     top[0]->Reshape(top_shape);
@@ -308,6 +328,8 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
   boost::filesystem::path output_directory(output_directory_);
   for (int i = 0; i < num; ++i) {
     const map<int, vector<float> >& conf_scores = all_conf_scores[i];
+    const map<int, vector<float> >& blur_scores = all_blur_scores[i];
+    const map<int, vector<float> >& occlu_scores = all_occlu_scores[i];
     const LabelBBox& decode_bboxes = all_decode_bboxes[i];
     for (map<int, vector<int> >::iterator it = all_indices[i].begin();
          it != all_indices[i].end(); ++it) {
@@ -318,6 +340,8 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
         continue;
       }
       const vector<float>& scores = conf_scores.find(label)->second;
+      const vector<float>& blur_sc = blur_scores.find(label)->second;
+      const vector<float>& occlu_sc = occlu_scores.find(label)->second;
       int loc_label = share_location_ ? -1 : label;
       if (decode_bboxes.find(loc_label) == decode_bboxes.end()) {
         // Something bad happened if there are no predictions for current label.
@@ -334,19 +358,21 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
       }
       for (int j = 0; j < indices.size(); ++j) {
         int idx = indices[j];
-        top_data[count * 7] = i;
-        top_data[count * 7 + 1] = label;
-        top_data[count * 7 + 2] = scores[idx];
+        top_data[count * 9] = i;
+        top_data[count * 9 + 1] = label;
+        top_data[count * 9 + 2] = scores[idx];
         const NormalizedBBox& bbox = bboxes[idx];
-        top_data[count * 7 + 3] = bbox.xmin();
-        top_data[count * 7 + 4] = bbox.ymin();
-        top_data[count * 7 + 5] = bbox.xmax();
-        top_data[count * 7 + 6] = bbox.ymax();
+        top_data[count * 9 + 3] = bbox.xmin();
+        top_data[count * 9 + 4] = bbox.ymin();
+        top_data[count * 9 + 5] = bbox.xmax();
+        top_data[count * 9 + 6] = bbox.ymax();
+        top_data[count * 9 + 7] = blur_sc[idx];
+        top_data[count * 9 + 8] = occlu_sc[idx];
         if (need_save_) {
           NormalizedBBox out_bbox;
           OutputBBox(bbox, sizes_[name_count_], has_resize_, resize_param_,
                      &out_bbox);
-          float score = top_data[count * 7 + 2];
+          float score = top_data[count * 9 + 2];
           float xmin = out_bbox.xmin();
           float ymin = out_bbox.ymin();
           float xmax = out_bbox.xmax();

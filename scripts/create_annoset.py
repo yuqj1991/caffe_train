@@ -3,7 +3,7 @@ import os
 import shutil
 import subprocess
 import sys
-CAFFE_ROOT = "/home/deepano/workspace/deepano_face_train"
+CAFFE_ROOT = ".."
 sys.path.insert(0, CAFFE_ROOT+'/python')
 from caffe.proto import caffe_pb2
 from google.protobuf import text_format

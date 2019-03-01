@@ -47,6 +47,18 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
       num_classes_, num_priors_, 1, conf_permute_data);
   const Dtype* conf_cpu_data = conf_permute_.cpu_data();
 
+  // Retrieve all confidences.
+  Dtype* blur_permute_data = blur_permute_.mutable_gpu_data();
+  PermuteDataGPU<Dtype>(bottom[3]->count(), bottom[3]->gpu_data(),
+      num_blur_, num_priors_, 1, blur_permute_data);
+  const Dtype* blur_cpu_data = blur_permute_.cpu_data();
+
+  // Retrieve all confidences.
+  Dtype* occlu_permute_data = occlu_permute_.mutable_gpu_data();
+  PermuteDataGPU<Dtype>(bottom[4]->count(), bottom[4]->gpu_data(),
+      num_occlusion_, num_priors_, 1, occlu_permute_data);
+  const Dtype* occlu_cpu_data = occlu_permute_.cpu_data();
+
   int num_kept = 0;
   vector<map<int, vector<int> > > all_indices;
   for (int i = 0; i < num; ++i) {
@@ -107,7 +119,7 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
 
   vector<int> top_shape(2, 1);
   top_shape.push_back(num_kept);
-  top_shape.push_back(7);
+  top_shape.push_back(9);
   Dtype* top_data;
   if (num_kept == 0) {
     LOG(INFO) << "Couldn't find any detections";
@@ -118,7 +130,7 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
     // Generate fake results per image.
     for (int i = 0; i < num; ++i) {
       top_data[0] = i;
-      top_data += 7;
+      top_data += 9;
     }
   } else {
     top[0]->Reshape(top_shape);
@@ -129,6 +141,8 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
   boost::filesystem::path output_directory(output_directory_);
   for (int i = 0; i < num; ++i) {
     const int conf_idx = i * num_classes_ * num_priors_;
+    const int blur_idx = i * num_blur_ * num_priors_;
+    const int occlu_idx = i * num_occlusion_ * num_priors_;
     int bbox_idx;
     if (share_location_) {
       bbox_idx = i * num_priors_ * 4;
@@ -146,29 +160,35 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
       }
       const Dtype* cur_conf_data =
         conf_cpu_data + conf_idx + label * num_priors_;
+      const Dtype* cur_blur_data =
+        blur_cpu_data + blur_idx + label * num_priors_;
+       const Dtype* cur_occlu_data =
+        occlu_cpu_data + occlu_idx + label * num_priors_;
       const Dtype* cur_bbox_data = bbox_cpu_data + bbox_idx;
       if (!share_location_) {
         cur_bbox_data += label * num_priors_ * 4;
       }
       for (int j = 0; j < indices.size(); ++j) {
         int idx = indices[j];
-        top_data[count * 7] = i;
-        top_data[count * 7 + 1] = label;
-        top_data[count * 7 + 2] = cur_conf_data[idx];
+        top_data[count * 9] = i;
+        top_data[count * 9 + 1] = label;
+        top_data[count * 9 + 2] = cur_conf_data[idx];
         for (int k = 0; k < 4; ++k) {
-          top_data[count * 7 + 3 + k] = cur_bbox_data[idx * 4 + k];
+          top_data[count * 9 + 3 + k] = cur_bbox_data[idx * 4 + k];
         }
+        top_data[count * 9 + 7] = cur_blur_data[idx];
+        top_data[count * 9 + 8] = cur_occlu_data[idx];
         if (need_save_) {
           // Generate output bbox.
           NormalizedBBox bbox;
-          bbox.set_xmin(top_data[count * 7 + 3]);
-          bbox.set_ymin(top_data[count * 7 + 4]);
-          bbox.set_xmax(top_data[count * 7 + 5]);
-          bbox.set_ymax(top_data[count * 7 + 6]);
+          bbox.set_xmin(top_data[count * 9 + 3]);
+          bbox.set_ymin(top_data[count * 9 + 4]);
+          bbox.set_xmax(top_data[count * 9 + 5]);
+          bbox.set_ymax(top_data[count * 9 + 6]);
           NormalizedBBox out_bbox;
           OutputBBox(bbox, sizes_[name_count_], has_resize_, resize_param_,
                      &out_bbox);
-          float score = top_data[count * 7 + 2];
+          float score = top_data[count * 9 + 2];
           float xmin = out_bbox.xmin();
           float ymin = out_bbox.ymin();
           float xmax = out_bbox.xmax();

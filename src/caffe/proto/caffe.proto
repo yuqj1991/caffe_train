@@ -1040,7 +1040,7 @@ message DetectionOutputParameter {
   optional int32 background_blur_id = 13 [default = -1];
   optional int32 background_occl_id = 14 [default = -1];
   optional uint32 num_blur = 15;
-  optional uint32 num_occlussion = 16;
+  optional uint32 num_occlusion = 16;
 }
 
 message DropoutParameter {
@@ -1322,7 +1322,7 @@ message MultiBoxLossParameter {
   // Number of blur to be predicted. Required!
   optional uint32 num_blur = 24;
   //Number of occlusion to be predicted. Required!
-  optional uint32 num_occlussion = 25;
+  optional uint32 num_occlusion = 25;
   // blur conf loss types
   optional ConfLossType conf_blur_loss_type = 26;
   // occlusion conf loss types

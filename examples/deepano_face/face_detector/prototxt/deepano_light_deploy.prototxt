@@ -2312,7 +2312,7 @@ layer {
 	detection_output_param {
 		num_classes: 2
 		num_blur: 4
-		num_occlussion: 4
+		num_occlusion: 4
 		share_location: true
 		background_label_id: 0
 		background_blur_id: -1
