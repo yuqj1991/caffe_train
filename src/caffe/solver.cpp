@@ -624,6 +624,7 @@ template <typename Dtype>
 void Solver<Dtype>::UpdateSmoothedLoss(Dtype loss, int start_iter,
     int average_loss) {
   if (losses_.size() < average_loss) {
+    LOG(INFO)<<"losses_.size(): "<<losses.size();
     losses_.push_back(loss);
     int size = losses_.size();
     smoothed_loss_ = (smoothed_loss_ * (size - 1) + loss) / size;
