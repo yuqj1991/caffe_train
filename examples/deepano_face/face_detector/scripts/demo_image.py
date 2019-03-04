@@ -7,7 +7,7 @@ import caffe
 
 
 net_file= '../prototxt/deepano_light_deploy.prototxt'  
-caffe_model='../snapshot_iter_120000.caffemodel'  
+caffe_model='../snapshot_iter_10000.caffemodel'  
 test_dir = "../images"
 
 if not os.path.exists(caffe_model):

@@ -9,7 +9,6 @@ layer {
 	}
 	transform_param {
 		scale: 0.007843
-		mirror: true
 		mean_value: 127.5
 		mean_value: 127.5
 		mean_value: 127.5
@@ -23,7 +22,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
-		batch_size: 2
+		batch_size: 8
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -50,10 +49,6 @@ layer {
 		weight_filler {
 			type: "msra"
 		}
-		bias_filler {
-            type: "constant"
-        value: 0.0
-        }
 	}
 }
 layer {
@@ -3743,7 +3738,6 @@ layer {
 		background_label_id: 0
 		background_blur_id: -1
 		background_occl_id: -1
-		visualize: true
 		nms_param {
 			nms_threshold: 0.55
 			top_k: 100

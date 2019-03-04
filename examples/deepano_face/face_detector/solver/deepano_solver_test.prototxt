@@ -1,5 +1,5 @@
-train_net: "MobileNetSSD_train.prototxt"
-test_net: "MobileNetSSD_test.prototxt"
+train_net: "../prototxt/deepano_light_face_train.prototxt"
+test_net: "../prototxt/deepano_light_face_test.prototxt"
 test_iter: 673
 test_interval: 10000
 base_lr: 0.0005
@@ -9,7 +9,7 @@ lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.00005
 snapshot: 0
-snapshot_prefix: "snapshot/mobilenet"
+snapshot_prefix: "../snapshot/deepanoFace"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: false

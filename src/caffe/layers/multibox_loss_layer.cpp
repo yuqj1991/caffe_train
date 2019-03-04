@@ -29,10 +29,10 @@ void MultiBoxLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   // Get other parameters.
   CHECK(multibox_loss_param.has_num_classes()) << "Must provide num_classes.";
   CHECK(multibox_loss_param.has_num_blur()) << "Must prodived num_blur";
-  CHECK(multibox_loss_param.has_num_occlussion()) << "Must provide num_occlusson";
+  CHECK(multibox_loss_param.has_num_occlusion()) << "Must provide num_occlusson";
   num_classes_ = multibox_loss_param.num_classes();
   num_blur_ = multibox_loss_param.num_blur();
-  num_occlusion_ = multibox_loss_param.num_occlussion();
+  num_occlusion_ = multibox_loss_param.num_occlusion();
   CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
   share_location_ = multibox_loss_param.share_location();
   loc_classes_ = share_location_ ? 1 : num_classes_;
@@ -415,10 +415,10 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 
           conf_occlussion_loss_.cpu_data()[0] / normalizer;
   }
-  LOG(INFO)<<" loc_weight_ * loc_loss_.cpu_data()[0] / normalizer: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
-          <<" conf_loss_.cpu_data()[0] / normalizer: "<<conf_loss_.cpu_data()[0] / normalizer
-          <<" conf_blur_loss_.cpu_data()[0] / normalizer: "<<conf_blur_loss_.cpu_data()[0] / normalizer
-          <<" conf_occlussion_loss_.cpu_data()[0] / normalizer: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
+  LOG(INFO)<<" loc_loss_: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
+          <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
+          <<" conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0] / normalizer
+          <<" conf_occlussion_loss_: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
 }
 
 template <typename Dtype>

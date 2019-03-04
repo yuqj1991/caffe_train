@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 8
+		batch_size: 16
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -133,7 +133,7 @@ layer {
 			max_sample: 1
 			max_trials: 50
 		}
-		label_map_file: "/home/dmitrii/Work/Projects/FaceCaffe/models/labelmap.prototxt"
+		label_map_file: "../labelmap_face.prototxt"
 	}
 }
 layer {
@@ -154,10 +154,6 @@ layer {
 		weight_filler {
 			type: "msra"
 		}
-		bias_filler {
-            type: "constant"
-        value: 0.0
-        }
 	}
 }
 layer {

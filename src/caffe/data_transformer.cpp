@@ -741,7 +741,7 @@ void DataTransformer<Dtype>::TransformInv(const Dtype* data, cv::Mat* cv_img,
 			}
 		}
 	}
-
+	//LOG(INFO)<<".................\\";
 	const int img_type = channels == 3 ? CV_8UC3 : CV_8UC1;
 	cv::Mat orig_img(height, width, img_type, cv::Scalar(0, 0, 0));
 	for (int h = 0; h < height; ++h) {

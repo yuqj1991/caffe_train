@@ -15,10 +15,6 @@ layer {
 		lr_mult: 1.0
 		decay_mult: 1.0
 	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
 	convolution_param {
 		num_output: 32
 		pad: 1
@@ -26,10 +22,6 @@ layer {
 		stride: 2
 		weight_filler {
 			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
 		}
 	}
 }
@@ -2533,8 +2525,8 @@ layer {
 	bottom: "mbox_loc"
 	bottom: "mbox_conf_flatten"
 	bottom: "mbox_priorbox"
-	bottom: mbox_blur_flatten
-	bottom: mbox_occlu_flatten
+	bottom: "mbox_blur_flatten"
+	bottom: "mbox_occlu_flatten"
 	top: "detection_out"
 	include {
 	phase: TEST
@@ -2554,4 +2546,5 @@ layer {
 		code_type: CENTER_SIZE
 		keep_top_k: 100
 		confidence_threshold: 0.25
+	}
 }
