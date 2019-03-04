@@ -1,0 +1,1 @@
+snapshots/hor0_iter_8000.caffemodel
