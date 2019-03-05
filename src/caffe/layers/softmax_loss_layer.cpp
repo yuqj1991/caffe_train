@@ -49,6 +49,8 @@ void SoftmaxWithLossLayer<Dtype>::Reshape(
       << "e.g., if softmax axis == 1 and prediction shape is (N, C, H, W), "
       << "label count (number of labels) must be N*H*W, "
       << "with integer values in {0, 1, ..., C-1}.";
+  //LOG(INFO)<<"=========================: "<<" softmax_axis_: "<<softmax_axis_<<" outer_num: "<<outer_num_<<" inner_num: "<<inner_num_;
+  //LOG(INFO)<<"&&&&&&&&&&&&&&&&&&&&&&&&&: "<<" bottom[1]->count(): "<<bottom[1]->count();
   if (top.size() >= 2) {
     // softmax output
     top[1]->ReshapeLike(*bottom[0]);

@@ -139,10 +139,6 @@ void MultiBoxLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   conf_blur_loss_.Reshape(loss_shape);
   conf_blur_top_vec_.push_back(&conf_blur_loss_);
   if (conf_blur_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
-    CHECK_GE(background_label_id_, 0)
-        << "background_label_id should be within [0, num_classes) for Softmax.";
-    CHECK_LT(background_label_id_, num_classes_)
-        << "background_label_id should be within [0, num_classes) for Softmax.";
     LayerParameter layer_param;
     layer_param.set_name(this->layer_param_.name() + "_softmax_blur_conf");
     layer_param.set_type("SoftmaxWithLoss");
@@ -180,10 +176,6 @@ void MultiBoxLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   conf_occlussion_loss_.Reshape(loss_shape);
   conf_occlussion_top_vec_.push_back(&conf_occlussion_loss_);
   if (conf_occlussion_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
-    CHECK_GE(background_label_id_, 0)
-        << "background_label_id should be within [0, num_classes) for Softmax.";
-    CHECK_LT(background_label_id_, num_classes_)
-        << "background_label_id should be within [0, num_classes) for Softmax.";
     LayerParameter layer_param;
     layer_param.set_name(this->layer_param_.name() + "_softmax_occlu_conf");
     layer_param.set_type("SoftmaxWithLoss");
@@ -298,6 +290,7 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     num_conf_ = num_ * num_priors_;
   }
   if (num_conf_ >= 1) {
+    // LOG(INFO)<<"****************************";
     // Reshape the confidence data.
     vector<int> conf_shape;
     if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
@@ -349,8 +342,8 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     if (!do_neg_mining_) {
       // Consider all scores.
       //t Share daa and diff with bottom[1].
-      CHECK_EQ(conf_pred_.count(), bottom[1]->count());
-      conf_pred_.ShareData(*(bottom[1]));
+      CHECK_EQ(conf_pred_.count(), bottom[3]->count());
+      conf_pred_.ShareData(*(bottom[3]));
     }
     Dtype* conf_blur_pred_data = conf_blur_pred_.mutable_cpu_data();
     Dtype* conf_blur_gt_data = conf_blur_gt_.mutable_cpu_data();
@@ -380,8 +373,8 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     if (!do_neg_mining_) {
       // Consider all scores.
       //t Share daa and diff with bottom[1].
-      CHECK_EQ(conf_occlussion_pred_.count(), bottom[1]->count());
-      conf_occlussion_pred_.ShareData(*(bottom[1]));
+      CHECK_EQ(conf_occlussion_pred_.count(), bottom[4]->count());
+      conf_occlussion_pred_.ShareData(*(bottom[4]));
     }
     Dtype* conf_occl_pred_data = conf_occlussion_pred_.mutable_cpu_data();
     Dtype* conf_occl_gt_data = conf_occlussion_gt_.mutable_cpu_data();
@@ -415,11 +408,12 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 
           conf_occlussion_loss_.cpu_data()[0] / normalizer;
   }
+  LOG(INFO)<<" num_conf_: "<<num_conf_;
   LOG(INFO)<<" loc_loss_: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
           <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
           <<" conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0] / normalizer
           <<" conf_occlussion_loss_: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
-  LOG(INFO)<<"+++++++++++++++++++=========================";
+  LOG(INFO)<<"***************************";
 }
 
 template <typename Dtype>
@@ -607,7 +601,7 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
       caffe_scal(conf_occlussion_pred_.count(), loss_weight,
                  conf_occlussion_pred_.mutable_cpu_diff());
-      // Copy gradient back to bottom[1].
+      // Copy gradient back to bottom[4].
       const Dtype* conf_occl_pred_diff = conf_occlussion_pred_.cpu_diff();
       if (do_neg_mining_) {
         int count = 0;
