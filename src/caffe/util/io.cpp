@@ -357,9 +357,9 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
           bbox->set_blur(blured);
           bbox->set_occlusion(occlusioned);
           bbox->set_difficult(difficult);
-          LOG(INFO) << "bbox->xmin: "<<bbox->xmin()<<" bbox->ymin: "<<bbox->ymin()
-                    <<" bbox->xmax: "<<bbox->xmax()<<" bbox->ymax: "<<bbox->ymax()
-                    <<" bbox->blur: "<<bbox->blur()<<" bbox->occlusion: "<<bbox->occlusion();
+          //LOG(INFO) << "bbox->xmin: "<<bbox->xmin()<<" bbox->ymin: "<<bbox->ymin()
+           //         <<" bbox->xmax: "<<bbox->xmax()<<" bbox->ymax: "<<bbox->ymax()
+            //        <<" bbox->blur: "<<bbox->blur()<<" bbox->occlusion: "<<bbox->occlusion();
         }
       }
     }

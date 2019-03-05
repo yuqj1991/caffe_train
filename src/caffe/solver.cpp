@@ -460,7 +460,7 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
       loss += iter_loss;
     }
     for (int j = 0; j < result.size(); ++j) {
-      LOG(INFO)<<"J:"<<j<<" of result.size(): "<<result.size();
+      //LOG(INFO)<<"J:"<<j<<" of result.size(): "<<result.size();
       CHECK_EQ(result[j]->width(), 5);
       const Dtype* result_vec = result[j]->cpu_data();
       int num_det = result[j]->height();
@@ -624,7 +624,7 @@ template <typename Dtype>
 void Solver<Dtype>::UpdateSmoothedLoss(Dtype loss, int start_iter,
     int average_loss) {
   if (losses_.size() < average_loss) {
-    LOG(INFO)<<"losses_.size(): "<<losses.size();
+    //LOG(INFO)<<"losses_.size(): "<<losses_.size()<< ", loss: "<<loss;
     losses_.push_back(loss);
     int size = losses_.size();
     smoothed_loss_ = (smoothed_loss_ * (size - 1) + loss) / size;

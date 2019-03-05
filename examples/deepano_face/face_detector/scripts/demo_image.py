@@ -7,7 +7,7 @@ import caffe
 
 
 net_file= '../prototxt/deepano_light_deploy.prototxt'  
-caffe_model='../snapshot/deepanoFace_iter_5.caffemodel'  
+caffe_model='../snapshot/deepanoFace_iter_10000.caffemodel'  
 # net_file ='/home/resideo/workspace/deepano_face_train/examples/deepano_face/face_detector/face_no_blur/deepano_face_deploy.prototxt'
 # caffe_model= "/home/resideo/workspace/deepano_face_train/examples/deepano_face/face_detector/face_no_blur/deepano_face_bn.caffemodel"
 test_dir = "../images"
