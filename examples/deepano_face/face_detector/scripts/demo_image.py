@@ -7,7 +7,7 @@ import caffe
 
 
 net_file= '../prototxt/deepano_light_deploy.prototxt'  
-caffe_model='../snapshot/deepanoFace_iter_10000.caffemodel'  
+caffe_model='../snapshot/deepanoFace_iter_371.caffemodel'  
 # net_file ='/home/resideo/workspace/deepano_face_train/examples/deepano_face/face_detector/face_no_blur/deepano_face_deploy.prototxt'
 # caffe_model= "/home/resideo/workspace/deepano_face_train/examples/deepano_face/face_detector/face_no_blur/deepano_face_bn.caffemodel"
 test_dir = "../images"
@@ -52,12 +52,13 @@ def detect(imgfile):
     box, conf, cls = postprocess(origimg, out)
 
     for i in range(len(box)):
-       p1 = (box[i][0], box[i][1])
-       p2 = (box[i][2], box[i][3])
-       cv2.rectangle(origimg, p1, p2, (0,255,0))
-       p3 = (max(p1[0], 15), max(p1[1], 15))
-       title = "%s:%.2f" % (CLASSES[int(cls[i])], conf[i])
-       cv2.putText(origimg, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
+       if conf[i]>=0.26:
+           p1 = (box[i][0], box[i][1])
+           p2 = (box[i][2], box[i][3])
+           cv2.rectangle(origimg, p1, p2, (0,255,0))
+           p3 = (max(p1[0], 15), max(p1[1], 15))
+           title = "%s:%.2f" % (CLASSES[int(cls[i])], conf[i])
+           cv2.putText(origimg, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
     cv2.imshow("facedetector", origimg)
  
     k = cv2.waitKey(0) & 0xff
