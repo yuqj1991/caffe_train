@@ -408,12 +408,12 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 
           conf_occlussion_loss_.cpu_data()[0] / normalizer;
   }
-  LOG(INFO)<<" num_conf_: "<<num_conf_;
-  LOG(INFO)<<" loc_loss_: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
-          <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
-          <<" conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0] / normalizer
-          <<" conf_occlussion_loss_: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
-  LOG(INFO)<<"***************************";
+  //LOG(INFO)<<" num_conf_: "<<num_conf_;
+  //LOG(INFO)<<" loc_loss_: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
+    //      <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
+    //      <<" conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0] / normalizer
+    //      <<" conf_occlussion_loss_: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
+  //LOG(INFO)<<"***************************";
 }
 
 template <typename Dtype>

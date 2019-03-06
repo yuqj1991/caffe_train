@@ -1,15 +1,20 @@
-import numpy as np  
+import numpy as np
+import argparse
 import sys,os  
 import cv2
 caffe_root = '../../../../../deepano_face_train/'
 sys.path.insert(0, caffe_root + 'python')  
 import caffe  
 
-
-net_file= '../prototxt/deepano_light_deploy.prototxt'  
-caffe_model='../snapshot/deepanoFace_iter_371.caffemodel'  
-# net_file ='/home/resideo/workspace/deepano_face_train/examples/deepano_face/face_detector/face_no_blur/deepano_face_deploy.prototxt'
-# caffe_model= "/home/resideo/workspace/deepano_face_train/examples/deepano_face/face_detector/face_no_blur/deepano_face_bn.caffemodel"
+def make_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model', type=str, required=True, help='.prototxt file for inference')
+    parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
+    return parser
+parser1 = make_parser()
+args = parser1.parse_args()
+net_file= args.model
+caffe_model= args.weights
 test_dir = "../images"
 
 if not os.path.exists(caffe_model):
