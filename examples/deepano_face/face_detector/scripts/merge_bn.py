@@ -122,7 +122,7 @@ if __name__ == '__main__':
     pre_process(args.model, "no_bn.prototxt")
 
     net = caffe.Net(args.model, args.weights, caffe.TEST)  
-    net2 = caffe.Net("no_bn.prototxt", caffe.TEST)
+    net2 = caffe.Net("ssd_face_no_bn.prototxt", caffe.TEST)
 
     load_weights(net, net2)
-    net2.save("no_bn.caffemodel")
+    net2.save("ssd_face_no_bn.caffemodel")
