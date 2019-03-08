@@ -268,7 +268,7 @@ def load_wider_split(split_file):
 				newline = x_min + ' '+y_min+ ' '+width+ ' '+height+ ' '+blur+ ' '+occlusion+' \n'
 				if int(invalid) == 1:
 					continue
-				if int(width)<10 or int(height)<10:
+				if int(width)<30 or int(height)<30:
 					continue
 				lab_file.writelines(newline)
 			lab_file.close()
@@ -374,7 +374,8 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 			#if int(invalid) == 1:
 				#label_text_line = label_img_file.readline()
 				#continue
-			if int(width) <10 or int(height)<10:
+			if int(width) <30 or int(height)<30:
+				label_text_line = label_img_file.readline()
 				continue
 			objects = doc.createElement('objects')
 			annotation.appendChild(objects)
