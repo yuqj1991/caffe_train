@@ -63,7 +63,7 @@ layer {
 				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.1
+				min_jaccard_overlap: 0.6
 			}
 			max_sample: 1
 			max_trials: 50
@@ -76,33 +76,7 @@ layer {
 				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.3
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.1
-				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.5
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.1
-				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.7
+				min_jaccard_overlap: 0.8
 			}
 			max_sample: 1
 			max_trials: 50
@@ -1404,9 +1378,142 @@ layer {
 	top: "conv9"
 }
 layer {
-	name: "conv10/dw"
+	name: "conv10_1/dw"
 	type: "Convolution"
 	bottom: "conv9"
+	top: "conv10_1/dw"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 512
+		bias_term: false
+		pad: 1
+		kernel_size: 3
+		group: 512
+		engine: CAFFE
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv10_1/dw/bn"
+	type: "BatchNorm"
+	bottom: "conv10_1/dw"
+	top: "conv10_1/dw"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv10_1/dw/scale"
+	type: "Scale"
+	bottom: "conv10_1/dw"
+	top: "conv10_1/dw"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv10_1/dw/relu"
+	type: "ReLU"
+	bottom: "conv10_1/dw"
+	top: "conv10_1/dw"
+}
+layer {
+	name: "conv10_1"
+	type: "Convolution"
+	bottom: "conv10_1/dw"
+	top: "conv10_1"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 512
+		bias_term: false
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv10_1/bn"
+	type: "BatchNorm"
+	bottom: "conv10_1"
+	top: "conv10_1"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv10_1/scale"
+	type: "Scale"
+	bottom: "conv10_1"
+	top: "conv10_1"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv10_1/relu"
+	type: "ReLU"
+	bottom: "conv10_1"
+	top: "conv10_1"
+}
+layer {
+	name: "conv10/dw"
+	type: "Convolution"
+	bottom: "conv10_1"
 	top: "conv10/dw"
 	param {
 		lr_mult: 1.0
@@ -2478,7 +2585,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2524,7 +2631,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2571,7 +2678,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2619,7 +2726,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2660,8 +2767,9 @@ layer {
 	bottom: "data"
 	top: "conv11_mbox_priorbox"
 	prior_box_param {
-		min_size: 16.0
-		max_size: 32.0
+		min_size: 8.0
+		max_size: 16.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2685,7 +2793,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2731,7 +2839,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2778,7 +2886,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2826,7 +2934,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2867,8 +2975,9 @@ layer {
 	bottom: "data"
 	top: "conv13_mbox_priorbox"
 	prior_box_param {
-		min_size: 32.0
-		max_size: 64.0
+		min_size: 16.0
+		max_size: 32.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2892,7 +3001,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2938,7 +3047,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2984,7 +3093,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3032,7 +3141,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3072,8 +3181,9 @@ layer {
 	bottom: "data"
 	top: "conv14_2_mbox_priorbox"
 	prior_box_param {
-		min_size: 64.0
-		max_size: 128.0
+		min_size: 32.0
+		max_size: 64.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3097,7 +3207,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3143,7 +3253,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3189,7 +3299,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3237,7 +3347,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3277,8 +3387,9 @@ layer {
 	bottom: "data"
 	top: "conv15_2_mbox_priorbox"
 	prior_box_param {
-		min_size: 128.0
-		max_size: 214.0
+		min_size: 64.0
+		max_size: 128.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3302,7 +3413,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3348,7 +3459,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3394,7 +3505,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3442,7 +3553,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3482,8 +3593,9 @@ layer {
 	bottom: "data"
 	top: "conv16_2_mbox_priorbox"
 	prior_box_param {
-		min_size: 214.0
-		max_size: 300.0
+		min_size: 128.0
+		max_size: 214.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3507,7 +3619,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3553,7 +3665,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3599,7 +3711,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3647,7 +3759,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3689,6 +3801,7 @@ layer {
 	prior_box_param {
 		min_size: 214.0
 		max_size: 300.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
