@@ -149,6 +149,24 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // get a anno_datum
     AnnotatedDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
     read_time += timer.MicroSeconds();
+#if 0
+    int size_group = anno_datum.annotation_group_size();
+    LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
+    for(int ii=0; ii< size_group; ii++)
+    {
+      const AnnotationGroup& anno_group = anno_datum.annotation_group(ii);
+      int anno_size = anno_group.annotation_size();
+      for(int jj=0; jj<anno_size; jj++)
+      {
+        const Annotation& anno = anno_group.annotation(jj);
+        const NormalizedBBox& bbox = anno.bbox();
+        LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
+                  <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
+                  <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion();
+      }
+    }
+    LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";
+#endif 
     timer.Start();
     AnnotatedDatum distort_datum;
     AnnotatedDatum* expand_datum = NULL;
@@ -176,6 +194,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       // Generate sampled bboxes from expand_datum.
       vector<NormalizedBBox> sampled_bboxes;
       GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
+      //LOG(INFO)<<"sampled_bboxes: size(): "<<sampled_bboxes.size()
+               //<<" batch_samplers_.size(): "<<batch_samplers_.size();
       if (sampled_bboxes.size() > 0) {
         // Randomly pick a sampled bbox and crop the expand_datum.
         int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
@@ -279,7 +299,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         int idx = 0;
         for (int item_id = 0; item_id < batch_size; ++item_id) {
           const vector<AnnotationGroup>& anno_vec = all_anno[item_id];
-          //LOG(INFO) << "AnnotationGroup size is " << anno_vec.size();
           for (int g = 0; g < anno_vec.size(); ++g) {
             const AnnotationGroup& anno_group = anno_vec[g];
             for (int a = 0; a < anno_group.annotation_size(); ++a) {
@@ -295,10 +314,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
               top_label[idx++] = bbox.blur();
               top_label[idx++] = bbox.occlusion();
               top_label[idx++] = bbox.difficult();
-              //LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
-              //          <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-               //         <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion();
-              //LOG(FATAL) << "Unknown annotation type.";
             }
           }
         }
@@ -307,6 +322,20 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       LOG(FATAL) << "Unknown annotation type.";
     }
   }
+#if 0
+  LOG(INFO)<< "start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& single image: num_bboxes: "<<num_bboxes;
+  const Dtype* top_label_data = batch->label_.cpu_data();
+  for(int ii=0; ii < num_bboxes; ii++)
+  {
+    int id = ii*10;
+    LOG(INFO) <<"batch_id: "<<top_label_data[id]<<" anno_label: "<<top_label_data[id+1]
+              <<" anno.instance_id: "<<top_label_data[id+2];
+    LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
+              <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
+              <<" bbox->blur: "<<top_label_data[id+7]<<" bbox->occlusion: "<<top_label_data[id+8];
+  }
+  LOG(INFO)<< "finished **************************************************** end ";
+#endif 
   timer.Stop();
   batch_timer.Stop();
   DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";

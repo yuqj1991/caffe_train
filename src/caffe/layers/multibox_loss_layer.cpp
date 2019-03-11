@@ -11,6 +11,7 @@ namespace caffe {
 template <typename Dtype>
 void MultiBoxLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+  num_cnt_ = 0;
   LossLayer<Dtype>::LayerSetUp(bottom, top);
   if (this->layer_param_.propagate_down_size() == 0) {
     this->layer_param_.add_propagate_down(true);
@@ -236,6 +237,25 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const Dtype* occl_data = bottom[4]->cpu_data();
   const Dtype* gt_data = bottom[5]->cpu_data();
 
+  #if 0
+  LOG(INFO)<< "loss compute start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& num_gt_: "<<num_gt_;
+  for(int ii=0; ii < num_gt_; ii++)
+  {
+    int id = ii*10;
+    if (gt_data[id] == -1) {
+      continue;
+    }
+
+    LOG(INFO) <<"LABEL batch_id: "<<gt_data[id]<<" anno_label: "<<gt_data[id+1]
+              <<" anno.instance_id: "<<gt_data[id+2];
+    LOG(INFO)  <<"LABEL bbox->xmin: "<<gt_data[id+3]<<" bbox->ymin: "<<gt_data[id+4]
+              <<" bbox->xmax: "<<gt_data[id+5]<<" bbox->ymax: "<<gt_data[id+6]
+              <<" bbox->blur: "<<gt_data[id+7]<<" bbox->occlusion: "<<gt_data[id+8];
+  }
+  LOG(INFO)<< "loss compute finished **************************************************** end ";
+  
+  #endif 
+
   // Retrieve all ground truth.
   map<int, vector<NormalizedBBox> > all_gt_bboxes;
   GetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
@@ -290,7 +310,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     num_conf_ = num_ * num_priors_;
   }
   if (num_conf_ >= 1) {
-    // LOG(INFO)<<"****************************";
     // Reshape the confidence data.
     vector<int> conf_shape;
     if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
@@ -408,12 +427,14 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 
           conf_occlussion_loss_.cpu_data()[0] / normalizer;
   }
-  //LOG(INFO)<<" num_conf_: "<<num_conf_;
-  //LOG(INFO)<<" loc_loss_: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
-    //      <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
-    //      <<" conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0] / normalizer
-    //      <<" conf_occlussion_loss_: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
-  //LOG(INFO)<<"***************************";
+  #if 0
+  LOG(INFO)<<" num_conf_: "<<num_conf_;
+  LOG(INFO)<<" loc_loss_: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
+          <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
+          <<" conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0] / normalizer
+          <<" conf_occlussion_loss_: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
+  LOG(FATAL)<<" END";
+  #endif
 }
 
 template <typename Dtype>
@@ -428,7 +449,6 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     LOG(FATAL) << this->type()
         << " Layer cannot backpropagate to label inputs.";
   }
-
   // Back propagate on location prediction.
   if (propagate_down[0]) {
     Dtype* loc_bottom_diff = bottom[0]->mutable_cpu_diff();
@@ -643,6 +663,11 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   // After backward, remove match statistics.
   all_match_indices_.clear();
   all_neg_indices_.clear();
+  #if 0
+  num_cnt_++;
+  if(num_cnt_ == 3)
+    LOG(FATAL)<<" END";
+  #endif
 }
 
 INSTANTIATE_CLASS(MultiBoxLossLayer);

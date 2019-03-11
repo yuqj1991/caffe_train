@@ -106,6 +106,7 @@ class MultiBoxLossLayer : public LossLayer<Dtype> {
   MultiBoxLossParameter multibox_loss_param_;
   int num_classes_;
   int num_blur_;
+  int num_cnt_;
   int num_occlusion_;
   bool share_location_;
   MatchType match_type_;

@@ -287,7 +287,6 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
       ptree object = v1.second;
       int blured = object.get<int>("blur");
       int occlusioned = object.get<int>("occlusion");
-      LOG(INFO)<<"filename: "<<pt.get<string>("annotation.filename");
       BOOST_FOREACH(ptree::value_type &v2, object.get_child("")) {
         ptree pt2 = v2.second;
         if (v2.first == "name") {
@@ -326,7 +325,6 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
           int ymin = pt2.get("ymin", 0);
           int xmax = pt2.get("xmax", 0);
           int ymax = pt2.get("ymax", 0);
-          LOG(INFO)<< "xmin: "<<xmin<< " ymin: "<<ymin<< " xmax: "<<xmax<< " ymax: "<<ymax;
           CHECK_NOTNULL(anno);
           LOG_IF(WARNING, xmin > width) << labelfile <<
               " bounding box exceeds image boundary.";
@@ -357,13 +355,31 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
           bbox->set_blur(blured);
           bbox->set_occlusion(occlusioned);
           bbox->set_difficult(difficult);
-          //LOG(INFO) << "bbox->xmin: "<<bbox->xmin()<<" bbox->ymin: "<<bbox->ymin()
-           //         <<" bbox->xmax: "<<bbox->xmax()<<" bbox->ymax: "<<bbox->ymax()
-            //        <<" bbox->blur: "<<bbox->blur()<<" bbox->occlusion: "<<bbox->occlusion();
         }
       }
     }
   }
+#if 1
+  int group_size = anno_datum->annotation_group_size();
+  LOG(INFO)<<"group_size: "<<group_size;
+  for(int nn = 0; nn< group_size; nn++)
+  {
+    const AnnotationGroup anno_group = anno_datum->annotation_group(nn);
+    LOG(INFO) << "=============================";
+    LOG(INFO) <<"anno_group label: "<<anno_group.group_label();
+    int anno_size = anno_group.annotation_size();
+    for(int jj=0; jj<anno_size; jj++)
+    {
+      const Annotation anno = anno_group.annotation(jj);
+      LOG(INFO)<< "anno_instance_id: "<<anno.instance_id();
+      NormalizedBBox bbox = anno.bbox();
+      LOG(INFO) << "bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
+                <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
+                <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion()
+                <<" bbox->label: "<<bbox.label();
+    }
+  }
+#endif
   return true;
 }
 
