@@ -2481,7 +2481,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2527,7 +2527,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2574,7 +2574,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2622,7 +2622,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2661,9 +2661,8 @@ layer {
 	bottom: "data"
 	top: "conv11_mbox_priorbox"
 	prior_box_param {
-		min_size: 8.0
+		min_size: 10
 		max_size: 16.0
-		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2870,7 +2869,7 @@ layer {
 	prior_box_param {
 		min_size: 16.0
 		max_size: 32.0
-		aspect_ratio: 3.0
+		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3076,7 +3075,7 @@ layer {
 	prior_box_param {
 		min_size: 32.0
 		max_size: 64.0
-		aspect_ratio: 3.0
+		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3279,7 +3278,7 @@ layer {
 	prior_box_param {
 		min_size: 64.0
 		max_size: 128.0
-		aspect_ratio: 3.0
+		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3483,7 +3482,7 @@ layer {
 	prior_box_param {
 		min_size: 128.0
 		max_size: 214.0
-		aspect_ratio: 3.0
+		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3689,7 +3688,7 @@ layer {
 	prior_box_param {
 		min_size: 214.0
 		max_size: 300.0
-		aspect_ratio: 3.0
+		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1

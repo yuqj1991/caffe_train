@@ -18,7 +18,7 @@ Annotation_img_dir = '../../dataset/facedata/wider_face/Annotation_img'
 root_dir = "../../dataset/facedata/"
 anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
-thread_hold = 30
+thread_hold = 40
 class ConfigureHistogram(object):
 	def __init__(self):
 		self.count = 0
@@ -388,6 +388,9 @@ def load_wider_split(split_file):
 					continue
 				lab_file.writelines(newline)
 			lab_file.close()
+			data = open(label_image_file, "r").read()
+			if len(data)==0:
+				os.remove(label_image_file)
 	label_file.close()
 
 
@@ -400,16 +403,15 @@ def generate_pascal_image_set(wider_source_directory, save_folder):
 		for sub_env in sub_env_image_dir:
 			img_file_names = os.listdir(wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env)
 			for img_file_ in img_file_names:
-				#print("img_file_", img_file_)
 				img_no_jpg = img_file_.split('.jpg')[0]
-				#print("img-no-jpg",img_no_jpg)
 				full_img_file_ = wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env+'/'+img_no_jpg
 				if sub_dir == 'wider_train' or sub_dir == 'wider_val':
-					generate_xml_from_wider_face(LABEL_DIR, wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env+'/'+img_file_,
+					label_image_file = LABEL_DIR + '/' + img_no_jpg
+					if os.path.exists(label_image_file):
+						generate_xml_from_wider_face(LABEL_DIR, wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env+'/'+img_file_,
 												 ANNOTATIONS_DIR)
-				#print(full_img_file_)
-				imgfileline = os.path.abspath(full_img_file_) + '\n'
-				imgset_file.writelines(imgfileline)
+						imgfileline = os.path.abspath(full_img_file_) + '\n'
+						imgset_file.writelines(imgfileline)
 		imgset_file.close()
 
 
@@ -524,16 +526,16 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 
 
 def main():
-	'''
+	#'''
 	for sub in anno_src_wider_dir:
 		dir = "../../dataset/facedata/wider_face_split/"+sub
 		load_wider_split(dir)
 	generate_pascal_image_set(root_dir+'wider_face/JPEGImages', root_dir+'wider_face/ImageSets/Main')
 	for file in wider_directory:
 		shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
-	 '''
+	# '''
 	#draw_histogram_base_data()
-	draw_histogram_specfic_range_base_data()
+	# draw_histogram_specfic_range_base_data()
 
 
 if __name__ == '__main__':
