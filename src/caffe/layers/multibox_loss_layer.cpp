@@ -339,6 +339,7 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                          all_match_indices_, all_neg_indices_, all_gt_bboxes,
                          conf_pred_data, conf_gt_data);
     conf_loss_layer_->Reshape(conf_bottom_vec_, conf_top_vec_);
+    //LOG(INFO)<<"&&&&&&&&&&&&&&&&:conf_loss_: ";
     conf_loss_layer_->Forward(conf_bottom_vec_, conf_top_vec_);
 
      // conf blur layer 
@@ -366,11 +367,12 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
     Dtype* conf_blur_pred_data = conf_blur_pred_.mutable_cpu_data();
     Dtype* conf_blur_gt_data = conf_blur_gt_.mutable_cpu_data();
-    caffe_set(conf_blur_gt_.count(), Dtype(-1), conf_blur_gt_data);
+    caffe_set(conf_blur_gt_.count(), Dtype(0), conf_blur_gt_data);
     EncodeBlurConfPrediction(blur_data, num_, num_priors_, multibox_loss_param_,
                          all_match_indices_, all_neg_indices_, all_gt_bboxes,
                          conf_blur_pred_data, conf_blur_gt_data);
     conf_blur_loss_layer_->Reshape(conf_blur_bottom_vec_, conf_blur_top_vec_);
+    //LOG(INFO)<<"&&&&&&&&&&&&&&&&:conf_blur_loss_: ";
     conf_blur_loss_layer_->Forward(conf_blur_bottom_vec_, conf_blur_top_vec_);
 
     // conf occlussion layer
@@ -397,11 +399,12 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
     Dtype* conf_occl_pred_data = conf_occlussion_pred_.mutable_cpu_data();
     Dtype* conf_occl_gt_data = conf_occlussion_gt_.mutable_cpu_data();
-    caffe_set(conf_occlussion_gt_.count(), Dtype(-1), conf_occl_gt_data);
+    caffe_set(conf_occlussion_gt_.count(), Dtype(0), conf_occl_gt_data);
     EncodeOcclusConfPrediction(occl_data, num_, num_priors_, multibox_loss_param_,
                          all_match_indices_, all_neg_indices_, all_gt_bboxes,
                          conf_occl_pred_data, conf_occl_gt_data);
     conf_occlussion_loss_layer_->Reshape(conf_occlussion_bottom_vec_, conf_occlussion_top_vec_);
+    //LOG(INFO)<<"&&&&&&&&&&&&&&&&:conf_occlusion_loss_: ";
     conf_occlussion_loss_layer_->Forward(conf_occlussion_bottom_vec_, conf_occlussion_top_vec_);
   } else {
     conf_loss_.mutable_cpu_data()[0] = 0;
@@ -427,13 +430,13 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 
           conf_occlussion_loss_.cpu_data()[0] / normalizer;
   }
-  #if 0
-  LOG(INFO)<<" num_conf_: "<<num_conf_;
+  #if 1
+  LOG(INFO)<<"num_matches_: "<<num_matches_<<" num_gtBoxes: "<<num_gt_<<" num_conf_: "<<num_conf_;
   LOG(INFO)<<" loc_loss_: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
-          <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
-          <<" conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0] / normalizer
-          <<" conf_occlussion_loss_: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
-  LOG(FATAL)<<" END";
+           <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
+           <<" conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0] / normalizer
+           <<" conf_occlussion_loss_: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
+  LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
   #endif
 }
 
@@ -663,11 +666,6 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   // After backward, remove match statistics.
   all_match_indices_.clear();
   all_neg_indices_.clear();
-  #if 0
-  num_cnt_++;
-  if(num_cnt_ == 3)
-    LOG(FATAL)<<" END";
-  #endif
 }
 
 INSTANTIATE_CLASS(MultiBoxLossLayer);

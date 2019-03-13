@@ -379,8 +379,12 @@ def load_wider_split(split_file):
 				width = anno_bbox[2]
 				height = anno_bbox[3]
 				blur = anno_bbox[4]
+				intBlur = int(blur) + 1
+				blur = str(intBlur)
 				invalid = anno_bbox[7]
 				occlusion = anno_bbox[8]
+				intOcclu_ = int(occlusion) + 1
+				occlusion = str(intOcclu_)
 				newline = x_min + ' '+y_min+ ' '+width+ ' '+height+ ' '+blur+ ' '+occlusion+' \n'
 				if int(invalid) == 1:
 					continue

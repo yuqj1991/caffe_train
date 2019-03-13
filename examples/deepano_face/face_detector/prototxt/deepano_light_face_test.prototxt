@@ -2918,7 +2918,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2964,7 +2964,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3010,7 +3010,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3058,7 +3058,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3100,7 +3100,6 @@ layer {
 	prior_box_param {
 		min_size: 32.0
 		max_size: 64.0
-		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3124,7 +3123,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3170,7 +3169,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3216,7 +3215,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3262,7 +3261,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3303,7 +3302,6 @@ layer {
 	prior_box_param {
 		min_size: 64.0
 		max_size: 128.0
-		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3327,7 +3325,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3373,7 +3371,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3419,7 +3417,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3465,7 +3463,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3507,7 +3505,6 @@ layer {
 	prior_box_param {
 		min_size: 128.0
 		max_size: 214.0
-		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3531,7 +3528,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3577,7 +3574,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3623,7 +3620,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3671,7 +3668,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3713,7 +3710,6 @@ layer {
 	prior_box_param {
 		min_size: 214.0
 		max_size: 300.0
-		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3908,12 +3904,12 @@ layer {
 		background_blur_id: -1
 		background_occl_id: -1
 		nms_param {
-			nms_threshold: 0.55
+			nms_threshold: 0.85
 			top_k: 100
 		}
 		code_type: CENTER_SIZE
 		keep_top_k: 50
-		confidence_threshold: 0.25
+		confidence_threshold: 0.4
 	}
 }
 layer {
