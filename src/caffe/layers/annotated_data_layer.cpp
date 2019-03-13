@@ -194,8 +194,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       // Generate sampled bboxes from expand_datum.
       vector<NormalizedBBox> sampled_bboxes;
       GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
-      //LOG(INFO)<<"sampled_bboxes: size(): "<<sampled_bboxes.size()
-               //<<" batch_samplers_.size(): "<<batch_samplers_.size();
       if (sampled_bboxes.size() > 0) {
         // Randomly pick a sampled bbox and crop the expand_datum.
         int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
@@ -332,7 +330,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
               <<" anno.instance_id: "<<top_label_data[id+2];
     LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
               <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
-              <<" bbox->blur: "<<top_label_data[id+7]<<" bbox->occlusion: "<<top_label_data[id+8];
+              <<" bbox->blur: "<<top_label_data[id+7]<<" bbox->occlusion: "<<top_label_data[id+8]
+              <<" bbox->difficult: "<<top_label_data[id+9];
   }
   LOG(INFO)<< "finished **************************************************** end ";
 #endif 

@@ -492,6 +492,7 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 			cv2.rectangle(source_img, (int(x_min), int(y_min)), (int(x_min) + int(width), int(y_min) + int(height)), (255, 0, 0))
 			blur = anno_bbox[4]
 			occlusion = anno_bbox[5]
+			difficult = str(0)
 			if int(width) < thread_hold or int(height)< thread_hold:
 				label_text_line = label_img_file.readline()
 				continue
@@ -506,6 +507,9 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 			occlusion_node = doc.createElement('occlusion')
 			occlusion_node.appendChild(doc.createTextNode(occlusion))
 			objects.appendChild(occlusion_node)
+			difficult_node = doc.createElement('difficult')
+			difficult_node.appendChild(doc.createTextNode(difficult))
+			objects.appendChild(difficult_node)
 			boundbox = doc.createElement('boundingbox')  # boundbox
 			objects.appendChild(boundbox)
 			xmin = doc.createElement('xmin')

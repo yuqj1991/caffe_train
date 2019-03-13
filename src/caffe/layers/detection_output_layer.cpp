@@ -188,7 +188,7 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   // Since the number of bboxes to be kept is unknown before nms, we manually
   // set it to (fake) 1.
   top_shape.push_back(1);
-  // Each row is a 7 dimension vector, which stores
+  // Each row is a 9 dimension vector, which stores
   // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
   top_shape.push_back(9);
   top[0]->Reshape(top_shape);

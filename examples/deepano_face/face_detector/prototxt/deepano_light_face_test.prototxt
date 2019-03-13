@@ -3901,15 +3901,15 @@ layer {
 		num_occlusion: 4
 		share_location: true
 		background_label_id: 0
-		background_blur_id: -1
-		background_occl_id: -1
+		background_blur_id: 0
+		background_occl_id: 0
 		nms_param {
 			nms_threshold: 0.85
 			top_k: 100
 		}
 		code_type: CENTER_SIZE
 		keep_top_k: 50
-		confidence_threshold: 0.4
+		confidence_threshold: 0.25
 	}
 }
 layer {
