@@ -16,8 +16,9 @@ snapshot_after_train: true
 test_initialization: false
 average_loss: 10
 stepvalue: 8000
-stepvalue: 20000
-stepvalue: 40000
+stepvalue: 15000
+stepvalue: 30000
+stepvalue: 50000
 iter_size: 1
 momentum2 : 0.99
 type: "RMSProp"

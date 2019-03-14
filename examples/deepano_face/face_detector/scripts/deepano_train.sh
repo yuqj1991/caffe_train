@@ -10,4 +10,4 @@ if ! test -f ../prototxt/deepano_light_face_test.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=../solver/deepano_solver_train.prototxt -gpu 0 \
---snapshot=../snapshot/deepanoFace_iter_8494.solverstate
+--snapshot=../snapshot/deepanoFace_iter_60030.solverstate
