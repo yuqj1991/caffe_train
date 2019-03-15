@@ -18,7 +18,7 @@ Annotation_img_dir = '../../dataset/facedata/wider_face/Annotation_img'
 root_dir = "../../dataset/facedata/"
 anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
-thread_hold = 40
+thread_hold = 40 ##map:59.35%, thread_hold=40
 class ConfigureHistogram(object):
 	def __init__(self):
 		self.count = 0

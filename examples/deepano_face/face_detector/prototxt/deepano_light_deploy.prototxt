@@ -3805,7 +3805,7 @@ layer {
 	shape {
 		dim: 0
 		dim: -1
-		dim: 2
+		dim: 4
 	}
 	}
 }
@@ -3836,7 +3836,7 @@ layer {
 		shape {
 			dim: 0
 			dim: -1
-			dim: 2
+			dim: 4
 		}
 	}
 }
@@ -3879,7 +3879,7 @@ layer {
 		background_blur_id: 0
 		background_occl_id: 0
 		nms_param {
-			nms_threshold: 0.85
+			nms_threshold: 0.45
 			top_k: 100
 		}
 		code_type: CENTER_SIZE

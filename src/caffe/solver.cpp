@@ -543,7 +543,7 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
     mAP /= num_pos.size();
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
-    LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
+    LOG(INFO) << "&&&&Test net output #" << i << ": map of " << output_name << " = "
               << mAP;
   }
 }

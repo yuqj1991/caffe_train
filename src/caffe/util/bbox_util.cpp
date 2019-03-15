@@ -2034,7 +2034,7 @@ void ApplyNMS(const vector<NormalizedBBox>& bboxes, const vector<float>& scores,
     // Get the current highest score box.
     int best_idx = score_index_vec.front().second;
     const NormalizedBBox& best_bbox = bboxes[best_idx];
-    if (BBoxSize(best_bbox) < 1e-5) {
+    if (BBoxSize(best_bbox) < 1e-2) {
       // Erase small box.
       score_index_vec.erase(score_index_vec.begin());
       continue;
@@ -2054,7 +2054,7 @@ void ApplyNMS(const vector<NormalizedBBox>& bboxes, const vector<float>& scores,
          it != score_index_vec.end(); ) {
       int cur_idx = it->second;
       const NormalizedBBox& cur_bbox = bboxes[cur_idx];
-      if (BBoxSize(cur_bbox) < 1e-5) {
+      if (BBoxSize(cur_bbox) < 1e-2) {
         // Erase small box.
         it = score_index_vec.erase(it);
         continue;

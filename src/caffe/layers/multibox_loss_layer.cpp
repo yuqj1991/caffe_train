@@ -421,18 +421,18 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   if(this->layer_param_.propagate_down(3)) {
     top[0]->mutable_cpu_data()[0] += 
-          conf_blur_loss_.cpu_data()[0] / normalizer;
+          0.5*conf_blur_loss_.cpu_data()[0] / normalizer;
   }
   if(this->layer_param_.propagate_down(4)) {
     top[0]->mutable_cpu_data()[0] += 
-          conf_occlussion_loss_.cpu_data()[0] / normalizer;
+          0.5*conf_occlussion_loss_.cpu_data()[0] / normalizer;
   }
   #if 0
   LOG(INFO)<<"num_matches_: "<<num_matches_<<" num_gtBoxes: "<<num_gt_<<" num_conf_: "<<num_conf_;
   LOG(INFO)<<" loc_loss_: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
            <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
-           <<" conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0] / normalizer
-           <<" conf_occlussion_loss_: " << conf_occlussion_loss_.cpu_data()[0] / normalizer;
+           <<" conf_blur_loss_: "<<0.5*conf_blur_loss_.cpu_data()[0] / normalizer
+           <<" conf_occlussion_loss_: " << 0.5*conf_occlussion_loss_.cpu_data()[0] / normalizer;
   LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
   #endif
 }

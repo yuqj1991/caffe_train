@@ -57,7 +57,7 @@ def detect(imgfile):
     box, conf, cls = postprocess(origimg, out)
 
     for i in range(len(box)):
-       if conf[i]>=0.26:
+       if conf[i]>=0.25:
            p1 = (box[i][0], box[i][1])
            p2 = (box[i][2], box[i][3])
            cv2.rectangle(origimg, p1, p2, (0,255,0))
@@ -74,3 +74,4 @@ def detect(imgfile):
 for f in os.listdir(test_dir):
     if detect(test_dir + "/" + f) == False:
        break
+
