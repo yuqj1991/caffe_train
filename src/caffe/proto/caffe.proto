@@ -130,6 +130,20 @@ message NormalizedBBox {
   optional float size = 10;
 }
 
+// the normalized lanmarks of five points which has been normalized [0, 1] w.r.t. the input image size.
+message LandmarkFace{
+  optional float x1 = 1;
+  optional float x2 = 2;
+  optional float x3 = 3;
+  optional float x4 = 4;
+  optional float x5 = 5;
+  optional float y1 = 6;
+  optional float y2 = 7;
+  optional float y3 =8;
+  optional float y4 =9;
+  optional float y5 =10;
+}
+
 // Annotation for each object instance.
 message Annotation {
   optional int32 instance_id = 1 [default = 0];
