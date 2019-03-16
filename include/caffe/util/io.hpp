@@ -203,6 +203,22 @@ inline bool ReadRichImageToAnnotatedDatum(const string& filename,
                       anno_datum);
 }
 
+bool ReadRichFaceToAnnotatedDatum(const string& filename,
+    const string& labelfile, const int height, const int width,
+    const int min_dim, const int max_dim, const bool is_color,
+    const string& encoding, const AnnotatedDatum_AnnotationType type,
+    const string& labeltype, AnnoFaceDatum* anno_datum);
+
+inline bool ReadRichFaceToAnnotatedDatum(const string& filename,
+    const string& labelname, const int height, const int width,
+    const bool is_color, const std::string & encoding,
+    const AnnotatedDatum_AnnotationType type, const string& labeltype,
+    AnnoFaceDatum* anno_datum) {
+  return ReadRichFaceToAnnotatedDatum(filename, labelname, height, width, 0, 0,
+                      is_color, encoding, type, labeltype, 
+                      anno_datum);
+}
+
 bool ReadXMLToAnnotatedDatum(const string& labelname, const int img_height,
     const int img_width, const std::map<string, int>& name_to_label,
     AnnotatedDatum* anno_datum);
@@ -213,6 +229,9 @@ bool ReadJSONToAnnotatedDatum(const string& labelname, const int img_height,
 
 bool ReadTxtToAnnotatedDatum(const string& labelname, const int height,
     const int width, AnnotatedDatum* anno_datum);
+
+bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
+    const int width, AnnoFaceDatum* anno_datum);
 
 bool ReadLabelFileToLabelMap(const string& filename, bool include_background,
     const string& delimiter, LabelMap* map);

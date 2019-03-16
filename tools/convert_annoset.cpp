@@ -138,6 +138,7 @@ int main(int argc, char** argv) {
   std::string root_folder(argv[1]);
   AnnotatedDatum anno_datum;
   Datum* datum = anno_datum.mutable_datum();
+  AnnoFaceDatum anno_faceDatum;
   int count = 0;
   int data_size = 0;
   bool data_size_initialized = false;
@@ -165,7 +166,11 @@ int main(int argc, char** argv) {
           resize_width, min_dim, max_dim, is_color, enc, type, label_type,
           name_to_label, &anno_datum);
       anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
-    }
+    }else if(anno_type == "faceattributes"){
+		  status = ReadRichFaceToAnnotatedDatum(filename,
+          labelname, resize_height, resize_width, min_dim, max_dim, is_color,
+          enc, type, label_type, &anno_faceDatum);
+	}
     if (status == false) {
       LOG(WARNING) << "Failed to read " << lines[line_id].first;
       continue;

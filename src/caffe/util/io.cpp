@@ -209,6 +209,8 @@ bool ReadRichImageToAnnotatedDatum(const string& filename,
   if (!boost::filesystem::exists(labelfile)) {
     return true;
   }
+  // annno type bbox or attributes
+  const string & facetype = "faceattributes";
   switch (type) {
     case AnnotatedDatum_AnnotationType_BBOX:
       int ori_height, ori_width;
@@ -221,6 +223,41 @@ bool ReadRichImageToAnnotatedDatum(const string& filename,
                                         name_to_label, anno_datum);
       } else if (labeltype == "txt") {
         return ReadTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                       anno_datum);
+      } else {
+        LOG(FATAL) << "Unknown label file type.";
+        return false;
+      }
+      break;
+    default:
+      LOG(FATAL) << "Unknown annotation type.";
+      return false;
+  }
+}
+
+bool ReadRichFaceToAnnotatedDatum(const string& filename,
+    const string& labelfile, const int height, const int width,
+    const int min_dim, const int max_dim, const bool is_color,
+    const string& encoding, const AnnotatedDatum_AnnotationType type,
+    const string& labeltype, AnnoFaceDatum* anno_datum) {
+  // Read image to datum.
+  bool status = ReadImageToDatum(filename, -1, height, width,
+                                 min_dim, max_dim, is_color, encoding,
+                                 anno_datum->mutable_datum());
+  if (status == false) {
+    return status;
+  }
+  anno_datum->clear_annoface();
+  if (!boost::filesystem::exists(labelfile)) {
+    return true;
+  }
+  // annno type bbox or attributes
+  switch (type) {
+    case AnnotatedDatum_AnnotationType_BBOX:
+      int ori_height, ori_width;
+      GetImageSize(filename, &ori_height, &ori_width);
+      if (labeltype == "txt") {
+        return ReadFaceAttriTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
                                        anno_datum);
       } else {
         LOG(FATAL) << "Unknown label file type.";
@@ -550,6 +587,66 @@ bool ReadTxtToAnnotatedDatum(const string& labelfile, const int height,
     bbox->set_xmax(xmax / width);
     bbox->set_ymax(ymax / height);
     bbox->set_difficult(false);
+  }
+  return true;
+}
+
+bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
+    const int width, AnnoFaceDatum* anno_datum) {
+  std::ifstream infile(labelfile.c_str());
+  if (!infile.good()) {
+    LOG(INFO) << "Cannot open " << labelfile;
+    return false;
+  }
+  float x1, x2, x3, x4, x5, y1, y2, y3, y4, y5;
+  int gender, headPose;
+  bool glass;
+  while (infile >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5 >> gender >> glass >> headPose) {
+    AnnotationFace* anno = NULL;
+    anno = anno_datum->add_annoface();
+    LOG_IF(WARNING, x1 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y1 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x2 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y2 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x3 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y3 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x4 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y4 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x5 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y5 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x1 < 0) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y1 < 0) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x2 < 0) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x2 < 0) << labelfile <<
+      " bounding box exceeds image boundary.";
+    // Store the normalized bounding box.
+    LandmarkFace* landface = anno->mutable_markface();
+    anno->set_gender(gender);
+    anno->set_glasses(glass);
+    anno->set_headpose(headPose);
+    landface->set_x1(x1);
+    landface->set_x2(x2);
+    landface->set_x3(x3);
+    landface->set_x4(x4);
+    landface->set_x5(x5);
+    landface->set_y1(y1);
+    landface->set_y2(y2);
+    landface->set_y3(y3);
+    landface->set_y4(y4);
+    landface->set_y5(y5);
   }
   return true;
 }
