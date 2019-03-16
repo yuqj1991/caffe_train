@@ -11,14 +11,16 @@ from xml.dom.minidom import Document
 # from lxml.etree import Element, SubElement, tostring
 sys.setrecursionlimit(1000000)
 
-ANNOTATIONS_DIR = '../../dataset/facedata/wider_face/Annotations'
-LABEL_DIR = '../../dataset/facedata/wider_face/label'
+ANNOTATIONS_DIR = '../../dataset/facedata/mtfl/Annotations'
+LABEL_DIR = '../../dataset/facedata/mtfl/label'
 wider_directory = ['wider_train', 'wider_test', 'wider_val']
-Annotation_img_dir = '../../dataset/facedata/wider_face/Annotation_img'
+Annotation_img_dir = '../../dataset/facedata/mtfl/Annotation_img'
 root_dir = "../../dataset/facedata/"
-anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
+anno_mtfl_dir = ['training.txt', 'testing.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
-thread_hold = 40 ##map:59.35%, thread_hold=40
+thread_hold = 40  # map:59.35%, thread_hold=40
+
+
 class ConfigureHistogram(object):
 	def __init__(self):
 		self.count = 0
@@ -360,63 +362,48 @@ def generate_label_file(label_line):
 
 
 # generate label txt file for each image
-def load_wider_split(split_file):
+def convert_src_anno_label(split_file):
+	mainSetFile = open(root_dir+ "mtfl/ImageSets/Main/" +str(split_file.split("/")[-1]), "w")
 	with open(split_file, 'r') as label_file:
 		while True:  # and len(faces)<10
-			img_filename = label_file.readline()[:-1]
-			if img_filename == "":
+			'''
+			info = label_file.readline()
+			if len(info) == 0:
 				break;
-			print("img_filename:%s"%{img_filename})
-			label_image_file = LABEL_DIR + '/' + img_filename.split('.')[-2].split('/')[-1]
-			lab_file = open(label_image_file, 'w')
-			numbbox = int(label_file.readline())
-			for i in range(numbbox):
-				line = label_file.readline()
-				anno_bbox = line.split(' ')
-				print('anno_bbox :', anno_bbox)
-				x_min = anno_bbox[0]
-				y_min = anno_bbox[1]
-				width = anno_bbox[2]
-				height = anno_bbox[3]
-				blur = anno_bbox[4]
-				intBlur = int(blur) + 1
-				blur = str(intBlur)
-				invalid = anno_bbox[7]
-				occlusion = anno_bbox[8]
-				intOcclu_ = int(occlusion) + 1
-				occlusion = str(intOcclu_)
-				newline = x_min + ' '+y_min+ ' '+width+ ' '+height+ ' '+blur+ ' '+occlusion+' \n'
-				if int(invalid) == 1:
-					continue
-				if int(width)< thread_hold or int(height)< thread_hold:
-					continue
-				lab_file.writelines(newline)
-			lab_file.close()
-			data = open(label_image_file, "r").read()
-			if len(data)==0:
-				os.remove(label_image_file)
-	label_file.close()
-
-
-# generate pascal _image Set , subdirectory Main train and test , and xml file ,and annotation_img_file
-def generate_pascal_image_set(wider_source_directory, save_folder):
-	subdirectory = os.listdir(wider_source_directory)
-	for sub_dir in subdirectory:
-		imgset_file = open(save_folder+'/'+sub_dir+'.txt', 'w')
-		sub_env_image_dir = os.listdir(wider_source_directory+'/'+sub_dir+'/images')
-		for sub_env in sub_env_image_dir:
-			img_file_names = os.listdir(wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env)
-			for img_file_ in img_file_names:
-				img_no_jpg = img_file_.split('.jpg')[0]
-				full_img_file_ = wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env+'/'+img_no_jpg
-				if sub_dir == 'wider_train' or sub_dir == 'wider_val':
-					label_image_file = LABEL_DIR + '/' + img_no_jpg
-					if os.path.exists(label_image_file):
-						generate_xml_from_wider_face(LABEL_DIR, wider_source_directory+'/'+sub_dir+'/images'+'/'+sub_env+'/'+img_file_,
-												 ANNOTATIONS_DIR)
-						imgfileline = os.path.abspath(full_img_file_) + '\n'
-						imgset_file.writelines(imgfileline)
-		imgset_file.close()
+			'''
+			img_file_info = label_file.readline().split(' ')
+			img_filename = img_file_info[1]
+			img_filename = img_filename.replace('\\', '/')
+			img_file = root_dir + "mtfl/JPEGImages/" + img_filename
+			source_img = cv2.imread(img_file)
+			fullImg = os.path.abspath(img_file) + '\n'
+			mainSetFile.writelines(fullImg)
+			labelFile = open(LABEL_DIR+'/'+fullImg.split("/")[-1].split(".")[0], "w")
+			x1 = img_file_info[2]
+			x2 = img_file_info[3]
+			x3 = img_file_info[4]
+			x4 = img_file_info[5]
+			x5 = img_file_info[6]
+			y1 = img_file_info[7]
+			y2 = img_file_info[8]
+			y3 = img_file_info[9]
+			y4 = img_file_info[10]
+			y5 = img_file_info[11]
+			x =[x1, x2, x3, x4, x5];
+			y =[y1, y2, y3, y4, y5];
+			for ii in range(5):
+				cv2.circle(source_img, (int(float(x[ii])), int(float(y[ii]))), 1, (0, 0, 225), -1)
+			cv2.imwrite(Annotation_img_dir+"/"+str(img_file.split("/")[-1]), source_img)
+			print (Annotation_img_dir+"/"+str(img_file.split("/")[-1]))
+			gender = img_file_info[12]
+			glass = img_file_info[14]
+			headpose = img_file_info[15]
+			landmark = x1 + " " + x2 + " " + x3 + " " + x4 \
+						+ " " + x5 + " " + y1 + " " + y2 + " " \
+						+ " " + y3 + " " + y4 + " " + y5 + " " + gender + " " + glass + " "+ headpose
+			labelFile.write(landmark)
+			labelFile.close()
+	mainSetFile.close()
 
 
 # shuffle samples
@@ -430,119 +417,14 @@ def shuffle_file(filename):
 	f.close()
 
 
-# generate xml file from wider
-def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_folder):
-	label_img_file = label_source_folder+'/'+img_filename.split('.')[-2].split('/')[-1]
-	xml_file_path = xml_save_folder+'/'+img_filename.split('.')[-2].split('/')[-1]+'.xml'
-	print('xml_file_path: %s' %{xml_file_path})
-	source_img = cv2.imread(img_filename)
-	doc = Document()
-	annotation = doc.createElement('annotation') 	# annotation element
-	doc.appendChild(annotation)
-	folder = doc.createElement('folder')
-	folder_name = doc.createTextNode('wider_face')
-	folder.appendChild(folder_name)
-	annotation.appendChild(folder)
-	filename_node = doc.createElement('filename')
-	filename_name = doc.createTextNode(img_filename)
-	filename_node.appendChild(filename_name)
-	annotation.appendChild(filename_node)
-	source = doc.createElement('source')  # source sub_element
-	annotation.appendChild(source)
-	database = doc.createElement('database')
-	database.appendChild(doc.createTextNode('wider_face Database'))
-	annotation.appendChild(database)
-	annotation_s = doc.createElement('annotation')
-	annotation_s.appendChild(doc.createTextNode('PASCAL VOC2007'))
-	source.appendChild(annotation_s)
-	image = doc.createElement('image')
-	image.appendChild(doc.createTextNode('flickr'))
-	source.appendChild(image)
-	flickrid = doc.createElement('flickrid')
-	flickrid.appendChild(doc.createTextNode('-1'))
-	source.appendChild(flickrid)
-	owner = doc.createElement('owner')  # company element
-	annotation.appendChild(owner)
-	flickrid_o = doc.createElement('flickrid')
-	flickrid_o.appendChild(doc.createTextNode('deepano'))
-	owner.appendChild(flickrid_o)
-	name_o = doc.createElement('name')
-	name_o.appendChild(doc.createTextNode('deepano'))
-	owner.appendChild(name_o)
-	size = doc.createElement('size')   # img size info element
-	annotation.appendChild(size)
-	width = doc.createElement('width')
-	width.appendChild(doc.createTextNode(str(source_img.shape[1])))
-	height = doc.createElement('height')
-	height.appendChild(doc.createTextNode(str(source_img.shape[0])))
-	depth = doc.createElement('depth')
-	depth.appendChild(doc.createTextNode(str(source_img.shape[2])))
-	size.appendChild(width)
-	size.appendChild(height)
-	size.appendChild(depth)
-	with open(label_img_file,'r') as label_img_file:
-		label_text_line = label_img_file.readline()
-		while label_text_line:
-			anno_bbox = label_text_line.split(' ')
-			print('anno_bbox :', anno_bbox)
-			x_min = anno_bbox[0]
-			y_min = anno_bbox[1]
-			width = anno_bbox[2]
-			height = anno_bbox[3]
-			cv2.rectangle(source_img, (int(x_min), int(y_min)), (int(x_min) + int(width), int(y_min) + int(height)), (255, 0, 0))
-			blur = anno_bbox[4]
-			occlusion = anno_bbox[5]
-			difficult = str(0)
-			if int(width) < thread_hold or int(height)< thread_hold:
-				label_text_line = label_img_file.readline()
-				continue
-			objects = doc.createElement('objects')
-			annotation.appendChild(objects)
-			object_name = doc.createElement('name')
-			object_name.appendChild(doc.createTextNode('face'))
-			objects.appendChild(object_name)
-			blur_node = doc.createElement('blur')
-			blur_node.appendChild(doc.createTextNode(blur))
-			objects.appendChild(blur_node)
-			occlusion_node = doc.createElement('occlusion')
-			occlusion_node.appendChild(doc.createTextNode(occlusion))
-			objects.appendChild(occlusion_node)
-			difficult_node = doc.createElement('difficult')
-			difficult_node.appendChild(doc.createTextNode(difficult))
-			objects.appendChild(difficult_node)
-			boundbox = doc.createElement('boundingbox')  # boundbox
-			objects.appendChild(boundbox)
-			xmin = doc.createElement('xmin')
-			xmin.appendChild(doc.createTextNode(x_min))
-			boundbox.appendChild(xmin)
-			ymin = doc.createElement('ymin')
-			ymin.appendChild(doc.createTextNode(y_min))
-			boundbox.appendChild(ymin)
-			xmax = doc.createElement('xmax')
-			xmax.appendChild(doc.createTextNode(str(int(x_min) + int(width))))
-			boundbox.appendChild(xmax)
-			ymax =doc.createElement('ymax')
-			ymax.appendChild(doc.createTextNode(str(int(y_min) + int(height))))
-			boundbox.appendChild(ymax)
-
-
-			label_text_line = label_img_file.readline()
-	cv2.imwrite(Annotation_img_dir+'/'+img_filename.split('.')[-2].split('/')[-1]+'.jpg',source_img)
-	xml_file = open(xml_file_path, 'w')
-	xml_file.write(doc.toprettyxml(indent=''))
-	xml_file.close()
-
-
 def main():
-	#'''
-	for sub in anno_src_wider_dir:
-		dir = "../../dataset/facedata/wider_face_split/"+sub
-		load_wider_split(dir)
-	generate_pascal_image_set(root_dir+'wider_face/JPEGImages', root_dir+'wider_face/ImageSets/Main')
-	for file in wider_directory:
-		shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
-	# '''
-	#draw_histogram_base_data()
+
+	for sub in anno_mtfl_dir:
+		dir = "../../dataset/facedata/mtfl/"+sub
+		convert_src_anno_label(dir)
+	# for file in wider_directory:
+	# 	shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt'
+	# draw_histogram_base_data()
 	# draw_histogram_specfic_range_base_data()
 
 
