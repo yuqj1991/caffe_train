@@ -180,8 +180,12 @@ message AnnotationFace{
 
 // An extension of Datum which have "rich " face attributes
 message AnnoFaceDatum{
+  enum AnnotationType {
+    FACEMARK = 0;
+  }
   optional Datum datum = 1;
   repeated AnnotationFace annoface = 2;
+  optional AnnotationType type = 3;
 }
 
 message FillerParameter {

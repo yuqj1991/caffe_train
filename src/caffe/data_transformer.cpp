@@ -341,6 +341,32 @@ void DataTransformer<Dtype>::TransformAnnotation(
 }
 
 template<typename Dtype>
+void DataTransformer<Dtype>::TransformAnnoFace(
+      const AnnoFaceDatum& anno_datum, const bool do_resize,
+      const bool do_mirror, 
+      RepeatedPtrField<AnnotationFace>* transformed_annoface_all){
+	const int img_height = anno_datum.datum().height();
+	const int img_width = anno_datum.datum().width();
+	if(anno_datum.type() == AnnoFaceDatum_AnnotationType_FACEMARK){
+		bool has_valid_annotation = false;
+		if(do_resize && param_.has_resize_param()){
+			CHECK_GT(img_height, 0);
+			CHECK_GT(img_width, 0);
+			const ResizeParameter& resize_param = param_.resize_param();
+			const int new_height = resize_param.height();
+			const int new_width = resize_param.width();
+			CHECK_GT(new_height, 0);
+			CHECK_GT(new_width, 0);
+			const float height_scale = (float)new_height/img_height;
+			const float width_scale = (float)new_width/img_width;
+			const L
+		}
+
+	}
+
+}
+
+template<typename Dtype>
 void DataTransformer<Dtype>::CropImage(const Datum& datum,
 																			 const NormalizedBBox& bbox,
 																			 Datum* crop_datum) {
