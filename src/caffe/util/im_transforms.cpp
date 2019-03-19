@@ -101,9 +101,6 @@ void UpdateLandmarkFaceByResizePolicy(const ResizeParameter& param,
                               LandmarkFace* lface) {
   float new_height = param.height();
   float new_width = param.width();
-  float orig_aspect = static_cast<float>(old_width) / old_height;
-  float new_aspect = new_width / new_height;
-
   float x1 = lface->x1() * old_width;
   float x2 = lface->x2() * old_width;
   float x3 = lface->x3() * old_width;
@@ -114,51 +111,42 @@ void UpdateLandmarkFaceByResizePolicy(const ResizeParameter& param,
   float y3 = lface->y3() * old_height;
   float y4 = lface->y4() * old_height;
   float y5 = lface->y5() * old_height;
-  float padding;
   switch (param.resize_mode()) {
     case ResizeParameter_Resize_mode_WARP:
       x1 = std::max(0.f, x1 * new_width / old_width);
-      x1 = std::min(new_width, x_max * new_width / old_width);
-      y_min = std::max(0.f, y_min * new_height / old_height);
-      y_max = std::min(new_height, y_max * new_height / old_height);
-      break;
-    case ResizeParameter_Resize_mode_FIT_LARGE_SIZE_AND_PAD:
-      if (orig_aspect > new_aspect) {
-        padding = (new_height - new_width / orig_aspect) / 2;
-        x_min = std::max(0.f, x_min * new_width / old_width);
-        x_max = std::min(new_width, x_max * new_width / old_width);
-        y_min = y_min * (new_height - 2 * padding) / old_height;
-        y_min = padding + std::max(0.f, y_min);
-        y_max = y_max * (new_height - 2 * padding) / old_height;
-        y_max = padding + std::min(new_height, y_max);
-      } else {
-        padding = (new_width - orig_aspect * new_height) / 2;
-        x_min = x_min * (new_width - 2 * padding) / old_width;
-        x_min = padding + std::max(0.f, x_min);
-        x_max = x_max * (new_width - 2 * padding) / old_width;
-        x_max = padding + std::min(new_width, x_max);
-        y_min = std::max(0.f, y_min * new_height / old_height);
-        y_max = std::min(new_height, y_max * new_height / old_height);
-      }
-      break;
-    case ResizeParameter_Resize_mode_FIT_SMALL_SIZE:
-      if (orig_aspect < new_aspect) {
-        new_height = new_width / orig_aspect;
-      } else {
-        new_width = orig_aspect * new_height;
-      }
-      x_min = std::max(0.f, x_min * new_width / old_width);
-      x_max = std::min(new_width, x_max * new_width / old_width);
-      y_min = std::max(0.f, y_min * new_height / old_height);
-      y_max = std::min(new_height, y_max * new_height / old_height);
+      x1 = std::min(new_width, x1 * new_width / old_width);
+      y1 = std::max(0.f, y1 * new_height / old_height);
+      y1 = std::min(new_height, y1 * new_height / old_height);
+      x2 = std::max(0.f, x2 * new_width / old_width);
+      x2 = std::min(new_width, x2 * new_width / old_width);
+      y2 = std::max(0.f, y2 * new_height / old_height);
+      y2 = std::min(new_height, y2 * new_height / old_height);
+      x3 = std::max(0.f, x3 * new_width / old_width);
+      x3 = std::min(new_width, x3 * new_width / old_width);
+      y3 = std::max(0.f, y3 * new_height / old_height);
+      y3 = std::min(new_height, y3 * new_height / old_height);
+      x4 = std::max(0.f, x4 * new_width / old_width);
+      x4 = std::min(new_width, x4 * new_width / old_width);
+      y4 = std::max(0.f, y4 * new_height / old_height);
+      y4 = std::min(new_height, y4 * new_height / old_height);
+      x5 = std::max(0.f, x5 * new_width / old_width);
+      x5 = std::min(new_width, x5 * new_width / old_width);
+      y5 = std::max(0.f, y5 * new_height / old_height);
+      y5 = std::min(new_height, y5 * new_height / old_height);
       break;
     default:
       LOG(FATAL) << "Unknown resize mode.";
   }
-  bbox->set_xmin(x_min / new_width);
-  bbox->set_ymin(y_min / new_height);
-  bbox->set_xmax(x_max / new_width);
-  bbox->set_ymax(y_max / new_height);
+  lface->set_x1(x1/new_width);
+  lface->set_y1(y1/new_height);
+  lface->set_x2(x2/new_width);
+  lface->set_y2(y2/new_height);
+  lface->set_x3(x3/new_width);
+  lface->set_y3(y3/new_height);
+  lface->set_x4(x4/new_width);
+  lface->set_y4(y4/new_height);
+  lface->set_x5(x5/new_width);
+  lface->set_y5(y5/new_height);
 }
 
 void InferNewSize(const ResizeParameter& resize_param,

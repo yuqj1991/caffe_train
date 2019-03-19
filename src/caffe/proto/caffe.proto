@@ -173,9 +173,9 @@ message LandmarkFace{
 // Annotation face attritubite for each object.
 message AnnotationFace{
   optional LandmarkFace markface = 1;
-  optional int32 gender = 2;
+  optional int32 gender = 2 [default = 0];
   optional bool glasses = 3 [default = false];
-  optional int32 headpose = 4;
+  optional int32 headpose = 4 [default = 0];
 }
 
 // An extension of Datum which have "rich " face attributes
@@ -184,7 +184,7 @@ message AnnoFaceDatum{
     FACEMARK = 0;
   }
   optional Datum datum = 1;
-  repeated AnnotationFace annoface = 2;
+  optional AnnotationFace annoface = 2;
   optional AnnotationType type = 3;
 }
 

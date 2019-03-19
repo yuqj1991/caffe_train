@@ -6,6 +6,7 @@
 #include "caffe/common.hpp"
 #include "caffe/data_reader.hpp"
 #include "caffe/layers/annotated_data_layer.hpp"
+#include "caffe/layers/faceData_layer.hpp"
 #include "caffe/layers/data_layer.hpp"
 #include "caffe/proto/caffe.pb.h"
 
@@ -134,5 +135,6 @@ void DataReader<T>::Body::read_one(db::Cursor* cursor, QueuePair* qp) {
 // Instance class
 template class DataReader<Datum>;
 template class DataReader<AnnotatedDatum>;
+template class DataReader<AnnoFaceDatum>;
 
 }  // namespace caffe

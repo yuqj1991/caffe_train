@@ -4,7 +4,6 @@
 
 #include <string>
 #include <vector>
-
 #include "caffe/data_transformer.hpp"
 #include "caffe/util/bbox_util.hpp"
 #include "caffe/util/im_transforms.hpp"
@@ -341,26 +340,77 @@ void DataTransformer<Dtype>::TransformAnnotation(
 }
 
 template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoFaceDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 AnnotationFace* transformed_annoface_all,
+                 bool* do_mirror){
+	// Transform datum.
+	const Datum& datum = anno_datum.datum();
+	NormalizedBBox crop_bbox;
+	Transform(datum, transformed_blob, &crop_bbox, do_mirror);
+
+	// Transform annotation.
+	const bool do_resize = true;
+	const bool do_expand = false;
+	TransformAnnoFace(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
+											transformed_annoface_all);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoFaceDatum& anno_datum, 
+				Blob<Dtype>* transformed_blob,
+				AnnotationFace* transformed_anno_vec){
+	bool do_mirror;
+	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
+}
+
+template<typename Dtype>
 void DataTransformer<Dtype>::TransformAnnoFace(
-      const AnnoFaceDatum& anno_datum, const bool do_resize,
-      const bool do_mirror, 
-      RepeatedPtrField<AnnotationFace>* transformed_annoface_all){
+		const AnnoFaceDatum& anno_datum,const bool do_resize,
+		const NormalizedBBox& crop_bbox, const bool do_mirror, const bool do_expand,
+		AnnotationFace* transformed_annoface_all){
 	const int img_height = anno_datum.datum().height();
 	const int img_width = anno_datum.datum().width();
+	AnnotationFace src_annoface = anno_datum.annoface();
+	LandmarkFace* face = src_annoface.mutable_markface();
 	if(anno_datum.type() == AnnoFaceDatum_AnnotationType_FACEMARK){
-		bool has_valid_annotation = false;
 		if(do_resize && param_.has_resize_param()){
 			CHECK_GT(img_height, 0);
 			CHECK_GT(img_width, 0);
-			const ResizeParameter& resize_param = param_.resize_param();
-			const int new_height = resize_param.height();
-			const int new_width = resize_param.width();
-			CHECK_GT(new_height, 0);
-			CHECK_GT(new_width, 0);
-			const float height_scale = (float)new_height/img_height;
-			const float width_scale = (float)new_width/img_width;
-			const L
+			UpdateLandmarkFaceByResizePolicy(param_.resize_param(),
+											img_width, img_height,
+											face);
 		}
+		if(do_mirror){
+			face->set_x1(1-face->x1());
+			face->set_x2(1-face->x2());
+			face->set_x3(1-face->x3());
+			face->set_x4(1-face->x4());
+			face->set_x5(1-face->x5());
+		}
+		if(do_expand){
+			if (face->x1() >= crop_bbox.xmax() || face->x2() <= crop_bbox.xmin() ||
+					face->y1() >= crop_bbox.ymax() || face->y5() <= crop_bbox.ymin()) {
+				LOG(FATAL)<<"While do expanding and landmark ,has something wrong";
+			}
+			float src_width = crop_bbox.xmax() - crop_bbox.xmin();
+			float src_height = crop_bbox.ymax() - crop_bbox.ymin();
+			face->set_x1((face->x1()-crop_bbox.xmin())/src_width);
+			face->set_x2((face->x2()-crop_bbox.xmin())/src_width);
+			face->set_x3((face->x3()-crop_bbox.xmin())/src_width);
+			face->set_x4((face->x4()-crop_bbox.xmin())/src_width);
+			face->set_x5((face->x5()-crop_bbox.xmin())/src_width);
+			face->set_y1((face->y1()-crop_bbox.ymin())/src_height);
+			face->set_y2((face->y2()-crop_bbox.ymin())/src_height);
+			face->set_y3((face->y3()-crop_bbox.ymin())/src_height);
+			face->set_y4((face->y4()-crop_bbox.ymin())/src_height);
+			face->set_y5((face->y5()-crop_bbox.ymin())/src_height);
+		}
+		LandmarkFace* annolandface = transformed_annoface_all->mutable_markface();
+		annolandface->CopyFrom(*face);
+		transformed_annoface_all->set_gender(src_annoface.gender());
+		transformed_annoface_all->set_glasses(src_annoface.glasses());
+		transformed_annoface_all->set_headpose(src_annoface.headpose());
 
 	}
 
@@ -559,6 +609,42 @@ void DataTransformer<Dtype>::ExpandImage(const AnnotatedDatum& anno_datum,
 	const bool do_mirror = false;
 	TransformAnnotation(anno_datum, do_resize, expand_bbox, do_mirror,
 											expanded_anno_datum->mutable_annotation_group());
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::ExpandImage(const AnnoFaceDatum& anno_datum,
+																				 AnnoFaceDatum* expanded_anno_datum) {
+	if (!param_.has_expand_param()) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const ExpansionParameter& expand_param = param_.expand_param();
+	const float expand_prob = expand_param.prob();
+	float prob;
+	caffe_rng_uniform(1, 0.f, 1.f, &prob);
+	if (prob > expand_prob) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const float max_expand_ratio = expand_param.max_expand_ratio();
+	if (fabs(max_expand_ratio - 1.) < 1e-2) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	float expand_ratio;
+	caffe_rng_uniform(1, 1.f, max_expand_ratio, &expand_ratio);
+	// Expand the datum.
+	NormalizedBBox expand_bbox;
+	ExpandImage(anno_datum.datum(), expand_ratio, &expand_bbox,
+							expanded_anno_datum->mutable_datum());
+	expanded_anno_datum->set_type(anno_datum.type());
+
+	// Transform the annotation according to crop_bbox.
+	const bool do_resize = false;
+	const bool do_mirror = false;
+	const bool do_expand = true;
+	TransformAnnoFace(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
+											expanded_anno_datum->mutable_annoface());
 }
 
 template<typename Dtype>
@@ -767,7 +853,6 @@ void DataTransformer<Dtype>::TransformInv(const Dtype* data, cv::Mat* cv_img,
 			}
 		}
 	}
-	//LOG(INFO)<<".................\\";
 	const int img_type = channels == 3 ? CV_8UC3 : CV_8UC1;
 	cv::Mat orig_img(height, width, img_type, cv::Scalar(0, 0, 0));
 	for (int h = 0; h < height; ++h) {

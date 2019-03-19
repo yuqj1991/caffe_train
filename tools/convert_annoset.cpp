@@ -24,7 +24,6 @@
 #include "boost/variant.hpp"
 #include "gflags/gflags.h"
 #include "glog/logging.h"
-
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/db.hpp"
 #include "caffe/util/format.hpp"
@@ -166,11 +165,12 @@ int main(int argc, char** argv) {
           resize_width, min_dim, max_dim, is_color, enc, type, label_type,
           name_to_label, &anno_datum);
       anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
-    }else if(anno_type == "faceattributes"){
+    } else if(anno_type == "faceattributes") {
 		  status = ReadRichFaceToAnnotatedDatum(filename,
           labelname, resize_height, resize_width, min_dim, max_dim, is_color,
           enc, type, label_type, &anno_faceDatum);
-	}
+      anno_faceDatum.set_type(AnnoFaceDatum_AnnotationType_FACEMARK);
+	  }
     if (status == false) {
       LOG(WARNING) << "Failed to read " << lines[line_id].first;
       continue;
