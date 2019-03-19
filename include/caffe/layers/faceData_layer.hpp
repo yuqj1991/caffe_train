@@ -1,5 +1,5 @@
-#ifndef CAFFE_DATA_LAYER_HPP_
-#define CAFFE_DATA_LAYER_HPP__
+#ifndef CAFFE_FACE_DATA_LAYER_HPP_
+#define CAFFE_FACE_DATA_LAYER_HPP__
 
 #include <string>
 #include <vector>
@@ -37,4 +37,4 @@ class faceAnnoDataLayer: public BasePrefetchingDataLayer<Dtype>{
 
 }  //cafe
 
-#endif // CAFFE_DATA_LAYER_HPP_
+#endif // CAFFE_FACE_DATA_LAYER_HPP_

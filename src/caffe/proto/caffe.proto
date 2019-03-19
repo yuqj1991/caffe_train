@@ -184,8 +184,8 @@ message AnnoFaceDatum{
     FACEMARK = 0;
   }
   optional Datum datum = 1;
-  optional AnnotationFace annoface = 2;
-  optional AnnotationType type = 3;
+  optional AnnotationType type = 2;
+  optional AnnotationFace annoface = 3;
 }
 
 message FillerParameter {

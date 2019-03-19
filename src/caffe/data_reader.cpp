@@ -25,6 +25,10 @@ template <>
 map<const string, weak_ptr<DataReader<AnnotatedDatum>::Body> >
   DataReader<AnnotatedDatum>::bodies_
   = map<const string, weak_ptr<DataReader<AnnotatedDatum>::Body> >();
+template <>
+map<const string, weak_ptr<DataReader<AnnoFaceDatum>::Body> >
+  DataReader<AnnoFaceDatum>::bodies_
+  = map<const string, weak_ptr<DataReader<AnnoFaceDatum>::Body> >();
 static boost::mutex bodies_mutex_;
 
 template <typename T>
