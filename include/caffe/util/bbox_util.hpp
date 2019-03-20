@@ -26,6 +26,8 @@ typedef MultiBoxLossParameter_MatchType MatchType;
 typedef MultiBoxLossParameter_LocLossType LocLossType;
 typedef MultiBoxLossParameter_ConfLossType ConfLossType;
 typedef MultiBoxLossParameter_MiningType MiningType;
+typedef MultiFaceLossParameter_MarkLossType MarkLossType;
+typedef MultiFaceLossParameter_AttriLossType AttriLossType;
 
 typedef map<int, vector<NormalizedBBox> > LabelBBox;
 

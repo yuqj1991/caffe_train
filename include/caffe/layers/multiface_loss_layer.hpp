@@ -23,9 +23,9 @@ namespace caffe {
  *
  */
 template <typename Dtype>
-class MutilFaceLossLayer : public LossLayer<Dtype> {
+class MultiFaceLossLayer : public LossLayer<Dtype> {
  public:
-  explicit MutilFaceLossLayer(const LayerParameter& param)
+  explicit MultiFaceLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
@@ -47,9 +47,9 @@ class MutilFaceLossLayer : public LossLayer<Dtype> {
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
-  // The internal localization loss layer.
+  // The internal landmark loss layer.
   shared_ptr<Layer<Dtype> > landmark_loss_layer_;
-  LocLossType landmark_loss_type_;
+  MarkLossType landmark_loss_type_;
   float landmark_weight_;
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> landmark_bottom_vec_;
@@ -59,82 +59,57 @@ class MutilFaceLossLayer : public LossLayer<Dtype> {
   Blob<Dtype> landmark_pred_;
   // blob which stores the corresponding matched ground truth.
   Blob<Dtype> landmark_gt_;
-  // localization loss.
+  // landmark loss.
   Blob<Dtype> landmark_loss_;
 
   // The internal confidence category loss layer.
-  shared_ptr<Layer<Dtype> > conf_loss_layer_;
-  ConfLossType conf_loss_type_;
+  shared_ptr<Layer<Dtype> > gender_loss_layer_;
+  AttriLossType gender_loss_type_;
   // bottom vector holder used in Forward function.
-  vector<Blob<Dtype>*> conf_bottom_vec_;
+  vector<Blob<Dtype>*> gender_bottom_vec_;
   // top vector holder used in Forward function.
-  vector<Blob<Dtype>*> conf_top_vec_;
+  vector<Blob<Dtype>*> gender_top_vec_;
   // blob which stores the confidence prediction.
-  Blob<Dtype> conf_pred_;
+  Blob<Dtype> gender_pred_;
   // blob which stores the corresponding ground truth label.
-  Blob<Dtype> conf_gt_;
+  Blob<Dtype> gender_gt_;
   // confidence loss.
-  Blob<Dtype> conf_loss_;
+  Blob<Dtype> gender_loss_;
 
-  // The internal confidence blur loss layer.
-  shared_ptr<Layer<Dtype> > conf_blur_loss_layer_;
-  ConfLossType conf_blur_loss_type_;
+  // The internal confidence category loss layer.
+  shared_ptr<Layer<Dtype> > glasses_loss_layer_;
+  AttriLossType glasses_loss_type_;
   // bottom vector holder used in Forward function.
-  vector<Blob<Dtype>*> conf_blur_bottom_vec_;
+  vector<Blob<Dtype>*> glasses_bottom_vec_;
   // top vector holder used in Forward function.
-  vector<Blob<Dtype>*> conf_blur_top_vec_;
+  vector<Blob<Dtype>*> glasses_top_vec_;
   // blob which stores the confidence prediction.
-  Blob<Dtype> conf_blur_pred_;
+  Blob<Dtype> glasses_pred_;
   // blob which stores the corresponding ground truth label.
-  Blob<Dtype> conf_blur_gt_;
+  Blob<Dtype> glasses_gt_;
   // confidence loss.
-  Blob<Dtype> conf_blur_loss_;
+  Blob<Dtype> glasses_loss_;
 
-  // The internal confidence occlussion loss layer.
-  shared_ptr<Layer<Dtype> > conf_occlussion_loss_layer_;
-  ConfLossType conf_occlussion_loss_type_;
+  // The internal confidence category loss layer.
+  shared_ptr<Layer<Dtype> > headpose_loss_layer_;
+  AttriLossType headpose_loss_type_;
   // bottom vector holder used in Forward function.
-  vector<Blob<Dtype>*> conf_occlussion_bottom_vec_;
+  vector<Blob<Dtype>*> headpose_bottom_vec_;
   // top vector holder used in Forward function.
-  vector<Blob<Dtype>*> conf_occlussion_top_vec_;
+  vector<Blob<Dtype>*> headpose_top_vec_;
   // blob which stores the confidence prediction.
-  Blob<Dtype> conf_occlussion_pred_;
+  Blob<Dtype> headpose_pred_;
   // blob which stores the corresponding ground truth label.
-  Blob<Dtype> conf_occlussion_gt_;
+  Blob<Dtype> headpose_gt_;
   // confidence loss.
-  Blob<Dtype> conf_occlussion_loss_;
+  Blob<Dtype> headpose_loss_;
 
-  MultiBoxLossParameter multibox_loss_param_;
-  int num_classes_;
-  int num_blur_;
-  int num_cnt_;
-  int num_occlusion_;
-  bool share_location_;
-  MatchType match_type_;
-  float overlap_threshold_;
-  bool use_prior_for_matching_;
-  int background_label_id_;
-  bool use_difficult_gt_;
-  bool do_neg_mining_;
-  float neg_pos_ratio_;
-  float neg_overlap_;
-  CodeType code_type_;
-  bool encode_variance_in_target_;
-  bool map_object_to_agnostic_;
-  bool ignore_cross_boundary_bbox_;
-  bool bp_inside_;
-  MiningType mining_type_;
-
-  int loc_classes_;
-  int num_gt_;
-  int num_;
-  int num_priors_;
-
-  int num_matches_;
-  int num_conf_;
-  vector<map<int, vector<int> > > all_match_indices_;
-  vector<vector<int> > all_neg_indices_;
-
+  MultiFaceLossParameter multiface_loss_param_;
+  int num_gender_;
+  int num_glasses_;
+  int num_headpose_;
+  int batch_size_;
+  
   // How to normalize the loss.
   LossParameter_NormalizationMode normalization_;
 };

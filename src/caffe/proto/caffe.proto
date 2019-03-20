@@ -576,6 +576,7 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional VideoDataParameter video_data_param = 207;
   optional WindowDataParameter window_data_param = 129;
+  optional MultiFaceLossParameter multiface_loss_param = 208;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1363,6 +1364,36 @@ message MultiBoxLossParameter {
   optional int32 background_blur_id = 28 [default = -1];
   optional int32 background_occl_id = 29 [default = -1];
 }
+
+// Message that store parameters used by MultiBoxLossLayer
+message MultiFaceLossParameter {
+  // Localization loss type.
+  enum MarkLossType {
+    L2 = 0;
+    SMOOTH_L1 = 1;
+  }
+  optional MarkLossType mark_loss_type = 2 [default = SMOOTH_L1];
+  // Confidence loss type.
+  enum AttriLossType {
+    SOFTMAX = 0;
+    LOGISTIC = 1;
+  }
+  optional float mark_weight = 3 [default = 1.0];
+  // Number of classes to be predicted. Required!
+  optional uint32 num_gender = 4;
+  // If match_type is PER_PREDICTION, use overlap_threshold to
+  // determine the extra matching bboxes.
+  optional uint32 num_glasses = 24;
+  //Number of occlusion to be predicted. Required!
+  optional uint32 num_headpose = 25;
+  // blur gender loss types
+  optional AttriLossType conf_gender_loss_type = 26 [default = SOFTMAX];
+  // glass conf loss types
+  optional AttriLossType conf_glasses_loss_type = 27 [default = SOFTMAX];
+  // add new background id realeated id r.w.t blur & occlusion
+  optional AttriLossType conf_headpose_loss_type = 30 [default = SOFTMAX];
+}
+
 
 message MVNParameter {
   // This parameter can be set to false to normalize mean only
