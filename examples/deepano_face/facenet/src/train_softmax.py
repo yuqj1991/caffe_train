@@ -97,7 +97,6 @@ def main(args):
     with tf.Graph().as_default():
         tf.set_random_seed(args.seed)
         global_step = tf.Variable(0, trainable=False)
-        
         # Get a list of image paths and their labels
         image_list, label_list = facenet.get_image_paths_and_labels(train_set)
         assert len(image_list)>0, 'The training set should not be empty'
