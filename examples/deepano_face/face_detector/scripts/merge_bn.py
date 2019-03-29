@@ -5,7 +5,7 @@ import logging
 
 import numpy as np
 try:
-    caffe_root = '../../../../../deepano_face_train/'
+    caffe_root = '../../../../../face_train/'
     sys.path.insert(0, caffe_root + 'python')
     import caffe
 except ImportError:
