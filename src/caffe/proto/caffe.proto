@@ -219,12 +219,16 @@ message AnnoFaceContourPoints{
   optional ContourPoint point_x21 = 21;
 }
 
-// Annotation for face headpose contain yaw, roll, pitch
-message AnnoFacePose{
+// Annotation for face headpose contain yaw, roll, pitch 
+message AnnoFacePoseOritation{
   optional float yaw = 1;
   optional float pitch = 2;
   optional float roll = 3;
-  optional AnnoFaceContourPoints faceCour=4;
+}
+// Annotation for face headpose contain yaw, roll, pitch
+message AnnoFacePose{
+  optional AnnoFacePoseOritation faceOritation = 1;
+  optional AnnoFaceContourPoints faceCour=2;
 }
 
 // AnnofaceDataum with datum, and facepoints & AnnofacePose
@@ -626,6 +630,7 @@ message LayerParameter {
   optional VideoDataParameter video_data_param = 207;
   optional WindowDataParameter window_data_param = 129;
   optional MultiFaceLossParameter multiface_loss_param = 208;
+  optional MultiFacePoseLossParameter multiface_pose_loss_param = 209;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1441,6 +1446,20 @@ message MultiFaceLossParameter {
   optional AttriLossType conf_glasses_loss_type = 27 [default = SOFTMAX];
   // add new background id realeated id r.w.t blur & occlusion
   optional AttriLossType conf_headpose_loss_type = 30 [default = SOFTMAX];
+}
+
+// Message that store parameters used by MultiBoxLossLayer
+message MultiFacePoseLossParameter {
+  enum AttriLossType {
+    LOGISTIC = 0;
+    SMOOTH_L1 = 1;
+    L2 = 2;
+  }
+  optional float pose_weights = 1.0 [default = 1.0];
+  // facecontour loss types
+  optional AttriLossType regs_face_contour_loss_type = 2 [default = SMOOTH_L1];
+  // facepose loss types
+  optional AttriLossType regs_face_pose_loss_type = 3 [default = SMOOTH_L1];
 }
 
 

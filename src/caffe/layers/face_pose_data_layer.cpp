@@ -265,9 +265,9 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.faceCour().y19();
                 top_label[idx++] = face.faceCour().y20();
                 top_label[idx++] = face.faceCour().y21();
-                top_label[idx++] = face.yaw();
-                top_label[idx++] = face.pitch();
-                top_label[idx++] = face.raw();
+                top_label[idx++] = face.faceOritation().yaw();
+                top_label[idx++] = face.faceOritation().pitch();
+                top_label[idx++] = face.faceOritation().raw();
             }
         } else {
             LOG(FATAL) << "Unknown annotation type.";
