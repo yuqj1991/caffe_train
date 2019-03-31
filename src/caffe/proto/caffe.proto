@@ -188,6 +188,55 @@ message AnnoFaceDatum{
   optional AnnotationFace annoface = 3;
 }
 
+// the anno point has been normolizsed!
+message ContourPoint{
+  optional float x =1;
+  optional float y =2;
+}
+
+// Annotation for face 21 points(coordinate for x and y)
+message AnnoFaceContourPoints{
+  optional ContourPoint point_x1 = 1;
+  optional ContourPoint point_x2 = 2;
+  optional ContourPoint point_x3 = 3;
+  optional ContourPoint point_x4 = 4;
+  optional ContourPoint point_x5 = 5;
+  optional ContourPoint point_x6 = 6;
+  optional ContourPoint point_x7 = 7;
+  optional ContourPoint point_x8 = 8;
+  optional ContourPoint point_x9 = 9;
+  optional ContourPoint point_x10 = 10;
+  optional ContourPoint point_x11 = 11;
+  optional ContourPoint point_x12 = 12;
+  optional ContourPoint point_x13 = 13;
+  optional ContourPoint point_x14 = 14;
+  optional ContourPoint point_x15 = 15;
+  optional ContourPoint point_x16 = 16;
+  optional ContourPoint point_x17 = 17;
+  optional ContourPoint point_x18 = 18;
+  optional ContourPoint point_x19 = 19;
+  optional ContourPoint point_x20 = 20;
+  optional ContourPoint point_x21 = 21;
+}
+
+// Annotation for face headpose contain yaw, roll, pitch
+message AnnoFacePose{
+  optional float yaw = 1;
+  optional float pitch = 2;
+  optional float roll = 3;
+  optional AnnoFaceContourPoints faceCour=4;
+}
+
+// AnnofaceDataum with datum, and facepoints & AnnofacePose
+message AnnoFacePoseDatum{
+  enum AnnoType{
+    FACEPOSE =0;
+  }
+  optional Datum datum =1;
+  optional AnnoType type =2;
+  optional AnnoFacePose facePose =3;
+}
+
 message FillerParameter {
   // The filler type.
   optional string type = 1 [default = 'constant'];
