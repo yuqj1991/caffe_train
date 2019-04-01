@@ -282,7 +282,7 @@ bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
   if (status == false) {
     return status;
   }
-  anno_datum->clear_annoface();
+  anno_datum->clear_facepose();
   if (!boost::filesystem::exists(labelfile)) {
     return true;
   }
@@ -643,7 +643,7 @@ bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
         >> y9 >> y10 >> y11 >> y12 >> y13 >> y14 >> y15 >> y16 >> y17 >> y18 >> y19 >> y20 >> y21 >> yaw
         >> pitch >> roll) {
     AnnoFacePose* anno = NULL;
-    anno = anno_datum->mutable_facePose();
+    anno = anno_datum->mutable_facepose();
     LOG_IF(WARNING, x1 > width) << labelfile <<
       " bounding box exceeds image boundary.";
     LOG_IF(WARNING, y1 > height) << labelfile <<
@@ -673,53 +673,55 @@ bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
     LOG_IF(WARNING, x2 < 0) << labelfile <<
       " bounding box exceeds image boundary.";
     // Store the normalized bounding box.
-    AnnoFaceContourPoints* landface = anno->mutable_faceCour();
-    AnnoFacePoseOritation* faceOri = anno->mutable_faceOritation();
+    AnnoFaceContourPoints* landface = anno->mutable_facecour();
+    AnnoFacePoseOritation* faceOri = anno->mutable_faceoritation();
     faceOri->set_yaw(yaw);
     faceOri->set_pitch(pitch);
     faceOri->set_roll(roll);
-    landface->set_point_x1(x1);
-    landface->set_point_x2(x2);
-    landface->set_point_x3(x3);
-    landface->set_point_x4(x4);
-    landface->set_point_x5(x5);
-    landface->set_point_y1(y1);
-    landface->set_point_y2(y2);
-    landface->set_point_y3(y3);
-    landface->set_point_y4(y4);
-    landface->set_point_y5(y5);
-    landface->set_point_x6(x6);
-    landface->set_point_x7(x7);
-    landface->set_point_x8(x8);
-    landface->set_point_x9(x9);
-    landface->set_point_x10(x10);
-    landface->set_point_y6(y6);
-    landface->set_point_y7(y7);
-    landface->set_point_y8(y8);
-    landface->set_point_y9(y9);
-    landface->set_point_y10(y10);
-    landface->set_point_x11(x11);
-    landface->set_point_x12(x12);
-    landface->set_point_x13(x13);
-    landface->set_point_x14(x14);
-    landface->set_point_x15(x15);
-    landface->set_point_y11(y11);
-    landface->set_point_y12(y12);
-    landface->set_point_y13(y13);
-    landface->set_point_y14(y14);
-    landface->set_point_y15(y15);
-    landface->set_point_x16(x16);
-    landface->set_point_x17(x17);
-    landface->set_point_x18(x18);
-    landface->set_point_x19(x19);
-    landface->set_point_x20(x20);
-    landface->set_point_y16(y16);
-    landface->set_point_y17(y17);
-    landface->set_point_y18(y18);
-    landface->set_point_y19(y19);
-    landface->set_point_y20(y20);
-    landface->set_point_x21(x21);
-    landface->set_point_y21(y21);
+    landface->mutable_point_1()->set_x(x1);
+    landface->mutable_point_1()->set_y(y1);
+    landface->mutable_point_2()->set_x(x2);
+    landface->mutable_point_2()->set_y(y2);
+    landface->mutable_point_3()->set_x(x3);
+    landface->mutable_point_3()->set_y(y3);
+    landface->mutable_point_4()->set_x(x4);
+    landface->mutable_point_4()->set_y(y4);
+    landface->mutable_point_5()->set_x(x5);
+    landface->mutable_point_5()->set_y(y5);
+    landface->mutable_point_6()->set_x(x6);
+    landface->mutable_point_6()->set_y(y6);
+    landface->mutable_point_7()->set_x(x7);
+    landface->mutable_point_7()->set_y(y7);
+    landface->mutable_point_8()->set_x(x8);
+    landface->mutable_point_8()->set_y(y8);
+    landface->mutable_point_9()->set_x(x9);
+    landface->mutable_point_9()->set_y(y9);
+    landface->mutable_point_10()->set_x(x10);
+    landface->mutable_point_10()->set_y(y10);
+
+    landface->mutable_point_11()->set_x(x11);
+    landface->mutable_point_11()->set_y(y11);
+    landface->mutable_point_12()->set_x(x12);
+    landface->mutable_point_12()->set_y(y12);
+    landface->mutable_point_13()->set_x(x13);
+    landface->mutable_point_13()->set_y(y13);
+    landface->mutable_point_14()->set_x(x14);
+    landface->mutable_point_14()->set_y(y14);
+    landface->mutable_point_15()->set_x(x15);
+    landface->mutable_point_15()->set_y(y15);
+    landface->mutable_point_16()->set_x(x16);
+    landface->mutable_point_16()->set_y(y16);
+    landface->mutable_point_17()->set_x(x17);
+    landface->mutable_point_17()->set_y(y17);
+    landface->mutable_point_18()->set_x(x18);
+    landface->mutable_point_18()->set_y(y18);
+    landface->mutable_point_19()->set_x(x19);
+    landface->mutable_point_19()->set_y(y19);
+    landface->mutable_point_20()->set_x(x20);
+    landface->mutable_point_20()->set_y(y20);
+    landface->mutable_point_21()->set_x(x21);
+    landface->mutable_point_21()->set_y(y21);
+
   }
   return true;
 }
