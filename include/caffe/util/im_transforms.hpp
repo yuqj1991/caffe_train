@@ -24,6 +24,11 @@ void UpdateLandmarkFaceByResizePolicy(const ResizeParameter& param,
                               const int old_width, const int old_height,
                               LandmarkFace* lface) ;
 
+void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
+                              const int old_width, const int old_height,
+                              AnnoFaceContourPoints* lface) ;
+
+
 void InferNewSize(const ResizeParameter& resize_param,
                   const int old_width, const int old_height,
                   int* new_width, int* new_height);

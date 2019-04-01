@@ -190,8 +190,8 @@ message AnnoFaceDatum{
 
 // the anno point has been normolizsed!
 message ContourPoint{
-  optional float x =1;
-  optional float y =2;
+  optional float x = 1;
+  optional float y = 2;
 }
 
 // Annotation for face 21 points(coordinate for x and y)

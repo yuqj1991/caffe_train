@@ -133,6 +133,13 @@ class DataTransformer {
                  Blob<Dtype>* transformed_blob,
                  AnnotationFace* transformed_anno_vec);
 
+  void Transform(const AnnoFacePoseDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 AnnoFacePose* transformed_annoface_all,
+                 bool* do_mirror);
+  void Transform(const AnnoFacePoseDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 AnnoFacePose* transformed_anno_vec);
   /**
    * @brief Transform the annotation according to the transformation applied
    * to the datum.
@@ -151,6 +158,11 @@ class DataTransformer {
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
       AnnotationFace* transformed_annoface_all);
 
+  void TransformAnnoFacePose(
+      const AnnoFacePoseDatum& anno_datum, const bool do_resize,
+      const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
+      AnnoFacePose* transformed_annoface_all);
+
   /**
    * @brief Expand the datum.
    */
@@ -165,6 +177,9 @@ class DataTransformer {
 
   void ExpandImage(const AnnoFaceDatum& anno_datum,
                     AnnoFaceDatum* expanded_anno_datum);
+
+  void ExpandImage(const AnnoFacePoseDatum& anno_datum,
+                    AnnoFacePoseDatum* expanded_anno_datum);
 
   /**
    * @brief Apply distortion to the datum.
