@@ -196,27 +196,27 @@ message ContourPoint{
 
 // Annotation for face 21 points(coordinate for x and y)
 message AnnoFaceContourPoints{
-  optional ContourPoint point_x1 = 1;
-  optional ContourPoint point_x2 = 2;
-  optional ContourPoint point_x3 = 3;
-  optional ContourPoint point_x4 = 4;
-  optional ContourPoint point_x5 = 5;
-  optional ContourPoint point_x6 = 6;
-  optional ContourPoint point_x7 = 7;
-  optional ContourPoint point_x8 = 8;
-  optional ContourPoint point_x9 = 9;
-  optional ContourPoint point_x10 = 10;
-  optional ContourPoint point_x11 = 11;
-  optional ContourPoint point_x12 = 12;
-  optional ContourPoint point_x13 = 13;
-  optional ContourPoint point_x14 = 14;
-  optional ContourPoint point_x15 = 15;
-  optional ContourPoint point_x16 = 16;
-  optional ContourPoint point_x17 = 17;
-  optional ContourPoint point_x18 = 18;
-  optional ContourPoint point_x19 = 19;
-  optional ContourPoint point_x20 = 20;
-  optional ContourPoint point_x21 = 21;
+  optional ContourPoint point_1 = 1;
+  optional ContourPoint point_2 = 2;
+  optional ContourPoint point_3 = 3;
+  optional ContourPoint point_4 = 4;
+  optional ContourPoint point_5 = 5;
+  optional ContourPoint point_6 = 6;
+  optional ContourPoint point_7 = 7;
+  optional ContourPoint point_8 = 8;
+  optional ContourPoint point_9 = 9;
+  optional ContourPoint point_10 = 10;
+  optional ContourPoint point_11 = 11;
+  optional ContourPoint point_12 = 12;
+  optional ContourPoint point_13 = 13;
+  optional ContourPoint point_14 = 14;
+  optional ContourPoint point_15 = 15;
+  optional ContourPoint point_16 = 16;
+  optional ContourPoint point_17 = 17;
+  optional ContourPoint point_18 = 18;
+  optional ContourPoint point_19 = 19;
+  optional ContourPoint point_20 = 20;
+  optional ContourPoint point_21 = 21;
 }
 
 // Annotation for face headpose contain yaw, roll, pitch 
@@ -1455,7 +1455,7 @@ message MultiFacePoseLossParameter {
     SMOOTH_L1 = 1;
     L2 = 2;
   }
-  optional float pose_weights = 1.0 [default = 1.0];
+  optional float pose_weights = 1 [default = 1.0];
   // facecontour loss types
   optional AttriLossType regs_face_contour_loss_type = 2 [default = SMOOTH_L1];
   // facepose loss types

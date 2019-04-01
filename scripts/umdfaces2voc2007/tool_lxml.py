@@ -53,7 +53,17 @@ def createXML(trans,store_path):
     xmax = etree.SubElement(bndbox, "xmax")   
     xmax.text = trans['xmax']
     ymax = etree.SubElement(bndbox, "ymax")   
-    ymax.text = trans['ymax'] 
+    ymax.text = trans['ymax']
+    facepoint_1 =  etree.SubElement(_object, "landmark")
+    x1 = etree.SubElement(facepoint_1, "x1")
+    x1.text = trans['facepoint_x1']
+    y1 = etree.SubElement(facepoint_1, "y1")
+    y1.text = trans['facepoint_y1']
+    facepoint_2 =  etree.SubElement(_object, "landmark")
+    x1 = etree.SubElement(facepoint_2, "x2")
+    x1.text = trans['facepoint_x2']
+    y1 = etree.SubElement(facepoint_2, "y2")
+    y1.text = trans['facepoint_y2']
        
     #print etree.tostring(annotation, pretty_print=True)   
       

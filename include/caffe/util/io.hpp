@@ -206,15 +206,31 @@ inline bool ReadRichImageToAnnotatedDatum(const string& filename,
 bool ReadRichFaceToAnnotatedDatum(const string& filename,
     const string& labelfile, const int height, const int width,
     const int min_dim, const int max_dim, const bool is_color,
-    const string& encoding, const AnnotatedDatum_AnnotationType type,
+    const string& encoding, const AnnoFaceDatum_AnnotationType type,
     const string& labeltype, AnnoFaceDatum* anno_datum);
 
 inline bool ReadRichFaceToAnnotatedDatum(const string& filename,
     const string& labelname, const int height, const int width,
     const bool is_color, const std::string & encoding,
-    const AnnotatedDatum_AnnotationType type, const string& labeltype,
+    const AnnoFaceDatum_AnnotationType type, const string& labeltype,
     AnnoFaceDatum* anno_datum) {
   return ReadRichFaceToAnnotatedDatum(filename, labelname, height, width, 0, 0,
+                      is_color, encoding, type, labeltype, 
+                      anno_datum);
+}
+
+bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
+    const string& labelfile, const int height, const int width,
+    const int min_dim, const int max_dim, const bool is_color,
+    const string& encoding, const AnnoFacePoseDatum_AnnoType type,
+    const string& labeltype, AnnoFacePoseDatum* anno_datum);
+
+inline bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
+    const string& labelname, const int height, const int width,
+    const bool is_color, const std::string & encoding,
+    const AnnoFacePoseDatum_AnnoType type, const string& labeltype,
+    AnnoFacePoseDatum* anno_datum) {
+  return ReadRichFacePoseToAnnotatedDatum(filename, labelname, height, width, 0, 0,
                       is_color, encoding, type, labeltype, 
                       anno_datum);
 }
@@ -232,6 +248,9 @@ bool ReadTxtToAnnotatedDatum(const string& labelname, const int height,
 
 bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
     const int width, AnnoFaceDatum* anno_datum);
+
+bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
+    const int width, AnnoFacePoseDatum* anno_datum);
 
 bool ReadLabelFileToLabelMap(const string& filename, bool include_background,
     const string& delimiter, LabelMap* map);

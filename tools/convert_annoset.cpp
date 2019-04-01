@@ -138,6 +138,7 @@ int main(int argc, char** argv) {
   AnnotatedDatum anno_datum;
   Datum* datum = anno_datum.mutable_datum();
   AnnoFaceDatum anno_faceDatum;
+  AnnoFacePoseDatum anno_faceposeDatum;
   int count = 0;
   int data_size = 0;
   bool data_size_initialized = false;
@@ -170,6 +171,11 @@ int main(int argc, char** argv) {
           labelname, resize_height, resize_width, min_dim, max_dim, is_color,
           enc, type, label_type, &anno_faceDatum);
       anno_faceDatum.set_type(AnnoFaceDatum_AnnotationType_FACEMARK);
+	  } else if(anno_type == "facepose") {
+		  status = ReadumdfaceTxtToAnnotatedDatum(filename,
+          labelname, resize_height, resize_width, min_dim, max_dim, is_color,
+          enc, type, label_type, &anno_faceposeDatum);
+      anno_faceDatum.set_type(AnnoFacePoseDatum_AnnoType_FACEPOSE);
 	  }
     if (status == false) {
       LOG(WARNING) << "Failed to read " << lines[line_id].first;

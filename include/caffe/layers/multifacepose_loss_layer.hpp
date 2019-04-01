@@ -47,7 +47,7 @@ class MultiFacePoseLossLayer : public LossLayer<Dtype> {
 
   // The internal landmark loss layer.
   shared_ptr<Layer<Dtype> > landmark_loss_layer_;
-  AttriLossType landmark_loss_type_;
+  PoseAttriLossType landmark_loss_type_;
   float landmark_weight_;
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> landmark_bottom_vec_;
@@ -62,7 +62,7 @@ class MultiFacePoseLossLayer : public LossLayer<Dtype> {
 
   // The internal poseface loss layer.
   shared_ptr<Layer<Dtype> > pose_loss_layer_;
-  AttriLossType pose_loss_type_;
+  PoseAttriLossType pose_loss_type_;
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> pose_bottom_vec_;
   // top vector holder used in Forward function.

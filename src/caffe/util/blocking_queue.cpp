@@ -91,10 +91,12 @@ template class BlockingQueue<Batch<double>*>;
 template class BlockingQueue<Datum*>;
 template class BlockingQueue<AnnotatedDatum*>;
 template class BlockingQueue<AnnoFaceDatum*>;
+template class BlockingQueue<AnnoFacePoseDatum*>;
 template class BlockingQueue<shared_ptr<DataReader<Datum>::QueuePair> >;
 template class BlockingQueue<
   shared_ptr<DataReader<AnnotatedDatum>::QueuePair> >;
 template class BlockingQueue<shared_ptr<DataReader<AnnoFaceDatum>::QueuePair> >;
+template class BlockingQueue<shared_ptr<DataReader<AnnoFacePoseDatum>::QueuePair> >;
 template class BlockingQueue<P2PSync<float>*>;
 template class BlockingQueue<P2PSync<double>*>;
 

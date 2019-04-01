@@ -2,14 +2,14 @@ import logging
 import pandas as pd
 
 #ori
-ORI_BATCH1 = '/media/scs4450/hard/umdfaces_batch1/'
-ORI_BATCH2 = '/media/scs4450/hard/umdfaces_batch2/'
-ORI_BATCH3 = '/media/scs4450/hard/umdfaces_batch3/'
+ORI_BATCH1 = 'umdfaces_batch1/'
+ORI_BATCH2 = 'umdfaces_batch2/'
+ORI_BATCH3 = 'umdfaces_batch3/'
 
 #process
-PROCESSED_BATCH1 = '/media/scs4450/hard/luyi/tensorflow/facenet/images/umdfaces_batch1/'
-PROCESSED_BATCH2 = '/media/scs4450/hard/luyi/tensorflow/facenet/images/umdfaces_batch2/'
-PROCESSED_BATCH3 = '/media/scs4450/hard/luyi/tensorflow/facenet/images/umdfaces_batch3/'
+PROCESSED_BATCH1 = '../../../dataset/facedata/umdface/images/umdfaces_batch1/'
+PROCESSED_BATCH2 = '../../../dataset/facedata/umdface/images/umdfaces_batch2/'
+PROCESSED_BATCH3 = '../../../dataset/facedata/umdface/images/umdfaces_batch3/'
 
 def init_my_logger(): 
     logger = logging.getLogger()  

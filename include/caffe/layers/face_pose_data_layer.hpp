@@ -32,7 +32,7 @@ class facePoseDataLayer: public BasePrefetchingDataLayer<Dtype>{
 
         DataReader<AnnoFacePoseDatum> reader_;
         bool has_anno_type_;
-        AnnoFacePoseDatum anno_type_;
+        AnnoFacePoseDatum_AnnoType anno_type_;
 };
 
 }  //cafe

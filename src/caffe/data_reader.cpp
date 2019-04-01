@@ -29,6 +29,10 @@ template <>
 map<const string, weak_ptr<DataReader<AnnoFaceDatum>::Body> >
   DataReader<AnnoFaceDatum>::bodies_
   = map<const string, weak_ptr<DataReader<AnnoFaceDatum>::Body> >();
+template <>
+map<const string, weak_ptr<DataReader<AnnoFacePoseDatum>::Body> >
+  DataReader<AnnoFacePoseDatum>::bodies_
+  = map<const string, weak_ptr<DataReader<AnnoFacePoseDatum>::Body> >();
 static boost::mutex bodies_mutex_;
 
 template <typename T>
@@ -140,5 +144,5 @@ void DataReader<T>::Body::read_one(db::Cursor* cursor, QueuePair* qp) {
 template class DataReader<Datum>;
 template class DataReader<AnnotatedDatum>;
 template class DataReader<AnnoFaceDatum>;
-
+template class DataReader<AnnoFacePoseDatum>;
 }  // namespace caffe

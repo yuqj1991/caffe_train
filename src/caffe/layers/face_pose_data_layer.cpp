@@ -38,7 +38,7 @@ void facePoseDataLayer<Dtype>::layerDataSetup(const vector<Blob<Dtype>*>& bottom
     }
     }
     // Read a data point, and use it to initialize the top blob.
-    AnnoFacePoseData& anno_datum = *(reader_.full().peek());
+    AnnoFacePoseDatum& anno_datum = *(reader_.full().peek());
 
     // Use data_transformer to infer the expected blob shape from anno_datum.
     vector<int> top_shape =
@@ -205,13 +205,13 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             delete expand_datum;
         }
         trans_time += timer.MicroSeconds();
-        reader_.free().push(const_cast<AnnoFaceDatum*>(&anno_datum));
+        reader_.free().push(const_cast<AnnoFacePoseDatum*>(&anno_datum));
     }
 
     // store "rich " landmark, face attributes
     if (this->output_labels_ && has_anno_type_) {
         vector<int> label_shape(4);
-        if (anno_type_ == AnnoFaceDatum_AnnotationType_FACEMARK) {
+        if (anno_type_ == AnnoFacePoseDatum_AnnoType_FACEPOSE) {
             label_shape[0] = 1;
             label_shape[1] = 1;
             // Reshape the label and store the annotation.
@@ -223,51 +223,51 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             for (int item_id = 0; item_id < batch_size; ++item_id) {
                 AnnoFacePose face = all_anno[item_id];
                 top_label[idx++] = item_id;
-                top_label[idx++] = face.faceCour().x1();
-                top_label[idx++] = face.faceCour().x2();
-                top_label[idx++] = face.faceCour().x3();
-                top_label[idx++] = face.faceCour().x4();
-                top_label[idx++] = face.faceCour().x5();
-                top_label[idx++] = face.faceCour().x6();
-                top_label[idx++] = face.faceCour().x7();
-                top_label[idx++] = face.faceCour().x8();
-                top_label[idx++] = face.faceCour().x9();
-                top_label[idx++] = face.faceCour().x10();
-                top_label[idx++] = face.faceCour().x11();
-                top_label[idx++] = face.faceCour().x12();
-                top_label[idx++] = face.faceCour().x13();
-                top_label[idx++] = face.faceCour().x14();
-                top_label[idx++] = face.faceCour().x15();
-                top_label[idx++] = face.faceCour().x16();
-                top_label[idx++] = face.faceCour().x17();
-                top_label[idx++] = face.faceCour().x18();
-                top_label[idx++] = face.faceCour().x19();
-                top_label[idx++] = face.faceCour().x20();
-                top_label[idx++] = face.faceCour().x21();
-                top_label[idx++] = face.faceCour().y1();
-                top_label[idx++] = face.faceCour().y2();
-                top_label[idx++] = face.faceCour().y3();
-                top_label[idx++] = face.faceCour().y4();
-                top_label[idx++] = face.faceCour().y5();
-                top_label[idx++] = face.faceCour().y6();
-                top_label[idx++] = face.faceCour().y7();
-                top_label[idx++] = face.faceCour().y8();
-                top_label[idx++] = face.faceCour().y9();
-                top_label[idx++] = face.faceCour().y10();
-                top_label[idx++] = face.faceCour().y11();
-                top_label[idx++] = face.faceCour().y12();
-                top_label[idx++] = face.faceCour().y13();
-                top_label[idx++] = face.faceCour().y14();
-                top_label[idx++] = face.faceCour().y15();
-                top_label[idx++] = face.faceCour().y16();
-                top_label[idx++] = face.faceCour().y17();
-                top_label[idx++] = face.faceCour().y18();
-                top_label[idx++] = face.faceCour().y19();
-                top_label[idx++] = face.faceCour().y20();
-                top_label[idx++] = face.faceCour().y21();
-                top_label[idx++] = face.faceOritation().yaw();
-                top_label[idx++] = face.faceOritation().pitch();
-                top_label[idx++] = face.faceOritation().raw();
+                top_label[idx++] = face.facecour().point_1().x();
+                top_label[idx++] = face.facecour().point_2().x();
+                top_label[idx++] = face.facecour().point_3().x();
+                top_label[idx++] = face.facecour().point_4().x();
+                top_label[idx++] = face.facecour().point_5().x();
+                top_label[idx++] = face.facecour().point_6().x();
+                top_label[idx++] = face.facecour().point_7().x();
+                top_label[idx++] = face.facecour().point_8().x();
+                top_label[idx++] = face.facecour().point_9().x();
+                top_label[idx++] = face.facecour().point_10().x();
+                top_label[idx++] = face.facecour().point_11().x();
+                top_label[idx++] = face.facecour().point_12().x();
+                top_label[idx++] = face.facecour().point_13().x();
+                top_label[idx++] = face.facecour().point_14().x();
+                top_label[idx++] = face.facecour().point_15().x();
+                top_label[idx++] = face.facecour().point_16().x();
+                top_label[idx++] = face.facecour().point_17().x();
+                top_label[idx++] = face.facecour().point_18().x();
+                top_label[idx++] = face.facecour().point_19().x();
+                top_label[idx++] = face.facecour().point_20().x();
+                top_label[idx++] = face.facecour().point_21().x();
+                top_label[idx++] = face.facecour().point_1().y();
+                top_label[idx++] = face.facecour().point_2().y();
+                top_label[idx++] = face.facecour().point_3().y();
+                top_label[idx++] = face.facecour().point_4().y();
+                top_label[idx++] = face.facecour().point_5().y();
+                top_label[idx++] = face.facecour().point_6().y();
+                top_label[idx++] = face.facecour().point_7().y();
+                top_label[idx++] = face.facecour().point_8().y();
+                top_label[idx++] = face.facecour().point_9().y();
+                top_label[idx++] = face.facecour().point_10().y();
+                top_label[idx++] = face.facecour().point_11().y();
+                top_label[idx++] = face.facecour().point_12().y();
+                top_label[idx++] = face.facecour().point_13().y();
+                top_label[idx++] = face.facecour().point_14().y();
+                top_label[idx++] = face.facecour().point_15().y();
+                top_label[idx++] = face.facecour().point_16().y();
+                top_label[idx++] = face.facecour().point_17().y();
+                top_label[idx++] = face.facecour().point_18().y();
+                top_label[idx++] = face.facecour().point_19().y();
+                top_label[idx++] = face.facecour().point_20().y();
+                top_label[idx++] = face.facecour().point_21().y();
+                top_label[idx++] = face.faceoritation().yaw();
+                top_label[idx++] = face.faceoritation().pitch();
+                top_label[idx++] = face.faceoritation().roll();
             }
         } else {
             LOG(FATAL) << "Unknown annotation type.";
@@ -296,7 +296,7 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     DLOG(INFO) << "Transform time: " << trans_time / 1000 << " ms.";
 }
 
-INSTANTIATE_CLASS(faceAnnoPoseDataLayer);
-REGISTER_LAYER_CLASS(faceAnnoPoseData);
+INSTANTIATE_CLASS(facePoseDataLayer);
+REGISTER_LAYER_CLASS(facePoseData);
 
 } //namespace caffe
