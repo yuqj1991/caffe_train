@@ -181,7 +181,7 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         // Apply data transformations (mirror, scale, crop...)
         int offset = batch->data_.offset(item_id);
         this->transformed_data_.set_cpu_data(top_data + offset);
-        AnnotationFace transformed_anno_vec;
+        AnnoFacePose transformed_anno_vec;
         if (this->output_labels_) {
             if (has_anno_type_) {
                 // Transform datum and annotation_group at the same time

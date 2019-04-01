@@ -36,8 +36,8 @@ void MultiFacePoseLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& botto
    // 21 face points face loss layer setup
     vector<int> loss_shape(1, 1);
     // Set up landmark loss layer.
-    landmark_weight_ = multiface_loss_param.pose_weights();
-    landmark_loss_type_ = multiface_loss_param.regs_face_contour_loss_type();
+    landmark_weight_ = multifacepose_loss_param.pose_weights();
+    landmark_loss_type_ = multifacepose_loss_param.regs_face_contour_loss_type();
     // fake shape.
     vector<int> loc_shape(1, 1);
     loc_shape.push_back(42); //landmark_shape:{ 1, 21}x2
@@ -67,12 +67,12 @@ void MultiFacePoseLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& botto
 
     /*************************************************************/
     // facepose yaw pitch roll loss
-    pose_loss_type_ = multiface_loss_param.regs_face_pose_loss_type();
+    pose_loss_type_ = multifacepose_loss_param.regs_face_pose_loss_type();
     // fake shape.
-    vector<int> loc_shape(1, 1);
-    loc_shape.push_back(3); //facepose (yaw pitch roll)
-    pose_pred_.Reshape(loc_shape); //loc_shape:{ }
-    pose_gt_.Reshape(loc_shape);
+    vector<int> pose_loc_shape(1, 1);
+    pose_loc_shape.push_back(3); //facepose (yaw pitch roll)
+    pose_pred_.Reshape(pose_loc_shape); //loc_shape:{ }
+    pose_gt_.Reshape(pose_loc_shape);
     pose_bottom_vec_.push_back(&pose_pred_);
     pose_bottom_vec_.push_back(&pose_gt_);
     pose_loss_.Reshape(loss_shape);
@@ -143,53 +143,55 @@ const vector<Blob<Dtype>*>& top) {
         }
         AnnoFaceContourPoints facemark;
         AnnoFacePoseOritation facepose;
-        facemark.point_x1(label_data[idx+1]);
-        facemark.point_x2(label_data[idx+2]);
-        facemark.point_x3(label_data[idx+3]);
-        facemark.point_x4(label_data[idx+4]);
-        facemark.point_x5(label_data[idx+5]);
-        facemark.point_x6(label_data[idx+6]);
-        facemark.point_x7(label_data[idx+7]);
-        facemark.point_x8(label_data[idx+8]);
-        facemark.point_x9(label_data[idx+9]);
-        facemark.point_x10(label_data[idx+10]);
-        facemark.point_x11(label_data[idx+11]);
-        facemark.point_x12(label_data[idx+12]);
-        facemark.point_x13(label_data[idx+13]);
-        facemark.point_x14(label_data[idx+14]);
-        facemark.point_x15(label_data[idx+15]);
-        facemark.point_x16(label_data[idx+16]);
-        facemark.point_x17(label_data[idx+17]);
-        facemark.point_x18(label_data[idx+18]);
-        facemark.point_x19(label_data[idx+19]);
-        facemark.point_x20(label_data[idx+20]);
-        facemark.point_x21(label_data[idx+21]);
-        facemark.point_y1(label_data[idx+22]);
-        facemark.point_y2(label_data[idx+23]);
-        facemark.point_y3(label_data[idx+24]);
-        facemark.point_y4(label_data[idx+25]);
-        facemark.point_y5(label_data[idx+26]);
-        facemark.point_y6(label_data[idx+27]);
-        facemark.point_y7(label_data[idx+28]);
-        facemark.point_y8(label_data[idx+29]);
-        facemark.point_y9(label_data[idx+30]);
-        facemark.point_y10(label_data[idx+31]);
-        facemark.point_y11(label_data[idx+32]);
-        facemark.point_y12(label_data[idx+33]);
-        facemark.point_y13(label_data[idx+34]);
-        facemark.point_y14(label_data[idx+35]);
-        facemark.point_y15(label_data[idx+36]);
-        facemark.point_y16(label_data[idx+37]);
-        facemark.point_y17(label_data[idx+38]);
-        facemark.point_y18(label_data[idx+39]);
-        facemark.point_y19(label_data[idx+40]);
-        facemark.point_y20(label_data[idx+41]);
-        facemark.point_y21(label_data[idx+42]);
+        facemark.mutable_point_1()->set_x(label_data[idx+1]);
+        facemark.mutable_point_2()->set_x(label_data[idx+2]);
+        facemark.mutable_point_3()->set_x(label_data[idx+3]);
+        facemark.mutable_point_4()->set_x(label_data[idx+4]);
+        facemark.mutable_point_5()->set_x(label_data[idx+5]);
+        facemark.mutable_point_6()->set_x(label_data[idx+6]);
+        facemark.mutable_point_7()->set_x(label_data[idx+7]);
+        facemark.mutable_point_8()->set_x(label_data[idx+8]);
+        facemark.mutable_point_9()->set_x(label_data[idx+9]);
+        facemark.mutable_point_10()->set_x(label_data[idx+10]);
+        facemark.mutable_point_11()->set_x(label_data[idx+11]);
+        facemark.mutable_point_12()->set_x(label_data[idx+12]);
+        facemark.mutable_point_13()->set_x(label_data[idx+13]);
+        facemark.mutable_point_14()->set_x(label_data[idx+14]);
+        facemark.mutable_point_15()->set_x(label_data[idx+15]);
+        facemark.mutable_point_16()->set_x(label_data[idx+16]);
+        facemark.mutable_point_17()->set_x(label_data[idx+17]);
+        facemark.mutable_point_18()->set_x(label_data[idx+18]);
+        facemark.mutable_point_19()->set_x(label_data[idx+19]);
+        facemark.mutable_point_20()->set_x(label_data[idx+20]);
+        facemark.mutable_point_21()->set_x(label_data[idx+21]);
+
+        facemark.mutable_point_1()->set_y(label_data[idx+22]);
+        facemark.mutable_point_2()->set_y(label_data[idx+23]);
+        facemark.mutable_point_3()->set_y(label_data[idx+24]);
+        facemark.mutable_point_4()->set_y(label_data[idx+25]);
+        facemark.mutable_point_5()->set_y(label_data[idx+26]);
+        facemark.mutable_point_6()->set_y(label_data[idx+27]);
+        facemark.mutable_point_7()->set_y(label_data[idx+28]);
+        facemark.mutable_point_8()->set_y(label_data[idx+29]);
+        facemark.mutable_point_9()->set_y(label_data[idx+30]);
+        facemark.mutable_point_10()->set_y(label_data[idx+31]);
+        facemark.mutable_point_11()->set_y(label_data[idx+32]);
+        facemark.mutable_point_12()->set_y(label_data[idx+33]);
+        facemark.mutable_point_13()->set_y(label_data[idx+34]);
+        facemark.mutable_point_14()->set_y(label_data[idx+35]);
+        facemark.mutable_point_15()->set_y(label_data[idx+36]);
+        facemark.mutable_point_16()->set_y(label_data[idx+37]);
+        facemark.mutable_point_17()->set_y(label_data[idx+38]);
+        facemark.mutable_point_18()->set_y(label_data[idx+39]);
+        facemark.mutable_point_19()->set_y(label_data[idx+40]);
+        facemark.mutable_point_20()->set_y(label_data[idx+41]);
+        facemark.mutable_point_21()->set_y(label_data[idx+42]);
+        
         facepose.set_yaw(label_data[idx+43]);
         facepose.set_pitch(label_data[idx+44]);
         facepose.set_roll(label_data[idx+45]);
         all_landmarks.insert(pair<int,AnnoFaceContourPoints>(item_id, facemark));
-        all_poses.insert(pair<int,AnnoFacePoseOritation>(item_id, facepose));
+        all_faceposes.insert(pair<int,AnnoFacePoseOritation>(item_id, facepose));
     }
     CHECK_EQ(batch_size_, all_landmarks.size())<<"ground truth label size should match batch_size_";
 
@@ -207,48 +209,48 @@ const vector<Blob<Dtype>*>& top) {
     for(int ii = 0; ii< batch_size_; ii++)
     {
         AnnoFaceContourPoints face = all_landmarks[ii];
-        landmark_gt_data[count*42] = face.point_x1() ;
-        landmark_gt_data[count*42+1] = face.point_x2() ;
-        landmark_gt_data[count*42+2] = face.point_x3() ;
-        landmark_gt_data[count*42+3] = face.point_x4() ;
-        landmark_gt_data[count*42+4] = face.point_x5() ;
-        landmark_gt_data[count*42+5] = face.point_x6() ;
-        landmark_gt_data[count*42+6] = face.point_x7() ;
-        landmark_gt_data[count*42+7] = face.point_x8() ;
-        landmark_gt_data[count*42+8] = face.point_x9() ;
-        landmark_gt_data[count*42+9] = face.point_x10() ;
-        landmark_gt_data[count*42+10] = face.point_x11() ;
-        landmark_gt_data[count*42+11] = face.point_x12() ;
-        landmark_gt_data[count*42+12] = face.point_x13() ;
-        landmark_gt_data[count*42+13] = face.point_x14() ;
-        landmark_gt_data[count*42+14] = face.point_x15() ;
-        landmark_gt_data[count*42+15] = face.point_x16() ;
-        landmark_gt_data[count*42+16] = face.point_x17() ;
-        landmark_gt_data[count*42+17] = face.point_x18() ;
-        landmark_gt_data[count*42+18] = face.point_x19() ;
-        landmark_gt_data[count*42+19] = face.point_x20() ;
-        landmark_gt_data[count*42+20] = face.point_x21() ;
-        landmark_gt_data[count*42+21] = face.point_y1() ;
-        landmark_gt_data[count*42+22] = face.point_y2() ;
-        landmark_gt_data[count*42+23] = face.point_y3() ;
-        landmark_gt_data[count*42+24] = face.point_y4() ;
-        landmark_gt_data[count*42+25] = face.point_y5() ;
-        landmark_gt_data[count*42+26] = face.point_y6() ;
-        landmark_gt_data[count*42+27] = face.point_y7() ;
-        landmark_gt_data[count*42+28] = face.point_y8() ;
-        landmark_gt_data[count*42+29] = face.point_y9() ;
-        landmark_gt_data[count*42+30] = face.point_y10() ;
-        landmark_gt_data[count*42+31] = face.point_y11() ;
-        landmark_gt_data[count*42+32] = face.point_y12() ;
-        landmark_gt_data[count*42+33] = face.point_y13() ;
-        landmark_gt_data[count*42+34] = face.point_y14() ;
-        landmark_gt_data[count*42+35] = face.point_y15() ;
-        landmark_gt_data[count*42+36] = face.point_y16() ;
-        landmark_gt_data[count*42+37] = face.point_y17() ;
-        landmark_gt_data[count*42+38] = face.point_y18() ;
-        landmark_gt_data[count*42+39] = face.point_y19() ;
-        landmark_gt_data[count*42+40] = face.point_y20() ;
-        landmark_gt_data[count*42+41] = face.point_y21() ;
+        landmark_gt_data[count*42] = face.point_1().x() ;
+        landmark_gt_data[count*42+1] = face.point_2().x()  ;
+        landmark_gt_data[count*42+2] = face.point_3().x() ;
+        landmark_gt_data[count*42+3] = face.point_4().x() ;
+        landmark_gt_data[count*42+4] = face.point_5().x() ;
+        landmark_gt_data[count*42+5] = face.point_6().x() ;
+        landmark_gt_data[count*42+6] = face.point_7().x() ;
+        landmark_gt_data[count*42+7] = face.point_8().x() ;
+        landmark_gt_data[count*42+8] = face.point_9().x() ;
+        landmark_gt_data[count*42+9] = face.point_10().x() ;
+        landmark_gt_data[count*42+10] = face.point_11().x() ;
+        landmark_gt_data[count*42+11] = face.point_12().x() ;
+        landmark_gt_data[count*42+12] = face.point_13().x() ;
+        landmark_gt_data[count*42+13] = face.point_14().x() ;
+        landmark_gt_data[count*42+14] = face.point_15().x() ;
+        landmark_gt_data[count*42+15] = face.point_16().x() ;
+        landmark_gt_data[count*42+16] = face.point_17().x() ;
+        landmark_gt_data[count*42+17] = face.point_18().x() ;
+        landmark_gt_data[count*42+18] = face.point_19().x() ;
+        landmark_gt_data[count*42+19] = face.point_20().x() ;
+        landmark_gt_data[count*42+20] = face.point_21().x() ;
+        landmark_gt_data[count*42+21] = face.point_1().y();
+        landmark_gt_data[count*42+22] = face.point_2().y();
+        landmark_gt_data[count*42+23] = face.point_3().y() ;
+        landmark_gt_data[count*42+24] = face.point_4().y() ;
+        landmark_gt_data[count*42+25] = face.point_5().y() ;
+        landmark_gt_data[count*42+26] = face.point_6().y() ;
+        landmark_gt_data[count*42+27] = face.point_7().y() ;
+        landmark_gt_data[count*42+28] = face.point_8().y() ;
+        landmark_gt_data[count*42+29] = face.point_9().y() ;
+        landmark_gt_data[count*42+30] = face.point_10().y() ;
+        landmark_gt_data[count*42+31] = face.point_11().y() ;
+        landmark_gt_data[count*42+32] = face.point_12().y() ;
+        landmark_gt_data[count*42+33] = face.point_13().y() ;
+        landmark_gt_data[count*42+34] = face.point_14().y() ;
+        landmark_gt_data[count*42+35] = face.point_15().y() ;
+        landmark_gt_data[count*42+36] = face.point_16().y() ;
+        landmark_gt_data[count*42+37] = face.point_17().y() ;
+        landmark_gt_data[count*42+38] = face.point_18().y() ;
+        landmark_gt_data[count*42+39] = face.point_19().y() ;
+        landmark_gt_data[count*42+40] = face.point_20().y() ;
+        landmark_gt_data[count*42+41] = face.point_21().y() ;
         ++count;
     }
     landmark_loss_layer_->Reshape(landmark_bottom_vec_, landmark_top_vec_);
@@ -268,7 +270,7 @@ const vector<Blob<Dtype>*>& top) {
     count =0;
     for(int ii = 0; ii< batch_size_; ii++)
     {
-        AnnoFacePoseOritation face = all_poses[ii];
+        AnnoFacePoseOritation face = all_faceposes[ii];
         pose_gt_data[count*3] = face.yaw() ;
         pose_gt_data[count*3+1] = face.pitch() ;
         pose_gt_data[count*3+2] = face.roll() ;

@@ -66,7 +66,7 @@ class MultiFacePoseLossLayer : public LossLayer<Dtype> {
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> pose_bottom_vec_;
   // top vector holder used in Forward function.
-  vector<Blob<Dtype>* pose_top_vec_;
+  vector<Blob<Dtype>*> pose_top_vec_;
   // blob which stores the confidence prediction.
   Blob<Dtype> pose_pred_;
   // blob which stores the corresponding ground truth label.
