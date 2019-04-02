@@ -18,7 +18,7 @@ Annotation_img_dir = '../../dataset/facedata/wider_face/Annotation_img'
 root_dir = "../../dataset/facedata/"
 anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
-thread_hold = 40 ##map:59.35%, thread_hold=40
+thread_hold = 30 ##map:70.35%, thread_hold=40, now i want to detector 30 pixels, just like 6-10m distance
 class ConfigureHistogram(object):
 	def __init__(self):
 		self.count = 0
@@ -32,6 +32,8 @@ class ConfigureHistogram(object):
 		self.face_occlusion = []
 		self.face_illumination = []
 		self.face_width_aspect_ratio = []
+		self.relative_face_image_aspect_width_ratio = []
+		self.relative_face_image_aspect_height_ratio = []
 
 	def face_append(self, width, height, blur, pose, occlusion, illumination):
 		self.face_count += 1
@@ -42,13 +44,15 @@ class ConfigureHistogram(object):
 		self.face_occlusion.append(occlusion)
 		self.face_illumination.append(illumination)
 
-	def face_specfic_append(self, width, height, blur, occlusion, aspect_ratio):
+	def face_specfic_append(self, width, height, blur, occlusion, aspect_ratio, width_ratio, height_ratio):
 		self.face_count += 1
 		self.face_width.append(width)
 		self.face_height.append(height)
 		self.face_blur.append(blur)
 		self.face_occlusion.append(occlusion)
 		self.face_width_aspect_ratio.append(aspect_ratio)
+		self.relative_face_image_aspect_width_ratio.append(width_ratio)
+		self.relative_face_image_aspect_height_ratio.append(height_ratio)
 
 	def image_append(self, img_width, img_height):
 		self.count += 1
@@ -133,7 +137,9 @@ def statsic_specfic_face_base_data(source_folder,label_folder, heightMin, height
 						blur = anno_str_bbox[4]
 						occlusion = anno_str_bbox[5]
 						aspec_ratio =float(int(face_width)/int(face_height))
-						static_his.face_specfic_append(int(face_width), int(face_height), int(blur), int(occlusion), aspec_ratio)
+						width_realtive_ratio = float(int(face_width)/int(width))
+						height_realtive_ratio = float(int(face_width)/int(height))
+						static_his.face_specfic_append(int(face_width), int(face_height), int(blur), int(occlusion), aspec_ratio,         width_realtive_ratio, height_realtive_ratio)
 						if int(face_width)<=0 or int(face_height)<=0:
 							print('face_width, and height:',int(face_width), int(face_height))
 							print('../../dataset/facedata/wider_face/Annotations/'+image_file.split('.')[-2]+'.xml')
@@ -164,11 +170,19 @@ def draw_histogram_specfic_range_base_data():
 		# face width/height aspec_ratio
 		face_aspec_ratio_min = np.min(static_data.face_width_aspect_ratio)
 		face_aspec_ratio_max = np.max(static_data.face_width_aspect_ratio)
+		# face width image_relative_ratio
+		face_width_aspec_ratio_min = np.min(static_data.relative_face_image_aspect_width_ratio)
+		face_width_aspec_ratio_max = np.max(static_data.relative_face_image_aspect_width_ratio)
+		# face height image_relative_ratio
+		face_height_aspec_ratio_min = np.min(static_data.relative_face_image_aspect_height_ratio)
+		face_height_aspec_ratio_max = np.max(static_data.relative_face_image_aspect_height_ratio)
 		# print img_height and img_width(min and max), and face_height and width (min and max)
 		print('img height min & max ', img_height_min, img_height_max)
 		print('img_face width min & max ', face_width_min, face_width_max)
 		print('img_face height min & max ', face_height_min, face_height_max)
 		print('face_aspec_ratio_ min & max ', face_aspec_ratio_min, face_aspec_ratio_max)
+		print('face width relative ratio min & max', face_width_aspec_ratio_min, face_width_aspec_ratio_max)
+		print('face height relative ratio min & max ', face_height_aspec_ratio_min, face_height_aspec_ratio_max)
 		# i want to know the img height disturibution , so i use histogram, and i need to make some gap between the min and max of img_height
 		# and by the max gap between the max and the min ,i want to make 120 gap,year
 		# ==========================================================
