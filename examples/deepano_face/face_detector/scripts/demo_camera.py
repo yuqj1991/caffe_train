@@ -29,7 +29,8 @@ net = caffe.Net(net_file,caffe_model,caffe.TEST)
 
 CLASSES = ('background',
            'face')
-
+blur_classes = ('clear', 'normal', 'heavy')
+occlu_classes = ('clear', 'partial', 'heavy')
 
 def preprocess(src):
     img = cv2.resize(src, (300,300))
@@ -44,9 +45,11 @@ def postprocess(img, out):
 
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
-    blur = out['detection_out'][0,0,:,7]
-    occlu = out['detection_out'][0,0,:,8]
-    return (box.astype(np.int32), conf, cls, blur, occlu)
+    blur = out['detection_out'][0,0,:,7:10]
+    occlu = out['detection_out'][0,0,:,10:13]
+    blur_max_index = blur.index(max(blur))
+    occlu_max_index = occlu.index(max(occlu))
+    return (box.astype(np.int32), conf, cls, blur_max_index, occlu_max_index)
 
 def detect():
     cap = cv2.VideoCapture(0)
