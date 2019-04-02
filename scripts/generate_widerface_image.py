@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import shutil
 import sys
@@ -18,7 +19,7 @@ Annotation_img_dir = '../../dataset/facedata/wider_face/Annotation_img'
 root_dir = "../../dataset/facedata/"
 anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
-thread_hold = 30 ##map:70.35%, thread_hold=40, now i want to detector 30 pixels, just like 6-10m distance
+thread_hold = 30 ##map:70.35%, thread_hold=40; now i want to detector 30 pixels, just like 6-10m distance
 class ConfigureHistogram(object):
 	def __init__(self):
 		self.count = 0
@@ -117,6 +118,8 @@ def statsic_specfic_face_base_data(source_folder,label_folder, heightMin, height
 		file_list = os.listdir(source_folder+'/'+sub_folder)
 		for image_file in file_list:
 			image_file_full_path = source_folder+'/'+sub_folder+'/'+image_file
+			if not os.path.exists('../../dataset/facedata/wider_face/Annotations/'+image_file.split('.')[-2]+'.xml'):
+				continue
 			xml_file = xml.dom.minidom.parse('../../dataset/facedata/wider_face/Annotations/'+image_file.split('.')[-2]+'.xml')
 			root = xml_file.documentElement
 			width = root.getElementsByTagName('width')
@@ -126,6 +129,8 @@ def statsic_specfic_face_base_data(source_folder,label_folder, heightMin, height
 			if img_height >=heightMin and img_height < heightMax:
 				static_his.image_append(img_width, img_height)
 				label_file = label_folder+'/'+image_file.split('.')[-2]
+				if not os.path.exists(label_file):
+					continue
 				with open(label_file, 'r') as lab_file:
 					lab_an_line = lab_file.readline()
 					while lab_an_line:
@@ -137,9 +142,9 @@ def statsic_specfic_face_base_data(source_folder,label_folder, heightMin, height
 						blur = anno_str_bbox[4]
 						occlusion = anno_str_bbox[5]
 						aspec_ratio =float(int(face_width)/int(face_height))
-						width_realtive_ratio = float(int(face_width)/int(width))
-						height_realtive_ratio = float(int(face_width)/int(height))
-						static_his.face_specfic_append(int(face_width), int(face_height), int(blur), int(occlusion), aspec_ratio,         width_realtive_ratio, height_realtive_ratio)
+						width_realtive_ratio = float(int(face_width)/int(img_width))
+						height_realtive_ratio = float(int(face_width)/int(img_height))
+						static_his.face_specfic_append(int(face_width), int(face_height), int(blur), int(occlusion), aspec_ratio, width_realtive_ratio, height_realtive_ratio)
 						if int(face_width)<=0 or int(face_height)<=0:
 							print('face_width, and height:',int(face_width), int(face_height))
 							print('../../dataset/facedata/wider_face/Annotations/'+image_file.split('.')[-2]+'.xml')
@@ -538,8 +543,6 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 			ymax =doc.createElement('ymax')
 			ymax.appendChild(doc.createTextNode(str(int(y_min) + int(height))))
 			boundbox.appendChild(ymax)
-
-
 			label_text_line = label_img_file.readline()
 	cv2.imwrite(Annotation_img_dir+'/'+img_filename.split('.')[-2].split('/')[-1]+'.jpg',source_img)
 	xml_file = open(xml_file_path, 'w')
@@ -548,7 +551,7 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 
 
 def main():
-	#'''
+	# '''
 	for sub in anno_src_wider_dir:
 		dir = "../../dataset/facedata/wider_face_split/"+sub
 		load_wider_split(dir)
@@ -556,8 +559,8 @@ def main():
 	for file in wider_directory:
 		shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
 	# '''
-	#draw_histogram_base_data()
-	# draw_histogram_specfic_range_base_data()
+	# draw_histogram_base_data()
+	draw_histogram_specfic_range_base_data()
 
 
 if __name__ == '__main__':
