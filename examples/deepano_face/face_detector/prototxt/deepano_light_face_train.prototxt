@@ -2678,7 +2678,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2726,7 +2726,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2885,7 +2885,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2933,7 +2933,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3092,7 +3092,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3140,7 +3140,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3297,7 +3297,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3345,7 +3345,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3502,7 +3502,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3550,7 +3550,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3707,7 +3707,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3755,7 +3755,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3906,8 +3906,8 @@ layer {
 		conf_occlu_loss_type: SOFTMAX
 		loc_weight: 1.0
 		num_classes: 2
-		num_blur: 4
-		num_occlusion: 4
+		num_blur: 3
+		num_occlusion: 3
 		share_location: true
 		match_type: PER_PREDICTION
 		overlap_threshold: 0.9

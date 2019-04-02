@@ -266,7 +266,6 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
           top_k_, &(indices[c]));
       num_det += indices[c].size();
     }
-    LOG(INFO)<<"@@@@ =========== num_det: "<<num_det;
     if (keep_top_k_ > -1 && num_det > keep_top_k_) {
       vector<pair<float, pair<int, int> > > score_index_pairs;
       for (map<int, vector<int> >::iterator it = indices.begin();

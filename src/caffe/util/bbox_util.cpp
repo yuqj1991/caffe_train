@@ -1672,8 +1672,6 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
       const vector<vector<int> >& all_neg_indices,
       const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
       Dtype* conf_pred_data, Dtype* conf_gt_data) {
-  // CHECK_EQ(num, all_match_indices.size());
-  // CHECK_EQ(num, all_neg_indices.size());
   // Retrieve parameters.
   CHECK(multibox_loss_param.has_num_blur()) << "Must provide num_blur.";
   const int num_blur = multibox_loss_param.num_blur();
@@ -1725,7 +1723,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
         }
       }
       // Go to next image.
-      if (do_neg_mining) {
+      /*if (do_neg_mining) {
         // Save negative bboxes scores and labels.
         for (int n = 0; n < all_neg_indices[i].size(); ++n) {
           int j = all_neg_indices[i][n];
@@ -1747,7 +1745,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
           }
           ++count;
         }
-      }
+      }*/
     }
     if (do_neg_mining) {
       conf_data += num_priors * num_blur;
@@ -1831,7 +1829,7 @@ void EncodeOcclusConfPrediction(const Dtype* conf_data, const int num,
         }
       }
       // Go to next image.
-      if (do_neg_mining) {
+      /*if (do_neg_mining) {
         // Save negative bboxes scores and labels.
         for (int n = 0; n < all_neg_indices[i].size(); ++n) {
           int j = all_neg_indices[i][n];
@@ -1853,7 +1851,7 @@ void EncodeOcclusConfPrediction(const Dtype* conf_data, const int num,
           }
           ++count;
         }
-      }
+      }*/
     }
     if (do_neg_mining) {
       conf_data += num_priors * num_occlussion;

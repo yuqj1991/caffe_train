@@ -587,14 +587,14 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             }
           }
           // Copy negative bboxes scores' diff.
-          for (int n = 0; n < all_neg_indices_[i].size(); ++n) {
+          /*for (int n = 0; n < all_neg_indices_[i].size(); ++n) {
             int j = all_neg_indices_[i][n];
             CHECK_LT(j, num_priors_);
             caffe_copy<Dtype>(num_blur_,
                               conf_blur_pred_diff + count * num_blur_,
                               conf_blur_bottom_diff + j * num_blur_);
             ++count;
-          }
+          }*/
           conf_blur_bottom_diff += bottom[3]->offset(1);
         }
       } else {
@@ -644,14 +644,14 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             }
           }
           // Copy negative bboxes scores' diff.
-          for (int n = 0; n < all_neg_indices_[i].size(); ++n) {
+          /*for (int n = 0; n < all_neg_indices_[i].size(); ++n) {
             int j = all_neg_indices_[i][n];
             CHECK_LT(j, num_priors_);
             caffe_copy<Dtype>(num_occlusion_,
                               conf_occl_pred_diff + count * num_occlusion_,
                               conf_occl_bottom_diff + j * num_occlusion_);
             ++count;
-          }
+          }*/
           conf_occl_bottom_diff += bottom[4]->offset(1);
         }
       } else {

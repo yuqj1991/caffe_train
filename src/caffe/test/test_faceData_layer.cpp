@@ -9,7 +9,7 @@
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/filler.hpp"
-#include "caffe/layers/annotated_data_layer.hpp"
+#include "caffe/layers/faceData_layer.hpp"
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/db.hpp"
 #include "caffe/util/io.hpp"
@@ -43,11 +43,11 @@ int BBoxNum(int n) {
 }
 
 template <typename TypeParam>
-class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
+class faceDataLayerTest : public MultiDeviceTest<TypeParam> {
   typedef typename TypeParam::Dtype Dtype;
 
  protected:
-  AnnotatedDataLayerTest()
+  faceDataLayerTest()
       : backend_(DataParameter_DB_LEVELDB),
         blob_top_data_(new Blob<Dtype>()),
         blob_top_label_(new Blob<Dtype>()),
@@ -79,7 +79,7 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
   //  - use_rich_annotation: if false, use datum.label() instead.
   //  - type: type of rich annotation.
   void Fill(DataParameter_DB backend, bool unique_pixel, bool unique_annotation,
-            bool use_rich_annotation, AnnotatedDatum_AnnotationType type) {
+            bool use_rich_annotation, AnnoFaceDatum_AnnotationType type) {
     backend_ = backend;
     unique_pixel_ = unique_pixel;
     unique_annotation_ = unique_annotation;
@@ -91,7 +91,7 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
     db->Open(*filename_, db::NEW);
     scoped_ptr<db::Transaction> txn(db->NewTransaction());
     for (int i = 0; i < num_; ++i) {
-      AnnotatedDatum anno_datum;
+      AnnoFaceDatum anno_datum;
       // Fill data.
       Datum* datum = anno_datum.mutable_datum();
       datum->set_channels(channels_);
@@ -105,23 +105,21 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
       // Fill annotation.
       if (use_rich_annotation) {
         anno_datum.set_type(type);
-        for (int g = 0; g < i; ++g) {
-          AnnotationGroup* anno_group = anno_datum.add_annotation_group();
-          anno_group->set_group_label(g);
-          for (int a = 0; a < g; ++a) {
-            Annotation* anno = anno_group->add_annotation();
-            anno->set_instance_id(a);
-            if (type == AnnotatedDatum_AnnotationType_BBOX) {
-              NormalizedBBox* bbox = anno->mutable_bbox();
-              int b = unique_annotation ? a : g;
-              bbox->set_xmin(b*0.1);
-              bbox->set_ymin(b*0.1);
-              bbox->set_xmax(std::min(b*0.1 + 0.2, 1.0));
-              bbox->set_ymax(std::min(b*0.1 + 0.2, 1.0));
-              bbox->set_difficult(a % 2);
-            }
-          }
-        }
+        LandmarkFace* facemark = anno_datum.mutable_annoface()->mutable_markface();
+        int b = unique_annotation ? 0.2 : 0.3;
+        facemark->set_x1(b*1);
+        facemark->set_x2(b*1 + 0.1);
+        facemark->set_x3(b*1 + 0.2);
+        facemark->set_x4(b*1 + 0.3);
+        facemark->set_x5(b*1 + 0.4);
+        facemark->set_y1(b*1);
+        facemark->set_y2(b*1 + 0.1);
+        facemark->set_y3(b*1 + 0.2);
+        facemark->set_y4(b*1 + 0.3);
+        facemark->set_y5(b*1 + 0.4);
+        anno_datum.mutable_annoface()->set_gender(1);
+        anno_datum.mutable_annoface()->set_glasses(1);
+        anno_datum.mutable_annoface()->set_headpose(1);
       } else {
         datum->set_label(i);
       }
@@ -148,7 +146,7 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
         param.mutable_transform_param();
     transform_param->set_scale(scale);
 
-    AnnotatedDataLayer<Dtype> layer(param);
+    faceAnnoDataLayer<Dtype> layer(param);
     layer.SetUp(blob_bottom_vec_, blob_top_vec_);
     EXPECT_EQ(blob_top_data_->num(), num_);
     EXPECT_EQ(blob_top_data_->channels(), channels_);
@@ -156,11 +154,11 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
     EXPECT_EQ(blob_top_data_->width(), width_);
     if (use_rich_annotation_) {
       switch (type_) {
-        case AnnotatedDatum_AnnotationType_BBOX:
+        case AnnoFaceDatum_AnnotationType_FACEMARK:
           EXPECT_EQ(blob_top_label_->num(), 1);
           EXPECT_EQ(blob_top_label_->channels(), 1);
           EXPECT_EQ(blob_top_label_->height(), 1);
-          EXPECT_EQ(blob_top_label_->width(), 8);
+          EXPECT_EQ(blob_top_label_->width(), 14);
           break;
         default:
           LOG(FATAL) << "Unknown annotation type.";
@@ -180,28 +178,24 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
       int cur_bbox = 0;
       for (int i = 0; i < num_; ++i) {
         if (use_rich_annotation_) {
-          if (type_ == AnnotatedDatum_AnnotationType_BBOX) {
+          if (type_ == AnnoFaceDatum_AnnotationType_FACEMARK) {
             EXPECT_EQ(blob_top_label_->num(), 1);
             EXPECT_EQ(blob_top_label_->channels(), 1);
-            EXPECT_EQ(blob_top_label_->height(), BBoxNum(num_));
-            EXPECT_EQ(blob_top_label_->width(), 8);
-            for (int g = 0; g < i; ++g) {
-              for (int a = 0; a < g; ++a) {
-                EXPECT_EQ(i, label_data[cur_bbox*8]);
-                EXPECT_EQ(g, label_data[cur_bbox*8+1]);
-                EXPECT_EQ(a, label_data[cur_bbox*8+2]);
-                int b = unique_annotation_ ? a : g;
-                for (int p = 3; p < 5; ++p) {
-                  EXPECT_NEAR(b*0.1, label_data[cur_bbox*8+p], this->eps_);
-                }
-                for (int p = 5; p < 7; ++p) {
-                  EXPECT_NEAR(std::min(b*0.1 + 0.2, 1.0),
-                            label_data[cur_bbox*8+p], this->eps_);
-                }
-                EXPECT_EQ(a % 2, label_data[cur_bbox*8+7]);
-                cur_bbox++;
-              }
-            }
+            EXPECT_EQ(blob_top_label_->height(), 1);
+            EXPECT_EQ(blob_top_label_->width(), 14);
+            EXPECT_EQ(0.2, label_data[i*14+1]);
+            EXPECT_EQ(0.3, label_data[i*14+2]);
+            EXPECT_EQ(0.4, label_data[i*14+3]);
+            EXPECT_EQ(0.5, label_data[i*14+4]);
+            EXPECT_EQ(0.5, label_data[i*14+5]);
+            EXPECT_EQ(0.2, label_data[i*14+6]);
+            EXPECT_EQ(0.3, label_data[i*14+7]);
+            EXPECT_EQ(0.4, label_data[i*14+8]);
+            EXPECT_EQ(0.5, label_data[i*14+9]);
+            EXPECT_EQ(0.5, label_data[i*14+10]);
+            EXPECT_EQ(1, label_data[i*14+11]);
+            EXPECT_EQ(1, label_data[i*14+12]);
+            EXPECT_EQ(1, label_data[i*14+13]);
           } else {
             LOG(FATAL) << "Unknown annotation type.";
           }
@@ -222,7 +216,7 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
 
   void TestReshape(DataParameter_DB backend, bool unique_pixel,
                    bool unique_annotation, bool use_rich_annotation,
-                   AnnotatedDatum_AnnotationType type) {
+                   AnnoFaceDatum_AnnotationType type) {
     // Save data of varying shapes.
     GetTempDirname(filename_.get());
     LOG(INFO) << "Using temporary dataset " << *filename_;
@@ -230,7 +224,7 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
     db->Open(*filename_, db::NEW);
     scoped_ptr<db::Transaction> txn(db->NewTransaction());
     for (int i = 0; i < num_; ++i) {
-      AnnotatedDatum anno_datum;
+      AnnoFaceDatum anno_datum;
       // Fill data.
       Datum* datum = anno_datum.mutable_datum();
       datum->set_channels(channels_);
@@ -245,23 +239,21 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
       // Fill annotation.
       if (use_rich_annotation) {
         anno_datum.set_type(type);
-        for (int g = 0; g < i; ++g) {
-          AnnotationGroup* anno_group = anno_datum.add_annotation_group();
-          anno_group->set_group_label(g);
-          for (int a = 0; a < g; ++a) {
-            Annotation* anno = anno_group->add_annotation();
-            anno->set_instance_id(a);
-            if (type == AnnotatedDatum_AnnotationType_BBOX) {
-              NormalizedBBox* bbox = anno->mutable_bbox();
-              int b = unique_annotation ? a : g;
-              bbox->set_xmin(b*0.1);
-              bbox->set_ymin(b*0.1);
-              bbox->set_xmax(std::min(b*0.1 + 0.2, 1.0));
-              bbox->set_ymax(std::min(b*0.1 + 0.2, 1.0));
-              bbox->set_difficult(a % 2);
-            }
-          }
-        }
+        LandmarkFace* facemark = anno_datum.mutable_annoface()->mutable_markface();
+        int b = unique_annotation ? 0.2 : 0.3;
+        facemark->set_x1(b*1);
+        facemark->set_x2(b*1 + 0.1);
+        facemark->set_x3(b*1 + 0.2);
+        facemark->set_x4(b*1 + 0.3);
+        facemark->set_x5(b*1 + 0.4);
+        facemark->set_y1(b*1);
+        facemark->set_y2(b*1 + 0.1);
+        facemark->set_y3(b*1 + 0.2);
+        facemark->set_y4(b*1 + 0.3);
+        facemark->set_y5(b*1 + 0.4);
+        anno_datum.mutable_annoface()->set_gender(1);
+        anno_datum.mutable_annoface()->set_glasses(1);
+        anno_datum.mutable_annoface()->set_headpose(1);
       } else {
         datum->set_label(i);
       }
@@ -282,17 +274,17 @@ class AnnotatedDataLayerTest : public MultiDeviceTest<TypeParam> {
     data_param->set_source(filename_->c_str());
     data_param->set_backend(backend);
 
-    AnnotatedDataLayer<Dtype> layer(param);
+    facePoseDataLayer<Dtype> layer(param);
     layer.SetUp(blob_bottom_vec_, blob_top_vec_);
     EXPECT_EQ(blob_top_data_->num(), 1);
     EXPECT_EQ(blob_top_data_->channels(), channels_);
     if (use_rich_annotation) {
       switch (type) {
-        case AnnotatedDatum_AnnotationType_BBOX:
+        case AnnoFaceDatum_AnnotationType_FACEMARK:
           EXPECT_EQ(blob_top_label_->num(), 1);
           EXPECT_EQ(blob_top_label_->channels(), 1);
           EXPECT_EQ(blob_top_label_->height(), 1);
-          EXPECT_EQ(blob_top_label_->width(), 8);
+          EXPECT_EQ(blob_top_label_->width(), 14);
           break;
         default:
           LOG(FATAL) << "Unknown annotation type.";
