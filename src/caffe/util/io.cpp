@@ -210,7 +210,6 @@ bool ReadRichImageToAnnotatedDatum(const string& filename,
     return true;
   }
   // annno type bbox or attributes
-  const string & facetype = "faceattributes";
   switch (type) {
     case AnnotatedDatum_AnnotationType_BBOX:
       int ori_height, ori_width;

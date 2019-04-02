@@ -88,6 +88,8 @@ int main(int argc, char** argv) {
   const string encode_type = FLAGS_encode_type;
   const string anno_type = FLAGS_anno_type;
   AnnotatedDatum_AnnotationType type;
+  AnnoFaceDatum_AnnotationType anno_face_attri_type;
+  AnnoFacePoseDatum_AnnoType anno_facepose_type;
   const string label_type = FLAGS_label_type;
   const string label_map_file = FLAGS_label_map_file;
   const bool check_label = FLAGS_check_label;
@@ -112,7 +114,11 @@ int main(int argc, char** argv) {
     while (infile >> filename >> labelname) {
       lines.push_back(std::make_pair(filename, labelname));
     }
-  }
+  }else if(anno_type == "faceattributes") {
+		anno_face_attri_type = AnnoFaceDatum_AnnotationType_FACEMARK;
+	} else if(anno_type == "facepose") {
+		anno_facepose_type = AnnoFacePoseDatum_AnnoType_FACEPOSE;
+	}
   if (FLAGS_shuffle) {
     // randomly shuffle data
     LOG(INFO) << "Shuffling data";
@@ -167,15 +173,17 @@ int main(int argc, char** argv) {
           name_to_label, &anno_datum);
       anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
     } else if(anno_type == "faceattributes") {
+      labelname = boost::get<std::string>(lines[line_id].second); // lines  contain imagename & label.txt
 		  status = ReadRichFaceToAnnotatedDatum(filename,
           labelname, resize_height, resize_width, min_dim, max_dim, is_color,
-          enc, type, label_type, &anno_faceDatum);
+          enc, anno_face_attri_type, label_type, &anno_faceDatum);
       anno_faceDatum.set_type(AnnoFaceDatum_AnnotationType_FACEMARK);
 	  } else if(anno_type == "facepose") {
-		  status = ReadumdfaceTxtToAnnotatedDatum(filename,
+      labelname = boost::get<std::string>(lines[line_id].second); // lines contain imagename & label.txt
+		  status = ReadRichFacePoseToAnnotatedDatum(filename,
           labelname, resize_height, resize_width, min_dim, max_dim, is_color,
-          enc, type, label_type, &anno_faceposeDatum);
-      anno_faceDatum.set_type(AnnoFacePoseDatum_AnnoType_FACEPOSE);
+          enc, anno_facepose_type, label_type, &anno_faceposeDatum);
+      anno_faceposeDatum.set_type(AnnoFacePoseDatum_AnnoType_FACEPOSE);
 	  }
     if (status == false) {
       LOG(WARNING) << "Failed to read " << lines[line_id].first;
