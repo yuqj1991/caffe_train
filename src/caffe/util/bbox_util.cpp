@@ -1676,7 +1676,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
   CHECK(multibox_loss_param.has_num_blur()) << "Must provide num_blur.";
   const int num_blur = multibox_loss_param.num_blur();
   CHECK_GE(num_blur, 1) << "num_blur should not be less than 1.";
-  const int background_blur_id = multibox_loss_param.background_blur_id();
+  //const int background_blur_id = multibox_loss_param.background_blur_id();
 
   const MiningType mining_type = multibox_loss_param.mining_type();
   bool do_neg_mining;
@@ -1782,7 +1782,7 @@ void EncodeOcclusConfPrediction(const Dtype* conf_data, const int num,
   CHECK(multibox_loss_param.has_num_occlusion()) << "Must provide num_occlussion.";
   const int num_occlussion = multibox_loss_param.num_occlusion();
   CHECK_GE(num_occlussion, 1) << "num_occlussion should not be less than 1.";
-  const int background_occl_id = multibox_loss_param.background_occl_id();
+  //const int background_occl_id = multibox_loss_param.background_occl_id();
 
   const MiningType mining_type = multibox_loss_param.mining_type();
   bool do_neg_mining;
