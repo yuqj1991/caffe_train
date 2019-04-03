@@ -17,7 +17,7 @@ wider_directory = ['wider_train', 'wider_test', 'wider_val']
 Annotation_img_dir = '../../dataset/facedata/mtfl/Annotation_img'
 root_dir = "../../dataset/facedata/"
 anno_mtfl_dir = ['training.txt', 'testing.txt']
-thread_hold = 40  # map:59.35%, thread_hold=40
+thread_hold = 40 
 
 
 class ConfigureHistogram(object):

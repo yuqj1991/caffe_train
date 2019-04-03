@@ -1,10 +1,24 @@
 name: "deepano_face_landmarknet"
-input: "data"
-input_dim: 1
-input_dim: 3
-input_dim: 48
-input_dim: 48
-
+layer {
+  name: "data"
+  type: "faceAnnoData"
+  top: "data"
+  top: "label"
+  transform_param {
+    mirror: false
+    mean_value: 127.5
+    scale: 0.0078125
+    crop_size: 48
+  }
+  include {
+    phase: TEST
+  }
+  data_param {
+    source: "train_lmdb48"
+    batch_size: 64
+    backend: LMDB
+  }
+}
 layer {
   name: "conv1"
   type: "Convolution"
@@ -310,24 +324,6 @@ layer {
       value: 0
     }
   }
-}
-layer {
-  name: "conv6_gender"
-  type: "Softmax"
-  bottom: "conv6_gender"
-  top: "conv6_gender"
-}
-layer {
-  name: "conv6_glasses"
-  type: "Softmax"
-  bottom: "conv6_glasses"
-  top: "conv6_glasses"
-}
-layer {
-  name: "conv6_headpose"
-  type: "Softmax"
-  bottom: "conv6_headpose"
-  top: "conv6_headpose"
 }
 layer {
   name: "multiface_output"

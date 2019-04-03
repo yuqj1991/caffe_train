@@ -1,15 +1,17 @@
-name: "ONet"
+name: "deepano_face_landmarknet"
 layer {
   name: "data"
-  type: "MTCNNData"
+  type: "faceAnnoData"
   top: "data"
   top: "label"
-  top: "roi"
   transform_param {
     mirror: false
     mean_value: 127.5
     scale: 0.0078125
-    #crop_size: 48
+    crop_size: 48
+  }
+  include {
+    phase: TRAIN
   }
   data_param {
     source: "train_lmdb48"
@@ -17,7 +19,6 @@ layer {
     backend: LMDB
   }
 }
-##################################
 layer {
   name: "conv1"
   type: "Convolution"
@@ -223,12 +224,11 @@ layer {
   top: "conv5"
 }
 
-
 layer {
-  name: "conv6-1"
+  name: "conv6_gender"
   type: "InnerProduct"
   bottom: "conv5"
-  top: "conv6-1"
+  top: "conv6_gender"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -250,38 +250,10 @@ layer {
   }
 }
 layer {
-  name: "cls_loss"
-  type: "SoftmaxWithLoss"
-  bottom: "conv6-1"
-  bottom: "label"
-  top: "cls_loss"
-  propagate_down: 1
-  propagate_down: 0
-  loss_weight: 1
-  loss_param{
-    ignore_label: -1
-  }
-}
-
-layer {
-  name: "cls_Acc"
-  type: "Accuracy"
-  bottom: "conv6-1"
-  bottom: "label"
-  top: "cls_acc"
-  include {
-    phase: TRAIN
-  }
-  accuracy_param{
-    ignore_label: -1
-  }
-}
-
-layer {
-  name: "conv6-2"
+  name: "conv6_glasses"
   type: "InnerProduct"
   bottom: "conv5"
-  top: "conv6-2"
+  top: "conv6_glasses"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -291,8 +263,8 @@ layer {
     decay_mult: 1
   }
   inner_product_param {
-  	#kernel_size: 1
-	num_output: 4
+    #kernel_size: 1
+	num_output: 2
     weight_filler {
       type: "xavier"
 	}
@@ -303,17 +275,75 @@ layer {
   }
 }
 layer {
-  name: "roi_loss"
-  type: "MTCNNEuclideanLoss"
-  bottom: "conv6-2"
-  bottom: "roi"
-  bottom: "label"
-  top: "roi_loss"
-  loss_weight: 0.5
-  loss_param{
-    ignore_label: 0
+  name: "conv6_headpose"
+  type: "InnerProduct"
+  bottom: "conv5"
+  top: "conv6_headpose"
+  param {
+    lr_mult: 1
+    decay_mult: 1
   }
-  accuracy_param{
-    ignore_label: 0
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  inner_product_param {
+    #kernel_size: 1
+	num_output: 5
+    weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+
+layer {
+  name: "conv6_landmark"
+  type: "InnerProduct"
+  bottom: "conv5"
+  top: "conv6_landmark"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  inner_product_param {
+  	#kernel_size: 1
+	num_output: 10
+    weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "multiface_loss"
+  type: "MultiFaceLoss"
+  bottom: "conv6_landmark"
+  bottom: "conv6_gender"
+  bottom: "conv6_glasses"
+  bottom: "conv6_headpose"
+  bottom: "label"
+  top: "multiface_loss"
+  loss_weight: 0.5
+  include {
+		phase: TRAIN
+	}
+  multiface_loss_param{
+    mark_loss_type : SMOOTH_L1
+    mark_weight: 0.5
+    conf_gender_loss_type: SOFTMAX
+    conf_glasses_loss_type: SOFTMAX
+    conf_headpose_loss_type: SOFTMAX
   }
 }
