@@ -41,9 +41,9 @@ DEFINE_bool(shuffle, false,
 DEFINE_string(backend, "lmdb",
     "The backend {lmdb, leveldb} for storing the result");
 DEFINE_string(anno_type, "classification",
-    "The type of annotation {classification, detection}.");
+    "The type of annotation {classification, detection, faceattributes, facepose}.");
 DEFINE_string(label_type, "xml",
-    "The type of annotation file format.");
+    "The type of annotation file format.{xml , txt}");
 DEFINE_string(label_map_file, "",
     "A file with LabelMap protobuf message.");
 DEFINE_bool(check_label, false,
@@ -116,8 +116,14 @@ int main(int argc, char** argv) {
     }
   }else if(anno_type == "faceattributes") {
 		anno_face_attri_type = AnnoFaceDatum_AnnotationType_FACEMARK;
+    while (infile >> filename >> labelname) {
+      lines.push_back(std::make_pair(filename, labelname));
+    }
 	} else if(anno_type == "facepose") {
 		anno_facepose_type = AnnoFacePoseDatum_AnnoType_FACEPOSE;
+    while (infile >> filename >> labelname) {
+      lines.push_back(std::make_pair(filename, labelname));
+    }
 	}
   if (FLAGS_shuffle) {
     // randomly shuffle data

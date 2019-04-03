@@ -1,4 +1,4 @@
-root_dir="../../../../../deepano_face_train"
+root_dir="../../../../../face_train"
 cd $root_dir/scripts
 
 redo=1
