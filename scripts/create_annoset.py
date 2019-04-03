@@ -9,7 +9,7 @@ from caffe.proto import caffe_pb2
 from google.protobuf import text_format
 
 if __name__ == "__main__":
-  parser = argparse.ArgumentParser(description="Create AnnotatedDatum database")
+  parser = argparse.ArgumentParser(description="Create  database")
   parser.add_argument("root",
       help="The root directory which contains the images and annotations.")
   parser.add_argument("listfile",

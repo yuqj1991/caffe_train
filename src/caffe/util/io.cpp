@@ -240,8 +240,8 @@ bool ReadRichFaceToAnnotatedDatum(const string& filename,
     const string& encoding, const AnnoFaceDatum_AnnotationType type,
     const string& labeltype, AnnoFaceDatum* anno_datum) {
   // Read image to datum.
-  return true;
-  /*bool status = ReadImageToDatum(filename, -1, height, width,
+  //return true;
+  bool status = ReadImageToDatum(filename, -1, height, width,
                                  min_dim, max_dim, is_color, encoding,
                                  anno_datum->mutable_datum());
   if (status == false) {
@@ -267,7 +267,7 @@ bool ReadRichFaceToAnnotatedDatum(const string& filename,
     default:
       LOG(FATAL) << "Unknown annotation type.";
       return false;
-  }*/
+  }
 }
 
 bool ReadRichFacePoseToAnnotatedDatum(const string& filename,

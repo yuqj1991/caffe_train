@@ -210,8 +210,18 @@ int main(int argc, char** argv) {
 
     // Put in db
     string out;
-    CHECK(anno_datum.SerializeToString(&out));
-    txn->Put(key_str, out);
+    if(anno_type == "classification" || anno_type == "detection")
+    {
+      CHECK(anno_datum.SerializeToString(&out));
+      txn->Put(key_str, out);
+    }else if(anno_type == "faceattributes") {
+      CHECK(anno_faceDatum.SerializeToString(&out));
+      txn->Put(key_str, out);
+    }else if(anno_type == "facepose") {
+      CHECK(anno_faceposeDatum.SerializeToString(&out));
+      txn->Put(key_str, out);
+    }
+    
 
     if (++count % 1000 == 0) {
       // Commit db
