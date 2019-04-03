@@ -240,7 +240,8 @@ bool ReadRichFaceToAnnotatedDatum(const string& filename,
     const string& encoding, const AnnoFaceDatum_AnnotationType type,
     const string& labeltype, AnnoFaceDatum* anno_datum) {
   // Read image to datum.
-  bool status = ReadImageToDatum(filename, -1, height, width,
+  return true;
+  /*bool status = ReadImageToDatum(filename, -1, height, width,
                                  min_dim, max_dim, is_color, encoding,
                                  anno_datum->mutable_datum());
   if (status == false) {
@@ -266,7 +267,7 @@ bool ReadRichFaceToAnnotatedDatum(const string& filename,
     default:
       LOG(FATAL) << "Unknown annotation type.";
       return false;
-  }
+  }*/
 }
 
 bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
@@ -753,8 +754,10 @@ bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
     sstr << lineStr;
     sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5
           >> gender >> glass >> headPose;
+    #if 0
     LOG(INFO)<< x1 <<" "<< x2 <<" "<< x3 <<" "<< x4 <<" " << x5 <<" "<< y1 <<" "<< y2 <<" "
              << y3 <<" "<< y4 <<" "<< y5 <<" "<< gender <<" "<< glass <<" "<< headPose;
+    #endif
     AnnotationFace* anno = NULL;
     anno = anno_datum->mutable_annoface();
     LOG_IF(WARNING, x1 > width) << labelfile <<
@@ -795,8 +798,10 @@ bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
     x33 = float(x3/width);y33 = float(y3/height);
     x44 = float(x4/width);y44 = float(y4/height);
     x55 = float(x5/width);y55 = float(y5/height);
+    #if 0
     LOG(INFO)<< x11 <<" "<< x22 <<" "<< x33 <<" "<< x44 <<" " << x55 <<" "<< y11 <<" "<< y22 <<" "
              << y33 <<" "<< y44 <<" "<< y55 <<" "<< gender <<" "<< glass <<" "<< headPose;
+    #endif
     landface->set_x1(x11);
     landface->set_x2(x22);
     landface->set_x3(x33);
