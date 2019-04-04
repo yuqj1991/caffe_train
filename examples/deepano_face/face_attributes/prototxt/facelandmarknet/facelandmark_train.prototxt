@@ -895,7 +895,6 @@ layer {
 	}
 	propagate_down: true
 	propagate_down: true
-	propagate_down: false
 	propagate_down: true
 	propagate_down: true
 	propagate_down: false
