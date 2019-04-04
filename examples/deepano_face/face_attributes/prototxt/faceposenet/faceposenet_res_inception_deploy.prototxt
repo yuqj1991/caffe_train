@@ -1,9 +1,9 @@
-name: "deepano_face_landmarknet"
+name: "deepano_face_posenet"
 input: "data"
 input_dim: 1
 input_dim: 3
-input_dim: 48
-input_dim: 48
+input_dim: 160
+input_dim: 160
 
 layer {
   name: "convpre_1"
