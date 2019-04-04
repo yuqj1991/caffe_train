@@ -25,7 +25,7 @@ facePoseDataLayer<Dtype>::~facePoseDataLayer(){
 }
 
 template <typename Dtype>
-void facePoseDataLayer<Dtype>::layerDataSetup(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){
+void facePoseDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){
     const int batch_size = this->layer_param_.data_param().batch_size();
     // Make sure dimension is consistent within batch.
     const TransformationParameter& transform_param =

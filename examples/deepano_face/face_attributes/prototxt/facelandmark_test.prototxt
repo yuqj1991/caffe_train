@@ -4,20 +4,27 @@ layer {
   type: "faceAnnoData"
   top: "data"
   top: "label"
-  transform_param {
-    mirror: false
-    mean_value: 127.5
-    scale: 0.0078125
-    crop_size: 48
-  }
   include {
-    phase: TEST
+		phase: TEST
   }
-  data_param {
-    source: "/home/stive/workspace/dataset/facedata/mtfl/lmdb/mtfl_testing_lmdb"
-    batch_size: 64
-    backend: LMDB
-  }
+    transform_param {
+	    scale: 0.007843
+	    mean_value: 127.5
+	    mean_value: 127.5
+	    mean_value: 127.5
+	    resize_param {
+		    prob: 1.0
+		    resize_mode: WARP
+		    height: 48
+		    width: 48
+		    interp_mode: LINEAR
+	    }
+    }
+    data_param {
+		source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_testing_lmdb/"
+		batch_size: 16
+		backend: LMDB
+	}
 }
 layer {
   name: "convpre_1"
@@ -800,6 +807,25 @@ layer {
     }
   }
 }
+layer {
+  name: "conv6_gender"
+  type: "Softmax"
+  bottom: "conv6_gender"
+  top: "conv6_gender"
+}
+layer {
+  name: "conv6_glasses"
+  type: "Softmax"
+  bottom: "conv6_glasses"
+  top: "conv6_glasses"
+}
+layer {
+  name: "conv6_headpose"
+  type: "Softmax"
+  bottom: "conv6_headpose"
+  top: "conv6_headpose"
+}
+
 layer {
   name: "multiface_output"
   type: "Concat"

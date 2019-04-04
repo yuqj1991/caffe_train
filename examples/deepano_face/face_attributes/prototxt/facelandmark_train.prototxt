@@ -1,50 +1,82 @@
 name: "deepano_face_landmarknet"
 layer {
-  name: "data"
-  type: "faceAnnoData"
-  top: "data"
-  top: "label"
-  transform_param {
-    mirror: false
-    mean_value: 127.5
-    scale: 0.0078125
-    crop_size: 48
+    name: "data"
+    type: "faceAnnoData"
+    top: "data"
+    top: "label"
+    include {
+        phase: TRAIN
+    }
+    transform_param {
+        scale: 0.007843
+	    mirror: false
+	    mean_value: 127.5
+	    mean_value: 127.5
+	    mean_value: 127.5
+	    resize_param {
+		    prob: 1.0
+		    resize_mode: WARP
+		    height: 48
+		    width: 48
+		    interp_mode: LINEAR
+		    interp_mode: AREA
+		    interp_mode: NEAREST
+		    interp_mode: CUBIC
+		    interp_mode: LANCZOS4
+	    }
+	    emit_constraint {
+		    emit_type: CENTER
+	    }
+	    distort_param {
+		    brightness_prob: 0.5
+		    brightness_delta: 32.0
+		    contrast_prob: 0.5
+		    contrast_lower: 0.5
+		    contrast_upper: 1.5
+		    hue_prob: 0.5
+		    hue_delta: 18.0
+		    saturation_prob: 0.5
+		    saturation_lower: 0.5
+		    saturation_upper: 1.5
+		    random_order_prob: 0.0
+	    }
+	    expand_param {
+		    prob: 0.5
+		    max_expand_ratio: 4.0
+	    }
   }
-  include {
-    phase: TRAIN
-  }
-  data_param {
-    source: "/home/stive/workspace/dataset/facedata/mtfl/lmdb/mtfl_training_lmdb"
-    batch_size: 64
-    backend: LMDB
-  }
+    data_param {
+        source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_training_lmdb/"
+        batch_size: 64
+        backend: LMDB
+    }
 }
 layer {
-  name: "convpre_1"
-  type: "Convolution"
-  bottom: "data"
-  top: "convpre_1"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 1
-  }
-  convolution_param {
-    num_output: 32
-    kernel_size: 3
-    stride: 1
-    pad: 1
-     weight_filler {
-      type: "xavier"
-	}
-    bias_filler {
-      type: "constant"
-      value: 0
+    name: "convpre_1"
+    type: "Convolution"
+    bottom: "data"
+    top: "convpre_1"
+    param {
+        lr_mult: 1
+        decay_mult: 1
     }
-  }
+    param {
+        lr_mult: 2
+        decay_mult: 1
+    }
+    convolution_param {
+        num_output: 32
+        kernel_size: 3
+        stride: 1
+        pad: 1
+        weight_filler {
+            type: "xavier"
+        }
+        bias_filler {
+            type: "constant"
+            value: 0
+        }
+    }
 }
 layer {
 	name: "convpre_1/bn"
@@ -813,9 +845,21 @@ layer {
   include {
 		phase: TRAIN
 	}
+	propagate_down: true
+	propagate_down: true
+	propagate_down: false
+	propagate_down: true
+	propagate_down: true
+	propagate_down: false
+	loss_param {
+		normalization: VALID
+	}
   multiface_loss_param{
     mark_loss_type : SMOOTH_L1
     mark_weight: 0.5
+    num_gender: 2
+    num_glasses: 2
+    num_headpose: 5
     conf_gender_loss_type: SOFTMAX
     conf_glasses_loss_type: SOFTMAX
     conf_headpose_loss_type: SOFTMAX

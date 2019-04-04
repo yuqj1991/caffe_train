@@ -25,7 +25,7 @@ faceAnnoDataLayer<Dtype>::~faceAnnoDataLayer(){
 }
 
 template <typename Dtype>
-void faceAnnoDataLayer<Dtype>::layerDataSetup(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){
+void faceAnnoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){
     const int batch_size = this->layer_param_.data_param().batch_size();
     // Make sure dimension is consistent within batch.
     const TransformationParameter& transform_param =
@@ -39,7 +39,6 @@ void faceAnnoDataLayer<Dtype>::layerDataSetup(const vector<Blob<Dtype>*>& bottom
     }
     // Read a data point, and use it to initialize the top blob.
     AnnoFaceDatum& anno_datum = *(reader_.full().peek());
-
     // Use data_transformer to infer the expected blob shape from anno_datum.
     vector<int> top_shape =
         this->data_transformer_->InferBlobShape(anno_datum.datum());

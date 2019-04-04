@@ -1437,15 +1437,15 @@ message MultiFaceLossParameter {
   optional uint32 num_gender = 4;
   // If match_type is PER_PREDICTION, use overlap_threshold to
   // determine the extra matching bboxes.
-  optional uint32 num_glasses = 24;
+  optional uint32 num_glasses = 5;
   //Number of occlusion to be predicted. Required!
-  optional uint32 num_headpose = 25;
+  optional uint32 num_headpose = 6;
   // blur gender loss types
-  optional AttriLossType conf_gender_loss_type = 26 [default = SOFTMAX];
+  optional AttriLossType conf_gender_loss_type = 7 [default = SOFTMAX];
   // glass conf loss types
-  optional AttriLossType conf_glasses_loss_type = 27 [default = SOFTMAX];
+  optional AttriLossType conf_glasses_loss_type = 8 [default = SOFTMAX];
   // add new background id realeated id r.w.t blur & occlusion
-  optional AttriLossType conf_headpose_loss_type = 30 [default = SOFTMAX];
+  optional AttriLossType conf_headpose_loss_type = 9 [default = SOFTMAX];
 }
 
 // Message that store parameters used by MultiBoxLossLayer

@@ -20,7 +20,7 @@ class faceAnnoDataLayer: public BasePrefetchingDataLayer<Dtype>{
     public:
         explicit faceAnnoDataLayer(const LayerParameter & param);
         virtual ~faceAnnoDataLayer();
-        virtual void layerDataSetup(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+        virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
         // faceDataLayer uses DataReader instead for sharing for parallelism
         virtual inline bool ShareInParallel() const { return false; }
         virtual inline const char* type() const { return "faceAnnoData"; }

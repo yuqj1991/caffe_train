@@ -25,9 +25,9 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
     batch_size_ = bottom[0]->num();
     // Get other parameters.
-    CHECK_EQ(multiface_loss_param.has_num_gender(), 2) << "Must provide num_gender, and the num_gender must is 2.";
-    CHECK_EQ(multiface_loss_param.has_num_glasses(), 2) << "Must prodived num_glasses, and the num_glasses must is 2";
-    CHECK_EQ(multiface_loss_param.has_num_headpose(), 5) << "Must provide num_headpose, and the num_headpose must is 5";
+    CHECK_EQ(multiface_loss_param.num_gender(), 2) << "Must provide num_gender, and the num_gender must is 2.";
+    CHECK_EQ(multiface_loss_param.num_glasses(), 2) << "Must prodived num_glasses, and the num_glasses must is 2";
+    CHECK_EQ(multiface_loss_param.num_headpose(), 5) << "Must provide num_headpose, and the num_headpose must is 5";
     num_gender_ = multiface_loss_param.num_gender();
     num_glasses_ = multiface_loss_param.num_glasses();
     num_headpose_ = multiface_loss_param.num_headpose();
@@ -226,10 +226,6 @@ void MultiFaceLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void MultiFaceLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 const vector<Blob<Dtype>*>& top) {
-    const Dtype* landmark_data = bottom[0]->cpu_data();
-    const Dtype* gender_data = bottom[1]->cpu_data();
-    const Dtype* glasses_data = bottom[2]->cpu_data();
-    const Dtype* headpose_data = bottom[3]->cpu_data();
     const Dtype* label_data = bottom[4]->cpu_data();
     #if 0
     LOG(INFO)<< "loss compute start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& num_gt_: "<<num_gt_;
@@ -288,8 +284,11 @@ const vector<Blob<Dtype>*>& top) {
     landmark_shape[1] = batch_size_ * 10;
     landmark_pred_.Reshape(landmark_shape);
     landmark_gt_.Reshape(landmark_shape);
-    landmark_pred_.CopyFrom(*bottom[0]);
-    //Dtype* landmark_pred_data = landmark_pred_.mutable_cpu_data();
+    Blob<Dtype> landmark_temp;
+    landmark_temp.ReshapeLike(*(bottom[0]));
+    landmark_temp.CopyFrom(*(bottom[0]));
+    landmark_temp.Reshape(landmark_shape);
+    landmark_pred_.CopyFrom(landmark_temp);
     Dtype* landmark_gt_data = landmark_gt_.mutable_cpu_data();
     int count =0;
     for(int ii = 0; ii< batch_size_; ii++)
@@ -305,6 +304,7 @@ const vector<Blob<Dtype>*>& top) {
         landmark_gt_data[count*10+7] = face.y3() ;
         landmark_gt_data[count*10+8] = face.y4() ;
         landmark_gt_data[count*10+9] = face.y5() ;
+        
         ++count;
     }
     landmark_loss_layer_->Reshape(landmark_bottom_vec_, landmark_top_vec_);
@@ -329,7 +329,7 @@ const vector<Blob<Dtype>*>& top) {
         LOG(FATAL) << "Unknown gender confidence loss type.";
     }
     //Dtype* conf_pred_data = conf_pred_.mutable_cpu_data();
-    gender_pred_.CopyFrom(*bottom[1]);
+    gender_pred_.CopyFrom(*(bottom[1]));
     Dtype* gender_gt_data = gender_gt_.mutable_cpu_data();
     caffe_set(gender_gt_.count(), Dtype(0), gender_gt_data);
     for(int ii = 0; ii< batch_size_; ii++)
@@ -357,7 +357,7 @@ const vector<Blob<Dtype>*>& top) {
         LOG(FATAL) << "Unknown glasses confidence loss type.";
     }
     //Dtype* conf_pred_data = conf_pred_.mutable_cpu_data();
-    glasses_pred_.CopyFrom(*bottom[2]);
+    glasses_pred_.CopyFrom(*(bottom[2]));
     Dtype* glasses_gt_data = glasses_gt_.mutable_cpu_data();
     caffe_set(glasses_gt_.count(), Dtype(0), glasses_gt_data);
     for(int ii = 0; ii< batch_size_; ii++)
@@ -385,7 +385,7 @@ const vector<Blob<Dtype>*>& top) {
         LOG(FATAL) << "Unknown headpose confidence loss type.";
     }
     //Dtype* conf_pred_data = conf_pred_.mutable_cpu_data();
-    headpose_pred_.CopyFrom(*bottom[3]);
+    headpose_pred_.CopyFrom(*(bottom[3]));
     Dtype* headpose_gt_data = headpose_gt_.mutable_cpu_data();
     caffe_set(headpose_gt_.count(), Dtype(0), headpose_gt_data);
     for(int ii = 0; ii< batch_size_; ii++)
