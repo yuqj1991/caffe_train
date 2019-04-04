@@ -1781,43 +1781,6 @@ layer {
 		}
 	}
 }
-layer {
-	name: "conv6_facecontour/bn"
-	type: "BatchNorm"
-	bottom: "conv6_facecontour"
-	top: "conv6_facecontour"
-	param {
-		lr_mult: 0.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 0.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 0.0
-		decay_mult: 0.0
-	}
-	batch_norm_param {
-		use_global_stats: false
-		moving_average_fraction: 0.95
-	}
-}
-layer {
-	name: "conv6_facecontour/scale"
-	type: "Scale"
-	bottom: "conv6_facecontour"
-	top: "conv6_facecontour"
-	scale_param {
-		bias_term: true
-	}
-}
-layer {
-	name: "conv6_facecontour/relu"
-	type: "ReLU"
-	bottom: "conv6_facecontour"
-	top: "conv6_facecontour"
-}
 
 layer {
 	name: "multiface_loss"
