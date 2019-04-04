@@ -15,10 +15,12 @@ def batch_work():
             #Extract Important Imformation
             file_name = row[1]['FILE']
             img_file_name_no_jpg = file_name.split('/')[1].split('.jpg')[0]
-            label_file_name = LABEL_FILE_FOLDER + img_file_name_no_jpg + '.txt'
+            label_full_anno_file_name = LABEL_FILE_FOLDER + img_file_name_no_jpg + '.txt'
+            label_angle_anno_file_name = LABEL_FILE_FOLDER + img_file_name_no_jpg + '_angle.txt'
             full_path_image_name = SOURCE_IMG_FILE_FOLDER + pairs[0] + file_name
-            print('label file: %s, and full_path_img : %s'%(label_file_name, full_path_image_name))
-            label_file_ = open(label_file_name, 'w')
+            print('label file: %s, and full_path_img : %s'%(label_full_anno_file_name, full_path_image_name))
+            label_file_ = open(label_full_anno_file_name, 'w')
+            label_file_angle = open(label_angle_anno_file_name, 'w')
             roi_x = int(row[1]['FACE_X'])
             roi_y = int(row[1]['FACE_Y'])
             roi_w = int(row[1]['FACE_WIDTH'])
@@ -77,6 +79,8 @@ def batch_work():
                         + ponit_y15 + ' ' + ponit_y16 + ' ' + ponit_y17 + ' '+ ponit_y18 + ' ' + ponit_y19 + ' ' + ponit_y20 + ' ' + ponit_y21 + ' '
                         + yaw + ' ' + pitch + ' ' + roll + '\n'
             label_file_.write(content)
+            label_file_angle.write(yaw + ' ' + pitch + ' ' + roll + '\n')
+            label_file_angle.close()
             label_file_.close()
 
 if __name__ == '__main__':
