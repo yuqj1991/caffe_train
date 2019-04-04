@@ -305,6 +305,75 @@ bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
   }
 }
 
+bool ReadRichFaceContourToAnnotatedDatum(const string& filename,
+    const string& labelfile, const int height, const int width,
+    const int min_dim, const int max_dim, const bool is_color,
+    const string& encoding, const AnnoFaceContourDatum_AnnoType type,
+    const string& labeltype, AnnoFaceContourDatum* anno_datum){
+  // Read image to datum.
+  bool status = ReadImageToDatum(filename, -1, height, width,
+                                 min_dim, max_dim, is_color, encoding,
+                                 anno_datum->mutable_datum());
+  if (status == false) {
+    return status;
+  }
+  anno_datum->clear_facecontour();
+  if (!boost::filesystem::exists(labelfile)) {
+    return true;
+  }
+  // annno type bbox or attributes
+  switch (type) {
+    case AnnoFaceContourDatum_AnnoType_FACECONTOUR:
+      int ori_height, ori_width;
+      GetImageSize(filename, &ori_height, &ori_width);
+      if (labeltype == "txt") {
+        return ReadFaceContourTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                       anno_datum);
+      } else {
+        LOG(FATAL) << "Unknown label file type.";
+        return false;
+      }
+      break;
+    default:
+      LOG(FATAL) << "Unknown annotation type.";
+      return false;
+  }
+}
+
+bool ReadRichFaceAngleToAnnotatedDatum(const string& filename,
+    const string& labelfile, const int height, const int width,
+    const int min_dim, const int max_dim, const bool is_color,
+    const string& encoding, const AnnoFaceAngleDatum_AnnoType type,
+    const string& labeltype, AnnoFaceAngleDatum* anno_datum){
+  // Read image to datum.
+  bool status = ReadImageToDatum(filename, -1, height, width,
+                                 min_dim, max_dim, is_color, encoding,
+                                 anno_datum->mutable_datum());
+  if (status == false) {
+    return status;
+  }
+  anno_datum->clear_faceangle();
+  if (!boost::filesystem::exists(labelfile)) {
+    return true;
+  }
+  // annno type bbox or attributes
+  switch (type) {
+    case AnnoFaceAngleDatum_AnnoType_FACEANGLE:
+      int ori_height, ori_width;
+      GetImageSize(filename, &ori_height, &ori_width);
+      if (labeltype == "txt") {
+        return ReadFaceAngleTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                       anno_datum);
+      } else {
+        LOG(FATAL) << "Unknown label file type.";
+        return false;
+      }
+      break;
+    default:
+      LOG(FATAL) << "Unknown annotation type.";
+      return false;
+  }
+}
 
 #endif  // USE_OPENCV
 
@@ -735,6 +804,132 @@ bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
   infile.close();
   return true;
 }
+
+// Parse plain txt detection annotation: label_id, xmin, ymin, xmax, ymax.
+bool ReadFaceContourTxtToAnnotatedDatum(const string& labelfile, const int height,
+    const int width, AnnoFaceContourDatum* anno_datum) {
+  std::ifstream infile(labelfile.c_str());
+  std::string lineStr ;
+  std::stringstream sstr ;
+  if (!infile.good()) {
+    LOG(INFO) << "Cannot open " << labelfile;
+    return false;
+  }
+  float x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21; 
+  float y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12, y13, y14, y15, y16, y17, y18, y19, y20, y21;
+  while (std::getline(infile, lineStr )) {
+    sstr << lineStr;
+    sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> x6 >> x7 >> x8 >> x9 >> x10 >> x11 >> x12 >> x13 >> x14 
+        >> x15 >> x16 >> x17 >> x18 >> x19 >> x20 >> x21 >> y1 >> y2 >> y3 >> y4 >> y5 >> y6 >> y7 >> y8
+        >> y9 >> y10 >> y11 >> y12 >> y13 >> y14 >> y15 >> y16 >> y17 >> y18 >> y19 >> y20 >> y21 ;
+    LOG(INFO)<< x1 <<" "<< x2 <<" "<< x3 <<" "<< x4 <<" " << x5 <<" "<< x6 <<" "<< x7 <<" "<< x8 <<" "<< x9 <<" " << x10 <<" "
+             << x11 <<" "<< x12 <<" "<< x13 <<" "<< x14 <<" " << x15 <<" "<< x16 <<" "<< x17 <<" "<< x18 <<" "<< x19 <<" " << x20 <<" "<< x21<<" "
+             <<y1 <<" "<< y2 <<" "<< y3 <<" "<< y4 <<" " << y5 <<" "<< y6 <<" "<< y7 <<" "<< y8 <<" "<< y9 <<" " << y10 <<" "
+             << y11 <<" "<< y12 <<" "<< y13 <<" "<< y14 <<" " << y15 <<" "<< y16 <<" "<< y17 <<" "<< y18 <<" "<< y19 <<" " << y20 <<" "
+             <<y21;
+    LOG_IF(WARNING, x1 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y1 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x2 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y2 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x3 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y3 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x4 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y4 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x5 > width) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y5 > height) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x1 < 0) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, y1 < 0) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x2 < 0) << labelfile <<
+      " bounding box exceeds image boundary.";
+    LOG_IF(WARNING, x2 < 0) << labelfile <<
+      " bounding box exceeds image boundary.";
+    // Store the normalized bounding box.
+    AnnoFaceContourPoints* landface = anno_datum->mutable_facecontour();
+    landface->mutable_point_1()->set_x(float(x1/width));
+    landface->mutable_point_1()->set_y(float(y1/height));
+    landface->mutable_point_2()->set_x(float(x2/width));
+    landface->mutable_point_2()->set_y(float(y2/height));
+    landface->mutable_point_3()->set_x(float(x3/width));
+    landface->mutable_point_3()->set_y(float(y3/height));
+    landface->mutable_point_4()->set_x(float(x4/width));
+    landface->mutable_point_4()->set_y(float(y4/height));
+    landface->mutable_point_5()->set_x(float(x5/width));
+    landface->mutable_point_5()->set_y(float(y5/height));
+    landface->mutable_point_6()->set_x(float(x6/width));
+    landface->mutable_point_6()->set_y(float(y6/height));
+    landface->mutable_point_7()->set_x(float(x7/width));
+    landface->mutable_point_7()->set_y(float(y7/height));
+    landface->mutable_point_8()->set_x(float(x8/width));
+    landface->mutable_point_8()->set_y(float(y8/height));
+    landface->mutable_point_9()->set_x(float(x9/width));
+    landface->mutable_point_9()->set_y(float(y9/height));
+    landface->mutable_point_10()->set_x(float(x10/width));
+    landface->mutable_point_10()->set_y(float(y10/height));
+    landface->mutable_point_11()->set_x(float(x11/width));
+    landface->mutable_point_11()->set_y(float(y11/height));
+    landface->mutable_point_12()->set_x(float(x12/width));
+    landface->mutable_point_12()->set_y(float(y12/height));
+    landface->mutable_point_13()->set_x(float(x13/width));
+    landface->mutable_point_13()->set_y(float(y13/height));
+    landface->mutable_point_14()->set_x(float(x14/width));
+    landface->mutable_point_14()->set_y(float(y14/height));
+    landface->mutable_point_15()->set_x(float(x15/width));
+    landface->mutable_point_15()->set_y(float(y15/height));
+    landface->mutable_point_16()->set_x(float(x16/width));
+    landface->mutable_point_16()->set_y(float(y16/height));
+    landface->mutable_point_17()->set_x(float(x17/width));
+    landface->mutable_point_17()->set_y(float(y17/height));
+    landface->mutable_point_18()->set_x(float(x18/width));
+    landface->mutable_point_18()->set_y(float(y18/height));
+    landface->mutable_point_19()->set_x(float(x19/width));
+    landface->mutable_point_19()->set_y(float(y19/height));
+    landface->mutable_point_20()->set_x(float(x20/width));
+    landface->mutable_point_20()->set_y(float(y20/height));
+    landface->mutable_point_21()->set_x(float(x21/width));
+    landface->mutable_point_21()->set_y(float(y21/height));
+    sstr.clear();
+  }
+  infile.close();
+  return true;
+}
+
+// Parse plain txt detection annotation: label_id, xmin, ymin, xmax, ymax.
+bool ReadFaceAngleTxtToAnnotatedDatum(const string& labelfile, const int height,
+    const int width, AnnoFaceAngleDatum* anno_datum) {
+  std::ifstream infile(labelfile.c_str());
+  std::string lineStr ;
+  std::stringstream sstr ;
+  if (!infile.good()) {
+    LOG(INFO) << "Cannot open " << labelfile;
+    return false;
+  }
+  float yaw, pitch, roll;
+  while (std::getline(infile, lineStr )) {
+    sstr << lineStr;
+    sstr >> yaw >> pitch >> roll;
+    LOG(INFO)<< " "<< yaw <<" "<< pitch <<" "<< roll;
+    AnnoFacePoseOritation* faceOri = anno_datum->mutable_faceangle();
+    faceOri->set_yaw(yaw);
+    faceOri->set_pitch(pitch);
+    faceOri->set_roll(roll);
+    sstr.clear();
+  }
+  infile.close();
+  return true;
+}
+
 
 bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
     const int width, AnnoFaceDatum* anno_datum) {

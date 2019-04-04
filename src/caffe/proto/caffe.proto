@@ -241,6 +241,26 @@ message AnnoFacePoseDatum{
   optional AnnoFacePose facePose =3;
 }
 
+// AnnofaceDataum with datum, and facepoints contour
+message AnnoFaceContourDatum{
+  enum AnnoType{
+    FACECONTOUR =0;
+  }
+  optional Datum datum =1;
+  optional AnnoType type =2;
+  optional AnnoFaceContourPoints facecontour =3;
+}
+
+// AnnofaceDataum with datum, and faceangle
+message AnnoFaceAngleDatum{
+  enum AnnoType{
+    FACEANGLE =0;
+  }
+  optional Datum datum =1;
+  optional AnnoType type =2;
+  optional AnnoFacePoseOritation faceangle =3;
+}
+
 message FillerParameter {
   // The filler type.
   optional string type = 1 [default = 'constant'];
@@ -1460,6 +1480,28 @@ message MultiFacePoseLossParameter {
   optional AttriLossType regs_face_contour_loss_type = 2 [default = SMOOTH_L1];
   // facepose loss types
   optional AttriLossType regs_face_pose_loss_type = 3 [default = SMOOTH_L1];
+}
+// Message that store parameters used by MultiBoxLossLayer
+message MultiFaceContourLossParameter {
+  enum AttriLossType {
+    LOGISTIC = 0;
+    SMOOTH_L1 = 1;
+    L2 = 2;
+  }
+  optional float contour_weights = 1 [default = 1.0];
+  // facecontour loss types
+  optional AttriLossType regs_face_contour_loss_type = 2 [default = SMOOTH_L1];
+}
+// Message that store parameters used by MultiBoxLossLayer
+message MultiFaceAngleLossParameter {
+  enum AttriLossType {
+    LOGISTIC = 0;
+    SMOOTH_L1 = 1;
+    L2 = 2;
+  }
+  optional float angle_weights = 1 [default = 1.0];
+  // facepose loss types
+  optional AttriLossType regs_face_pose_loss_type = 2 [default = SMOOTH_L1];
 }
 
 

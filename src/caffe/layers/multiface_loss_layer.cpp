@@ -31,10 +31,7 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     num_gender_ = multiface_loss_param.num_gender();
     num_glasses_ = multiface_loss_param.num_glasses();
     num_headpose_ = multiface_loss_param.num_headpose();
-    //share_location_ = multiface_loss_param.share_location();
-    //loc_classes_ = share_location_ ? 1 : num_classes_;
-    //background_label_id_ = multiface_loss_param.background_label_id();
-
+    
     /*
     mining_type_ = multiface_loss_param.mining_type();
     if (multiface_loss_param.has_do_neg_mining()) {

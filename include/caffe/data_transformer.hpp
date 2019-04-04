@@ -140,6 +140,22 @@ class DataTransformer {
   void Transform(const AnnoFacePoseDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
                  AnnoFacePose* transformed_anno_vec);
+  
+  void Transform(const AnnoFaceContourDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 AnnoFaceContourPoints* transformed_annoface_all,
+                 bool* do_mirror);
+  void Transform(const AnnoFaceContourDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 AnnoFaceContourPoints* transformed_anno_vec);
+  
+  void Transform(const AnnoFaceAngleDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 AnnoFacePoseOritation* transformed_annoface_all,
+                 bool* do_mirror);
+  void Transform(const AnnoFaceAngleDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 AnnoFacePoseOritation* transformed_anno_vec);
   /**
    * @brief Transform the annotation according to the transformation applied
    * to the datum.
@@ -163,6 +179,18 @@ class DataTransformer {
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
       AnnoFacePose* transformed_annoface_all);
 
+   void TransformAnnoFaceContour(
+      const AnnoFaceContourDatum& anno_datum, const bool do_resize,
+      const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
+      AnnoFaceContourPoints* transformed_annoface_all);
+
+   void TransformAnnoFaceAngle(
+      const AnnoFaceAngleDatum& anno_datum, const bool do_resize,
+      const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
+      AnnoFacePoseOritation* transformed_annoface_all);
+
+
+
   /**
    * @brief Expand the datum.
    */
@@ -180,6 +208,10 @@ class DataTransformer {
 
   void ExpandImage(const AnnoFacePoseDatum& anno_datum,
                     AnnoFacePoseDatum* expanded_anno_datum);
+  void ExpandImage(const AnnoFaceAngleDatum& anno_datum,
+                    AnnoFaceAngleDatum* expanded_anno_datum);
+  void ExpandImage(const AnnoFaceContourDatum& anno_datum,
+                    AnnoFaceContourDatum* expanded_anno_datum);
 
   /**
    * @brief Apply distortion to the datum.

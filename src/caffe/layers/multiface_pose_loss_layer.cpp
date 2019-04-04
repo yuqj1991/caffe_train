@@ -3,7 +3,7 @@
 #include <utility>
 #include <vector>
 
-#include "caffe/layers/multifacepose_loss_layer.hpp"
+#include "caffe/layers/multiface_pose_loss_layer.hpp"
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
@@ -107,8 +107,6 @@ void MultiFacePoseLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void MultiFacePoseLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 const vector<Blob<Dtype>*>& top) {
-    const Dtype* landmark_data = bottom[0]->cpu_data(); // landmark data
-    const Dtype* pose_data = bottom[1]->cpu_data(); 
     const Dtype* label_data = bottom[2]->cpu_data();
     #if 0
     LOG(INFO)<< "loss compute start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& num_gt_: "<<num_gt_;
@@ -202,8 +200,11 @@ const vector<Blob<Dtype>*>& top) {
     landmark_shape[1] = batch_size_ * 42;
     landmark_pred_.Reshape(landmark_shape);
     landmark_gt_.Reshape(landmark_shape);
-    landmark_pred_.CopyFrom(*bottom[0]);
-    //Dtype* landmark_pred_data = landmark_pred_.mutable_cpu_data();
+    Blob<Dtype> landmark_temp;
+    landmark_temp.ReshapeLike(*(bottom[0]));
+    landmark_temp.CopyFrom(*(bottom[0]));
+    landmark_temp.Reshape(landmark_shape);
+    landmark_pred_.CopyFrom(landmark_temp);
     Dtype* landmark_gt_data = landmark_gt_.mutable_cpu_data();
     int count =0;
     for(int ii = 0; ii< batch_size_; ii++)

@@ -374,6 +374,40 @@ void DataTransformer<Dtype>::Transform(const AnnoFacePoseDatum& anno_datum,
 }
 
 template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoFaceContourDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 AnnoFaceContourPoints* transformed_annoface_all,
+                 bool* do_mirror){
+	// Transform datum.
+	const Datum& datum = anno_datum.datum();
+	NormalizedBBox crop_bbox;
+	Transform(datum, transformed_blob, &crop_bbox, do_mirror);
+
+	// Transform annotation.
+	const bool do_resize = true;
+	const bool do_expand = false;
+	TransformAnnoFaceContour(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
+											transformed_annoface_all);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 AnnoFacePoseOritation* transformed_annoface_all,
+                 bool* do_mirror){
+	// Transform datum.
+	const Datum& datum = anno_datum.datum();
+	NormalizedBBox crop_bbox;
+	Transform(datum, transformed_blob, &crop_bbox, do_mirror);
+
+	// Transform annotation.
+	const bool do_resize = true;
+	const bool do_expand = false;
+	TransformAnnoFaceAngle(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
+											transformed_annoface_all);
+}
+
+template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceDatum& anno_datum, 
 				Blob<Dtype>* transformed_blob,
 				AnnotationFace* transformed_anno_vec){
@@ -385,6 +419,22 @@ template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFacePoseDatum& anno_datum, 
 				Blob<Dtype>* transformed_blob,
 				AnnoFacePose* transformed_anno_vec){
+	bool do_mirror;
+	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoFaceContourDatum& anno_datum, 
+				Blob<Dtype>* transformed_blob,
+				AnnoFaceContourPoints* transformed_anno_vec){
+	bool do_mirror;
+	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum, 
+				Blob<Dtype>* transformed_blob,
+				AnnoFacePoseOritation* transformed_anno_vec){
 	bool do_mirror;
 	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
 }
@@ -502,7 +552,16 @@ void DataTransformer<Dtype>::TransformAnnoFacePose(
 			point_19->set_x(1-point_19->x());
 			point_20->set_x(1-point_20->x());
 			point_21->set_x(1-point_21->x());
+			transformed_annoface_all->mutable_faceoritation()->set_yaw(-src_annoface.faceoritation().yaw());
+			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
+			transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
+		}else
+		{
+			transformed_annoface_all->mutable_faceoritation()->set_yaw(src_annoface.faceoritation().yaw());
+			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
+			transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
 		}
+		
 		if(do_expand){
 			//if (face->x1() >= crop_bbox.xmax() || face->x2() <= crop_bbox.xmin() ||
 			//		face->y1() >= crop_bbox.ymax() || face->y5() <= crop_bbox.ymin()) {
@@ -555,12 +614,140 @@ void DataTransformer<Dtype>::TransformAnnoFacePose(
 		}
 		AnnoFaceContourPoints* annolandface = transformed_annoface_all->mutable_facecour();
 		annolandface->CopyFrom(*face);
-		transformed_annoface_all->mutable_faceoritation()->set_yaw(src_annoface.faceoritation().yaw());
-		transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
-		transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
 	}
-
 }
+
+// transfer label face pose depender expand
+template<typename Dtype>
+void DataTransformer<Dtype>::TransformAnnoFaceAngle(
+		const AnnoFaceAngleDatum& anno_datum,const bool do_resize,
+		const NormalizedBBox& crop_bbox, const bool do_mirror, const bool do_expand,
+		AnnoFacePoseOritation* transformed_annoface_all){
+	if(anno_datum.type() == AnnoFaceAngleDatum_AnnoType_FACEANGLE){
+		if(do_mirror){
+			transformed_annoface_all->set_yaw(-anno_datum.faceangle().yaw());
+			transformed_annoface_all->set_pitch(anno_datum.faceangle().pitch());
+			transformed_annoface_all->set_roll(anno_datum.faceangle().roll());		
+		}else
+		{
+			transformed_annoface_all->set_yaw(anno_datum.faceangle().yaw());
+			transformed_annoface_all->set_pitch(anno_datum.faceangle().pitch());
+			transformed_annoface_all->set_roll(anno_datum.faceangle().roll());
+		}
+	}
+}
+
+// transfer label face pose depender expand
+template<typename Dtype>
+void DataTransformer<Dtype>::TransformAnnoFaceContour(
+		const AnnoFaceContourDatum& anno_datum,const bool do_resize,
+		const NormalizedBBox& crop_bbox, const bool do_mirror, const bool do_expand,
+		AnnoFaceContourPoints* transformed_annoface_all){
+	const int img_height = anno_datum.datum().height();
+	const int img_width = anno_datum.datum().width();
+	AnnoFaceContourPoints face = anno_datum.facecontour();
+	ContourPoint * point_1 = face.mutable_point_1();
+	ContourPoint * point_2 = face.mutable_point_2();
+	ContourPoint * point_3 = face.mutable_point_3();
+	ContourPoint * point_4 = face.mutable_point_4();
+	ContourPoint * point_5 = face.mutable_point_5();
+	ContourPoint * point_6 = face.mutable_point_6();
+	ContourPoint * point_7 = face.mutable_point_7();
+	ContourPoint * point_8 = face.mutable_point_8();
+	ContourPoint * point_9 = face.mutable_point_9();
+	ContourPoint * point_10 = face.mutable_point_10();
+	ContourPoint * point_11 = face.mutable_point_11();
+	ContourPoint * point_12 = face.mutable_point_12();
+	ContourPoint * point_13 = face.mutable_point_13();
+	ContourPoint * point_14 = face.mutable_point_14();
+	ContourPoint * point_15 = face.mutable_point_15();
+	ContourPoint * point_16 = face.mutable_point_16();
+	ContourPoint * point_17 = face.mutable_point_17();
+	ContourPoint * point_18 = face.mutable_point_18();
+	ContourPoint * point_19 = face.mutable_point_19();
+	ContourPoint * point_20 = face.mutable_point_20();
+	ContourPoint * point_21 = face.mutable_point_21();
+	if(anno_datum.type() == AnnoFaceContourDatum_AnnoType_FACECONTOUR){
+		if(do_resize && param_.has_resize_param()){
+			CHECK_GT(img_height, 0);
+			CHECK_GT(img_width, 0);
+			UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
+											img_width, img_height,
+											&face);
+		}
+		if(do_mirror){
+			point_1->set_x(1-point_1->x());
+			point_2->set_x(1-point_2->x());
+			point_3->set_x(1-point_3->x());
+			point_4->set_x(1-point_4->x());
+			point_5->set_x(1-point_5->x());
+			point_6->set_x(1-point_6->x());
+			point_7->set_x(1-point_7->x());
+			point_8->set_x(1-point_8->x());
+			point_9->set_x(1-point_9->x());
+			point_10->set_x(1-point_10->x());
+			point_11->set_x(1-point_11->x());
+			point_12->set_x(1-point_12->x());
+			point_13->set_x(1-point_13->x());
+			point_14->set_x(1-point_14->x());
+			point_15->set_x(1-point_15->x());
+			point_16->set_x(1-point_16->x());
+			point_17->set_x(1-point_17->x());
+			point_18->set_x(1-point_18->x());
+			point_19->set_x(1-point_19->x());
+			point_20->set_x(1-point_20->x());
+			point_21->set_x(1-point_21->x());
+		}
+		if(do_expand){
+			float src_width = crop_bbox.xmax() - crop_bbox.xmin();
+			float src_height = crop_bbox.ymax() - crop_bbox.ymin();
+			point_1->set_x((point_1->x()-crop_bbox.xmin())/src_width);
+			point_1->set_y((point_1->y()-crop_bbox.ymin())/src_height);
+			point_2->set_x((point_2->x()-crop_bbox.xmin())/src_width);
+			point_2->set_y((point_2->y()-crop_bbox.ymin())/src_height);
+			point_3->set_x((point_3->x()-crop_bbox.xmin())/src_width);
+			point_3->set_y((point_3->y()-crop_bbox.ymin())/src_height);
+			point_4->set_x((point_4->x()-crop_bbox.xmin())/src_width);
+			point_4->set_y((point_4->y()-crop_bbox.ymin())/src_height);
+			point_5->set_x((point_5->x()-crop_bbox.xmin())/src_width);
+			point_5->set_y((point_5->y()-crop_bbox.ymin())/src_height);
+			point_6->set_x((point_6->x()-crop_bbox.xmin())/src_width);
+			point_6->set_y((point_6->y()-crop_bbox.ymin())/src_height);
+			point_7->set_x((point_7->x()-crop_bbox.xmin())/src_width);
+			point_7->set_y((point_7->y()-crop_bbox.ymin())/src_height);
+			point_8->set_x((point_8->x()-crop_bbox.xmin())/src_width);
+			point_8->set_y((point_8->y()-crop_bbox.ymin())/src_height);
+			point_9->set_x((point_9->x()-crop_bbox.xmin())/src_width);
+			point_9->set_y((point_9->y()-crop_bbox.ymin())/src_height);
+			point_10->set_x((point_10->x()-crop_bbox.xmin())/src_width);
+			point_10->set_y((point_10->y()-crop_bbox.ymin())/src_height);
+			point_11->set_x((point_11->x()-crop_bbox.xmin())/src_width);
+			point_11->set_y((point_11->y()-crop_bbox.ymin())/src_height);
+			point_12->set_x((point_12->x()-crop_bbox.xmin())/src_width);
+			point_12->set_y((point_12->y()-crop_bbox.ymin())/src_height);
+			point_13->set_x((point_13->x()-crop_bbox.xmin())/src_width);
+			point_13->set_y((point_13->y()-crop_bbox.ymin())/src_height);
+			point_14->set_x((point_14->x()-crop_bbox.xmin())/src_width);
+			point_14->set_y((point_14->y()-crop_bbox.ymin())/src_height);
+			point_15->set_x((point_15->x()-crop_bbox.xmin())/src_width);
+			point_15->set_y((point_15->y()-crop_bbox.ymin())/src_height);
+			point_16->set_x((point_16->x()-crop_bbox.xmin())/src_width);
+			point_16->set_y((point_16->y()-crop_bbox.ymin())/src_height);
+			point_17->set_x((point_17->x()-crop_bbox.xmin())/src_width);
+			point_17->set_y((point_17->y()-crop_bbox.ymin())/src_height);
+			point_18->set_x((point_18->x()-crop_bbox.xmin())/src_width);
+			point_18->set_y((point_18->y()-crop_bbox.ymin())/src_height);
+			point_19->set_x((point_19->x()-crop_bbox.xmin())/src_width);
+			point_19->set_y((point_19->y()-crop_bbox.ymin())/src_height);
+			point_20->set_x((point_20->x()-crop_bbox.xmin())/src_width);
+			point_20->set_y((point_20->y()-crop_bbox.ymin())/src_height);
+			point_21->set_x((point_21->x()-crop_bbox.xmin())/src_width);
+			point_21->set_y((point_21->y()-crop_bbox.ymin())/src_height);
+		}
+		transformed_annoface_all->CopyFrom(face);
+	}
+}
+
 
 template<typename Dtype>
 void DataTransformer<Dtype>::CropImage(const Datum& datum,
@@ -827,6 +1014,78 @@ void DataTransformer<Dtype>::ExpandImage(const AnnoFacePoseDatum& anno_datum,
 	const bool do_expand = true;
 	TransformAnnoFacePose(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
 											expanded_anno_datum->mutable_facepose());
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::ExpandImage(const AnnoFaceAngleDatum& anno_datum,
+																				 AnnoFaceAngleDatum* expanded_anno_datum) {
+	if (!param_.has_expand_param()) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const ExpansionParameter& expand_param = param_.expand_param();
+	const float expand_prob = expand_param.prob();
+	float prob;
+	caffe_rng_uniform(1, 0.f, 1.f, &prob);
+	if (prob > expand_prob) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const float max_expand_ratio = expand_param.max_expand_ratio();
+	if (fabs(max_expand_ratio - 1.) < 1e-2) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	float expand_ratio;
+	caffe_rng_uniform(1, 1.f, max_expand_ratio, &expand_ratio);
+	// Expand the datum.
+	NormalizedBBox expand_bbox;
+	ExpandImage(anno_datum.datum(), expand_ratio, &expand_bbox,
+							expanded_anno_datum->mutable_datum());
+	expanded_anno_datum->set_type(anno_datum.type());
+
+	// Transform the annotation according to crop_bbox.
+	const bool do_resize = false;
+	const bool do_mirror = false;
+	const bool do_expand = true;
+	TransformAnnoFaceAngle(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
+											expanded_anno_datum->mutable_faceangle());
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::ExpandImage(const AnnoFaceContourDatum& anno_datum,
+																				 AnnoFaceContourDatum* expanded_anno_datum) {
+	if (!param_.has_expand_param()) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const ExpansionParameter& expand_param = param_.expand_param();
+	const float expand_prob = expand_param.prob();
+	float prob;
+	caffe_rng_uniform(1, 0.f, 1.f, &prob);
+	if (prob > expand_prob) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const float max_expand_ratio = expand_param.max_expand_ratio();
+	if (fabs(max_expand_ratio - 1.) < 1e-2) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	float expand_ratio;
+	caffe_rng_uniform(1, 1.f, max_expand_ratio, &expand_ratio);
+	// Expand the datum.
+	NormalizedBBox expand_bbox;
+	ExpandImage(anno_datum.datum(), expand_ratio, &expand_bbox,
+							expanded_anno_datum->mutable_datum());
+	expanded_anno_datum->set_type(anno_datum.type());
+
+	// Transform the annotation according to crop_bbox.
+	const bool do_resize = false;
+	const bool do_mirror = false;
+	const bool do_expand = true;
+	TransformAnnoFaceContour(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
+											expanded_anno_datum->mutable_facecontour());
 }
 
 
