@@ -1,3 +1,4 @@
+# -*- coding:UTF-8 -*-
 from __future__ import division
 import numpy as np
 import shutil
@@ -124,8 +125,7 @@ def bboxIou(bbox_one, bbox_two):
 	center_y_two = bbox_two[1]
 	bbox_two_width = bbox_two[2]	
 	bbox_two_height = bbox_two[3]
-	if (center_x_two-bbox_two_width/2) <(center_x_one+bbox_one_width/2) 
-										and (center_y_two-bbox_two_height/2)<(center_y_one+bbox_one_height/2):
+	if (center_x_two-bbox_two_width/2) <(center_x_one+bbox_one_width/2) and (center_y_two-bbox_two_height/2)<(center_y_one+bbox_one_height/2):
 		jessord_area  = (center_x_one+bbox_one_width/2 - (center_x_two-bbox_two_width/2))*(center_y_one+bbox_one_height/2 - (center_y_two-bbox_two_height/2))
 		total_area = bbox_one_width* bbox_one_height+ bbox_two_width* bbox_two_height-jessord_area
 		return float(jessord_area/total_area)
@@ -138,7 +138,7 @@ def getClassflyIouBbox(annoBboxDatafile):
 	with open(annoBboxDatafile, 'r') as file_:
 		while True:
 			lineinfo = file_.readline().replace('\n', '').split(' ')
-			if len(lineinfo)==0:
+			if lineinfo[0]=='':
 				break
 			center_x = float(lineinfo[0])
 			center_y = float(lineinfo[1])
@@ -158,7 +158,7 @@ def init_centroids(boxes,n_anchors):
     boxes_num = len(boxes)
  
     centroid_index = np.random.choice(boxes_num, 1)
-    centroids.append(boxes[centroid_index])
+    centroids.append(boxes[centroid_index[0]])
  
     print(centroids[0].w,centroids[0].h)
  
@@ -201,6 +201,7 @@ def do_kmeans(n_anchors, boxes, centroids):
     loss = 0
     groups = []
     new_centroids = []
+    eps = 0.005
     for i in range(n_anchors):
         groups.append([])
         new_centroids.append(Box(0, 0, 0, 0))
@@ -217,10 +218,10 @@ def do_kmeans(n_anchors, boxes, centroids):
         loss += min_distance
         new_centroids[group_index].w += box.w
         new_centroids[group_index].h += box.h
- 
+	 
     for i in range(n_anchors):
-        new_centroids[i].w /= len(groups[i])
-        new_centroids[i].h /= len(groups[i])
+		new_centroids[i].w /= (len(groups[i])+eps)
+		new_centroids[i].h /= (len(groups[i])+eps)
  
     return new_centroids, groups, loss
 
@@ -235,7 +236,8 @@ def do_kmeans(n_anchors, boxes, centroids):
 def compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations_num,plus):
     boxes = getClassflyIouBbox(label_path)
     if plus:
-        centroids = init_centroids(boxes, n_anchors)
+		print('boxes length: ', len(boxes))
+		centroids = init_centroids(boxes, n_anchors)
     else:
         centroid_indices = np.random.choice(len(boxes), n_anchors)
         centroids = []
@@ -248,6 +250,7 @@ def compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations
     while (True):
         centroids, groups, loss = do_kmeans(n_anchors, boxes, centroids)
         iterations = iterations + 1
+        print("~~~~~~~~~~~~~~~the %d times iterations~~~~~~~~~~~~~~~~~~~~~~~"%(iterations+1))
         print("loss = %f" % loss)
         if abs(old_loss - loss) < loss_convergence or iterations > iterations_num:
             break
@@ -588,7 +591,7 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 
 def main():
 	# generate setfile xmlfile 
-	if 1:
+	if 0:
 		for sub in anno_src_wider_dir:
 			dir = "../../dataset/facedata/wider_face_split/"+sub
 			load_wider_split(dir)
@@ -596,13 +599,13 @@ def main():
 		for file in wider_directory:
 			shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
 	# static and get classfyFile
-	if 1:
+	if 0:
 		draw_histogram_specfic_range_base_data()
 	if 1:
 		n_anchors = 7
 		loss_convergence = 1e-6
 		grid_size = 13
-		iterations_num = 10000
+		iterations_num = 100000
 		plus = 0
 		compute_centroids(classfyFile,n_anchors,loss_convergence,grid_size,iterations_num,plus)
 
