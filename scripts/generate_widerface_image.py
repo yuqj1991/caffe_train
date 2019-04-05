@@ -210,16 +210,24 @@ def do_kmeans(n_anchors, boxes, centroids):
         min_distance = 1
         group_index = 0
         for centroid_index, centroid in enumerate(centroids):
+            if 0:
+                print("box.x %f, box.y: %f, box.w: %f, box.h:%f"%(box.x,box.y, box.w, box.h))
+                print("centroid.x %f, centroid.y: %f, centroid.w: %f, centroid.h:%f"%(centroid.x,centroid.y, centroid.w, centroid.h))
+                print('box_iou(box, centroid): %f'%(box_iou(box, centroid)))
             distance = (1 - box_iou(box, centroid))
             if distance < min_distance:
                 min_distance = distance
                 group_index = centroid_index
         groups[group_index].append(box)
         loss += min_distance
+        new_centroids[group_index].x += box.x
+        new_centroids[group_index].y += box.y
         new_centroids[group_index].w += box.w
         new_centroids[group_index].h += box.h
 	 
     for i in range(n_anchors):
+		new_centroids[i].x /= (len(groups[i])+eps)
+		new_centroids[i].y /= (len(groups[i])+eps)
 		new_centroids[i].w /= (len(groups[i])+eps)
 		new_centroids[i].h /= (len(groups[i])+eps)
  
@@ -251,7 +259,7 @@ def compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations
         centroids, groups, loss = do_kmeans(n_anchors, boxes, centroids)
         iterations = iterations + 1
         print("~~~~~~~~~~~~~~~the %d times iterations~~~~~~~~~~~~~~~~~~~~~~~"%(iterations+1))
-        print("loss = %f" % loss)
+        print("old_loss = %f, loss = %f" % (old_loss, loss))
         if abs(old_loss - loss) < loss_convergence or iterations > iterations_num:
             break
         old_loss = loss
@@ -606,7 +614,7 @@ def main():
 		loss_convergence = 1e-6
 		grid_size = 13
 		iterations_num = 100000
-		plus = 0
+		plus = 1
 		compute_centroids(classfyFile,n_anchors,loss_convergence,grid_size,iterations_num,plus)
 
 
