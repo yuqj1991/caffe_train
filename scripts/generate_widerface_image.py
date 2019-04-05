@@ -21,6 +21,59 @@ anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt'
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
 thread_hold = 30 ##map:70.35%, thread_hold=40; now i want to detector 30 pixels, just like 6-10m distance
 classfyFile = "../../dataset/facedata/wider_face/wider_face_classfy_distance_data.txt"
+
+
+# 定义Box类，描述bounding box的坐标
+class Box():
+    def __init__(self, x, y, w, h):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+ 
+ 
+# 计算两个box在某个轴上的重叠部分
+# x1是box1的中心在该轴上的坐标
+# len1是box1在该轴上的长度
+# x2是box2的中心在该轴上的坐标
+# len2是box2在该轴上的长度
+# 返回值是该轴上重叠的长度
+def overlap(x1, len1, x2, len2):
+    len1_half = len1 / 2
+    len2_half = len2 / 2
+    left = max(x1 - len1_half, x2 - len2_half)
+    right = min(x1 + len1_half, x2 + len2_half)
+    return right - left
+
+
+# 计算box a 和box b 的交集面积
+# a和b都是Box类型实例
+# 返回值area是box a 和box b 的交集面积
+def box_intersection(a, b):
+    w = overlap(a.x, a.w, b.x, b.w)
+    h = overlap(a.y, a.h, b.y, b.h)
+    if w < 0 or h < 0:
+        return 0
+    area = w * h
+    return area
+ 
+ 
+# 计算 box a 和 box b 的并集面积
+# a和b都是Box类型实例
+# 返回值u是box a 和box b 的并集面积
+def box_union(a, b):
+    i = box_intersection(a, b)
+    u = a.w * a.h + b.w * b.h - i
+    return u
+
+
+# 计算 box a 和 box b 的 iou
+# a和b都是Box类型实例
+# 返回值是box a 和box b 的iou
+def box_iou(a, b):
+    return box_intersection(a, b) / box_union(a, b)
+
+
 class ConfigureHistogram(object):
 	def __init__(self):
 		self.count = 0
@@ -91,12 +144,9 @@ def getClassflyIouBbox(annoBboxDatafile):
 			center_y = float(lineinfo[1])
 			class_width = float(lineinfo[2])
 			class_height = float(lineinfo[3])
-			bboxlist.append((center_x, center_y, class_width, class_height))
+			bboxlist.append(Box(center_x, center_y, class_width, class_height))
 		file_.close()
 	return bboxlist
-
-
-def classflyIouBbox():
 
 
 # 使用k-means ++ 初始化 centroids，减少随机初始化的centroids对最终结果的影响
@@ -176,32 +226,14 @@ def do_kmeans(n_anchors, boxes, centroids):
 
 
 # 计算给定bounding boxes的n_anchors数量的centroids
-# label_path是训练集列表文件地址
+# label_path是训练集bbox anno setfile
 # n_anchors 是anchors的数量
 # loss_convergence是允许的loss的最小变化值
 # grid_size * grid_size 是栅格数量
 # iterations_num是最大迭代次数
 # plus = 1时启用k means ++ 初始化centroids
 def compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations_num,plus):
- 
-    boxes = []
-    label_files = []
-    f = open(label_path)
-    for line in f:
-        label_path = line.rstrip().replace('images', 'labels')
-        label_path = label_path.replace('JPEGImages', 'labels')
-        label_path = label_path.replace('.jpg', '.txt')
-        label_path = label_path.replace('.JPEG', '.txt')
-        label_files.append(label_path)
-    f.close()
- 
-    for label_file in label_files:
-        f = open(label_file)
-        for line in f:
-            temp = line.strip().split(" ")
-            if len(temp) > 1:
-                boxes.append(Box(0, 0, float(temp[3]), float(temp[4])))
- 
+    boxes = getClassflyIouBbox(label_path)
     if plus:
         centroids = init_centroids(boxes, n_anchors)
     else:
@@ -555,24 +587,24 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 
 
 def main():
-	# '''
-	for sub in anno_src_wider_dir:
-		dir = "../../dataset/facedata/wider_face_split/"+sub
-		load_wider_split(dir)
-	generate_pascal_image_set(root_dir+'wider_face/JPEGImages', root_dir+'wider_face/ImageSets/Main')
-	for file in wider_directory:
-		shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
-	# '''
-	draw_histogram_specfic_range_base_data()
-	'''
-	label_path = "/raid/pengchong_data/Data/Lists/paul_train.txt"
-	n_anchors = 5
-	loss_convergence = 1e-6
-	grid_size = 13
-	iterations_num = 100
-	plus = 0
-	compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations_num,plus)
-	'''
+	# generate setfile xmlfile 
+	if 1:
+		for sub in anno_src_wider_dir:
+			dir = "../../dataset/facedata/wider_face_split/"+sub
+			load_wider_split(dir)
+		generate_pascal_image_set(root_dir+'wider_face/JPEGImages', root_dir+'wider_face/ImageSets/Main')
+		for file in wider_directory:
+			shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
+	# static and get classfyFile
+	if 1:
+		draw_histogram_specfic_range_base_data()
+	if 1:
+		n_anchors = 7
+		loss_convergence = 1e-6
+		grid_size = 13
+		iterations_num = 10000
+		plus = 0
+		compute_centroids(classfyFile,n_anchors,loss_convergence,grid_size,iterations_num,plus)
 
 
 if __name__ == '__main__':
