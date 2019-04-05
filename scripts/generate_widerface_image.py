@@ -20,6 +20,7 @@ root_dir = "../../dataset/facedata/"
 anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
 thread_hold = 30 ##map:70.35%, thread_hold=40; now i want to detector 30 pixels, just like 6-10m distance
+classfyFile = "../../dataset/facedata/wider_face/wider_face_classfy_distance_data.txt"
 class ConfigureHistogram(object):
 	def __init__(self):
 		self.count = 0
@@ -61,58 +62,183 @@ class ConfigureHistogram(object):
 		self.height.append(img_height)
 
 
-def static_histogram_data_from_all_sample(source_folder,label_folder):
-	# source_folder: ../wider_face/JPEGImages/wider_train/images
-	# label_folder: ../wider_face/label
-	sub_image_folder = os.listdir(source_folder)
-	static_his = ConfigureHistogram()
-	for sub_folder in sub_image_folder:
-		file_list = os.listdir(source_folder+'/'+sub_folder)
-		for image_file in file_list:
-			image_file_full_path = source_folder+'/'+sub_folder+'/'+image_file
-			# print(image_file_full_path)
-			xml_file = xml.dom.minidom.parse('../../dataset/facedata/wider_face/Annotations/'+image_file.split('.')[-2]+'.xml')
-			# print('../wider_face/Annotations/'+image_file.split('.')[-2]+'.xml')
-			root = xml_file.documentElement
-			width = root.getElementsByTagName('width')
-			img_width = int(width[0].firstChild.data)
-			# print('img_width', int(img_width.firstChild.data))
-			height = root.getElementsByTagName('height')
-			img_height = int(height[0].firstChild.data)
-			# print('height,width', img_height,img_width)
-			static_his.image_append(img_width, img_height)
-			label_file = label_folder+'/'+image_file.split('.')[-2]
-			with open(label_file, 'r') as lab_file:
-				lab_an_line = lab_file.readline()
-				while lab_an_line:
-					anno_str_bbox = lab_an_line.split(' ')
-					x_min = anno_str_bbox[0]
-					y_min = anno_str_bbox[1]
-					face_width = anno_str_bbox[2]
-					face_height = anno_str_bbox[3]
-					blur = anno_str_bbox[4]
-					illumination = anno_str_bbox[6]
-					invalid = anno_str_bbox[7]
-					occlusion = anno_str_bbox[8]
-					pose = anno_str_bbox[9]
-					static_his.face_append(int(face_width), int(face_height), int(blur), int(pose), int(occlusion), int(illumination))
-					if int(face_width)<=0 or int(face_height)<=0:
-						print('face_width, and height:',int(face_width), int(face_height))
-						print('../../dataset/facedata/wider_face/Annotations/'+image_file.split('.')[-2]+'.xml')
-					lab_an_line = lab_file.readline()
-			if img_height > 4500:
-				print('../../dataset/facedata/wider_face/Annotations/'+image_file.split('.')[-2]+'.xml')
-				print('img_height:', img_height)
-	return static_his
+def bboxIou(bbox_one, bbox_two):
+	center_x_one = bbox_one[0]
+	center_y_one = bbox_one[1]
+	bbox_one_width = bbox_one[2]
+	bbox_one_height = bbox_one[3]
+	center_x_two = bbox_two[0]
+	center_y_two = bbox_two[1]
+	bbox_two_width = bbox_two[2]	
+	bbox_two_height = bbox_two[3]
+	if (center_x_two-bbox_two_width/2) <(center_x_one+bbox_one_width/2) 
+										and (center_y_two-bbox_two_height/2)<(center_y_one+bbox_one_height/2):
+		jessord_area  = (center_x_one+bbox_one_width/2 - (center_x_two-bbox_two_width/2))*(center_y_one+bbox_one_height/2 - (center_y_two-bbox_two_height/2))
+		total_area = bbox_one_width* bbox_one_height+ bbox_two_width* bbox_two_height-jessord_area
+		return float(jessord_area/total_area)
+	else:
+		return 0.0
 
 
+def getClassflyIouBbox(annoBboxDatafile):
+	bboxlist = []
+	with open(annoBboxDatafile, 'r') as file_:
+		while True:
+			lineinfo = file_.readline().replace('\n', '').split(' ')
+			if len(lineinfo)==0:
+				break
+			center_x = float(lineinfo[0])
+			center_y = float(lineinfo[1])
+			class_width = float(lineinfo[2])
+			class_height = float(lineinfo[3])
+			bboxlist.append((center_x, center_y, class_width, class_height))
+		file_.close()
+	return bboxlist
+
+
+def classflyIouBbox():
+
+
+# 使用k-means ++ 初始化 centroids，减少随机初始化的centroids对最终结果的影响
+# boxes是所有bounding boxes的Box对象列表
+# n_anchors是k-means的k值
+# 返回值centroids 是初始化的n_anchors个centroid
+def init_centroids(boxes,n_anchors):
+    centroids = []
+    boxes_num = len(boxes)
+ 
+    centroid_index = np.random.choice(boxes_num, 1)
+    centroids.append(boxes[centroid_index])
+ 
+    print(centroids[0].w,centroids[0].h)
+ 
+    for centroid_index in range(0,n_anchors-1):
+ 
+        sum_distance = 0
+        distance_thresh = 0
+        distance_list = []
+        cur_sum = 0
+ 
+        for box in boxes:
+            min_distance = 1
+            for centroid_i, centroid in enumerate(centroids):
+                distance = (1 - box_iou(box, centroid))
+                if distance < min_distance:
+                    min_distance = distance
+            sum_distance += min_distance
+            distance_list.append(min_distance)
+ 
+        distance_thresh = sum_distance*np.random.random()
+ 
+        for i in range(0,boxes_num):
+            cur_sum += distance_list[i]
+            if cur_sum > distance_thresh:
+                centroids.append(boxes[i])
+                print(boxes[i].w, boxes[i].h)
+                break
+ 
+    return centroids
+
+
+# 进行 k-means 计算新的centroids
+# boxes是所有bounding boxes的Box对象列表
+# n_anchors是k-means的k值
+# centroids是所有簇的中心
+# 返回值new_centroids 是计算出的新簇中心
+# 返回值groups是n_anchors个簇包含的boxes的列表
+# 返回值loss是所有box距离所属的最近的centroid的距离的和
+def do_kmeans(n_anchors, boxes, centroids):
+    loss = 0
+    groups = []
+    new_centroids = []
+    for i in range(n_anchors):
+        groups.append([])
+        new_centroids.append(Box(0, 0, 0, 0))
+ 
+    for box in boxes:
+        min_distance = 1
+        group_index = 0
+        for centroid_index, centroid in enumerate(centroids):
+            distance = (1 - box_iou(box, centroid))
+            if distance < min_distance:
+                min_distance = distance
+                group_index = centroid_index
+        groups[group_index].append(box)
+        loss += min_distance
+        new_centroids[group_index].w += box.w
+        new_centroids[group_index].h += box.h
+ 
+    for i in range(n_anchors):
+        new_centroids[i].w /= len(groups[i])
+        new_centroids[i].h /= len(groups[i])
+ 
+    return new_centroids, groups, loss
+
+
+# 计算给定bounding boxes的n_anchors数量的centroids
+# label_path是训练集列表文件地址
+# n_anchors 是anchors的数量
+# loss_convergence是允许的loss的最小变化值
+# grid_size * grid_size 是栅格数量
+# iterations_num是最大迭代次数
+# plus = 1时启用k means ++ 初始化centroids
+def compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations_num,plus):
+ 
+    boxes = []
+    label_files = []
+    f = open(label_path)
+    for line in f:
+        label_path = line.rstrip().replace('images', 'labels')
+        label_path = label_path.replace('JPEGImages', 'labels')
+        label_path = label_path.replace('.jpg', '.txt')
+        label_path = label_path.replace('.JPEG', '.txt')
+        label_files.append(label_path)
+    f.close()
+ 
+    for label_file in label_files:
+        f = open(label_file)
+        for line in f:
+            temp = line.strip().split(" ")
+            if len(temp) > 1:
+                boxes.append(Box(0, 0, float(temp[3]), float(temp[4])))
+ 
+    if plus:
+        centroids = init_centroids(boxes, n_anchors)
+    else:
+        centroid_indices = np.random.choice(len(boxes), n_anchors)
+        centroids = []
+        for centroid_index in centroid_indices:
+            centroids.append(boxes[centroid_index])
+ 
+    # iterate k-means
+    centroids, groups, old_loss = do_kmeans(n_anchors, boxes, centroids)
+    iterations = 1
+    while (True):
+        centroids, groups, loss = do_kmeans(n_anchors, boxes, centroids)
+        iterations = iterations + 1
+        print("loss = %f" % loss)
+        if abs(old_loss - loss) < loss_convergence or iterations > iterations_num:
+            break
+        old_loss = loss
+ 
+        for centroid in centroids:
+            print(centroid.w * grid_size, centroid.h * grid_size)
+ 
+    # print result
+    for centroid in centroids:
+        print("k-means result：\n")
+        print(centroid.w * grid_size, centroid.h * grid_size)
+ 
+ 
 # statsic specfic image height range
-def statsic_specfic_face_base_data(source_folder,label_folder, heightMin, heightMax):
+def statsic_specfic_face_base_data(source_folder,label_folder, heightMin, heightMax, classfydataFile):
 	# source_folder: ../wider_face/JPEGImages/wider_train/images
 	# label_folder: ../wider_face/label
+	# classfydataFile: ../../dataset/facedata/wider_face/wider_face_classfy_distance_data.txt
 	assert heightMax > heightMin
 	print("heightMin, %d ,heightMax %d"%(heightMin, heightMax))
 	sub_image_folder = os.listdir(source_folder)
+	classfy_file = open(classfydataFile, 'a+')
 	static_his = ConfigureHistogram()
 	for sub_folder in sub_image_folder:
 		file_list = os.listdir(source_folder+'/'+sub_folder)
@@ -148,17 +274,30 @@ def statsic_specfic_face_base_data(source_folder,label_folder, heightMin, height
 						if int(face_width)<=0 or int(face_height)<=0:
 							print('face_width, and height:',int(face_width), int(face_height))
 							print('../../dataset/facedata/wider_face/Annotations/'+image_file.split('.')[-2]+'.xml')
+						## get relative x, y , w, h corresponind width, height
+						class_bdx_center_x = float((int(x_min)+int(x_min)+int(face_width))/(2*int(img_width)))
+						class_bdx_center_y = float((int(y_min)+int(y_min)+int(face_height))/(2*int(img_height)))
+						class_bdx_w = float(int(face_width)/int(img_width))
+						class_bdx_h = float(int(face_height)/int(img_height))
+						classfly_content = str(class_bdx_center_x)+ ' '+ str(class_bdx_center_y)+ ' '+str(class_bdx_w)+ ' '+str(class_bdx_h)+'\n'
+						classfy_file.write(classfly_content)
 						lab_an_line = lab_file.readline()
+	classfy_file.close()
 	return static_his
 
 
 def draw_histogram_specfic_range_base_data():
 	face_num=0
+	# clean classfy file ############
+	classfy_ = open(classfyFile, "w")
+	classfy_.truncate()
+	classfy_.close()
+	#################################
 	for ii in range(len(height_level)):
 		if ii == len(height_level)-1:
 			break
 		static_data = statsic_specfic_face_base_data('../../dataset/facedata/wider_face/JPEGImages/wider_train/images', '../../dataset/facedata/wider_face/label',
-													 height_level[ii], height_level[ii+1])
+													 height_level[ii], height_level[ii+1], classfyFile)
 		img_num = static_data.count
 		face_num += static_data.face_count
 		print('img_num: ', img_num)
@@ -225,141 +364,6 @@ def draw_histogram_specfic_range_base_data():
 				print('face_height_levle_gap_'+str(ii*120),createVar['face_height_levle_gap_'+str(ii*120)])
 		print('####################################################')
 	print("face_num:", face_num)
-
-
-def autolabel(rects):
-	for rect in rects:
-		height = rect.get_height()
-		plot.text(rect.get_x()+rect.get_width()/2.-0.2, 1.03*height, '%s' % float(height))
-
-
-def draw_histogram_base_data():
-	static_data = static_histogram_data_from_all_sample('../../dataset/facedata/wider_face/JPEGImages/wider_train/images', '../../dataset/facedata/wider_face/label')
-	img_num = static_data.count
-	img_face_num = static_data.face_count
-	# width_min and _max
-	img_width_min = np.min(static_data.width)
-	img_width_max = np.max(static_data.width)
-	# height_min and _max
-	img_height_min = np.min(static_data.height)
-	img_height_max = np.max(static_data.height)
-	# face_width_min and _max
-	face_width_min = np.min(static_data.face_width)
-	face_width_max = np.max(static_data.face_width)
-	# face_height_min and _max
-	face_height_min = np.min(static_data.face_height)
-	face_height_max = np.max(static_data.face_height)
-	# face blur
-	img_face_blur_0 = 0
-	img_face_blur_1 = 0
-	img_face_blur_2 = 0
-	# face pose
-	img_face_pose_0 = 0
-	img_face_pose_1 = 0
-	# face illumination
-	img_face_illumination_0 = 0
-	img_face_illumination_1 = 0
-	# face occlusion
-	img_face_occlusion_0 = 0
-	img_face_occlusion_1 = 0
-	img_face_occlusion_2 = 0
-	for ii in range(img_face_num):
-		# blur
-		if static_data.face_blur[ii] == 0:
-			img_face_blur_0 += 1
-		elif static_data.face_blur[ii] == 1:
-			img_face_blur_1 += 1
-		elif static_data.face_blur[ii] == 2:
-			img_face_blur_2 += 1
-		# pose
-		if static_data.face_pose[ii] == 0:
-			img_face_pose_0 += 1
-		elif static_data.face_pose[ii] == 1:
-			img_face_pose_1 += 1
-		# illumination
-		if static_data.face_illumination[ii] == 0:
-			img_face_illumination_0 += 1
-		elif static_data.face_illumination[ii] == 1:
-			img_face_illumination_1 += 1
-		# occlusion
-		if static_data.face_occlusion[ii] == 0:
-			img_face_occlusion_0 += 1
-		elif static_data.face_occlusion[ii] == 1:
-			img_face_occlusion_1 += 1
-		elif static_data.face_occlusion[ii] == 2:
-			img_face_occlusion_2 += 1
-	# draw_img
-	total_blur = [img_face_blur_0, img_face_blur_1, img_face_blur_2]
-	total_pose = [img_face_pose_0, img_face_pose_1]
-	total_illumination = [img_face_illumination_0, img_face_illumination_1]
-	total_occlusion = [img_face_occlusion_0, img_face_occlusion_1, img_face_occlusion_2]
-	print('img_face_blur_0, img_face_blur_1, img_face_blur_2', img_face_blur_0, img_face_blur_1, img_face_blur_2)
-	print('img_face_pose_0, img_face_pose_1', img_face_pose_0, img_face_pose_1)
-	print('img_face_illumination_0, img_face_illumination_1', img_face_illumination_0, img_face_illumination_1)
-	print('img_face_occlusion_0, img_face_occlusion_1, img_face_occlusion_2', img_face_occlusion_0, img_face_occlusion_1, img_face_occlusion_2)
-	# print img_height and img_width(min and max), and face_height and width (min and max)
-	print('img width min & max ', img_width_min, img_width_max)
-	print('img height min & max ', img_height_min, img_height_max)
-	print('img_face width min & max ', face_width_min, face_width_max)
-	print('img_face height min & max ', face_height_min, face_height_max)
-	# i want to know the img height disturibution , so i use histogram, and i need to make some gap between the min and max of img_height
-	# and by the max gap between the max and the min ,i want to make 120 gap,year
-	for_iter = math.ceil(float(9108)/120)
-	print('for_iter:', for_iter)
-	createVar = locals()
-	for ii in range(int(for_iter)):
-		createVar['height_levle_gap_'+str(ii*120)] =0
-	for ii in range(len(static_data.height)):
-		for jj in range(int(for_iter)):
-			if 120*(jj) <= static_data.height[ii] < 120*(jj+1):
-				createVar['height_levle_gap_'+str(jj*120)] += 1
-				break
-	var_height_list = []
-	for ii in range(int(for_iter)):
-		var_height_list.append(createVar['height_levle_gap_'+str(ii*120)])
-		if createVar['height_levle_gap_'+str(ii*120)]>0:
-			print('height_levle_gap_'+str(ii*120),createVar['height_levle_gap_'+str(ii*120)])
-	# ==========================================================
-	# face_width min & max, and i will set gap between min & max
-	# ==========================================================
-	face_width_iter = math.ceil(float(976)/90)
-	for ii in range(int(face_width_iter)):
-		createVar['face_width_levle_gap_'+str(ii*90)] =0
-	for ii in range(len(static_data.face_width)):
-		for jj in range(int(face_width_iter)):
-			if 90*(jj) <= static_data.face_width[ii] < 90*(jj+1):
-				createVar['face_width_levle_gap_'+str(jj*90)] += 1
-				break
-	face_width_list = []
-	for ii in range(int(face_width_iter)):
-		face_width_list.append(createVar['face_width_levle_gap_'+str(ii*90)])
-		print('face_width_levle_gap_'+str(ii*90),createVar['face_width_levle_gap_'+str(ii*90)])
-	# ===============================================================
-	# face_height min & max, and i will set gap between min & max too
-	# ===============================================================
-	face_height_iter = math.ceil(float(1289)/120)
-	for ii in range(int(face_height_iter)):
-		createVar['face_height_levle_gap_'+str(ii*120)] =0
-	for ii in range(len(static_data.face_height)):
-		for jj in range(int(face_height_iter)):
-			if 120*(jj) <= static_data.face_height[ii] < 120*(jj+1):
-				createVar['face_height_levle_gap_'+str(jj*120)] += 1
-				break
-	face_height_list = []
-	for ii in range(int(face_height_iter)):
-		face_height_list.append(createVar['face_height_levle_gap_'+str(ii*120)])
-		print('face_height_levle_gap_'+str(ii*120),createVar['face_height_levle_gap_'+str(ii*120)])
-	# ==================================================================
-	# draw plot figure
-	x = np.arange(for_iter)+1
-	xx = np.arange(face_width_iter)+1
-	xxx = np.arange(face_height_iter)+1
-	# img_height_plot = plot.bar(x=x,height=var_height_list,width=0.85,facecolor='red', edgecolor = 'white', label='img_height_dist')
-	#face_width_plot = plot.bar(x=xx+0.5,height=face_width_list,width=0.35,facecolor='green', edgecolor = 'white', label='face_width_dist')
-	face_width_plot = plot.bar(x=xxx+0.5,height=face_height_list,width=0.35,facecolor='black', edgecolor = 'white', label='face_label_dist')
-	# autolabel(img_height_plot)
-	# autolabel(face_width_plot)
-	plot.show()
 
 
 # recursive function for the file of all readlines, maybe killed
@@ -559,8 +563,16 @@ def main():
 	for file in wider_directory:
 		shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
 	# '''
-	# draw_histogram_base_data()
 	draw_histogram_specfic_range_base_data()
+	'''
+	label_path = "/raid/pengchong_data/Data/Lists/paul_train.txt"
+	n_anchors = 5
+	loss_convergence = 1e-6
+	grid_size = 13
+	iterations_num = 100
+	plus = 0
+	compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations_num,plus)
+	'''
 
 
 if __name__ == '__main__':
