@@ -346,7 +346,9 @@ void Solver<Dtype>::TestAll() {
       TestClassification(test_net_id);
     } else if (param_.eval_type() == "detection") {
       TestDetection(test_net_id);
-    } else {
+    }else if (param_.eval_type() == "detectionface") {
+      TestDetectionFace(test_net_id);
+    }else {
       LOG(FATAL) << "Unknown evaluation type: " << param_.eval_type();
     }
   }
@@ -460,7 +462,6 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
       loss += iter_loss;
     }
     for (int j = 0; j < result.size(); ++j) {
-      //LOG(INFO)<<"J:"<<j<<" of result.size(): "<<result.size();
       CHECK_EQ(result[j]->width(), 5);
       const Dtype* result_vec = result[j]->cpu_data();
       int num_det = result[j]->height();
@@ -547,6 +548,48 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
               << mAP;
   }
 }
+#if 1
+template <typename Dtype>
+void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
+  CHECK(Caffe::root_solver());
+  LOG(INFO) << "Iteration " << iter_
+            << ", Testing net (#" << test_net_id << ")";
+  CHECK_NOTNULL(test_nets_[test_net_id].get())->
+      ShareTrainedLayersWith(net_.get());
+  const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
+  for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
+    SolverAction::Enum request = GetRequestedAction();
+    // Check to see if stoppage of testing/training has been requested.
+    while (request != SolverAction::NONE) {
+        if (SolverAction::SNAPSHOT == request) {
+          Snapshot();
+        } else if (SolverAction::STOP == request) {
+          requested_early_exit_ = true;
+        }
+        request = GetRequestedAction();
+    }
+    if (requested_early_exit_) {
+      // break out of test loop.
+      break;
+    }
+    Dtype iter_loss;
+    const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
+    for (int j = 0; j < result.size(); ++j) {
+      const Dtype* result_vec = result[j]->cpu_data();
+      LOG(INFO)<< "NME: "<< result_vec[0];
+      LOG(INFO)<<"gender precision: "<<result_vec[1];
+      LOG(INFO)<<"glasses precision: "<<result_vec[2];
+      LOG(INFO)<<"headpose precision: "<<result_vec[3];
+    }
+    
+  }
+  if (requested_early_exit_) {
+    LOG(INFO)     << "Test interrupted.";
+    return;
+  }
+}
+
+#endif
 
 template <typename Dtype>
 void Solver<Dtype>::Snapshot() {

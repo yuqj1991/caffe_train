@@ -10,6 +10,8 @@
 
 #include "caffe/layers/detection_output_layer.hpp"
 
+
+
 namespace caffe {
 
 template <typename Dtype>
@@ -24,8 +26,6 @@ void DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   share_location_ = detection_output_param.share_location();
   num_loc_classes_ = share_location_ ? 1 : num_classes_;
   background_label_id_ = detection_output_param.background_label_id();
-  background_blur_id_ = detection_output_param.background_blur_id();
-  background_occlu_id_ = detection_output_param.background_occl_id();
   code_type_ = detection_output_param.code_type();
   variance_encoded_in_target_ =
       detection_output_param.variance_encoded_in_target();
@@ -190,7 +190,7 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   top_shape.push_back(1);
   // Each row is a 9 dimension vector, which stores
   // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
-  top_shape.push_back(13);
+  top_shape.push_back(9);
   top[0]->Reshape(top_shape);
 }
 
@@ -306,7 +306,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
 
   vector<int> top_shape(2, 1);
   top_shape.push_back(num_kept);
-  top_shape.push_back(13);
+  top_shape.push_back(9);
   Dtype* top_data;
   if (num_kept == 0) {
     LOG(INFO) << "Couldn't find any detections";
@@ -317,7 +317,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
     // Generate fake results per image.
     for (int i = 0; i < num; ++i) {
       top_data[0] = i;
-      top_data += 13;
+      top_data += 9;
     }
   } else {
     top[0]->Reshape(top_shape);
@@ -340,12 +340,6 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
         continue;
       }
       const vector<float>& scores = conf_scores.find(label)->second;
-      const vector<float>& blur_sc_0 = blur_scores.find(0)->second;
-      const vector<float>& blur_sc_1 = blur_scores.find(1)->second;
-      const vector<float>& blur_sc_2 = blur_scores.find(1)->second;
-      const vector<float>& occlu_sc_0 = occlu_scores.find(0)->second;
-      const vector<float>& occlu_sc_1 = occlu_scores.find(1)->second;
-      const vector<float>& occlu_sc_2 = occlu_scores.find(1)->second;
       int loc_label = share_location_ ? -1 : label;
       if (decode_bboxes.find(loc_label) == decode_bboxes.end()) {
         // Something bad happened if there are no predictions for current label.
@@ -362,25 +356,36 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
       }
       for (int j = 0; j < indices.size(); ++j) {
         int idx = indices[j];
-        top_data[count * 13] = i;
-        top_data[count * 13 + 1] = label;
-        top_data[count * 13 + 2] = scores[idx];
+        top_data[count * 9] = i;
+        top_data[count * 9 + 1] = label;
+        top_data[count * 9 + 2] = scores[idx];
         const NormalizedBBox& bbox = bboxes[idx];
-        top_data[count * 13 + 3] = bbox.xmin();
-        top_data[count * 13 + 4] = bbox.ymin();
-        top_data[count * 13 + 5] = bbox.xmax();
-        top_data[count * 13 + 6] = bbox.ymax();
-        top_data[count * 13 + 7] = blur_sc_0[idx];
-        top_data[count * 13 + 8] = blur_sc_1[idx];
-        top_data[count * 13 + 9] = blur_sc_2[idx];
-        top_data[count * 13 + 10] = occlu_sc_0[idx];
-        top_data[count * 13 + 11] = occlu_sc_1[idx];
-        top_data[count * 13 + 12] = occlu_sc_2[idx];
+        top_data[count * 9 + 3] = bbox.xmin();
+        top_data[count * 9 + 4] = bbox.ymin();
+        top_data[count * 9 + 5] = bbox.xmax();
+        top_data[count * 9 + 6] = bbox.ymax();
+        int blur_index = 0; int occlu_index = 0;
+        float blur_temp =0; float occlu_temp =0.0;
+        for (int ii = 1; ii< 4; ii++ )
+        {
+          if (blur_temp <  blur_scores.find(ii)->second[idx])
+          {
+            blur_index = ii;
+            blur_temp = blur_scores.find(ii)->second[idx];
+          }
+          if (occlu_temp <  occlu_scores.find(ii)->second[idx])
+          {
+            occlu_index = ii;
+            occlu_temp = occlu_scores.find(ii)->second[idx];
+          }
+        }
+        top_data[count * 9 + 7] = blur_index;
+        top_data[count * 9 + 8] = occlu_index;
         if (need_save_) {
           NormalizedBBox out_bbox;
           OutputBBox(bbox, sizes_[name_count_], has_resize_, resize_param_,
                      &out_bbox);
-          float score = top_data[count * 13 + 2];
+          float score = top_data[count * 9 + 2];
           float xmin = out_bbox.xmin();
           float ymin = out_bbox.ymin();
           float xmax = out_bbox.xmax();

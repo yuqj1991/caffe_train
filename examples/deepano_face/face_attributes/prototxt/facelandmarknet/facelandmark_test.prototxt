@@ -812,18 +812,27 @@ layer {
   type: "Softmax"
   bottom: "conv6_gender"
   top: "conv6_gender"
+  softmax_param {
+	    axis: 1
+  }
 }
 layer {
   name: "conv6_glasses"
   type: "Softmax"
   bottom: "conv6_glasses"
   top: "conv6_glasses"
+  softmax_param {
+	    axis: 1
+  }
 }
 layer {
   name: "conv6_headpose"
   type: "Softmax"
   bottom: "conv6_headpose"
   top: "conv6_headpose"
+  softmax_param {
+	    axis: 1
+  }
 }
 
 layer {
@@ -834,7 +843,30 @@ layer {
   bottom: "conv6_glasses"
   bottom: "conv6_headpose"
   top: "multiface_output"
+  include {
+		phase: TEST
+	}
   concat_param {
 		axis: 1
   }
 }
+
+layer{
+    name: "faceeval_output"
+    type: "FaceEvaluate"
+    bottom: "multiface_output"
+    bottom: "label"
+    top: "faceeval_output"
+    include {
+		phase: TEST
+	}
+    face_evaluate_param{
+        facetype: FACE_5_TYPE
+        facethreold: 0.001
+        facepoints: 5
+        num_gender: 2
+        num_glasses:2
+        num_headpose:5 
+    }
+}
+

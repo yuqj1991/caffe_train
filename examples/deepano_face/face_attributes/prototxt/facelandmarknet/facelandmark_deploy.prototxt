@@ -791,18 +791,27 @@ layer {
   type: "Softmax"
   bottom: "conv6_gender"
   top: "conv6_gender"
+  softmax_param {
+	    axis: 1
+  }
 }
 layer {
   name: "conv6_glasses"
   type: "Softmax"
   bottom: "conv6_glasses"
   top: "conv6_glasses"
+  softmax_param {
+	    axis: 1
+  }
 }
 layer {
   name: "conv6_headpose"
   type: "Softmax"
   bottom: "conv6_headpose"
   top: "conv6_headpose"
+  softmax_param {
+	    axis: 1
+  }
 }
 layer {
   name: "multiface_output"
@@ -815,4 +824,7 @@ layer {
   concat_param {
 		axis: 1
   }
+  include {
+		phase: TEST
+	}
 }
