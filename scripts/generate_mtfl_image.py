@@ -68,6 +68,7 @@ def convert_src_anno_label(split_file):
 			img_filename = img_filename.replace('\\', '/')
 			img_file = root_dir + "mtfl/JPEGImages/" + img_filename
 			source_img = cv2.imread(img_file)
+			assert source_img.shape[2]==3
 			fullImg = os.path.abspath(img_file) + '\n'
 			mainSetFile.writelines(fullImg)
 			labelFile = open(LABEL_DIR+'/'+fullImg.split("/")[-1].split(".")[0], "w")

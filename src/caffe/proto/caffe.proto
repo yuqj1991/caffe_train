@@ -1623,7 +1623,6 @@ message FaceEvaluateParameter{
         FACE_5_TYPE =1;
     }
     optional FaceType facetype = 1[default = FACE_5_TYPE];
-    optional float facethreold = 6;
     optional int32 facepoints = 2;
     optional int32 num_gender = 3;
     optional int32 num_glasses =4;

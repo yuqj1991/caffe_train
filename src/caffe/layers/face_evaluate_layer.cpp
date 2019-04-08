@@ -11,7 +11,7 @@ namespace caffe {
 template <typename Dtype>
 void FaceEvaluateLayer<Dtype>::LayerSetUp(
       const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-  FaceEvaluateParameter face_paramer = this->layer_param_.face_evaluate_param();
+  const FaceEvaluateParameter& face_paramer = this->layer_param_.face_evaluate_param();
   num_gender_ = face_paramer.num_gender();
   num_glasses_ = face_paramer.num_glasses();
   num_headpose_ = face_paramer.num_headpose();
@@ -20,7 +20,6 @@ void FaceEvaluateLayer<Dtype>::LayerSetUp(
     face_attributes_ =true;
   } 
   facetype_ = face_paramer.facetype();
-  threold_ = face_paramer.facethreold();
 }
 
 template <typename Dtype>

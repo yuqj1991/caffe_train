@@ -576,10 +576,10 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
     const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
     for (int j = 0; j < result.size(); ++j) {
       const Dtype* result_vec = result[j]->cpu_data();
-      LOG(INFO)<< "NME: "<< result_vec[0];
-      LOG(INFO)<<"gender precision: "<<result_vec[1];
-      LOG(INFO)<<"glasses precision: "<<result_vec[2];
-      LOG(INFO)<<"headpose precision: "<<result_vec[3];
+      LOG(INFO)<< "NME: "<< result_vec[0]
+               <<" gender precision: "<<result_vec[1]
+               <<" glasses precision: "<<result_vec[2]
+               <<" headpose precision: "<<result_vec[3];
     }
     
   }

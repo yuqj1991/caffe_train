@@ -56,7 +56,7 @@ void facePoseDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
     // label
     if (this->output_labels_) {
         has_anno_type_ = anno_datum.has_type();
-        vector<int> label_shape(46, 1);
+        vector<int> label_shape(4, 1);
         if (has_anno_type_) {
             anno_type_ = anno_datum.type();
             if (anno_type_ == AnnoFacePoseDatum_AnnoType_FACEPOSE) {
@@ -171,7 +171,11 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_data = batch->data_.mutable_cpu_data();
             } else {
                 CHECK(std::equal(top_shape.begin() + 1, top_shape.begin() + 4,
-                    shape.begin() + 1));
+                    shape.begin() + 1))<<"shape: "<<shape[0]<<" "
+                             <<shape[1]<<" "<<shape[2]<<" "
+                             <<shape[3]<<";top_shape: "<<top_shape[0]<<" "
+                             <<top_shape[1]<<" "<<top_shape[2]<<" "
+                             <<top_shape[3];
             }
         } else {
         CHECK(std::equal(top_shape.begin() + 1, top_shape.begin() + 4,

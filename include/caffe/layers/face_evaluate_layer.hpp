@@ -33,19 +33,6 @@ class FaceEvaluateLayer : public Layer<Dtype> {
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
-  /**
-   * @brief Evaluate the detection output.
-   *
-   * @param bottom input Blob vector (exact 2)
-   *   -# @f$ (1 \times 1 \times N \times 7) @f$
-   *      N detection results.
-   *   -# @f$ (1 \times 1 \times M \times 7) @f$
-   *      M ground truth.
-   * @param top Blob vector (length 1)
-   *   -# @f$ (1 \times 1 \times N \times 4) @f$
-   *      N is the number of detections, and each row is:
-   *      [image_id, label, confidence, true_pos, false_pos]
-   */
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   /// @brief Not implemented
@@ -59,8 +46,6 @@ class FaceEvaluateLayer : public Layer<Dtype> {
   int num_facepoints_;
   FaceEvaluateParameter_FaceType facetype_;
   bool face_attributes_;
-  float threold_;
-  vector<pair<int, int> > sizes_;
 };
 
 }  // namespace caffe
