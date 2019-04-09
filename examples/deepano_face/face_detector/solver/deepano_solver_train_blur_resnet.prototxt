@@ -1,5 +1,5 @@
-train_net: "../prototxt/deepano_light_face_train_resblock.prototxt"
-test_net: "../prototxt/deepano_light_face_test_resblock.prototxt"
+train_net: "../prototxt/deepano_light_face_train_resblock_v2.prototxt"
+test_net: "../prototxt/deepano_light_face_test_resblock_v2.prototxt"
 test_iter: 1500
 test_interval: 5000
 base_lr: 0.001
@@ -10,7 +10,7 @@ gamma: 0.5
 weight_decay: 0.0001
 snapshot: 5000
 snapshot_prefix: "../snapshot/deepanoFace_res"
-solver_mode: GPU
+solver_mode: CPU
 debug_info: false
 snapshot_after_train: true
 test_initialization: false

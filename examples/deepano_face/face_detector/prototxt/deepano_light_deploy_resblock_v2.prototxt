@@ -4504,7 +4504,7 @@ layer {
 	shape {
 		dim: 0
 		dim: -1
-		dim: 4
+		dim: 3
 	}
 	}
 }
@@ -4535,7 +4535,7 @@ layer {
 		shape {
 			dim: 0
 			dim: -1
-			dim: 4
+			dim: 3
 		}
 	}
 }
