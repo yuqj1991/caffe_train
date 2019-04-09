@@ -84,7 +84,7 @@ def bboxIou(bbox_one, bbox_two):
 	bbox_one_height = bbox_one[3]
 	center_x_two = bbox_two[0]
 	center_y_two = bbox_two[1]
-	bbox_two_width = bbox_two[2]	
+	bbox_two_width = bbox_two[2]
 	bbox_two_height = bbox_two[3]
 	if (center_x_two-bbox_two_width/2) <(center_x_one+bbox_one_width/2) and (center_y_two-bbox_two_height/2)<(center_y_one+bbox_one_height/2):
 		jessord_area  = (center_x_one+bbox_one_width/2 - (center_x_two-bbox_two_width/2))*(center_y_one+bbox_one_height/2 - (center_y_two-bbox_two_height/2))
@@ -105,7 +105,7 @@ def getClassflyIouBbox(annoBboxDatafile):
 			center_y = float(lineinfo[1])
 			class_width = float(lineinfo[2])
 			class_height = float(lineinfo[3])
-			bboxlist.append(Box(center_x, center_y, class_width, class_height))
+			bboxlist.append(Box(0, 0, class_width, class_height))
 		file_.close()
 	return bboxlist
 
@@ -185,13 +185,9 @@ def do_kmeans(n_anchors, boxes, centroids):
         groups[group_index].append(box)
         loss += min_distance
         distance_all.append(one_distance)
-        new_centroids[group_index].x += box.x
-        new_centroids[group_index].y += box.y
         new_centroids[group_index].w += box.w
         new_centroids[group_index].h += box.h
     for i in range(n_anchors):
-		new_centroids[i].x /= (len(groups[i])+eps)
-		new_centroids[i].y /= (len(groups[i])+eps)
 		new_centroids[i].w /= (len(groups[i])+eps)
 		new_centroids[i].h /= (len(groups[i])+eps)
     return new_centroids, groups, loss, distance_all
@@ -231,12 +227,15 @@ def compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations
         old_loss = loss 
         prev_assignments = assignments.copy()
     # print result
+    ii=0
     for centroid in centroids:
         print("k-means result：\n")
+        print("the num of the group_%d: %d"%(ii, len(groups[ii])))
         print(centroid.w*grid_size, centroid.h*grid_size)
+        ii+=1
     avgIOU = avg_iou(boxes, centroids)
     print("avgIOU: ", avgIOU)
-    
+
 
 def main():
 	if 1:

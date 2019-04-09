@@ -113,7 +113,7 @@ def statsic_specfic_face_base_data(source_folder,label_folder, heightMin, height
 						class_bdx_center_y = float((int(y_min)+int(y_min)+int(face_height))/(2*int(img_height)))
 						class_bdx_w = float(int(face_width)/int(img_width))
 						class_bdx_h = float(int(face_height)/int(img_height))
-						classfly_content = str(class_bdx_center_x)+ ' '+ str(class_bdx_center_y)+ ' '+str(class_bdx_w)+ ' '+str(class_bdx_h)+'\n'
+						classfly_content = str(class_bdx_w)+ ' '+str(class_bdx_h)+'\n'
 						classfy_file.write(classfly_content)
 						lab_an_line = lab_file.readline()
 	classfy_file.close()
@@ -398,7 +398,7 @@ def main():
 		for file in wider_directory:
 			shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
 	# static and get classfyFile
-	if 0:
+	if 1:
 		draw_histogram_specfic_range_base_data()
 	if 1:
 		n_anchors = 7
