@@ -409,7 +409,7 @@ const vector<Blob<Dtype>*>& top) {
     top[0]->mutable_cpu_data()[0] += 
             headpose_loss_.cpu_data()[0] / normalizer;
     }
-    #if 1
+    #if 0
     LOG(INFO)<<" landmark_loss_: "<< landmark_weight_ * landmark_loss_.cpu_data()[0] / normalizer 
             <<" gender_loss_: "<<gender_loss_.cpu_data()[0] / normalizer
             <<" conf_glasses_loss_: "<<0.5*glasses_loss_.cpu_data()[0] / normalizer
