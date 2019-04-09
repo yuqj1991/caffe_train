@@ -16,16 +16,13 @@ layer {
 	    resize_param {
 		    prob: 1.0
 		    resize_mode: WARP
-		    height: 48
-		    width: 48
+		    height: 96
+		    width: 96
 		    interp_mode: LINEAR
 		    interp_mode: AREA
 		    interp_mode: NEAREST
 		    interp_mode: CUBIC
 		    interp_mode: LANCZOS4
-	    }
-	    emit_constraint {
-		    emit_type: CENTER
 	    }
 	    distort_param {
 		    brightness_prob: 0.5
@@ -40,22 +37,18 @@ layer {
 		    saturation_upper: 1.5
 		    random_order_prob: 0.0
 	    }
-	    expand_param {
-		    prob: 0.5
-		    max_expand_ratio: 4.0
-	    }
-  }
+    }
     data_param {
         source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_training_lmdb/"
-        batch_size: 64
+        batch_size: 32
         backend: LMDB
     }
 }
 layer {
-    name: "convpre_1"
+    name: "convpre_11"
     type: "Convolution"
     bottom: "data"
-    top: "convpre_1"
+    top: "convpre_11"
     param {
         lr_mult: 1
         decay_mult: 1
@@ -66,6 +59,154 @@ layer {
     }
     convolution_param {
         num_output: 32
+        kernel_size: 3
+        stride: 1
+        pad: 1
+        weight_filler {
+            type: "xavier"
+        }
+        bias_filler {
+            type: "constant"
+            value: 0
+        }
+    }
+}
+layer {
+	name: "convpre_11/bn"
+	type: "BatchNorm"
+	bottom: "convpre_11"
+	top: "convpre_11"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "convpre_11/scale"
+	type: "Scale"
+	bottom: "convpre_11"
+	top: "convpre_11"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "convpre_11/relu"
+	type: "PReLU"
+	bottom: "convpre_11"
+	top: "convpre_11"
+}
+layer {
+    name: "convpre_12"
+    type: "Convolution"
+    bottom: "convpre_11"
+    top: "convpre_12"
+    param {
+        lr_mult: 1
+        decay_mult: 1
+    }
+    param {
+        lr_mult: 2
+        decay_mult: 1
+    }
+    convolution_param {
+        num_output: 64
+        kernel_size: 3
+        stride: 2
+        pad: 1
+        weight_filler {
+            type: "xavier"
+        }
+        bias_filler {
+            type: "constant"
+            value: 0
+        }
+    }
+}
+layer {
+	name: "convpre_12/bn"
+	type: "BatchNorm"
+	bottom: "convpre_12"
+	top: "convpre_12"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "convpre_12/scale"
+	type: "Scale"
+	bottom: "convpre_12"
+	top: "convpre_12"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "convpre_12/relu"
+	type: "PReLU"
+	bottom: "convpre_12"
+	top: "convpre_12"
+}
+layer {
+    name: "convpre_1"
+    type: "Convolution"
+    bottom: "convpre_12"
+    top: "convpre_1"
+    param {
+        lr_mult: 1
+        decay_mult: 1
+    }
+    param {
+        lr_mult: 2
+        decay_mult: 1
+    }
+    convolution_param {
+        num_output: 64
         kernel_size: 3
         stride: 1
         pad: 1

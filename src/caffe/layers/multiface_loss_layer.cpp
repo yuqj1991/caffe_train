@@ -287,22 +287,19 @@ const vector<Blob<Dtype>*>& top) {
     landmark_temp.Reshape(landmark_shape);
     landmark_pred_.CopyFrom(landmark_temp);
     Dtype* landmark_gt_data = landmark_gt_.mutable_cpu_data();
-    int count =0;
     for(int ii = 0; ii< batch_size_; ii++)
     {
         LandmarkFace face = all_landmarks[ii];
-        landmark_gt_data[count*10] = face.x1() ;
-        landmark_gt_data[count*10+1] = face.x2() ;
-        landmark_gt_data[count*10+2] = face.x3() ;
-        landmark_gt_data[count*10+3] = face.x4() ;
-        landmark_gt_data[count*10+4] = face.x5() ;
-        landmark_gt_data[count*10+5] = face.y1() ;
-        landmark_gt_data[count*10+6] = face.y2() ;
-        landmark_gt_data[count*10+7] = face.y3() ;
-        landmark_gt_data[count*10+8] = face.y4() ;
-        landmark_gt_data[count*10+9] = face.y5() ;
-        
-        ++count;
+        landmark_gt_data[ii*10] = face.x1() ;
+        landmark_gt_data[ii*10+1] = face.x2() ;
+        landmark_gt_data[ii*10+2] = face.x3() ;
+        landmark_gt_data[ii*10+3] = face.x4() ;
+        landmark_gt_data[ii*10+4] = face.x5() ;
+        landmark_gt_data[ii*10+5] = face.y1() ;
+        landmark_gt_data[ii*10+6] = face.y2() ;
+        landmark_gt_data[ii*10+7] = face.y3() ;
+        landmark_gt_data[ii*10+8] = face.y4() ;
+        landmark_gt_data[ii*10+9] = face.y5() ;
     }
     landmark_loss_layer_->Reshape(landmark_bottom_vec_, landmark_top_vec_);
     landmark_loss_layer_->Forward(landmark_bottom_vec_, landmark_top_vec_);
@@ -413,11 +410,10 @@ const vector<Blob<Dtype>*>& top) {
             headpose_loss_.cpu_data()[0] / normalizer;
     }
     #if 0
-    LOG(INFO)<<"num_matches_: "<<num_matches_<<" num_gtBoxes: "<<num_gt_<<" num_conf_: "<<num_conf_;
-    LOG(INFO)<<" loc_loss_: "<< landmark_weight_ * loc_loss_.cpu_data()[0] / normalizer 
-            <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
-            <<" conf_blur_loss_: "<<0.5*conf_blur_loss_.cpu_data()[0] / normalizer
-            <<" conf_occlussion_loss_: " << 0.5*conf_occlussion_loss_.cpu_data()[0] / normalizer;
+    LOG(INFO)<<" landmark_loss_: "<< landmark_weight_ * landmark_loss_.cpu_data()[0] / normalizer 
+            <<" gender_loss_: "<<gender_loss_.cpu_data()[0] / normalizer
+            <<" conf_glasses_loss_: "<<0.5*glasses_loss_.cpu_data()[0] / normalizer
+            <<" conf_headpose_loss_: " << 0.5*headpose_loss_.cpu_data()[0] / normalizer;
     LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     #endif
 }
