@@ -31,11 +31,11 @@ void faceAnnoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
     const TransformationParameter& transform_param =
     this->layer_param_.transform_param();
     if (transform_param.has_resize_param()) {
-    if (transform_param.resize_param().resize_mode() ==
-        ResizeParameter_Resize_mode_FIT_SMALL_SIZE) {
-        CHECK_EQ(batch_size, 1)
-        << "Only support batch size of 1 for FIT_SMALL_SIZE.";
-    }
+        if (transform_param.resize_param().resize_mode() ==
+            ResizeParameter_Resize_mode_FIT_SMALL_SIZE) {
+            CHECK_EQ(batch_size, 1)
+            << "Only support batch size of 1 for FIT_SMALL_SIZE.";
+        }
     }
     // Read a data point, and use it to initialize the top blob.
     AnnoFaceDatum& anno_datum = *(reader_.full().peek());
@@ -70,8 +70,8 @@ void faceAnnoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
             // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
             // cpu_data and gpu_data for consistent prefetch thread. Thus we make
             // sure there is at least one bbox.
-            label_shape[2] = batch_size;
-            label_shape[3] = 14;
+            label_shape[2] = 1;
+            label_shape[3] = batch_size*14;
             } else {
             LOG(FATAL) << "Unknown annotation type.";
             }
@@ -121,23 +121,15 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         timer.Start();
         // get a anno_datum
         AnnoFaceDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
-        #if 0
-        int size_group = anno_datum.annotation_group_size();
+    #if 0
         LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
-        for(int ii=0; ii< size_group; ii++)
-        {
-            const AnnotationGroup& anno_group = anno_datum.annotation_group(ii);
-            int anno_size = anno_group.annotation_size();
-            for(int jj=0; jj<anno_size; jj++)
-            {
-                const Annotation& anno = anno_group.annotation(jj);
-                const NormalizedBBox& bbox = anno.bbox();
-                LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
-                        <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                        <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion();
-            }
-        }
-        LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";
+        LOG(INFO) <<" image->height: "<<anno_datum.datum().height()<<" image->width: "<<anno_datum.datum().width()
+                  <<" point_1: "<<anno_datum.annoface().markface().x1()<<" "<<anno_datum.annoface().markface().y1()
+                  <<" point_2: "<<anno_datum.annoface().markface().x2()<<" "<<anno_datum.annoface().markface().y2()
+                  <<" point_3: "<<anno_datum.annoface().markface().x3()<<" "<<anno_datum.annoface().markface().y3()
+                  <<" point_4: "<<anno_datum.annoface().markface().x4()<<" "<<anno_datum.annoface().markface().y4()
+                  <<" point_5: "<<anno_datum.annoface().markface().x5()<<" "<<anno_datum.annoface().markface().y5();
+        LOG(INFO)<<" END READ RAW ANNODATUM~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     #endif
         AnnoFaceDatum distort_datum;
         AnnoFaceDatum* expand_datum = NULL;
@@ -151,7 +143,7 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             } else {
                 expand_datum = &distort_datum;
             }
-            } else {
+        } else {
             if (transform_param.has_expand_param()) {
                 expand_datum = new AnnoFaceDatum();
                 this->data_transformer_->ExpandImage(anno_datum, expand_datum);
@@ -195,9 +187,6 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             } else {
                 this->data_transformer_->Transform(expand_datum->datum(),
                                                 &(this->transformed_data_));
-                // Otherwise, store the label from datum.
-                // CHECK(expand_datum->datum().has_label()) << "Cannot find any label.";
-                // top_label[item_id] = expand_datum->datum().label();
             }
         } else {
             this->data_transformer_->Transform(expand_datum->datum(),
@@ -218,8 +207,8 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             label_shape[0] = 1;
             label_shape[1] = 1;
             // Reshape the label and store the annotation.
-            label_shape[2] = batch_size;
-            label_shape[3] = 14;
+            label_shape[2] = 1;
+            label_shape[3] = batch_size*14;
             batch->label_.Reshape(label_shape);
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
@@ -239,27 +228,19 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.gender();
                 top_label[idx++] = face.glasses();
                 top_label[idx++] = face.headpose();
+                #if 0
+                    LOG(INFO)<<" point_1: "<<face.markface().x1()<<" "<<face.markface().y1()
+                        <<" point_2: "<<face.markface().x2()<<" "<<face.markface().y2()
+                        <<" point_3: "<<face.markface().x3()<<" "<<face.markface().y3()
+                        <<" point_4: "<<face.markface().x4()<<" "<<face.markface().y4()
+                        <<" point_5: "<<face.markface().x5()<<" "<<face.markface().y5();
+                    LOG(INFO)<<"~~~~~~~~~~~~~~~~~END READ RAW ANNODATUM~~~~~~~~~~~~~~~";
+                #endif
             }
         } else {
             LOG(FATAL) << "Unknown annotation type.";
         }
     }
-#if 0
-  LOG(INFO)<< "start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& single image: num_bboxes: "<<num_bboxes;
-  const Dtype* top_label_data = batch->label_.cpu_data();
-  for(int ii=0; ii < num_bboxes; ii++)
-  {
-    int id = ii*10;
-    LOG(INFO) <<"batch_id: "<<top_label_data[id]<<" anno_label: "<<top_label_data[id+1]
-              <<" anno.instance_id: "<<top_label_data[id+2];
-    LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
-              <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
-              <<" bbox->blur: "<<top_label_data[id+7]<<" bbox->occlusion: "<<top_label_data[id+8]
-              <<" bbox->difficult: "<<top_label_data[id+9];
-  }
-  LOG(INFO)<< "finished **************************************************** end ";
-#endif 
-
     timer.Stop();
     batch_timer.Stop();
     DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";
