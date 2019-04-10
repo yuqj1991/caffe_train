@@ -985,15 +985,15 @@ bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
       " bounding box exceeds image boundary.";
     // Store the normalized bounding box.
     LandmarkFace* landface = anno->mutable_markface();
-    anno->set_gender(gender);
-    anno->set_glasses(glass);
-    anno->set_headpose(headPose);
+    anno->set_gender(gender - 1);
+    anno->set_glasses(glass -1);
+    anno->set_headpose(headPose -1);
     x11 = float(x1/width);y11 = float(y1/height);
     x22 = float(x2/width);y22 = float(y2/height);
     x33 = float(x3/width);y33 = float(y3/height);
     x44 = float(x4/width);y44 = float(y4/height);
     x55 = float(x5/width);y55 = float(y5/height);
-    #if 0
+    #if 1
     LOG(INFO)<< x11 <<" "<< x22 <<" "<< x33 <<" "<< x44 <<" " << x55 <<" "<< y11 <<" "<< y22 <<" "
              << y33 <<" "<< y44 <<" "<< y55 <<" "<< gender <<" "<< glass <<" "<< headPose;
     #endif

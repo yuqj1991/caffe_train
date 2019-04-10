@@ -224,24 +224,7 @@ template <typename Dtype>
 void MultiFaceLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 const vector<Blob<Dtype>*>& top) {
     const Dtype* label_data = bottom[4]->cpu_data();
-    #if 0
-    LOG(INFO)<< "loss compute start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& num_gt_: "<<num_gt_;
-    for(int ii=0; ii < num_gt_; ii++)
-    {
-    int id = ii*10;
-    if (gt_data[id] == -1) {
-        continue;
-    }
-
-    LOG(INFO) <<"LABEL batch_id: "<<gt_data[id]<<" anno_label: "<<gt_data[id+1]
-                <<" anno.instance_id: "<<gt_data[id+2];
-    LOG(INFO)  <<"LABEL bbox->xmin: "<<gt_data[id+3]<<" bbox->ymin: "<<gt_data[id+4]
-                <<" bbox->xmax: "<<gt_data[id+5]<<" bbox->ymax: "<<gt_data[id+6]
-                <<" bbox->blur: "<<gt_data[id+7]<<" bbox->occlusion: "<<gt_data[id+8];
-    }
-    LOG(INFO)<< "loss compute finished **************************************************** end ";
-
-    #endif 
+ 
     /***************************************retrive all ground truth****************************************/
     // Retrieve all landmarks , gender, and glasses && headpose.
     map<int, LandmarkFace > all_landmarks;
@@ -249,36 +232,59 @@ const vector<Blob<Dtype>*>& top) {
     vector<int> all_glasses;
     vector<int> all_headpose; 
     all_landmarks.clear();
+    #if 0
+    LOG(INFO)<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    const Dtype* pre_point_data = bottom[0]->cpu_data();
+    for(int ii = 0; ii< batch_size_; ii++)
+    {
+        int idx = ii*10;
+        int idxg = ii*14;
+        LOG(INFO)<<"batch_index: "<<ii;
+        LOG(INFO)<<" pre layers: "<< pre_point_data[idx]<<" "<< pre_point_data[idx+1]<<" "
+                 << pre_point_data[idx+2]<<" "<< pre_point_data[idx+3]<<" "
+                 << pre_point_data[idx+4]<<" "<< pre_point_data[idx+5]<<" "
+                 << pre_point_data[idx+6]<<" "<< pre_point_data[idx+7]<<" "
+                 << pre_point_data[idx+8]<<" "<< pre_point_data[idx+9];
+        LOG(INFO)<<" groundtruth: "<<label_data[idxg]<<" "<<label_data[idxg+1]<<" "
+                 << label_data[idxg+2]<<" "<< label_data[idxg+3]<<" "
+                 << label_data[idxg+4]<<" "<< label_data[idxg+5]<<" "
+                 << label_data[idxg+6]<<" "<< label_data[idxg+7]<<" "
+                 << label_data[idxg+8]<<" "<< label_data[idxg+9]<<" "
+                 << label_data[idxg+10]<<" "<< label_data[idxg+11]<<" "
+                 << label_data[idxg+12]<<" "<< label_data[idxg+13];
+    }
+    #endif
     for(int item_id = 0; item_id < batch_size_; item_id++){
-        int idx = item_id*14;
-        int id = label_data[idx];
+        int idxg = item_id*14;
+        int id = label_data[idxg];
         if(id == -1)
         {
             LOG(WARNING)<<"the item_id from each image, should not be the -1!!!1";
             continue;
         }
         LandmarkFace facemark;
-        facemark.set_x1(label_data[idx+1]);
-        facemark.set_x2(label_data[idx+2]);
-        facemark.set_x3(label_data[idx+3]);
-        facemark.set_x4(label_data[idx+4]);
-        facemark.set_x5(label_data[idx+5]);
-        facemark.set_y1(label_data[idx+6]);
-        facemark.set_y2(label_data[idx+7]);
-        facemark.set_y3(label_data[idx+8]);
-        facemark.set_y4(label_data[idx+9]);
-        facemark.set_y5(label_data[idx+10]);
-        all_gender.push_back(label_data[idx+11]);
-        all_glasses.push_back(label_data[idx+12]);
-        all_headpose.push_back(label_data[idx+13]);
+        facemark.set_x1(label_data[idxg+1]);
+        facemark.set_x2(label_data[idxg+2]);
+        facemark.set_x3(label_data[idxg+3]);
+        facemark.set_x4(label_data[idxg+4]);
+        facemark.set_x5(label_data[idxg+5]);
+        facemark.set_y1(label_data[idxg+6]);
+        facemark.set_y2(label_data[idxg+7]);
+        facemark.set_y3(label_data[idxg+8]);
+        facemark.set_y4(label_data[idxg+9]);
+        facemark.set_y5(label_data[idxg+10]);
+        all_gender.push_back(label_data[idxg+11]);
+        all_glasses.push_back(label_data[idxg+12]);
+        all_headpose.push_back(label_data[idxg+13]);
         all_landmarks.insert(pair<int,LandmarkFace>(item_id, facemark));
     }
     CHECK_EQ(batch_size_, all_landmarks.size())<<"ground truth label size should match batch_size_";
     /***********************************************************************************/
     // Form data to pass on to landmark_loss_layer_.
+   
     vector<int> landmark_shape(2);
     landmark_shape[0] = 1;
-    landmark_shape[1] = batch_size_ * 10;
+    landmark_shape[1] =  batch_size_ *10;
     landmark_pred_.Reshape(landmark_shape);
     landmark_gt_.Reshape(landmark_shape);
     Blob<Dtype> landmark_temp;
@@ -301,8 +307,28 @@ const vector<Blob<Dtype>*>& top) {
         landmark_gt_data[ii*10+8] = face.y4() ;
         landmark_gt_data[ii*10+9] = face.y5() ;
     }
+    #if 1
+    const Dtype* landmark_pred_data = landmark_pred_.cpu_data();
+    for(int ii = 0; ii< 1; ii++)
+    {
+        LOG(INFO)<<"batch_index: "<<ii;
+        LOG(INFO)<<"  groundtruth: "<<landmark_gt_data[ii*10]<<" "<<landmark_gt_data[ii*10+1]<<" "
+                 << landmark_gt_data[ii*10+2]<<" "<< landmark_gt_data[ii*10+3]<<" "
+                 << landmark_gt_data[ii*10+4]<<" "<< landmark_gt_data[ii*10+5]<<" "
+                 << landmark_gt_data[ii*10+6]<<" "<< landmark_gt_data[ii*10+7]<<" "
+                 << landmark_gt_data[ii*10+8]<<" "<< landmark_gt_data[ii*10+9];
+        LOG(INFO)<<"  facepredata: "<<landmark_pred_data[ii*10]<<" "<<landmark_pred_data[ii*10+1]<<" "
+                 << landmark_pred_data[ii*10+2]<<" "<< landmark_pred_data[ii*10+3]<<" "
+                 << landmark_pred_data[ii*10+4]<<" "<< landmark_pred_data[ii*10+5]<<" "
+                 << landmark_pred_data[ii*10+6]<<" "<< landmark_pred_data[ii*10+7]<<" "
+                 << landmark_pred_data[ii*10+8]<<" "<< landmark_pred_data[ii*10+9];
+    }
+    #endif
     landmark_loss_layer_->Reshape(landmark_bottom_vec_, landmark_top_vec_);
     landmark_loss_layer_->Forward(landmark_bottom_vec_, landmark_top_vec_);
+    #if 1
+    LOG(INFO)<<"total origin facepoint_loss_: "<< landmark_loss_.cpu_data()[0];
+    #endif
 
     /********************************************************************************/
     // Form data to pass on to gender_loss_layer_.
@@ -330,8 +356,21 @@ const vector<Blob<Dtype>*>& top) {
     {
         gender_gt_data[ii] = all_gender[ii];
     }
+    #if 0
+    const Dtype* gender_pred_data = gender_pred_.cpu_data();
+    const Dtype* bottom_pred_data = bottom[1]->cpu_data();
+    for(int ii = 0; ii< 3; ii++)
+    {
+        LOG(INFO)<< "gender_gt_data: "<<gender_gt_data[ii];
+        LOG(INFO)<< "gender_pr_data: "<<gender_pred_data[ii*2]<<" "<<gender_pred_data[ii*2+1];
+        LOG(INFO)<< "bottom_01_data: "<<bottom_pred_data[ii*2]<<" "<<bottom_pred_data[ii*2+1];
+    }
+    #endif
     gender_loss_layer_->Reshape(gender_bottom_vec_, gender_top_vec_);
     gender_loss_layer_->Forward(gender_bottom_vec_, gender_top_vec_);
+    #if 1
+    LOG(INFO)<<"total origin gender_loss_: "<< gender_loss_.cpu_data()[0];
+    #endif
 
     /********************************************************************************/
     // Form data to pass on to glasses_loss_layer_.
@@ -358,8 +397,21 @@ const vector<Blob<Dtype>*>& top) {
     {
         glasses_gt_data[ii] = all_glasses[ii];
     }
+    #if 0
+    const Dtype* glasses_pred_data = glasses_pred_.cpu_data();
+    const Dtype* bottom2_pred_data = bottom[2]->cpu_data();
+    for(int ii = 0; ii< 3; ii++)
+    {
+        LOG(INFO)<< "glasses_gt_data: "<<glasses_gt_data[ii];
+        LOG(INFO)<< "glasses_pr_data: "<<glasses_pred_data[ii*2]<<" "<<glasses_pred_data[ii*2+1];
+        LOG(INFO)<< "bottom_02_data: "<<bottom2_pred_data[ii*2]<<" "<<bottom2_pred_data[ii*2+1];
+    }
+    #endif
     glasses_loss_layer_->Reshape(glasses_bottom_vec_, glasses_top_vec_);
     glasses_loss_layer_->Forward(glasses_bottom_vec_, glasses_top_vec_);
+    #if 1
+    LOG(INFO)<<"total origin glassess_loss_: "<< glasses_loss_.cpu_data()[0];
+    #endif
 
     /********************************************************************************/
     // Form data to pass on to headpose_loss_layer_.
@@ -386,9 +438,25 @@ const vector<Blob<Dtype>*>& top) {
     {
         headpose_gt_data[ii] = all_headpose[ii];
     }
+    #if 0
+    const Dtype* headpose_pred_data = headpose_pred_.cpu_data();
+    const Dtype* bottom3_pred_data = bottom[3]->cpu_data();
+    for(int ii = 0; ii< 3; ii++)
+    {
+        LOG(INFO)<< "headpose_gt_data: "<<headpose_gt_data[ii];
+        LOG(INFO)<< "headpose_pr_data: "<<headpose_pred_data[ii*5]<<" "<<headpose_pred_data[ii*5+1]
+                 <<" "<<headpose_pred_data[ii*5+2]<<" "<<headpose_pred_data[ii*5+3]
+                 <<" "<<headpose_pred_data[ii*5+4];
+        LOG(INFO)<< "bottom_03_data: "<<bottom3_pred_data[ii*5]<<" "<<bottom3_pred_data[ii*5+1]
+                 <<" "<<bottom3_pred_data[ii*5+2]<<" "<<bottom3_pred_data[ii*5+3]
+                 <<" "<<bottom3_pred_data[ii*5+4];
+    }
+    #endif
     headpose_loss_layer_->Reshape(headpose_bottom_vec_, headpose_top_vec_);
     headpose_loss_layer_->Forward(headpose_bottom_vec_, headpose_top_vec_);
-
+    #if 1
+    LOG(INFO)<<"total origin headpose_loss_: "<< headpose_loss_.cpu_data()[0];
+    #endif
     /**************************************sum loss value**************************************************/
     top[0]->mutable_cpu_data()[0] = 0;
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
@@ -409,12 +477,10 @@ const vector<Blob<Dtype>*>& top) {
     top[0]->mutable_cpu_data()[0] += 
             headpose_loss_.cpu_data()[0] / normalizer;
     }
-    #if 0
-    LOG(INFO)<<" landmark_loss_: "<< landmark_weight_ * landmark_loss_.cpu_data()[0] / normalizer 
-            <<" gender_loss_: "<<gender_loss_.cpu_data()[0] / normalizer
-            <<" conf_glasses_loss_: "<<0.5*glasses_loss_.cpu_data()[0] / normalizer
-            <<" conf_headpose_loss_: " << 0.5*headpose_loss_.cpu_data()[0] / normalizer;
-    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    #if 1
+    LOG(INFO)<<"total loss_layer loss value: "<<top[0]->cpu_data()[0]
+             <<" normalizer: "<<normalizer;
+    //LOG(FATAL)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     #endif
 }
 

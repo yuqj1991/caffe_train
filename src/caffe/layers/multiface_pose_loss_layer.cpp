@@ -231,8 +231,8 @@ const vector<Blob<Dtype>*>& top) {
         landmark_gt_data[count*42+18] = face.point_19().x() ;
         landmark_gt_data[count*42+19] = face.point_20().x() ;
         landmark_gt_data[count*42+20] = face.point_21().x() ;
-        landmark_gt_data[count*42+21] = face.point_1().y();
-        landmark_gt_data[count*42+22] = face.point_2().y();
+        landmark_gt_data[count*42+21] = face.point_1().y() ;
+        landmark_gt_data[count*42+22] = face.point_2().y() ;
         landmark_gt_data[count*42+23] = face.point_3().y() ;
         landmark_gt_data[count*42+24] = face.point_4().y() ;
         landmark_gt_data[count*42+25] = face.point_5().y() ;

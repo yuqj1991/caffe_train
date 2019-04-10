@@ -70,8 +70,8 @@ void faceAnnoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
             // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
             // cpu_data and gpu_data for consistent prefetch thread. Thus we make
             // sure there is at least one bbox.
-            label_shape[2] = 1;
-            label_shape[3] = batch_size*14;
+            label_shape[2] = batch_size;
+            label_shape[3] = 14;
             } else {
             LOG(FATAL) << "Unknown annotation type.";
             }
@@ -207,8 +207,8 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             label_shape[0] = 1;
             label_shape[1] = 1;
             // Reshape the label and store the annotation.
-            label_shape[2] = 1;
-            label_shape[3] = batch_size*14;
+            label_shape[2] = batch_size;
+            label_shape[3] = 14;
             batch->label_.Reshape(label_shape);
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
@@ -229,12 +229,14 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.glasses();
                 top_label[idx++] = face.headpose();
                 #if 0
-                    LOG(INFO)<<" point_1: "<<face.markface().x1()<<" "<<face.markface().y1()
-                        <<" point_2: "<<face.markface().x2()<<" "<<face.markface().y2()
-                        <<" point_3: "<<face.markface().x3()<<" "<<face.markface().y3()
-                        <<" point_4: "<<face.markface().x4()<<" "<<face.markface().y4()
-                        <<" point_5: "<<face.markface().x5()<<" "<<face.markface().y5();
-                    LOG(INFO)<<"~~~~~~~~~~~~~~~~~END READ RAW ANNODATUM~~~~~~~~~~~~~~~";
+                LOG(INFO)<<" label point: "<<top_label[item_id*14]<<" "<<top_label[item_id*14+1]
+                            <<" "<<top_label[item_id*14+2]
+                            <<" "<<top_label[item_id*14+3]<<" "<<top_label[item_id*14+4]
+                            <<" "<<top_label[item_id*14+5]<<" "<<top_label[item_id*14+6]
+                            <<" "<<top_label[item_id*14+7]<<" "<<top_label[item_id*14+8]
+                            <<" "<<top_label[item_id*14+9]<<" "<<top_label[item_id*14+10]
+                            <<" "<<top_label[item_id*14+11]<<" "<<top_label[item_id*14+12]
+                            <<" "<<top_label[item_id*14+13];
                 #endif
             }
         } else {
