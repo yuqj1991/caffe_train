@@ -21,7 +21,7 @@ root_dir = "../../dataset/facedata/"
 anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
 thread_hold = 30 ##map:70.35%, thread_hold=40; now i want to detector 30 pixels, just like 6-10m distance
-
+classfyFile = "../../dataset/facedata/wider_face/wider_face_classfy_distance_data.txt"
 
 class ConfigureHistogram(object):
 	def __init__(self):
@@ -236,11 +236,11 @@ def load_wider_split(split_file):
 				width = anno_bbox[2]
 				height = anno_bbox[3]
 				blur = anno_bbox[4]
-				intBlur = int(blur) - 1
+				intBlur = int(blur)
 				blur = str(intBlur)
 				invalid = anno_bbox[7]
 				occlusion = anno_bbox[8]
-				intOcclu_ = int(occlusion) - 1
+				intOcclu_ = int(occlusion)
 				occlusion = str(intOcclu_)
 				newline = x_min + ' '+y_min+ ' '+width+ ' '+height+ ' '+blur+ ' '+occlusion+' \n'
 				if int(invalid) == 1:
@@ -400,15 +400,6 @@ def main():
 	# static and get classfyFile
 	if 1:
 		draw_histogram_specfic_range_base_data()
-	if 1:
-		n_anchors = 7
-		loss_convergence = 1e-2
-		grid_size = 300
-		iterations_num = 10000
-		plus = 1
-		compute_centroids(classfyFile,n_anchors,loss_convergence,grid_size,iterations_num,plus)
-
-
 if __name__ == '__main__':
 	main()
 
