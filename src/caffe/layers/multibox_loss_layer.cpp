@@ -302,7 +302,10 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   } else {
     loc_loss_.mutable_cpu_data()[0] = 0;
   }
-
+  #if 1
+  LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+  LOG(INFO)<<"loc_loss_: "<< loc_loss_.cpu_data()[0];
+  #endif
   // Form data to pass on to conf_loss_layer_.
   if (do_neg_mining_) {
     num_conf_ = num_matches_ + num_negs;
@@ -340,7 +343,10 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                          conf_pred_data, conf_gt_data);
     conf_loss_layer_->Reshape(conf_bottom_vec_, conf_top_vec_);
     conf_loss_layer_->Forward(conf_bottom_vec_, conf_top_vec_);
-
+    #if 1
+    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    LOG(INFO)<<"conf_loss_: "<< conf_loss_.cpu_data()[0];
+    #endif
      // conf blur layer 
      // Reshape the blur confidence data.
     vector<int> conf_blur_shape;
@@ -372,7 +378,10 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                          conf_blur_pred_data, conf_blur_gt_data);
     conf_blur_loss_layer_->Reshape(conf_blur_bottom_vec_, conf_blur_top_vec_);
     conf_blur_loss_layer_->Forward(conf_blur_bottom_vec_, conf_blur_top_vec_);
-
+    #if 1
+    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    LOG(INFO)<<"conf_blur_loss_: "<< conf_blur_loss_.cpu_data()[0];
+    #endif
     // conf occlussion layer
     vector<int> conf_occlussion_shape;
     if (conf_occlussion_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
@@ -408,6 +417,11 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     conf_blur_loss_.mutable_cpu_data()[0] = 0;
     conf_occlussion_loss_.mutable_cpu_data()[0] = 0;
   }
+  #if 1
+    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    LOG(INFO)<<"conf_occlussion_loss_: "<< conf_occlussion_loss_.cpu_data()[0];
+    #endif
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   top[0]->mutable_cpu_data()[0] = 0;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_priors_, num_matches_);
