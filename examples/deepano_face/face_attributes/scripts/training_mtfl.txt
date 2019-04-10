@@ -1,2 +1,0 @@
-/home/stive/workspace/dataset/facedata/mtfl/Annotation_img/Odilia_Collazo_0001.jpg /home/stive/workspace/dataset/facedata/mtfl/label/Odilia_Collazo_0001
-/home/stive/workspace/dataset/facedata/mtfl/Annotation_img/Stephane_Rousseau_0001.jpg /home/stive/workspace/dataset/facedata/mtfl/label/Stephane_Rousseau_0001
