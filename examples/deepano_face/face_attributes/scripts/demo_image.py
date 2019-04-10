@@ -33,7 +33,7 @@ headpose_content = ('left profile', 'left', 'frontal', 'right', 'right profile')
 
 
 def preprocess(src):
-    img = cv2.resize(src, (48,48))
+    img = cv2.resize(src, (96,96))
     img = img - 127.5
     img = img * 0.007843
     return img
@@ -61,13 +61,14 @@ def detect(imgfile):
     net.blobs['data'].data[...] = img
     out = net.forward()
     box, gender, glasses, headpose = postprocess(origimg, out)
-
+    title =''
     for i in range(5):
        p1 = (box[i], box[i+5])
-       cv2.circle(origimg, p1, 15,(0,0,213),-1)
+       cv2.circle(origimg, p1, 5,(0,0,213),-1)
        
        title = "%s, %s, %s" % (gender, glasses, headpose)
        cv2.putText(origimg, title, (30,30), cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
+    print(title)
     cv2.imshow("facedetector", origimg)
  
     k = cv2.waitKey(0) & 0xff

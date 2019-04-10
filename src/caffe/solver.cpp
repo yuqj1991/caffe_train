@@ -241,7 +241,7 @@ void Solver<Dtype>::Step(int iters) {
     UpdateSmoothedLoss(loss, start_iter, average_loss);
     if (display) {
       LOG_IF(INFO, Caffe::root_solver()) << "Iteration " << iter_
-          << ", loss = " << smoothed_loss_<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&";
+          << ", loss = " << smoothed_loss_;
       const vector<Blob<Dtype>*>& result = net_->output_blobs();
       int score_index = 0;
       for (int j = 0; j < result.size(); ++j) {
@@ -673,8 +673,8 @@ void Solver<Dtype>::UpdateSmoothedLoss(Dtype loss, int start_iter,
   } else {
     int idx = (iter_ - start_iter) % average_loss;
     smoothed_loss_ += (loss - losses_[idx]) / average_loss;
-    #if 1
-    LOG(INFO)<<"@@@@@@@@@@@@@@@loss: "<<loss<<" previse losses_["<<idx<<"]: "<<losses_[idx]<<" smoothed_loss_: "<<smoothed_loss_;
+    #if 0
+      LOG(INFO)<<"@@@@@@@@@@@@@@@loss: "<<loss<<" previse losses_["<<idx<<"]: "<<losses_[idx]<<" smoothed_loss_: "<<smoothed_loss_;
     #endif
     losses_[idx] = loss;
   }

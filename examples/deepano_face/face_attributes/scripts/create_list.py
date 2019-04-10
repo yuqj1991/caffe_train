@@ -2,7 +2,7 @@ import shutil
 import sys
 import os
 import random
-wider_directory = ['training', 'testing']
+wider_directory = ['training','testing']
 root_dir ='../../../../../face_train/examples/deepano_face/face_attributes/scripts/'
 root_dataset = '../../../../../dataset/facedata/mtfl/label/'
 def shuffle_file(filename):
@@ -27,8 +27,6 @@ def generate_list(imageSetDir):
 				imgname =imgline.split('/')[-1].strip()
 				xmlline_ = root_dataset+imgname.split('.')[0]
 				xmlline = os.path.abspath(xmlline_) + '\n'
-				#print (os.path.abspath(xmlline_))
-				#print(xmlline)
 				newline = imgline.strip()+' '+xmlline
 				#print(newline)
 				#break
