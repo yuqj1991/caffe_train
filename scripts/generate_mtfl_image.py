@@ -70,7 +70,7 @@ def convert_src_anno_label(split_file):
 			source_img = cv2.imread(img_file)
 			assert source_img.shape[2]==3
 			fullImg = os.path.abspath(img_file) + '\n'
-			mainSetFile.writelines(fullImg)
+			
 			labelFile = open(LABEL_DIR+'/'+fullImg.split("/")[-1].split(".")[0], "w")
 			if 1:
 			    print("##################################")
@@ -90,10 +90,9 @@ def convert_src_anno_label(split_file):
 			y5 = img_file_info[11]
 			x =[x1, x2, x3, x4, x5];
 			y =[y1, y2, y3, y4, y5];
-			for ii in range(5):
-				cv2.circle(source_img, (int(float(x[ii])), int(float(y[ii]))), 2, (0, 0, 225), 1)
-			
+						
 			cv2.imwrite(Annotation_img_dir+"/"+str(img_file.split("/")[-1]), source_img)
+			mainSetFile.writelines(os.path.abspath(Annotation_img_dir+"/"+str(img_file.split("/")[-1]))+'\n')
 			
 			gender = img_file_info[12]
 			glass = img_file_info[14]

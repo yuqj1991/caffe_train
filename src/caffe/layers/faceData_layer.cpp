@@ -166,7 +166,7 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                              <<shape[1]<<" "<<shape[2]<<" "
                              <<shape[3]<<"; top_shape: "<<top_shape[0]<<" "
                              <<top_shape[1]<<" "<<top_shape[2]<<" "
-                             <<top_shape[3];
+                             <<top_shape[3]<<" item_id: "<<item_id;
             }
         } else {
         CHECK(std::equal(top_shape.begin() + 1, top_shape.begin() + 4,

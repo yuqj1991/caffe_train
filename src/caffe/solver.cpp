@@ -544,11 +544,11 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
     mAP /= num_pos.size();
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
-    LOG(INFO) << "&&&&Test net output #" << i << ": map of " << output_name << " = "
+    LOG(INFO) << "Test net output #" << i << ": map of " << output_name << " = "
               << mAP;
   }
 }
-#if 1
+
 template <typename Dtype>
 void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
   CHECK(Caffe::root_solver());
@@ -573,14 +573,19 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
       break;
     }
     Dtype iter_loss;
+    Dtype nme =0.0, gender_precision =0.0, glasses_presion=0.0, headpose_presicon=0.0;
     const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
     for (int j = 0; j < result.size(); ++j) {
       const Dtype* result_vec = result[j]->cpu_data();
-      LOG(INFO)<< "NME: "<< result_vec[0]
-               <<" gender precision: "<<result_vec[1]
-               <<" glasses precision: "<<result_vec[2]
-               <<" headpose precision: "<<result_vec[3];
+      nme +=result_vec[0];
+      gender_precision +=result_vec[1];
+      glasses_presion +=result_vec[2];
+      headpose_presicon +=result_vec[3];
     }
+    LOG(INFO)<< "NME: "<< nme/result.size()
+             <<" gender precision: "<<gender_precision/result.size()
+             <<" glasses precision: "<<glasses_presion/result.size()
+             <<" headpose precision: "<<headpose_presicon/result.size();
     
   }
   if (requested_early_exit_) {
@@ -588,8 +593,6 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
     return;
   }
 }
-
-#endif
 
 template <typename Dtype>
 void Solver<Dtype>::Snapshot() {
@@ -674,7 +677,7 @@ void Solver<Dtype>::UpdateSmoothedLoss(Dtype loss, int start_iter,
     int idx = (iter_ - start_iter) % average_loss;
     smoothed_loss_ += (loss - losses_[idx]) / average_loss;
     #if 0
-      LOG(INFO)<<"@@@@@@@@@@@@@@@loss: "<<loss<<" previse losses_["<<idx<<"]: "<<losses_[idx]<<" smoothed_loss_: "<<smoothed_loss_;
+      LOG(INFO)<<"loss: "<<loss<<" previse losses_["<<idx<<"]: "<<losses_[idx]<<" smoothed_loss_: "<<smoothed_loss_;
     #endif
     losses_[idx] = loss;
   }
