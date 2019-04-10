@@ -307,7 +307,7 @@ const vector<Blob<Dtype>*>& top) {
         landmark_gt_data[ii*10+8] = face.y4() ;
         landmark_gt_data[ii*10+9] = face.y5() ;
     }
-    #if 1
+    #if 0
     const Dtype* landmark_pred_data = landmark_pred_.cpu_data();
     for(int ii = 0; ii< 1; ii++)
     {
@@ -327,6 +327,7 @@ const vector<Blob<Dtype>*>& top) {
     landmark_loss_layer_->Reshape(landmark_bottom_vec_, landmark_top_vec_);
     landmark_loss_layer_->Forward(landmark_bottom_vec_, landmark_top_vec_);
     #if 1
+    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     LOG(INFO)<<"total origin facepoint_loss_: "<< landmark_loss_.cpu_data()[0];
     #endif
 
