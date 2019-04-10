@@ -557,6 +557,8 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
   CHECK_NOTNULL(test_nets_[test_net_id].get())->
       ShareTrainedLayersWith(net_.get());
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
+  Dtype nme =0.0, gender_precision =0.0, glasses_presion=0.0, headpose_presicon=0.0;
+  int iter_size = 0.0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
     SolverAction::Enum request = GetRequestedAction();
     // Check to see if stoppage of testing/training has been requested.
@@ -573,21 +575,20 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
       break;
     }
     Dtype iter_loss;
-    Dtype nme =0.0, gender_precision =0.0, glasses_presion=0.0, headpose_presicon=0.0;
     const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
+    iter_size = result.size();
     for (int j = 0; j < result.size(); ++j) {
       const Dtype* result_vec = result[j]->cpu_data();
       nme +=result_vec[0];
       gender_precision +=result_vec[1];
       glasses_presion +=result_vec[2];
       headpose_presicon +=result_vec[3];
-    }
-    LOG(INFO)<< "NME: "<< nme/result.size()
-             <<" gender precision: "<<gender_precision/result.size()
-             <<" glasses precision: "<<glasses_presion/result.size()
-             <<" headpose precision: "<<headpose_presicon/result.size();
-    
+    }    
   }
+  LOG(INFO)<< "NME: "<< nme/(param_.test_iter(test_net_id)*iter_size)
+             <<" gender precision: "<<gender_precision/(param_.test_iter(test_net_id)*iter_size)
+             <<" glasses precision: "<<glasses_presion/(param_.test_iter(test_net_id)*iter_size)
+             <<" headpose precision: "<<headpose_presicon/(param_.test_iter(test_net_id)*iter_size);
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";
     return;
