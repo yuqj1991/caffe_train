@@ -344,7 +344,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     conf_loss_layer_->Reshape(conf_bottom_vec_, conf_top_vec_);
     conf_loss_layer_->Forward(conf_bottom_vec_, conf_top_vec_);
     #if 1
-    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     LOG(INFO)<<"conf_loss_: "<< conf_loss_.cpu_data()[0];
     #endif
      // conf blur layer 
@@ -379,7 +378,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     conf_blur_loss_layer_->Reshape(conf_blur_bottom_vec_, conf_blur_top_vec_);
     conf_blur_loss_layer_->Forward(conf_blur_bottom_vec_, conf_blur_top_vec_);
     #if 1
-    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     LOG(INFO)<<"conf_blur_loss_: "<< conf_blur_loss_.cpu_data()[0];
     #endif
     // conf occlussion layer
@@ -418,7 +416,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     conf_occlussion_loss_.mutable_cpu_data()[0] = 0;
   }
   #if 1
-    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     LOG(INFO)<<"conf_occlussion_loss_: "<< conf_occlussion_loss_.cpu_data()[0];
     #endif
   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
