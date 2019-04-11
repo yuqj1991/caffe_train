@@ -40,7 +40,7 @@ layer {
     }
     data_param {
         source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_training_lmdb/"
-        batch_size: 32
+        batch_size: 64
         backend: LMDB
     }
 }
@@ -993,8 +993,8 @@ layer {
 		normalization: VALID
 	}
   multiface_loss_param{
-    mark_loss_type : L2
-    mark_weight: 1.0
+    mark_loss_type : SMOOTH_L1
+    mark_weight: 0.5
     num_gender: 2
     num_glasses: 2
     num_headpose: 5

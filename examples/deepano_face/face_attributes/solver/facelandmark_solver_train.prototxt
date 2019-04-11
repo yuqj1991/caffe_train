@@ -8,7 +8,7 @@ max_iter: 500000
 lr_policy: "multistep"
 gamma: 0.8
 weight_decay: 0.004
-momentum: 0.9
+#momentum: 0.9
 snapshot: 20000
 snapshot_prefix: "../snapshot/deepanoFacelandmark"
 solver_mode: GPU
@@ -17,3 +17,5 @@ stepvalue: 30000
 stepvalue: 100000
 stepvalue: 200000
 eval_type: "detectionface"
+momentum2 : 0.99
+type: "Adam"
