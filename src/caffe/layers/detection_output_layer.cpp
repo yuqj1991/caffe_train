@@ -366,7 +366,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
         top_data[count * 9 + 6] = bbox.ymax();
         int blur_index = 0; int occlu_index = 0;
         float blur_temp =0; float occlu_temp =0.0;
-        for (int ii = 1; ii< 4; ii++ )
+        for (int ii = 0; ii< 3; ii++ )
         {
           if (blur_temp <  blur_scores.find(ii)->second[idx])
           {
