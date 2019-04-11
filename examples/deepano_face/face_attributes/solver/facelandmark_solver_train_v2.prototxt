@@ -8,7 +8,7 @@ max_iter: 600000
 lr_policy: "multistep"
 gamma: 0.8
 weight_decay: 0.004
-momentum: 0.9
+#momentum: 0.9
 snapshot: 20000
 snapshot_prefix: "../snapshot/deepanoFacelandmark_v2"
 solver_mode: GPU
@@ -16,3 +16,5 @@ snapshot_after_train: true
 stepvalue: 100000
 stepvalue: 300000
 eval_type: "detectionface"
+type: "RMSProp"
+momentum2: 0.99
