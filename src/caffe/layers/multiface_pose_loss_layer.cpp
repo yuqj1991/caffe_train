@@ -328,13 +328,14 @@ const vector<Blob<Dtype>*>& bottom) {
             normalization_, batch_size_, 1, -1);
         Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
         caffe_scal(landmark_pred_.count(), loss_weight, landmark_pred_.mutable_cpu_diff());
+        bottom[0]->ShareDiff(landmark_pred_);
         // Copy gradient back to bottom[0].
-        const Dtype* landmark_pred_diff = landmark_pred_.cpu_diff();
+        /*const Dtype* landmark_pred_diff = landmark_pred_.cpu_diff();
         for (int ii = 0; ii < batch_size_; ++ii) {
             caffe_copy<Dtype>(42, landmark_pred_diff + ii * 42,
                                 mark_bottom_diff + ii*42);
             mark_bottom_diff += bottom[0]->offset(1);
-        }
+        }*/
     }
 
     /*************************************************************************************/
@@ -353,13 +354,14 @@ const vector<Blob<Dtype>*>& bottom) {
             normalization_, batch_size_, 1, -1);
         Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
         caffe_scal(pose_pred_.count(), loss_weight, pose_pred_.mutable_cpu_diff());
+        bottom[1]->ShareDiff(pose_pred_);
         // Copy gradient back to bottom[0].
-        const Dtype* pose_pred_diff = pose_pred_.cpu_diff();
+        /*const Dtype* pose_pred_diff = pose_pred_.cpu_diff();
         for (int ii = 0; ii < batch_size_; ++ii) {
             caffe_copy<Dtype>(3, pose_pred_diff + ii * 3,
                                 mark_bottom_diff + ii*3);
             mark_bottom_diff += bottom[1]->offset(1);
-        }
+        }*/
     }
 }
 
