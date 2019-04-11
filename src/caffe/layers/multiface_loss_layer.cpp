@@ -309,7 +309,7 @@ const vector<Blob<Dtype>*>& top) {
     }
     #if 0
     const Dtype* landmark_pred_data = landmark_pred_.cpu_data();
-    for(int ii = 0; ii< 1; ii++)
+    for(int ii = 0; ii< 3; ii++)
     {
         LOG(INFO)<<"batch_index: "<<ii;
         LOG(INFO)<<"  groundtruth: "<<landmark_gt_data[ii*10]<<" "<<landmark_gt_data[ii*10+1]<<" "
@@ -510,13 +510,14 @@ const vector<Blob<Dtype>*>& bottom) {
             normalization_, batch_size_, 1, -1);
         Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
         caffe_scal(landmark_pred_.count(), loss_weight, landmark_pred_.mutable_cpu_diff());
+        bottom[0]->ShareDiff(landmark_pred_);
         // Copy gradient back to bottom[0].
-        const Dtype* landmark_pred_diff = landmark_pred_.cpu_diff();
+        /*const Dtype* landmark_pred_diff = landmark_pred_.cpu_diff();
         for (int ii = 0; ii < batch_size_; ++ii) {
             caffe_copy<Dtype>(10, landmark_pred_diff + ii * 10,
                                 mark_bottom_diff + ii*10);
             mark_bottom_diff += bottom[0]->offset(1);
-        }
+        }*/
     }
 
     /*************************************************************************************/
