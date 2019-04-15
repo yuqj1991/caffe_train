@@ -161,9 +161,9 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
       const Dtype* cur_conf_data =
         conf_cpu_data + conf_idx + label * num_priors_;
       const Dtype* cur_blur_data =
-        blur_cpu_data + blur_idx + label * num_priors_;
+        blur_cpu_data + blur_idx;
        const Dtype* cur_occlu_data =
-        occlu_cpu_data + occlu_idx + label * num_priors_;
+        occlu_cpu_data + occlu_idx;
       const Dtype* cur_bbox_data = bbox_cpu_data + bbox_idx;
       if (!share_location_) {
         cur_bbox_data += label * num_priors_ * 4;
@@ -176,8 +176,23 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
         for (int k = 0; k < 4; ++k) {
           top_data[count * 9 + 3 + k] = cur_bbox_data[idx * 4 + k];
         }
-        top_data[count * 9 + 7] = cur_blur_data[idx];
-        top_data[count * 9 + 8] = cur_occlu_data[idx];
+        int blur_index = 0; int occlu_index = 0;
+        float blur_temp =0; float occlu_temp =0.0;
+        for (int ii = 0; ii< 3; ii++ )
+        {
+          if (blur_temp <  cur_blur_data[ii])
+          {
+            blur_index = ii;
+            blur_temp = cur_blur_data[ii];
+          }
+          if (occlu_temp <  cur_occlu_data[ii])
+          {
+            occlu_index = ii;
+            occlu_temp = cur_occlu_data[ii];
+          }
+        }
+        top_data[count * 9 + 7] = blur_index;
+        top_data[count * 9 + 8] = occlu_index;
         if (need_save_) {
           // Generate output bbox.
           NormalizedBBox bbox;

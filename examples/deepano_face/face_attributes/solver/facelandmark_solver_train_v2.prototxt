@@ -4,7 +4,7 @@ test_iter: 1000
 test_interval: 10000
 base_lr: 0.00001
 display: 1000
-max_iter: 600000
+max_iter: 800000
 lr_policy: "multistep"
 gamma: 0.8
 weight_decay: 0.004
@@ -15,6 +15,8 @@ solver_mode: GPU
 snapshot_after_train: true
 stepvalue: 100000
 stepvalue: 300000
+stepvalue: 400000
+stepvalue: 600000
 eval_type: "detectionface"
 type: "RMSProp"
 momentum2: 0.99

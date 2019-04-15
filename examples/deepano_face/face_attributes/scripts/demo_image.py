@@ -15,7 +15,7 @@ parser1 = make_parser()
 args = parser1.parse_args()
 net_file= args.model
 caffe_model= args.weights
-test_dir = "../images"
+test_dir = "/home/stive/workspace/dataset/facedata/mtfl/JPEGImages/AFLW"
 
 if not os.path.exists(caffe_model):
     print(caffe_model + " does not exist")
