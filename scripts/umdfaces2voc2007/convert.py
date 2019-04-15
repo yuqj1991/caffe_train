@@ -5,19 +5,25 @@ import os
 
 SOURCE_IMG_FILE_FOLDER = '../../../dataset/facedata/umdface/JPEGImages/' 
 LABEL_FILE_FOLDER = '../../../dataset/facedata/umdface/labels/'
-CSV_FILE_NAME = 'roi.csv'
+ImageSetFileForder = '../../../dataset/facedata/umdface/ImageSet/Main/'
+trainFileName = ['umdfaces_batch1_ultraface.csv', 'umdfaces_batch2_ultraface.csv']
+testFileName = ['umdfaces_batch3_ultraface.csv']
+trainSet = [common.ORI_BATCH1, common.ORI_BATCH2]
+testSet = [ common.ORI_BATCH3]
 
-def batch_work():
-    ori = ((common.ORI_BATCH1, common.PROCESSED_BATCH1), (common.ORI_BATCH2, common.PROCESSED_BATCH2), (common.ORI_BATCH3, common.PROCESSED_BATCH3))
-    for pairs in ori:
-        df = common.read_from_file(pairs[0]+CSV_FILE_NAME)
+def batch_work(ori, csvFile, setFile):
+    setfile_ = open(setFile, 'w')
+    for ii in range(len(ori)):
+        df = common.read_from_file(SOURCE_IMG_FILE_FOLDER+ori[ii]+csvFile[ii])
         for row in df.iterrows():
             #Extract Important Imformation
             file_name = row[1]['FILE']
             img_file_name_no_jpg = file_name.split('/')[1].split('.jpg')[0]
             label_full_anno_file_name = LABEL_FILE_FOLDER + img_file_name_no_jpg + '.txt'
             label_angle_anno_file_name = LABEL_FILE_FOLDER + img_file_name_no_jpg + '_angle.txt'
-            full_path_image_name = SOURCE_IMG_FILE_FOLDER + pairs[0] + file_name
+            full_path_image_name = SOURCE_IMG_FILE_FOLDER + ori[ii] + file_name
+            fullImg = os.path.abspath(full_path_image_name) + '\n'
+            setfile_.writelines(fullImg)
             print('label file: %s, and full_path_img : %s'%(label_full_anno_file_name, full_path_image_name))
             label_file_ = open(label_full_anno_file_name, 'w')
             label_file_angle = open(label_angle_anno_file_name, 'w')
@@ -71,21 +77,20 @@ def batch_work():
             yaw = row[1]['YAW']
             pitch = row[1]['PITCH']
             roll = row[1]['ROLL']
-            content = ponit_x1 + ' ' + ponit_x2 + ' ' + ponit_x3 + ' ' + ponit_x4 + ' ' + ponit_x5 + ' ' + ponit_x6 + ' ' + ponit_x7 + ' ' 
-                        + ponit_x8 + ' ' + ponit_x9 + ' ' + ponit_x10 + ' ' + ponit_x11 + ' ' + ponit_x12 + ' ' + ponit_x13 + ' ' + ponit_x14 + ' '
-                        + ponit_x15 + ' ' + ponit_x16 + ' ' + ponit_x17 + ' ' + ponit_x18 + ' ' + ponit_x19 + ' ' + ponit_x20 + ' ' + ponit_x21 + ' '
-                        + ponit_y1 + ' ' + ponit_y2 + ' ' + ponit_y3 + ' ' + ponit_y4 + ' ' + ponit_y5 + ' ' + ponit_y6 + ' ' + ponit_y7 + ' ' 
-                        + ponit_y8 + ' ' + ponit_y9 + ' ' + ponit_y10 + ' ' + ponit_y11 + ' ' + ponit_y12 + ' ' + ponit_y13 + ' ' + ponit_y14 + ' ' 
-                        + ponit_y15 + ' ' + ponit_y16 + ' ' + ponit_y17 + ' '+ ponit_y18 + ' ' + ponit_y19 + ' ' + ponit_y20 + ' ' + ponit_y21 + ' '
-                        + yaw + ' ' + pitch + ' ' + roll + '\n'
+            content = str(ponit_x1) + ' ' + str(ponit_x2) + ' ' + str(ponit_x3) + ' ' + str(ponit_x4) + ' ' + str(ponit_x5) + ' ' + str(ponit_x6) + ' ' + str(ponit_x7) + ' ' + str(ponit_x8) + ' ' + str(ponit_x9) + ' ' + str(ponit_x10) + ' ' + str(ponit_x11) + ' ' + str(ponit_x12) + ' ' + str(ponit_x13) + ' ' + str(ponit_x14) + ' '+ str(ponit_x15) + ' ' + str(ponit_x16) + ' ' + str(ponit_x17) + ' ' + str(ponit_x18) + ' ' + str(ponit_x19) + ' ' + str(ponit_x20) + ' ' + str(ponit_x21) + ' '+ str(ponit_y1) + ' ' + str(ponit_y2) + ' ' + str(ponit_y3) + ' ' + str(ponit_y4) + ' ' + str(ponit_y5) + ' ' + str(ponit_y6) + ' ' + str(ponit_y7) + ' ' + str(ponit_y8) + ' ' + str(ponit_y9) + ' ' + str(ponit_y10) + ' ' + str(ponit_y11) + ' ' + str(ponit_y12) + ' ' + str(ponit_y13) + ' ' + str(ponit_y14) + ' ' + str(ponit_y15) + ' ' + str(ponit_y16) + ' ' + str(ponit_y17) + ' '+ str(ponit_y18) + ' ' + str(ponit_y19) + ' ' + str(ponit_y20) + ' ' + str(ponit_y21) + ' '+ str(yaw) + ' ' + str(pitch) + ' ' + str(roll) + '\n'
             label_file_.write(content)
-            label_file_angle.write(yaw + ' ' + pitch + ' ' + roll + '\n')
+            label_file_angle.write(str(yaw) + ' ' + str(pitch) + ' ' + str(roll) + '\n')
             label_file_angle.close()
             label_file_.close()
+    setfile_.close()
+   
 
 if __name__ == '__main__':
     LOG = common.init_my_logger()
     start_time = datetime.datetime.now()
-    batch_work()
+    trainset = ImageSetFileForder + 'train.txt'
+    testset = ImageSetFileForder + 'test.txt'
+    batch_work(trainSet, trainFileName, trainset)
+    batch_work(testSet, testFileName, testset)
     end_time = datetime.datetime.now()
     LOG.info('Cost %d Seconds!'%((end_time-start_time).seconds))
