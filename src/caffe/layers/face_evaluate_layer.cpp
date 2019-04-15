@@ -80,8 +80,9 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
       int gender_index=0; 
       int glasses_index=0; 
       int headpose_index=0;
+      float gender_temp=0.0, glasses_temp=0.0 ;
+      float headpose_temp=0.0;
       for(int jj=0; jj<2; jj++){
-        float gender_temp=0.0, glasses_temp=0.0 ;
         if(gender_temp<all_face_prediction_attributes[ii][jj]){
           gender_index = jj;
           gender_temp = all_face_prediction_attributes[ii][jj];
@@ -92,7 +93,6 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
         }
       }
       for(int jj=0; jj<5; jj++){
-        float headpose_temp=0.0;
         if(headpose_temp<all_face_prediction_attributes[ii][jj+4]){
           headpose_index = jj;
           headpose_temp = all_face_prediction_attributes[ii][jj+4];
