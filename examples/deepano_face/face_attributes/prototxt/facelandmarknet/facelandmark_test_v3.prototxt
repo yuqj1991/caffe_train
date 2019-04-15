@@ -397,11 +397,98 @@ layer {
 	bottom: "convpre_3"
 	top: "convpre_3"
 }
+
+layer {
+  name: "convpre_3_1"
+  type: "Convolution"
+  bottom: "convpre_1"
+  top: "convpre_3_1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    stride: 2
+    pad: 1
+     weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "convpre_3_1/bn"
+	type: "BatchNorm"
+	bottom: "convpre_3_1"
+	top: "convpre_3_1"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "convpre_3_1/scale"
+	type: "Scale"
+	bottom: "convpre_3_1"
+	top: "convpre_3_1"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "convpre_3_1/relu"
+	type: "ReLU"
+	bottom: "convpre_3_1"
+	top: "convpre_3_1"
+}
+
+layer{
+    name: "convpre_3_1/eltwise"
+	type: "Eltwise"
+	bottom: "convpre_3_1"
+	bottom: "convpre_3"
+	top: "convpre_3_1/eltwise"
+	eltwise_param {
+	    operation: SUM
+	}
+}
+
 ###
 layer {
   name: "convpre_4"
   type: "Convolution"
-  bottom: "convpre_3"
+  bottom: "convpre_3_1/eltwise"
   top: "convpre_4"
   param {
     lr_mult: 1
@@ -625,11 +712,97 @@ layer {
 	top: "conv_5"
 }
 
+layer {
+  name: "convpre_eltesize_1"
+  type: "Convolution"
+  bottom: "convpre_3_1/eltwise"
+  top: "convpre_eltesize_1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 3
+    stride: 2
+    pad: 1
+     weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "convpre_eltesize_1/bn"
+	type: "BatchNorm"
+	bottom: "convpre_eltesize_1"
+	top: "convpre_eltesize_1"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "convpre_eltesize_1/scale"
+	type: "Scale"
+	bottom: "convpre_eltesize_1"
+	top: "convpre_eltesize_1"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "convpre_eltesize_1/relu"
+	type: "ReLU"
+	bottom: "convpre_eltesize_1"
+	top: "convpre_eltesize_1"
+}
+
+layer{
+    name: "convpre_eltesize_1/eltwise"
+	type: "Eltwise"
+	bottom: "convpre_eltesize_1"
+	bottom: "conv_5"
+	top: "conv_5_eltsize"
+	eltwise_param {
+	    operation: SUM
+	}
+}
+
 ####
 layer {
   name: "conv_5_1"
   type: "Convolution"
-  bottom: "conv_5"
+  bottom: "conv_5_eltsize"
   top: "conv_5_1"
   param {
     lr_mult: 1

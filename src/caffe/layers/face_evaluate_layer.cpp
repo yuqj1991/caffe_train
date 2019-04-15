@@ -98,11 +98,11 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
           headpose_temp = all_face_prediction_attributes[ii][jj+4];
         }
       }
-      if(all_gt_face_attributes[ii][0]==(gender_index+1))
+      if(all_gt_face_attributes[ii][0]==gender_index)
         correct_precisive_gender++;
-      if(all_gt_face_attributes[ii][1]==(glasses_index+1))
+      if(all_gt_face_attributes[ii][1]==glasses_index)
         correct_precisive_glasses++;
-      if(all_gt_face_attributes[ii][2]==(headpose_index+1))
+      if(all_gt_face_attributes[ii][2]==headpose_index)
         correct_precisive_headpose++;
     }
     top_data[0]=float(distance_loss/batch_size);
