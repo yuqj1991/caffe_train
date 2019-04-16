@@ -754,9 +754,9 @@ bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
     // Store the normalized bounding box.
     AnnoFaceContourPoints* landface = anno->mutable_facecour();
     AnnoFacePoseOritation* faceOri = anno->mutable_faceoritation();
-    faceOri->set_yaw(yaw);
-    faceOri->set_pitch(pitch);
-    faceOri->set_roll(roll);
+    faceOri->set_yaw(float(yaw/360));
+    faceOri->set_pitch(float(pitch/360));
+    faceOri->set_roll(float(roll/360));
     landface->mutable_point_1()->set_x(float(x1/width));
     landface->mutable_point_1()->set_y(float(y1/height));
     landface->mutable_point_2()->set_x(float(x2/width));
@@ -922,9 +922,9 @@ bool ReadFaceAngleTxtToAnnotatedDatum(const string& labelfile, const int height,
     sstr >> yaw >> pitch >> roll;
     LOG(INFO)<< " "<< yaw <<" "<< pitch <<" "<< roll;
     AnnoFacePoseOritation* faceOri = anno_datum->mutable_faceangle();
-    faceOri->set_yaw(yaw);
-    faceOri->set_pitch(pitch);
-    faceOri->set_roll(roll);
+    faceOri->set_yaw(float(yaw/360));
+    faceOri->set_pitch(float(pitch/360));
+    faceOri->set_roll(float(roll/360));
     sstr.clear();
   }
   infile.close();

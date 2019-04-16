@@ -306,6 +306,9 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
   LOG(INFO)<<"loc_loss_: "<< loc_loss_.cpu_data()[0];
   #endif
+
+
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   // Form data to pass on to conf_loss_layer_.
   if (do_neg_mining_) {
     num_conf_ = num_matches_ + num_negs;
@@ -313,6 +316,7 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     num_conf_ = num_ * num_priors_;
   }
   if (num_conf_ >= 1) {
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~calss confidence loss layer~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
     // Reshape the confidence data.
     vector<int> conf_shape;
     if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
@@ -331,7 +335,7 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
     if (!do_neg_mining_) {
       // Consider all scores.
-      //t Share daa and diff with bottom[1].
+      // Share data and diff with bottom[1].
       CHECK_EQ(conf_pred_.count(), bottom[1]->count());
       conf_pred_.ShareData(*(bottom[1]));
     }
@@ -346,17 +350,18 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     #if 1
     LOG(INFO)<<"conf_loss_: "<< conf_loss_.cpu_data()[0];
     #endif
-     // conf blur layer 
+
+     /*~~~~~~~~~~~~~~~~~~~~~~blur loss layer  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
      // Reshape the blur confidence data.
     vector<int> conf_blur_shape;
     if (conf_blur_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
-      conf_blur_shape.push_back(num_conf_);
+      conf_blur_shape.push_back(num_matches_);
       conf_blur_gt_.Reshape(conf_blur_shape);
       conf_blur_shape.push_back(num_blur_);
       conf_blur_pred_.Reshape(conf_blur_shape);
     } else if (conf_blur_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
       conf_blur_shape.push_back(1);
-      conf_blur_shape.push_back(num_conf_);
+      conf_blur_shape.push_back(num_matches_);
       conf_blur_shape.push_back(num_blur_);
       conf_blur_gt_.Reshape(conf_blur_shape);
       conf_blur_pred_.Reshape(conf_blur_shape);
@@ -364,8 +369,7 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       LOG(FATAL) << "Unknown confidence loss type.";
     }
     if (!do_neg_mining_) {
-      // Consider all scores.
-      //t Share daa and diff with bottom[1].
+      //Share data and diff with bottom[3].
       CHECK_EQ(conf_pred_.count(), bottom[3]->count());
       conf_pred_.ShareData(*(bottom[3]));
     }
@@ -380,16 +384,18 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     #if 1
     LOG(INFO)<<"conf_blur_loss_: "<< conf_blur_loss_.cpu_data()[0];
     #endif
+
+    /*~~~~~~~~~~~~~~~~~~~~~~~occlussion_loss_layer~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
     // conf occlussion layer
     vector<int> conf_occlussion_shape;
     if (conf_occlussion_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
-      conf_occlussion_shape.push_back(num_conf_);
+      conf_occlussion_shape.push_back(num_matches_);
       conf_occlussion_gt_.Reshape(conf_occlussion_shape);
       conf_occlussion_shape.push_back(num_occlusion_);
       conf_occlussion_pred_.Reshape(conf_occlussion_shape);
     } else if (conf_occlussion_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
       conf_occlussion_shape.push_back(1);
-      conf_occlussion_shape.push_back(num_conf_);
+      conf_occlussion_shape.push_back(num_matches_);
       conf_occlussion_shape.push_back(num_occlusion_);
       conf_occlussion_gt_.Reshape(conf_occlussion_shape);
       conf_occlussion_pred_.Reshape(conf_occlussion_shape);
@@ -555,13 +561,12 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
           conf_bottom_diff += bottom[1]->offset(1);
         }
       } else {
-        // The diff is already computed and stored.
         bottom[1]->ShareDiff(conf_pred_);
       }
     }
   }
 
-  // Back propagate on blur confidence prediction.
+  // Back propagate on blur prediction.
   if (propagate_down[3]) {
     Dtype* conf_blur_bottom_diff = bottom[3]->mutable_cpu_diff();
     caffe_set(bottom[3]->count(), Dtype(0), conf_blur_bottom_diff);
@@ -600,15 +605,6 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
               ++count;
             }
           }
-          // Copy negative bboxes scores' diff.
-          /*for (int n = 0; n < all_neg_indices_[i].size(); ++n) {
-            int j = all_neg_indices_[i][n];
-            CHECK_LT(j, num_priors_);
-            caffe_copy<Dtype>(num_blur_,
-                              conf_blur_pred_diff + count * num_blur_,
-                              conf_blur_bottom_diff + j * num_blur_);
-            ++count;
-          }*/
           conf_blur_bottom_diff += bottom[3]->offset(1);
         }
       } else {
@@ -618,7 +614,7 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     }
   }
 
-  // Back propagate on occlussion confidence prediction.
+  // Back propagate on occlussion prediction.
   if (propagate_down[4]) {
     Dtype* conf_occl_bottom_diff = bottom[4]->mutable_cpu_diff();
     caffe_set(bottom[4]->count(), Dtype(0), conf_occl_bottom_diff);
@@ -657,15 +653,6 @@ void MultiBoxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
               ++count;
             }
           }
-          // Copy negative bboxes scores' diff.
-          /*for (int n = 0; n < all_neg_indices_[i].size(); ++n) {
-            int j = all_neg_indices_[i][n];
-            CHECK_LT(j, num_priors_);
-            caffe_copy<Dtype>(num_occlusion_,
-                              conf_occl_pred_diff + count * num_occlusion_,
-                              conf_occl_bottom_diff + j * num_occlusion_);
-            ++count;
-          }*/
           conf_occl_bottom_diff += bottom[4]->offset(1);
         }
       } else {
