@@ -88,8 +88,8 @@ def batch_work(ori, csvFile, setFile):
 if __name__ == '__main__':
     LOG = common.init_my_logger()
     start_time = datetime.datetime.now()
-    trainset = ImageSetFileForder + 'train.txt'
-    testset = ImageSetFileForder + 'test.txt'
+    trainset = ImageSetFileForder + 'training_umdface_pose.txt'
+    testset = ImageSetFileForder + 'testing_umdface_pose.txt'
     batch_work(trainSet, trainFileName, trainset)
     batch_work(testSet, testFileName, testset)
     end_time = datetime.datetime.now()
