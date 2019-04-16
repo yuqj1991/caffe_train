@@ -21,7 +21,7 @@ layer {
 	    }
     }
     data_param {
-		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_testing_lmdb/"
+		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_testing_umdface_pose_lmdb/"
 		batch_size: 16
 		backend: LMDB
 	}
@@ -1333,7 +1333,7 @@ layer {
 	}
 }
 layer {
-	name: "stage_2_conv_stage_2_3x3_s2_up"
+	name: "stage_2_conv_stage_2_3x3_s2_up/bn"
 	type: "BatchNorm"
 	bottom: "stage_2_conv_stage_2_3x3_s2_up"
 	top: "stage_2_conv_stage_2_3x3_s2_up"
@@ -1355,7 +1355,7 @@ layer {
 	}
 }
 layer {
-	name: "stage_2_conv_stage_2_3x3_s2_up"
+	name: "stage_2_conv_stage_2_3x3_s2_up/sc"
 	type: "Scale"
 	bottom: "stage_2_conv_stage_2_3x3_s2_up"
 	top: "stage_2_conv_stage_2_3x3_s2_up"
@@ -1654,7 +1654,7 @@ layer {
 	convolution_param {
 		num_output: 256
 		pad: 0
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
 		weight_filler {
 			type: "xavier"
@@ -1719,7 +1719,7 @@ layer {
 	}
 	inner_product_param {
 		#kernel_size: 1
-		num_output: 5
+		num_output: 3
 		weight_filler {
 			type: "xavier"
 		}

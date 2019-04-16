@@ -245,7 +245,11 @@ const vector<Blob<Dtype>*>& top) {
     pose_shape[1] = batch_size_ * 3;
     pose_pred_.Reshape(pose_shape);
     pose_gt_.Reshape(pose_shape);
-    pose_pred_.CopyFrom(*bottom[1]);
+    Blob<Dtype> pose_temp;
+    pose_temp.ReshapeLike(*(bottom[1]));
+    pose_temp.CopyFrom(*(bottom[1]));
+    pose_temp.Reshape(pose_shape);
+    pose_pred_.CopyFrom(pose_temp);
     //Dtype* landmark_pred_data = landmark_pred_.mutable_cpu_data();
     Dtype* pose_gt_data = pose_gt_.mutable_cpu_data();
     for(int ii = 0; ii< batch_size_; ii++)
