@@ -368,15 +368,15 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
         float blur_temp =0; float occlu_temp =0.0;
         for (int ii = 0; ii< 3; ii++ )
         {
-          if (blur_temp <  blur_scores.find(ii)->second[idx+ii])
+          if (blur_temp <  blur_scores.find(ii)->second[idx])
           {
             blur_index = ii;
-            blur_temp = blur_scores.find(ii)->second[idx+ii];
+            blur_temp = blur_scores.find(ii)->second[idx];
           }
-          if (occlu_temp <  occlu_scores.find(ii)->second[idx+ii])
+          if (occlu_temp <  occlu_scores.find(ii)->second[idx])
           {
             occlu_index = ii;
-            occlu_temp = occlu_scores.find(ii)->second[idx+ii];
+            occlu_temp = occlu_scores.find(ii)->second[idx];
           }
         }
         top_data[count * 9 + 7] = blur_index;
