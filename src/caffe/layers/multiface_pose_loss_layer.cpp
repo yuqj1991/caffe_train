@@ -108,24 +108,6 @@ template <typename Dtype>
 void MultiFacePoseLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 const vector<Blob<Dtype>*>& top) {
     const Dtype* label_data = bottom[2]->cpu_data();
-    #if 0
-    LOG(INFO)<< "loss compute start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& num_gt_: "<<num_gt_;
-    for(int ii=0; ii < num_gt_; ii++)
-    {
-    int id = ii*10;
-    if (gt_data[id] == -1) {
-        continue;
-    }
-
-    LOG(INFO) <<"LABEL batch_id: "<<gt_data[id]<<" anno_label: "<<gt_data[id+1]
-                <<" anno.instance_id: "<<gt_data[id+2];
-    LOG(INFO)  <<"LABEL bbox->xmin: "<<gt_data[id+3]<<" bbox->ymin: "<<gt_data[id+4]
-                <<" bbox->xmax: "<<gt_data[id+5]<<" bbox->ymax: "<<gt_data[id+6]
-                <<" bbox->blur: "<<gt_data[id+7]<<" bbox->occlusion: "<<gt_data[id+8];
-    }
-    LOG(INFO)<< "loss compute finished **************************************************** end ";
-
-    #endif 
     /***************************************retrive all ground truth****************************************/
     // Retrieve all landmarks , gender, and glasses && headpose.
     map<int, AnnoFaceContourPoints > all_landmarks;
@@ -206,76 +188,72 @@ const vector<Blob<Dtype>*>& top) {
     landmark_temp.Reshape(landmark_shape);
     landmark_pred_.CopyFrom(landmark_temp);
     Dtype* landmark_gt_data = landmark_gt_.mutable_cpu_data();
-    int count =0;
     for(int ii = 0; ii< batch_size_; ii++)
     {
         AnnoFaceContourPoints face = all_landmarks[ii];
-        landmark_gt_data[count*42] = face.point_1().x() ;
-        landmark_gt_data[count*42+1] = face.point_2().x()  ;
-        landmark_gt_data[count*42+2] = face.point_3().x() ;
-        landmark_gt_data[count*42+3] = face.point_4().x() ;
-        landmark_gt_data[count*42+4] = face.point_5().x() ;
-        landmark_gt_data[count*42+5] = face.point_6().x() ;
-        landmark_gt_data[count*42+6] = face.point_7().x() ;
-        landmark_gt_data[count*42+7] = face.point_8().x() ;
-        landmark_gt_data[count*42+8] = face.point_9().x() ;
-        landmark_gt_data[count*42+9] = face.point_10().x() ;
-        landmark_gt_data[count*42+10] = face.point_11().x() ;
-        landmark_gt_data[count*42+11] = face.point_12().x() ;
-        landmark_gt_data[count*42+12] = face.point_13().x() ;
-        landmark_gt_data[count*42+13] = face.point_14().x() ;
-        landmark_gt_data[count*42+14] = face.point_15().x() ;
-        landmark_gt_data[count*42+15] = face.point_16().x() ;
-        landmark_gt_data[count*42+16] = face.point_17().x() ;
-        landmark_gt_data[count*42+17] = face.point_18().x() ;
-        landmark_gt_data[count*42+18] = face.point_19().x() ;
-        landmark_gt_data[count*42+19] = face.point_20().x() ;
-        landmark_gt_data[count*42+20] = face.point_21().x() ;
-        landmark_gt_data[count*42+21] = face.point_1().y() ;
-        landmark_gt_data[count*42+22] = face.point_2().y() ;
-        landmark_gt_data[count*42+23] = face.point_3().y() ;
-        landmark_gt_data[count*42+24] = face.point_4().y() ;
-        landmark_gt_data[count*42+25] = face.point_5().y() ;
-        landmark_gt_data[count*42+26] = face.point_6().y() ;
-        landmark_gt_data[count*42+27] = face.point_7().y() ;
-        landmark_gt_data[count*42+28] = face.point_8().y() ;
-        landmark_gt_data[count*42+29] = face.point_9().y() ;
-        landmark_gt_data[count*42+30] = face.point_10().y() ;
-        landmark_gt_data[count*42+31] = face.point_11().y() ;
-        landmark_gt_data[count*42+32] = face.point_12().y() ;
-        landmark_gt_data[count*42+33] = face.point_13().y() ;
-        landmark_gt_data[count*42+34] = face.point_14().y() ;
-        landmark_gt_data[count*42+35] = face.point_15().y() ;
-        landmark_gt_data[count*42+36] = face.point_16().y() ;
-        landmark_gt_data[count*42+37] = face.point_17().y() ;
-        landmark_gt_data[count*42+38] = face.point_18().y() ;
-        landmark_gt_data[count*42+39] = face.point_19().y() ;
-        landmark_gt_data[count*42+40] = face.point_20().y() ;
-        landmark_gt_data[count*42+41] = face.point_21().y() ;
-        ++count;
+        landmark_gt_data[ii*42] = face.point_1().x() ;
+        landmark_gt_data[ii*42+1] = face.point_2().x()  ;
+        landmark_gt_data[ii*42+2] = face.point_3().x() ;
+        landmark_gt_data[ii*42+3] = face.point_4().x() ;
+        landmark_gt_data[ii*42+4] = face.point_5().x() ;
+        landmark_gt_data[ii*42+5] = face.point_6().x() ;
+        landmark_gt_data[ii*42+6] = face.point_7().x() ;
+        landmark_gt_data[ii*42+7] = face.point_8().x() ;
+        landmark_gt_data[ii*42+8] = face.point_9().x() ;
+        landmark_gt_data[ii*42+9] = face.point_10().x() ;
+        landmark_gt_data[ii*42+10] = face.point_11().x() ;
+        landmark_gt_data[ii*42+11] = face.point_12().x() ;
+        landmark_gt_data[ii*42+12] = face.point_13().x() ;
+        landmark_gt_data[ii*42+13] = face.point_14().x() ;
+        landmark_gt_data[ii*42+14] = face.point_15().x() ;
+        landmark_gt_data[ii*42+15] = face.point_16().x() ;
+        landmark_gt_data[ii*42+16] = face.point_17().x() ;
+        landmark_gt_data[ii*42+17] = face.point_18().x() ;
+        landmark_gt_data[ii*42+18] = face.point_19().x() ;
+        landmark_gt_data[ii*42+19] = face.point_20().x() ;
+        landmark_gt_data[ii*42+20] = face.point_21().x() ;
+        landmark_gt_data[ii*42+21] = face.point_1().y() ;
+        landmark_gt_data[ii*42+22] = face.point_2().y() ;
+        landmark_gt_data[ii*42+23] = face.point_3().y() ;
+        landmark_gt_data[ii*42+24] = face.point_4().y() ;
+        landmark_gt_data[ii*42+25] = face.point_5().y() ;
+        landmark_gt_data[ii*42+26] = face.point_6().y() ;
+        landmark_gt_data[ii*42+27] = face.point_7().y() ;
+        landmark_gt_data[ii*42+28] = face.point_8().y() ;
+        landmark_gt_data[ii*42+29] = face.point_9().y() ;
+        landmark_gt_data[ii*42+30] = face.point_10().y() ;
+        landmark_gt_data[ii*42+31] = face.point_11().y() ;
+        landmark_gt_data[ii*42+32] = face.point_12().y() ;
+        landmark_gt_data[ii*42+33] = face.point_13().y() ;
+        landmark_gt_data[ii*42+34] = face.point_14().y() ;
+        landmark_gt_data[ii*42+35] = face.point_15().y() ;
+        landmark_gt_data[ii*42+36] = face.point_16().y() ;
+        landmark_gt_data[ii*42+37] = face.point_17().y() ;
+        landmark_gt_data[ii*42+38] = face.point_18().y() ;
+        landmark_gt_data[ii*42+39] = face.point_19().y() ;
+        landmark_gt_data[ii*42+40] = face.point_20().y() ;
+        landmark_gt_data[ii*42+41] = face.point_21().y() ;
     }
     landmark_loss_layer_->Reshape(landmark_bottom_vec_, landmark_top_vec_);
     landmark_loss_layer_->Forward(landmark_bottom_vec_, landmark_top_vec_);
 
-    /********************************************************************************/
+    /****************************************************************************************************/
     // Form data to pass on to pose_loss_layer_.
     // Reshape the pose confidence data.
     vector<int> pose_shape(2);
     pose_shape[0] = 1;
-    pose_shape[1] = batch_size_ * 42;
+    pose_shape[1] = batch_size_ * 3;
     pose_pred_.Reshape(pose_shape);
     pose_gt_.Reshape(pose_shape);
     pose_pred_.CopyFrom(*bottom[1]);
     //Dtype* landmark_pred_data = landmark_pred_.mutable_cpu_data();
     Dtype* pose_gt_data = pose_gt_.mutable_cpu_data();
-    count =0;
     for(int ii = 0; ii< batch_size_; ii++)
     {
         AnnoFacePoseOritation face = all_faceposes[ii];
-        pose_gt_data[count*3] = face.yaw() ;
-        pose_gt_data[count*3+1] = face.pitch() ;
-        pose_gt_data[count*3+2] = face.roll() ;
-        ++count;
+        pose_gt_data[ii*3] = face.yaw() ;
+        pose_gt_data[ii*3+1] = face.pitch() ;
+        pose_gt_data[ii*3+2] = face.roll() ;
     }
     pose_loss_layer_->Reshape(pose_bottom_vec_, pose_top_vec_);
     pose_loss_layer_->Forward(pose_bottom_vec_, pose_top_vec_);
@@ -292,15 +270,6 @@ const vector<Blob<Dtype>*>& top) {
     top[0]->mutable_cpu_data()[0] += 
             pose_loss_.cpu_data()[0] / normalizer;
     }
-    
-    #if 0
-    LOG(INFO)<<"num_matches_: "<<num_matches_<<" num_gtBoxes: "<<num_gt_<<" num_conf_: "<<num_conf_;
-    LOG(INFO)<<" loc_loss_: "<< landmark_weight_ * loc_loss_.cpu_data()[0] / normalizer 
-            <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
-            <<" conf_blur_loss_: "<<0.5*conf_blur_loss_.cpu_data()[0] / normalizer
-            <<" conf_occlussion_loss_: " << 0.5*conf_occlussion_loss_.cpu_data()[0] / normalizer;
-    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
-    #endif
 }
 
 template <typename Dtype>
@@ -311,7 +280,6 @@ const vector<Blob<Dtype>*>& bottom) {
     LOG(FATAL) << this->type()
         << " Layer cannot backpropagate to label inputs.";
     }
-
     /*************************************************************************************/
     // Back propagate on landmark prediction.
     if (propagate_down[0]) {
@@ -329,15 +297,7 @@ const vector<Blob<Dtype>*>& bottom) {
         Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
         caffe_scal(landmark_pred_.count(), loss_weight, landmark_pred_.mutable_cpu_diff());
         bottom[0]->ShareDiff(landmark_pred_);
-        // Copy gradient back to bottom[0].
-        /*const Dtype* landmark_pred_diff = landmark_pred_.cpu_diff();
-        for (int ii = 0; ii < batch_size_; ++ii) {
-            caffe_copy<Dtype>(42, landmark_pred_diff + ii * 42,
-                                mark_bottom_diff + ii*42);
-            mark_bottom_diff += bottom[0]->offset(1);
-        }*/
     }
-
     /*************************************************************************************/
     // Back propagate on facepose loc prediction.
     if (propagate_down[1]) {
@@ -355,13 +315,6 @@ const vector<Blob<Dtype>*>& bottom) {
         Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
         caffe_scal(pose_pred_.count(), loss_weight, pose_pred_.mutable_cpu_diff());
         bottom[1]->ShareDiff(pose_pred_);
-        // Copy gradient back to bottom[0].
-        /*const Dtype* pose_pred_diff = pose_pred_.cpu_diff();
-        for (int ii = 0; ii < batch_size_; ++ii) {
-            caffe_copy<Dtype>(3, pose_pred_diff + ii * 3,
-                                mark_bottom_diff + ii*3);
-            mark_bottom_diff += bottom[1]->offset(1);
-        }*/
     }
 }
 

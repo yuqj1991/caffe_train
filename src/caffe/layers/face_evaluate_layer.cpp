@@ -32,7 +32,7 @@ void FaceEvaluateLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   }else
   {
     CHECK_EQ(num_facepoints_, 21)<< "this face points should be  21";
-    vector<int> top_shape(2, 1);
+    vector<int> top_shape(4, 1);
     top[0]->Reshape(top_shape);
   }
         
@@ -110,7 +110,40 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
     top_data[2]=float(correct_precisive_glasses/batch_size);
     top_data[3]=float(correct_precisive_headpose/batch_size);
   }else{  // evaluate 21 face point and yaw pitch roll 
-
+    map<int, vector<float> >all_face_prediction_attributes;
+    map<int, vector<int> > all_gt_face_attributes;
+    for(int ii = 0; ii<batch_size; ii++){
+      for(int jj =1; jj<43; jj++){
+        all_gt_face_points[ii].push_back(gt_data[ii*46+jj]);
+      }
+      for(int jj =43; jj<46; jj++){
+        all_gt_face_attributes[ii].push_back(gt_data[ii*46+jj]);
+      }
+      for(int jj =0; jj< num_facepoints_*2; jj++){
+        all_prediction_face_points[ii].push_back(det_data[ii*bottom[0]->channels()+jj]);
+      }
+      for(int jj =num_facepoints_*2; jj< bottom[0]->channels(); jj++){
+        all_face_prediction_attributes[ii].push_back(det_data[ii*bottom[0]->channels()+jj]);
+      }
+    }
+    /**#####################################################**/
+    // face precision
+    float distance_loss =0.0;
+    float correct_precisive_yaw =0;
+    float correct_precisive_pitch =0;
+    float correct_precisive_roll =0;
+    for(int ii = 0; ii<batch_size; ii++){
+      for(int jj = 0; jj< num_facepoints_*2; jj++){
+        distance_loss += pow((all_prediction_face_points[ii][jj]-all_gt_face_points[ii][jj]), 2);
+      }
+      correct_precisive_yaw += std::abs(all_face_prediction_attributes[ii][0]- all_gt_face_attributes[ii][0]);
+      correct_precisive_pitch += std::abs( all_face_prediction_attributes[ii][1] - all_gt_face_attributes[ii][1]);
+      correct_precisive_roll += std::abs(all_face_prediction_attributes[ii][2] - all_gt_face_attributes[ii][2]);
+    }
+    top_data[0]=float(distance_loss/batch_size);
+    top_data[1]=float(correct_precisive_yaw/batch_size);
+    top_data[2]=float(correct_precisive_pitch/batch_size);
+    top_data[3]=float(correct_precisive_roll/batch_size);
   }
 }
 

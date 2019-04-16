@@ -60,12 +60,6 @@ void facePoseDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
         if (has_anno_type_) {
             anno_type_ = anno_datum.type();
             if (anno_type_ == AnnoFacePoseDatum_AnnoType_FACEPOSE) {
-            // Since the number of lanmarks of one person can be constant for each image,
-            // and another point is each image only have one person face, so we store the lable 
-            // in a specific formate. In specific:
-            // All landmarks  are stored in one spatial plane (# x1,...,x21; #y1,...,y21), and three head pose which has 21 point 
-            // and they are left eye, right eye, nose , left mouse endpoint, right mouse endpoint. And the labels formate:
-            // [item_id(image_id), x1,..,x21, y1,...,y21, yaw,  pitch, roll]
             label_shape[0] = 1;
             label_shape[1] = 1;
             // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
@@ -123,23 +117,32 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         // get a anno_datum
         AnnoFacePoseDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
         #if 0
-        int size_group = anno_datum.annotation_group_size();
-        LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
-        for(int ii=0; ii< size_group; ii++)
-        {
-            const AnnotationGroup& anno_group = anno_datum.annotation_group(ii);
-            int anno_size = anno_group.annotation_size();
-            for(int jj=0; jj<anno_size; jj++)
-            {
-                const Annotation& anno = anno_group.annotation(jj);
-                const NormalizedBBox& bbox = anno.bbox();
-                LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
-                        <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                        <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion();
-            }
-        }
-        LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";
-    #endif
+        LOG(INFO) <<" image->height: "<<anno_datum.datum().height()<<" image->width: "<<anno_datum.datum().width()
+                  <<" point_1: "<<anno_datum.facepose().facecour().point_1().x()<<" "<<anno_datum.facepose().facecour().point_1().y()
+                  <<" point_2: "<<anno_datum.facepose().facecour().point_2().x()<<" "<<anno_datum.facepose().facecour().point_2().y()
+                  <<" point_3: "<<anno_datum.facepose().facecour().point_3().x()<<" "<<anno_datum.facepose().facecour().point_3().y()
+                  <<" point_4: "<<anno_datum.facepose().facecour().point_4().x()<<" "<<anno_datum.facepose().facecour().point_4().y()
+                  <<" point_5: "<<anno_datum.facepose().facecour().point_5().x()<<" "<<anno_datum.facepose().facecour().point_5().y()
+                  <<" point_6: "<<anno_datum.facepose().facecour().point_6().x()<<" "<<anno_datum.facepose().facecour().point_6().y()
+                  <<" point_7: "<<anno_datum.facepose().facecour().point_7().x()<<" "<<anno_datum.facepose().facecour().point_7().y()
+                  <<" point_8: "<<anno_datum.facepose().facecour().point_8().x()<<" "<<anno_datum.facepose().facecour().point_8().y()
+                  <<" point_9: "<<anno_datum.facepose().facecour().point_9().x()<<" "<<anno_datum.facepose().facecour().point_9().y()
+                  <<" point_10: "<<anno_datum.facepose().facecour().point_10().x()<<" "<<anno_datum.facepose().facecour().point_10().y()
+                  <<" point_11: "<<anno_datum.facepose().facecour().point_11().x()<<" "<<anno_datum.facepose().facecour().point_11().y()
+                  <<" point_12: "<<anno_datum.facepose().facecour().point_12().x()<<" "<<anno_datum.facepose().facecour().point_12().y()
+                  <<" point_13: "<<anno_datum.facepose().facecour().point_13().x()<<" "<<anno_datum.facepose().facecour().point_13().y()
+                  <<" point_14: "<<anno_datum.facepose().facecour().point_14().x()<<" "<<anno_datum.facepose().facecour().point_14().y()
+                  <<" point_15: "<<anno_datum.facepose().facecour().point_15().x()<<" "<<anno_datum.facepose().facecour().point_15().y()
+                  <<" point_16: "<<anno_datum.facepose().facecour().point_16().x()<<" "<<anno_datum.facepose().facecour().point_16().y()
+                  <<" point_17: "<<anno_datum.facepose().facecour().point_17().x()<<" "<<anno_datum.facepose().facecour().point_17().y()
+                  <<" point_18: "<<anno_datum.facepose().facecour().point_18().x()<<" "<<anno_datum.facepose().facecour().point_18().y()
+                  <<" point_19: "<<anno_datum.facepose().facecour().point_19().x()<<" "<<anno_datum.facepose().facecour().point_19().y()
+                  <<" point_20: "<<anno_datum.facepose().facecour().point_20().x()<<" "<<anno_datum.facepose().facecour().point_20().y()
+                  <<" point_21: "<<anno_datum.facepose().facecour().point_21().x()<<" "<<anno_datum.facepose().facecour().point_21().y();
+                  << " yaw : "<<anno_datum.facepose().faceoritation().yaw() << " "<<" pitch: "<< anno_datum.facepose().faceoritation().pitch()
+                  <<" "<<" roll: "<<anno_datum.facepose().faceoritation().roll();
+        LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~End Read Raw Annodation Data~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+        #endif
         AnnoFacePoseDatum distort_datum;
         AnnoFacePoseDatum* expand_datum = NULL;
         if (transform_param.has_distort_param()) {
@@ -196,9 +199,6 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             } else {
                 this->data_transformer_->Transform(expand_datum->datum(),
                                                 &(this->transformed_data_));
-                // Otherwise, store the label from datum.
-                // CHECK(expand_datum->datum().has_label()) << "Cannot find any label.";
-                // top_label[item_id] = expand_datum->datum().label();
             }
         } else {
             this->data_transformer_->Transform(expand_datum->datum(),
@@ -272,27 +272,38 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.faceoritation().yaw();
                 top_label[idx++] = face.faceoritation().pitch();
                 top_label[idx++] = face.faceoritation().roll();
+                #if 0
+                LOG(INFO)<<" label point: "<<top_label[item_id*46]<<" "<<top_label[item_id*46+1]
+                            <<" "<<top_label[item_id*46+2]
+                            <<" "<<top_label[item_id*46+3]<<" "<<top_label[item_id*46+4]
+                            <<" "<<top_label[item_id*46+5]<<" "<<top_label[item_id*46+6]
+                            <<" "<<top_label[item_id*46+7]<<" "<<top_label[item_id*46+8]
+                            <<" "<<top_label[item_id*46+9]<<" "<<top_label[item_id*46+10]
+                            <<" "<<top_label[item_id*46+11]<<" "<<top_label[item_id*46+12]
+                            <<" "<<top_label[item_id*46+13]<<" "
+                            <<" "<<top_label[item_id*46+14]<<" "<<top_label[item_id*46+15]
+                            <<" "<<top_label[item_id*46+16]<<" "<<top_label[item_id*46+17]
+                            <<" "<<top_label[item_id*46+18]<<" "<<top_label[item_id*46+19]
+                            <<" "<<top_label[item_id*46+20]<<" "<<top_label[item_id*46+21]
+                            <<" "<<top_label[item_id*46+22]<<" "<<top_label[item_id*46+23]
+                            <<" "<<top_label[item_id*46+24]<<" "<<top_label[item_id*46+25]
+                            <<" "<<top_label[item_id*46+26]<<" "<<top_label[item_id*46+27]
+                            <<" "<<top_label[item_id*46+28]<<" "<<top_label[item_id*46+29]
+                            <<" "<<top_label[item_id*46+30]<<" "<<top_label[item_id*46+32]
+                            <<" "<<top_label[item_id*46+32]<<" "<<top_label[item_id*46+33]
+                            <<" "<<top_label[item_id*46+34]<<" "<<top_label[item_id*46+35]
+                            <<" "<<top_label[item_id*46+36]<<" "<<top_label[item_id*46+37]
+                            <<" "<<top_label[item_id*46+38]<<" "<<top_label[item_id*46+39]
+                            <<" "<<top_label[item_id*46+40]<<" "<<top_label[item_id*46+41]
+                            <<" "<<top_label[item_id*46+42]<<" "<<top_label[item_id*46+43]
+                            <<" "<<top_label[item_id*46+44]<<" "<<top_label[item_id*46+45]
+                            <<" "<<top_label[item_id*46+46];
+                #endif
             }
         } else {
             LOG(FATAL) << "Unknown annotation type.";
         }
     }
-#if 0
-  LOG(INFO)<< "start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& single image: num_bboxes: "<<num_bboxes;
-  const Dtype* top_label_data = batch->label_.cpu_data();
-  for(int ii=0; ii < num_bboxes; ii++)
-  {
-    int id = ii*10;
-    LOG(INFO) <<"batch_id: "<<top_label_data[id]<<" anno_label: "<<top_label_data[id+1]
-              <<" anno.instance_id: "<<top_label_data[id+2];
-    LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
-              <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
-              <<" bbox->blur: "<<top_label_data[id+7]<<" bbox->occlusion: "<<top_label_data[id+8]
-              <<" bbox->difficult: "<<top_label_data[id+9];
-  }
-  LOG(INFO)<< "finished **************************************************** end ";
-#endif 
-
     timer.Stop();
     batch_timer.Stop();
     DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";

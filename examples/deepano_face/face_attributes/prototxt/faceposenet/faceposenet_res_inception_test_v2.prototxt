@@ -1,7 +1,7 @@
 name: "deepano_face_posenet"
 layer {
     name: "data"
-    type: "faceAnnoPoseData"
+    type: "facePoseData"
     top: "data"
     top: "label"
     include {
@@ -21,8 +21,8 @@ layer {
 	    }
 	}
 	data_param {
-        source: "../../../../../dataset/facedata/mtfl/lmdb/umd_training_lmdb/"
-        batch_size: 64
+        source: "../../../../../dataset/facedata/umdface/lmdb/umdface_testing_umdface_pose_lmdb/"
+        batch_size: 16
         backend: LMDB
     }
 }
@@ -13240,6 +13240,7 @@ layer {
   bottom: "reduction_b_3x3_2"
   bottom: "reduction_b_3x3_4"
   bottom: "reduction_b_pool"
+  top: "reduction_b_concat"
 }
 
 layer {
@@ -13296,9 +13297,23 @@ layer {
   name: "multiface_output"
   type: "Concat"
   bottom: "output_face_contour"
-  bottom: "conv6_faceangle"
-  top: "output_face_angle"
+  bottom: "output_face_angle"
+  top: "multiface_output"
   concat_param {
 		axis: 1
   }
+}
+layer{
+    name: "faceeval_output"
+    type: "FaceEvaluate"
+    bottom: "multiface_output"
+    bottom: "label"
+    top: "faceeval_output"
+    include {
+		phase: TEST
+	}
+    face_evaluate_param{
+        facetype: FACE_21_TYPE
+        facepoints: 21
+    }
 }
