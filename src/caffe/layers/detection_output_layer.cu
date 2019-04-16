@@ -180,15 +180,15 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
         float blur_temp =0; float occlu_temp =0.0;
         for (int ii = 0; ii< 3; ii++ )
         {
-          if (blur_temp <  cur_blur_data[ii])
+          if (blur_temp <  cur_blur_data[idx+ii])
           {
             blur_index = ii;
-            blur_temp = cur_blur_data[ii];
+            blur_temp = cur_blur_data[idx+ii];
           }
-          if (occlu_temp <  cur_occlu_data[ii])
+          if (occlu_temp <  cur_occlu_data[idx+ii])
           {
             occlu_index = ii;
-            occlu_temp = cur_occlu_data[ii];
+            occlu_temp = cur_occlu_data[idx+ii];
           }
         }
         top_data[count * 9 + 7] = blur_index;
