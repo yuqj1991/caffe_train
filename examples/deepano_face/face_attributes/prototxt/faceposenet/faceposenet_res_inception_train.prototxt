@@ -24,9 +24,6 @@ layer {
 			interp_mode: CUBIC
 			interp_mode: LANCZOS4
 		}
-		emit_constraint {
-			emit_type: CENTER
-		}
 		distort_param {
 			brightness_prob: 0.5
 			brightness_delta: 32.0

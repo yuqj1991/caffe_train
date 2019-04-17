@@ -80,8 +80,7 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
       int gender_index=0; 
       int glasses_index=0; 
       int headpose_index=0;
-      float gender_temp=0.0, glasses_temp=0.0 ;
-      float headpose_temp=0.0;
+      float gender_temp=0.0, glasses_temp=0.0, headpose_temp=0.0;
       for(int jj=0; jj<2; jj++){
         if(gender_temp<all_face_prediction_attributes[ii][jj]){
           gender_index = jj;
@@ -136,9 +135,9 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
       for(int jj = 0; jj< num_facepoints_*2; jj++){
         distance_loss += pow((all_prediction_face_points[ii][jj]-all_gt_face_points[ii][jj]), 2);
       }
-      correct_precisive_yaw += std::abs(all_face_prediction_attributes[ii][0]- all_gt_face_attributes[ii][0]);
-      correct_precisive_pitch += std::abs( all_face_prediction_attributes[ii][1] - all_gt_face_attributes[ii][1]);
-      correct_precisive_roll += std::abs(all_face_prediction_attributes[ii][2] - all_gt_face_attributes[ii][2]);
+      correct_precisive_yaw += pow(std::abs(all_face_prediction_attributes[ii][0]- all_gt_face_attributes[ii][0]),2);
+      correct_precisive_pitch += pow(std::abs(all_face_prediction_attributes[ii][1] - all_gt_face_attributes[ii][1]),2);
+      correct_precisive_roll += pow(std::abs(all_face_prediction_attributes[ii][2] - all_gt_face_attributes[ii][2]),2);
     }
     top_data[0]=float(distance_loss/batch_size);
     top_data[1]=float(correct_precisive_yaw/batch_size);
