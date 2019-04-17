@@ -370,7 +370,7 @@ const vector<Blob<Dtype>*>& top) {
     gender_loss_layer_->Reshape(gender_bottom_vec_, gender_top_vec_);
     gender_loss_layer_->Forward(gender_bottom_vec_, gender_top_vec_);
     #if 1
-    LOG(INFO)<<"total origin gender_loss_: "<< gender_loss_.cpu_data()[0];
+    LOG(INFO)<<"total origin _gender_loss_: "<< gender_loss_.cpu_data()[0];
     #endif
 
     /********************************************************************************/

@@ -1457,7 +1457,6 @@ layer {
   bottom: "conv6_headpose"
   bottom: "label"
   top: "multiface_loss"
-  loss_weight: 0.5
   include {
 		phase: TRAIN
 	}
