@@ -15,7 +15,7 @@ parser1 = make_parser()
 args = parser1.parse_args()
 net_file= args.model
 caffe_model= args.weights
-test_dir = "/home/stive/workspace/dataset/facedata/mtfl/JPEGImages/AFLW"
+test_dir = "../images"
 
 if not os.path.exists(caffe_model):
     print(caffe_model + " does not exist")
@@ -42,6 +42,12 @@ def postprocess(img, out):
     h = img.shape[0]
     w = img.shape[1]
     facepoints = out['multiface_output'][0,0:10] * np.array([w,w,w,w,w,h,h,h,h,h])
+    print('~~~~~~~~~~~~~~~~~~~~~~~')
+    print('h: %d, w: %d'%(h,w))
+    print("facepoint: ", out['multiface_output'][0,0:10])
+    print("gender: ", out['multiface_output'][0,10:12])
+    print("glasses: ", out['multiface_output'][0,12:14])
+    print("headpose: ", out['multiface_output'][0,14:19])
 
     gender = out['multiface_output'][0,10:12]
     gender_index = np.argmax(gender)
