@@ -326,10 +326,6 @@ const vector<Blob<Dtype>*>& top) {
     #endif
     landmark_loss_layer_->Reshape(landmark_bottom_vec_, landmark_top_vec_);
     landmark_loss_layer_->Forward(landmark_bottom_vec_, landmark_top_vec_);
-    #if 1
-    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
-    LOG(INFO)<<"total origin facepoint_loss_: "<< landmark_loss_.cpu_data()[0];
-    #endif
 
     /********************************************************************************/
     // Form data to pass on to gender_loss_layer_.
@@ -369,9 +365,6 @@ const vector<Blob<Dtype>*>& top) {
     #endif
     gender_loss_layer_->Reshape(gender_bottom_vec_, gender_top_vec_);
     gender_loss_layer_->Forward(gender_bottom_vec_, gender_top_vec_);
-    #if 1
-    LOG(INFO)<<"total origin _gender_loss_: "<< gender_loss_.cpu_data()[0];
-    #endif
 
     /********************************************************************************/
     // Form data to pass on to glasses_loss_layer_.
@@ -410,9 +403,6 @@ const vector<Blob<Dtype>*>& top) {
     #endif
     glasses_loss_layer_->Reshape(glasses_bottom_vec_, glasses_top_vec_);
     glasses_loss_layer_->Forward(glasses_bottom_vec_, glasses_top_vec_);
-    #if 1
-    LOG(INFO)<<"total origin glassess_loss_: "<< glasses_loss_.cpu_data()[0];
-    #endif
 
     /********************************************************************************/
     // Form data to pass on to headpose_loss_layer_.
@@ -455,9 +445,6 @@ const vector<Blob<Dtype>*>& top) {
     #endif
     headpose_loss_layer_->Reshape(headpose_bottom_vec_, headpose_top_vec_);
     headpose_loss_layer_->Forward(headpose_bottom_vec_, headpose_top_vec_);
-    #if 1
-    LOG(INFO)<<"total origin headpose_loss_: "<< headpose_loss_.cpu_data()[0];
-    #endif
     /**************************************sum loss value**************************************************/
     top[0]->mutable_cpu_data()[0] = 0;
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
@@ -478,7 +465,12 @@ const vector<Blob<Dtype>*>& top) {
     top[0]->mutable_cpu_data()[0] += 
             headpose_loss_.cpu_data()[0] / normalizer;
     }
-    #if 1
+    #if 0
+    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    LOG(INFO)<<"total origin facepoint_loss_: "<< landmark_loss_.cpu_data()[0];
+    LOG(INFO)<<"total origin _gender_loss_: "<< gender_loss_.cpu_data()[0];
+    LOG(INFO)<<"total origin glassess_loss_: "<< glasses_loss_.cpu_data()[0];
+    LOG(INFO)<<"total origin headpose_loss_: "<< headpose_loss_.cpu_data()[0];
     LOG(INFO)<<"total loss_layer loss value: "<<top[0]->cpu_data()[0]
              <<" normalizer: "<<normalizer;
     //LOG(FATAL)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~";

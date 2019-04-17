@@ -302,11 +302,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   } else {
     loc_loss_.mutable_cpu_data()[0] = 0;
   }
-  #if 1
-  LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
-  LOG(INFO)<<"loc_loss_: "<< loc_loss_.cpu_data()[0];
-  #endif
-
 
   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   // Form data to pass on to conf_loss_layer_.
@@ -347,9 +342,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                          conf_pred_data, conf_gt_data);
     conf_loss_layer_->Reshape(conf_bottom_vec_, conf_top_vec_);
     conf_loss_layer_->Forward(conf_bottom_vec_, conf_top_vec_);
-    #if 1
-    LOG(INFO)<<"conf_loss_: "<< conf_loss_.cpu_data()[0];
-    #endif
 
      /*~~~~~~~~~~~~~~~~~~~~~~blur loss layer  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
      // Reshape the blur confidence data.
@@ -381,9 +373,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                          conf_blur_pred_data, conf_blur_gt_data);
     conf_blur_loss_layer_->Reshape(conf_blur_bottom_vec_, conf_blur_top_vec_);
     conf_blur_loss_layer_->Forward(conf_blur_bottom_vec_, conf_blur_top_vec_);
-    #if 1
-    LOG(INFO)<<"conf_blur_loss_: "<< conf_blur_loss_.cpu_data()[0];
-    #endif
 
     /*~~~~~~~~~~~~~~~~~~~~~~~occlussion_loss_layer~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
     // conf occlussion layer
@@ -444,16 +433,13 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 
           0.5*conf_occlussion_loss_.cpu_data()[0] / normalizer;
   }
-  #if 1
-   LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0];
-  #endif
   #if 0
   LOG(INFO)<<"num_matches_: "<<num_matches_<<" num_gtBoxes: "<<num_gt_<<" num_conf_: "<<num_conf_;
-  LOG(INFO)<<" loc_loss_: "<< loc_weight_ * loc_loss_.cpu_data()[0] / normalizer 
-           <<" conf_loss_: "<<conf_loss_.cpu_data()[0] / normalizer
-           <<" conf_blur_loss_: "<<0.5*conf_blur_loss_.cpu_data()[0] / normalizer
-           <<" conf_occlussion_loss_: " << 0.5*conf_occlussion_loss_.cpu_data()[0] / normalizer;
-  LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+  LOG(INFO)<<"origin loc_loss_: "<< loc_loss_.cpu_data()[0];
+  LOG(INFO)<<"origin conf_loss_: "<<conf_loss_.cpu_data()[0];
+  LOG(INFO)<<"origin conf_blur_loss_: "<<conf_blur_loss_.cpu_data()[0];
+  LOG(INFO)<<"origin conf_occlussion_loss_: " <<conf_occlussion_loss_.cpu_data()[0];
+  LOG(INFO)<<"total ~~~~~~~~~~~~~~~~~~loss: "<<top[0]->mutable_cpu_data()[0]<<" normalizer: "<<normalizer;
   #endif
 }
 
