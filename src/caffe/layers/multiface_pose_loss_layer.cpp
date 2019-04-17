@@ -274,6 +274,12 @@ const vector<Blob<Dtype>*>& top) {
     top[0]->mutable_cpu_data()[0] += 
             pose_loss_.cpu_data()[0] / normalizer;
     }
+    #if 1
+    LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    LOG(INFO)<<" orign total 21 face point loss value: "<<landmark_loss_.cpu_data()[0];
+    LOG(INFO)<<" orign total angle face loss value: "<< pose_loss_.cpu_data()[0];
+    LOG(INFO)<<" orign total loss value: "<<top[0]->mutable_cpu_data()[0]<< " normalizer: "<<normalizer;
+    #endif
 }
 
 template <typename Dtype>

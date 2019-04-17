@@ -563,10 +563,6 @@ void DataTransformer<Dtype>::TransformAnnoFacePose(
 		}
 		
 		if(do_expand){
-			//if (face->x1() >= crop_bbox.xmax() || face->x2() <= crop_bbox.xmin() ||
-			//		face->y1() >= crop_bbox.ymax() || face->y5() <= crop_bbox.ymin()) {
-			//	LOG(FATAL)<<"While do expanding and landmark ,has something wrong";
-			//}
 			float src_width = crop_bbox.xmax() - crop_bbox.xmin();
 			float src_height = crop_bbox.ymax() - crop_bbox.ymin();
 			point_1->set_x((point_1->x()-crop_bbox.xmin())/src_width);

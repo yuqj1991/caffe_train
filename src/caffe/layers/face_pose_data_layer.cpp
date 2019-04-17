@@ -272,7 +272,7 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.faceoritation().yaw();
                 top_label[idx++] = face.faceoritation().pitch();
                 top_label[idx++] = face.faceoritation().roll();
-                #if 0
+                #if 1
                 LOG(INFO)<<" label point: "<<top_label[item_id*46]<<" "<<top_label[item_id*46+1]
                             <<" "<<top_label[item_id*46+2]
                             <<" "<<top_label[item_id*46+3]<<" "<<top_label[item_id*46+4]
