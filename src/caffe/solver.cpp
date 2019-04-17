@@ -585,10 +585,10 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
       headpose_presicon +=result_vec[3];
     }    
   }
-  LOG(INFO)<< "NME: "<< nme
-             <<" gender/yaw precision: "<<gender_precision
-             <<" glasses/pitch precision: "<<glasses_presion
-             <<" headpose/roll precision: "<<headpose_presicon;
+  LOG(INFO)<< "NME: "<< nme/param_.test_iter(test_net_id)
+             <<" gender/yaw precision: "<<gender_precision/param_.test_iter(test_net_id)
+             <<" glasses/pitch precision: "<<glasses_presion/param_.test_iter(test_net_id)
+             <<" headpose/roll precision: "<<headpose_presicon/param_.test_iter(test_net_id);
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";
     return;
