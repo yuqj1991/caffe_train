@@ -45,11 +45,10 @@ def postprocess(img, out):
 
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
-    blur = out['detection_out'][0,0,:,7:10]
-    occlu = out['detection_out'][0,0,:,10:13]
-    blur_max_index = blur.index(max(blur))
-    occlu_max_index = occlu.index(max(occlu))
-    return (box.astype(np.int32), conf, cls, blur_max_index, occlu_max_index)
+    conf = out['detection_out'][0,0,:,2]
+    blur_max_index = out['detection_out'][0,0,:,7]
+    blur_max_index = out['detection_out'][0,0,:8]
+    return (box.astype(np.int32), conf, cls, blur_max_index, blur_max_index)
 
 def detect():
     cap = cv2.VideoCapture(0)
@@ -68,8 +67,8 @@ def detect():
              p2 = (box[i][2], box[i][3])
              cv2.rectangle(frame, p1, p2, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "%s:%.2f,blur:%.2f, occlu: %.2f" % (CLASSES[int(cls[i])], conf[i], blur[i], occlu[i])
-             cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
+             #title = "%s:%.2f" % (CLASSES[int(cls[i])])
+             #cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("facedetector", frame)
        k = cv2.waitKey(30) & 0xff
         #Exit if ESC pressed

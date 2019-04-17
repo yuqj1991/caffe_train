@@ -410,9 +410,6 @@ void MultiBoxLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     conf_blur_loss_.mutable_cpu_data()[0] = 0;
     conf_occlussion_loss_.mutable_cpu_data()[0] = 0;
   }
-  #if 1
-    LOG(INFO)<<"conf_occlussion_loss_: "<< conf_occlussion_loss_.cpu_data()[0];
-    #endif
   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   top[0]->mutable_cpu_data()[0] = 0;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
