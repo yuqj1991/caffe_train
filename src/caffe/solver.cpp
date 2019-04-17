@@ -558,7 +558,6 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
       ShareTrainedLayersWith(net_.get());
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
   Dtype nme =0.0, gender_precision =0.0, glasses_presion=0.0, headpose_presicon=0.0;
-  int iter_size = 0.0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
     SolverAction::Enum request = GetRequestedAction();
     // Check to see if stoppage of testing/training has been requested.
@@ -576,7 +575,6 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
     }
     Dtype iter_loss;
     const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
-    iter_size = result.size();
     for (int j = 0; j < result.size(); ++j) {
       const Dtype* result_vec = result[j]->cpu_data();
       nme +=result_vec[0];
