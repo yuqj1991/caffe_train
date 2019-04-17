@@ -40,6 +40,10 @@ layer {
 			saturation_upper: 1.5
 			random_order_prob: 0.0
 		}
+		expand_param {
+			prob: 0.5
+			max_expand_ratio: 4.0
+		}
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_training_umdface_pose_lmdb/"
