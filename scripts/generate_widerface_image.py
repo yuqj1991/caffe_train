@@ -390,7 +390,7 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 
 def main():
 	# generate setfile xmlfile 
-	if 0:
+	if 1:
 		for sub in anno_src_wider_dir:
 			dir = "../../dataset/facedata/wider_face_split/"+sub
 			load_wider_split(dir)
@@ -398,7 +398,7 @@ def main():
 		for file in wider_directory:
 			shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
 	# static and get classfyFile
-	if 1:
+	if 0:
 		draw_histogram_specfic_range_base_data()
 if __name__ == '__main__':
 	main()
