@@ -64,9 +64,9 @@ def postprocess(img, out):
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
     blur_max_index = out['detection_out'][0,0,:,7]
-    blur_max_index = out['detection_out'][0,0,:8]
-    return (box.astype(np.int32), conf, cls, blur_max_index, blur_max_index)
-
+    blur_max_index = out['detection_out'][0,0,:,8]
+    return (box.astype(np.int32), conf, cls, blur_max_index.astype(np.int32), blur_max_index.astype(np.int32))
+    
 
 def postprocessface(img, out):   
     h = img.shape[0]
@@ -93,12 +93,12 @@ def detect():
        out = net.forward()
        box, conf, cls , blur, occlu= postprocess(frame, out)
        for i in range(len(box)):
-          if conf[i]>=0.35:
+          if conf[i]>=0.25:
              p1 = (box[i][0], box[i][1])
              p2 = (box[i][2], box[i][3])
              cv2.rectangle(frame, p1, p2, (0,255,0))
              
-             ori_img = frame[box[i][1]:box[i][3],box[i][0]:box[i][2],:]
+             ori_img = frame[(box[i][1]):(box[i][3]),(box[i][0]):(box[i][2]),:]
              oimg = preprocessface(ori_img)
              oimg = oimg.astype(np.float32)
              oimg = oimg.transpose((2, 0, 1))
@@ -109,7 +109,7 @@ def detect():
                  point = (boxpoint[jj], boxpoint[jj+5])
                  cv2.circle(ori_img, point, 3,(0,0,213),-1)
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "%s:%.2f, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i],gender, glasses, headpose)
+             title = "%s:%.2f,  %s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i],blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("facedetector", frame)
        k = cv2.waitKey(30) & 0xff

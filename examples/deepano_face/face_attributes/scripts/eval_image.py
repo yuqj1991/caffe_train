@@ -1,3 +1,5 @@
+# -*- coding:UTF-8 -*-
+from __future__ import division
 import numpy as np
 import argparse
 import sys,os  
@@ -18,7 +20,7 @@ parser1 = make_parser()
 args = parser1.parse_args()
 net_file= args.model
 caffe_model= args.weights
-test_dir = "../images"
+test_dir = "../../../../../dataset/facedata/mtfl/JPEGImages/AFLW"
 label_dir = "../../../../../dataset/facedata/mtfl/label/"
 num_image = 0
 
@@ -48,19 +50,19 @@ def postprocess(img, out):
     h = img.shape[0]
     w = img.shape[1]
     facepoints = out['multiface_output'][0, 0:10] * np.array([w, w, w, w, w, h, h, h, h, h])
-    print('~~~~~~~~~~~~~~~~~~~~~~~')
     gender = out['multiface_output'][0, 10:12]
     gender_index = np.argmax(gender)
     glasses = out['multiface_output'][0, 12:14]
     glasses_index = np.argmax(glasses)
     headpose = out['multiface_output'][0, 14:19]
     headpose_index = np.argmax(headpose)
-    return (facepoints.astype(np.int32), gender_content[gender_index[0]], glasses_content[glasses_index[0]],
-            headpose_content[headpose_index[0]])
+    return (facepoints.astype(np.int32), gender_index, glasses_index,
+           headpose_index)
 
 
 def detect(imgfile):
     origimg = cv2.imread(imgfile)
+    w = origimg.shape[1]
     img = preprocess(origimg)
     labelpath = label_dir+imgfile.split('/')[-1].split('.jpg')[0]
     
@@ -70,7 +72,7 @@ def detect(imgfile):
     net.blobs['data'].data[...] = img
     out = net.forward()
     box, gender, glasses, headpose = postprocess(origimg, out)
-    sum_nmse = []
+    sum_nmse = [0.0,0.0,0.0,0.0,0.0]
 
     num_correct_gender = 0
     num_correct_glasses = 0
@@ -103,8 +105,8 @@ def detect(imgfile):
             x = [x1, x2, x3, x4, x5]
             y = [y1, y2, y3, y4, y5]
             for ii in range(5):
-                sum_nmse[ii] += pow((x[ii]-box[ii]), 2)
-                sum_nmse[ii] += pow((y[ii]-box[ii+5]), 2)
+                sum_nmse[ii] = pow((x[ii]-box[ii]), 2) + pow((y[ii]-box[ii+5]), 2)
+                sum_nmse[ii] = float(pow(sum_nmse[ii], 0.5))/w
     labelfile_.close()
     return sum_nmse, num_correct_gender, num_correct_glasses, num_correct_headpose
 
@@ -113,7 +115,7 @@ mtfl_eval_landmakrs = []
 mtfl_eval_gender = 0
 mtfl_eval_glass =0
 mtfl_eval_headpose = 0
-sum_landmark = []
+sum_landmark = [0.0,0.0,0.0,0.0,0.0]
 for f in os.listdir(test_dir):
     sum, num_gender, num_glasses, num_headpose = detect(test_dir + "/" + f)
     mtfl_eval_landmakrs.append(sum)
@@ -123,11 +125,12 @@ for f in os.listdir(test_dir):
     num_image += 1
 
 # static
-for ii in range(5):
-    sum_landmark[ii] += mtfl_eval_landmakrs[ii]/num_image
-eval_gender = mtfl_eval_gender/num_image
-eval_glass = mtfl_eval_glass/num_image
-eval_headpose = mtfl_eval_headpose/num_image
+for nn in range(len(mtfl_eval_landmakrs)):
+    for ii in range(5):
+        sum_landmark[ii] += float(mtfl_eval_landmakrs[nn][ii]/num_image)
+eval_gender = float(mtfl_eval_gender/num_image)
+eval_glass = float(mtfl_eval_glass/num_image)
+eval_headpose = float(mtfl_eval_headpose/num_image)
 
 print ("eval_gender: %f, eval_glass: %f, eval_headpose: %f" % (eval_gender, eval_glass, eval_headpose))
 print ("left eye : %f, right eye: %f, nose : %f, left cornor mouth: %f, right cornor mouth: %f" % (sum_landmark[0],

@@ -59,7 +59,7 @@ def detect():
        out = net.forward()
        box, conf, cls , blur, occlu= postprocess(frame, out)
        for i in range(len(box)):
-          if conf[i]>=0.26:
+          if conf[i]>=0.25:
              p1 = (box[i][0], box[i][1])
              p2 = (box[i][2], box[i][3])
              cv2.rectangle(frame, p1, p2, (0,255,0))
