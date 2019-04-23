@@ -4113,6 +4113,6 @@ layer {
 		}
 		code_type: CENTER_SIZE
 		keep_top_k: 50
-		confidence_threshold: 0.5
+		confidence_threshold: 0.25
 	}
 }

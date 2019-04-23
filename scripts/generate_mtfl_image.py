@@ -13,7 +13,7 @@ sys.setrecursionlimit(1000000)
 
 ANNOTATIONS_DIR = '../../dataset/facedata/mtfl/Annotations'
 LABEL_DIR = '../../dataset/facedata/mtfl/label'
-Annotation_img_dir = '../../dataset/facedata/mtfl/Annotation_img'
+Annotation_img_dir = '../../dataset/facedata/mtfl/annoImage'
 root_dir = "../../dataset/facedata/"
 anno_mtfl_dir = ['training.txt', 'testing.txt']
 thread_hold = 40 
@@ -98,8 +98,7 @@ def convert_src_anno_label(split_file):
 			glass = img_file_info[14]
 			headpose = img_file_info[15]
 			landmark = x1 + " " + x2 + " " + x3 + " " + x4 \
-						+ " " + x5 + " " + y1 + " " + y2 + " " \
-						+ " " + y3 + " " + y4 + " " + y5 + " " + gender + " " + glass + " "+ headpose
+						+ " " + x5 + " " + y1 + " " + y2 + " " + y3 + " " + y4 + " " + y5 + " " + gender + " " + glass + " "+ headpose
 			labelFile.write(landmark)
 			labelFile.close()
 	mainSetFile.close()
