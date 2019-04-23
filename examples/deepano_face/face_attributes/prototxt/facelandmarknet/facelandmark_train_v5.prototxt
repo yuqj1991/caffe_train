@@ -1936,3 +1936,4 @@ layer {
     conf_headpose_loss_type: SOFTMAX
   }
 }
+
