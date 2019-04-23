@@ -22,7 +22,7 @@ layer {
     }
     data_param {
 		source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_testing_lmdb/"
-		batch_size: 2
+		batch_size: 1
 		backend: LMDB
 	}
 }
@@ -813,7 +813,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
+    num_output: 512
     kernel_size: 3
     stride: 2
     pad: 1
@@ -889,7 +889,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
+    num_output: 512
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1268,7 +1268,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
+    num_output: 512
     kernel_size: 3
     stride: 2
     pad: 1
@@ -1343,7 +1343,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 2
     pad: 1
@@ -1418,7 +1418,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1493,7 +1493,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1570,7 +1570,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 4096
+	num_output: 1024
     weight_filler {
       type: "xavier"
 	}
@@ -1603,7 +1603,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 1024
+	num_output: 512
     weight_filler {
       type: "xavier"
 	}
@@ -1635,7 +1635,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 256
+	num_output: 128
     weight_filler {
       type: "xavier"
 	}
@@ -1681,7 +1681,7 @@ layer {
 
 ####
 
-####
+
 layer {
   name: "conv_5_3_2"
   type: "Convolution"
@@ -1696,7 +1696,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1772,7 +1772,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 4096
+	num_output: 1024
     weight_filler {
       type: "xavier"
 	}
@@ -2181,6 +2181,7 @@ layer {
 	bottom: "conv6_landmark_fds_2"
 	top: "conv6_landmark_fds_2"
 }
+
 layer {
   name: "conv6_landmark"
   type: "InnerProduct"

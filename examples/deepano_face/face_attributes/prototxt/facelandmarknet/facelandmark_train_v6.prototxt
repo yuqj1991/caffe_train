@@ -44,7 +44,7 @@ layer {
     }
     data_param {
         source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_training_lmdb/"
-        batch_size: 16
+        batch_size: 8
         backend: LMDB
     }
 }
@@ -270,6 +270,7 @@ layer {
 	bottom: "convpre_1"
 	top: "convpre_1"
 }
+
 layer {
   name: "convpre_2"
   type: "Convolution"
@@ -834,7 +835,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
+    num_output: 512
     kernel_size: 3
     stride: 2
     pad: 1
@@ -910,7 +911,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
+    num_output: 512
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1046,6 +1047,7 @@ layer {
 	bottom: "conv_5_3"
 	top: "conv_5_3"
 }
+
 layer {
   name: "convpre_4_attri"
   type: "Convolution"
@@ -1288,7 +1290,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
+    num_output: 512
     kernel_size: 3
     stride: 2
     pad: 1
@@ -1363,7 +1365,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 2
     pad: 1
@@ -1438,7 +1440,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1513,7 +1515,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1590,7 +1592,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 4096
+	num_output: 1024
     weight_filler {
       type: "xavier"
 	}
@@ -1623,7 +1625,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 1024
+	num_output: 512
     weight_filler {
       type: "xavier"
 	}
@@ -1655,7 +1657,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 256
+	num_output: 128
     weight_filler {
       type: "xavier"
 	}
@@ -1716,7 +1718,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1792,7 +1794,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 4096
+	num_output: 1024
     weight_filler {
       type: "xavier"
 	}
@@ -1900,6 +1902,7 @@ layer {
     }
   }
 }
+
 ####
 layer {
   name: "conv_5_3_3"

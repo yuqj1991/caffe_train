@@ -18,8 +18,8 @@ caffe_model= args.weights
 gender_content = ('male', 'female')
 glasses_content = ('wearing glasses', 'not wearing glasses')
 headpose_content = ('left profile', 'left', 'frontal', 'right', 'right profile')
-#test_dir ='../images'
-test_dir = "../../../../../dataset/facedata/mtfl/JPEGImages/AFLW"
+test_dir ='../images'
+#test_dir = "../../../../../dataset/facedata/mtfl/JPEGImages/AFLW"
 
 if not os.path.exists(caffe_model):
     print(caffe_model + " does not exist")
