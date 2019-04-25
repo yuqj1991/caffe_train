@@ -5,83 +5,9 @@ input_dim: 3
 input_dim: 96
 input_dim: 96
 layer {
-    name: "convpre_11"
-    type: "Convolution"
-    bottom: "data"
-    top: "convpre_11"
-    param {
-        lr_mult: 1
-        decay_mult: 1
-    }
-    param {
-        lr_mult: 2
-        decay_mult: 1
-    }
-    convolution_param {
-        num_output: 64
-        kernel_size: 3
-        stride: 1
-        pad: 1
-        weight_filler {
-            type: "xavier"
-        }
-        bias_filler {
-            type: "constant"
-            value: 0
-        }
-    }
-}
-layer {
-	name: "convpre_11/bn"
-	type: "BatchNorm"
-	bottom: "convpre_11"
-	top: "convpre_11"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "convpre_11/scale"
-	type: "Scale"
-	bottom: "convpre_11"
-	top: "convpre_11"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "convpre_11/relu"
-	type: "ReLU"
-	bottom: "convpre_11"
-	top: "convpre_11"
-}
-layer {
     name: "convpre_12"
     type: "Convolution"
-    bottom: "convpre_11"
+    bottom: "data"
     top: "convpre_12"
     param {
         lr_mult: 1

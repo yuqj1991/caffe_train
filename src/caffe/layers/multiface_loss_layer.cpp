@@ -90,6 +90,7 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
     /*****************************************************************************************/
     // Set up gender confidence loss layer.
+    gender_weight_ = multiface_loss_param.gender_weight();
     gender_loss_type_ = multiface_loss_param.conf_gender_loss_type();
     gender_bottom_vec_.push_back(&gender_pred_);
     gender_bottom_vec_.push_back(&gender_gt_);
@@ -129,6 +130,7 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
     /*****************************************************************************************/
     // Set up glasses confidence loss layer.
+    glasses_weight_ = multiface_loss_param.glass_weight();
     glasses_loss_type_ = multiface_loss_param.conf_glasses_loss_type();
     glasses_bottom_vec_.push_back(&glasses_pred_);
     glasses_bottom_vec_.push_back(&glasses_gt_);
@@ -168,6 +170,7 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
     /***************************************************************************************/
     // Set up headpose confidence loss layer.
+    headpose_weight_ = multiface_loss_param.headpose_weight();
     headpose_loss_type_ = multiface_loss_param.conf_headpose_loss_type();
     headpose_bottom_vec_.push_back(&headpose_pred_);
     headpose_bottom_vec_.push_back(&headpose_gt_);
@@ -336,17 +339,24 @@ const vector<Blob<Dtype>*>& top) {
         gender_gt_.Reshape(gender_shape);
         gender_shape.push_back(num_gender_);
         gender_pred_.Reshape(gender_shape);
+        gender_pred_.CopyFrom(*(bottom[1]));
     } else if (gender_loss_type_ == MultiFaceLossParameter_AttriLossType_LOGISTIC) {
         gender_shape.push_back(1);
         gender_shape.push_back(batch_size_);
         gender_shape.push_back(num_gender_);
         gender_gt_.Reshape(gender_shape);
+        /************************************************/
+        Blob<Dtype> gender_temp;
+        gender_temp.ReshapeLike(*(bottom[1]));
+        gender_temp.CopyFrom(*(bottom[1]));
+        gender_temp.Reshape(gender_shape);
         gender_pred_.Reshape(gender_shape);
+        gender_pred_.CopyFrom(gender_temp);
+        
     } else {
         LOG(FATAL) << "Unknown gender confidence loss type.";
     }
     //Dtype* conf_pred_data = conf_pred_.mutable_cpu_data();
-    gender_pred_.CopyFrom(*(bottom[1]));
     Dtype* gender_gt_data = gender_gt_.mutable_cpu_data();
     caffe_set(gender_gt_.count(), Dtype(0), gender_gt_data);
     for(int ii = 0; ii< batch_size_; ii++)
@@ -455,15 +465,15 @@ const vector<Blob<Dtype>*>& top) {
     }
     if (this->layer_param_.propagate_down(1)) {
     top[0]->mutable_cpu_data()[0] += 
-            gender_loss_.cpu_data()[0] / normalizer;
+            gender_weight_*gender_loss_.cpu_data()[0] / normalizer;
     }
     if(this->layer_param_.propagate_down(2)) {
     top[0]->mutable_cpu_data()[0] += 
-            glasses_loss_.cpu_data()[0] / normalizer;
+            glasses_weight_*glasses_loss_.cpu_data()[0] / normalizer;
     }
     if(this->layer_param_.propagate_down(3)) {
     top[0]->mutable_cpu_data()[0] += 
-            headpose_loss_.cpu_data()[0] / normalizer;
+            headpose_weight_*headpose_loss_.cpu_data()[0] / normalizer;
     }
     #if 0
     LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
@@ -501,6 +511,9 @@ const vector<Blob<Dtype>*>& bottom) {
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, batch_size_, 1, -1);
         Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+        #if 0
+            LOG(INFO)<<"top[0]->cpu_diff()[0]: "<<top[0]->cpu_diff()[0];
+        #endif
         caffe_scal(landmark_pred_.count(), loss_weight, landmark_pred_.mutable_cpu_diff());
         bottom[0]->ShareDiff(landmark_pred_);
         // Copy gradient back to bottom[0].

@@ -2253,6 +2253,9 @@ layer {
   multiface_loss_param{
     mark_loss_type : L2
     mark_weight: 1
+    gender_weight: 1
+    glass_weight: 1
+    headpose_weight: 1
     num_gender: 2
     num_glasses: 2
     num_headpose: 5

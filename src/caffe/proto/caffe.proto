@@ -1467,6 +1467,9 @@ message MultiFaceLossParameter {
   optional AttriLossType conf_glasses_loss_type = 8 [default = SOFTMAX];
   // add new background id realeated id r.w.t blur & occlusion
   optional AttriLossType conf_headpose_loss_type = 9 [default = SOFTMAX];
+  optional float gender_weight = 10 [default = 1.0];
+  optional float glass_weight = 11 [default = 1.0];
+  optional float headpose_weight = 12 [default = 1.0];
 }
 
 // Message that store parameters used by MultiBoxLossLayer
