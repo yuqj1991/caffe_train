@@ -1553,12 +1553,42 @@ layer {
 	bottom: "conv_5_3_1"
 	top: "conv_5_3_1"
 }
-
+layer {
+  name: "conv6_gender_fds_1"
+  type: "InnerProduct"
+  bottom: "conv_5_3_1"
+  top: "conv6_gender_fds_1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  inner_product_param {
+  	#kernel_size: 1
+	num_output: 32
+    weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv6_gender_fds_1/relu"
+	type: "ReLU"
+	bottom: "conv6_gender_fds_1"
+	top: "conv6_gender_fds_1"
+}
 
 layer {
   name: "conv6_gender"
   type: "InnerProduct"
-  bottom: "conv_5_3_1"
+  bottom: "conv6_gender_fds_1"
   top: "conv6_gender"
   param {
     lr_mult: 1
@@ -1658,9 +1688,40 @@ layer {
 	top: "conv_5_3_2"
 }
 layer {
-  name: "conv6_glasses"
+  name: "conv6_glasses_fds_1"
   type: "InnerProduct"
   bottom: "conv_5_3_2"
+  top: "conv6_glasses_fds_1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  inner_product_param {
+  	#kernel_size: 1
+	num_output: 32
+    weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv6_glasses_fds_1/relu"
+	type: "ReLU"
+	bottom: "conv6_glasses_fds_1"
+	top: "conv6_glasses_fds_1"
+}
+layer {
+  name: "conv6_glasses"
+  type: "InnerProduct"
+  bottom: "conv6_glasses_fds_1"
   top: "conv6_glasses"
   param {
     lr_mult: 1
@@ -1759,9 +1820,40 @@ layer {
 	top: "conv_5_3_3"
 }
 layer {
-  name: "conv6_headpose"
+  name: "conv6_headpose_fds_1"
   type: "InnerProduct"
   bottom: "conv_5_3_3"
+  top: "conv6_headpose_fds_1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  inner_product_param {
+  	#kernel_size: 1
+	num_output: 64
+    weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv6_headpose_fds_1/relu"
+	type: "ReLU"
+	bottom: "conv6_headpose_fds_1"
+	top: "conv6_headpose_fds_1"
+}
+layer {
+  name: "conv6_headpose"
+  type: "InnerProduct"
+  bottom: "conv6_headpose_fds_1"
   top: "conv6_headpose"
   param {
     lr_mult: 1
@@ -1783,6 +1875,7 @@ layer {
     }
   }
 }
+
 ####
 layer {
   name: "conv_5_3_4"
@@ -1859,9 +1952,40 @@ layer {
 	top: "conv_5_3_4"
 }
 layer {
-  name: "conv6_landmark"
+  name: "conv6_landmark_fds_1"
   type: "InnerProduct"
   bottom: "conv_5_3_4"
+  top: "conv6_landmark_fds_1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  inner_product_param {
+  	#kernel_size: 1
+	num_output: 64
+    weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv6_landmark_fds_1/relu"
+	type: "ReLU"
+	bottom: "conv6_landmark_fds_1"
+	top: "conv6_landmark_fds_1"
+}
+layer {
+  name: "conv6_landmark"
+  type: "InnerProduct"
+  bottom: "conv6_landmark_fds_1"
   top: "conv6_landmark"
   param {
     lr_mult: 1
@@ -1883,6 +2007,7 @@ layer {
     }
   }
 }
+
 layer {
   name: "conv6_gender"
   type: "Softmax"
