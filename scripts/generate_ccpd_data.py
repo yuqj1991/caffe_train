@@ -46,8 +46,7 @@ def generate_label(imagefilepath, savefilepath):
 	vertices_4_x = exactbndBox[3].split("&")[0]
 	vertices_4_y = exactbndBox[3].split("&")[1]
 	licenseNum = labelInfo[4].split('_')
-	for ii in range(2):
-		labelContent = " ".join(a for a in labelbndBox[ii].split("&")) +" "+ " ".join(b for b in licenseNum)
+	labelContent = " ".join(a for ii in range(2) for a in labelbndBox[ii].split("&")) +" "+ " ".join(b for b in licenseNum)
 	label_file_ = open(savefilepath, "w")
 	label_file_.write(labelContent)
 	label_file_.close()
