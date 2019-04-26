@@ -3,7 +3,7 @@ import sys
 import os
 import random
 wider_directory = ['wider_train', 'wider_val']
-root_dir ='../../../../../face_train/examples/deepano_face/face_detector/scripts/'
+root_dir ='../../../../../caffe_deeplearning_train/examples/deepano_face/face_detector/scripts/'
 root_dataset = '../../../../../dataset/facedata/wider_face/Annotations/'
 def shuffle_file(filename):
 	f = open(filename, 'r+')

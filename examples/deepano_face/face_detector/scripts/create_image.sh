@@ -1,4 +1,4 @@
-root_dir="/home/deepano/workspace/deepano_face_train"
+root_dir="/home/deepano/workspace/caffe_deeplearning_train"
 cd $root_dir
 
 redo=1
