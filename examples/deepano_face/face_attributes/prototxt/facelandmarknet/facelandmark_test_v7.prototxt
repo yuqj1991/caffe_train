@@ -2626,7 +2626,7 @@ layer {
   }
   inner_product_param {
   	#kernel_size: 1
-	num_output: 64
+	num_output: 10
     weight_filler {
       type: "xavier"
 	}
