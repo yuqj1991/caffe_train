@@ -61,7 +61,7 @@ layer {
 		num_output: 32
 		kernel_size: 3
 		stride: 1
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -136,7 +136,7 @@ layer {
 		num_output: 64
 		kernel_size: 3
 		stride: 1
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -210,7 +210,7 @@ layer {
 		num_output: 128
 		kernel_size: 3
 		stride: 2
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -285,7 +285,7 @@ layer {
 		num_output: 256
 		kernel_size: 3
 		stride: 1
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -361,7 +361,7 @@ layer {
 		num_output: 256
 		kernel_size: 3
 		stride: 2
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -437,7 +437,7 @@ layer {
 		num_output: 256
 		kernel_size: 3
 		stride: 1
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -513,7 +513,7 @@ layer {
 		num_output: 512
 		kernel_size: 3
 		stride: 2
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -589,7 +589,7 @@ layer {
 		num_output: 256
 		kernel_size: 3
 		stride: 1
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -665,7 +665,7 @@ layer {
 		num_output: 256
 		kernel_size: 3
 		stride: 2
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -740,7 +740,7 @@ layer {
 		num_output: 256
 		kernel_size: 3
 		stride: 2
-		pad: 1
+		pad: 0
 		weight_filler {
 			type: "xavier"
 		}
@@ -797,12 +797,42 @@ layer {
 	bottom: "conv_5_3_2"
 	top: "conv_5_3_2"
 }
-
+layer {
+	name: "conv6_angle_fds"
+	type: "InnerProduct"
+	bottom: "conv_5_3_2"
+	top: "conv6_angle"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 1
+	}
+	inner_product_param {
+		#kernel_size: 1
+		num_output: 64
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv6_angle_fds/relu"
+	type: "PReLU"
+	bottom: "conv6_angle_fds"
+	top: "conv6_angle_fds"
+}
 
 layer {
 	name: "conv6_angle"
 	type: "InnerProduct"
-	bottom: "conv_5_3_2"
+	bottom: "conv6_angle_fds"
 	top: "conv6_angle"
 	param {
 		lr_mult: 1

@@ -22,7 +22,7 @@ net_file= args.model
 caffe_model= args.weights
 face_file= args.facemodel
 face_model= args.faceweights
-
+test_dir = "../images"
 
 if not os.path.exists(caffe_model):
     print(caffe_model + " does not exist")
@@ -81,43 +81,43 @@ def postprocessface(img, out):
     return (facepoints.astype(np.int32), gender_content[gender_index], glasses_content[glasses_index], headpose_content[headpose_index])
 
 
-def detect():
-    cap = cv2.VideoCapture(0)
-    while True:
-       ret, frame = cap.read()
-       img = preprocess(frame)
-       img = img.astype(np.float32)
-       img = img.transpose((2, 0, 1))
+def detect(imgfile):
+	frame = cv2.imread(imgfile)
+	img = preprocess(frame)
+	img = img.astype(np.float32)
+	img = img.transpose((2, 0, 1))
 
-       net.blobs['data'].data[...] = img
-       out = net.forward()
-       box, conf, cls , blur, occlu= postprocess(frame, out)
-       for i in range(len(box)):
-          if conf[i]>=0.25:
-             p1 = (box[i][0], box[i][1])
-             p2 = (box[i][2], box[i][3])
-             cv2.rectangle(frame, p1, p2, (0,255,0))
-             
-             ori_img = frame[box[i][0]:box[i][2],box[i][1]:box[i][3],:]
-             oimg = preprocessface(ori_img)
-             oimg = oimg.astype(np.float32)
-             oimg = oimg.transpose((2, 0, 1))
-             net2.blobs['data'].data[...] = oimg
-             out2 = net2.forward()
-             print("p1 and p2: ", p1, p2)
-             boxpoint, gender, glasses, headpose = postprocessface(ori_img, out2)
-             for jj in range(5):
-                 point = (boxpoint[jj], boxpoint[jj+5])
-                 print point
-                 cv2.circle(ori_img, point, 3,(0,0,213),-1)
-             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-             p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "%s:%.2f,  %s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i],blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
-             cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
-       cv2.imshow("facedetector", frame)
-       k = cv2.waitKey(30) & 0xff
-       if k == 27 : 
-          return False
+	net.blobs['data'].data[...] = img
+	out = net.forward()
+	box, conf, cls , blur, occlu= postprocess(frame, out)
+	for i in range(len(box)):
+	  if conf[i]>=0.25:
+	     p1 = (box[i][0], box[i][1])
+	     p2 = (box[i][2], box[i][3])
+	     cv2.rectangle(frame, p1, p2, (0,255,0))
+	     
+	     ori_img = frame[box[i][1]:box[i][3],box[i][0]:box[i][2],:]
+	     oimg = preprocessface(ori_img)
+	     oimg = oimg.astype(np.float32)
+	     oimg = oimg.transpose((2, 0, 1))
+	     net2.blobs['data'].data[...] = oimg
+	     out2 = net2.forward()
+	     print("p1 and p2: ", p1, p2)
+	     boxpoint, gender, glasses, headpose = postprocessface(ori_img, out2)
+	     for jj in range(5):
+		 point = (boxpoint[jj], boxpoint[jj+5])
+		 print point
+		 cv2.circle(ori_img, point, 3,(0,0,213),-1)
+	     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+	     p3 = (max(p1[0], 15), max(p1[1], 15))
+	     title = "%s:%.2f,  %s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i],blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
+	     cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
+	cv2.imshow("facedetector", frame)
+	k = cv2.waitKey(0) & 0xff
+	if k == 27 : 
+	  return False
+	return True
 
-if __name__=="__main__":
-    detect()
+for f in os.listdir(test_dir):
+    if detect(test_dir + "/" + f) == False:
+       break
