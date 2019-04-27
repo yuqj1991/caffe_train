@@ -1,0 +1,218 @@
+#ifndef CAFFE_MULTIBOX_LOSS_LAYER_HPP_
+#define CAFFE_MULTIBOX_LOSS_LAYER_HPP_
+
+#include <map>
+#include <utility>
+#include <vector>
+
+#include "caffe/blob.hpp"
+#include "caffe/layer.hpp"
+#include "caffe/proto/caffe.pb.h"
+#include "caffe/util/bbox_util.hpp"
+
+#include "caffe/layers/loss_layer.hpp"
+
+namespace caffe {
+
+/**
+ * @brief Perform MultiBox operations. Including the following:
+ *
+ *  - decode the predictions.
+ *  - perform matching between priors/predictions and ground truth.
+ *  - use matched boxes and confidences to compute loss.
+ *
+ */
+template <typename Dtype>
+class MultiBoxccpdLossLayer : public LossLayer<Dtype> {
+ public:
+  explicit MultiBoxccpdLossLayer(const LayerParameter& param)
+      : LossLayer<Dtype>(param) {}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual inline const char* type() const { return "MultiBoxccpdLoss"; }
+  // bottom[0] stores the location predictions.
+  // bottom[1] stores the confidence predictions.
+  // bottom[2] stores the prior bounding boxes.
+  // bottom[3] stores the ground truth bounding boxes.
+  virtual inline int ExactNumBottomBlobs() const { return 11; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+
+  // The internal localization loss layer.
+  shared_ptr<Layer<Dtype> > loc_loss_layer_;
+  LocLossType loc_loss_type_;
+  float loc_weight_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> loc_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> loc_top_vec_;
+  // blob which stores the matched location prediction.
+  Blob<Dtype> loc_pred_;
+  // blob which stores the corresponding matched ground truth.
+  Blob<Dtype> loc_gt_;
+  // localization loss.
+  Blob<Dtype> loc_loss_;
+
+  // The internal confidence category loss layer.
+  shared_ptr<Layer<Dtype> > conf_loss_layer_;
+  ConfLossType conf_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> conf_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> conf_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> conf_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> conf_gt_;
+  // confidence loss.
+  Blob<Dtype> conf_loss_;
+
+  // The internal confidence chinesecharcter_loss_layer.
+  shared_ptr<Layer<Dtype> > chinesecharcter_loss_layer_;
+  ConfLossType chinesecharcter_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> chinesecharcter_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> chinesecharcter_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> chinesecharcter_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> chinesecharcter_gt_;
+  // confidence loss.
+  Blob<Dtype> chinesecharcter_loss_;
+
+  // The internal confidence engcharcter_loss_layer.
+  shared_ptr<Layer<Dtype> > engcharcter_loss_layer_;
+  ConfLossType engcharcter_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> engcharcter_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> engcharcterr_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> engcharcter_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> engcharcter_gt_;
+  // confidence loss.
+  Blob<Dtype> engcharcter_loss_;
+
+  // The internal confidence letternum_loss_layer.
+  shared_ptr<Layer<Dtype> > letternum_1_loss_layer_;
+  ConfLossType letternum_1_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_1_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_1_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> letternum_1_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> letternum_1_gt_;
+  // confidence loss.
+  Blob<Dtype> letternum_1_loss_;
+
+  // The internal confidence letternum_loss_layer.
+  shared_ptr<Layer<Dtype> > letternum_2_loss_layer_;
+  ConfLossType letternum_2_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_2_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_2_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> letternum_2_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> letternum_2_gt_;
+  // confidence loss.
+  Blob<Dtype> letternum_2_loss_;
+
+  // The internal confidence letternum_loss_layer.
+  shared_ptr<Layer<Dtype> > letternum_3_loss_layer_;
+  ConfLossType letternum_3_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_3_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_3_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> letternum_3_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> letternum_3_gt_;
+  // confidence loss.
+  Blob<Dtype> letternum_3_loss_;
+
+  // The internal confidence letternum_loss_layer.
+  shared_ptr<Layer<Dtype> > letternum_4_loss_layer_;
+  ConfLossType letternum_4_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_4_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_4_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> letternum_4_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> letternum_4_gt_;
+  // confidence loss.
+  Blob<Dtype> letternum_4_loss_;
+
+  // The internal confidence letternum_loss_layer.
+  shared_ptr<Layer<Dtype> > letternum_5_loss_layer_;
+  ConfLossType letternum_5_loss_type_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_5_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> letternum_5_top_vec_;
+  // blob which stores the confidence prediction.
+  Blob<Dtype> letternum_5_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> letternum_5_gt_;
+  // confidence loss.
+  Blob<Dtype> letternum_5_loss_;
+
+  MultiBoxLossParameter multibox_loss_param_;
+  int num_classes_;
+  int num_chinese_;
+  int num_english_;
+  int num_letter_1_;
+  int num_letter_2_;
+  int num_letter_3_;
+  int num_letter_4_;
+  int num_letter_5_;
+  int num_cnt_;
+  bool share_location_;
+  MatchType match_type_;
+  float overlap_threshold_;
+  bool use_prior_for_matching_;
+  int background_label_id_;
+  bool use_difficult_gt_;
+  bool do_neg_mining_;
+  float neg_pos_ratio_;
+  float neg_overlap_;
+  CodeType code_type_;
+  bool encode_variance_in_target_;
+  bool map_object_to_agnostic_;
+  bool ignore_cross_boundary_bbox_;
+  bool bp_inside_;
+  MiningType mining_type_;
+
+  int loc_classes_;
+  int num_gt_;
+  int num_;
+  int num_priors_;
+
+  int num_matches_;
+  int num_conf_;
+  vector<map<int, vector<int> > > all_match_indices_;
+  vector<vector<int> > all_neg_indices_;
+
+  // How to normalize the loss.
+  LossParameter_NormalizationMode normalization_;
+};
+
+}  // namespace caffe
+
+#endif  // CAFFE_MULTIBOX_LOSS_LAYER_HPP_

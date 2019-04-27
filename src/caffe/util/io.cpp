@@ -196,6 +196,7 @@ bool ReadRichImageToAnnotatedDatum(const string& filename,
     const string& labelfile, const int height, const int width,
     const int min_dim, const int max_dim, const bool is_color,
     const string& encoding, const AnnotatedDatum_AnnotationType type,
+    const AnnotatedDatum_AnnoataionAttriType attri_type,
     const string& labeltype, const std::map<string, int>& name_to_label,
     AnnotatedDatum* anno_datum) {
   // Read image to datum.
@@ -214,17 +215,33 @@ bool ReadRichImageToAnnotatedDatum(const string& filename,
     case AnnotatedDatum_AnnotationType_BBOX:
       int ori_height, ori_width;
       GetImageSize(filename, &ori_height, &ori_width);
-      if (labeltype == "xml") {
-        return ReadXMLToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                       name_to_label, anno_datum);
-      } else if (labeltype == "json") {
-        return ReadJSONToAnnotatedDatum(labelfile, ori_height, ori_width,
+      switch(attri_type){
+        case AnnotatedDatum_AnnoataionAttriType_FACE:
+        if (labeltype == "xml") {
+          return ReadXMLToAnnotatedDatum(labelfile, ori_height, ori_width,
                                         name_to_label, anno_datum);
-      } else if (labeltype == "txt") {
-        return ReadTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                       anno_datum);
-      } else {
-        LOG(FATAL) << "Unknown label file type.";
+        } else if (labeltype == "json") {
+          return ReadJSONToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                          name_to_label, anno_datum);
+        } else if (labeltype == "txt") {
+          return ReadTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                        anno_datum);
+        } else {
+          LOG(FATAL) << "Unknown label file type.";
+          return false;
+        }
+        break;
+      case AnnotatedDatum_AnnoataionAttriType_LPnumber:
+        if (labeltype == "txt") {
+          return ReadccpdTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                        name_to_label, anno_datum);
+        } else {
+          LOG(FATAL) << "Unknown label file type.";
+          return false;
+        }
+        break;
+      default:
+        LOG(FATAL) << "Unknown attri type.";
         return false;
       }
       break;
@@ -494,14 +511,14 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
           bbox->set_ymin(static_cast<float>(ymin) / height);
           bbox->set_xmax(static_cast<float>(xmax) / width);
           bbox->set_ymax(static_cast<float>(ymax) / height);
-          bbox->set_blur(blured);
-          bbox->set_occlusion(occlusioned);
+          bbox->mutable_faceattrib()->set_blur(blured);
+          bbox->mutable_faceattrib()->set_occlusion(occlusioned);
           bbox->set_difficult(difficult);
         }
       }
     }
   }
-#if 1
+#if 0
   int group_size = anno_datum->annotation_group_size();
   LOG(INFO)<<"group_size: "<<group_size;
   for(int nn = 0; nn< group_size; nn++)
@@ -695,6 +712,71 @@ bool ReadTxtToAnnotatedDatum(const string& labelfile, const int height,
   }
   return true;
 }
+
+bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
+    const int width, const std::map<string, int>& name_to_label,
+    AnnotatedDatum* anno_datum){
+  std::ifstream infile(labelfile.c_str());
+  std::string lineStr ;
+  std::stringstream sstr ;
+  if (!infile.good()) {
+    LOG(INFO) << "Cannot open " << labelfile;
+    return false;
+  }
+  LOG(INFO)<<labelfile;
+  float x1, y1, x2, y2;
+  int lpnum_1, lpnum_2, lpnum_3, lpnum_4, lpnum_5, lpnum_6, lpnum_7;
+  int instance_id = 0;
+  while (std::getline(infile, lineStr )) {
+    sstr << lineStr;
+    sstr >> x1 >> y1 >> x2 >>y2 >> lpnum_1>>lpnum_2 >>lpnum_3 >>lpnum_4 >>lpnum_5 >>lpnum_6 >>lpnum_7;
+    float xf1 = float(x1/width), yf1 = float(y1/height);float xf2 = float(x2/width), yf2 = float(y2/height);
+    Annotation* anno = NULL;
+    string name = "licenseplate";
+    if (name_to_label.find(name) == name_to_label.end()) {
+            LOG(FATAL) << "Unknown name: " << name;
+    }
+    int label = name_to_label.find(name)->second;
+    bool found_group = false;
+    for (int g = 0; g < anno_datum->annotation_group_size(); ++g) {
+      AnnotationGroup* anno_group =
+          anno_datum->mutable_annotation_group(g);
+      if (label == anno_group->group_label()) {
+        if (anno_group->annotation_size() == 0) {
+          instance_id = 0;
+        } else {
+          instance_id = anno_group->annotation(
+              anno_group->annotation_size() - 1).instance_id() + 1;
+        }
+        anno = anno_group->add_annotation();
+        found_group = true;
+      }
+    }
+    if (!found_group) {
+      // If there is no such annotation_group, create a new one.
+      AnnotationGroup* anno_group = anno_datum->add_annotation_group();
+      anno_group->set_group_label(label);
+      anno = anno_group->add_annotation();
+      instance_id = 0;
+    }
+    anno->set_instance_id(instance_id++);
+    NormalizedBBox* bbox = anno->mutable_bbox();
+    bbox->set_xmin(xf1);
+    bbox->set_ymin(yf1);
+    bbox->set_xmax(xf2);
+    bbox->set_ymax(yf2);
+    bbox->mutable_lpnumber()->set_chichracter(lpnum_1);
+    bbox->mutable_lpnumber()->set_engchracter(lpnum_2);
+    bbox->mutable_lpnumber()->set_letternum_1(lpnum_3);
+    bbox->mutable_lpnumber()->set_letternum_2(lpnum_4);
+    bbox->mutable_lpnumber()->set_letternum_3(lpnum_5);
+    bbox->mutable_lpnumber()->set_letternum_4(lpnum_6);
+    bbox->mutable_lpnumber()->set_letternum_5(lpnum_7);
+    bool difficult = false;
+    bbox->set_difficult(difficult);
+  }
+}
+
 
 // Parse plain txt detection annotation: label_id, xmin, ymin, xmax, ymax.
 bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,

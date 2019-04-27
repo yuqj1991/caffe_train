@@ -127,8 +127,6 @@ void ClipBBox(const NormalizedBBox& bbox, NormalizedBBox* clip_bbox) {
   clip_bbox->clear_size();
   clip_bbox->set_size(BBoxSize(*clip_bbox));
   clip_bbox->set_difficult(bbox.difficult());
-  clip_bbox->set_blur(bbox.blur());
-  clip_bbox->set_occlusion(bbox.occlusion());
 }
 
 void ClipBBox(const NormalizedBBox& bbox, const float height, const float width,
@@ -140,8 +138,6 @@ void ClipBBox(const NormalizedBBox& bbox, const float height, const float width,
   clip_bbox->clear_size();
   clip_bbox->set_size(BBoxSize(*clip_bbox));
   clip_bbox->set_difficult(bbox.difficult());
-  clip_bbox->set_blur(bbox.blur());
-  clip_bbox->set_occlusion(bbox.occlusion());
 }
 
 void ScaleBBox(const NormalizedBBox& bbox, const int height, const int width,
@@ -154,8 +150,6 @@ void ScaleBBox(const NormalizedBBox& bbox, const int height, const int width,
   bool normalized = !(width > 1 || height > 1);
   scale_bbox->set_size(BBoxSize(*scale_bbox, normalized));
   scale_bbox->set_difficult(bbox.difficult());
-  scale_bbox->set_blur(bbox.blur());
-  scale_bbox->set_occlusion(bbox.occlusion());
 }
 
 void OutputBBox(const NormalizedBBox& bbox, const pair<int, int>& img_size,
@@ -228,8 +222,6 @@ void LocateBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
   loc_bbox->set_xmax(src_bbox.xmin() + bbox.xmax() * src_width);
   loc_bbox->set_ymax(src_bbox.ymin() + bbox.ymax() * src_height);
   loc_bbox->set_difficult(bbox.difficult());
-  loc_bbox->set_blur(bbox.blur());
-  loc_bbox->set_occlusion(bbox.occlusion());
 }
 
 bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
@@ -245,8 +237,6 @@ bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
   proj_bbox->set_xmax((bbox.xmax() - src_bbox.xmin()) / src_width);
   proj_bbox->set_ymax((bbox.ymax() - src_bbox.ymin()) / src_height);
   proj_bbox->set_difficult(bbox.difficult());
-  proj_bbox->set_blur(bbox.blur());
-  proj_bbox->set_occlusion(bbox.occlusion());
   ClipBBox(*proj_bbox, proj_bbox);
   if (BBoxSize(*proj_bbox) > 0) {
     return true;
@@ -1064,85 +1054,158 @@ template void MineHardExamples(const Blob<double>& conf_blob,
 template <typename Dtype>
 void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, vector<NormalizedBBox> >* all_gt_bboxes) {
-  all_gt_bboxes->clear();
-  for (int i = 0; i < num_gt; ++i) {
-    int start_idx = i * 10;
-    int item_id = gt_data[start_idx];
-    if (item_id == -1) {
-      continue;
+      map<int, vector<NormalizedBBox> >* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type) {
+  if(attri_type ==AnnotatedDatum_AnnoataionAttriType_FACE){
+    all_gt_bboxes->clear();
+    for (int i = 0; i < num_gt; ++i) {
+      int start_idx = i * 10;
+      int item_id = gt_data[start_idx];
+      if (item_id == -1) {
+        continue;
+      }
+      int label = gt_data[start_idx + 1];
+      CHECK_NE(background_label_id, label)
+          << "Found background label in the dataset.";
+      bool difficult = static_cast<bool>(gt_data[start_idx + 9]);
+      if (!use_difficult_gt && difficult) {
+        // Skip reading difficult ground truth.
+        continue;
+      }
+      NormalizedBBox bbox;
+      bbox.set_label(label);
+      bbox.set_xmin(gt_data[start_idx + 3]);
+      bbox.set_ymin(gt_data[start_idx + 4]);
+      bbox.set_xmax(gt_data[start_idx + 5]);
+      bbox.set_ymax(gt_data[start_idx + 6]);
+      bbox.mutable_faceattrib()->set_blur(gt_data[start_idx + 7]);
+      bbox.mutable_faceattrib()->set_occlusion(gt_data[start_idx +8]);
+      bbox.set_difficult(difficult);
+      float bbox_size = BBoxSize(bbox);
+      bbox.set_size(bbox_size);
+      (*all_gt_bboxes)[item_id].push_back(bbox);
     }
-    int label = gt_data[start_idx + 1];
-    CHECK_NE(background_label_id, label)
-        << "Found background label in the dataset.";
-    bool difficult = static_cast<bool>(gt_data[start_idx + 9]);
-    if (!use_difficult_gt && difficult) {
-      // Skip reading difficult ground truth.
-      continue;
+  }else if(attri_type ==AnnotatedDatum_AnnoataionAttriType_LPnumber){
+    all_gt_bboxes->clear();
+    for (int i = 0; i < num_gt; ++i) {
+      int start_idx = i * 15;
+      int item_id = gt_data[start_idx];
+      if (item_id == -1) {
+        continue;
+      }
+      int label = gt_data[start_idx + 1];
+      CHECK_NE(background_label_id, label)
+          << "Found background label in the dataset.";
+      bool difficult = static_cast<bool>(gt_data[start_idx + 14]);
+      if (!use_difficult_gt && difficult) {
+        // Skip reading difficult ground truth.
+        continue;
+      }
+      NormalizedBBox bbox;
+      bbox.set_label(label);
+      bbox.set_xmin(gt_data[start_idx + 3]);
+      bbox.set_ymin(gt_data[start_idx + 4]);
+      bbox.set_xmax(gt_data[start_idx + 5]);
+      bbox.set_ymax(gt_data[start_idx + 6]);
+      bbox.mutable_lpnumber()->set_chichracter(gt_data[start_idx + 7]);
+      bbox.mutable_lpnumber()->set_engchracter(gt_data[start_idx +8]);
+      bbox.mutable_lpnumber()->set_letternum_1(gt_data[start_idx +9]);
+      bbox.mutable_lpnumber()->set_letternum_2(gt_data[start_idx +10]);
+      bbox.mutable_lpnumber()->set_letternum_3(gt_data[start_idx +11]);
+      bbox.mutable_lpnumber()->set_letternum_4(gt_data[start_idx +12]);
+      bbox.mutable_lpnumber()->set_letternum_5(gt_data[start_idx +13]);
+      bbox.set_difficult(difficult);
+      float bbox_size = BBoxSize(bbox);
+      bbox.set_size(bbox_size);
+      (*all_gt_bboxes)[item_id].push_back(bbox);
     }
-    NormalizedBBox bbox;
-    bbox.set_label(label);
-    bbox.set_xmin(gt_data[start_idx + 3]);
-    bbox.set_ymin(gt_data[start_idx + 4]);
-    bbox.set_xmax(gt_data[start_idx + 5]);
-    bbox.set_ymax(gt_data[start_idx + 6]);
-    bbox.set_blur(gt_data[start_idx + 7]);
-    bbox.set_occlusion(gt_data[start_idx +8]);
-    bbox.set_difficult(difficult);
-    float bbox_size = BBoxSize(bbox);
-    bbox.set_size(bbox_size);
-    (*all_gt_bboxes)[item_id].push_back(bbox);
   }
+  
 }
 
 // Explicit initialization.
 template void GetGroundTruth(const float* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, vector<NormalizedBBox> >* all_gt_bboxes);
+      map<int, vector<NormalizedBBox> >* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type);
 template void GetGroundTruth(const double* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, vector<NormalizedBBox> >* all_gt_bboxes);
+      map<int, vector<NormalizedBBox> >* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type);
 
 template <typename Dtype>
 void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, LabelBBox>* all_gt_bboxes) {
-  all_gt_bboxes->clear();
-  for (int i = 0; i < num_gt; ++i) {
-    int start_idx = i * 10;
-    int item_id = gt_data[start_idx];
-    if (item_id == -1) {
-      break;
+      map<int, LabelBBox>* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type) {
+  if(attri_type ==AnnotatedDatum_AnnoataionAttriType_FACE){
+    all_gt_bboxes->clear();
+    for (int i = 0; i < num_gt; ++i) {
+      int start_idx = i * 10;
+      int item_id = gt_data[start_idx];
+      if (item_id == -1) {
+        break;
+      }
+      NormalizedBBox bbox;
+      int label = gt_data[start_idx + 1];
+      CHECK_NE(background_label_id, label)
+          << "Found background label in the dataset.";
+      bool difficult = static_cast<bool>(gt_data[start_idx + 14]);
+      if (!use_difficult_gt && difficult) {
+        // Skip reading difficult ground truth.
+        continue;
+      }
+      bbox.set_xmin(gt_data[start_idx + 3]);
+      bbox.set_ymin(gt_data[start_idx + 4]);
+      bbox.set_xmax(gt_data[start_idx + 5]);
+      bbox.set_ymax(gt_data[start_idx + 6]);
+      bbox.mutable_faceattrib()->set_blur(gt_data[start_idx + 7]);
+      bbox.mutable_faceattrib()->set_occlusion(gt_data[start_idx +8]);
+      bbox.set_difficult(difficult);
+      float bbox_size = BBoxSize(bbox);
+      bbox.set_size(bbox_size);
+      (*all_gt_bboxes)[item_id][label].push_back(bbox);
     }
-    NormalizedBBox bbox;
-    int label = gt_data[start_idx + 1];
-    CHECK_NE(background_label_id, label)
-        << "Found background label in the dataset.";
-    bool difficult = static_cast<bool>(gt_data[start_idx + 9]);
-    if (!use_difficult_gt && difficult) {
-      // Skip reading difficult ground truth.
-      continue;
+  }else if(attri_type ==AnnotatedDatum_AnnoataionAttriType_LPnumber){
+    all_gt_bboxes->clear();
+    for (int i = 0; i < num_gt; ++i) {
+      int start_idx = i * 15;
+      int item_id = gt_data[start_idx];
+      if (item_id == -1) {
+        break;
+      }
+      NormalizedBBox bbox;
+      int label = gt_data[start_idx + 1];
+      CHECK_NE(background_label_id, label)
+          << "Found background label in the dataset.";
+      bool difficult = static_cast<bool>(gt_data[start_idx + 14]);
+      if (!use_difficult_gt && difficult) {
+        // Skip reading difficult ground truth.
+        continue;
+      }
+      bbox.set_xmin(gt_data[start_idx + 3]);
+      bbox.set_ymin(gt_data[start_idx + 4]);
+      bbox.set_xmax(gt_data[start_idx + 5]);
+      bbox.set_ymax(gt_data[start_idx + 6]);
+      bbox.mutable_lpnumber()->set_chichracter(gt_data[start_idx + 7]);
+      bbox.mutable_lpnumber()->set_engchracter(gt_data[start_idx +8]);
+      bbox.mutable_lpnumber()->set_letternum_1(gt_data[start_idx +9]);
+      bbox.mutable_lpnumber()->set_letternum_2(gt_data[start_idx +10]);
+      bbox.mutable_lpnumber()->set_letternum_3(gt_data[start_idx +11]);
+      bbox.mutable_lpnumber()->set_letternum_4(gt_data[start_idx +12]);
+      bbox.mutable_lpnumber()->set_letternum_5(gt_data[start_idx +13]);
+      bbox.set_difficult(difficult);
+      float bbox_size = BBoxSize(bbox);
+      bbox.set_size(bbox_size);
+      (*all_gt_bboxes)[item_id][label].push_back(bbox);
     }
-    bbox.set_xmin(gt_data[start_idx + 3]);
-    bbox.set_ymin(gt_data[start_idx + 4]);
-    bbox.set_xmax(gt_data[start_idx + 5]);
-    bbox.set_ymax(gt_data[start_idx + 6]);
-    bbox.set_blur(gt_data[start_idx + 7]);
-    bbox.set_occlusion(gt_data[start_idx +8]);
-    bbox.set_difficult(difficult);
-    float bbox_size = BBoxSize(bbox);
-    bbox.set_size(bbox_size);
-    (*all_gt_bboxes)[item_id][label].push_back(bbox);
   }
+  
 }
 
 // Explicit initialization.
 template void GetGroundTruth(const float* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, LabelBBox>* all_gt_bboxes);
+      map<int, LabelBBox>* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type);
 template void GetGroundTruth(const double* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, LabelBBox>* all_gt_bboxes);
+      map<int, LabelBBox>* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type);
 
 template <typename Dtype>
 void GetLocPredictions(const Dtype* loc_data, const int num,
@@ -1700,7 +1763,7 @@ void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
           if (match_index[j] <= -1) {
             continue;
           }
-          const int gt_blur_label = all_gt_bboxes.find(i)->second[match_index[j]].blur();
+          const int gt_blur_label = all_gt_bboxes.find(i)->second[match_index[j]].faceattrib().blur();
           // LOG(INFO)<<"gt_blur_label: "<< gt_blur_label;
           int idx = do_neg_mining ? count : j;
           switch (conf_blur_loss_type) {
@@ -1780,7 +1843,7 @@ void EncodeOcclusConfPrediction(const Dtype* conf_data, const int num,
           if (match_index[j] <= -1) {
             continue;
           }
-          const int gt_occlu_label = all_gt_bboxes.find(i)->second[match_index[j]].occlusion();
+          const int gt_occlu_label = all_gt_bboxes.find(i)->second[match_index[j]].faceattrib().occlusion();
           int idx = do_neg_mining ? count : j;
           switch (conf_occlu_loss_type) {
             case MultiBoxLossParameter_ConfLossType_SOFTMAX:
@@ -1879,8 +1942,8 @@ void GetDetectionResults(const Dtype* det_data, const int num_det,
     bbox.set_ymin(det_data[start_idx + 4]);
     bbox.set_xmax(det_data[start_idx + 5]);
     bbox.set_ymax(det_data[start_idx + 6]);
-    bbox.set_blur(det_data[start_idx + 7]);
-    bbox.set_occlusion(det_data[start_idx + 8]);
+    bbox.mutable_faceattrib()->set_blur(det_data[start_idx + 7]);
+    bbox.mutable_faceattrib()->set_occlusion(det_data[start_idx + 8]);
     float bbox_size = BBoxSize(bbox);
     bbox.set_size(bbox_size);
     (*all_detections)[item_id][label].push_back(bbox);

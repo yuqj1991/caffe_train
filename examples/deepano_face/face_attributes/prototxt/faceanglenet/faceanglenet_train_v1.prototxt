@@ -39,7 +39,7 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_training_lmdb/"
+		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_training_umdface_pose_lmdb/"
 		batch_size: 64
 		backend: LMDB
 	}
@@ -801,7 +801,7 @@ layer {
 	name: "conv6_angle_fds"
 	type: "InnerProduct"
 	bottom: "conv_5_3_2"
-	top: "conv6_angle"
+	top: "conv6_angle_fds"
 	param {
 		lr_mult: 1
 		decay_mult: 1

@@ -200,12 +200,12 @@ void MineHardExamples(const Blob<Dtype>& conf_blob,
 template <typename Dtype>
 void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, vector<NormalizedBBox> >* all_gt_bboxes);
+      map<int, vector<NormalizedBBox> >* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type);
 // Store ground truth bboxes of same label in a group.
 template <typename Dtype>
 void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, LabelBBox>* all_gt_bboxes);
+      map<int, LabelBBox>* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type);
 
 // Get location predictions from loc_data.
 //    loc_data: num x num_preds_per_class * num_loc_classes * 4 blob.

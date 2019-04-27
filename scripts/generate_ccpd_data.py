@@ -14,8 +14,8 @@ root_dir = "../../dataset/car_person_data/car_license/ccpd_dataset"
 set_dir = "ImageSets/Main"
 image_dir = "JPEGImages"
 label_dir = "label"
-lengthTestset = 4000
-lengthTrain = 0
+lengthTestset = 50000
+lengthTrain = 280001
 provNum, alphaNum, adNum = 34, 25, 35
 provinces = ["皖", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "苏", "浙", "京", "闽", "赣", "鲁", "豫", "鄂", "湘", "粤", "桂",
              "琼", "川", "贵", "云", "藏", "陕", "甘", "青", "宁", "新", "警", "学", "O"]
@@ -64,29 +64,24 @@ def generate_train_setfile(imagefiledir, setfile):
 		lengthTrain += 1
 	
 	
-def split_train_setfile(trainSetfilepath, testSetfilepath, testline):
-	count = 0
+def split_train_setfile(trainSetfilepath, testSetfilepath, testline, count, setfile):
 	lines = []
-	with open(trainSetfilepath, 'r') as trainfile:
+	with open(trainSetfilepath, 'r+w') as trainfile:
 		for index, line in enumerate(trainfile):
-			count += 1
-		currentLine = 0
-		with open(testSetfilepath, 'a+') as testfile:
-			assert testline <= count
-			while True:  #(del_line - 1)
-				if currentLine== testline:
-					testcontent = trainfile.readline()
-					testfile.write(testcontent)
+			with open(testSetfilepath, 'a+') as testfile:
+				assert testline <= count
+				if index== testline:
+					testfile.write(line)
 				else:
-					lines.append(trainfile.readline())
-				currentLine += 1
-				if currentLine == count:
-					break
-		testfile.close()
-	trainfile.close()
-	trainfile = open(trainSetfilepath, "w")
-	trainfile.writelines(lines)
-	trainfile.close()
+					lines.append(line)
+			testfile.close()
+		trainfile.close()
+	file_ = open(setfile, 'r+w')
+	file_.seek(0)
+	file_.truncate()
+	for linecontent in lines:
+		file_.write(linecontent)
+	file_.close()
 	
 	
 def generate_random_test_indexlist(lengthTrainset, lengthTestset):
@@ -101,10 +96,16 @@ def generate_random_test_indexlist(lengthTrainset, lengthTestset):
 
 
 trainsetfilepath = root_dir + '/' + set_dir + '/training.txt'
+trainsetfilecopypath = root_dir + '/' + set_dir + '/training_copy.txt'
 testsetfilepath = root_dir + '/' + set_dir + '/testing.txt'
+'''
 for imgdir in os.listdir(root_dir + '/' + image_dir):
 	fullimgdirpath = root_dir + '/' + image_dir +'/'+imgdir
 	generate_train_setfile(fullimgdirpath, trainsetfilepath)
+'''
 test_list = generate_random_test_indexlist(lengthTrain, lengthTestset)
+numlines =0
 for index in test_list:
-	split_train_setfile(trainsetfilepath, testsetfilepath, index)
+	split_train_setfile(trainsetfilecopypath, testsetfilepath, index, lengthTrain,trainsetfilepath)
+	numlines += 1
+
