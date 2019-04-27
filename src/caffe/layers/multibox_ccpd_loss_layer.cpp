@@ -180,7 +180,7 @@ void MultiBoxccpdLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
-  // Set up occl confidence loss layer.
+  // Set up engcharcter confidence loss layer.
   engcharcter_loss_type_ = multibox_loss_param.englishlp_loss_type();
   engcharcter_bottom_vec_.push_back(&engcharcter_pred_);
   engcharcter_bottom_vec_.push_back(&engcharcter_gt_);
