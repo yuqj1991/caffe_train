@@ -143,13 +143,13 @@ void MultiBoxccpdLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
-  // Set up blur confidence loss layer.
-  conf_blur_loss_type_ = multibox_loss_param.conf_blur_loss_type();
-  conf_blur_bottom_vec_.push_back(&conf_blur_pred_);
-  conf_blur_bottom_vec_.push_back(&conf_blur_gt_);
-  conf_blur_loss_.Reshape(loss_shape);
-  conf_blur_top_vec_.push_back(&conf_blur_loss_);
-  if (conf_blur_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
+  // Set up chinese confidence loss layer.
+  chinesecharcter_loss_type_ = multibox_loss_param.chineselp_loss_type();
+  chinesecharcter_bottom_vec_.push_back(&chinesecharcter_pred_);
+  chinesecharcter_bottom_vec_.push_back(&chinesecharcter_gt_);
+  chinesecharcter_loss_.Reshape(loss_shape);
+  chinesecharcter_top_vec_.push_back(&chinesecharcter_loss_);
+  if (chinesecharcter_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
     LayerParameter layer_param;
     layer_param.set_name(this->layer_param_.name() + "_softmax_blur_conf");
     layer_param.set_type("SoftmaxWithLoss");
@@ -159,34 +159,34 @@ void MultiBoxccpdLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     SoftmaxParameter* softmax_param = layer_param.mutable_softmax_param();
     softmax_param->set_axis(1);
     // Fake reshape.
-    vector<int> conf_blur_shape(1, 1);
-    conf_blur_gt_.Reshape(conf_blur_shape);
-    conf_blur_shape.push_back(num_blur_);
-    conf_blur_pred_.Reshape(conf_blur_shape);
-    conf_blur_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
-    conf_blur_loss_layer_->SetUp(conf_blur_bottom_vec_, conf_blur_top_vec_);
-  } else if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
+    vector<int> chinesecharcter_shape(1, 1);
+    chinesecharcter_gt_.Reshape(chinesecharcter_shape);
+    chinesecharcter_shape.push_back(num_chinese_);
+    chinesecharcter_pred_.Reshape(chinesecharcter_shape);
+    chinesecharcter_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+    chinesecharcter_loss_layer_->SetUp(chinesecharcter_bottom_vec_, chinesecharcter_top_vec_);
+  } else if (chinesecharcter_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     LayerParameter layer_param;
     layer_param.set_name(this->layer_param_.name() + "_logistic_blur_conf");
     layer_param.set_type("SigmoidCrossEntropyLoss");
     layer_param.add_loss_weight(Dtype(1.));
     // Fake reshape.
-    vector<int> conf_blur_shape(1, 1);
-    conf_blur_shape.push_back(num_blur_);
-    conf_blur_gt_.Reshape(conf_blur_shape);
-    conf_blur_pred_.Reshape(conf_blur_shape);
-    conf_blur_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
-    conf_blur_loss_layer_->SetUp(conf_blur_bottom_vec_, conf_blur_top_vec_);
+    vector<int> chinesecharcter_shape(1, 1);
+    chinesecharcter_shape.push_back(num_chinese_);
+    chinesecharcter_gt_.Reshape(chinesecharcter_shape);
+    chinesecharcter_pred_.Reshape(chinesecharcter_shape);
+    chinesecharcter_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+    chinesecharcter_loss_layer_->SetUp(chinesecharcter_bottom_vec_, chinesecharcter_top_vec_);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
   // Set up occl confidence loss layer.
-  conf_occlussion_loss_type_ = multibox_loss_param.conf_occlu_loss_type();
-  conf_occlussion_bottom_vec_.push_back(&conf_occlussion_pred_);
-  conf_occlussion_bottom_vec_.push_back(&conf_occlussion_gt_);
-  conf_occlussion_loss_.Reshape(loss_shape);
-  conf_occlussion_top_vec_.push_back(&conf_occlussion_loss_);
-  if (conf_occlussion_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
+  engcharcter_loss_type_ = multibox_loss_param.englishlp_loss_type();
+  engcharcter_bottom_vec_.push_back(&engcharcter_pred_);
+  engcharcter_bottom_vec_.push_back(&engcharcter_gt_);
+  engcharcter_loss_.Reshape(loss_shape);
+  engcharcter_top_vec_.push_back(&engcharcter_loss_);
+  if (engcharcter_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
     LayerParameter layer_param;
     layer_param.set_name(this->layer_param_.name() + "_softmax_occlu_conf");
     layer_param.set_type("SoftmaxWithLoss");
@@ -196,24 +196,24 @@ void MultiBoxccpdLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     SoftmaxParameter* softmax_param = layer_param.mutable_softmax_param();
     softmax_param->set_axis(1);
     // Fake reshape.
-    vector<int> conf_occlu_shape(1, 1);
-    conf_occlussion_gt_.Reshape(conf_occlu_shape);
-    conf_occlu_shape.push_back(num_occlusion_);
-    conf_occlussion_pred_.Reshape(conf_occlu_shape);
-    conf_occlussion_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
-    conf_occlussion_loss_layer_->SetUp(conf_occlussion_bottom_vec_, conf_occlussion_top_vec_);
-  } else if (conf_occlussion_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
+    vector<int> engcharcter_shape(1, 1);
+    engcharcter_gt_.Reshape(engcharcter_shape);
+    engcharcter_shape.push_back(num_english_);
+    engcharcter_pred_.Reshape(engcharcter_shape);
+    engcharcter_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+    engcharcter_loss_layer_->SetUp(engcharcter_bottom_vec_, engcharcter_top_vec_);
+  } else if (engcharcter_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     LayerParameter layer_param;
     layer_param.set_name(this->layer_param_.name() + "_logistic_occlu_conf");
     layer_param.set_type("SigmoidCrossEntropyLoss");
     layer_param.add_loss_weight(Dtype(1.));
     // Fake reshape.
-    vector<int> conf_occlu_shape(1, 1);
-    conf_occlu_shape.push_back(num_occlusion_);
-    conf_occlussion_gt_.Reshape(conf_occlu_shape);
-    conf_occlussion_pred_.Reshape(conf_occlu_shape);
-    conf_occlussion_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
-    conf_occlussion_loss_layer_->SetUp(conf_occlussion_bottom_vec_, conf_occlussion_top_vec_);
+    vector<int> engcharcter_shape(1, 1);
+    engcharcter_shape.push_back(num_english_);
+    engcharcter_gt_.Reshape(engcharcter_shape);
+    engcharcter_pred_.Reshape(engcharcter_shape);
+    engcharcter_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+    engcharcter_loss_layer_->SetUp(engcharcter_bottom_vec_, engcharcter_top_vec_);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
