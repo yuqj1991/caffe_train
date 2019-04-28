@@ -775,6 +775,7 @@ bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
     bool difficult = false;
     bbox->set_difficult(difficult);
   }
+  return true;
 }
 
 

@@ -1,5 +1,5 @@
-train_net: "../prototxt/deepano_light_face_train_1.prototxt"
-test_net: "../prototxt/deepano_light_face_test_1.prototxt"
+train_net: "../prototxt/deepano_light_face_train_v1.prototxt"
+test_net: "../prototxt/deepano_light_face_test_v1.prototxt"
 test_iter: 1500
 test_interval: 5000
 base_lr: 0.001
@@ -21,6 +21,6 @@ stepvalue: 120000
 iter_size: 1
 momentum2 : 0.99
 type: "RMSProp"
-eval_type: "detection"
+eval_type: "detectionfaceboxattri"
 ap_version: "11point"
 

@@ -76,6 +76,9 @@ class DetectionOutputLayer : public Layer<Dtype> {
   int num_classes_;
   int num_blur_;
   int num_occlusion_;
+  int num_chinese_;
+  int num_english_;
+  int num_letter_;
   bool share_location_;
   int num_loc_classes_;
   int background_label_id_;
@@ -85,14 +88,11 @@ class DetectionOutputLayer : public Layer<Dtype> {
   bool variance_encoded_in_target_;
   int keep_top_k_;
   float confidence_threshold_;
-
   int num_;
   int num_priors_;
-
   float nms_threshold_;
   int top_k_;
   float eta_;
-
   bool need_save_;
   string output_directory_;
   string output_name_prefix_;
@@ -105,7 +105,7 @@ class DetectionOutputLayer : public Layer<Dtype> {
   int name_count_;
   bool has_resize_;
   ResizeParameter resize_param_;
-
+  DetectionOutputParameter_AnnoataionAttriType attri_type_;
   ptree detections_;
 
   bool visualize_;
@@ -117,6 +117,13 @@ class DetectionOutputLayer : public Layer<Dtype> {
   Blob<Dtype> conf_permute_;
   Blob<Dtype> blur_permute_;
   Blob<Dtype> occlu_permute_;
+  Blob<Dtype> chinese_permute_;
+  Blob<Dtype> english_permute_;
+  Blob<Dtype> letter_1_permute_;
+  Blob<Dtype> letter_2_permute_;
+  Blob<Dtype> letter_3_permute_;
+  Blob<Dtype> letter_4_permute_;
+  Blob<Dtype> letter_5_permute_;
 };
 
 }  // namespace caffe

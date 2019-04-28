@@ -20,9 +20,26 @@ void DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   const DetectionOutputParameter& detection_output_param =
       this->layer_param_.detection_output_param();
   CHECK(detection_output_param.has_num_classes()) << "Must specify num_classes";
+  CHECK(detection_output_param.has_attri_type()) << "Must specify attri_type";
+  attri_type_ = detection_output_param.attri_type();
+  if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_FACE){
+    num_blur_ = detection_output_param.num_blur();
+    num_occlusion_ = detection_output_param.num_occlusion();
+    blur_permute_.ReshapeLike(*(bottom[3]));
+    occlu_permute_.ReshapeLike(*(bottom[4]));
+  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_LPnumber){
+    num_chinese_ = detection_output_param.num_lpchinese();
+    num_english_ = detection_output_param.num_lpenglish();
+    num_letter_ = detection_output_param.num_lpletter();
+    chinese_permute_.ReshapeLike(*(bottom[3]));
+    english_permute_.ReshapeLike(*(bottom[4]));
+    letter_1_permute_.ReshapeLike(*(bottom[5]));
+    letter_2_permute_.ReshapeLike(*(bottom[6]));
+    letter_3_permute_.ReshapeLike(*(bottom[7]));
+    letter_4_permute_.ReshapeLike(*(bottom[8]));
+    letter_5_permute_.ReshapeLike(*(bottom[9]));
+  }
   num_classes_ = detection_output_param.num_classes();
-  num_blur_ = detection_output_param.num_blur();
-  num_occlusion_ = detection_output_param.num_occlusion();
   share_location_ = detection_output_param.share_location();
   num_loc_classes_ = share_location_ ? 1 : num_classes_;
   background_label_id_ = detection_output_param.background_label_id();
@@ -126,8 +143,6 @@ void DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     bbox_permute_.ReshapeLike(*(bottom[0]));
   }
   conf_permute_.ReshapeLike(*(bottom[1]));
-  blur_permute_.ReshapeLike(*(bottom[3]));
-  occlu_permute_.ReshapeLike(*(bottom[4]));
 }
 
 template <typename Dtype>
@@ -166,32 +181,43 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       conf_permute_.count(1) != bottom[1]->count(1)) {
     conf_permute_.ReshapeLike(*(bottom[1]));
   }
-  if (blur_permute_.num() != bottom[3]->num() ||
-      blur_permute_.count(1) != bottom[3]->count(1)) {
-    blur_permute_.ReshapeLike(*(bottom[3]));
-  }
-  if (occlu_permute_.num() != bottom[4]->num() ||
-      occlu_permute_.count(1) != bottom[4]->count(1)) {
-    occlu_permute_.ReshapeLike(*(bottom[4]));
-  }
   num_priors_ = bottom[2]->height() / 4;
   CHECK_EQ(num_priors_ * num_loc_classes_ * 4, bottom[0]->channels())
       << "Number of priors must match number of location predictions.";
   CHECK_EQ(num_priors_ * num_classes_, bottom[1]->channels())
       << "Number of priors must match number of confidence predictions.";
-  CHECK_EQ(num_priors_ * num_blur_, bottom[3]->channels())
-      << "Number of priors must match number of blur predictions.";
-  CHECK_EQ(num_priors_ * num_occlusion_, bottom[4]->channels())
-      << "Number of priors must match number of occlussion predictions.";
-  // num() and channels() are 1.
-  vector<int> top_shape(2, 1);
-  // Since the number of bboxes to be kept is unknown before nms, we manually
-  // set it to (fake) 1.
-  top_shape.push_back(1);
-  // Each row is a 9 dimension vector, which stores
-  // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
-  top_shape.push_back(9);
-  top[0]->Reshape(top_shape);
+  if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_FACE){
+    if (blur_permute_.num() != bottom[3]->num() ||
+      blur_permute_.count(1) != bottom[3]->count(1)) {
+    blur_permute_.ReshapeLike(*(bottom[3]));
+    }
+    if (occlu_permute_.num() != bottom[4]->num() ||
+        occlu_permute_.count(1) != bottom[4]->count(1)) {
+      occlu_permute_.ReshapeLike(*(bottom[4]));
+    }
+    CHECK_EQ(num_priors_ * num_blur_, bottom[3]->channels())
+        << "Number of priors must match number of blur predictions.";
+    CHECK_EQ(num_priors_ * num_occlusion_, bottom[4]->channels())
+        << "Number of priors must match number of occlussion predictions.";
+    // num() and channels() are 1.
+    vector<int> top_shape(2, 1);
+    // Since the number of bboxes to be kept is unknown before nms, we manually
+    // set it to (fake) 1.
+    top_shape.push_back(1);
+    // Each row is a 9 dimension vector, which stores
+    // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
+    top_shape.push_back(9);
+    top[0]->Reshape(top_shape);
+  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_LPnumber){
+    vector<int> top_shape(2, 1);
+    // Since the number of bboxes to be kept is unknown before nms, we manually
+    // set it to (fake) 1.
+    top_shape.push_back(1);
+    // Each row is a 14 dimension vector, which stores
+    // [image_id, label, confidence, xmin, ymin, xmax, ymax, 7-lpnumber]
+    top_shape.push_back(14);
+    top[0]->Reshape(top_shape);
+  }  
 }
 
 template <typename Dtype>
@@ -200,29 +226,15 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
   const Dtype* loc_data = bottom[0]->cpu_data();
   const Dtype* conf_data = bottom[1]->cpu_data();
   const Dtype* prior_data = bottom[2]->cpu_data();
-  const Dtype* blur_data = bottom[3]->cpu_data();
-  const Dtype* occlu_data = bottom[4]->cpu_data();
   const int num = bottom[0]->num();
-
   // Retrieve all location predictions.
   vector<LabelBBox> all_loc_preds;
   GetLocPredictions(loc_data, num, num_priors_, num_loc_classes_,
                     share_location_, &all_loc_preds);
-
   // Retrieve all confidences.
   vector<map<int, vector<float> > > all_conf_scores;
   GetConfidenceScores(conf_data, num, num_priors_, num_classes_,
                       &all_conf_scores);
-  
-  //Retrieve all blur_data confidences.
-  vector<map<int, vector<float> > > all_blur_scores;
-  GetConfidenceScores(blur_data, num, num_priors_, num_blur_,
-                      &all_blur_scores);
-  
-  //Retrieve all occlu_data confidences
-  vector<map<int, vector<float> > > all_occlu_scores;
-  GetConfidenceScores(occlu_data, num, num_priors_, num_occlusion_,
-                      &all_occlu_scores);
   
   // Retrieve all prior bboxes. It is same within a batch since we assume all
   // images in a batch are of same dimension.
@@ -303,205 +315,230 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
       num_kept += num_det;
     }
   }
-
   vector<int> top_shape(2, 1);
   top_shape.push_back(num_kept);
-  top_shape.push_back(9);
-  Dtype* top_data;
-  if (num_kept == 0) {
-    LOG(INFO) << "Couldn't find any detections";
-    top_shape[2] = num;
-    top[0]->Reshape(top_shape);
-    top_data = top[0]->mutable_cpu_data();
-    caffe_set<Dtype>(top[0]->count(), -1, top_data);
-    // Generate fake results per image.
+  if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_FACE){
+    const Dtype* blur_data = bottom[3]->cpu_data();
+    const Dtype* occlu_data = bottom[4]->cpu_data();
+
+    //Retrieve all blur_data confidences.
+    vector<map<int, vector<float> > > all_blur_scores;
+    GetConfidenceScores(blur_data, num, num_priors_, num_blur_,
+                      &all_blur_scores);
+    //Retrieve all blur_data confidences.
+    vector<map<int, vector<float> > > all_occlu_scores;
+    GetConfidenceScores(occlu_data, num, num_priors_, num_occlusion_,
+                      &all_occlu_scores);
+    top_shape.push_back(9);
+    Dtype* top_data;
+    if (num_kept == 0) {
+      LOG(INFO) << "Couldn't find any detections";
+      top_shape[2] = num;
+      top[0]->Reshape(top_shape);
+      top_data = top[0]->mutable_cpu_data();
+      caffe_set<Dtype>(top[0]->count(), -1, top_data);
+      // Generate fake results per image.
+      for (int i = 0; i < num; ++i) {
+        top_data[0] = i;
+        top_data += 9;
+      }
+    } else {
+      top[0]->Reshape(top_shape);
+      top_data = top[0]->mutable_cpu_data();
+    }
+    int count = 0;
+    boost::filesystem::path output_directory(output_directory_);
     for (int i = 0; i < num; ++i) {
-      top_data[0] = i;
-      top_data += 9;
-    }
-  } else {
-    top[0]->Reshape(top_shape);
-    top_data = top[0]->mutable_cpu_data();
-  }
-
-  int count = 0;
-  boost::filesystem::path output_directory(output_directory_);
-  for (int i = 0; i < num; ++i) {
-    const map<int, vector<float> >& conf_scores = all_conf_scores[i];
-    const map<int, vector<float> >& blur_scores = all_blur_scores[i];
-    const map<int, vector<float> >& occlu_scores = all_occlu_scores[i];
-    const LabelBBox& decode_bboxes = all_decode_bboxes[i];
-    for (map<int, vector<int> >::iterator it = all_indices[i].begin();
-         it != all_indices[i].end(); ++it) {
-      int label = it->first;
-      if (conf_scores.find(label) == conf_scores.end()) {
-        // Something bad happened if there are no predictions for current label.
-        LOG(FATAL) << "Could not find confidence predictions for " << label;
-        continue;
-      }
-      const vector<float>& scores = conf_scores.find(label)->second;
-      int loc_label = share_location_ ? -1 : label;
-      if (decode_bboxes.find(loc_label) == decode_bboxes.end()) {
-        // Something bad happened if there are no predictions for current label.
-        LOG(FATAL) << "Could not find location predictions for " << loc_label;
-        continue;
-      }
-      const vector<NormalizedBBox>& bboxes =
-          decode_bboxes.find(loc_label)->second;
-      vector<int>& indices = it->second;
-      if (need_save_) {
-        CHECK(label_to_name_.find(label) != label_to_name_.end())
-          << "Cannot find label: " << label << " in the label map.";
-        CHECK_LT(name_count_, names_.size());
-      }
-      for (int j = 0; j < indices.size(); ++j) {
-        int idx = indices[j];
-        top_data[count * 9] = i;
-        top_data[count * 9 + 1] = label;
-        top_data[count * 9 + 2] = scores[idx];
-        const NormalizedBBox& bbox = bboxes[idx];
-        top_data[count * 9 + 3] = bbox.xmin();
-        top_data[count * 9 + 4] = bbox.ymin();
-        top_data[count * 9 + 5] = bbox.xmax();
-        top_data[count * 9 + 6] = bbox.ymax();
-        int blur_index = 0; int occlu_index = 0;
-        float blur_temp =0; float occlu_temp =0.0;
-        for (int ii = 0; ii< 3; ii++ )
-        {
-          if (blur_temp <  blur_scores.find(ii)->second[idx])
-          {
-            blur_index = ii;
-            blur_temp = blur_scores.find(ii)->second[idx];
-          }
-          if (occlu_temp <  occlu_scores.find(ii)->second[idx])
-          {
-            occlu_index = ii;
-            occlu_temp = occlu_scores.find(ii)->second[idx];
-          }
+      const map<int, vector<float> >& conf_scores = all_conf_scores[i];
+      const map<int, vector<float> >& blur_scores = all_blur_scores[i];
+      const map<int, vector<float> >& occlu_scores = all_occlu_scores[i];
+      const LabelBBox& decode_bboxes = all_decode_bboxes[i];
+      for (map<int, vector<int> >::iterator it = all_indices[i].begin();
+          it != all_indices[i].end(); ++it) {
+        int label = it->first;
+        if (conf_scores.find(label) == conf_scores.end()) {
+          // Something bad happened if there are no predictions for current label.
+          LOG(FATAL) << "Could not find confidence predictions for " << label;
+          continue;
         }
-        top_data[count * 9 + 7] = blur_index;
-        top_data[count * 9 + 8] = occlu_index;
+        const vector<float>& scores = conf_scores.find(label)->second;
+        int loc_label = share_location_ ? -1 : label;
+        if (decode_bboxes.find(loc_label) == decode_bboxes.end()) {
+          // Something bad happened if there are no predictions for current label.
+          LOG(FATAL) << "Could not find location predictions for " << loc_label;
+          continue;
+        }
+        const vector<NormalizedBBox>& bboxes =
+            decode_bboxes.find(loc_label)->second;
+        vector<int>& indices = it->second;
         if (need_save_) {
-          NormalizedBBox out_bbox;
-          OutputBBox(bbox, sizes_[name_count_], has_resize_, resize_param_,
-                     &out_bbox);
-          float score = top_data[count * 9 + 2];
-          float xmin = out_bbox.xmin();
-          float ymin = out_bbox.ymin();
-          float xmax = out_bbox.xmax();
-          float ymax = out_bbox.ymax();
-          ptree pt_xmin, pt_ymin, pt_width, pt_height;
-          pt_xmin.put<float>("", round(xmin * 100) / 100.);
-          pt_ymin.put<float>("", round(ymin * 100) / 100.);
-          pt_width.put<float>("", round((xmax - xmin) * 100) / 100.);
-          pt_height.put<float>("", round((ymax - ymin) * 100) / 100.);
-
-          ptree cur_bbox;
-          cur_bbox.push_back(std::make_pair("", pt_xmin));
-          cur_bbox.push_back(std::make_pair("", pt_ymin));
-          cur_bbox.push_back(std::make_pair("", pt_width));
-          cur_bbox.push_back(std::make_pair("", pt_height));
-
-          ptree cur_det;
-          cur_det.put("image_id", names_[name_count_]);
-          if (output_format_ == "ILSVRC") {
-            cur_det.put<int>("category_id", label);
-          } else {
-            cur_det.put("category_id", label_to_name_[label].c_str());
-          }
-          cur_det.add_child("bbox", cur_bbox);
-          cur_det.put<float>("score", score);
-
-          detections_.push_back(std::make_pair("", cur_det));
+          CHECK(label_to_name_.find(label) != label_to_name_.end())
+            << "Cannot find label: " << label << " in the label map.";
+          CHECK_LT(name_count_, names_.size());
         }
-        ++count;
+        for (int j = 0; j < indices.size(); ++j) {
+          int idx = indices[j];
+          top_data[count * 9] = i;
+          top_data[count * 9 + 1] = label;
+          top_data[count * 9 + 2] = scores[idx];
+          const NormalizedBBox& bbox = bboxes[idx];
+          top_data[count * 9 + 3] = bbox.xmin();
+          top_data[count * 9 + 4] = bbox.ymin();
+          top_data[count * 9 + 5] = bbox.xmax();
+          top_data[count * 9 + 6] = bbox.ymax();
+          int blur_index = 0; int occlu_index = 0;
+          float blur_temp =0; float occlu_temp =0.0;
+          for (int ii = 0; ii< 3; ii++ )
+          {
+            if (blur_temp <  blur_scores.find(ii)->second[idx])
+            {
+              blur_index = ii;
+              blur_temp = blur_scores.find(ii)->second[idx];
+            }
+            if (occlu_temp <  occlu_scores.find(ii)->second[idx])
+            {
+              occlu_index = ii;
+              occlu_temp = occlu_scores.find(ii)->second[idx];
+            }
+          }
+          top_data[count * 9 + 7] = blur_index;
+          top_data[count * 9 + 8] = occlu_index;
+          ++count;
+        }
       }
     }
-    if (need_save_) {
-      ++name_count_;
-      if (name_count_ % num_test_image_ == 0) {
-        if (output_format_ == "VOC") {
-          map<string, std::ofstream*> outfiles;
-          for (int c = 0; c < num_classes_; ++c) {
-            if (c == background_label_id_) {
-              continue;
-            }
-            string label_name = label_to_name_[c];
-            boost::filesystem::path file(
-                output_name_prefix_ + label_name + ".txt");
-            boost::filesystem::path out_file = output_directory / file;
-            outfiles[label_name] = new std::ofstream(out_file.string().c_str(),
-                std::ofstream::out);
-          }
-          BOOST_FOREACH(ptree::value_type &det, detections_.get_child("")) {
-            ptree pt = det.second;
-            string label_name = pt.get<string>("category_id");
-            if (outfiles.find(label_name) == outfiles.end()) {
-              std::cout << "Cannot find " << label_name << std::endl;
-              continue;
-            }
-            string image_name = pt.get<string>("image_id");
-            float score = pt.get<float>("score");
-            vector<int> bbox;
-            BOOST_FOREACH(ptree::value_type &elem, pt.get_child("bbox")) {
-              bbox.push_back(static_cast<int>(elem.second.get_value<float>()));
-            }
-            *(outfiles[label_name]) << image_name;
-            *(outfiles[label_name]) << " " << score;
-            *(outfiles[label_name]) << " " << bbox[0] << " " << bbox[1];
-            *(outfiles[label_name]) << " " << bbox[0] + bbox[2];
-            *(outfiles[label_name]) << " " << bbox[1] + bbox[3];
-            *(outfiles[label_name]) << std::endl;
-          }
-          for (int c = 0; c < num_classes_; ++c) {
-            if (c == background_label_id_) {
-              continue;
-            }
-            string label_name = label_to_name_[c];
-            outfiles[label_name]->flush();
-            outfiles[label_name]->close();
-            delete outfiles[label_name];
-          }
-        } else if (output_format_ == "COCO") {
-          boost::filesystem::path output_directory(output_directory_);
-          boost::filesystem::path file(output_name_prefix_ + ".json");
-          boost::filesystem::path out_file = output_directory / file;
-          std::ofstream outfile;
-          outfile.open(out_file.string().c_str(), std::ofstream::out);
+  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_LPnumber){
+    const Dtype* chi_data = bottom[3]->cpu_data();
+    const Dtype* eng_data = bottom[4]->cpu_data();
+    const Dtype* let1_data = bottom[5]->cpu_data();
+    const Dtype* let2_data = bottom[6]->cpu_data();
+    const Dtype* let3_data = bottom[7]->cpu_data();
+    const Dtype* let4_data = bottom[8]->cpu_data();
+    const Dtype* let5_data = bottom[9]->cpu_data();
+    const int num = bottom[0]->num();
 
-          boost::regex exp("\"(null|true|false|-?[0-9]+(\\.[0-9]+)?)\"");
-          ptree output;
-          output.add_child("detections", detections_);
-          std::stringstream ss;
-          write_json(ss, output);
-          std::string rv = boost::regex_replace(ss.str(), exp, "$1");
-          outfile << rv.substr(rv.find("["), rv.rfind("]") - rv.find("["))
-              << std::endl << "]" << std::endl;
-        } else if (output_format_ == "ILSVRC") {
-          boost::filesystem::path output_directory(output_directory_);
-          boost::filesystem::path file(output_name_prefix_ + ".txt");
-          boost::filesystem::path out_file = output_directory / file;
-          std::ofstream outfile;
-          outfile.open(out_file.string().c_str(), std::ofstream::out);
+    //Retrieve all chi_data confidences.
+    vector<map<int, vector<float> > > all_chi_scores;
+    GetConfidenceScores(chi_data, num, num_priors_, num_chinese_,
+                      &all_chi_scores);
+    //Retrieve all eng_data confidences
+    vector<map<int, vector<float> > > all_eng_scores;
+    GetConfidenceScores(eng_data, num, num_priors_, num_english_,
+                        &all_eng_scores);
+    //Retrieve all let1_data confidences
+    vector<vector<map<int, vector<float> > > > all_let_scores;
+    GetConfidenceScores(let1_data, num, num_priors_, num_letter_,
+                        &all_let_scores[1]);
+    //Retrieve all let2_data confidences
+    GetConfidenceScores(let2_data, num, num_priors_, num_letter_,
+                        &all_let_scores[2]);
+    //Retrieve all let3_data confidences
+    GetConfidenceScores(let3_data, num, num_priors_, num_letter_,
+                        &all_let_scores[3]);
+    //Retrieve all let4_data confidences
+    GetConfidenceScores(let4_data, num, num_priors_, num_letter_,
+                        &all_let_scores[4]);
+    //Retrieve all let5_data confidences
+    GetConfidenceScores(let5_data, num, num_priors_, num_letter_,
+                        &all_let_scores[5]);
 
-          BOOST_FOREACH(ptree::value_type &det, detections_.get_child("")) {
-            ptree pt = det.second;
-            int label = pt.get<int>("category_id");
-            string image_name = pt.get<string>("image_id");
-            float score = pt.get<float>("score");
-            vector<int> bbox;
-            BOOST_FOREACH(ptree::value_type &elem, pt.get_child("bbox")) {
-              bbox.push_back(static_cast<int>(elem.second.get_value<float>()));
-            }
-            outfile << image_name << " " << label << " " << score;
-            outfile << " " << bbox[0] << " " << bbox[1];
-            outfile << " " << bbox[0] + bbox[2];
-            outfile << " " << bbox[1] + bbox[3];
-            outfile << std::endl;
-          }
+    top_shape.push_back(14);
+    Dtype* top_data;
+    if (num_kept == 0) {
+      LOG(INFO) << "Couldn't find any detections";
+      top_shape[2] = num;
+      top[0]->Reshape(top_shape);
+      top_data = top[0]->mutable_cpu_data();
+      caffe_set<Dtype>(top[0]->count(), -1, top_data);
+      // Generate fake results per image.
+      for (int i = 0; i < num; ++i) {
+        top_data[0] = i;
+        top_data += 14;
+      }
+    } else {
+      top[0]->Reshape(top_shape);
+      top_data = top[0]->mutable_cpu_data();
+    }
+    int count = 0;
+    boost::filesystem::path output_directory(output_directory_);
+    for (int i = 0; i < num; ++i) {
+      const map<int, vector<float> >& conf_scores = all_conf_scores[i];
+      const map<int, vector<float> >& chi_scores = all_chi_scores[i];
+      const map<int, vector<float> >& eng_scores = all_eng_scores[i];
+      const LabelBBox& decode_bboxes = all_decode_bboxes[i];
+      for (map<int, vector<int> >::iterator it = all_indices[i].begin();
+          it != all_indices[i].end(); ++it) {
+        int label = it->first;
+        if (conf_scores.find(label) == conf_scores.end()) {
+          // Something bad happened if there are no predictions for current label.
+          LOG(FATAL) << "Could not find confidence predictions for " << label;
+          continue;
         }
-        name_count_ = 0;
-        detections_.clear();
+        const vector<float>& scores = conf_scores.find(label)->second;
+        int loc_label = share_location_ ? -1 : label;
+        if (decode_bboxes.find(loc_label) == decode_bboxes.end()) {
+          // Something bad happened if there are no predictions for current label.
+          LOG(FATAL) << "Could not find location predictions for " << loc_label;
+          continue;
+        }
+        const vector<NormalizedBBox>& bboxes =
+            decode_bboxes.find(loc_label)->second;
+        vector<int>& indices = it->second;
+        if (need_save_) {
+          CHECK(label_to_name_.find(label) != label_to_name_.end())
+            << "Cannot find label: " << label << " in the label map.";
+          CHECK_LT(name_count_, names_.size());
+        }
+        for (int j = 0; j < indices.size(); ++j) {
+          int idx = indices[j];
+          top_data[count * 14] = i;
+          top_data[count * 14 + 1] = label;
+          top_data[count * 14 + 2] = scores[idx];
+          const NormalizedBBox& bbox = bboxes[idx];
+          top_data[count * 14 + 3] = bbox.xmin();
+          top_data[count * 14 + 4] = bbox.ymin();
+          top_data[count * 14 + 5] = bbox.xmax();
+          top_data[count * 14 + 6] = bbox.ymax();
+          int let_index[5] ={0};
+          float let_temp[5] ={0.0f};
+          int chi_index = 0; int eng_index = 0;
+          float chi_temp =0; float eng_temp =0.0; 
+          for (int ii = 0; ii< num_chinese_; ii++ )
+          {
+            if (chi_temp <  chi_scores.find(ii)->second[idx])
+            {
+              chi_index = ii;
+              chi_temp = chi_scores.find(ii)->second[idx];
+            }
+          }
+          for (int ii = 0; ii< num_english_; ii++ )
+          {
+            if (eng_temp <  eng_scores.find(ii)->second[idx])
+            {
+              eng_index = ii;
+              eng_temp = eng_scores.find(ii)->second[idx];
+            }
+          }
+          for(int jj = 0 ; jj < 5; jj++)
+          {
+            for (int ii = 0; ii< num_letter_; ii++ )
+            {
+              if (let_temp[jj] < all_let_scores[jj][i].find(ii)->second[idx])
+              {
+                let_index[jj] = ii;
+                let_temp[jj] = all_let_scores[jj][i].find(ii)->second[idx];
+              }
+            }
+          }
+          top_data[count * 14 + 7] = chi_index;
+          top_data[count * 14 + 8] = eng_index;
+          top_data[count * 14 + 9] = let_index[0];
+          top_data[count * 14 + 10] = let_index[1];
+          top_data[count * 14 + 11] = let_index[2];
+          top_data[count * 14 + 12] = let_index[3];
+          top_data[count * 14 + 13] = let_index[4];
+          ++count;
+        }
       }
     }
   }

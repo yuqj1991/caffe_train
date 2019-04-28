@@ -95,7 +95,7 @@ class MultiBoxccpdLossLayer : public LossLayer<Dtype> {
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> engcharcter_bottom_vec_;
   // top vector holder used in Forward function.
-  vector<Blob<Dtype>*> engcharcterr_top_vec_;
+  vector<Blob<Dtype>*> engcharcter_top_vec_;
   // blob which stores the confidence prediction.
   Blob<Dtype> engcharcter_pred_;
   // blob which stores the corresponding ground truth label.
@@ -177,11 +177,7 @@ class MultiBoxccpdLossLayer : public LossLayer<Dtype> {
   int num_classes_;
   int num_chinese_;
   int num_english_;
-  int num_letter_1_;
-  int num_letter_2_;
-  int num_letter_3_;
-  int num_letter_4_;
-  int num_letter_5_;
+  int num_letter_;
   int num_cnt_;
   bool share_location_;
   MatchType match_type_;

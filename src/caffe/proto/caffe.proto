@@ -1098,6 +1098,11 @@ message DetectionEvaluateParameter {
   optional string name_size_file = 5;
   // The resize parameter used in converting NormalizedBBox to original image.
   optional ResizeParameter resize_param = 6;
+  enum AnnoataionAttriType{
+    FACE = 0;
+    LPnumber = 1;
+  }
+  optional AnnoataionAttriType attri_type = 7[default =FACE ];
 }
 
 message NonMaximumSuppressionParameter {
@@ -1165,11 +1170,16 @@ message DetectionOutputParameter {
   optional float visualize_threshold = 11;
   // If provided, save outputs to video file.
   optional string save_file = 12;
-  // add new background id realeated id r.w.t blur & occlusion
-  optional int32 background_blur_id = 13 [default = -1];
-  optional int32 background_occl_id = 14 [default = -1];
-  optional uint32 num_blur = 15;
-  optional uint32 num_occlusion = 16;
+  optional uint32 num_blur = 13;
+  optional uint32 num_occlusion = 14;
+  optional uint32 num_lpchinese = 15;
+  optional uint32 num_lpenglish = 16;
+  optional uint32 num_lpletter = 17;
+  enum AnnoataionAttriType{
+    FACE = 0;
+    LPnumber = 1;
+  }
+  optional AnnoataionAttriType attri_type = 18;
 }
 
 message DropoutParameter {
@@ -1460,16 +1470,8 @@ message MultiBoxLossParameter {
   optional ConfLossType chineselp_loss_type = 29;
   optional uint32 num_english = 30;
   optional ConfLossType englishlp_loss_type = 31;
-  optional uint32 num_letter_1 = 32;
-  optional ConfLossType letter_1_lp_loss_type = 33;
-  optional uint32 num_letter_2 = 34;
-  optional ConfLossType letter_2_lp_loss_type = 35;
-  optional uint32 num_letter_3 = 36;
-  optional ConfLossType letter_3_lp_loss_type = 37;
-  optional uint32 num_letter_4 = 38;
-  optional ConfLossType letter_4_lp_loss_type = 39;
-  optional uint32 num_letter_5 = 40;
-  optional ConfLossType letter_5_lp_loss_type = 41;
+  optional uint32 num_letter = 32;
+  optional ConfLossType letter_lp_loss_type = 33;
 }
 
 // Message that store parameters used by MultiBoxLossLayer

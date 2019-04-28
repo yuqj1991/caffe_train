@@ -4130,8 +4130,6 @@ layer {
 		num_occlusion: 3
 		share_location: true
 		background_label_id: 0
-		background_blur_id: 0
-		background_occl_id: 0
 		nms_param {
 			nms_threshold: 0.55
 			top_k: 100
