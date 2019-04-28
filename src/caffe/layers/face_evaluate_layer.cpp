@@ -7,7 +7,7 @@
 #include "caffe/util/bbox_util.hpp"
 
 namespace caffe {
-
+#define M_PI 3.1415926
 template <typename Dtype>
 void FaceEvaluateLayer<Dtype>::LayerSetUp(
       const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
@@ -136,9 +136,9 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
       for(int jj = 0; jj< num_facepoints_*2; jj++){
         distance_loss += pow((all_prediction_face_points[ii][jj]-all_gt_face_points[ii][jj]), 2);
       }
-      correct_precisive_yaw += pow(std::abs(all_face_prediction_attributes[ii][0]*360- all_gt_face_attributes[ii][0]*360),2);
-      correct_precisive_pitch += pow(std::abs(all_face_prediction_attributes[ii][1]*360 - all_gt_face_attributes[ii][1]*360),2);
-      correct_precisive_roll += pow(std::abs(all_face_prediction_attributes[ii][2]*360 - all_gt_face_attributes[ii][2]*360),2);
+      correct_precisive_yaw += cosf((all_face_prediction_attributes[ii][0]*M_PI- all_gt_face_attributes[ii][0]*M_PI);
+      correct_precisive_pitch += cosf((all_face_prediction_attributes[ii][1]*M_PI - all_gt_face_attributes[ii][1]*M_PI);
+      correct_precisive_roll += cosf((all_face_prediction_attributes[ii][2]*M_PI - all_gt_face_attributes[ii][2]*M_PI);
     }
     top_data[0]=float(distance_loss/batch_size);
     top_data[1]=float(correct_precisive_yaw/batch_size);
@@ -159,9 +159,9 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
     float correct_precisive_pitch =0;
     float correct_precisive_roll =0;
     for(int ii = 0; ii<batch_size; ii++){
-      correct_precisive_yaw += pow(std::abs(all_prediction_[ii][0]*360- all_gt_[ii][0]*360),2);
-      correct_precisive_pitch += pow(std::abs(all_prediction_[ii][1]*360 - all_gt_[ii][1]*360),2);
-      correct_precisive_roll += pow(std::abs(all_prediction_[ii][2]*360 - all_gt_[ii][2]*360),2);
+      correct_precisive_yaw += cosf((all_prediction_[ii][0]*M_PI- all_gt_[ii][0]*M_PI);
+      correct_precisive_pitch += cosf((all_prediction_[ii][1]*M_PI - all_gt_[ii][1]*M_PI);
+      correct_precisive_roll += cosf((all_prediction_[ii][2]*M_PI - all_gt_[ii][2]*M_PI);
     }
     top_data[0]=float(0/batch_size);
     top_data[1]=float(correct_precisive_yaw/batch_size);
