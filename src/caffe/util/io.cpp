@@ -827,9 +827,9 @@ bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
     // Store the normalized bounding box.
     AnnoFaceContourPoints* landface = anno->mutable_facecour();
     AnnoFacePoseOritation* faceOri = anno->mutable_faceoritation();
-    faceOri->set_yaw(float(yaw/180));
-    faceOri->set_pitch(float(pitch/180));
-    faceOri->set_roll(float(roll/180));
+    faceOri->set_yaw(float(yaw/360));
+    faceOri->set_pitch(float(pitch/360));
+    faceOri->set_roll(float(roll/360));
     landface->mutable_point_1()->set_x(xf1);
     landface->mutable_point_1()->set_y(yf1);
     landface->mutable_point_2()->set_x(xf2);

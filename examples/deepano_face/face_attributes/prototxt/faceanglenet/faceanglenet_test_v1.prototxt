@@ -836,3 +836,16 @@ layer {
 		}
 	}
 }
+layer{
+    name: "faceeval_output"
+    type: "FaceEvaluate"
+    bottom: "conv6_angle"
+    bottom: "label"
+    top: "faceeval_output"
+    include {
+		phase: TEST
+	}
+    face_evaluate_param{
+        facetype: FACE_ANGLE
+    }
+}

@@ -719,9 +719,9 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
     }    
   }
   LOG(INFO)<< "NME: "<< nme/param_.test_iter(test_net_id)
-             <<" gender/yaw precision: "<<gender_precision/param_.test_iter(test_net_id)
-             <<" glasses/pitch precision: "<<glasses_presion/param_.test_iter(test_net_id)
-             <<" headpose/roll precision: "<<headpose_presicon/param_.test_iter(test_net_id);
+             <<" gender : "<<gender_precision/param_.test_iter(test_net_id)
+             <<" glasses : "<<glasses_presion/param_.test_iter(test_net_id)
+             <<" headpose : "<<headpose_presicon/param_.test_iter(test_net_id);
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";
     return;

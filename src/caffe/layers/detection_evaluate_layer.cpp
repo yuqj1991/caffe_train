@@ -15,6 +15,8 @@ void DetectionEvaluateLayer<Dtype>::LayerSetUp(
       this->layer_param_.detection_evaluate_param();
   CHECK(detection_evaluate_param.has_num_classes())
       << "Must provide num_classes.";
+  CHECK(detection_evaluate_param.has_attri_type())
+      << "Must provide attri_type.";
   num_classes_ = detection_evaluate_param.num_classes();
   background_label_id_ = detection_evaluate_param.background_label_id();
   overlap_threshold_ = detection_evaluate_param.overlap_threshold();

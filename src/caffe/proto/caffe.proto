@@ -1658,6 +1658,7 @@ message FaceEvaluateParameter{
     enum FaceType{
         FACE_21_TYPE =0;
         FACE_5_TYPE =1;
+        FACE_ANGLE = 2;
     }
     optional FaceType facetype = 1[default = FACE_5_TYPE];
     optional int32 facepoints = 2;

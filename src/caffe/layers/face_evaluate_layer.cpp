@@ -16,9 +16,8 @@ void FaceEvaluateLayer<Dtype>::LayerSetUp(
   num_glasses_ = face_paramer.num_glasses();
   num_headpose_ = face_paramer.num_headpose();
   num_facepoints_ = face_paramer.facepoints();
-  if (num_gender_ >0 && num_glasses_>0 && num_headpose_>0){
-    face_attributes_ =true;
-  } 
+  CHECK(face_paramer.has_facetype())
+      << "Must provide facetype.";
   facetype_ = face_paramer.facetype();
 }
 
@@ -29,13 +28,14 @@ void FaceEvaluateLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     CHECK_EQ(num_facepoints_, 5)<< "this face points should be 5";
     vector<int> top_shape(4, 1);
     top[0]->Reshape(top_shape);
-  }else
+  }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_21_TYPE)
   {
     CHECK_EQ(num_facepoints_, 21)<< "this face points should be  21";
     vector<int> top_shape(4, 1);
     top[0]->Reshape(top_shape);
-  }
-        
+  }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_ANGLE)
+    vector<int> top_shape(4, 1);
+    top[0]->Reshape(top_shape);    
 }
 
 template <typename Dtype>
@@ -46,11 +46,10 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
   Dtype* top_data = top[0]->mutable_cpu_data();
   caffe_set(top[0]->count(), Dtype(0.), top_data);
   int batch_size = bottom[0]->num();
-
-  map<int, vector<float> > all_prediction_face_points;
-  map<int, vector<float> > all_gt_face_points;
     
-  if(face_attributes_){ // evaluate 5 face point and face attributes 
+  if(facetype_ == FaceEvaluateParameter_FaceType_FACE_5_TYPE){ // evaluate 5 face point and face attributes
+    map<int, vector<float> > all_prediction_face_points;
+    map<int, vector<float> > all_gt_face_points; 
     map<int, vector<float> >all_face_prediction_attributes;
     map<int, vector<int> > all_gt_face_attributes;
     for(int ii = 0; ii<batch_size; ii++){
@@ -108,7 +107,9 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
     top_data[1]=float(correct_precisive_gender/batch_size);
     top_data[2]=float(correct_precisive_glasses/batch_size);
     top_data[3]=float(correct_precisive_headpose/batch_size);
-  }else{  // evaluate 21 face point and yaw pitch roll 
+  }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_21_TYPE){  // evaluate 21 face point and yaw pitch roll 
+    map<int, vector<float> > all_prediction_face_points;
+    map<int, vector<float> > all_gt_face_points;
     map<int, vector<float> >all_face_prediction_attributes;
     map<int, vector<int> > all_gt_face_attributes;
     for(int ii = 0; ii<batch_size; ii++){
@@ -135,11 +136,34 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
       for(int jj = 0; jj< num_facepoints_*2; jj++){
         distance_loss += pow((all_prediction_face_points[ii][jj]-all_gt_face_points[ii][jj]), 2);
       }
-      correct_precisive_yaw += pow(std::abs(all_face_prediction_attributes[ii][0]- all_gt_face_attributes[ii][0]),2);
-      correct_precisive_pitch += pow(std::abs(all_face_prediction_attributes[ii][1] - all_gt_face_attributes[ii][1]),2);
-      correct_precisive_roll += pow(std::abs(all_face_prediction_attributes[ii][2] - all_gt_face_attributes[ii][2]),2);
+      correct_precisive_yaw += pow(std::abs(all_face_prediction_attributes[ii][0]*360- all_gt_face_attributes[ii][0]*360),2);
+      correct_precisive_pitch += pow(std::abs(all_face_prediction_attributes[ii][1]*360 - all_gt_face_attributes[ii][1]*360),2);
+      correct_precisive_roll += pow(std::abs(all_face_prediction_attributes[ii][2]*360 - all_gt_face_attributes[ii][2]*360),2);
     }
     top_data[0]=float(distance_loss/batch_size);
+    top_data[1]=float(correct_precisive_yaw/batch_size);
+    top_data[2]=float(correct_precisive_pitch/batch_size);
+    top_data[3]=float(correct_precisive_roll/batch_size);
+  }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_ANGLE){
+    map<int, vector<float> > all_prediction_;
+    map<int, vector<float> > all_gt_;
+    for(int ii = 0; ii<batch_size; ii++){
+      for(int jj =0; jj< 3; jj++){
+        all_gt_[ii].push_back(gt_data[ii*3+jj]);
+        all_prediction_[ii].push_back(det_data[ii*bottom[0]->channels()+jj]);
+      }
+    }
+    /**#####################################################**/
+    // face angle precision
+    float correct_precisive_yaw =0;
+    float correct_precisive_pitch =0;
+    float correct_precisive_roll =0;
+    for(int ii = 0; ii<batch_size; ii++){
+      correct_precisive_yaw += pow(std::abs(all_prediction_[ii][0]*360- all_gt_[ii][0]*360),2);
+      correct_precisive_pitch += pow(std::abs(all_prediction_[ii][1]*360 - all_gt_[ii][1]*360),2);
+      correct_precisive_roll += pow(std::abs(all_prediction_[ii][2]*360 - all_gt_[ii][2]*360),2);
+    }
+    top_data[0]=float(0/batch_size);
     top_data[1]=float(correct_precisive_yaw/batch_size);
     top_data[2]=float(correct_precisive_pitch/batch_size);
     top_data[3]=float(correct_precisive_roll/batch_size);

@@ -209,6 +209,12 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     top_shape.push_back(9);
     top[0]->Reshape(top_shape);
   }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_LPnumber){
+    CHECK_EQ(num_priors_ * num_chinese_, bottom[3]->channels())
+    << "Number of priors must match number of chinese predictions.";
+    CHECK_EQ(num_priors_ * num_english_, bottom[4]->channels())
+    << "Number of priors must match number of english predictions.";
+    CHECK_EQ(num_priors_ * num_letter_, bottom[5]->channels())
+    << "Number of priors must match number of letter predictions.";
     vector<int> top_shape(2, 1);
     // Since the number of bboxes to be kept is unknown before nms, we manually
     // set it to (fake) 1.
