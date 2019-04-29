@@ -43,6 +43,18 @@ glasses_content = ('wearing glasses', 'not wearing glasses')
 headpose_content = ('left profile', 'left', 'frontal', 'right', 'right profile')
 
 
+def max_(m,n):
+	if m > n:
+		return m
+	return n
+
+
+def min_(m,n):
+	if m > n:
+		return n
+	return m
+
+
 def preprocess(src):
     img = cv2.resize(src, (300,300))
     img = img - 127.5
@@ -69,9 +81,10 @@ def postprocess(img, out):
     
 
 def postprocessface(img, out):   
-    w = img.shape[0]
-    h = img.shape[1]
-    facepoints = out['multiface_output'][0,0:10] * np.array([w,w,w,w,w,h,h,h,h,h])
+    h = img.shape[0]
+    w = img.shape[1]
+    print("w: %d, h: %d"%(w, h))
+    facepoints = out['multiface_output'][0,0:10] * np.array([w, w, w, w, w, h, h, h, h, h])
     gender = out['multiface_output'][0,10:12]
     gender_index = np.argmax(gender)
     glasses = out['multiface_output'][0,12:14]
@@ -85,6 +98,8 @@ def detect():
     cap = cv2.VideoCapture(0)
     while True:
        ret, frame = cap.read()
+       h = frame.shape[0]
+       w = frame.shape[1]
        img = preprocess(frame)
        img = img.astype(np.float32)
        img = img.transpose((2, 0, 1))
@@ -96,21 +111,32 @@ def detect():
           if conf[i]>=0.25:
              p1 = (box[i][0], box[i][1])
              p2 = (box[i][2], box[i][3])
-             cv2.rectangle(frame, p1, p2, (0,255,0))
              
-             ori_img = frame[box[i][0]:box[i][2],box[i][1]:box[i][3],:]
+             x1 = max_(0, box[i][0] - 60)
+             x2 = min_(box[i][2]+60, w)
+             y1 = max_(0, box[i][1] - 60)
+             y2 = min_(box[i][3]+60, h)
+             
+             print("x2 - x1: %d, y2 - y1: %d"%(x2 - x1, y2 - y1))
+             p11 = (x1, y1)
+             p22 = (x2, y2)
+             
+             ori_img = frame[y1:y2, x1:x2, :]
+             
              oimg = preprocessface(ori_img)
              oimg = oimg.astype(np.float32)
              oimg = oimg.transpose((2, 0, 1))
              net2.blobs['data'].data[...] = oimg
              out2 = net2.forward()
-             print("p1 and p2: ", p1, p2)
              boxpoint, gender, glasses, headpose = postprocessface(ori_img, out2)
              for jj in range(5):
                  point = (boxpoint[jj], boxpoint[jj+5])
                  print point
                  cv2.circle(ori_img, point, 3,(0,0,213),-1)
              print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+             cv2.imwrite("crop.jpg", ori_img)
+             cv2.rectangle(frame, p1, p2, (0,255,0))
+             cv2.rectangle(frame, p11, p22, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
              title = "%s:%.2f,  %s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i],blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
