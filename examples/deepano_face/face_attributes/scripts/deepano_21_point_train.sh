@@ -10,4 +10,4 @@ if ! test -f ../prototxt/faceposenet/faceposenet_res_inception_test.prototxt ;th
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=../solver/facepose_solver_train.prototxt -gpu 0 \
-#--snapshot=../snapshot/deepanoFacelandmark_iter_352891.solverstate
+--snapshot=../snapshot/deepanoFacepose_iter_80000.solverstate
