@@ -103,7 +103,8 @@ class Solver {
   // The test routine
   void TestAll();
   void TestClassification(const int test_net_id = 0);
-  void TestDetection(const int test_net_id = 0);
+  void TestDetectionFACEattri(const int test_net_id = 0);
+  void TestDetectionLP(const int test_net_id = 0);
   void TestDetectionFace(const int test_net_id = 0);
   virtual void SnapshotSolverState(const string& model_filename) = 0;
   virtual void RestoreSolverStateFromHDF5(const string& state_file) = 0;

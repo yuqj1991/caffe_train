@@ -34,6 +34,7 @@ class AnnotatedDataLayer : public BasePrefetchingDataLayer<Dtype> {
   DataReader<AnnotatedDatum> reader_;
   bool has_anno_type_;
   AnnotatedDatum_AnnotationType anno_type_;
+  AnnotatedDatum_AnnoataionAttriType anno_attri_type_;
   vector<BatchSampler> batch_samplers_;
   string label_map_file_;
 };

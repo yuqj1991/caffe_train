@@ -65,6 +65,7 @@ class MultiFaceLossLayer : public LossLayer<Dtype> {
   // The internal confidence category loss layer.
   shared_ptr<Layer<Dtype> > gender_loss_layer_;
   AttriLossType gender_loss_type_;
+  float gender_weight_;
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> gender_bottom_vec_;
   // top vector holder used in Forward function.
@@ -79,6 +80,7 @@ class MultiFaceLossLayer : public LossLayer<Dtype> {
   // The internal confidence category loss layer.
   shared_ptr<Layer<Dtype> > glasses_loss_layer_;
   AttriLossType glasses_loss_type_;
+  float glasses_weight_;
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> glasses_bottom_vec_;
   // top vector holder used in Forward function.
@@ -93,6 +95,7 @@ class MultiFaceLossLayer : public LossLayer<Dtype> {
   // The internal confidence category loss layer.
   shared_ptr<Layer<Dtype> > headpose_loss_layer_;
   AttriLossType headpose_loss_type_;
+  float headpose_weight_;
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> headpose_bottom_vec_;
   // top vector holder used in Forward function.

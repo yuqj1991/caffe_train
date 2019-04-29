@@ -45,7 +45,6 @@ class FaceEvaluateLayer : public Layer<Dtype> {
   int num_headpose_;
   int num_facepoints_;
   FaceEvaluateParameter_FaceType facetype_;
-  bool face_attributes_;
 };
 
 }  // namespace caffe

@@ -4033,6 +4033,7 @@ layer {
 		conf_loss_type: SOFTMAX
 		conf_blur_loss_type: SOFTMAX
 		conf_occlu_loss_type: SOFTMAX
+		attri_type: FACE
 		loc_weight: 1.0
 		num_classes: 2
 		num_blur: 3

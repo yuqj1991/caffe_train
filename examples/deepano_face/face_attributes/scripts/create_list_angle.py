@@ -3,7 +3,7 @@ import sys
 import os
 import random
 wider_directory = ['training_umdface_pose','testing_umdface_pose']
-root_dir ='../../../../../face_train/examples/deepano_face/face_attributes/scripts/'
+root_dir ='../../../../../caffe_deeplearning_train/examples/deepano_face/face_attributes/scripts/'
 root_dataset = '../../../../../dataset/facedata/umdface/labels/'
 def shuffle_file(filename):
 	f = open(filename, 'r+')
@@ -25,7 +25,7 @@ def generate_list(imageSetDir):
 				if imgline =='':
 					break
 				imgname =imgline.split('/')[-1].strip()
-				xmlline_ = root_dataset+imgname.split('.')[0]+'.txt'
+				xmlline_ = root_dataset+imgname.split('.')[0]+'_angle.txt'
 				xmlline = os.path.abspath(xmlline_) + '\n'
 				newline = imgline.strip()+' '+xmlline
 				#print(newline)

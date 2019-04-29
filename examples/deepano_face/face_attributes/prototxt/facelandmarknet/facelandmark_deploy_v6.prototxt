@@ -791,7 +791,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
+    num_output: 256
     kernel_size: 3
     stride: 2
     pad: 1
@@ -867,7 +867,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -943,7 +943,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 512
+    num_output: 256
     kernel_size: 3
     stride: 2
     pad: 1
@@ -1246,7 +1246,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
+    num_output: 256
     kernel_size: 3
     stride: 2
     pad: 1
@@ -1321,7 +1321,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 2
     pad: 1
@@ -1396,7 +1396,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1471,7 +1471,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1548,7 +1548,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 4096
+	num_output: 1024
     weight_filler {
       type: "xavier"
 	}
@@ -1581,7 +1581,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 1024
+	num_output: 256
     weight_filler {
       type: "xavier"
 	}
@@ -1613,7 +1613,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 256
+	num_output: 64
     weight_filler {
       type: "xavier"
 	}
@@ -1659,7 +1659,7 @@ layer {
 
 ####
 
-####
+
 layer {
   name: "conv_5_3_2"
   type: "Convolution"
@@ -1674,7 +1674,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 2048
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1750,7 +1750,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 4096
+	num_output: 1024
     weight_filler {
       type: "xavier"
 	}
@@ -1783,7 +1783,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 1024
+	num_output: 256
     weight_filler {
       type: "xavier"
 	}
@@ -1815,7 +1815,7 @@ layer {
   }
   inner_product_param {
     #kernel_size: 1
-	num_output: 256
+	num_output: 64
     weight_filler {
       type: "xavier"
 	}
@@ -1874,7 +1874,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 512
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -1997,9 +1997,40 @@ layer {
 	top: "conv6_headpose_fds_2"
 }
 layer {
-  name: "conv6_headpose"
+  name: "conv6_headpose_fds_3"
   type: "InnerProduct"
   bottom: "conv6_headpose_fds_2"
+  top: "conv6_headpose_fds_3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  inner_product_param {
+    #kernel_size: 1
+	num_output: 64
+    weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv6_headpose_fds_3/relu"
+	type: "ReLU"
+	bottom: "conv6_headpose_fds_3"
+	top: "conv6_headpose_fds_3"
+}
+layer {
+  name: "conv6_headpose"
+  type: "InnerProduct"
+  bottom: "conv6_headpose_fds_3"
   top: "conv6_headpose"
   param {
     lr_mult: 1
@@ -2037,7 +2068,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 512
+    num_output: 256
     kernel_size: 3
     stride: 1
     pad: 1
@@ -2160,9 +2191,40 @@ layer {
 	top: "conv6_landmark_fds_2"
 }
 layer {
-  name: "conv6_landmark"
+  name: "conv6_landmark_fds_3"
   type: "InnerProduct"
   bottom: "conv6_landmark_fds_2"
+  top: "conv6_landmark_fds_3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  inner_product_param {
+  	#kernel_size: 1
+	num_output: 64
+    weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv6_landmark_fds_3/relu"
+	type: "ReLU"
+	bottom: "conv6_landmark_fds_3"
+	top: "conv6_landmark_fds_3"
+}
+layer {
+  name: "conv6_landmark"
+  type: "InnerProduct"
+  bottom: "conv6_landmark_fds_3"
   top: "conv6_landmark"
   param {
     lr_mult: 1

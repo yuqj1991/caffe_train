@@ -285,55 +285,113 @@ void DataTransformer<Dtype>::TransformAnnotation(
 	const int img_height = anno_datum.datum().height();
 	const int img_width = anno_datum.datum().width();
 	if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
-		// Go through each AnnotationGroup.
-		for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
-			const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
-			AnnotationGroup transformed_anno_group;
-			// Go through each Annotation.
-			bool has_valid_annotation = false;
-			for (int a = 0; a < anno_group.annotation_size(); ++a) {
-				const Annotation& anno = anno_group.annotation(a);
-				const NormalizedBBox& bbox = anno.bbox();
-				// Adjust bounding box annotation.
-				NormalizedBBox resize_bbox = bbox;
-				if (do_resize && param_.has_resize_param()) {
-					CHECK_GT(img_height, 0);
-					CHECK_GT(img_width, 0);
-					UpdateBBoxByResizePolicy(param_.resize_param(), img_width, img_height,
-																	 &resize_bbox);
-				}
-				if (param_.has_emit_constraint() &&
-						!MeetEmitConstraint(crop_bbox, resize_bbox,
-																param_.emit_constraint())) {
-					continue;
-				}
-				NormalizedBBox proj_bbox;
-				if (ProjectBBox(crop_bbox, resize_bbox, &proj_bbox)) {
-					has_valid_annotation = true;
-					Annotation* transformed_anno =
-							transformed_anno_group.add_annotation();
-					transformed_anno->set_instance_id(anno.instance_id());
-					NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
-					transformed_bbox->CopyFrom(proj_bbox);
-					if (do_mirror) {
-						Dtype temp = transformed_bbox->xmin();
-						transformed_bbox->set_xmin(1 - transformed_bbox->xmax());
-						transformed_bbox->set_xmax(1 - temp);
-					}
+		if (anno_datum.attri_type() ==AnnotatedDatum_AnnoataionAttriType_FACE){
+			// Go through each AnnotationGroup.
+			for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
+				const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
+				AnnotationGroup transformed_anno_group;
+				// Go through each Annotation.
+				bool has_valid_annotation = false;
+				for (int a = 0; a < anno_group.annotation_size(); ++a) {
+					const Annotation& anno = anno_group.annotation(a);
+					const NormalizedBBox& bbox = anno.bbox();
+					// Adjust bounding box annotation.
+					NormalizedBBox resize_bbox = bbox;
 					if (do_resize && param_.has_resize_param()) {
-						ExtrapolateBBox(param_.resize_param(), img_height, img_width,
-								crop_bbox, transformed_bbox);
+						CHECK_GT(img_height, 0);
+						CHECK_GT(img_width, 0);
+						UpdateBBoxByResizePolicy(param_.resize_param(), img_width, img_height,
+																			&resize_bbox);
 					}
-					transformed_bbox->set_blur(bbox.blur());
-					transformed_bbox->set_occlusion(bbox.occlusion());
+					if (param_.has_emit_constraint() &&
+							!MeetEmitConstraint(crop_bbox, resize_bbox,
+																	param_.emit_constraint())) {
+						continue;
+					}
+					NormalizedBBox proj_bbox;
+					if (ProjectBBox(crop_bbox, resize_bbox, &proj_bbox)) {
+						has_valid_annotation = true;
+						Annotation* transformed_anno =
+								transformed_anno_group.add_annotation();
+						transformed_anno->set_instance_id(anno.instance_id());
+						NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
+						transformed_bbox->CopyFrom(proj_bbox);
+						if (do_mirror) {
+							Dtype temp = transformed_bbox->xmin();
+							transformed_bbox->set_xmin(1 - transformed_bbox->xmax());
+							transformed_bbox->set_xmax(1 - temp);
+						}
+						if (do_resize && param_.has_resize_param()) {
+							ExtrapolateBBox(param_.resize_param(), img_height, img_width,
+									crop_bbox, transformed_bbox);
+						}
+						transformed_bbox->mutable_faceattrib()->set_blur(bbox.faceattrib().blur());
+						transformed_bbox->mutable_faceattrib()->set_occlusion(bbox.faceattrib().occlusion());
+					}
+				}
+				// Save for output.
+				if (has_valid_annotation) {
+					transformed_anno_group.set_group_label(anno_group.group_label());
+					transformed_anno_group_all->Add()->CopyFrom(transformed_anno_group);
 				}
 			}
-			// Save for output.
-			if (has_valid_annotation) {
-				transformed_anno_group.set_group_label(anno_group.group_label());
-				transformed_anno_group_all->Add()->CopyFrom(transformed_anno_group);
+		}else if(anno_datum.attri_type() ==AnnotatedDatum_AnnoataionAttriType_LPnumber){
+			// Go through each AnnotationGroup.
+			for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
+				const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
+				AnnotationGroup transformed_anno_group;
+				// Go through each Annotation.
+				bool has_valid_annotation = false;
+				for (int a = 0; a < anno_group.annotation_size(); ++a) {
+					const Annotation& anno = anno_group.annotation(a);
+					const NormalizedBBox& bbox = anno.bbox();
+					// Adjust bounding box annotation.
+					NormalizedBBox resize_bbox = bbox;
+					if (do_resize && param_.has_resize_param()) {
+						CHECK_GT(img_height, 0);
+						CHECK_GT(img_width, 0);
+						UpdateBBoxByResizePolicy(param_.resize_param(), img_width, img_height,
+																			&resize_bbox);
+					}
+					if (param_.has_emit_constraint() &&
+							!MeetEmitConstraint(crop_bbox, resize_bbox,
+																	param_.emit_constraint())) {
+						continue;
+					}
+					NormalizedBBox proj_bbox;
+					if (ProjectBBox(crop_bbox, resize_bbox, &proj_bbox)) {
+						has_valid_annotation = true;
+						Annotation* transformed_anno =
+								transformed_anno_group.add_annotation();
+						transformed_anno->set_instance_id(anno.instance_id());
+						NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
+						transformed_bbox->CopyFrom(proj_bbox);
+						if (do_mirror) {
+							Dtype temp = transformed_bbox->xmin();
+							transformed_bbox->set_xmin(1 - transformed_bbox->xmax());
+							transformed_bbox->set_xmax(1 - temp);
+						}
+						if (do_resize && param_.has_resize_param()) {
+							ExtrapolateBBox(param_.resize_param(), img_height, img_width,
+									crop_bbox, transformed_bbox);
+						}
+						transformed_bbox->mutable_lpnumber()->set_chichracter(bbox.lpnumber().chichracter());
+						transformed_bbox->mutable_lpnumber()->set_engchracter(bbox.lpnumber().engchracter());
+						transformed_bbox->mutable_lpnumber()->set_letternum_1(bbox.lpnumber().letternum_1());
+						transformed_bbox->mutable_lpnumber()->set_letternum_2(bbox.lpnumber().letternum_2());
+						transformed_bbox->mutable_lpnumber()->set_letternum_3(bbox.lpnumber().letternum_3());
+						transformed_bbox->mutable_lpnumber()->set_letternum_4(bbox.lpnumber().letternum_4());
+						transformed_bbox->mutable_lpnumber()->set_letternum_5(bbox.lpnumber().letternum_5());
+					}
+				}
+				// Save for output.
+				if (has_valid_annotation) {
+					transformed_anno_group.set_group_label(anno_group.group_label());
+					transformed_anno_group_all->Add()->CopyFrom(transformed_anno_group);
+				}
 			}
 		}
+		
 	} else {
 		LOG(FATAL) << "Unknown annotation type.";
 	}

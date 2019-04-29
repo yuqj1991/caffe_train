@@ -116,6 +116,20 @@ message EmitConstraint {
   optional float emit_overlap = 2;
 }
 
+message LicensePlate {
+  optional int32 chichracter = 1;
+  optional int32 engchracter = 2;
+  optional int32 letternum_1 = 3;
+  optional int32 letternum_2 = 4;
+  optional int32 letternum_3 = 5;
+  optional int32 letternum_4 = 6;
+  optional int32 letternum_5 = 7;
+}
+message FaceAttributes {
+  optional int32 blur = 1;
+  optional int32 occlusion = 2;
+}
+
 // The normalized bounding box [0, 1] w.r.t. the input image size.
 message NormalizedBBox {
   optional float xmin = 1;
@@ -123,17 +137,18 @@ message NormalizedBBox {
   optional float xmax = 3;
   optional float ymax = 4;
   optional int32 label = 5;
-  optional int32 blur = 6;
-  optional int32 occlusion = 7;
-  optional bool difficult = 8;
-  optional float score = 9;
-  optional float size = 10;
+  optional bool difficult = 6;
+  optional float score = 7;
+  optional float size = 8;
+  optional FaceAttributes faceattrib = 9;
+  optional LicensePlate lpnumber = 10;
 }
 
 // Annotation for each object instance.
 message Annotation {
   optional int32 instance_id = 1 [default = 0];
   optional NormalizedBBox bbox = 2;
+  
 }
 
 // Group of annotations for a particular label.
@@ -147,13 +162,19 @@ message AnnotatedDatum {
   enum AnnotationType {
     BBOX = 0;
   }
+  enum AnnoataionAttriType {
+    FACE = 0;
+	LPnumber = 1;
+  }
   optional Datum datum = 1;
   // If there are "rich" annotations, specify the type of annotation.
   // Currently it only supports bounding box.
   // If there are no "rich" annotations, use label in datum instead.
   optional AnnotationType type = 2;
+  // label attri
+  optional AnnoataionAttriType attri_type = 3;
   // Each group contains annotation for a particular class.
-  repeated AnnotationGroup annotation_group = 3;
+  repeated AnnotationGroup annotation_group = 4;
 }
 
 // the normalized lanmarks of five points which has been normalized [0, 1] w.r.t. the input image size.
@@ -1077,6 +1098,11 @@ message DetectionEvaluateParameter {
   optional string name_size_file = 5;
   // The resize parameter used in converting NormalizedBBox to original image.
   optional ResizeParameter resize_param = 6;
+  enum AnnoataionAttriType{
+    FACE = 0;
+    LPnumber = 1;
+  }
+  optional AnnoataionAttriType attri_type = 7[default =FACE ];
 }
 
 message NonMaximumSuppressionParameter {
@@ -1144,11 +1170,16 @@ message DetectionOutputParameter {
   optional float visualize_threshold = 11;
   // If provided, save outputs to video file.
   optional string save_file = 12;
-  // add new background id realeated id r.w.t blur & occlusion
-  optional int32 background_blur_id = 13 [default = -1];
-  optional int32 background_occl_id = 14 [default = -1];
-  optional uint32 num_blur = 15;
-  optional uint32 num_occlusion = 16;
+  optional uint32 num_blur = 13;
+  optional uint32 num_occlusion = 14;
+  optional uint32 num_lpchinese = 15;
+  optional uint32 num_lpenglish = 16;
+  optional uint32 num_lpletter = 17;
+  enum AnnoataionAttriType{
+    FACE = 0;
+    LPnumber = 1;
+  }
+  optional AnnoataionAttriType attri_type = 18;
 }
 
 message DropoutParameter {
@@ -1435,9 +1466,12 @@ message MultiBoxLossParameter {
   optional ConfLossType conf_blur_loss_type = 26;
   // occlusion conf loss types
   optional ConfLossType conf_occlu_loss_type = 27;
-  // add new background id realeated id r.w.t blur & occlusion
-  optional int32 background_blur_id = 28 [default = -1];
-  optional int32 background_occl_id = 29 [default = -1];
+  optional uint32 num_chinese = 28;
+  optional ConfLossType chineselp_loss_type = 29;
+  optional uint32 num_english = 30;
+  optional ConfLossType englishlp_loss_type = 31;
+  optional uint32 num_letter = 32;
+  optional ConfLossType letter_lp_loss_type = 33;
 }
 
 // Message that store parameters used by MultiBoxLossLayer
@@ -1467,6 +1501,9 @@ message MultiFaceLossParameter {
   optional AttriLossType conf_glasses_loss_type = 8 [default = SOFTMAX];
   // add new background id realeated id r.w.t blur & occlusion
   optional AttriLossType conf_headpose_loss_type = 9 [default = SOFTMAX];
+  optional float gender_weight = 10 [default = 1.0];
+  optional float glass_weight = 11 [default = 1.0];
+  optional float headpose_weight = 12 [default = 1.0];
 }
 
 // Message that store parameters used by MultiBoxLossLayer
@@ -1621,6 +1658,7 @@ message FaceEvaluateParameter{
     enum FaceType{
         FACE_21_TYPE =0;
         FACE_5_TYPE =1;
+        FACE_ANGLE = 2;
     }
     optional FaceType facetype = 1[default = FACE_5_TYPE];
     optional int32 facepoints = 2;

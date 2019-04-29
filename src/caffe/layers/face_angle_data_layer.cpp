@@ -56,7 +56,7 @@ void faceAngleDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& botto
     // label
     if (this->output_labels_) {
         has_anno_type_ = anno_datum.has_type();
-        vector<int> label_shape(3, 1);
+        vector<int> label_shape(2, 1);
         if (has_anno_type_) {
             anno_type_ = anno_datum.type();
             if (anno_type_ == AnnoFaceAngleDatum_AnnoType_FACEANGLE) {
@@ -66,13 +66,8 @@ void faceAngleDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& botto
             // All landmarks  are stored in one spatial plane (# x1,...,x21; #y1,...,y21), and three head pose which has 21 point 
             // and they are left eye, right eye, nose , left mouse endpoint, right mouse endpoint. And the labels formate:
             // [item_id(image_id), yaw,  pitch, roll]
-            label_shape[0] = 1;
-            label_shape[1] = 1;
-            // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
-            // cpu_data and gpu_data for consistent prefetch thread. Thus we make
-            // sure there is at least one bbox.
-            label_shape[2] = batch_size;
-            label_shape[3] = 4;
+            label_shape[0] = batch_size;
+            label_shape[1] = 3;
             } else {
             LOG(FATAL) << "Unknown annotation type.";
             }
@@ -210,19 +205,16 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
     // store "rich " landmark, face attributes
     if (this->output_labels_ && has_anno_type_) {
-        vector<int> label_shape(4);
+        vector<int> label_shape(2);
         if (anno_type_ == AnnoFaceAngleDatum_AnnoType_FACEANGLE) {
-            label_shape[0] = 1;
-            label_shape[1] = 1;
             // Reshape the label and store the annotation.
-            label_shape[2] = batch_size;
-            label_shape[3] = 4;
+            label_shape[0] = batch_size;
+            label_shape[1] = 3;
             batch->label_.Reshape(label_shape);
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
             for (int item_id = 0; item_id < batch_size; ++item_id) {
                 AnnoFacePoseOritation face = all_anno[item_id];
-                top_label[idx++] = item_id;
                 top_label[idx++] = face.yaw();
                 top_label[idx++] = face.pitch();
                 top_label[idx++] = face.roll();
