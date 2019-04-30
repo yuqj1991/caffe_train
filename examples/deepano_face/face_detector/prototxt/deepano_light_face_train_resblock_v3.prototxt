@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 12
+		batch_size: 32
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -4129,7 +4129,6 @@ layer {
 		conf_loss_type: SOFTMAX
 		conf_blur_loss_type: SOFTMAX
 		conf_occlu_loss_type: SOFTMAX
-		attri_type: FACE
 		loc_weight: 1.0
 		num_classes: 2
 		num_blur: 3
@@ -4139,8 +4138,6 @@ layer {
 		overlap_threshold: 0.9
 		use_prior_for_matching: true
 		background_label_id: 0
-		background_blur_id: 0
-		background_occl_id: 0
 		use_difficult_gt: true
 		neg_pos_ratio: 3.0
 		neg_overlap: 0.9

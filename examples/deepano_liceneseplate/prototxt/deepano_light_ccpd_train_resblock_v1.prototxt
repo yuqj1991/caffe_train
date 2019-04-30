@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../dataset/car_person_data/car_license/ccpd_dataset/lmdb/ccpd_training_lmdb/"
-		batch_size: 16
+		batch_size: 32
 		backend: LMDB
 	}
 	annotated_data_param {
