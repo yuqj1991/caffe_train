@@ -211,6 +211,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       if (sampled_bboxes.size() > 0) {
         // Randomly pick a sampled bbox and crop the expand_datum.
         int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+        //LOG(INFO)<<"rand_idx: "<<rand_idx << " sampled_bboxes.size():  "<< sampled_bboxes.size();
+        //LOG(INFO)<<"==========: "<<sampled_bboxes[rand_idx].xmin();
         sampled_datum = new AnnotatedDatum();
         this->data_transformer_->CropImage(*expand_datum,
                                            sampled_bboxes[rand_idx],
