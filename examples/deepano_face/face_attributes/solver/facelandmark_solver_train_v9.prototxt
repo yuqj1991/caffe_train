@@ -1,5 +1,5 @@
-train_net: "../prototxt/facelandmarknet/facelandmark_train_v3.prototxt"
-test_net: "../prototxt/facelandmarknet/facelandmark_test_v3.prototxt"
+train_net: "../prototxt/facelandmarknet/facelandmark_train_v9.prototxt"
+test_net: "../prototxt/facelandmarknet/facelandmark_test_v9.prototxt"
 test_iter: 1000
 test_interval: 10000
 base_lr: 0.001
@@ -10,7 +10,7 @@ gamma: 0.8
 weight_decay: 0.004
 #momentum: 0.9
 snapshot: 20000
-snapshot_prefix: "../snapshot/deepanoFacelandmark_v3"
+snapshot_prefix: "../snapshot/deepanoFacelandmark_v9"
 solver_mode: GPU
 snapshot_after_train: true
 stepvalue: 50000
