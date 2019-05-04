@@ -5867,9 +5867,9 @@ layer {
 	detection_output_param {
 	    attri_type: LPnumber
 		num_classes: 2
-		num_chinese: 34
-		num_english: 25
-		num_letter: 35
+		num_lpchinese: 34
+		num_lpenglish: 25
+		num_lpletter: 35
 		share_location: true
 		background_label_id: 0
 		nms_param {
