@@ -2,7 +2,7 @@ import shutil
 import sys
 import os
 import random
-ccpd_directory = ['training', 'teesting']
+ccpd_directory = ['training', 'testing']
 root_dir ='../../../../caffe_deeplearning_train/examples/deepano_liceneseplate/scripts/'
 root_dataset = '../../../../dataset/car_person_data/car_license/ccpd_dataset/label/'
 def shuffle_file(filename):
@@ -29,7 +29,7 @@ def generate_list(imageSetDir):
 				xmlline = os.path.abspath(xmlline_) + '\n'
 				#print (os.path.abspath(xmlline_))
 				#print(xmlline)
-				newline = imgline.strip()+'.jpg'+' '+xmlline
+				newline = imgline.strip()+' '+xmlline
 				#print(newline)
 				#break
 				newfile.write(newline)

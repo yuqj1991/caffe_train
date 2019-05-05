@@ -68,6 +68,7 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
     vector<int> label_shape(4, 1);
     if (has_anno_type_) {
       anno_type_ = anno_datum.type();
+      anno_attri_type_ = anno_datum.attri_type();
       if (anno_data_param.has_anno_type()) {
         // If anno_type is provided in AnnotatedDataParameter, replace
         // the type stored in each individual AnnotatedDatum.
@@ -95,7 +96,7 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
           // sure there is at least one bbox.
           label_shape[2] = std::max(num_bboxes, 1);
           label_shape[3] = 10;
-        }else{
+        }else if(anno_attri_type_ ==AnnotatedDatum_AnnoataionAttriType_LPnumber){
           for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
             num_bboxes += anno_datum.annotation_group(g).annotation_size();
           }
@@ -211,6 +212,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       if (sampled_bboxes.size() > 0) {
         // Randomly pick a sampled bbox and crop the expand_datum.
         int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+        //LOG(INFO)<<"rand_idx: "<<rand_idx << " sampled_bboxes.size():  "<< sampled_bboxes.size();
+        //LOG(INFO)<<"==========: "<<sampled_bboxes[rand_idx].xmin();
         sampled_datum = new AnnotatedDatum();
         this->data_transformer_->CropImage(*expand_datum,
                                            sampled_bboxes[rand_idx],

@@ -445,6 +445,7 @@ void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
   int all_num_pos_occlu = 0;
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
   Dtype loss = 0;
+  int all_det_num = 0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
     SolverAction::Enum request = GetRequestedAction();
     // Check to see if stoppage of testing/training has been requested.
@@ -469,6 +470,7 @@ void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
       CHECK_EQ(result[j]->width(), 7);
       const Dtype* result_vec = result[j]->cpu_data();
       int num_det = result[j]->height();
+      all_det_num += result.size()*num_det;
       for (int k = 0; k < num_det; ++k) {
         int item_id = static_cast<int>(result_vec[k * 7]);
         int label = static_cast<int>(result_vec[k * 7+ 1]);
@@ -500,6 +502,7 @@ void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
       }
     }
   }
+  LOG(INFO)<<"all_num_pos_blur = "<<all_num_pos_blur<<" all_num_pos_occlu = "<<all_num_pos_occlu;
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";
     return;
@@ -551,11 +554,12 @@ void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
       }
     }
     mAP /= num_pos.size();
+    LOG(INFO)<<"all_det_num: "<<all_det_num<<" all_num_pos.size(): "<<all_num_pos.size();
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
     LOG(INFO) << "Test net output #" << i << ": map of " << output_name << " = "
-              << mAP << ", blur accuracy: "<<all_num_pos_blur/num_pos.size()
-              << ", occlussion accuracy: "<<all_num_pos_occlu/num_pos.size();
+              << mAP << ", blur accuracy: "<<all_num_pos_blur/all_det_num
+              << ", occlussion accuracy: "<<all_num_pos_occlu/all_det_num;
   }
 }
 
@@ -570,6 +574,7 @@ void Solver<Dtype>::TestDetectionLP(const int test_net_id) {
   map<int, map<int, vector<pair<float, int> > > > all_false_pos;
   map<int, map<int, int> > all_num_pos;
   int all_num_pos_lpnumber = 0;
+  int all_det_num = 0;
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
   Dtype loss = 0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
@@ -596,6 +601,7 @@ void Solver<Dtype>::TestDetectionLP(const int test_net_id) {
       CHECK_EQ(result[j]->width(), 6);
       const Dtype* result_vec = result[j]->cpu_data();
       int num_det = result[j]->height();
+      all_det_num += result.size()*num_det;
       for (int k = 0; k < num_det; ++k) {
         int item_id = static_cast<int>(result_vec[k * 6]);
         int label = static_cast<int>(result_vec[k * 6+ 1]);
@@ -676,10 +682,11 @@ void Solver<Dtype>::TestDetectionLP(const int test_net_id) {
       }
     }
     mAP /= num_pos.size();
+    LOG(INFO)<<"all_det_num: "<<all_det_num<<" all_num_pos_lpnumber: "<<all_num_pos_lpnumber;
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
     LOG(INFO) << "Test net output #" << i << ": map of " << output_name << " = "
-              << mAP << ", lpnumber accuracy: "<< all_num_pos_lpnumber/num_pos.size();
+              << mAP << ", lpnumber accuracy: "<< all_num_pos_lpnumber/all_det_num;
   }
 }
 

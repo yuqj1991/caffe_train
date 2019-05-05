@@ -20,7 +20,7 @@ Annotation_img_dir = '../../dataset/facedata/wider_face/Annotation_img'
 root_dir = "../../dataset/facedata/"
 anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
-thread_hold = 30 ##map:70.35%, thread_hold=40; now i want to detector 30 pixels, just like 6-10m distance
+thread_hold = 10 ##map:70.35%, thread_hold=40; now i want to detector 30 pixels, just like 6-10m distance
 classfyFile = "../../dataset/facedata/wider_face/wider_face_classfy_distance_data.txt"
 
 class ConfigureHistogram(object):

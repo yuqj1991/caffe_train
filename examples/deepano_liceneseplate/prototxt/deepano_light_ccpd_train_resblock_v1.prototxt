@@ -46,8 +46,8 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../dataset/car_person_data/car_license/ccpd_dataset/db/wider_face_wider_train_lmdb/"
-		batch_size: 16
+		source: "../../../../dataset/car_person_data/car_license/ccpd_dataset/lmdb/ccpd_training_lmdb/"
+		batch_size: 32
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -76,7 +76,7 @@ layer {
 				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.8
+				min_jaccard_overlap: 0.7
 			}
 			max_sample: 1
 			max_trials: 50
@@ -5741,7 +5741,6 @@ layer {
 		chineselp_loss_type: SOFTMAX
 		englishlp_loss_type: SOFTMAX
 		letter_lp_loss_type: SOFTMAX
-		attri_type: LPnumber
 		loc_weight: 1.0
 		num_classes: 2
 		num_chinese: 34

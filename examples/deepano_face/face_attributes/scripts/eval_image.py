@@ -2,7 +2,8 @@
 from __future__ import division
 import numpy as np
 import argparse
-import sys,os  
+import sys,os
+import math
 import cv2
 caffe_root = '../../../../../caffe_deeplearning_train/'
 sys.path.insert(0, caffe_root + 'python')  
@@ -104,9 +105,13 @@ def detect(imgfile):
                 num_correct_headpose = 1
             x = [x1, x2, x3, x4, x5]
             y = [y1, y2, y3, y4, y5]
+            intal_eye_w = float(pow(pow((x1-x2), 2) + pow((y1-y2), 2), 0.5))
             for ii in range(5):
                 sum_nmse[ii] = pow((x[ii]-box[ii]), 2) + pow((y[ii]-box[ii+5]), 2)
-                sum_nmse[ii] = float(pow(sum_nmse[ii], 0.5))/w
+                if headpose_gt == 2:
+                    sum_nmse[ii] = float(pow(sum_nmse[ii], 0.5))/w
+                else:
+                    sum_nmse[ii] = float(pow(sum_nmse[ii], 0.5))/intal_eye_w
     labelfile_.close()
     return sum_nmse, num_correct_gender, num_correct_glasses, num_correct_headpose
 
