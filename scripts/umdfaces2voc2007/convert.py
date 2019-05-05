@@ -22,8 +22,9 @@ def batch_work(ori, csvFile, setFile):
             label_full_anno_file_name = LABEL_FILE_FOLDER + img_file_name_no_jpg + '.txt'
             label_angle_anno_file_name = LABEL_FILE_FOLDER + img_file_name_no_jpg + '_angle.txt'
             full_path_image_name = SOURCE_IMG_FILE_FOLDER + ori[ii] + file_name
+            ang_path_image_name = SOURCE_IMG_FILE_FOLDER + ori[ii] + file_name.split('.jpg')[0]+'_angle.jpg'
             fullImg = os.path.abspath(full_path_image_name) + '\n'
-            setfile_.writelines(fullImg)
+            
             print('label file: %s, and full_path_img : %s'%(label_full_anno_file_name, full_path_image_name))
             label_file_ = open(label_full_anno_file_name, 'w')
             label_file_angle = open(label_angle_anno_file_name, 'w')
@@ -31,6 +32,10 @@ def batch_work(ori, csvFile, setFile):
             roi_y = int(row[1]['FACE_Y'])
             roi_w = int(row[1]['FACE_WIDTH'])
             roi_h = int(row[1]['FACE_HEIGHT'])
+            orc_img = cv2.imread(os.path.abspath(full_path_image_name))
+            ori_img = orc_img[roi_y:roi_y+roi_h, roi_x:roi_x+roi_w, :]
+            cv2.imwrite(ang_path_image_name, ori_img)
+            setfile_.writelines(os.path.abspath(ang_path_image_name) + '\n')
             ponit_x1 = row[1]['P1X']
             ponit_x2 = row[1]['P2X']
             ponit_x3 = row[1]['P3X']
