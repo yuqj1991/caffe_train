@@ -700,6 +700,7 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
       ShareTrainedLayersWith(net_.get());
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
   Dtype nme =0.0, gender_precision =0.0, glasses_presion=0.0, headpose_presicon=0.0;
+  int batch_size =0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
     SolverAction::Enum request = GetRequestedAction();
     // Check to see if stoppage of testing/training has been requested.
@@ -719,16 +720,28 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
     const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
     for (int j = 0; j < result.size(); ++j) {
       const Dtype* result_vec = result[j]->cpu_data();
-      nme +=result_vec[0];
-      gender_precision +=result_vec[1];
-      glasses_presion +=result_vec[2];
-      headpose_presicon +=result_vec[3];
+      batch_size = result[j]->height();
+      for(int ii = 0; ii<batch_size; ii++){
+        nme +=result_vec[ii*4 + 0];
+        if (result_vec[ii*4 + 1]==1)
+          gender_precision++;
+        if (result_vec[ii*4 + 2]==1)
+          glasses_presion++;
+        if (result_vec[ii*4 + 3]==1)
+          headpose_presicon++;
+      } 
     }    
   }
-  LOG(INFO)<< "NME: "<< nme/param_.test_iter(test_net_id)
-             <<" gender : "<<gender_precision/param_.test_iter(test_net_id)
-             <<" glasses : "<<glasses_presion/param_.test_iter(test_net_id)
-             <<" headpose : "<<headpose_presicon/param_.test_iter(test_net_id);
+  int total_images = param_.test_iter(test_net_id)* batch_size;
+  LOG(INFO) << "total_images: "<< total_images
+             << " NME: "<< nme/total_images
+             <<" gender : "<<gender_precision
+             <<" gender accuracy: "<<gender_precision/total_images
+             <<" glasses : "<<glasses_presion
+             <<" glasses accuracy: "<<glasses_presion/total_images
+             <<" headpose : "<<headpose_presicon
+             <<" headpose accuracy: "<<headpose_presicon/total_images;
+             
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";
     return;

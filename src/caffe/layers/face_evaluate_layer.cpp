@@ -25,15 +25,17 @@ void FaceEvaluateLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   if (facetype_ == FaceEvaluateParameter_FaceType_FACE_5_TYPE){
     CHECK_EQ(num_facepoints_, 5)<< "this face points should be 5";
-    vector<int> top_shape(4, 1);
+    vector<int> top_shape(2, 1);
+    top_shape.push_back(bottom[0]->num());
+    top_shape.push_back(4);
     top[0]->Reshape(top_shape);
   }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_21_TYPE)
   {
     CHECK_EQ(num_facepoints_, 21)<< "this face points should be  21";
-    vector<int> top_shape(4, 1);
+    vector<int> top_shape(2, 1);
     top[0]->Reshape(top_shape);
   }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_ANGLE){
-    vector<int> top_shape(4, 1);
+    vector<int> top_shape(2, 1);
     top[0]->Reshape(top_shape);
   }    
 }
@@ -97,16 +99,23 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
         }
       }
       if(all_gt_face_attributes[ii][0]==gender_index)
-        correct_precisive_gender++;
+        correct_precisive_gender=1;
       if(all_gt_face_attributes[ii][1]==glasses_index)
-        correct_precisive_glasses++;
+        correct_precisive_glasses=1;
       if(all_gt_face_attributes[ii][2]==headpose_index)
-        correct_precisive_headpose++;
+        correct_precisive_headpose=1;
+      top_data[ii*4 + 0] = distance_loss;
+      top_data[ii*4 + 1] = correct_precisive_gender;
+      top_data[ii*4 + 2] = correct_precisive_glasses;
+      top_data[ii*4 + 3] = correct_precisive_headpose;
+      #if 0
+      for(int jj=0; jj<9; jj++){
+        LOG(INFO)<<"#####"<<all_face_prediction_attributes[ii][jj];
+      }
+      LOG(INFO)<<"gender_index: "<<gender_index<<" glasses_index: "<<glasses_index<<" headpose_index: "<<headpose_index;
+      LOG(INFO)<<"=====gt_gender_index: "<<all_gt_face_attributes[ii][0]<<" gt glassesindex: "<<all_gt_face_attributes[ii][1]<<" gt headpose index: "<<all_gt_face_attributes[ii][2];
+      #endif
     }
-    top_data[0]=float(distance_loss/batch_size);
-    top_data[1]=float(correct_precisive_gender/batch_size);
-    top_data[2]=float(correct_precisive_glasses/batch_size);
-    top_data[3]=float(correct_precisive_headpose/batch_size);
   }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_21_TYPE){  // evaluate 21 face point and yaw pitch roll 
     map<int, vector<float> > all_prediction_face_points;
     map<int, vector<float> > all_gt_face_points;
