@@ -179,15 +179,15 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
           float blur_temp =0; float occlu_temp =0.0;
           for (int ii = 0; ii< 3; ii++ )
           {
-            if (blur_temp <  cur_blur_data[idx+ii])
+            if (blur_temp <  cur_blur_data[idx+ num_priors_*ii])
             {
               blur_index = ii;
-              blur_temp = cur_blur_data[idx+ii];
+              blur_temp = cur_blur_data[idx+ num_priors_*ii];
             }
-            if (occlu_temp <  cur_occlu_data[idx+ii])
+            if (occlu_temp < cur_occlu_data[idx + num_priors_*ii])
             {
               occlu_index = ii;
-              occlu_temp = cur_occlu_data[idx+ii];
+              occlu_temp = cur_occlu_data[idx+num_priors_*ii];
             }
           }
           top_data[count * 9 + 7] = blur_index;
@@ -306,55 +306,47 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
           float let3_temp =0; float let4_temp =0.0; float let5_temp =0;
           for (int ii = 0; ii< num_chinese_; ii++ )
           {
-            if (chi_temp <  cur_chi_data[idx+ii])
+            if (chi_temp <  cur_chi_data[idx+num_priors_*ii])
             {
               chi_index = ii;
-              chi_temp = cur_chi_data[idx+ii];
+              chi_temp = cur_chi_data[idx+num_priors_*ii];
             }
           }
           for (int ii = 0; ii< num_english_; ii++ ){
-            if (eng_temp <  cur_eng_data[idx+ii])
+            if (eng_temp <  cur_eng_data[idx+num_priors_*ii])
             {
               eng_index = ii;
-              eng_temp = cur_eng_data[idx+ii];
+              eng_temp = cur_eng_data[idx+num_priors_*ii];
             }
           }
           for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let1_temp <  cur_let1_data[idx+ii])
+            if (let1_temp <  cur_let1_data[idx+num_priors_*ii])
             {
               let1_index = ii;
-              let1_temp = cur_let1_data[idx+ii];
+              let1_temp = cur_let1_data[idx+num_priors_*ii];
             }
-          }
-          for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let2_temp <  cur_let2_data[idx+ii])
+            if (let2_temp <  cur_let2_data[idx+num_priors_*ii])
             {
               let2_index = ii;
-              let2_temp = cur_let2_data[idx+ii];
+              let2_temp = cur_let2_data[idx*+num_priors_*ii];
             }
-          }
-          for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let3_temp <  cur_let3_data[idx+ii])
+            if (let3_temp <  cur_let3_data[idx+num_priors_*ii])
             {
               let3_index = ii;
-              let3_temp = cur_let3_data[idx+ii];
+              let3_temp = cur_let3_data[idx+num_priors_*ii];
             }
-          }
-          for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let4_temp <  cur_let4_data[idx+ii])
+            if (let4_temp <  cur_let4_data[idx+num_priors_*ii])
             {
               let4_index = ii;
-              let4_temp = cur_let4_data[idx+ii];
+              let4_temp = cur_let4_data[idx+num_priors_*ii];
             }
-          }
-          for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let5_temp <  cur_let5_data[idx+ii])
+            if (let5_temp <  cur_let5_data[idx+num_priors_*ii])
             {
               let5_index = ii;
-              let5_temp = cur_let5_data[idx+ii];
+              let5_temp = cur_let5_data[idx+num_priors_*ii];
             }
           }
-
+          
           top_data[count * 14 + 7] = chi_index;
           top_data[count * 14 + 8] = eng_index;
           top_data[count * 14 + 9] = let1_index;

@@ -422,7 +422,6 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
     const Dtype* let4_data = bottom[8]->cpu_data();
     const Dtype* let5_data = bottom[9]->cpu_data();
     const int num = bottom[0]->num();
-
     //Retrieve all chi_data confidences.
     vector<map<int, vector<float> > > all_chi_scores;
     GetConfidenceScores(chi_data, num, num_priors_, num_chinese_,
@@ -432,22 +431,21 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
     GetConfidenceScores(eng_data, num, num_priors_, num_english_,
                         &all_eng_scores);
     //Retrieve all let1_data confidences
-    vector<vector<map<int, vector<float> > > > all_let_scores;
+    vector<vector<map<int, vector<float> > > > all_let_scores(5);
     GetConfidenceScores(let1_data, num, num_priors_, num_letter_,
-                        &all_let_scores[1]);
+                        &all_let_scores[0]);
     //Retrieve all let2_data confidences
     GetConfidenceScores(let2_data, num, num_priors_, num_letter_,
-                        &all_let_scores[2]);
+                        &all_let_scores[1]);
     //Retrieve all let3_data confidences
     GetConfidenceScores(let3_data, num, num_priors_, num_letter_,
-                        &all_let_scores[3]);
+                        &all_let_scores[2]);
     //Retrieve all let4_data confidences
     GetConfidenceScores(let4_data, num, num_priors_, num_letter_,
-                        &all_let_scores[4]);
+                        &all_let_scores[3]);
     //Retrieve all let5_data confidences
     GetConfidenceScores(let5_data, num, num_priors_, num_letter_,
-                        &all_let_scores[5]);
-
+                        &all_let_scores[4]);
     top_shape.push_back(14);
     Dtype* top_data;
     if (num_kept == 0) {

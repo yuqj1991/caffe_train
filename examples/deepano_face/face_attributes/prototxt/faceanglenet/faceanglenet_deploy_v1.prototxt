@@ -2,8 +2,8 @@ name: "deepano_face_anglenet"
 input: "data"
 input_dim: 1
 input_dim: 3
-input_dim: 96
-input_dim: 96
+input_dim: 48
+input_dim: 48
 
 layer {
 	name: "convpre_1"
@@ -624,8 +624,8 @@ layer {
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
-		stride: 2
+		kernel_size: 1
+		stride: 1
 		pad: 0
 		weight_filler {
 			type: "xavier"
@@ -699,8 +699,8 @@ layer {
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
-		stride: 2
+		kernel_size: 1
+		stride: 1
 		pad: 0
 		weight_filler {
 			type: "xavier"

@@ -486,9 +486,9 @@ void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
           float score = result_vec[k * 7 + 2];
           int tp = static_cast<int>(result_vec[k * 7 + 3]);
           int fp = static_cast<int>(result_vec[k * 7 + 4]);
-          if (result_vec[k * 7 + 5] == 1)
+          if (static_cast<int>(result_vec[k * 7 + 5]) == 1)
             all_num_pos_blur ++ ;
-          if (result_vec[k * 7 + 6] == 1)
+          if (static_cast<int>(result_vec[k * 7 + 6]) == 1)
             all_num_pos_occlu ++ ;
 
           if (tp == 0 && fp == 0) {
@@ -502,7 +502,7 @@ void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
       }
     }
   }
-  LOG(INFO)<<"all_num_pos_blur = "<<all_num_pos_blur<<" all_num_pos_occlu = "<<all_num_pos_occlu;
+  
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";
     return;
@@ -554,7 +554,7 @@ void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
       }
     }
     mAP /= num_pos.size();
-    LOG(INFO)<<"all_det_num: "<<all_det_num<<" all_num_pos.size(): "<<all_num_pos.size();
+    LOG(INFO)<<"all_det_num: "<<all_det_num <<"all_num_pos_blur: "<<all_num_pos_blur<<" all_num_pos_occlu: "<<all_num_pos_occlu;
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
     LOG(INFO) << "Test net output #" << i << ": map of " << output_name << " = "
@@ -617,7 +617,7 @@ void Solver<Dtype>::TestDetectionLP(const int test_net_id) {
           float score = result_vec[k * 6 + 2];
           int tp = static_cast<int>(result_vec[k * 6 + 3]);
           int fp = static_cast<int>(result_vec[k * 6 + 4]);
-          if(result_vec[k * 6 + 5]==1){
+          if(static_cast<int>(result_vec[k * 6 + 5])==1){
             all_num_pos_lpnumber ++;
           }
           if (tp == 0 && fp == 0) {
