@@ -116,7 +116,7 @@ def detect():
              
              ori_img = frame[y1:y2, x1:x2, :]
              
-             oimg = preprocessface(ori_img, (96, 96))
+             oimg = preprocess(ori_img, (96, 96))
              oimg = oimg.astype(np.float32)
              oimg = oimg.transpose((2, 0, 1))
              net2.blobs['data'].data[...] = oimg
@@ -126,7 +126,6 @@ def detect():
                  point = (boxpoint[jj], boxpoint[jj+5])
                  print point
                  cv2.circle(ori_img, point, 3,(0,0,213),-1)
-             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
              cv2.rectangle(frame, p1, p2, (0,255,0))
              cv2.rectangle(frame, p11, p22, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
