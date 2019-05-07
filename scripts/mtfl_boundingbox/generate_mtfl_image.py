@@ -13,7 +13,6 @@ import matplotlib.pyplot as plot
 from scipy import misc
 import argparse
 import tensorflow as tf
-import facenet
 import detect_face
 from time import sleep
 
