@@ -105,10 +105,10 @@ def detect():
              p1 = (box[i][0], box[i][1])
              p2 = (box[i][2], box[i][3])
              
-             x1 = max_(0, box[i][0] - 60)
-             x2 = min_(box[i][2]+60, w)
-             y1 = max_(0, box[i][1] - 60)
-             y2 = min_(box[i][3]+60, h)
+             x1 = max_(0, box[i][0] - 44/2)
+             x2 = min_(box[i][2]+44/2, w)
+             y1 = max_(0, box[i][1] - 44/2)
+             y2 = min_(box[i][3]+44/2, h)
              
              print("x2 - x1: %d, y2 - y1: %d"%(x2 - x1, y2 - y1))
              p11 = (x1, y1)

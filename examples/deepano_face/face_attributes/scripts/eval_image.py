@@ -23,6 +23,7 @@ net_file= args.model
 caffe_model= args.weights
 test_dir = "../../../../../dataset/facedata/mtfl/JPEGImages/AFLW"
 label_dir = "../../../../../dataset/facedata/mtfl/label/"
+val_list_file = 'testing.txt'
 num_image = 0
 
 if not os.path.exists(caffe_model):
@@ -57,27 +58,26 @@ def postprocess(img, out):
     glasses_index = np.argmax(glasses)
     headpose = out['multiface_output'][0, 14:19]
     headpose_index = np.argmax(headpose)
-    return (facepoints.astype(np.int32), gender_index, glasses_index,
+    return (facepoints.astype(np.float32), gender_index, glasses_index,
            headpose_index)
 
 
-def detect(imgfile):
+def detect(imgfile, labelpath):
     origimg = cv2.imread(imgfile)
     w = origimg.shape[1]
     img = preprocess(origimg)
-    labelpath = label_dir+imgfile.split('/')[-1].split('.jpg')[0]
     
     img = img.astype(np.float32)
     img = img.transpose((2, 0, 1))
 
     net.blobs['data'].data[...] = img
     out = net.forward()
-    box, gender, glasses, headpose = postprocess(origimg, out)
+    point, gender, glasses, headpose = postprocess(origimg, out)
     sum_nmse = [0.0,0.0,0.0,0.0,0.0]
 
-    num_correct_gender = 0
-    num_correct_glasses = 0
-    num_correct_headpose = 0
+    correct_gender = False
+    correct_glasses = False
+    correct_headpose = False
 
     with open(labelpath, 'r') as labelfile_:
         while True:
@@ -98,22 +98,19 @@ def detect(imgfile):
             glass_gt = int(labelInfo[11]) - 1
             headpose_gt = int(labelInfo[12]) - 1
             if gender == gender_gt:
-                num_correct_gender = 1
+                correct_gender = True
             if glasses == glass_gt:
-                num_correct_glasses = 1
+                correct_glasses = True
             if headpose == headpose_gt:
-                num_correct_headpose = 1
+                correct_headpose = True
             x = [x1, x2, x3, x4, x5]
             y = [y1, y2, y3, y4, y5]
-            intal_eye_w = float(pow(pow((x1-x2), 2) + pow((y1-y2), 2), 0.5))
+            intal_eye_w = float(pow((pow((x1-x2), 2) + pow((y1-y2), 2)), 0.5))
             for ii in range(5):
-                sum_nmse[ii] = pow((x[ii]-box[ii]), 2) + pow((y[ii]-box[ii+5]), 2)
-                if headpose_gt == 2:
-                    sum_nmse[ii] = float(pow(sum_nmse[ii], 0.5))/w
-                else:
-                    sum_nmse[ii] = float(pow(sum_nmse[ii], 0.5))/intal_eye_w
+                sum_n = float(pow(pow((x[ii]-point[ii]), 2) + pow((y[ii]-point[ii+5]), 2), 0.5))
+                sum_nmse[ii] = sum_n/intal_eye_w
     labelfile_.close()
-    return sum_nmse, num_correct_gender, num_correct_glasses, num_correct_headpose
+    return sum_nmse, correct_gender, correct_glasses, correct_headpose
 
 
 mtfl_eval_landmakrs = []
@@ -121,13 +118,18 @@ mtfl_eval_gender = 0
 mtfl_eval_glass =0
 mtfl_eval_headpose = 0
 sum_landmark = [0.0,0.0,0.0,0.0,0.0]
-for f in os.listdir(test_dir):
-    sum, num_gender, num_glasses, num_headpose = detect(test_dir + "/" + f)
-    mtfl_eval_landmakrs.append(sum)
-    mtfl_eval_gender += num_gender
-    mtfl_eval_glass += num_glasses
-    mtfl_eval_headpose +=num_headpose
-    num_image += 1
+with open(val_list_file, 'r') as listfile_:
+	while True:
+		val_imageinfo = listfile_.readline().split(' ')
+		sum, gender, glasses, headpose = detect(val_imageinfo[0], val_imageinfo[1])
+		mtfl_eval_landmakrs.append(sum)
+		if gender:
+			mtfl_eval_gender += 1
+		if glasses:
+			mtfl_eval_glass += 1
+		if headpose:
+			mtfl_eval_headpose += 1
+		num_image += 1
 
 # static
 for nn in range(len(mtfl_eval_landmakrs)):
