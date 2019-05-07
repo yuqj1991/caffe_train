@@ -554,12 +554,12 @@ void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
       }
     }
     mAP /= num_pos.size();
-    LOG(INFO)<<"all_det_num: "<<all_det_num <<"all_num_pos_blur: "<<all_num_pos_blur<<" all_num_pos_occlu: "<<all_num_pos_occlu;
+    LOG(INFO)<<"all_det_num: "<<all_det_num <<" all_num_pos_blur: "<<all_num_pos_blur<<" all_num_pos_occlu: "<<all_num_pos_occlu;
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
     LOG(INFO) << "Test net output #" << i << ": map of " << output_name << " = "
-              << mAP << ", blur accuracy: "<<all_num_pos_blur/all_det_num
-              << ", occlussion accuracy: "<<all_num_pos_occlu/all_det_num;
+              << mAP << ", blur accuracy: "<< float(all_num_pos_blur/all_det_num)
+              << ", occlussion accuracy: "<< float(all_num_pos_occlu/all_det_num);
   }
 }
 
@@ -686,7 +686,7 @@ void Solver<Dtype>::TestDetectionLP(const int test_net_id) {
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
     LOG(INFO) << "Test net output #" << i << ": map of " << output_name << " = "
-              << mAP << ", lpnumber accuracy: "<< all_num_pos_lpnumber/all_det_num;
+              << mAP << ", lpnumber accuracy: "<< float(all_num_pos_lpnumber/all_det_num);
   }
 }
 
