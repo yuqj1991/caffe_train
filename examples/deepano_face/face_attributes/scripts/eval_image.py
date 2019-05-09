@@ -120,8 +120,11 @@ mtfl_eval_headpose = 0
 sum_landmark = [0.0,0.0,0.0,0.0,0.0]
 with open(val_list_file, 'r') as listfile_:
 	while True:
+		val_image = listfile_.readline()
+		if not val_image:
+			break
 		val_imageinfo = listfile_.readline().split(' ')
-		sum, gender, glasses, headpose = detect(val_imageinfo[0], val_imageinfo[1])
+		sum, gender, glasses, headpose = detect(val_imageinfo[0], val_imageinfo[1].replace('\n', ''))
 		mtfl_eval_landmakrs.append(sum)
 		if gender:
 			mtfl_eval_gender += 1
