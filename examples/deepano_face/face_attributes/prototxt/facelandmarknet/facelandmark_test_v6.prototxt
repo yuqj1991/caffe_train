@@ -1411,7 +1411,7 @@ layer {
 layer {
   name: "conv6_landmark_fds_1"
   type: "InnerProduct"
-  bottom: "conv_5_3_4"
+  bottom: "conv_5_3"
   top: "conv6_landmark_fds_1"
   param {
     lr_mult: 1
