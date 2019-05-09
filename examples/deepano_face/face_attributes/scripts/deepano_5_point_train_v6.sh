@@ -10,4 +10,4 @@ if ! test -f ../prototxt/facelandmarknet/facelandmark_test_v6.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=../solver/facelandmark_solver_train_v6.prototxt -gpu 0 \
-#--snapshot=../snapshot/deepanoFacelandmark_v6_iter_429235.solverstate
+--snapshot=../snapshot/deepanoFacelandmark_v6_iter_800000.solverstate
