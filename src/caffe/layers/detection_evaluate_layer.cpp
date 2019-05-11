@@ -429,6 +429,15 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
                     // true positive.
                     top_data[num_det * 6 + 3] = 1;
                     top_data[num_det * 6 + 4] = 0;
+                    # if 0
+                    LOG(INFO)<<gt_bboxes[jmax].lpnumber().chichracter()<<" : "<<bboxes[i].lpnumber().chichracter()<<
+                      " eng "<< gt_bboxes[jmax].lpnumber().engchracter()<<" : "<<bboxes[i].lpnumber().engchracter()<<
+                      " let1 "<< gt_bboxes[jmax].lpnumber().letternum_1()<<" : "<<bboxes[i].lpnumber().letternum_1()<<
+                      " let2 "<< gt_bboxes[jmax].lpnumber().letternum_2()<<" : "<<bboxes[i].lpnumber().letternum_2()<<
+                      " let3 "<< gt_bboxes[jmax].lpnumber().letternum_3()<<" : "<<bboxes[i].lpnumber().letternum_3()<<
+                      " let4 "<< gt_bboxes[jmax].lpnumber().letternum_4()<<" : "<<bboxes[i].lpnumber().letternum_4()<<
+                      " let5 "<< gt_bboxes[jmax].lpnumber().letternum_5()<<" : "<<bboxes[i].lpnumber().letternum_5();
+                    #endif
                     if(gt_bboxes[jmax].lpnumber().chichracter()==bboxes[i].lpnumber().chichracter()&&
                        gt_bboxes[jmax].lpnumber().engchracter()==bboxes[i].lpnumber().engchracter()&&
                        gt_bboxes[jmax].lpnumber().letternum_1()==bboxes[i].lpnumber().letternum_1()&&

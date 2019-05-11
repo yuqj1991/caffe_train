@@ -306,6 +306,7 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
           float let3_temp =0; float let4_temp =0.0; float let5_temp =0;
           for (int ii = 0; ii< num_chinese_; ii++ )
           {
+            //LOG(INFO)<<cur_chi_data[idx+num_priors_*ii];
             if (chi_temp <  cur_chi_data[idx+num_priors_*ii])
             {
               chi_index = ii;
@@ -319,6 +320,7 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
               eng_temp = cur_eng_data[idx+num_priors_*ii];
             }
           }
+          //LOG(INFO)<<"chi_index: "<< chi_index << " eng_index: "<<eng_index;
           for (int ii = 0; ii< num_letter_; ii++ ){
             if (let1_temp <  cur_let1_data[idx+num_priors_*ii])
             {

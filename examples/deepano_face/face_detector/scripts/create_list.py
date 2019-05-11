@@ -29,7 +29,7 @@ def generate_list(imageSetDir):
 				xmlline = os.path.abspath(xmlline_) + '\n'
 				#print (os.path.abspath(xmlline_))
 				#print(xmlline)
-				newline = imgline.strip()+'.jpg'+' '+xmlline
+				newline = imgline.strip().replace('stive', 'deepano')+'.jpg'+' '+xmlline
 				#print(newline)
 				#break
 				newfile.write(newline)

@@ -534,7 +534,7 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
       NormalizedBBox bbox = anno.bbox();
       LOG(INFO) << "bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
                 <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion()
+                <<" bbox->blur: "<<bbox.faceattrib().blur()<<" bbox->occlusion: "<<bbox.faceattrib().occlusion()
                 <<" bbox->label: "<<bbox.label();
     }
   }
@@ -730,6 +730,9 @@ bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
   while (std::getline(infile, lineStr )) {
     sstr << lineStr;
     sstr >> x1 >> y1 >> x2 >>y2 >> lpnum_1>>lpnum_2 >>lpnum_3 >>lpnum_4 >>lpnum_5 >>lpnum_6 >>lpnum_7;
+    #if 1
+    LOG(INFO)<< x1 <<" "<< y1 <<" "<< x2 <<" "<<y2 <<" "<< lpnum_1<<" "<<lpnum_2 <<" "<<lpnum_3 <<" "<<lpnum_4 <<" "<<lpnum_5 <<" "<<lpnum_6 <<" "<<lpnum_7;
+    #endif
     float xf1 = float(x1/width), yf1 = float(y1/height);float xf2 = float(x2/width), yf2 = float(y2/height);
     Annotation* anno = NULL;
     string name = "licenseplate";
@@ -772,6 +775,12 @@ bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
     bbox->mutable_lpnumber()->set_letternum_3(lpnum_5);
     bbox->mutable_lpnumber()->set_letternum_4(lpnum_6);
     bbox->mutable_lpnumber()->set_letternum_5(lpnum_7);
+    #if 1
+    LOG(INFO)<<"xmin: "<<bbox->xmin()<<" ymin: "<<bbox->ymin()<<" xmax: "<<bbox->xmax()<<" ymax: "<<bbox->ymax();
+    LOG(INFO)<<"chi: "<<bbox->lpnumber().chichracter()<< " eng: "<<bbox->lpnumber().engchracter()<<" let1: "<<bbox->lpnumber().letternum_1()
+              << " let2: "<<bbox->lpnumber().letternum_2()<<" let3: "<<bbox->lpnumber().letternum_3()<<" let4: "<<bbox->lpnumber().letternum_4()
+              <<" let5: "<<bbox->lpnumber().letternum_5();
+    #endif
     bool difficult = false;
     bbox->set_difficult(difficult);
   }

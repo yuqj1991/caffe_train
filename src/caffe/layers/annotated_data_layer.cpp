@@ -177,7 +177,26 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         const NormalizedBBox& bbox = anno.bbox();
         LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
                   <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                  <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion();
+                  <<" bbox->blur: "<<bbox.faceattrib().blur()<<" bbox->occlusion: "<<bbox.faceattrib().occlusion();
+      }
+    }
+    LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";
+#endif
+#if 0
+    int size_group = anno_datum.annotation_group_size();
+    LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
+    for(int ii=0; ii< size_group; ii++)
+    {
+      const AnnotationGroup& anno_group = anno_datum.annotation_group(ii);
+      int anno_size = anno_group.annotation_size();
+      for(int jj=0; jj<anno_size; jj++)
+      {
+        const Annotation& anno = anno_group.annotation(jj);
+        const NormalizedBBox& bbox = anno.bbox();
+        LOG(INFO)<<"xmin: "<<bbox.xmin()<<" ymin: "<<bbox.ymin()<<" xmax: "<<bbox.xmax()<<" ymax: "<<bbox.ymax();
+                LOG(INFO)<<"chi: "<<bbox.lpnumber().chichracter()<< " eng: "<<bbox.lpnumber().engchracter()<<" let1: "<<bbox.lpnumber().letternum_1()
+                         << " let2: "<<bbox.lpnumber().letternum_2()<<" let3: "<<bbox.lpnumber().letternum_3()<<" let5: "<<bbox.lpnumber().letternum_4()
+                         <<" let5: "<<bbox.lpnumber().letternum_5();
       }
     }
     LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";
@@ -212,8 +231,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       if (sampled_bboxes.size() > 0) {
         // Randomly pick a sampled bbox and crop the expand_datum.
         int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
-        //LOG(INFO)<<"rand_idx: "<<rand_idx << " sampled_bboxes.size():  "<< sampled_bboxes.size();
-        //LOG(INFO)<<"==========: "<<sampled_bboxes[rand_idx].xmin();
         sampled_datum = new AnnotatedDatum();
         this->data_transformer_->CropImage(*expand_datum,
                                            sampled_bboxes[rand_idx],
@@ -371,6 +388,12 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = bbox.lpnumber().letternum_4();
                 top_label[idx++] = bbox.lpnumber().letternum_5();
                 top_label[idx++] = bbox.difficult();
+                #if 0
+                LOG(INFO)<<"xmin: "<<bbox.xmin()<<" ymin: "<<bbox.ymin()<<" xmax: "<<bbox.xmax()<<" ymax: "<<bbox.ymax();
+                LOG(INFO)<<"chi: "<<bbox.lpnumber().chichracter()<< " eng: "<<bbox.lpnumber().engchracter()<<" let1: "<<bbox.lpnumber().letternum_1()
+                         << " let2: "<<bbox.lpnumber().letternum_2()<<" let3: "<<bbox.lpnumber().letternum_3()<<" let5: "<<bbox.lpnumber().letternum_4()
+                         <<" let5: "<<bbox.lpnumber().letternum_5();
+                #endif
               }
             }
           }
@@ -395,6 +418,25 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   }
   LOG(INFO)<< "finished **************************************************** end ";
 #endif 
+
+#if 0
+  LOG(INFO)<< "start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& single image: num_bboxes: "<<num_bboxes;
+  const Dtype* top_label_data = batch->label_.cpu_data();
+  for(int ii=0; ii < num_bboxes; ii++)
+  {
+    int id = ii*15;
+    LOG(INFO) <<"batch_id: "<<top_label_data[id]<<" anno_label: "<<top_label_data[id+1]
+              <<" anno.instance_id: "<<top_label_data[id+2];
+    LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
+              <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
+              <<" bbox->chi: "<<top_label_data[id+7]<<" bbox->eng: "<<top_label_data[id+8]
+              <<" bbox->let1: "<<top_label_data[id+9]<<" bbox->let2: "<<top_label_data[id+10]
+              <<" bbox->let3: "<<top_label_data[id+11]<<" bbox->let4: "<<top_label_data[id+12]
+              <<" bbox->let5: "<<top_label_data[id+13];
+  }
+  LOG(INFO)<< "finished **************************************************** end ";
+#endif 
+
   timer.Stop();
   batch_timer.Stop();
   DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";
