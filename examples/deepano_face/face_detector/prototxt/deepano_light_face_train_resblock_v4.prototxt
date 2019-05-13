@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 8
+		batch_size: 32
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -3666,7 +3666,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3712,7 +3712,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3823,7 +3823,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 18
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3871,7 +3871,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 18
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3913,7 +3913,6 @@ layer {
 		min_size: 10.0
 		max_size: 16.0
 		aspect_ratio: 2.0
-		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
