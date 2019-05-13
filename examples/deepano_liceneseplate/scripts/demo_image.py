@@ -3,6 +3,7 @@ import numpy as np
 import argparse
 import sys,os  
 import cv2
+from PIL import Image, ImageDraw, ImageFont
 caffe_root = '../../../../caffe_deeplearning_train/'
 sys.path.insert(0, caffe_root + 'python')  
 import caffe  
@@ -39,6 +40,9 @@ net = caffe.Net(net_file,caffe_model,caffe.TEST)
 CLASSES = ('background',
            'liceneseplate')
 
+
+font = ImageFont.truetype('NotoSansCJK-Black.ttc', 20)
+fillColor = (255,0,0)
 
 def preprocess(src):
     img = cv2.resize(src, (300,300))
@@ -88,8 +92,13 @@ def detect(imgfile):
            cv2.rectangle(origimg, p1, p2, (0,255,0))
            p3 = (max(p1[0], 15), max(p1[1], 15))
            lpstring = provinces[chin[i]] + alphabets[eng[i]] + ads[letter_1[i]] +ads[letter_2[i]] + ads[letter_3[i]] + ads[letter_4[i]] + ads[letter_5[i]]		
-           title = "%s: %s" % (CLASSES[int(cls[i])],lpstring)
-           cv2.putText(origimg, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
+           title = "%s:  %s" % (CLASSES[int(cls[i])],lpstring)
+           if not isinstance(title, unicode): 
+               title = title.decode('utf8')
+           img_PIL = Image.fromarray(cv2.cvtColor(origimg, cv2.COLOR_BGR2RGB))
+           draw = ImageDraw.Draw(img_PIL)
+           draw.text(p3, title, font=font, fill=fillColor) 
+           origimg = cv2.cvtColor(np.asarray(img_PIL),cv2.COLOR_RGB2BGR)
     cv2.imshow("facedetector", origimg)
  
     k = cv2.waitKey(0) & 0xff
