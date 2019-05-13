@@ -107,7 +107,7 @@ layer {
 			max_sample: 1
 			max_trials: 50
 		}
-		label_map_file: "../labelmap_face.prototxt"
+		label_map_file: "../labelmap_lp.prototxt"
 	}
 }
 layer {

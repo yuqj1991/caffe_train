@@ -382,6 +382,14 @@ void DataTransformer<Dtype>::TransformAnnotation(
 						transformed_bbox->mutable_lpnumber()->set_letternum_3(bbox.lpnumber().letternum_3());
 						transformed_bbox->mutable_lpnumber()->set_letternum_4(bbox.lpnumber().letternum_4());
 						transformed_bbox->mutable_lpnumber()->set_letternum_5(bbox.lpnumber().letternum_5());
+						#if 0
+						LOG(INFO)<<"chi: "<<bbox.lpnumber().chichracter()<< " eng: "<<bbox.lpnumber().engchracter()<<" let1: "<<bbox.lpnumber().letternum_1()
+                         << " let2: "<<bbox.lpnumber().letternum_2()<<" let3: "<<bbox.lpnumber().letternum_3()<<" let4: "<<bbox.lpnumber().letternum_4()
+                         <<" let5: "<<bbox.lpnumber().letternum_5();
+						LOG(INFO)<<"transformed_bbox chi: "<<transformed_bbox->lpnumber().chichracter()<< " eng: "<<transformed_bbox->lpnumber().engchracter()<<" let1: "<<transformed_bbox->lpnumber().letternum_1()
+                         <<" let2: "<<transformed_bbox->lpnumber().letternum_2()<<" let3: "<<transformed_bbox->lpnumber().letternum_3()<<" let4: "<<transformed_bbox->lpnumber().letternum_4()
+						 <<" let5: "<<transformed_bbox->lpnumber().letternum_5();
+						#endif
 					}
 				}
 				// Save for output.
@@ -879,6 +887,8 @@ void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
 	// Crop the datum.
 	CropImage(anno_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
 	cropped_anno_datum->set_type(anno_datum.type());
+	cropped_anno_datum->set_attri_type(anno_datum.attri_type());
+
 
 	// Transform the annotation according to crop_bbox.
 	const bool do_resize = false;
@@ -990,6 +1000,7 @@ void DataTransformer<Dtype>::ExpandImage(const AnnotatedDatum& anno_datum,
 	ExpandImage(anno_datum.datum(), expand_ratio, &expand_bbox,
 							expanded_anno_datum->mutable_datum());
 	expanded_anno_datum->set_type(anno_datum.type());
+	expanded_anno_datum->set_attri_type(anno_datum.attri_type());
 
 	// Transform the annotation according to crop_bbox.
 	const bool do_resize = false;

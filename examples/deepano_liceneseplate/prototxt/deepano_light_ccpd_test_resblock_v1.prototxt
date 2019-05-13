@@ -28,7 +28,7 @@ layer {
 	annotated_data_param {
 		batch_sampler {
 		}
-		label_map_file: "../labelmap_face.prototxt"
+		label_map_file: "../labelmap_lp.prototxt"
 	}
 }
 layer {
