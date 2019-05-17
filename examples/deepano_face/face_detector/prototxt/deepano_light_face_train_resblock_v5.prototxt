@@ -3670,7 +3670,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3716,7 +3716,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 2
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3827,7 +3827,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 6
+		num_output: 3
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3875,7 +3875,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 6
+		num_output: 3
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3915,7 +3915,6 @@ layer {
 	top: "conv11_mbox_priorbox"
 	prior_box_param {
 		min_size: 32.0
-		max_size: 64.0
 		flip: true
 		clip: false
 		variance: 0.1
