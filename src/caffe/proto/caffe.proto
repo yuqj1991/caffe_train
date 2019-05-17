@@ -117,14 +117,29 @@ message EmitConstraint {
 }
 
 message LicensePlate {
-  optional int32 chichracter = 1;
-  optional int32 engchracter = 2;
-  optional int32 letternum_1 = 3;
-  optional int32 letternum_2 = 4;
-  optional int32 letternum_3 = 5;
-  optional int32 letternum_4 = 6;
-  optional int32 letternum_5 = 7;
+	optional int32 chichracter = 1;
+	optional int32 engchracter = 2;
+	optional int32 letternum_1 = 3;
+	optional int32 letternum_2 = 4;
+	optional int32 letternum_3 = 5;
+	optional int32 letternum_4 = 6;
+	optional int32 letternum_5 = 7;
 }
+
+
+// An extension of Datum which contains "rich" annotations.
+message AnnotatedCCpdDatum {
+  optional Datum datum = 1;
+  // If there are "rich" annotations, specify the type of annotation.
+  // Currently it only supports bounding box.
+  // If there are no "rich" annotations, use label in datum instead.
+  enum AnnotationType {
+    CCPD = 0;
+  }
+  optional AnnotationType type = 2;
+  optional LicensePlate lpnumber = 3;
+}
+
 message FaceAttributes {
   optional int32 blur = 1;
   optional int32 occlusion = 2;
@@ -141,7 +156,6 @@ message NormalizedBBox {
   optional float score = 7;
   optional float size = 8;
   optional FaceAttributes faceattrib = 9;
-  optional LicensePlate lpnumber = 10;
 }
 
 // Annotation for each object instance.
@@ -163,8 +177,8 @@ message AnnotatedDatum {
     BBOX = 0;
   }
   enum AnnoataionAttriType {
-    FACE = 0;
-	LPnumber = 1;
+	FACE = 0;
+	NORMALL = 1;
   }
   optional Datum datum = 1;
   // If there are "rich" annotations, specify the type of annotation.
@@ -673,6 +687,8 @@ message LayerParameter {
   optional MultiFaceLossParameter multiface_loss_param = 208;
   optional MultiFacePoseLossParameter multiface_pose_loss_param = 209;
   optional FaceEvaluateParameter face_evaluate_param = 210;
+  optional LpEvaluateParameter lp_evaluate_param = 211;
+  optional LpDetParameter lp_det_param = 212;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1100,7 +1116,7 @@ message DetectionEvaluateParameter {
   optional ResizeParameter resize_param = 6;
   enum AnnoataionAttriType{
     FACE = 0;
-    LPnumber = 1;
+    NORMALL = 1;
   }
   optional AnnoataionAttriType attri_type = 7[default =FACE ];
 }
@@ -1177,7 +1193,7 @@ message DetectionOutputParameter {
   optional uint32 num_lpletter = 17;
   enum AnnoataionAttriType{
     FACE = 0;
-    LPnumber = 1;
+    NORMALL = 1;
   }
   optional AnnoataionAttriType attri_type = 18;
 }
@@ -1667,6 +1683,17 @@ message FaceEvaluateParameter{
     optional int32 num_headpose = 5;
 }
 
+message LpEvaluateParameter{
+    optional int32 num_chinese = 1;
+    optional int32 num_english = 2;
+    optional int32 num_letter  = 3;
+}
+
+message LpDetParameter{
+    optional int32 num_chinese = 1;
+    optional int32 num_english = 2;
+    optional int32 num_letter  = 3;
+}
 message PythonParameter {
   optional string module = 1;
   optional string layer = 2;

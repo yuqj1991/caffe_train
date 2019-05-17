@@ -156,6 +156,14 @@ class DataTransformer {
   void Transform(const AnnoFaceAngleDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
                  AnnoFacePoseOritation* transformed_anno_vec);
+
+  void Transform(const AnnotatedCCpdDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 LicensePlate* transformed_annoface_all,
+                 bool* do_mirror);
+  void Transform(const AnnotatedCCpdDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 LicensePlate* transformed_anno_vec);
   /**
    * @brief Transform the annotation according to the transformation applied
    * to the datum.
@@ -179,15 +187,20 @@ class DataTransformer {
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
       AnnoFacePose* transformed_annoface_all);
 
-   void TransformAnnoFaceContour(
+  void TransformAnnoFaceContour(
       const AnnoFaceContourDatum& anno_datum, const bool do_resize,
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
       AnnoFaceContourPoints* transformed_annoface_all);
 
-   void TransformAnnoFaceAngle(
+  void TransformAnnoFaceAngle(
       const AnnoFaceAngleDatum& anno_datum, const bool do_resize,
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
       AnnoFacePoseOritation* transformed_annoface_all);
+
+  void TransformAnnoCcpd(
+      const AnnotatedCCpdDatum& anno_datum, const bool do_resize,
+      const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
+      LicensePlate* transformed_annoface_all);
 
 
 
@@ -212,7 +225,8 @@ class DataTransformer {
                     AnnoFaceAngleDatum* expanded_anno_datum);
   void ExpandImage(const AnnoFaceContourDatum& anno_datum,
                     AnnoFaceContourDatum* expanded_anno_datum);
-
+  void ExpandImage(const AnnotatedCCpdDatum& anno_datum,
+                    AnnotatedCCpdDatum* expanded_anno_datum);
   /**
    * @brief Apply distortion to the datum.
    */

@@ -344,12 +344,14 @@ void Solver<Dtype>::TestAll() {
        ++test_net_id) {
     if (param_.eval_type() == "classification") {
       TestClassification(test_net_id);
-    } else if (param_.eval_type() == "detectionfaceboxattri") {
-      TestDetectionFACEattri(test_net_id);
-    }else if (param_.eval_type() == "detectionlpnumber") {
-      TestDetectionLP(test_net_id);
-    }else if (param_.eval_type() == "detectionface") {
-      TestDetectionFace(test_net_id);
+    } else if (param_.eval_type() == "detectionface") {
+      TestDetectionFACE(test_net_id);
+    }else if (param_.eval_type() == "detection") {
+      TestDetection(test_net_id);
+    }else if (param_.eval_type() == "faceattri") {
+      TestRecoFaceAttri(test_net_id);
+    }else if (param_.eval_type() == "Rec_ccpd") {
+      TestRecoccpdNumber(test_net_id);
     }else {
       LOG(FATAL) << "Unknown evaluation type: " << param_.eval_type();
     }
@@ -432,7 +434,7 @@ void Solver<Dtype>::TestClassification(const int test_net_id) {
 }
 
 template <typename Dtype>
-void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
+void Solver<Dtype>::TestDetectionFACE(const int test_net_id) {
   CHECK(Caffe::root_solver());
   LOG(INFO) << "Iteration " << iter_
             << ", Testing net (#" << test_net_id << ")";
@@ -564,7 +566,7 @@ void Solver<Dtype>::TestDetectionFACEattri(const int test_net_id) {
 }
 
 template <typename Dtype>
-void Solver<Dtype>::TestDetectionLP(const int test_net_id) {
+void Solver<Dtype>::TestDetection(const int test_net_id) {
   CHECK(Caffe::root_solver());
   LOG(INFO) << "Iteration " << iter_
             << ", Testing net (#" << test_net_id << ")";
@@ -573,8 +575,6 @@ void Solver<Dtype>::TestDetectionLP(const int test_net_id) {
   map<int, map<int, vector<pair<float, int> > > > all_true_pos;
   map<int, map<int, vector<pair<float, int> > > > all_false_pos;
   map<int, map<int, int> > all_num_pos;
-  int all_num_pos_lpnumber = 0;
-  int all_det_num = 0;
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
   Dtype loss = 0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
@@ -598,28 +598,24 @@ void Solver<Dtype>::TestDetectionLP(const int test_net_id) {
       loss += iter_loss;
     }
     for (int j = 0; j < result.size(); ++j) {
-      CHECK_EQ(result[j]->width(), 6);
+      CHECK_EQ(result[j]->width(), 5);
       const Dtype* result_vec = result[j]->cpu_data();
       int num_det = result[j]->height();
-      all_det_num += result.size()*num_det;
       for (int k = 0; k < num_det; ++k) {
-        int item_id = static_cast<int>(result_vec[k * 6]);
-        int label = static_cast<int>(result_vec[k * 6+ 1]);
+        int item_id = static_cast<int>(result_vec[k * 5]);
+        int label = static_cast<int>(result_vec[k * 5+ 1]);
         if (item_id == -1) {
           // Special row of storing number of positives for a label.
           if (all_num_pos[j].find(label) == all_num_pos[j].end()) {
-            all_num_pos[j][label] = static_cast<int>(result_vec[k * 6 + 2]);
+            all_num_pos[j][label] = static_cast<int>(result_vec[k * 5 + 2]);
           } else {
-            all_num_pos[j][label] += static_cast<int>(result_vec[k * 6 + 2]);
+            all_num_pos[j][label] += static_cast<int>(result_vec[k * 5 + 2]);
           }
         } else {
           // Normal row storing detection status.
-          float score = result_vec[k * 6 + 2];
-          int tp = static_cast<int>(result_vec[k * 6 + 3]);
-          int fp = static_cast<int>(result_vec[k * 6 + 4]);
-          if(static_cast<int>(result_vec[k * 6 + 5])==1){
-            all_num_pos_lpnumber ++;
-          }
+          float score = result_vec[k * 5 + 2];
+          int tp = static_cast<int>(result_vec[k * 5 + 3]);
+          int fp = static_cast<int>(result_vec[k * 5 + 4]);
           if (tp == 0 && fp == 0) {
             // Ignore such case. It happens when a detection bbox is matched to
             // a difficult gt bbox and we don't evaluate on difficult gt bbox.
@@ -682,17 +678,16 @@ void Solver<Dtype>::TestDetectionLP(const int test_net_id) {
       }
     }
     mAP /= num_pos.size();
-    LOG(INFO)<<"all_det_num: "<<all_det_num<<" all_num_pos_lpnumber: "<<all_num_pos_lpnumber;
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
     LOG(INFO) << "Test net output #" << i << ": map of " << output_name << " = "
-              << mAP << ", lpnumber accuracy: "<< float(all_num_pos_lpnumber/all_det_num);
+              << mAP ;
   }
 }
 
 
 template <typename Dtype>
-void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
+void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
   CHECK(Caffe::root_solver());
   LOG(INFO) << "Iteration " << iter_
             << ", Testing net (#" << test_net_id << ")";
@@ -747,6 +742,52 @@ void Solver<Dtype>::TestDetectionFace(const int test_net_id) {
     return;
   }
 }
+
+template <typename Dtype>
+void Solver<Dtype>::TestRecoccpdNumber(const int test_net_id) {
+  CHECK(Caffe::root_solver());
+  LOG(INFO) << "Iteration " << iter_
+            << ", Testing net (#" << test_net_id << ")";
+  CHECK_NOTNULL(test_nets_[test_net_id].get())->
+      ShareTrainedLayersWith(net_.get());
+  const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
+  Dtype lpnumber_precison = 0.0;
+  int batch_size =0;
+  for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
+    SolverAction::Enum request = GetRequestedAction();
+    // Check to see if stoppage of testing/training has been requested.
+    while (request != SolverAction::NONE) {
+        if (SolverAction::SNAPSHOT == request) {
+          Snapshot();
+        } else if (SolverAction::STOP == request) {
+          requested_early_exit_ = true;
+        }
+        request = GetRequestedAction();
+    }
+    if (requested_early_exit_) {
+      // break out of test loop.
+      break;
+    }
+    Dtype iter_loss;
+    const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
+    for (int j = 0; j < result.size(); ++j) {
+      const Dtype* result_vec = result[j]->cpu_data();
+      batch_size = result[j]->height();
+      for(int ii = 0; ii<batch_size; ii++){
+        if (result_vec[ii]==1)
+          lpnumber_precison++;
+      } 
+    }    
+  }
+  int total_images = param_.test_iter(test_net_id)* batch_size;
+  LOG(INFO) << "total_images: "<< total_images
+             << " lpnumber_precison: "<< lpnumber_precison/total_images;       
+  if (requested_early_exit_) {
+    LOG(INFO)     << "Test interrupted.";
+    return;
+  }
+}
+
 
 template <typename Dtype>
 void Solver<Dtype>::Snapshot() {

@@ -196,49 +196,8 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
         }
       }
     }
-  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_LPnumber){
-    // Retrieve all chineselp.
-    Dtype* chi_permute_data = chinese_permute_.mutable_gpu_data();
-    PermuteDataGPU<Dtype>(bottom[3]->count(), bottom[3]->gpu_data(),
-        num_chinese_, num_priors_, 1, chi_permute_data);
-    const Dtype* chi_cpu_data = chinese_permute_.cpu_data();
-
-    // Retrieve all englishlp.
-    Dtype* eng_permute_data = english_permute_.mutable_gpu_data();
-    PermuteDataGPU<Dtype>(bottom[4]->count(), bottom[4]->gpu_data(),
-        num_english_, num_priors_, 1, eng_permute_data);
-    const Dtype* eng_cpu_data = english_permute_.cpu_data();
-
-    // Retrieve all letterlp.
-    Dtype* letter_1_permute_data = letter_1_permute_.mutable_gpu_data();
-    PermuteDataGPU<Dtype>(bottom[5]->count(), bottom[5]->gpu_data(),
-        num_letter_, num_priors_, 1, letter_1_permute_data);
-    const Dtype* lettet_1_cpu_data = letter_1_permute_.cpu_data();
-
-    // Retrieve all letterlp.
-    Dtype* letter_2_permute_data = letter_2_permute_.mutable_gpu_data();
-    PermuteDataGPU<Dtype>(bottom[6]->count(), bottom[6]->gpu_data(),
-        num_letter_, num_priors_, 1, letter_2_permute_data);
-        const Dtype* lettet_2_cpu_data = letter_2_permute_.cpu_data();
-    // Retrieve all letterlp.
-    Dtype* letter_3_permute_data = letter_3_permute_.mutable_gpu_data();
-    PermuteDataGPU<Dtype>(bottom[7]->count(), bottom[7]->gpu_data(),
-        num_letter_, num_priors_, 1, letter_3_permute_data);
-    const Dtype* lettet_3_cpu_data = letter_3_permute_.cpu_data();
-
-    // Retrieve all letterlp.
-    Dtype* letter_4_permute_data = letter_4_permute_.mutable_gpu_data();
-    PermuteDataGPU<Dtype>(bottom[8]->count(), bottom[8]->gpu_data(),
-        num_letter_, num_priors_, 1, letter_4_permute_data);
-    const Dtype* lettet_4_cpu_data = letter_4_permute_.cpu_data();
-
-    // Retrieve all letterlp.
-    Dtype* letter_5_permute_data = letter_5_permute_.mutable_gpu_data();
-    PermuteDataGPU<Dtype>(bottom[9]->count(), bottom[9]->gpu_data(),
-        num_letter_, num_priors_, 1, letter_5_permute_data);
-    const Dtype* lettet_5_cpu_data = letter_5_permute_.cpu_data();
-
-    top_shape.push_back(14);
+  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_NORMALL){
+    top_shape.push_back(7);
     Dtype* top_data;
     if (num_kept == 0) {
       LOG(INFO) << "Couldn't find any detections";
@@ -249,7 +208,7 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
       // Generate fake results per image.
       for (int i = 0; i < num; ++i) {
         top_data[0] = i;
-        top_data += 14;
+        top_data += 7;
       }
     } else {
       top[0]->Reshape(top_shape);
@@ -259,15 +218,13 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
     boost::filesystem::path output_directory(output_directory_);
     for (int i = 0; i < num; ++i) {
       const int conf_idx = i * num_classes_ * num_priors_;
-      const int chi_idx = i * num_chinese_ * num_priors_;
-      const int eng_idx = i * num_english_ * num_priors_;
-      const int let_idx = i * num_letter_ * num_priors_;
       int bbox_idx;
       if (share_location_) {
         bbox_idx = i * num_priors_ * 4;
       } else {
         bbox_idx = conf_idx * 4;
       }
+      const Dtype* cur_bbox_data = bbox_cpu_data + bbox_idx;
       for (map<int, vector<int> >::iterator it = all_indices[i].begin();
           it != all_indices[i].end(); ++it) {
         int label = it->first;
@@ -279,90 +236,17 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
         }
         const Dtype* cur_conf_data =
           conf_cpu_data + conf_idx + label * num_priors_;
-        const Dtype* cur_chi_data = chi_cpu_data + chi_idx;
-        const Dtype* cur_eng_data = eng_cpu_data + eng_idx;
-        const Dtype* cur_let1_data = lettet_1_cpu_data + let_idx;
-        const Dtype* cur_let_2_data = lettet_2_cpu_data + let_idx;
-        const Dtype* cur_let3_data = lettet_3_cpu_data + let_idx;
-        const Dtype* cur_let4_data = lettet_4_cpu_data + let_idx;
-        const Dtype* cur_let5_data = lettet_5_cpu_data + let_idx;
-
-        const Dtype* cur_bbox_data = bbox_cpu_data + bbox_idx;
         if (!share_location_) {
           cur_bbox_data += label * num_priors_ * 4;
         }
         for (int j = 0; j < indices.size(); ++j) {
           int idx = indices[j];
-          top_data[count * 14] = i;
-          top_data[count * 14 + 1] = label;
-          top_data[count * 14 + 2] = cur_conf_data[idx];
+          top_data[count * 7] = i;
+          top_data[count * 7 + 1] = label;
+          top_data[count * 7 + 2] = cur_conf_data[idx];
           for (int k = 0; k < 4; ++k) {
-            top_data[count * 14 + 3 + k] = cur_bbox_data[idx * 4 + k];
+            top_data[count * 7 + 3 + k] = cur_bbox_data[idx * 4 + k];
           }
-          int chi_index = 0; int eng_index = 0; int let1_index = 0; int let2_index = 0;
-          int let3_index = 0; int let4_index = 0;int let5_index = 0;
-          Dtype chi_temp =0.0; Dtype eng_temp =0.0; Dtype let_temp =0.0; 
-          for (int ii = 0; ii< num_chinese_; ii++ )
-          {
-            if (chi_temp <  cur_chi_data[idx+num_priors_*ii])
-            {
-              chi_index = ii;
-              chi_temp = cur_chi_data[idx+num_priors_*ii];
-            }
-          }
-          for (int ii = 0; ii< num_english_; ii++ ){
-            if (eng_temp <  cur_eng_data[idx+num_priors_*ii])
-            {
-              eng_index = ii;
-              eng_temp = cur_eng_data[idx+num_priors_*ii];
-            }
-          }
-          for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let_temp <  cur_let1_data[idx+num_priors_*ii])
-            {
-              let1_index = ii;
-              let_temp = cur_let1_data[idx+num_priors_*ii];
-            }
-          }
-          let_temp = 0.0;
-          for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let_temp < cur_let_2_data[idx+num_priors_*ii])
-            {
-              let2_index = ii;
-              let_temp = cur_let_2_data[idx+num_priors_*ii];
-            }
-          }
-          let_temp = 0.0;
-          for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let_temp <  cur_let3_data[idx+num_priors_*ii])
-            {
-              let3_index = ii;
-              let_temp = cur_let3_data[idx+num_priors_*ii];
-            }
-          }
-          let_temp = 0.0;
-          for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let_temp <  cur_let4_data[idx+num_priors_*ii])
-            {
-              let4_index = ii;
-              let_temp = cur_let4_data[idx+num_priors_*ii];
-            }
-          }
-          let_temp = 0.0;
-          for (int ii = 0; ii< num_letter_; ii++ ){
-            if (let_temp <  cur_let5_data[idx+num_priors_*ii])
-            {
-              let5_index = ii;
-              let_temp = cur_let5_data[idx+num_priors_*ii];
-            }
-          }
-          top_data[count * 14 + 7] = chi_index;
-          top_data[count * 14 + 8] = eng_index;
-          top_data[count * 14 + 9] = let1_index;
-          top_data[count * 14 + 10] = let2_index;
-          top_data[count * 14 + 11] = let3_index;
-          top_data[count * 14 + 12] = let4_index;
-          top_data[count * 14 + 13] = let5_index;
           ++count;
         }
       }
