@@ -98,11 +98,12 @@ def generate_random_test_indexlist(lengthTrainset, lengthTestset):
 trainsetfilepath = root_dir + '/' + set_dir + '/training.txt'
 trainsetfilecopypath = root_dir + '/' + set_dir + '/training_copy.txt'
 testsetfilepath = root_dir + '/' + set_dir + '/testing.txt'
-'''
+
 for imgdir in os.listdir(root_dir + '/' + image_dir):
 	fullimgdirpath = root_dir + '/' + image_dir +'/'+imgdir
 	generate_train_setfile(fullimgdirpath, trainsetfilepath)
-'''
+shutil.copyfile(trainSetfilepath, trainsetfilecopypath)
+
 test_list = generate_random_test_indexlist(lengthTrain, lengthTestset)
 numlines =0
 for index in test_list:

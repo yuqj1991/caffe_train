@@ -11,7 +11,7 @@ import random
 import matplotlib.pyplot as plot
 
 root_dir = "../../dataset/car_person_data/car_license/ccpd_dataset"
-ccpd_anno_img_dir = "../../dataset/car_person_data/car_license/ccpd_dataset/annoImg"
+ccpd_anno_img_dir = "/home/deepano/workspace/dataset/car_person_data/car_license/ccpd_dataset/annoImg"
 if not os.path.exists(ccpd_anno_img_dir):
 	os.makedirs(ccpd_anno_img_dir)
 set_dir = "ImageSets/Main"
@@ -39,8 +39,8 @@ def generate_label(imagefilepath, savefilepath):
 	left_upBox_y = labelbndBox[0].split("&")[1]
 	right_bottom_x = labelbndBox[1].split("&")[0]
 	right_bottom_y = labelbndBox[1].split("&")[1]
-	cropped = img[left_upBox_y:right_bottom_y, left_upBox_x:right_bottom_x, :]
-	cv2.imwrite(ccpd_anno_img_dir+"/"+"crop_"+str(img_file.split("/")[-1]), cropped)
+	cropped = img[int(left_upBox_y):int(right_bottom_y), int(left_upBox_x):int(right_bottom_x), :]
+	cv2.imwrite(ccpd_anno_img_dir+"/"+"crop_"+str(imagefilepath.split("/")[-1]), cropped)
 	exactbndBox = labelInfo[3].split('_')
 	vertices_1_x = exactbndBox[0].split("&")[0]
 	vertices_1_y = exactbndBox[0].split("&")[1]
@@ -63,8 +63,9 @@ def generate_train_setfile(imagefiledir, setfile):
 	for imagefilepath in os.listdir(imagefiledir):
 		imgpath = imagefiledir +'/'+imagefilepath
 		absimgfilepath = os.path.abspath(imgpath)
-		setfile_.write(absimgfilepath+'\n')
-		savefilepath = root_dir+'/'+label_dir +'/'+ absimgfilepath.split('/')[-1].split('.jpg')[0] +"_lpnumber"
+		annopath = ccpd_anno_img_dir+"/"+"crop_"+str(absimgfilepath.split("/")[-1])
+		setfile_.write(annopath+'\n')
+		savefilepath = root_dir+'/'+label_dir +'/crop_'+ absimgfilepath.split('/')[-1].split('.jpg')[0]
 		generate_label(absimgfilepath, savefilepath)
 		lengthTrain += 1
 	
