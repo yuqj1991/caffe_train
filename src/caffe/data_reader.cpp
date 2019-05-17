@@ -42,6 +42,10 @@ template <>
 map<const string, weak_ptr<DataReader<AnnoFaceAngleDatum>::Body> >
   DataReader<AnnoFaceAngleDatum>::bodies_
   = map<const string, weak_ptr<DataReader<AnnoFaceAngleDatum>::Body> >();
+template <>
+map<const string, weak_ptr<DataReader<AnnotatedCCpdDatum>::Body> >
+  DataReader<AnnotatedCCpdDatum>::bodies_
+  = map<const string, weak_ptr<DataReader<AnnotatedCCpdDatum>::Body> >();
 static boost::mutex bodies_mutex_;
 
 template <typename T>
@@ -156,4 +160,5 @@ template class DataReader<AnnoFaceDatum>;
 template class DataReader<AnnoFacePoseDatum>;
 template class DataReader<AnnoFaceContourDatum>;
 template class DataReader<AnnoFaceAngleDatum>;
+template class DataReader<AnnotatedCCpdDatum>;
 }  // namespace caffe

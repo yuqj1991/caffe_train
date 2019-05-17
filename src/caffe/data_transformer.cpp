@@ -335,7 +335,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 					transformed_anno_group_all->Add()->CopyFrom(transformed_anno_group);
 				}
 			}
-		}else if(anno_datum.attri_type() ==AnnotatedDatum_AnnoataionAttriType_LPnumber){
+		}else if (anno_datum.attri_type() ==AnnotatedDatum_AnnoataionAttriType_NORMALL){
 			// Go through each AnnotationGroup.
 			for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
 				const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
@@ -375,21 +375,6 @@ void DataTransformer<Dtype>::TransformAnnotation(
 							ExtrapolateBBox(param_.resize_param(), img_height, img_width,
 									crop_bbox, transformed_bbox);
 						}
-						transformed_bbox->mutable_lpnumber()->set_chichracter(bbox.lpnumber().chichracter());
-						transformed_bbox->mutable_lpnumber()->set_engchracter(bbox.lpnumber().engchracter());
-						transformed_bbox->mutable_lpnumber()->set_letternum_1(bbox.lpnumber().letternum_1());
-						transformed_bbox->mutable_lpnumber()->set_letternum_2(bbox.lpnumber().letternum_2());
-						transformed_bbox->mutable_lpnumber()->set_letternum_3(bbox.lpnumber().letternum_3());
-						transformed_bbox->mutable_lpnumber()->set_letternum_4(bbox.lpnumber().letternum_4());
-						transformed_bbox->mutable_lpnumber()->set_letternum_5(bbox.lpnumber().letternum_5());
-						#if 0
-						LOG(INFO)<<"chi: "<<bbox.lpnumber().chichracter()<< " eng: "<<bbox.lpnumber().engchracter()<<" let1: "<<bbox.lpnumber().letternum_1()
-                         << " let2: "<<bbox.lpnumber().letternum_2()<<" let3: "<<bbox.lpnumber().letternum_3()<<" let4: "<<bbox.lpnumber().letternum_4()
-                         <<" let5: "<<bbox.lpnumber().letternum_5();
-						LOG(INFO)<<"transformed_bbox chi: "<<transformed_bbox->lpnumber().chichracter()<< " eng: "<<transformed_bbox->lpnumber().engchracter()<<" let1: "<<transformed_bbox->lpnumber().letternum_1()
-                         <<" let2: "<<transformed_bbox->lpnumber().letternum_2()<<" let3: "<<transformed_bbox->lpnumber().letternum_3()<<" let4: "<<transformed_bbox->lpnumber().letternum_4()
-						 <<" let5: "<<transformed_bbox->lpnumber().letternum_5();
-						#endif
 					}
 				}
 				// Save for output.
@@ -398,8 +383,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 					transformed_anno_group_all->Add()->CopyFrom(transformed_anno_group);
 				}
 			}
-		}
-		
+		}	
 	} else {
 		LOG(FATAL) << "Unknown annotation type.";
 	}
@@ -474,6 +458,23 @@ void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum,
 }
 
 template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnotatedCCpdDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 LicensePlate* transformed_annoface_all,
+                 bool* do_mirror){
+	// Transform datum.
+	const Datum& datum = anno_datum.datum();
+	NormalizedBBox crop_bbox;
+	Transform(datum, transformed_blob, &crop_bbox, do_mirror);
+
+	// Transform annotation.
+	const bool do_resize = true;
+	const bool do_expand = false;
+	TransformAnnoCcpd(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
+											transformed_annoface_all);
+}
+
+template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceDatum& anno_datum, 
 				Blob<Dtype>* transformed_blob,
 				AnnotationFace* transformed_anno_vec){
@@ -501,6 +502,14 @@ template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum, 
 				Blob<Dtype>* transformed_blob,
 				AnnoFacePoseOritation* transformed_anno_vec){
+	bool do_mirror;
+	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnotatedCCpdDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 LicensePlate* transformed_anno_vec){
 	bool do_mirror;
 	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
 }
@@ -696,6 +705,22 @@ void DataTransformer<Dtype>::TransformAnnoFaceAngle(
 			transformed_annoface_all->set_pitch(anno_datum.faceangle().pitch());
 			transformed_annoface_all->set_roll(anno_datum.faceangle().roll());
 		}
+	}
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::TransformAnnoCcpd(
+		const AnnotatedCCpdDatum& anno_datum, const bool do_resize,
+      const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
+      LicensePlate* transformed_annoface_all){
+	if(anno_datum.type() == AnnotatedCCpdDatum_AnnotationType_CCPD){
+		transformed_annoface_all->set_chichracter(anno_datum.lpnumber().chichracter());
+		transformed_annoface_all->set_engchracter(anno_datum.lpnumber().engchracter());
+		transformed_annoface_all->set_letternum_1(anno_datum.lpnumber().letternum_1());
+		transformed_annoface_all->set_letternum_2(anno_datum.lpnumber().letternum_2());
+		transformed_annoface_all->set_letternum_3(anno_datum.lpnumber().letternum_3());
+		transformed_annoface_all->set_letternum_4(anno_datum.lpnumber().letternum_4());
+		transformed_annoface_all->set_letternum_5(anno_datum.lpnumber().letternum_5());
 	}
 }
 
@@ -1115,6 +1140,42 @@ void DataTransformer<Dtype>::ExpandImage(const AnnoFaceAngleDatum& anno_datum,
 	const bool do_expand = true;
 	TransformAnnoFaceAngle(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
 											expanded_anno_datum->mutable_faceangle());
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::ExpandImage(const AnnotatedCCpdDatum& anno_datum,
+																				 AnnotatedCCpdDatum* expanded_anno_datum) {
+	if (!param_.has_expand_param()) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const ExpansionParameter& expand_param = param_.expand_param();
+	const float expand_prob = expand_param.prob();
+	float prob;
+	caffe_rng_uniform(1, 0.f, 1.f, &prob);
+	if (prob > expand_prob) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const float max_expand_ratio = expand_param.max_expand_ratio();
+	if (fabs(max_expand_ratio - 1.) < 1e-2) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	float expand_ratio;
+	caffe_rng_uniform(1, 1.f, max_expand_ratio, &expand_ratio);
+	// Expand the datum.
+	NormalizedBBox expand_bbox;
+	ExpandImage(anno_datum.datum(), expand_ratio, &expand_bbox,
+							expanded_anno_datum->mutable_datum());
+	expanded_anno_datum->set_type(anno_datum.type());
+
+	// Transform the annotation according to crop_bbox.
+	const bool do_resize = false;
+	const bool do_mirror = false;
+	const bool do_expand = true;
+	TransformAnnoCcpd(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
+											expanded_anno_datum->mutable_lpnumber());
 }
 
 template<typename Dtype>

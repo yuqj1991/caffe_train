@@ -1,16 +1,16 @@
-train_net: "../prototxt/deepano_light_face_train_resblock_v5.prototxt"
-test_net: "../prototxt/deepano_light_face_test_resblock_v5.prototxt"
+train_net: "../prototxt/deepano_light_ccpt_rec_train_v1.prototxt"
+test_net: "../prototxt/deepano_light_ccpt_rec_test_v1.prototxt"
 test_iter: 1500
 test_interval: 5000
 base_lr: 0.001
-display: 100
-max_iter: 400000
+display: 1000
+max_iter: 800000
 lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.0001
 snapshot: 5000
-snapshot_prefix: "../snapshot/deepanoFace_res_v5"
-solver_mode: CPU
+snapshot_prefix: "../snapshot/deepanoccpd_rec_v1"
+solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
 test_initialization: false
@@ -23,6 +23,4 @@ stepvalue: 300000
 iter_size: 1
 momentum2 : 0.99
 type: "RMSProp"
-eval_type: "detectionface"
-ap_version: "11point"
-
+eval_type: "Rec_ccpd"

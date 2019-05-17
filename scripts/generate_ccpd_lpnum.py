@@ -46,7 +46,7 @@ def generate_label(imagefilepath, savefilepath):
 	vertices_4_x = exactbndBox[3].split("&")[0]
 	vertices_4_y = exactbndBox[3].split("&")[1]
 	licenseNum = labelInfo[4].split('_')
-	labelContent = " ".join(a for ii in range(2) for a in labelbndBox[ii].split("&")) +" "+ " ".join(b for b in licenseNum)
+	labelContent =" ".join(b for b in licenseNum)
 	label_file_ = open(savefilepath, "w")
 	label_file_.write(labelContent)
 	label_file_.close()
@@ -59,7 +59,7 @@ def generate_train_setfile(imagefiledir, setfile):
 		imgpath = imagefiledir +'/'+imagefilepath
 		absimgfilepath = os.path.abspath(imgpath)
 		setfile_.write(absimgfilepath+'\n')
-		savefilepath = root_dir+'/'+label_dir +'/'+ absimgfilepath.split('/')[-1].split('.jpg')[0]
+		savefilepath = root_dir+'/'+label_dir +'/'+ absimgfilepath.split('/')[-1].split('.jpg')[0] +"_lpnumber"
 		generate_label(absimgfilepath, savefilepath)
 		lengthTrain += 1
 	
@@ -95,14 +95,16 @@ def generate_random_test_indexlist(lengthTrainset, lengthTestset):
 	return test_list
 
 
-trainsetfilepath = root_dir + '/' + set_dir + '/training.txt'
-trainsetfilecopypath = root_dir + '/' + set_dir + '/training_copy.txt'
-testsetfilepath = root_dir + '/' + set_dir + '/testing.txt'
-'''
+trainsetfilepath = root_dir + '/' + set_dir + '/training_lp.txt'
+trainsetfilecopypath = root_dir + '/' + set_dir + '/training_copy_lp.txt'
+testsetfilepath = root_dir + '/' + set_dir + '/testing_lp.txt'
+
 for imgdir in os.listdir(root_dir + '/' + image_dir):
 	fullimgdirpath = root_dir + '/' + image_dir +'/'+imgdir
 	generate_train_setfile(fullimgdirpath, trainsetfilepath)
-'''
+
+shutil.copyfile(trainSetfilepath, trainsetfilecopypath)
+
 test_list = generate_random_test_indexlist(lengthTrain, lengthTestset)
 numlines =0
 for index in test_list:

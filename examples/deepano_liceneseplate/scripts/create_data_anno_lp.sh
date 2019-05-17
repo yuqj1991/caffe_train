@@ -2,17 +2,10 @@ root_dir="../../../../caffe_deeplearning_train"
 cd $root_dir/scripts
 
 redo=1
-<<<<<<< HEAD
-data_root_dir="../../dataset/car_person_data/car_license"
-dataset_name="ccpd_dataset"
-mapfile="../examples/deepano_liceneseplate/scripts/labelmap_lp.prototxt"
-anno_type="detectionccpd"
-=======
 data_root_dir="../../dataset/car_person_data"
 dataset_name="ccpd"
-mapfile="../examples/deepano_liceneseplate/labelmap_face.prototxt"
-anno_type="detection_ccpd"
->>>>>>> 7b5289b2d3fa724a3f047a2130371920cc07a4a8
+mapfile="../examples/deepano_liceneseplate/labelmap_lp.prototxt"
+anno_type="Rec_ccpd"
 label_type="txt"
 db="lmdb"
 min_dim=0
@@ -25,7 +18,7 @@ if [ $redo ]
 then
   extra_cmd="$extra_cmd --redo"
 fi
-for subset in training testing
+for subset in training_lp testing_lp
 do
   python create_annoset.py --anno-type=$anno_type --label-map-file=$mapfile --label-type=$label_type --min-dim=$min_dim --max-dim=$max_dim --resize-width=$width --resize-height=$height --check-label $extra_cmd $data_root_dir ../examples/deepano_liceneseplate/scripts/$subset.txt $data_root_dir/$dataset_name/$db/$dataset_name"_"$subset"_"$db $data_root_dir/$dataset_name
 done

@@ -96,7 +96,7 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
           // sure there is at least one bbox.
           label_shape[2] = std::max(num_bboxes, 1);
           label_shape[3] = 10;
-        }else if(anno_attri_type_ ==AnnotatedDatum_AnnoataionAttriType_LPnumber){
+        }else if(anno_attri_type_ ==AnnotatedDatum_AnnoataionAttriType_NORMALL){
           for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
             num_bboxes += anno_datum.annotation_group(g).annotation_size();
           }
@@ -106,9 +106,8 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
           // cpu_data and gpu_data for consistent prefetch thread. Thus we make
           // sure there is at least one bbox.
           label_shape[2] = std::max(num_bboxes, 1);
-          label_shape[3] = 15;
+          label_shape[3] = 8;
         }
-        
       } else {
         LOG(FATAL) << "Unknown annotation type.";
       }
@@ -351,15 +350,15 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             }
           }
         }
-      }else if(anno_attri_type_ ==AnnotatedDatum_AnnoataionAttriType_LPnumber){
+      }else if(anno_attri_type_ ==AnnotatedDatum_AnnoataionAttriType_NORMALL){
         label_shape[0] = 1;
         label_shape[1] = 1;
-        label_shape[3] = 15;
+        label_shape[3] = 8;
         if (num_bboxes == 0) {
           // Store all -1 in the label.
           label_shape[2] = 1;
           batch->label_.Reshape(label_shape);
-          caffe_set<Dtype>(15, -1, batch->label_.mutable_cpu_data());
+          caffe_set<Dtype>(8, -1, batch->label_.mutable_cpu_data());
         } else {
           // Reshape the label and store the annotation.
           label_shape[2] = num_bboxes;
@@ -380,20 +379,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = bbox.ymin();
                 top_label[idx++] = bbox.xmax();
                 top_label[idx++] = bbox.ymax();
-                top_label[idx++] = bbox.lpnumber().chichracter();
-                top_label[idx++] = bbox.lpnumber().engchracter();
-                top_label[idx++] = bbox.lpnumber().letternum_1();
-                top_label[idx++] = bbox.lpnumber().letternum_2();
-                top_label[idx++] = bbox.lpnumber().letternum_3();
-                top_label[idx++] = bbox.lpnumber().letternum_4();
-                top_label[idx++] = bbox.lpnumber().letternum_5();
                 top_label[idx++] = bbox.difficult();
-                #if 0
-                LOG(INFO)<<"xmin: "<<bbox.xmin()<<" ymin: "<<bbox.ymin()<<" xmax: "<<bbox.xmax()<<" ymax: "<<bbox.ymax();
-                LOG(INFO)<<"chi: "<<bbox.lpnumber().chichracter()<< " eng: "<<bbox.lpnumber().engchracter()<<" let1: "<<bbox.lpnumber().letternum_1()
-                         << " let2: "<<bbox.lpnumber().letternum_2()<<" let3: "<<bbox.lpnumber().letternum_3()<<" let5: "<<bbox.lpnumber().letternum_4()
-                         <<" let5: "<<bbox.lpnumber().letternum_5();
-                #endif
               }
             }
           }

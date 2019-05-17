@@ -27,17 +27,6 @@ void DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     num_occlusion_ = detection_output_param.num_occlusion();
     blur_permute_.ReshapeLike(*(bottom[3]));
     occlu_permute_.ReshapeLike(*(bottom[4]));
-  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_LPnumber){
-    num_chinese_ = detection_output_param.num_lpchinese();
-    num_english_ = detection_output_param.num_lpenglish();
-    num_letter_ = detection_output_param.num_lpletter();
-    chinese_permute_.ReshapeLike(*(bottom[3]));
-    english_permute_.ReshapeLike(*(bottom[4]));
-    letter_1_permute_.ReshapeLike(*(bottom[5]));
-    letter_2_permute_.ReshapeLike(*(bottom[6]));
-    letter_3_permute_.ReshapeLike(*(bottom[7]));
-    letter_4_permute_.ReshapeLike(*(bottom[8]));
-    letter_5_permute_.ReshapeLike(*(bottom[9]));
   }
   num_classes_ = detection_output_param.num_classes();
   share_location_ = detection_output_param.share_location();
@@ -208,22 +197,7 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
     top_shape.push_back(9);
     top[0]->Reshape(top_shape);
-  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_LPnumber){
-    CHECK_EQ(num_priors_ * num_chinese_, bottom[3]->channels())
-    << "Number of priors must match number of chinese predictions.";
-    CHECK_EQ(num_priors_ * num_english_, bottom[4]->channels())
-    << "Number of priors must match number of english predictions.";
-    CHECK_EQ(num_priors_ * num_letter_, bottom[5]->channels())
-    << "Number of priors must match number of letter predictions.";
-    vector<int> top_shape(2, 1);
-    // Since the number of bboxes to be kept is unknown before nms, we manually
-    // set it to (fake) 1.
-    top_shape.push_back(1);
-    // Each row is a 14 dimension vector, which stores
-    // [image_id, label, confidence, xmin, ymin, xmax, ymax, 7-lpnumber]
-    top_shape.push_back(14);
-    top[0]->Reshape(top_shape);
-  }  
+  }
 }
 
 template <typename Dtype>
@@ -413,40 +387,8 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
         }
       }
     }
-  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_LPnumber){
-    const Dtype* chi_data = bottom[3]->cpu_data();
-    const Dtype* eng_data = bottom[4]->cpu_data();
-    const Dtype* let1_data = bottom[5]->cpu_data();
-    const Dtype* let2_data = bottom[6]->cpu_data();
-    const Dtype* let3_data = bottom[7]->cpu_data();
-    const Dtype* let4_data = bottom[8]->cpu_data();
-    const Dtype* let5_data = bottom[9]->cpu_data();
-    const int num = bottom[0]->num();
-    //Retrieve all chi_data confidences.
-    vector<map<int, vector<float> > > all_chi_scores;
-    GetConfidenceScores(chi_data, num, num_priors_, num_chinese_,
-                      &all_chi_scores);
-    //Retrieve all eng_data confidences
-    vector<map<int, vector<float> > > all_eng_scores;
-    GetConfidenceScores(eng_data, num, num_priors_, num_english_,
-                        &all_eng_scores);
-    //Retrieve all let1_data confidences
-    vector<vector<map<int, vector<float> > > > all_let_scores(5);
-    GetConfidenceScores(let1_data, num, num_priors_, num_letter_,
-                        &all_let_scores[0]);
-    //Retrieve all let2_data confidences
-    GetConfidenceScores(let2_data, num, num_priors_, num_letter_,
-                        &all_let_scores[1]);
-    //Retrieve all let3_data confidences
-    GetConfidenceScores(let3_data, num, num_priors_, num_letter_,
-                        &all_let_scores[2]);
-    //Retrieve all let4_data confidences
-    GetConfidenceScores(let4_data, num, num_priors_, num_letter_,
-                        &all_let_scores[3]);
-    //Retrieve all let5_data confidences
-    GetConfidenceScores(let5_data, num, num_priors_, num_letter_,
-                        &all_let_scores[4]);
-    top_shape.push_back(14);
+  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_NORMALL){
+    top_shape.push_back(9);
     Dtype* top_data;
     if (num_kept == 0) {
       LOG(INFO) << "Couldn't find any detections";
@@ -457,7 +399,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
       // Generate fake results per image.
       for (int i = 0; i < num; ++i) {
         top_data[0] = i;
-        top_data += 14;
+        top_data += 9;
       }
     } else {
       top[0]->Reshape(top_shape);
@@ -467,8 +409,6 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
     boost::filesystem::path output_directory(output_directory_);
     for (int i = 0; i < num; ++i) {
       const map<int, vector<float> >& conf_scores = all_conf_scores[i];
-      const map<int, vector<float> >& chi_scores = all_chi_scores[i];
-      const map<int, vector<float> >& eng_scores = all_eng_scores[i];
       const LabelBBox& decode_bboxes = all_decode_bboxes[i];
       for (map<int, vector<int> >::iterator it = all_indices[i].begin();
           it != all_indices[i].end(); ++it) {
@@ -495,52 +435,14 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
         }
         for (int j = 0; j < indices.size(); ++j) {
           int idx = indices[j];
-          top_data[count * 14] = i;
-          top_data[count * 14 + 1] = label;
-          top_data[count * 14 + 2] = scores[idx];
+          top_data[count * 7] = i;
+          top_data[count * 7 + 1] = label;
+          top_data[count * 7 + 2] = scores[idx];
           const NormalizedBBox& bbox = bboxes[idx];
-          top_data[count * 14 + 3] = bbox.xmin();
-          top_data[count * 14 + 4] = bbox.ymin();
-          top_data[count * 14 + 5] = bbox.xmax();
-          top_data[count * 14 + 6] = bbox.ymax();
-          int let_index[5] ={0};
-          float let_temp[5] ={0.0f};
-          int chi_index = 0; int eng_index = 0;
-          float chi_temp =0; float eng_temp =0.0; 
-          for (int ii = 0; ii< num_chinese_; ii++ )
-          {
-            if (chi_temp <  chi_scores.find(ii)->second[idx])
-            {
-              chi_index = ii;
-              chi_temp = chi_scores.find(ii)->second[idx];
-            }
-          }
-          for (int ii = 0; ii< num_english_; ii++ )
-          {
-            if (eng_temp <  eng_scores.find(ii)->second[idx])
-            {
-              eng_index = ii;
-              eng_temp = eng_scores.find(ii)->second[idx];
-            }
-          }
-          for(int jj = 0 ; jj < 5; jj++)
-          {
-            for (int ii = 0; ii< num_letter_; ii++ )
-            {
-              if (let_temp[jj] < all_let_scores[jj][i].find(ii)->second[idx])
-              {
-                let_index[jj] = ii;
-                let_temp[jj] = all_let_scores[jj][i].find(ii)->second[idx];
-              }
-            }
-          }
-          top_data[count * 14 + 7] = chi_index;
-          top_data[count * 14 + 8] = eng_index;
-          top_data[count * 14 + 9] = let_index[0];
-          top_data[count * 14 + 10] = let_index[1];
-          top_data[count * 14 + 11] = let_index[2];
-          top_data[count * 14 + 12] = let_index[3];
-          top_data[count * 14 + 13] = let_index[4];
+          top_data[count * 7 + 3] = bbox.xmin();
+          top_data[count * 7 + 4] = bbox.ymin();
+          top_data[count * 7 + 5] = bbox.xmax();
+          top_data[count * 7 + 6] = bbox.ymax();
           ++count;
         }
       }

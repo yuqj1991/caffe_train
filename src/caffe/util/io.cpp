@@ -231,10 +231,10 @@ bool ReadRichImageToAnnotatedDatum(const string& filename,
           return false;
         }
         break;
-      case AnnotatedDatum_AnnoataionAttriType_LPnumber:
+      case AnnotatedDatum_AnnoataionAttriType_NORMALL:
         if (labeltype == "txt") {
-          return ReadccpdTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                        name_to_label, anno_datum);
+          return ReadTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                        anno_datum);
         } else {
           LOG(FATAL) << "Unknown label file type.";
           return false;
@@ -381,6 +381,41 @@ bool ReadRichFaceAngleToAnnotatedDatum(const string& filename,
       if (labeltype == "txt") {
         return ReadFaceAngleTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
                                        anno_datum);
+      } else {
+        LOG(FATAL) << "Unknown label file type.";
+        return false;
+      }
+      break;
+    default:
+      LOG(FATAL) << "Unknown annotation type.";
+      return false;
+  }
+}
+
+bool ReadRichCcpdToAnnotatedDatum(const string& filename,
+    const string& labelfile, const int height, const int width,
+    const int min_dim, const int max_dim, const bool is_color,
+    const string& encoding, const AnnotatedCCpdDatum_AnnotationType type,
+    const string& labeltype,const std::map<string, int>& name_to_label, AnnotatedCCpdDatum* anno_datum){
+  // Read image to datum.
+  bool status = ReadImageToDatum(filename, -1, height, width,
+                                 min_dim, max_dim, is_color, encoding,
+                                 anno_datum->mutable_datum());
+  if (status == false) {
+    return status;
+  }
+  anno_datum->clear_lpnumber();
+  if (!boost::filesystem::exists(labelfile)) {
+    return true;
+  }
+  // annno type bbox or attributes
+  switch (type) {
+    case AnnotatedCCpdDatum_AnnotationType_CCPD:
+      int ori_height, ori_width;
+      GetImageSize(filename, &ori_height, &ori_width);
+      if (labeltype == "txt") {
+        return ReadccpdTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                       name_to_label, anno_datum);
       } else {
         LOG(FATAL) << "Unknown label file type.";
         return false;
@@ -715,7 +750,7 @@ bool ReadTxtToAnnotatedDatum(const string& labelfile, const int height,
 
 bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
     const int width, const std::map<string, int>& name_to_label,
-    AnnotatedDatum* anno_datum){
+    AnnotatedCCpdDatum* anno_datum){
   std::ifstream infile(labelfile.c_str());
   std::string lineStr ;
   std::stringstream sstr ;
@@ -724,65 +759,31 @@ bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
     return false;
   }
   LOG(INFO)<<labelfile;
-  float x1, y1, x2, y2;
   int lpnum_1, lpnum_2, lpnum_3, lpnum_4, lpnum_5, lpnum_6, lpnum_7;
-  int instance_id = 0;
   while (std::getline(infile, lineStr )) {
     sstr << lineStr;
-    sstr >> x1 >> y1 >> x2 >>y2 >> lpnum_1>>lpnum_2 >>lpnum_3 >>lpnum_4 >>lpnum_5 >>lpnum_6 >>lpnum_7;
+    sstr >> lpnum_1>>lpnum_2 >>lpnum_3 >>lpnum_4 >>lpnum_5 >>lpnum_6 >>lpnum_7;
     #if 1
-    LOG(INFO)<< x1 <<" "<< y1 <<" "<< x2 <<" "<<y2 <<" "<< lpnum_1<<" "<<lpnum_2 <<" "<<lpnum_3 <<" "<<lpnum_4 <<" "<<lpnum_5 <<" "<<lpnum_6 <<" "<<lpnum_7;
+    LOG(INFO)<<lpnum_1<<" "<<lpnum_2 <<" "<<lpnum_3 <<" "<<lpnum_4 <<" "<<lpnum_5 <<" "<<lpnum_6 <<" "<<lpnum_7;
     #endif
-    float xf1 = float(x1/width), yf1 = float(y1/height);float xf2 = float(x2/width), yf2 = float(y2/height);
-    Annotation* anno = NULL;
+    LicensePlate* anno = NULL;
+    anno = anno_datum->mutable_lpnumber();
     string name = "licenseplate";
     if (name_to_label.find(name) == name_to_label.end()) {
             LOG(FATAL) << "Unknown name: " << name;
     }
-    int label = name_to_label.find(name)->second;
-    bool found_group = false;
-    for (int g = 0; g < anno_datum->annotation_group_size(); ++g) {
-      AnnotationGroup* anno_group =
-          anno_datum->mutable_annotation_group(g);
-      if (label == anno_group->group_label()) {
-        if (anno_group->annotation_size() == 0) {
-          instance_id = 0;
-        } else {
-          instance_id = anno_group->annotation(
-              anno_group->annotation_size() - 1).instance_id() + 1;
-        }
-        anno = anno_group->add_annotation();
-        found_group = true;
-      }
-    }
-    if (!found_group) {
-      // If there is no such annotation_group, create a new one.
-      AnnotationGroup* anno_group = anno_datum->add_annotation_group();
-      anno_group->set_group_label(label);
-      anno = anno_group->add_annotation();
-      instance_id = 0;
-    }
-    anno->set_instance_id(instance_id++);
-    NormalizedBBox* bbox = anno->mutable_bbox();
-    bbox->set_xmin(xf1);
-    bbox->set_ymin(yf1);
-    bbox->set_xmax(xf2);
-    bbox->set_ymax(yf2);
-    bbox->mutable_lpnumber()->set_chichracter(lpnum_1);
-    bbox->mutable_lpnumber()->set_engchracter(lpnum_2);
-    bbox->mutable_lpnumber()->set_letternum_1(lpnum_3);
-    bbox->mutable_lpnumber()->set_letternum_2(lpnum_4);
-    bbox->mutable_lpnumber()->set_letternum_3(lpnum_5);
-    bbox->mutable_lpnumber()->set_letternum_4(lpnum_6);
-    bbox->mutable_lpnumber()->set_letternum_5(lpnum_7);
+    anno->set_chichracter(lpnum_1);
+    anno->set_engchracter(lpnum_2);
+    anno->set_letternum_1(lpnum_3);
+    anno->set_letternum_2(lpnum_4);
+    anno->set_letternum_3(lpnum_5);
+    anno->set_letternum_4(lpnum_6);
+    anno->set_letternum_5(lpnum_7);
     #if 1
-    LOG(INFO)<<"xmin: "<<bbox->xmin()<<" ymin: "<<bbox->ymin()<<" xmax: "<<bbox->xmax()<<" ymax: "<<bbox->ymax();
-    LOG(INFO)<<"chi: "<<bbox->lpnumber().chichracter()<< " eng: "<<bbox->lpnumber().engchracter()<<" let1: "<<bbox->lpnumber().letternum_1()
-              << " let2: "<<bbox->lpnumber().letternum_2()<<" let3: "<<bbox->lpnumber().letternum_3()<<" let4: "<<bbox->lpnumber().letternum_4()
-              <<" let5: "<<bbox->lpnumber().letternum_5();
+    LOG(INFO)<<"chi: "<<anno->chichracter()<< " eng: "<<anno->engchracter()<<" let1: "<<anno->letternum_1()
+              << " let2: "<<anno->letternum_2()<<" let3: "<<anno->letternum_3()<<" let4: "<<anno->letternum_4()
+              <<" let5: "<<anno->letternum_5();
     #endif
-    bool difficult = false;
-    bbox->set_difficult(difficult);
   }
   return true;
 }

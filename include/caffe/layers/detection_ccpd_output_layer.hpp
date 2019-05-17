@@ -29,17 +29,17 @@ namespace caffe {
  * NOTE: does not implement Backwards operation.
  */
 template <typename Dtype>
-class DetectionOutputLayer : public Layer<Dtype> {
+class DetectionCcpdOutputLayer : public Layer<Dtype> {
  public:
-  explicit DetectionOutputLayer(const LayerParameter& param)
+  explicit DetectionCcpdOutputLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "DetectionOutput"; }
-  virtual inline int MinBottomBlobs() const { return 3; }
+  virtual inline const char* type() const { return "DetectionCcpdOutput"; }
+  virtual inline int MinBottomBlobs() const { return 7; }
   virtual inline int MaxBottomBlobs() const { return 10; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
@@ -61,62 +61,15 @@ class DetectionOutputLayer : public Layer<Dtype> {
    */
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
-  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
   /// @brief Not implemented
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
     NOT_IMPLEMENTED;
   }
-  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-    NOT_IMPLEMENTED;
-  }
 
-  int num_classes_;
-  int num_blur_;
-  int num_occlusion_;
   int num_chinese_;
   int num_english_;
   int num_letter_;
-  bool share_location_;
-  int num_loc_classes_;
-  int background_label_id_;
-  int background_blur_id_;
-  int background_occlu_id_;
-  CodeType code_type_;
-  bool variance_encoded_in_target_;
-  int keep_top_k_;
-  float confidence_threshold_;
-  int num_;
-  int num_priors_;
-  float nms_threshold_;
-  int top_k_;
-  float eta_;
-  bool need_save_;
-  string output_directory_;
-  string output_name_prefix_;
-  string output_format_;
-  map<int, string> label_to_name_;
-  map<int, string> label_to_display_name_;
-  vector<string> names_;
-  vector<pair<int, int> > sizes_;
-  int num_test_image_;
-  int name_count_;
-  bool has_resize_;
-  ResizeParameter resize_param_;
-  DetectionOutputParameter_AnnoataionAttriType attri_type_;
-  ptree detections_;
-
-  bool visualize_;
-  float visualize_threshold_;
-  shared_ptr<DataTransformer<Dtype> > data_transformer_;
-  string save_file_;
-  Blob<Dtype> bbox_preds_;
-  Blob<Dtype> bbox_permute_;
-  Blob<Dtype> conf_permute_;
-  Blob<Dtype> blur_permute_;
-  Blob<Dtype> occlu_permute_;
 };
 
 }  // namespace caffe
