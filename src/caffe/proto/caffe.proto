@@ -1668,6 +1668,9 @@ message PriorBoxParameter {
 
   // Offset to the top left corner of each cell.
   optional float offset = 13 [default = 0.5];
+  repeated float fixed_size = 14;
+  repeated float fixed_ratio = 15;
+  repeated float density = 16;
 }
 
 message FaceEvaluateParameter{
