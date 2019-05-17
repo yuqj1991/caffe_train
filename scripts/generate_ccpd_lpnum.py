@@ -11,6 +11,9 @@ import random
 import matplotlib.pyplot as plot
 
 root_dir = "../../dataset/car_person_data/car_license/ccpd_dataset"
+ccpd_anno_img_dir = "../../dataset/car_person_data/car_license/ccpd_dataset/annoImg"
+if not os.path.exists(ccpd_anno_img_dir):
+	os.makedirs(ccpd_anno_img_dir)
 set_dir = "ImageSets/Main"
 image_dir = "JPEGImages"
 label_dir = "label"
@@ -36,6 +39,8 @@ def generate_label(imagefilepath, savefilepath):
 	left_upBox_y = labelbndBox[0].split("&")[1]
 	right_bottom_x = labelbndBox[1].split("&")[0]
 	right_bottom_y = labelbndBox[1].split("&")[1]
+	cropped = img[left_upBox_y:right_bottom_y, left_upBox_x:right_bottom_x, :]
+	cv2.imwrite(ccpd_anno_img_dir+"/"+"crop_"+str(img_file.split("/")[-1]), cropped)
 	exactbndBox = labelInfo[3].split('_')
 	vertices_1_x = exactbndBox[0].split("&")[0]
 	vertices_1_y = exactbndBox[0].split("&")[1]
