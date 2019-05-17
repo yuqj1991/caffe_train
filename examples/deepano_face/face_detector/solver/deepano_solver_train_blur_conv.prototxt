@@ -21,6 +21,6 @@ stepvalue: 120000
 iter_size: 1
 momentum2 : 0.99
 type: "RMSProp"
-eval_type: "detectionfaceboxattri"
+eval_type: "detectionface"
 ap_version: "11point"
 
