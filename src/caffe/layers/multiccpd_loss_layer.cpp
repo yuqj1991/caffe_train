@@ -563,31 +563,31 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   top[0]->mutable_cpu_data()[0] = 0;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, batch_size_, 1, -1);
-  if(this->layer_param_.propagate_down(3)) {
+  if(this->layer_param_.propagate_down(0)) {
     top[0]->mutable_cpu_data()[0] += 
           1*chinesecharcter_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(4)) {
+  if(this->layer_param_.propagate_down(1)) {
     top[0]->mutable_cpu_data()[0] += 
           1*engcharcter_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(5)) {
+  if(this->layer_param_.propagate_down(2)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_1_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(6)) {
+  if(this->layer_param_.propagate_down(3)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_2_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(7)) {
+  if(this->layer_param_.propagate_down(4)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_3_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(8)) {
+  if(this->layer_param_.propagate_down(5)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_4_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(9)) {
+  if(this->layer_param_.propagate_down(6)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_5_loss_.cpu_data()[0] / normalizer;
   }
