@@ -1,7 +1,7 @@
 name: "ResNet-18-ccpd"
 layer {
 	name: "data"
-	type: "Data"
+	type: "ccpdData"
 	top: "data"
 	top: "label"
 	include {
@@ -1488,7 +1488,7 @@ layer {
 	include {
 		phase: TEST
 	}
-	LpDetParameter {
+	lp_det_param {
 		num_chinese: 34
 		num_english: 25
 		num_letter: 35
