@@ -21,7 +21,7 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../dataset/car_person_data/car_license/ccpd_dataset/lmdb/ccpd_testing_lp_lmdb/"
+		source: "../../../../dataset/car_person_data/car_license/ccpd_dataset/lmdb/ccpd_dataset_testing_lp_lmdb/"
 		batch_size: 4
 		backend: LMDB
 	}

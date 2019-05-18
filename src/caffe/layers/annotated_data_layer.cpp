@@ -193,9 +193,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         const Annotation& anno = anno_group.annotation(jj);
         const NormalizedBBox& bbox = anno.bbox();
         LOG(INFO)<<"xmin: "<<bbox.xmin()<<" ymin: "<<bbox.ymin()<<" xmax: "<<bbox.xmax()<<" ymax: "<<bbox.ymax();
-                LOG(INFO)<<"chi: "<<bbox.lpnumber().chichracter()<< " eng: "<<bbox.lpnumber().engchracter()<<" let1: "<<bbox.lpnumber().letternum_1()
-                         << " let2: "<<bbox.lpnumber().letternum_2()<<" let3: "<<bbox.lpnumber().letternum_3()<<" let5: "<<bbox.lpnumber().letternum_4()
-                         <<" let5: "<<bbox.lpnumber().letternum_5();
       }
     }
     LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";

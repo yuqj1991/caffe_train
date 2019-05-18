@@ -325,14 +325,14 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   vector<int> all_let_4;
   vector<int> all_let_5;
   for(int item_id =0; item_id<batch_size_; item_id++){
-    int idxg = item_id*8;
-    all_chi.push_back(gt_data[idxg+1]);
-    all_eng.push_back(gt_data[idxg+2]);
-    all_let_1.push_back(gt_data[idxg+3]);
-    all_let_2.push_back(gt_data[idxg+4]);
-    all_let_3.push_back(gt_data[idxg+5]);
-    all_let_4.push_back(gt_data[idxg+6]);
-    all_let_5.push_back(gt_data[idxg+7]);
+    int idxg = item_id*7;
+    all_chi.push_back(gt_data[idxg+0]);
+    all_eng.push_back(gt_data[idxg+1]);
+    all_let_1.push_back(gt_data[idxg+2]);
+    all_let_2.push_back(gt_data[idxg+3]);
+    all_let_3.push_back(gt_data[idxg+4]);
+    all_let_4.push_back(gt_data[idxg+5]);
+    all_let_5.push_back(gt_data[idxg+6]);
   }
   
   /*~~~~~~~~~~~~~~~~~~~~~~chinese loss layer  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

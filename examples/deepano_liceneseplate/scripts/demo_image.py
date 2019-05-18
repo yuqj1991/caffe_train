@@ -57,21 +57,7 @@ def postprocess(img, out):
 
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
-    chin = out['detection_out'][0,0,:,7]
-    eng = out['detection_out'][0,0,:,8]
-    letter_1 = out['detection_out'][0,0,:,9]
-    letter_2 = out['detection_out'][0,0,:,10]
-    letter_3 = out['detection_out'][0,0,:,11]
-    letter_4 = out['detection_out'][0,0,:,12]
-    letter_5 = out['detection_out'][0,0,:,13]
-    print(chin)
-    print(eng)
-    print(letter_1)
-    print(letter_2)
-    print(letter_3)
-    print(letter_4)
-    print(letter_5)
-    return (box.astype(np.int32), conf, cls, chin.astype(np.int32), eng.astype(np.int32), letter_1.astype(np.int32), letter_2.astype(np.int32), letter_3.astype(np.int32), letter_4.astype(np.int32), letter_5.astype(np.int32) )
+    return (box.astype(np.int32), conf, cls)
 
 def detect(imgfile):
     origimg = cv2.imread(imgfile)
@@ -83,7 +69,7 @@ def detect(imgfile):
     net.blobs['data'].data[...] = img
     out = net.forward()
     print("out shape",out['detection_out'].shape)  
-    box, conf, cls, chin, eng, letter_1, letter_2, letter_3, letter_4, letter_5 = postprocess(origimg, out)
+    box, conf, cls = postprocess(origimg, out)
 
     for i in range(len(box)):
        if conf[i]>=0.25:
@@ -91,8 +77,7 @@ def detect(imgfile):
            p2 = (box[i][2], box[i][3])
            cv2.rectangle(origimg, p1, p2, (0,255,0))
            p3 = (max(p1[0], 15), max(p1[1], 15))
-           lpstring = provinces[chin[i]] + alphabets[eng[i]] + ads[letter_1[i]] +ads[letter_2[i]] + ads[letter_3[i]] + ads[letter_4[i]] + ads[letter_5[i]]		
-           title = "%s:  %s" % (CLASSES[int(cls[i])],lpstring)
+           title = "%s" % (CLASSES[int(cls[i])])
            if not isinstance(title, unicode): 
                title = title.decode('utf8')
            img_PIL = Image.fromarray(cv2.cvtColor(origimg, cv2.COLOR_BGR2RGB))
