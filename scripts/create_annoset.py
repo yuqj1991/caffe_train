@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
   # get caffe root directory
   caffe_root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-  if anno_type == "detectionccpd":
+  if anno_type == "detection_ccpd":
     cmd = "{}/build/tools/convert_annoset" \
         " --anno_type={}" \
         " --label_type={}" \
@@ -217,6 +217,26 @@ if __name__ == "__main__":
             min_dim, max_dim, resize_height, resize_width, backend, shuffle,
             check_size, encode_type, encoded, gray, root_dir, list_file, out_dir)
   if anno_type == "detection":
+    cmd = "{}/build/tools/convert_annoset" \
+        " --anno_type={}" \
+        " --label_type={}" \
+        " --label_map_file={}" \
+        " --check_label={}" \
+        " --min_dim={}" \
+        " --max_dim={}" \
+        " --resize_height={}" \
+        " --resize_width={}" \
+        " --backend={}" \
+        " --shuffle={}" \
+        " --check_size={}" \
+        " --encode_type={}" \
+        " --encoded={}" \
+        " --gray={}" \
+        " {} {} {}" \
+        .format(caffe_root, anno_type, label_type, label_map_file, check_label,
+            min_dim, max_dim, resize_height, resize_width, backend, shuffle,
+            check_size, encode_type, encoded, gray, root_dir, list_file, out_dir)
+  if anno_type == "Rec_ccpd":
     cmd = "{}/build/tools/convert_annoset" \
         " --anno_type={}" \
         " --label_type={}" \

@@ -115,21 +115,10 @@ void ccpdDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         // get a anno_datum
         AnnotatedCCpdDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
         #if 0
-        int size_group = anno_datum.annotation_group_size();
         LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
-        for(int ii=0; ii< size_group; ii++)
-        {
-            const AnnotationGroup& anno_group = anno_datum.annotation_group(ii);
-            int anno_size = anno_group.annotation_size();
-            for(int jj=0; jj<anno_size; jj++)
-            {
-                const Annotation& anno = anno_group.annotation(jj);
-                const NormalizedBBox& bbox = anno.bbox();
-                LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
-                        <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                        <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion();
-            }
-        }
+         LOG(INFO) <<" chi: "<<anno_datum.lpnumber().chichracter()<<" eng: "<<anno_datum.lpnumber().engchracter()
+                        <<" let1: "<<anno_datum.lpnumber().letternum_1()<<" let2: "<<anno_datum.lpnumber().letternum_2()
+                        <<" let3: "<<anno_datum.lpnumber().letternum_3()<<" let4: "<<anno_datum.lpnumber().letternum_4();
         LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";
     #endif
         AnnotatedCCpdDatum distort_datum;
@@ -206,7 +195,7 @@ void ccpdDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         if (anno_type_ == AnnotatedCCpdDatum_AnnotationType_CCPD) {
             // Reshape the label and store the annotation.
             label_shape[0] = batch_size;
-            label_shape[1] = 8;
+            label_shape[1] = 7;
             batch->label_.Reshape(label_shape);
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
@@ -225,17 +214,14 @@ void ccpdDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         }
     }
 #if 0
-  LOG(INFO)<< "start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& single image: num_bboxes: "<<num_bboxes;
   const Dtype* top_label_data = batch->label_.cpu_data();
-  for(int ii=0; ii < num_bboxes; ii++)
+  for(int ii=0; ii < batch_size; ii++)
   {
-    int id = ii*10;
-    LOG(INFO) <<"batch_id: "<<top_label_data[id]<<" anno_label: "<<top_label_data[id+1]
-              <<" anno.instance_id: "<<top_label_data[id+2];
-    LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
-              <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
-              <<" bbox->blur: "<<top_label_data[id+7]<<" bbox->occlusion: "<<top_label_data[id+8]
-              <<" bbox->difficult: "<<top_label_data[id+9];
+    int id = ii*7;
+    LOG(INFO) <<" chi: "<<top_label_data[id+0]
+              <<" eng: "<<top_label_data[id+1]<<"let1: "<<top_label_data[id+2]<<" let2: "<<top_label_data[id+3]
+              <<" let3: "<<top_label_data[id+4]<<" let4: "<<top_label_data[id+5]
+              <<" let5: "<<top_label_data[id+6];
   }
   LOG(INFO)<< "finished **************************************************** end ";
 #endif 

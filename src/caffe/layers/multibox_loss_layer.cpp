@@ -251,6 +251,9 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
         normalization_, num_, num_priors_, num_matches_);
     top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0] / normalizer;
   }
+  #if 0
+  LOG(INFO)<<": "<<top[0]->mutable_cpu_data()[0];
+  #endif
 }
 
 template <typename Dtype>

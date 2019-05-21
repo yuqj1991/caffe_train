@@ -2,9 +2,9 @@ root_dir="../../../../caffe_deeplearning_train"
 cd $root_dir/scripts
 
 redo=1
-data_root_dir="../../dataset/car_person_data"
-dataset_name="ccpd"
-mapfile="../examples/deepano_liceneseplate/labelmap_lp.prototxt"
+data_root_dir="../../dataset/car_person_data/car_license"
+dataset_name="ccpd_dataset"
+mapfile="../examples/deepano_liceneseplate/scripts/labelmap_lp.prototxt"
 anno_type="Rec_ccpd"
 label_type="txt"
 db="lmdb"

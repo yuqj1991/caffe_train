@@ -325,14 +325,14 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   vector<int> all_let_4;
   vector<int> all_let_5;
   for(int item_id =0; item_id<batch_size_; item_id++){
-    int idxg = item_id*8;
-    all_chi.push_back(gt_data[idxg+1]);
-    all_eng.push_back(gt_data[idxg+2]);
-    all_let_1.push_back(gt_data[idxg+3]);
-    all_let_2.push_back(gt_data[idxg+4]);
-    all_let_3.push_back(gt_data[idxg+5]);
-    all_let_4.push_back(gt_data[idxg+6]);
-    all_let_5.push_back(gt_data[idxg+7]);
+    int idxg = item_id*7;
+    all_chi.push_back(gt_data[idxg+0]);
+    all_eng.push_back(gt_data[idxg+1]);
+    all_let_1.push_back(gt_data[idxg+2]);
+    all_let_2.push_back(gt_data[idxg+3]);
+    all_let_3.push_back(gt_data[idxg+4]);
+    all_let_4.push_back(gt_data[idxg+5]);
+    all_let_5.push_back(gt_data[idxg+6]);
   }
   
   /*~~~~~~~~~~~~~~~~~~~~~~chinese loss layer  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -563,31 +563,31 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   top[0]->mutable_cpu_data()[0] = 0;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, batch_size_, 1, -1);
-  if(this->layer_param_.propagate_down(3)) {
+  if(this->layer_param_.propagate_down(0)) {
     top[0]->mutable_cpu_data()[0] += 
           1*chinesecharcter_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(4)) {
+  if(this->layer_param_.propagate_down(1)) {
     top[0]->mutable_cpu_data()[0] += 
           1*engcharcter_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(5)) {
+  if(this->layer_param_.propagate_down(2)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_1_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(6)) {
+  if(this->layer_param_.propagate_down(3)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_2_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(7)) {
+  if(this->layer_param_.propagate_down(4)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_3_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(8)) {
+  if(this->layer_param_.propagate_down(5)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_4_loss_.cpu_data()[0] / normalizer;
   }
-  if(this->layer_param_.propagate_down(9)) {
+  if(this->layer_param_.propagate_down(6)) {
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_5_loss_.cpu_data()[0] / normalizer;
   }

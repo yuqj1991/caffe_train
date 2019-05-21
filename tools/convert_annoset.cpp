@@ -275,7 +275,7 @@ int main(int argc, char** argv) {
 
     // Put in db
     string out;
-    if(anno_type == "classification" || anno_type == "detection")
+    if(anno_type == "classification" || anno_type == "detection_face"|| anno_type == "detection_ccpd")
     {
       CHECK(anno_datum.SerializeToString(&out));
       txn->Put(key_str, out);

@@ -197,7 +197,17 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
     top_shape.push_back(9);
     top[0]->Reshape(top_shape);
-  }
+  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_NORMALL){
+    // num() and channels() are 1.
+    vector<int> top_shape(2, 1);
+    // Since the number of bboxes to be kept is unknown before nms, we manually
+    // set it to (fake) 1.
+    top_shape.push_back(1);
+    // Each row is a 9 dimension vector, which stores
+    // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
+    top_shape.push_back(7);
+    top[0]->Reshape(top_shape);
+  }  
 }
 
 template <typename Dtype>
@@ -388,7 +398,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
       }
     }
   }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_NORMALL){
-    top_shape.push_back(9);
+    top_shape.push_back(7);
     Dtype* top_data;
     if (num_kept == 0) {
       LOG(INFO) << "Couldn't find any detections";
@@ -399,7 +409,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
       // Generate fake results per image.
       for (int i = 0; i < num; ++i) {
         top_data[0] = i;
-        top_data += 9;
+        top_data += 7;
       }
     } else {
       top[0]->Reshape(top_shape);

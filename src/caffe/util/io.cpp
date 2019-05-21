@@ -690,9 +690,9 @@ bool ReadTxtToAnnotatedDatum(const string& labelfile, const int height,
     LOG(INFO) << "Cannot open " << labelfile;
     return false;
   }
-  int label;
+  int label = 1;
   float xmin, ymin, xmax, ymax;
-  while (infile >> label >> xmin >> ymin >> xmax >> ymax) {
+  while (infile >> xmin >> ymin >> xmax >> ymax) {
     Annotation* anno = NULL;
     int instance_id = 0;
     bool found_group = false;

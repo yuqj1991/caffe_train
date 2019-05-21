@@ -1,7 +1,7 @@
 name: "ResNet-18-ccpd"
 layer {
 	name: "data"
-	type: "AnnotatedData"
+	type: "ccpdData"
 	top: "data"
 	top: "label"
 	include {
@@ -46,7 +46,7 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../dataset/car_person_data/car_license/ccpd_dataset/lmdb/ccpd_training_lp_lmdb/"
+		source: "../../../../dataset/car_person_data/car_license/ccpd_dataset/lmdb/ccpd_dataset_training_lp_lmdb/"
 		batch_size: 32
 		backend: LMDB
 	}
@@ -1435,5 +1435,40 @@ layer {
         }
     }
 }
-
+layer {
+	name: "Muti_ccpd_loss"
+	type: "MulticcpdLoss"
+	bottom: "lp_chinese_2"
+	bottom: "lp_eng_2"
+	bottom: "lp_let1_2"
+	bottom: "lp_let2_2"
+	bottom: "lp_let3_2"
+	bottom: "lp_let4_2"
+	bottom: "lp_let5_2"
+	bottom: "label"
+	top: "mbox_loss"
+	include {
+		phase: TRAIN
+	}
+	propagate_down: true
+	propagate_down: true
+	propagate_down: true
+	propagate_down: true
+	propagate_down: true
+	propagate_down: true
+	propagate_down: true
+	propagate_down: false
+	loss_param {
+		normalization: VALID
+	}
+	multibox_loss_param {
+		chineselp_loss_type: SOFTMAX
+		englishlp_loss_type: SOFTMAX
+		letter_lp_loss_type: SOFTMAX
+		loc_weight: 1.0
+		num_chinese: 34
+		num_english: 25
+		num_letter: 35
+	}
+}
 
