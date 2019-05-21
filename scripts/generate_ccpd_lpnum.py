@@ -109,7 +109,7 @@ for imgdir in os.listdir(root_dir + '/' + image_dir):
 	fullimgdirpath = root_dir + '/' + image_dir +'/'+imgdir
 	generate_train_setfile(fullimgdirpath, trainsetfilepath)
 
-shutil.copyfile(trainSetfilepath, trainsetfilecopypath)
+shutil.copyfile(trainsetfilepath, trainsetfilecopypath)
 
 test_list = generate_random_test_indexlist(lengthTrain, lengthTestset)
 numlines =0
