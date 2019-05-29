@@ -39,7 +39,7 @@ def generate_label(imagefilepath, savefilepath):
 	left_upBox_y = labelbndBox[0].split("&")[1]
 	right_bottom_x = labelbndBox[1].split("&")[0]
 	right_bottom_y = labelbndBox[1].split("&")[1]
-	cropped = img[int(left_upBox_y):int(right_bottom_y), int(left_upBox_x):int(right_bottom_x), :]
+	cropped = img[(int(left_upBox_y) - 22):(int(right_bottom_y)+22), (int(left_upBox_x) -22):(int(right_bottom_x) + 22), :]
 	cv2.imwrite(ccpd_anno_img_dir+"/"+"crop_"+str(imagefilepath.split("/")[-1]), cropped)
 	exactbndBox = labelInfo[3].split('_')
 	vertices_1_x = exactbndBox[0].split("&")[0]
