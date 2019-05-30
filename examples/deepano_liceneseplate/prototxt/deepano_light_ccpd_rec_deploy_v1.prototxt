@@ -1,16 +1,10 @@
 name: "ResNet-18-ccpd"
-layer {
-  name: "data"
-  type: "Input"
-  top: "data"
-  input_param { 
-    shape: { 
-      dim: 1 
-      dim: 3 
-      dim: 64 
-      dim: 128 
-    } 
-  }
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 64
+  dim: 128
 }
 
 layer {
@@ -1474,7 +1468,7 @@ layer {
 	include {
 		phase: TEST
 	}
-	LpDetParameter {
+	lp_det_param {
 		num_chinese: 34
 		num_english: 25
 		num_letter: 35
