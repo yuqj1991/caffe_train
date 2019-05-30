@@ -33,6 +33,15 @@ void MulticcpdLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   num_english_ = multibox_loss_param.num_english();
   num_letter_ = multibox_loss_param.num_letter();
 
+  if (!this->layer_param_.loss_param().has_normalization() &&
+    this->layer_param_.loss_param().has_normalize()) {
+    normalization_ = this->layer_param_.loss_param().normalize() ?
+                    LossParameter_NormalizationMode_VALID :
+                    LossParameter_NormalizationMode_BATCH_SIZE;
+  } else {
+    normalization_ = this->layer_param_.loss_param().normalization();
+  }
+
   vector<int> loss_shape(1, 1);
   // Set up chinese confidence loss layer.
   chinesecharcter_loss_type_ = multibox_loss_param.chineselp_loss_type();
