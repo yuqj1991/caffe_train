@@ -88,7 +88,8 @@ int main(int argc, char** argv) {
   const string encode_type = FLAGS_encode_type;
   const string anno_type = FLAGS_anno_type;
   AnnotatedDatum_AnnotationType type;
-  AnnotatedDatum_AnnoataionAttriType attri_type;
+  AnnotatedDatum_AnnoataionAttriType face_det_attri_type;
+  AnnotatedDatum_AnnoataionAttriType ccpd_det_attri_type;
   AnnoFaceDatum_AnnotationType anno_face_attri_type;
   AnnoFacePoseDatum_AnnoType anno_facepose_type;
   AnnoFaceContourDatum_AnnoType anno_facecontour_type;
@@ -110,7 +111,7 @@ int main(int argc, char** argv) {
     }
   } else if (anno_type == "detection_face") {
     type = AnnotatedDatum_AnnotationType_BBOX;
-    attri_type = AnnotatedDatum_AnnoataionAttriType_FACE;
+    face_det_attri_type = AnnotatedDatum_AnnoataionAttriType_FACE;
     LabelMap label_map;
     CHECK(ReadProtoFromTextFile(label_map_file, &label_map))
         << "Failed to read label map file.";
@@ -121,7 +122,7 @@ int main(int argc, char** argv) {
     }
   }else if (anno_type == "detection_ccpd") {
     type = AnnotatedDatum_AnnotationType_BBOX;
-    attri_type = AnnotatedDatum_AnnoataionAttriType_NORMALL;
+    ccpd_det_attri_type = AnnotatedDatum_AnnoataionAttriType_NORMALL;
     LabelMap label_map;
     CHECK(ReadProtoFromTextFile(label_map_file, &label_map))
         << "Failed to read label map file.";
@@ -214,14 +215,14 @@ int main(int argc, char** argv) {
     } else if (anno_type == "detection_face") {
       labelname = boost::get<std::string>(lines[line_id].second);
       status = ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
-          resize_width, min_dim, max_dim, is_color, enc, type, attri_type, label_type,
+          resize_width, min_dim, max_dim, is_color, enc, type, face_det_attri_type, label_type,
           name_to_label, &anno_datum);
       anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
       anno_datum.set_attri_type(AnnotatedDatum_AnnoataionAttriType_FACE);
     }else if (anno_type == "detection_ccpd") {
       labelname = boost::get<std::string>(lines[line_id].second);
       status = ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
-          resize_width, min_dim, max_dim, is_color, enc, type, attri_type, label_type,
+          resize_width, min_dim, max_dim, is_color, enc, type, ccpd_det_attri_type, label_type,
           name_to_label, &anno_datum);
       anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
       anno_datum.set_attri_type(AnnotatedDatum_AnnoataionAttriType_NORMALL);
