@@ -634,7 +634,8 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
   if (param_.test_compute_loss()) {
     loss /= param_.test_iter(test_net_id);
     LOG(INFO) << "Test loss: " << loss;
-  }
+  }    
+  LOG(INFO)<<"----all_true_pos.size(): "<<all_true_pos.size();
   for (int i = 0; i < all_true_pos.size(); ++i) {
     if (all_true_pos.find(i) == all_true_pos.end()) {
       LOG(FATAL) << "Missing output_blob true_pos: " << i;
