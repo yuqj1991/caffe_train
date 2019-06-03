@@ -77,7 +77,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
     const Dtype* cur_let_4_data= let4_data + letter_index;
     const Dtype* cur_let_5_data= let5_data + letter_index;
     int max_index = 0;
-    float temp = 0.f; 
+    Dtype temp = 0.f; 
     for(int ii =0;ii<num_chinese_;ii++){
       if(temp<cur_chi_data[ii]){
         max_index = ii;

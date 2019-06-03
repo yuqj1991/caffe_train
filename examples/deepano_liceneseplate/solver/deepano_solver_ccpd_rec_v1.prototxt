@@ -1,15 +1,15 @@
-train_net: "../prototxt/deepano_light_ccpd_train_resblock_v1.prototxt"
-test_net: "../prototxt/deepano_light_ccpd_test_resblock_v1.prototxt"
+train_net: "../prototxt/deepano_light_ccpd_rec_train_v1.prototxt"
+test_net: "../prototxt/deepano_light_ccpd_rec_test_v1.prototxt"
 test_iter: 1500
 test_interval: 5000
-base_lr: 0.001
+base_lr: 0.01
 display: 100
-max_iter: 400000
+max_iter: 1600000
 lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.0001
 snapshot: 5000
-snapshot_prefix: "../snapshot/deepanoccpd_res_v1"
+snapshot_prefix: "../snapshot/deepanoccpd_rec_v1"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
@@ -20,9 +20,9 @@ stepvalue: 100000
 stepvalue: 120000
 stepvalue: 180000
 stepvalue: 300000
+stepvalue: 800000
+stepvalue: 1200000
 iter_size: 1
 momentum2 : 0.99
 type: "RMSProp"
-eval_type: "detection"
-ap_version: "11point"
-
+eval_type: "Rec_ccpd"

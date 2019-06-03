@@ -219,7 +219,7 @@ void ccpdDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   {
     int id = ii*7;
     LOG(INFO) <<" chi: "<<top_label_data[id+0]
-              <<" eng: "<<top_label_data[id+1]<<"let1: "<<top_label_data[id+2]<<" let2: "<<top_label_data[id+3]
+              <<" eng: "<<top_label_data[id+1]<<" let1: "<<top_label_data[id+2]<<" let2: "<<top_label_data[id+3]
               <<" let3: "<<top_label_data[id+4]<<" let4: "<<top_label_data[id+5]
               <<" let5: "<<top_label_data[id+6];
   }
