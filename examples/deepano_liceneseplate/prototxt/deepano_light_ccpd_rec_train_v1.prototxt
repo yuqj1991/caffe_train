@@ -42,7 +42,7 @@ layer {
 		}
 		expand_param {
 			prob: 0.5
-			max_expand_ratio: 4.0
+			max_expand_ratio: 2.0
 		}
 	}
 	data_param {
@@ -1462,9 +1462,9 @@ layer {
 		normalization: VALID
 	}
 	multibox_loss_param {
-		chineselp_loss_type: LOGISTIC #SOFTMAX #
-		englishlp_loss_type: LOGISTIC #SOFTMAX #
-		letter_lp_loss_type: LOGISTIC #SOFTMAX #
+		chineselp_loss_type: SOFTMAX #LOGISTIC #
+		englishlp_loss_type: SOFTMAX #LOGISTIC #
+		letter_lp_loss_type: SOFTMAX #LOGISTIC #
 		loc_weight: 1.0
 		num_chinese: 34
 		num_english: 25

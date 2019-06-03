@@ -653,7 +653,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 
           1*letternum_5_loss_.cpu_data()[0] / normalizer;
   }
-  #if 1
+  #if 0
   LOG(INFO)<<"top[0]->mutable_cpu_data()[0]: "<<top[0]->mutable_cpu_data()[0];
   #endif
 }
