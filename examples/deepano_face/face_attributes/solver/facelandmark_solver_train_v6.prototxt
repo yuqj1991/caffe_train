@@ -18,6 +18,6 @@ stepvalue: 100000
 stepvalue: 300000
 stepvalue: 400000
 stepvalue: 600000
-eval_type: "detectionface"
+eval_type: "faceattri"
 #type: "RMSProp"
 #momentum2: 0.99
