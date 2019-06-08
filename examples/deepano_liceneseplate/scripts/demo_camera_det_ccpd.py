@@ -118,7 +118,7 @@ def detect():
                print(ccpdstring)
                cv2.rectangle(origimg, p1, p2, (0,255,0))
                p3 = (max(p1[0], 15), max(p1[1], 15))
-               title = "%s" % (CLASSES[int(cls[i])])
+               title = "%s, %s" % (CLASSES[int(cls[i])], ccpdstring)
                if not isinstance(title, unicode): 
                    title = title.decode('utf8')
                img_PIL = Image.fromarray(cv2.cvtColor(origimg, cv2.COLOR_BGR2RGB))
