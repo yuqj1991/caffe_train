@@ -1,0 +1,1 @@
+python demo_camera_det_ccpd.py --model ../prototxt/deepano_light_ccpd_det_deploy_v1.prototxt --weights ../snapshot/deepanoccpd_res_v1_iter_370000.caffemodel --ccpdmodel ../prototxt/deepano_light_ccpd_rec_deploy_v1.prototxt --ccpdweights ../snapshot/deepanoccpd_rec_v1_iter_1200000.caffemodel
