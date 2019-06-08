@@ -305,13 +305,13 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
     Dtype* top_data = top[0]->mutable_cpu_data();
     caffe_set(top[0]->count(), Dtype(0.), top_data);
     int num_det = 0;
-     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-     // Insert number of ground truth for each label.
-    map<int, int> num_pos;
-    for (map<int, LabelBBox>::iterator it =all_gt_bboxes.begin();
-        it != all_gt_bboxes.end(); ++it) {
+
+    // Insert number of ground truth for each label.
+    map<int, int> num_pos;  //所有的标注信息中，每一类标签有多少个
+    for (map<int, LabelBBox>::iterator it = all_gt_bboxes.begin();
+        it != all_gt_bboxes.end(); ++it) { //第一张图片
       for (LabelBBox::iterator iit = it->second.begin(); iit != it->second.end();
-          ++iit) {
+          ++iit) {  //可能是第一类
         int count = 0;
         if (evaluate_difficult_gt_) {
           count = iit->second.size();
@@ -334,23 +334,23 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
       if (c == background_label_id_) {
         continue;
       }
-      top_data[num_det * 5] = -1;
-      top_data[num_det * 5 + 1] = c;
+      top_data[num_det * 5] = -1; //itemid
+      top_data[num_det * 5 + 1] = c; //种类
       if (num_pos.find(c) == num_pos.end()) {
-        top_data[num_det * 5 + 2] = 0;
+        top_data[num_det * 5 + 2] = 0; // 每一类存在的个数
       } else {
         top_data[num_det * 5 + 2] = num_pos.find(c)->second;
       }
-      top_data[num_det * 5 + 3] = -1;
-      top_data[num_det * 5 + 4] = -1;
+      top_data[num_det * 5 + 3] = -1; //fp
+      top_data[num_det * 5 + 4] = -1; //tp
       ++num_det;
     }
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
     // Insert detection evaluate status.
     for (map<int, LabelBBox>::iterator it = all_detections.begin();
-        it != all_detections.end(); ++it) {
+        it != all_detections.end(); ++it) { //每一张图片
       int image_id = it->first;
-      LabelBBox& detections = it->second;
+      LabelBBox& detections = it->second;  //检测结果
       if (all_gt_bboxes.find(image_id) == all_gt_bboxes.end()) {
         // No ground truth for current image. All detections become false_pos.
         for (LabelBBox::iterator iit = detections.begin();
@@ -369,10 +369,10 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
             ++num_det;
           }
         }
-      }else{
+      } else {
         LabelBBox& label_bboxes = all_gt_bboxes.find(image_id)->second;
         for (LabelBBox::iterator iit = detections.begin();
-            iit != detections.end(); ++iit) {
+            iit != detections.end(); ++iit) { 
           int label = iit->first;
           if (label == -1) {
             continue;
@@ -426,7 +426,7 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
                   if (!visited[jmax]) {
                     // true positive.
                     top_data[num_det * 5 + 3] = 1;
-                    top_data[num_det * 5 + 4] = 0;                    
+                    top_data[num_det * 5 + 4] = 0;
                     visited[jmax] = true;
                   } else {
                     // false positive (multiple detection).
@@ -452,6 +452,8 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
         }
       }
     }
+  }else{
+    LOG(FATAL)<<"unknown attri_type!";
   }
 }
 

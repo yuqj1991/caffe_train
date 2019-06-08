@@ -79,6 +79,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
     int max_index = 0;
     Dtype temp = 0.f; 
     for(int ii =0;ii<num_chinese_;ii++){
+      //LOG(INFO)<<"cur_chi_data["<<ii<<"]: "<<cur_chi_data[ii];
       if(temp<cur_chi_data[ii]){
         max_index = ii;
         temp = cur_chi_data[ii];
@@ -88,6 +89,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
     temp = 0.f;
     max_index = 0;
     for(int ii =0;ii<num_english_;ii++){
+      //LOG(INFO)<<"cur_eng_data["<<ii<<"]: "<<cur_eng_data[ii];
       if(temp<cur_eng_data[ii]){
         max_index = ii;
         temp = cur_eng_data[ii];
@@ -97,6 +99,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
     temp = 0.f;
     max_index = 0;
     for(int ii =0;ii<num_letter_;ii++){
+      //LOG(INFO)<<"cur_let_1_data["<<ii<<"]: "<<cur_let_1_data[ii];
       if(temp<cur_let_1_data[ii]){
         max_index = ii;
         temp = cur_let_1_data[ii];
@@ -106,6 +109,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
     temp = 0.f;
     max_index = 0;
     for(int ii =0;ii<num_letter_;ii++){
+      //LOG(INFO)<<"cur_let_2_data["<<ii<<"]: "<<cur_let_2_data[ii];
       if(temp<cur_let_2_data[ii]){
         max_index = ii;
         temp = cur_let_2_data[ii];
@@ -115,6 +119,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
     temp = 0.f;
     max_index = 0;
     for(int ii =0;ii<num_letter_;ii++){
+      //LOG(INFO)<<"cur_let_3_data["<<ii<<"]: "<<cur_let_3_data[ii];
       if(temp<cur_let_3_data[ii]){
         max_index = ii;
         temp = cur_let_3_data[ii];
@@ -124,6 +129,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
     temp = 0.f;
     max_index = 0;
     for(int ii =0;ii<num_letter_;ii++){
+      //LOG(INFO)<<"cur_let_4_data["<<ii<<"]: "<<cur_let_4_data[ii];
       if(temp<cur_let_4_data[ii]){
         max_index = ii;
         temp = cur_let_4_data[ii];
@@ -133,6 +139,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
     temp = 0.f;
     max_index = 0;
     for(int ii =0;ii<num_letter_;ii++){
+      //LOG(INFO)<<"cur_let_5_data["<<ii<<"]: "<<cur_let_5_data[ii];
       if(temp<cur_let_5_data[ii]){
         max_index = ii;
         temp = cur_let_5_data[ii];

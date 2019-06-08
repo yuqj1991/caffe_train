@@ -2694,7 +2694,7 @@ layer {
 	bottom: "lp_let4_2"
 	bottom: "lp_let5_2"
 	bottom: "label"
-	top: "mbox_loss"
+	top: "Muti_ccpd_loss"
 	include {
 		phase: TRAIN
 	}

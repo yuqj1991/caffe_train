@@ -213,7 +213,7 @@ void ccpdDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             LOG(FATAL) << "Unknown annotation type.";
         }
     }
-#if 1
+#if 0
   const Dtype* top_label_data = batch->label_.cpu_data();
   for(int ii=0; ii < batch_size; ii++)
   {
