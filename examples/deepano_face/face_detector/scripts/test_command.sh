@@ -1,0 +1,1 @@
+python demo_camera_attri.py --model ../prototxt/deepano_light_deploy_resblock_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v9.prototxt --faceweights ../../face_attributes/snapshot/deepanoFacelandmark_v9_iter_800000.caffemodel
