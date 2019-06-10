@@ -363,7 +363,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     chinesecharcter_gt_.Reshape(chinesecharcter_shape);
     chinesecharcter_shape.push_back(num_chinese_);
     chinesecharcter_pred_.Reshape(chinesecharcter_shape);
-    chinesecharcter_pred_.CopyFrom(*bottom[0]);
+    //chinesecharcter_pred_.CopyFrom(*bottom[0]);
   } else if (chinesecharcter_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     //chinesecharcter_shape.push_back(1);
     chinesecharcter_shape.push_back(batch_size_);
@@ -371,7 +371,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     chinesecharcter_gt_.Reshape(chinesecharcter_shape);
     chinesecharcter_pred_.Reshape(chinesecharcter_shape);
     /************************************************/
-    chinesecharcter_pred_.CopyFrom(*bottom[0]);
+    //chinesecharcter_pred_.CopyFrom(*bottom[0]);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -390,6 +390,9 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       LOG(FATAL) << "Unknown conf loss type.";
     }
   }
+  Dtype* chinesecharcter_pred_data = chinesecharcter_pred_.mutable_cpu_data();
+  const Dtype* chinese_data = bottom[0]->cpu_data();
+  caffe_copy<Dtype>(bottom[0]->count(), chinese_data, chinesecharcter_pred_data);
   chinesecharcter_loss_layer_->Reshape(chinesecharcter_bottom_vec_, chinesecharcter_top_vec_);
   chinesecharcter_loss_layer_->Forward(chinesecharcter_bottom_vec_, chinesecharcter_top_vec_);
 
@@ -401,7 +404,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     engcharcter_gt_.Reshape(engcharcter_shape);
     engcharcter_shape.push_back(num_english_);
     engcharcter_pred_.Reshape(engcharcter_shape);
-    engcharcter_pred_.CopyFrom(*bottom[1]);
+    //engcharcter_pred_.CopyFrom(*bottom[1]);
   } else if (engcharcter_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     //engcharcter_shape.push_back(1);
     engcharcter_shape.push_back(batch_size_);
@@ -409,7 +412,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     engcharcter_gt_.Reshape(engcharcter_shape);
     engcharcter_pred_.Reshape(engcharcter_shape);
     /************************************************/
-    engcharcter_pred_.CopyFrom(*bottom[1]);
+    //engcharcter_pred_.CopyFrom(*bottom[1]);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -428,6 +431,9 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       LOG(FATAL) << "Unknown conf loss type.";
     }
   }
+  Dtype* engcharcter_pred_data = engcharcter_pred_.mutable_cpu_data();
+  const Dtype* eng_data = bottom[1]->cpu_data();
+  caffe_copy<Dtype>(bottom[1]->count(), eng_data, engcharcter_pred_data);
   engcharcter_loss_layer_->Reshape(engcharcter_bottom_vec_, engcharcter_top_vec_);
   engcharcter_loss_layer_->Forward(engcharcter_bottom_vec_, engcharcter_top_vec_);
 
@@ -439,7 +445,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_1_gt_.Reshape(letter_1_shape);
     letter_1_shape.push_back(num_letter_);
     letternum_1_pred_.Reshape(letter_1_shape);
-    letternum_1_pred_.CopyFrom(*bottom[2]);
+    //letternum_1_pred_.CopyFrom(*bottom[2]);
   } else if (letternum_1_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     //letter_1_shape.push_back(1);
     letter_1_shape.push_back(batch_size_);
@@ -447,7 +453,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_1_gt_.Reshape(letter_1_shape);
     letternum_1_pred_.Reshape(letter_1_shape);
     /************************************************/
-    letternum_1_pred_.CopyFrom(*bottom[2]);
+    //letternum_1_pred_.CopyFrom(*bottom[2]);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -466,6 +472,9 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       LOG(FATAL) << "Unknown conf loss type.";
     }
   }
+  Dtype* letternum_1_pred_data = letternum_1_pred_.mutable_cpu_data();
+  const Dtype* let_1_data = bottom[2]->cpu_data();
+  caffe_copy<Dtype>(bottom[2]->count(), let_1_data, letternum_1_pred_data);
   letternum_1_loss_layer_->Reshape(letternum_1_bottom_vec_, letternum_1_top_vec_);
   letternum_1_loss_layer_->Forward(letternum_1_bottom_vec_, letternum_1_top_vec_);
 
@@ -477,7 +486,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_2_gt_.Reshape(letter_2_shape);
     letter_2_shape.push_back(num_letter_);
     letternum_2_pred_.Reshape(letter_2_shape);
-    letternum_2_pred_.CopyFrom(*bottom[3]);
+    //letternum_2_pred_.CopyFrom(*bottom[3]);
   } else if (letternum_2_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     //letter_2_shape.push_back(1);
     letter_2_shape.push_back(batch_size_);
@@ -485,7 +494,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_2_gt_.Reshape(letter_2_shape);
     letternum_2_pred_.Reshape(letter_2_shape);
     /************************************************/
-    letternum_2_pred_.CopyFrom(*bottom[3]);
+    //letternum_2_pred_.CopyFrom(*bottom[3]);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -504,6 +513,9 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       LOG(FATAL) << "Unknown conf loss type.";
     }
   }
+  Dtype* letternum_2_pred_data = letternum_2_pred_.mutable_cpu_data();
+  const Dtype* let_2_data = bottom[3]->cpu_data();
+  caffe_copy<Dtype>(bottom[3]->count(), let_2_data, letternum_2_pred_data);
   letternum_2_loss_layer_->Reshape(letternum_2_bottom_vec_, letternum_2_top_vec_);
   letternum_2_loss_layer_->Forward(letternum_2_bottom_vec_, letternum_2_top_vec_);
 
@@ -515,7 +527,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_3_gt_.Reshape(letter_3_shape);
     letter_3_shape.push_back(num_letter_);
     letternum_3_pred_.Reshape(letter_3_shape);
-    letternum_3_pred_.CopyFrom(*bottom[4]);
+    //letternum_3_pred_.CopyFrom(*bottom[4]);
   } else if (letternum_3_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     //letter_3_shape.push_back(1);
     letter_3_shape.push_back(batch_size_);
@@ -523,7 +535,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_3_gt_.Reshape(letter_3_shape);
     letternum_3_pred_.Reshape(letter_3_shape);
     /************************************************/
-    letternum_3_pred_.CopyFrom(*bottom[4]);
+    //letternum_3_pred_.CopyFrom(*bottom[4]);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -542,6 +554,9 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       LOG(FATAL) << "Unknown conf loss type.";
     }
   }
+  Dtype* letternum_3_pred_data = letternum_3_pred_.mutable_cpu_data();
+  const Dtype* let_3_data = bottom[4]->cpu_data();
+  caffe_copy<Dtype>(bottom[4]->count(), let_3_data, letternum_3_pred_data);
   letternum_3_loss_layer_->Reshape(letternum_3_bottom_vec_, letternum_3_top_vec_);
   letternum_3_loss_layer_->Forward(letternum_3_bottom_vec_, letternum_3_top_vec_);
 
@@ -553,7 +568,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_4_gt_.Reshape(letter_4_shape);
     letter_4_shape.push_back(num_letter_);
     letternum_4_pred_.Reshape(letter_4_shape);
-    letternum_4_pred_.CopyFrom(*bottom[5]);
+    //letternum_4_pred_.CopyFrom(*bottom[5]);
   } else if (letternum_4_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     //letter_4_shape.push_back(1);
     letter_4_shape.push_back(batch_size_);
@@ -561,7 +576,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_4_gt_.Reshape(letter_4_shape);
     letternum_4_pred_.Reshape(letter_4_shape);
     /************************************************/
-    letternum_4_pred_.CopyFrom(*bottom[5]);
+    //letternum_4_pred_.CopyFrom(*bottom[5]);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -580,6 +595,9 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       LOG(FATAL) << "Unknown conf loss type.";
     }
   }
+  Dtype* letternum_4_pred_data = letternum_4_pred_.mutable_cpu_data();
+  const Dtype* let_4_data = bottom[5]->cpu_data();
+  caffe_copy<Dtype>(bottom[5]->count(), let_4_data, letternum_4_pred_data);
   letternum_4_loss_layer_->Reshape(letternum_4_bottom_vec_, letternum_4_top_vec_);
   letternum_4_loss_layer_->Forward(letternum_4_bottom_vec_, letternum_4_top_vec_);
 
@@ -591,7 +609,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_5_gt_.Reshape(letter_5_shape);
     letter_5_shape.push_back(num_letter_);
     letternum_5_pred_.Reshape(letter_5_shape);
-    letternum_5_pred_.CopyFrom(*bottom[6]);
+    //letternum_5_pred_.CopyFrom(*bottom[6]);
   } else if (letternum_5_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     //letter_5_shape.push_back(1);
     letter_5_shape.push_back(batch_size_);
@@ -599,7 +617,7 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     letternum_5_gt_.Reshape(letter_5_shape);
     letternum_5_pred_.Reshape(letter_5_shape);
     /************************************************/
-    letternum_5_pred_.CopyFrom(*bottom[6]);
+    //letternum_5_pred_.CopyFrom(*bottom[6]);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -618,6 +636,9 @@ void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       LOG(FATAL) << "Unknown conf loss type.";
     }
   }
+  Dtype* letternum_5_pred_data = letternum_5_pred_.mutable_cpu_data();
+  const Dtype* let_5_data = bottom[6]->cpu_data();
+  caffe_copy<Dtype>(bottom[6]->count(), let_5_data, letternum_5_pred_data);
   letternum_5_loss_layer_->Reshape(letternum_5_bottom_vec_, letternum_5_top_vec_);
   letternum_5_loss_layer_->Forward(letternum_5_bottom_vec_, letternum_5_top_vec_);
 
