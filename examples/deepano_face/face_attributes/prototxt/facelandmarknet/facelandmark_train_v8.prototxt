@@ -44,7 +44,7 @@ layer {
     }
     data_param {
         source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_training_lmdb/"
-        batch_size: 64
+        batch_size: 32
         backend: LMDB
     }
 }

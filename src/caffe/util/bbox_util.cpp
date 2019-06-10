@@ -1155,7 +1155,33 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       bbox.set_size(bbox_size);
       (*all_gt_bboxes)[item_id][label].push_back(bbox);
     }
-  } 
+  }else if(attri_type ==AnnotatedDatum_AnnoataionAttriType_NORMALL){
+    all_gt_bboxes->clear();
+    for (int i = 0; i < num_gt; ++i) {
+      int start_idx = i * 8;
+      int item_id = gt_data[start_idx];
+      if (item_id == -1) {
+        break;
+      }
+      NormalizedBBox bbox;
+      int label = gt_data[start_idx + 1];
+      CHECK_NE(background_label_id, label)
+          << "Found background label in the dataset.";
+      bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
+      if (!use_difficult_gt && difficult) {
+        // Skip reading difficult ground truth.
+        continue;
+      }
+      bbox.set_xmin(gt_data[start_idx + 3]);
+      bbox.set_ymin(gt_data[start_idx + 4]);
+      bbox.set_xmax(gt_data[start_idx + 5]);
+      bbox.set_ymax(gt_data[start_idx + 6]);
+      bbox.set_difficult(difficult);
+      float bbox_size = BBoxSize(bbox);
+      bbox.set_size(bbox_size);
+      (*all_gt_bboxes)[item_id][label].push_back(bbox);
+    }
+  }
 }
 
 // Explicit initialization.
@@ -1906,6 +1932,27 @@ void GetDetectionResults(const Dtype* det_data, const int num_det,
       bbox.set_ymax(det_data[start_idx + 6]);
       bbox.mutable_faceattrib()->set_blur(det_data[start_idx + 7]);
       bbox.mutable_faceattrib()->set_occlusion(det_data[start_idx + 8]);
+      float bbox_size = BBoxSize(bbox);
+      bbox.set_size(bbox_size);
+      (*all_detections)[item_id][label].push_back(bbox);
+    }
+  }else if(attri_type ==DetectionEvaluateParameter_AnnoataionAttriType_NORMALL){
+    all_detections->clear();
+    for (int i = 0; i < num_det; ++i) {
+      int start_idx = i * 7;
+      int item_id = det_data[start_idx];
+      if (item_id == -1) {
+        continue;
+      }
+      int label = det_data[start_idx + 1];
+      CHECK_NE(background_label_id, label)
+          << "Found background label in the detection results.";
+      NormalizedBBox bbox;
+      bbox.set_score(det_data[start_idx + 2]);
+      bbox.set_xmin(det_data[start_idx + 3]);
+      bbox.set_ymin(det_data[start_idx + 4]);
+      bbox.set_xmax(det_data[start_idx + 5]);
+      bbox.set_ymax(det_data[start_idx + 6]);
       float bbox_size = BBoxSize(bbox);
       bbox.set_size(bbox_size);
       (*all_detections)[item_id][label].push_back(bbox);
