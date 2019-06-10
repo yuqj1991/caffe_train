@@ -780,7 +780,7 @@ layer {
 		pad: 1
 		kernel_size: 3
 		stride: 2
-		group: 128
+		#group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1391,7 +1391,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 128
+		#group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1524,7 +1524,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 128
+		#group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"

@@ -4,11 +4,11 @@ test_iter: 1500
 test_interval: 5000
 base_lr: 0.001
 display: 100
-max_iter: 400000
+max_iter: 600000
 lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.0001
-snapshot: 5000
+snapshot: 20000
 snapshot_prefix: "../snapshot/deepanoface_v6"
 solver_mode: CPU
 debug_info: false

@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 16
+		batch_size: 6
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -884,7 +884,7 @@ layer {
 		pad: 1
 		kernel_size: 3
 		stride: 2
-		group: 128
+		#group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1495,7 +1495,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 128
+		#group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1628,7 +1628,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 128
+		#group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
