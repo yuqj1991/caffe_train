@@ -1,5 +1,5 @@
-train_net: "../prototxt/deepano_light_ccpd_rec_train_v1.prototxt"
-test_net: "../prototxt/deepano_light_ccpd_rec_test_v1.prototxt"
+train_net: "../prototxt/deepano_ccpd_rec_train_v1.prototxt"
+test_net: "../prototxt/deepano_ccpd_rec_test_v1.prototxt"
 test_iter: 1500
 test_interval: 5000
 base_lr: 0.01
