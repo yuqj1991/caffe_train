@@ -290,11 +290,6 @@ const vector<Blob<Dtype>*>& top) {
     landmark_shape[1] =  batch_size_ *10;
     landmark_pred_.Reshape(landmark_shape);
     landmark_gt_.Reshape(landmark_shape);
-    Blob<Dtype> landmark_temp;
-    landmark_temp.ReshapeLike(*bottom[0]);
-    landmark_temp.CopyFrom(*bottom[0]);
-    landmark_temp.Reshape(landmark_shape);
-    landmark_pred_.CopyFrom(landmark_temp);
     Dtype* landmark_gt_data = landmark_gt_.mutable_cpu_data();
     for(int ii = 0; ii< batch_size_; ii++)
     {
@@ -310,6 +305,9 @@ const vector<Blob<Dtype>*>& top) {
         landmark_gt_data[ii*10+8] = face.y4() ;
         landmark_gt_data[ii*10+9] = face.y5() ;
     }
+    Dtype* landmark_pred_data = landmark_pred_.mutable_cpu_data();
+    const Dtype* pred_data = bottom[0]->cpu_data();
+    caffe_copy(batch_size_ *10, pred_data, landmark_pred_data);
     #if 0
     const Dtype* landmark_pred_data = landmark_pred_.cpu_data();
     for(int ii = 0; ii< 3; ii++)
@@ -339,13 +337,12 @@ const vector<Blob<Dtype>*>& top) {
         gender_gt_.Reshape(gender_shape);
         gender_shape.push_back(num_gender_);
         gender_pred_.Reshape(gender_shape);
-        gender_pred_.CopyFrom(*bottom[1]);
     } else if (gender_loss_type_ == MultiFaceLossParameter_AttriLossType_LOGISTIC) {
         gender_shape.push_back(batch_size_);
         gender_shape.push_back(num_gender_);
         gender_gt_.Reshape(gender_shape);
+        gender_pred_.Reshape(gender_shape);
         /************************************************/
-        gender_pred_.CopyFrom(*bottom[1]);
         
     } else {
         LOG(FATAL) << "Unknown gender confidence loss type.";
@@ -357,6 +354,9 @@ const vector<Blob<Dtype>*>& top) {
     {
         gender_gt_data[ii] = all_gender[ii];
     }
+    Dtype* gender_pred_data = gender_pred_.mutable_cpu_data();
+    const Dtype* gender_data = bottom[1]->cpu_data();
+    caffe_copy(batch_size_ *num_gender_, gender_data, gender_pred_data);
     #if 0
     const Dtype* gender_pred_data = gender_pred_.cpu_data();
     const Dtype* bottom_pred_data = bottom[1]->cpu_data();
@@ -387,7 +387,10 @@ const vector<Blob<Dtype>*>& top) {
         LOG(FATAL) << "Unknown glasses confidence loss type.";
     }
     //Dtype* conf_pred_data = conf_pred_.mutable_cpu_data();
-    glasses_pred_.CopyFrom(*bottom[2]);
+    Dtype* glasses_pred_data = glasses_pred_.mutable_cpu_data();
+    const Dtype* glasses_data = bottom[2]->cpu_data();
+    caffe_copy(batch_size_ *num_glasses_, glasses_data, glasses_pred_data);
+
     Dtype* glasses_gt_data = glasses_gt_.mutable_cpu_data();
     caffe_set(glasses_gt_.count(), Dtype(0), glasses_gt_data);
     for(int ii = 0; ii< batch_size_; ii++)
@@ -424,7 +427,9 @@ const vector<Blob<Dtype>*>& top) {
         LOG(FATAL) << "Unknown headpose confidence loss type.";
     }
     //Dtype* conf_pred_data = conf_pred_.mutable_cpu_data();
-    headpose_pred_.CopyFrom(*bottom[3]);
+    Dtype* head_pred_data = headpose_pred_.mutable_cpu_data();
+    const Dtype* headpose_data = bottom[3]->cpu_data();
+    caffe_copy(batch_size_ *num_headpose_, headpose_data, head_pred_data);
     Dtype* headpose_gt_data = headpose_gt_.mutable_cpu_data();
     caffe_set(headpose_gt_.count(), Dtype(0), headpose_gt_data);
     for(int ii = 0; ii< batch_size_; ii++)
