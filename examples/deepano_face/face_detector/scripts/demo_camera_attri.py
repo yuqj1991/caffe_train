@@ -13,6 +13,8 @@ def make_parser():
     parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
     parser.add_argument('--facemodel', type=str, required=True, help='.prototxt file for inference face landmarks')
     parser.add_argument('--faceweights', type=str, required=True, help='.caffemodel file for inference face landmarks weights')
+    parser.add_argument('--anglemodel', type=str, required=True, help='.prototxt file for inference face angle')
+    parser.add_argument('--angleweights', type=str, required=True, help='.caffemodel file for inference face angle weights')
     return parser
     
 
@@ -22,6 +24,8 @@ net_file= args.model
 caffe_model= args.weights
 face_file= args.facemodel
 face_model= args.faceweights
+angle_file= args.anglemodel
+angle_model= args.angleweights
 
 
 if not os.path.exists(caffe_model):
@@ -33,7 +37,8 @@ if not os.path.exists(net_file):
 caffe.set_mode_gpu();
 caffe.set_device(0);
 net = caffe.Net(net_file,caffe_model,caffe.TEST) 
-net2 = caffe.Net(face_file,face_model,caffe.TEST)  
+face_net = caffe.Net(face_file,face_model,caffe.TEST) 
+angle_net = caffe.Net(angle_file,angle_model,caffe.TEST)  
 
 CLASSES = ('background', 'face')
 blur_classes = ('clear', 'normal', 'heavy')
@@ -76,7 +81,6 @@ def postprocess(img, out):
 def postprocessface(img, out):   
     h = img.shape[0]
     w = img.shape[1]
-    print("w: %d, h: %d"%(w, h))
     facepoints = out['multiface_output'][0,0:10] * np.array([w, w, w, w, w, h, h, h, h, h])
     gender = out['multiface_output'][0,10:12]
     gender_index = np.argmax(gender)
@@ -110,28 +114,34 @@ def detect():
              y1 = max_(0, box[i][1] - 44/2)
              y2 = min_(box[i][3]+44/2, h)
              
-             print("x2 - x1: %d, y2 - y1: %d"%(x2 - x1, y2 - y1))
              p11 = (x1, y1)
              p22 = (x2, y2)
              
              ori_img = frame[y1:y2, x1:x2, :]
-             
+             ######face attributes
              oimg = preprocess(ori_img, (96, 96))
              oimg = oimg.astype(np.float32)
              oimg = oimg.transpose((2, 0, 1))
-             net2.blobs['data'].data[...] = oimg
-             out2 = net2.forward()
-             boxpoint, gender, glasses, headpose = postprocessface(ori_img, out2)
+             face_net.blobs['data'].data[...] = oimg
+             face_out = face_net.forward()
+             boxpoint, gender, glasses, headpose = postprocessface(ori_img, face_out)
+             #####face angles
+             angleImg = preprocess(ori_img, (48, 48))
+             angleImg = angleImg.astype(np.float32)
+             angleImg = angleImg.transpose((2, 0, 1))
+             angle_net.blobs['data'].data[...] = angleImg
+             angle_out = angle_net.forward()
+             yaw, pitch, roll = angle_out["conv6_angle"][0,0:3]*360
              for jj in range(5):
                  point = (boxpoint[jj], boxpoint[jj+5])
-                 print point
-                 cv2.circle(ori_img, point, 3,(0,0,213),-1)
+                 cv2.circle(ori_img, point, 3, (0,0,213), -1)
              cv2.rectangle(frame, p1, p2, (0,255,0))
-             cv2.rectangle(frame, p11, p22, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "%s:%.2f,  %s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i],blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
+             title = "%s:%.2f,face angle: yaw: %f, pitch: %f, roll: %f, %s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i], yaw, pitch, roll ,blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
+             print(title)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
-       cv2.imshow("facedetector", frame)
+       cv2.imshow("face", frame)
+       print("======split line=====")
        k = cv2.waitKey(30) & 0xff
        if k == 27 : 
           return False

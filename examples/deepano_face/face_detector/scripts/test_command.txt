@@ -1,6 +1,14 @@
 ===========================================demo_camera_attri.py======================================
 python demo_camera_attri.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v9.prototxt --faceweights ../../face_attributes/snapshot/deepanoFacelandmark_v9_iter_800000.caffemodel
 
+python demo_camera_attri.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v6.prototxt --faceweights ../../face_attributes/snapshot/deepanoFacelandmark_v6_iter_480000.caffemodel
+
+python eval_image_attri.py --model ../prototxt/facelandmarknet/facelandmark_deploy_v5.prototxt --weights ../snapshot/deepanoFacelandmark_v5_iter_800000.caffemodel
+
+python demo_camera_attri.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v5.prototxt --faceweights ../../face_attributes/snapshot/deepanoFacelandmark_v5_iter_800000.caffemodel --anglemodel ../../face_attributes/prototxt/faceanglenet/faceanglenet_deploy_v1.prototxt --angleweights ../../face_attributes/snapshot/deepanoFaceangle_v1_iter_1200000.caffemodel
+
+python demo_camera_attri.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v9.prototxt --faceweights ../../face_attributes/snapshot/deepanoFacelandmark_v9_iter_800000.caffemodel --anglemodel ../../face_attributes/prototxt/faceanglenet/faceanglenet_deploy_v1.prototxt --angleweights ../../face_attributes/snapshot/deepanoFaceangle_v1_iter_1200000.caffemodel
+
 ===========================================demo_camera.py============================================
 python demo_camera.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel
 
