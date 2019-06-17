@@ -25,7 +25,7 @@ def generate_list(imageSetDir):
 				if imgline =='':
 					break
 				imgname =imgline.split('/')[-1].strip()
-				xmlline_ = root_dataset+imgname.split('.')[0]+'_angle.txt'
+				xmlline_ = root_dataset+imgname.split('.')[0]+'.txt'
 				xmlline = os.path.abspath(xmlline_) + '\n'
 				newline = imgline.strip()+' '+xmlline
 				#print(newline)
