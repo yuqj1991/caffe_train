@@ -810,7 +810,6 @@ layer {
 	bottom: "conv6_angle_fds"
 	top: "conv6_angle_fds"
 }
-
 layer {
 	name: "conv6_angle"
 	type: "InnerProduct"

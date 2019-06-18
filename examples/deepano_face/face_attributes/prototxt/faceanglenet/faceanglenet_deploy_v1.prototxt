@@ -762,7 +762,7 @@ layer {
 	name: "conv6_angle_fds"
 	type: "InnerProduct"
 	bottom: "conv_5_3_2"
-	top: "conv6_angle"
+	top: "conv6_angle_fds"
 	param {
 		lr_mult: 1
 		decay_mult: 1
@@ -789,7 +789,6 @@ layer {
 	bottom: "conv6_angle_fds"
 	top: "conv6_angle_fds"
 }
-
 layer {
 	name: "conv6_angle"
 	type: "InnerProduct"

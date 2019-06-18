@@ -977,9 +977,9 @@ bool ReadFaceAngleTxtToAnnotatedDatum(const string& labelfile, const int height,
     sstr >> yaw >> pitch >> roll;
     LOG(INFO)<< " "<< yaw <<" "<< pitch <<" "<< roll;
     AnnoFacePoseOritation* faceOri = anno_datum->mutable_faceangle();
-    faceOri->set_yaw(float(yaw/360));
-    faceOri->set_pitch(float(pitch/360));
-    faceOri->set_roll(float(roll/360));
+    faceOri->set_yaw(float(yaw/180));
+    faceOri->set_pitch(float(pitch/180));
+    faceOri->set_roll(float(roll/180));
     sstr.clear();
   }
   infile.close();

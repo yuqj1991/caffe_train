@@ -1,31 +1,9 @@
 name: "deepano_face_landmarknet"
-layer {
-  name: "data"
-  type: "faceAnnoData"
-  top: "data"
-  top: "label"
-  include {
-		phase: TEST
-  }
-    transform_param {
-	    scale: 0.007843
-	    mean_value: 127.5
-	    mean_value: 127.5
-	    mean_value: 127.5
-	    resize_param {
-		    prob: 1.0
-		    resize_mode: WARP
-		    height: 96
-		    width: 96
-		    interp_mode: LINEAR
-	    }
-    }
-    data_param {
-		source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_testing_lmdb/"
-		batch_size: 4
-		backend: LMDB
-	}
-}
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 96
+input_dim: 96
 layer {
     name: "convpre_12"
     type: "Convolution"
@@ -787,11 +765,161 @@ layer {
 	bottom: "convpre_eltesize_1_1"
 	top: "convpre_eltesize_1_1"
 }
+####
+layer {
+    name: "convpre_4_attri"
+    type: "Convolution"
+    bottom: "convpre_3_1/eltwise"
+    top: "convpre_4_attri"
+    param {
+        lr_mult: 1
+        decay_mult: 1
+    }
+    param {
+        lr_mult: 2
+        decay_mult: 1
+    }
+    convolution_param {
+        num_output: 128
+        kernel_size: 3
+        stride: 1
+        pad: 0
+        weight_filler {
+            type: "xavier"
+        }
+        bias_filler {
+            type: "constant"
+            value: 0
+        }
+    }
+}
 
+layer {
+	name: "convpre_4_attri/bn"
+	type: "BatchNorm"
+	bottom: "convpre_4_attri"
+	top: "convpre_4_attri"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "convpre_4_attri/scale"
+	type: "Scale"
+	bottom: "convpre_4_attri"
+	top: "convpre_4_attri"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "convpre_4_attri/relu"
+	type: "ReLU"
+	bottom: "convpre_4_attri"
+	top: "convpre_4_attri"
+}
+layer {
+  name: "conv_5_1_attri"
+  type: "Convolution"
+  bottom: "convpre_4_attri"
+  top: "conv_5_1_attri"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 3
+    stride: 2
+    pad: 1
+     weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv_5_1_attri/bn"
+	type: "BatchNorm"
+	bottom: "conv_5_1_attri"
+	top: "conv_5_1_attri"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv_5_1_attri/scale"
+	type: "Scale"
+	bottom: "conv_5_1_attri"
+	top: "conv_5_1_attri"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv_5_1_attri/relu"
+	type: "ReLU"
+	bottom: "conv_5_1_attri"
+	top: "conv_5_1_attri"
+}
 
 layer{
     name: "convpre_eltesize_1/eltwise"
 	type: "Eltwise"
+	bottom: "conv_5_1_attri"
 	bottom: "convpre_eltesize_1_1"
 	bottom: "conv_5"
 	top: "conv_5_eltsize"
@@ -1263,160 +1391,9 @@ layer {
 
 ####
 layer {
-    name: "convpre_4_attri"
-    type: "Convolution"
-    bottom: "convpre_3_1/eltwise"
-    top: "convpre_4_attri"
-    param {
-        lr_mult: 1
-        decay_mult: 1
-    }
-    param {
-        lr_mult: 2
-        decay_mult: 1
-    }
-    convolution_param {
-        num_output: 128
-        kernel_size: 3
-        stride: 1
-        pad: 0
-        weight_filler {
-            type: "xavier"
-        }
-        bias_filler {
-            type: "constant"
-            value: 0
-        }
-    }
-}
-
-layer {
-	name: "convpre_4_attri/bn"
-	type: "BatchNorm"
-	bottom: "convpre_4_attri"
-	top: "convpre_4_attri"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "convpre_4_attri/scale"
-	type: "Scale"
-	bottom: "convpre_4_attri"
-	top: "convpre_4_attri"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "convpre_4_attri/relu"
-	type: "ReLU"
-	bottom: "convpre_4_attri"
-	top: "convpre_4_attri"
-}
-layer {
-  name: "conv_5_1_attri"
-  type: "Convolution"
-  bottom: "convpre_4_attri"
-  top: "conv_5_1_attri"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 1
-  }
-  convolution_param {
-    num_output: 256
-    kernel_size: 3
-    stride: 2
-    pad: 0
-     weight_filler {
-      type: "xavier"
-	}
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-	name: "conv_5_1_attri/bn"
-	type: "BatchNorm"
-	bottom: "conv_5_1_attri"
-	top: "conv_5_1_attri"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv_5_1_attri/scale"
-	type: "Scale"
-	bottom: "conv_5_1_attri"
-	top: "conv_5_1_attri"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv_5_1_attri/relu"
-	type: "ReLU"
-	bottom: "conv_5_1_attri"
-	top: "conv_5_1_attri"
-}
-
-####
-layer {
   name: "conv_5_2_attri"
   type: "Convolution"
-  bottom: "conv_5_1_attri"
+  bottom: "conv_5_eltsize"
   top: "conv_5_2_attri"
   param {
     lr_mult: 1
@@ -1504,7 +1481,7 @@ layer {
     decay_mult: 1
   }
   convolution_param {
-    num_output: 512
+    num_output: 128
     kernel_size: 3
     stride: 2
     pad: 0
@@ -1566,9 +1543,255 @@ layer {
 }
 ####
 layer {
+  name: "conv_5_2_1_attri"
+  type: "Convolution"
+  bottom: "conv_5_eltsize"
+  top: "conv_5_2_1_attri"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 5
+    stride: 2
+    pad: 0
+     weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv_5_2_1_attri/bn"
+	type: "BatchNorm"
+	bottom: "conv_5_2_1_attri"
+	top: "conv_5_2_1_attri"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv_5_2_1_attri/scale"
+	type: "Scale"
+	bottom: "conv_5_2_1_attri"
+	top: "conv_5_2_1_attri"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv_5_2_1_attri/relu"
+	type: "ReLU"
+	bottom: "conv_5_2_1_attri"
+	top: "conv_5_2_1_attri"
+}
+####
+layer {
+  name: "conv_5_3_1_attri"
+  type: "Convolution"
+  bottom: "conv_5_2_1_attri"
+  top: "conv_5_3_1_attri"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 3
+    stride: 1
+    pad: 1
+     weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv_5_3_1_attri/bn"
+	type: "BatchNorm"
+	bottom: "conv_5_3_1_attri"
+	top: "conv_5_3_1_attri"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv_5_3_1_attri/scale"
+	type: "Scale"
+	bottom: "conv_5_3_1_attri"
+	top: "conv_5_3_1_attri"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv_5_3_1_attri/relu"
+	type: "ReLU"
+	bottom: "conv_5_3_1_attri"
+	top: "conv_5_3_1_attri"
+}
+####
+
+layer {
+    name: "conv_5_eltsize/pool"
+    type: "Pooling"
+    bottom: "conv_5_eltsize"
+    top: "conv_5_eltsize/pool"
+    pooling_param {
+        pool: MAX
+        kernel_size: 2
+        stride: 2
+    }
+}
+layer {
+  name: "conv_5_3_2_attri"
+  type: "Convolution"
+  bottom: "conv_5_eltsize/pool"
+  top: "conv_5_3_2_attri"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 3
+    stride: 2
+    pad: 1
+     weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv_5_3_2_attri/bn"
+	type: "BatchNorm"
+	bottom: "conv_5_3_2_attri"
+	top: "conv_5_3_2_attri"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv_5_3_2_attri/scale"
+	type: "Scale"
+	bottom: "conv_5_3_2_attri"
+	top: "conv_5_3_2_attri"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv_5_3_2_attri/relu"
+	type: "ReLU"
+	bottom: "conv_5_3_2_attri"
+	top: "conv_5_3_2_attri"
+}
+
+layer {
+	name: "inception_a2_concat"
+	type: "Concat"
+	bottom: "conv_5_3_attri"
+	bottom: "conv_5_3_1_attri"
+	bottom: "conv_5_3_2_attri"
+	top: "inception_a2_concat"
+}
+####
+layer {
   name: "conv_5_4_attri"
   type: "Convolution"
-  bottom: "conv_5_3_attri"
+  bottom: "inception_a2_concat"
   top: "conv_5_4_attri"
   param {
     lr_mult: 1
@@ -1638,6 +1861,81 @@ layer {
 	type: "ReLU"
 	bottom: "conv_5_4_attri"
 	top: "conv_5_4_attri"
+}
+
+layer {
+  name: "conv_5_4_1_attri"
+  type: "Convolution"
+  bottom: "inception_a2_concat"
+  top: "conv_5_4_1_attri"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 3
+    stride: 2
+    pad: 0
+     weight_filler {
+      type: "xavier"
+	}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+	name: "conv_5_4_1_attri/bn"
+	type: "BatchNorm"
+	bottom: "conv_5_4_1_attri"
+	top: "conv_5_4_1_attri"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv_5_4_1_attri/scale"
+	type: "Scale"
+	bottom: "conv_5_4_1_attri"
+	top: "conv_5_4_1_attri"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv_5_4_1_attri/relu"
+	type: "ReLU"
+	bottom: "conv_5_4_1_attri"
+	top: "conv_5_4_1_attri"
 }
 
 ####
@@ -1735,7 +2033,7 @@ layer {
 layer {
   name: "conv6_glasses_fds_1"
   type: "InnerProduct"
-  bottom: "conv_5_4_attri"
+  bottom: "conv_5_4_1_attri"
   top: "conv6_glasses_fds_1"
   param {
     lr_mult: 1
@@ -2182,28 +2480,11 @@ layer {
   bottom: "conv6_glasses"
   bottom: "conv6_headpose"
   top: "multiface_output"
-  include {
-		phase: TEST
-	}
   concat_param {
 		axis: 1
   }
-}
-
-layer{
-    name: "faceeval_output"
-    type: "FaceEvaluate"
-    bottom: "multiface_output"
-    bottom: "label"
-    top: "faceeval_output"
-    include {
+  include {
 		phase: TEST
 	}
-    face_evaluate_param{
-        facetype: FACE_5_TYPE
-        facepoints: 5
-        num_gender: 2
-        num_glasses:2
-        num_headpose:5 
-    }
 }
+
