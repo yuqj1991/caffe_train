@@ -13,6 +13,8 @@ def make_parser():
     parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
     parser.add_argument('--facemodel', type=str, required=True, help='.prototxt file for inference face landmarks')
     parser.add_argument('--faceweights', type=str, required=True, help='.caffemodel file for inference face landmarks weights')
+    parser.add_argument('--anglemodel', type=str, required=True, help='.prototxt file for inference face angle')
+    parser.add_argument('--angleweights', type=str, required=True, help='.caffemodel file for inference face angle weights')
     return parser
     
 
@@ -22,6 +24,8 @@ net_file= args.model
 caffe_model= args.weights
 face_file= args.facemodel
 face_model= args.faceweights
+angle_file= args.anglemodel
+angle_model= args.angleweights
 
 
 if not os.path.exists(caffe_model):
@@ -34,6 +38,7 @@ caffe.set_mode_gpu();
 caffe.set_device(0);
 net = caffe.Net(net_file,caffe_model,caffe.TEST) 
 face_net = caffe.Net(face_file,face_model,caffe.TEST) 
+angle_net = caffe.Net(angle_file,angle_model,caffe.TEST)  
 
 CLASSES = ('background', 'face')
 blur_classes = ('clear', 'normal', 'heavy')
@@ -120,12 +125,19 @@ def detect():
              face_net.blobs['data'].data[...] = oimg
              face_out = face_net.forward()
              boxpoint, gender, glasses, headpose = postprocessface(ori_img, face_out)
+             #####face angles
+             angleImg = preprocess(ori_img, (48, 48))
+             angleImg = angleImg.astype(np.float32)
+             angleImg = angleImg.transpose((2, 0, 1))
+             angle_net.blobs['data'].data[...] = angleImg
+             angle_out = angle_net.forward()
+             yaw, pitch, roll = angle_out["conv6_angle"][0,0:3]*360
              for jj in range(5):
                  point = (boxpoint[jj], boxpoint[jj+5])
                  cv2.circle(ori_img, point, 3, (0,0,213), -1)
              cv2.rectangle(frame, p1, p2, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "%s:%.2f,%s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i], blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
+             title = "%s:%.2f,face angle: yaw: %f, pitch: %f, roll: %f, %s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i], yaw, pitch, roll ,blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
              print(title)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("face", frame)
