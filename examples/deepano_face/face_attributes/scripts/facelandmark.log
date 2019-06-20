@@ -10,6 +10,11 @@ eval_gender: 0.835598, eval_glass: 0.978940, eval_headpose: 0.721467
 left eye : 0.172908, right eye: 0.197722, nose : 0.173217, left cornor mouth: 0.158956, right cornor mouth: 0.165630
 eval_gender: 0.843071, eval_glass: 0.979620, eval_headpose: 0.726902
 left eye : 0.170446, right eye: 0.195646, nose : 0.186629, left cornor mouth: 0.161913, right cornor mouth: 0.172152
+2019.6.19
+v5 version
+eval_gender: 0.833560, eval_glass: 0.981658, eval_headpose: 0.737092
+left eye : 0.175055, right eye: 0.200845, nose : 0.159597, left cornor mouth: 0.174445, right cornor mouth: 0.173554
+v6 version
 
 
 

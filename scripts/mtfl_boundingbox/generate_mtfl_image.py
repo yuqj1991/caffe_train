@@ -21,45 +21,9 @@ annoImg_dir = '../../../dataset/facedata/mtfl/annoImage'
 root_dir = "../../../dataset/facedata/"
 anno_mtfl_dir = ['training.txt', 'testing.txt']
 
-class ConfigureHistogram(object):
-	def __init__(self):
-		self.count = 0
-		self.width = []
-		self.height = []
-		self.face_count = 0
-		self.face_width = []
-		self.face_height = []
-		self.face_blur = []
-		self.face_pose = []
-		self.face_occlusion = []
-		self.face_illumination = []
-		self.face_width_aspect_ratio = []
-
-	def face_append(self, width, height, blur, pose, occlusion, illumination):
-		self.face_count += 1
-		self.face_width.append(width)
-		self.face_height.append(height)
-		self.face_blur.append(blur)
-		self.face_pose.append(pose)
-		self.face_occlusion.append(occlusion)
-		self.face_illumination.append(illumination)
-
-	def face_specfic_append(self, width, height, blur, occlusion, aspect_ratio):
-		self.face_count += 1
-		self.face_width.append(width)
-		self.face_height.append(height)
-		self.face_blur.append(blur)
-		self.face_occlusion.append(occlusion)
-		self.face_width_aspect_ratio.append(aspect_ratio)
-
-	def image_append(self, img_width, img_height):
-		self.count += 1
-		self.width.append(img_width)
-		self.height.append(img_height)
-
 
 # generate label txt file for each image
-def convert_src_anno_label(split_file, args,  pnet, rnet, onet, minsize, threshold, factor):
+def convert_src_anno_label(split_file, args, pnet, rnet, onet, minsize, threshold, factor):
 	mainSetFile = open(root_dir+ "mtfl/ImageSets/Main/" +str(split_file.split("/")[-1]), "w")
 	with open(split_file, 'r') as label_file:
 		while True:
@@ -72,8 +36,6 @@ def convert_src_anno_label(split_file, args,  pnet, rnet, onet, minsize, thresho
 			source_img = cv2.imread(img_file)
 			assert source_img.shape[2]==3
 			fullImg = os.path.abspath(img_file) + '\n'
-			
-			
 			if 1:
 				print("##################################")
 				print("imgfile path: ", img_file)

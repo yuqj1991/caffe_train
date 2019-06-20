@@ -560,8 +560,8 @@ void Solver<Dtype>::TestDetectionFACE(const int test_net_id) {
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
     LOG(INFO) << "Test net output #" << i << ": map of " << output_name << " = "
-              << mAP << ", blur accuracy: "<< float(all_num_pos_blur/all_det_num)
-              << ", occlussion accuracy: "<< float(all_num_pos_occlu/all_det_num);
+              << mAP << ", blur accuracy: "<< all_num_pos_blur/num_pos.size()
+              << ", occlussion accuracy: "<< all_num_pos_occlu/num_pos.size();
   }
 }
 
