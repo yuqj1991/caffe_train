@@ -106,6 +106,7 @@ class Solver {
   void TestDetectionFACE(const int test_net_id = 0);
   void TestDetection(const int test_net_id = 0);
   void TestRecoFaceAttri(const int test_net_id = 0);
+  void TestRecoFaceAngle(const int test_net_id = 0);
   void TestRecoccpdNumber(const int test_net_id = 0);
   virtual void SnapshotSolverState(const string& model_filename) = 0;
   virtual void RestoreSolverStateFromHDF5(const string& state_file) = 0;

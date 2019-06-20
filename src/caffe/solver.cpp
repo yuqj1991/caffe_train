@@ -352,6 +352,8 @@ void Solver<Dtype>::TestAll() {
       TestRecoFaceAttri(test_net_id);
     }else if (param_.eval_type() == "Rec_ccpd") {
       TestRecoccpdNumber(test_net_id);
+    }else if (param_.eval_type() == "faceangle") {
+      TestRecoFaceAngle(test_net_id);
     }else {
       LOG(FATAL) << "Unknown evaluation type: " << param_.eval_type();
     }
@@ -738,6 +740,54 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
              <<" headpose : "<<headpose_presicon
              <<" headpose accuracy: "<<headpose_presicon/total_images;
              
+  if (requested_early_exit_) {
+    LOG(INFO)     << "Test interrupted.";
+    return;
+  }
+}
+
+template <typename Dtype>
+void Solver<Dtype>::TestRecoFaceAngle(const int test_net_id) {
+  CHECK(Caffe::root_solver());
+  LOG(INFO) << "Iteration " << iter_
+            << ", Testing net (#" << test_net_id << ")";
+  CHECK_NOTNULL(test_nets_[test_net_id].get())->
+      ShareTrainedLayersWith(net_.get());
+  const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
+  Dtype pitch_precision =0.0, yaw_presion=0.0, roll_presicon=0.0;
+  int batch_size =0;
+  for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
+    SolverAction::Enum request = GetRequestedAction();
+    // Check to see if stoppage of testing/training has been requested.
+    while (request != SolverAction::NONE) {
+        if (SolverAction::SNAPSHOT == request) {
+          Snapshot();
+        } else if (SolverAction::STOP == request) {
+          requested_early_exit_ = true;
+        }
+        request = GetRequestedAction();
+    }
+    if (requested_early_exit_) {
+      // break out of test loop.
+      break;
+    }
+    Dtype iter_loss;
+    const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
+    for (int j = 0; j < result.size(); ++j) {
+      const Dtype* result_vec = result[j]->cpu_data();
+      batch_size = result[j]->height();
+      for(int ii = 0; ii<batch_size; ii++){
+          yaw_presion += result_vec[ii*4 + 1];
+          pitch_precision += result_vec[ii*4 + 2];
+          roll_presicon += result_vec[ii*4 + 3];
+      } 
+    }    
+  }
+  int total_images = param_.test_iter(test_net_id)* batch_size;
+  LOG(INFO) << "total_images: "<< total_images
+             <<" yaw accuracy: "<< yaw_presion/total_images
+             <<" pitch accuracy: "<< pitch_precision/total_images
+             <<" roll accuracy: "<< roll_presicon/total_images;      
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";
     return;

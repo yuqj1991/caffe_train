@@ -18,6 +18,6 @@ stepvalue: 300000
 stepvalue: 400000
 stepvalue: 600000
 stepvalue: 800000
-eval_type: "faceattri"
+eval_type: "faceangle"
 type: "RMSProp"
 momentum2: 0.99

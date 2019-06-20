@@ -168,14 +168,15 @@ void FaceEvaluateLayer<Dtype>::Forward_cpu(
     float correct_precisive_pitch =0;
     float correct_precisive_roll =0;
     for(int ii = 0; ii<batch_size; ii++){
-      correct_precisive_yaw += cosf((float(all_prediction_[ii][0]/360)*M_PI- float(all_gt_[ii][0]/360)*M_PI));
-      correct_precisive_pitch += cosf((float(all_prediction_[ii][1]/360)*M_PI - float(all_gt_[ii][1]/360)*M_PI));
-      correct_precisive_roll += cosf((float(all_prediction_[ii][2]/360)*M_PI - float(all_gt_[ii][2]/360)*M_PI));
+      correct_precisive_yaw = cos(double(all_prediction_[ii][0] - all_gt_[ii][0]));
+      correct_precisive_pitch = cos(double(all_prediction_[ii][1] - all_gt_[ii][1]));
+      correct_precisive_roll = cos(double(all_prediction_[ii][2] - all_gt_[ii][2]));
+      top_data[ii* 4 + 0]=float(0);
+      top_data[ii* 4 + 1]=float(correct_precisive_yaw);
+      top_data[ii* 4 + 2]=float(correct_precisive_pitch);
+      top_data[ii* 4 + 3]=float(correct_precisive_roll);
     }
-    top_data[0]=float(0/batch_size);
-    top_data[1]=float(correct_precisive_yaw/batch_size);
-    top_data[2]=float(correct_precisive_pitch/batch_size);
-    top_data[3]=float(correct_precisive_roll/batch_size);
+    
   }
 }
 
