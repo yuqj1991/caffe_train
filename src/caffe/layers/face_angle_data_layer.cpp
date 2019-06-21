@@ -215,9 +215,9 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             int idx = 0;
             for (int item_id = 0; item_id < batch_size; ++item_id) {
                 AnnoFacePoseOritation face = all_anno[item_id];
-                top_label[idx++] = face.yaw()*180;
-                top_label[idx++] = face.pitch()*180;
-                top_label[idx++] = face.roll()*180;
+                top_label[idx++] = face.yaw();
+                top_label[idx++] = face.pitch();
+                top_label[idx++] = face.roll();
             }
         } else {
             LOG(FATAL) << "Unknown annotation type.";
