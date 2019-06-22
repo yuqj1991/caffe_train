@@ -149,7 +149,6 @@ layer {
         use_global_stats: false
     }
 }
-
 layer {
     bottom: "conv1"
     top: "conv1"
@@ -159,7 +158,6 @@ layer {
         bias_term: true
     }
 }
-
 layer {
     bottom: "conv1"
     top: "conv1"
@@ -206,6 +204,8 @@ layer {
         use_global_stats: false
     }
 }
+
+###########################conv2##############################
 
 layer {
     bottom: "res2a_branch1"
@@ -318,6 +318,7 @@ layer {
     type: "ReLU"
 }
 
+###############################
 
 layer {
     bottom: "res2a"
