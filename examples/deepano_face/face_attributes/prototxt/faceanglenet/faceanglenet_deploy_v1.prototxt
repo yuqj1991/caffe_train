@@ -709,12 +709,6 @@ layer {
 	}
 }
 layer {
-	name: "conv6_angle_fds/relu"
-	type: "PReLU"
-	bottom: "conv6_angle_fds"
-	top: "conv6_angle_fds"
-}
-layer {
 	name: "conv6_angle_fds2"
 	type: "InnerProduct"
 	bottom: "conv6_angle_fds"
@@ -738,12 +732,6 @@ layer {
 			value: 0
 		}
 	}
-}
-layer {
-	name: "conv6_angle_fds2/relu"
-	type: "PReLU"
-	bottom: "conv6_angle_fds2"
-	top: "conv6_angle_fds2"
 }
 layer {
 	name: "conv6_angle"

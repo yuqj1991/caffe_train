@@ -6,7 +6,6 @@ input_shape {
   dim: 64
   dim: 64
 }
-
 layer {
     bottom: "data"
     top: "conv1"
@@ -1044,9 +1043,59 @@ layer {
     type: "ReLU"
 }
 layer {
-	name: "conv6_angle"
+	name: "conv6_angle_fds"
 	type: "InnerProduct"
 	bottom: "res5b"
+	top: "conv6_angle"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 1
+	}
+	inner_product_param {
+		#kernel_size: 1
+		num_output: 256
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv6_angle_fds2"
+	type: "InnerProduct"
+	bottom: "conv6_angle_fds"
+	top: "conv6_angle"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 1
+	}
+	inner_product_param {
+		#kernel_size: 1
+		num_output: 64
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv6_angle"
+	type: "InnerProduct"
+	bottom: "conv6_angle_fds2"
 	top: "conv6_angle"
 	param {
 		lr_mult: 1
