@@ -54,7 +54,6 @@ def convert_src_anno_label(split_file, args, pnet, rnet, onet, minsize, threshol
 			y5 = float(img_file_info[11])
 			gender = img_file_info[12]
 			glass = img_file_info[14]
-			headpose = img_file_info[15]
 			x =[x1, x2, x3, x4, x5]
 			x_arrary = np.array(x)
 			x_max = x_arrary[np.argmax(x_arrary)]
@@ -110,7 +109,7 @@ def convert_src_anno_label(split_file, args, pnet, rnet, onet, minsize, threshol
 							cv2.imwrite(annoImg_dir+"/"+ "crop_"+ str(img_file.split("/")[-1]), crop_img)
 						labelFile = open(LABEL_DIR+'/'+fullImg.split("/")[-1].split(".")[0], "w")
 						landmark = str(x11) + " " + str(x22) + " " + str(x33) + " " + str(x44) \
-									+ " " + str(x55) + " " + str(y11) + " " + str(y22) + " " + str(y33) + " " + str(y44) + " " + str(y55) + " " + 										gender + " " + glass + " "+ headpose
+									+ " " + str(x55) + " " + str(y11) + " " + str(y22) + " " + str(y33) + " " + str(y44) + " " + str(y55) + " " + 										gender + " " + glass
 						labelFile.write(landmark)
 						labelFile.close()
 						mainSetFile.writelines(os.path.abspath(annoImg_dir+"/"+str(img_file.split("/")[-1]))+'\n')

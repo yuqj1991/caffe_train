@@ -56,10 +56,7 @@ def postprocess(img, out):
     gender_index = np.argmax(gender)
     glasses = out['multiface_output'][0, 12:14]
     glasses_index = np.argmax(glasses)
-    headpose = out['multiface_output'][0, 14:19]
-    headpose_index = np.argmax(headpose)
-    return (facepoints.astype(np.float32), gender_index, glasses_index,
-           headpose_index)
+    return (facepoints.astype(np.float32), gender_index, glasses_index)
 
 
 def detect(imgfile, labelpath):
@@ -72,7 +69,7 @@ def detect(imgfile, labelpath):
 
     net.blobs['data'].data[...] = img
     out = net.forward()
-    point, gender, glasses, headpose = postprocess(origimg, out)
+    point, gender, glasses = postprocess(origimg, out)
     sum_nmse = [0.0,0.0,0.0,0.0,0.0]
 
     correct_gender = False
@@ -96,13 +93,10 @@ def detect(imgfile, labelpath):
             y5 = float(labelInfo[9])
             gender_gt = int(labelInfo[10]) - 1
             glass_gt = int(labelInfo[11]) - 1
-            headpose_gt = int(labelInfo[12]) - 1
             if gender == gender_gt:
                 correct_gender = True
             if glasses == glass_gt:
                 correct_glasses = True
-            if headpose == headpose_gt:
-                correct_headpose = True
             x = [x1, x2, x3, x4, x5]
             y = [y1, y2, y3, y4, y5]
             intal_eye_w = float(pow((pow((x1-x2), 2) + pow((y1-y2), 2)), 0.5))
@@ -110,7 +104,7 @@ def detect(imgfile, labelpath):
                 sum_n = float(pow(pow((x[ii]-point[ii]), 2) + pow((y[ii]-point[ii+5]), 2), 0.5))
                 sum_nmse[ii] = sum_n/intal_eye_w
     labelfile_.close()
-    return sum_nmse, correct_gender, correct_glasses, correct_headpose
+    return sum_nmse, correct_gender, correct_glasses
 
 
 mtfl_eval_landmakrs = []
@@ -130,8 +124,6 @@ with open(val_list_file, 'r') as listfile_:
 			mtfl_eval_gender += 1
 		if glasses:
 			mtfl_eval_glass += 1
-		if headpose:
-			mtfl_eval_headpose += 1
 		num_image += 1
 
 # static
@@ -140,9 +132,8 @@ for nn in range(len(mtfl_eval_landmakrs)):
         sum_landmark[ii] += float(mtfl_eval_landmakrs[nn][ii]/num_image)
 eval_gender = float(mtfl_eval_gender/num_image)
 eval_glass = float(mtfl_eval_glass/num_image)
-eval_headpose = float(mtfl_eval_headpose/num_image)
 
-print ("eval_gender: %f, eval_glass: %f, eval_headpose: %f" % (eval_gender, eval_glass, eval_headpose))
+print ("eval_gender: %f, eval_glass: %f" % (eval_gender, eval_glass))
 print ("left eye : %f, right eye: %f, nose : %f, left cornor mouth: %f, right cornor mouth: %f" % (sum_landmark[0],
                                                                                                    sum_landmark[1],
                                                                                                    sum_landmark[2],

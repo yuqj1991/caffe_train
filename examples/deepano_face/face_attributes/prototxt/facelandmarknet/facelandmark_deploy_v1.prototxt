@@ -1800,169 +1800,6 @@ layer {
 
 ####
 layer {
-  name: "conv_5_3_3"
-  type: "Convolution"
-  bottom: "inception_a1_concat"
-  top: "conv_5_3_3"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 1
-  }
-  convolution_param {
-    num_output: 256
-    kernel_size: 1
-    stride: 1
-    pad: 0
-     weight_filler {
-      type: "xavier"
-	}
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-	name: "conv_5_3_3/bn"
-	type: "BatchNorm"
-	bottom: "conv_5_3_3"
-	top: "conv_5_3_3"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv_5_3_3/scale"
-	type: "Scale"
-	bottom: "conv_5_3_3"
-	top: "conv_5_3_3"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv_5_3_3/relu"
-	type: "ReLU"
-	bottom: "conv_5_3_3"
-	top: "conv_5_3_3"
-}
-layer {
-  name: "conv6_headpose_fds_1"
-  type: "InnerProduct"
-  bottom: "conv_5_3_3"
-  top: "conv6_headpose_fds_1"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 1
-  }
-  inner_product_param {
-  	#kernel_size: 1
-	num_output: 512
-    weight_filler {
-      type: "xavier"
-	}
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-	name: "conv6_headpose_fds_1/relu"
-	type: "ReLU"
-	bottom: "conv6_headpose_fds_1"
-	top: "conv6_headpose_fds_1"
-}
-layer {
-  name: "conv6_headpose_fds_2"
-  type: "InnerProduct"
-  bottom: "conv6_headpose_fds_1"
-  top: "conv6_headpose_fds_2"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 1
-  }
-  inner_product_param {
-  	#kernel_size: 1
-	num_output: 64
-    weight_filler {
-      type: "xavier"
-	}
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-	name: "conv6_headpose_fds_2/relu"
-	type: "ReLU"
-	bottom: "conv6_headpose_fds_2"
-	top: "conv6_headpose_fds_2"
-}
-layer {
-  name: "conv6_headpose"
-  type: "InnerProduct"
-  bottom: "conv6_headpose_fds_2"
-  top: "conv6_headpose"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 1
-  }
-  inner_product_param {
-    #kernel_size: 1
-	num_output: 5
-    weight_filler {
-      type: "xavier"
-	}
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-
-####
-layer {
   name: "conv_5_3_4"
   type: "Convolution"
   bottom: "inception_a1_concat"
@@ -2142,15 +1979,6 @@ layer {
 	    axis: 1
   }
 }
-layer {
-  name: "conv6_headpose"
-  type: "Softmax"
-  bottom: "conv6_headpose"
-  top: "conv6_headpose"
-  softmax_param {
-	    axis: 1
-  }
-}
 
 layer {
   name: "multiface_output"
@@ -2158,7 +1986,6 @@ layer {
   bottom: "conv6_landmark"
   bottom: "conv6_gender"
   bottom: "conv6_glasses"
-  bottom: "conv6_headpose"
   top: "multiface_output"
   concat_param {
 		axis: 1

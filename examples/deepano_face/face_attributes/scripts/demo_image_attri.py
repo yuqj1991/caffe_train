@@ -46,10 +46,7 @@ def postprocess(img, out):
     gender_index = np.argmax(gender)
     glasses = out['multiface_output'][0, 12:14]
     glasses_index = np.argmax(glasses)
-    headpose = out['multiface_output'][0, 14:19]
-    headpose_index = np.argmax(headpose)
-    return (facepoints.astype(np.int32), gender_index, glasses_index,
-           headpose_index)
+    return (facepoints.astype(np.int32), gender_index, glasses_index)
 
 def detect(imgfile):
     origimg = cv2.imread(imgfile)
@@ -60,12 +57,12 @@ def detect(imgfile):
 
     net.blobs['data'].data[...] = img
     out = net.forward()
-    box, gender, glasses, headpose = postprocess(origimg, out)
+    box, gender, glasses = postprocess(origimg, out)
     title =''
     for i in range(5):
        p1 = (box[i], box[i+5])
        cv2.circle(origimg, p1, 5,(0,0,213),-1)
-    title = "%s, %s, %s" % (gender_content[gender], glasses_content[glasses], headpose_content[headpose])
+    title = "%s, %s, %s" % (gender_content[gender], glasses_content[glasses])
     cv2.putText(origimg, title, (10,10), cv2.FONT_ITALIC, 0.3, (0, 255, 0), 1)
     print(title)
     cv2.imshow("facepose", origimg)

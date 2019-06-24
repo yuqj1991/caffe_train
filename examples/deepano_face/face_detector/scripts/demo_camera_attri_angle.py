@@ -124,7 +124,7 @@ def detect():
              oimg = oimg.transpose((2, 0, 1))
              face_net.blobs['data'].data[...] = oimg
              face_out = face_net.forward()
-             boxpoint, gender, glasses, headpose = postprocessface(ori_img, face_out)
+             boxpoint, gender, glasses = postprocessface(ori_img, face_out)
              #####face angles
              angleImg = preprocess(ori_img, (48, 48))
              angleImg = angleImg.astype(np.float32)
@@ -137,7 +137,7 @@ def detect():
                  cv2.circle(ori_img, point, 3, (0,0,213), -1)
              cv2.rectangle(frame, p1, p2, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "%s:%.2f,face angle: yaw: %f, pitch: %f, roll: %f, %s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i], yaw, pitch, roll ,blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
+             title = "%s:%.2f,face angle: yaw: %f, pitch: %f, roll: %f, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i], yaw, pitch, roll ,blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses)
              print(title)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("face", frame)

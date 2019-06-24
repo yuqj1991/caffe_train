@@ -560,8 +560,6 @@ void DataTransformer<Dtype>::TransformAnnoFace(
 		annolandface->CopyFrom(*face);
 		transformed_annoface_all->set_gender(src_annoface.gender());
 		transformed_annoface_all->set_glasses(src_annoface.glasses());
-		transformed_annoface_all->set_headpose(src_annoface.headpose());
-
 	}
 
 }

@@ -999,15 +999,15 @@ bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
   LOG(INFO)<<labelfile;
   float x1, x2, x3, x4, x5, y1, y2, y3, y4, y5;
   float x11, x22, x33, x44, x55, y11, y22, y33, y44, y55;
-  int gender, headPose;
+  int gender;
   int glass;
   while (std::getline(infile, lineStr )) {
     sstr << lineStr;
     sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5
-          >> gender >> glass >> headPose;
+          >> gender >> glass;
     #if 0
     LOG(INFO)<< x1 <<" "<< x2 <<" "<< x3 <<" "<< x4 <<" " << x5 <<" "<< y1 <<" "<< y2 <<" "
-             << y3 <<" "<< y4 <<" "<< y5 <<" "<< gender <<" "<< glass <<" "<< headPose;
+             << y3 <<" "<< y4 <<" "<< y5 <<" "<< gender <<" "<< glass;
     #endif
     AnnotationFace* anno = NULL;
     anno = anno_datum->mutable_annoface();
@@ -1043,7 +1043,6 @@ bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
     LandmarkFace* landface = anno->mutable_markface();
     anno->set_gender(gender - 1);
     anno->set_glasses(glass -1);
-    anno->set_headpose(headPose -1);
     x11 = float(x1/width);y11 = float(y1/height);
     x22 = float(x2/width);y22 = float(y2/height);
     x33 = float(x3/width);y33 = float(y3/height);
@@ -1051,7 +1050,7 @@ bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
     x55 = float(x5/width);y55 = float(y5/height);
     #if 1
     LOG(INFO)<< x11 <<" "<< x22 <<" "<< x33 <<" "<< x44 <<" " << x55 <<" "<< y11 <<" "<< y22 <<" "
-             << y33 <<" "<< y44 <<" "<< y55 <<" "<< gender <<" "<< glass <<" "<< headPose;
+             << y33 <<" "<< y44 <<" "<< y55 <<" "<< gender <<" "<< glass;
     #endif
     landface->set_x1(x11);
     landface->set_x2(x22);

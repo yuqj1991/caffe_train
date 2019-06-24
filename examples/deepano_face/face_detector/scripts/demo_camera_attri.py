@@ -81,9 +81,7 @@ def postprocessface(img, out):
     gender_index = np.argmax(gender)
     glasses = out['multiface_output'][0,12:14]
     glasses_index = np.argmax(glasses)
-    headpose = out['multiface_output'][0,14:19]
-    headpose_index = np.argmax(headpose)
-    return (facepoints.astype(np.int32), gender_content[gender_index], glasses_content[glasses_index], headpose_content[headpose_index])
+    return (facepoints.astype(np.int32), gender_content[gender_index], glasses_content[glasses_index])
 
 
 def detect():
@@ -119,13 +117,13 @@ def detect():
              oimg = oimg.transpose((2, 0, 1))
              face_net.blobs['data'].data[...] = oimg
              face_out = face_net.forward()
-             boxpoint, gender, glasses, headpose = postprocessface(ori_img, face_out)
+             boxpoint, gender, glasses = postprocessface(ori_img, face_out)
              for jj in range(5):
                  point = (boxpoint[jj], boxpoint[jj+5])
                  cv2.circle(ori_img, point, 3, (0,0,213), -1)
              cv2.rectangle(frame, p1, p2, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "%s:%.2f,%s, %s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i], blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses, headpose)
+             title = "%s:%.2f,%s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i], blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses)
              print(title)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("face", frame)

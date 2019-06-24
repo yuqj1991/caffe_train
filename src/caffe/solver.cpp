@@ -699,7 +699,7 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
   CHECK_NOTNULL(test_nets_[test_net_id].get())->
       ShareTrainedLayersWith(net_.get());
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
-  Dtype nme =0.0, gender_precision =0.0, glasses_presion=0.0, headpose_presicon=0.0;
+  Dtype nme =0.0, gender_precision =0.0, glasses_presion=0.0;
   int batch_size =0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
     SolverAction::Enum request = GetRequestedAction();
@@ -722,13 +722,11 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
       const Dtype* result_vec = result[j]->cpu_data();
       batch_size = result[j]->height();
       for(int ii = 0; ii<batch_size; ii++){
-        nme +=result_vec[ii*4 + 0];
-        if (result_vec[ii*4 + 1]==1)
+        nme +=result_vec[ii*3 + 0];
+        if (result_vec[ii*3 + 1]==1)
           gender_precision++;
-        if (result_vec[ii*4 + 2]==1)
+        if (result_vec[ii*3 + 2]==1)
           glasses_presion++;
-        if (result_vec[ii*4 + 3]==1)
-          headpose_presicon++;
       } 
     }    
   }
@@ -738,9 +736,7 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
              <<" gender : "<<gender_precision
              <<" gender accuracy: "<<gender_precision/total_images
              <<" glasses : "<<glasses_presion
-             <<" glasses accuracy: "<<glasses_presion/total_images
-             <<" headpose : "<<headpose_presicon
-             <<" headpose accuracy: "<<headpose_presicon/total_images;
+             <<" glasses accuracy: "<<glasses_presion/total_images;
              
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";

@@ -36,9 +36,8 @@ class MultiFaceLossLayer : public LossLayer<Dtype> {
   // bottom[0] stores the landmark predictions.
   // bottom[1] stores the gender predictions.
   // bottom[2] stores the glasses predictions.
-  // bottom[3] stores the headpose predictions.
-  // bottom[4] stores the groundtruth labels.
-  virtual inline int ExactNumBottomBlobs() const { return 5; }
+  // bottom[3] stores the groundtruth labels.
+  virtual inline int ExactNumBottomBlobs() const { return 4; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
@@ -92,25 +91,11 @@ class MultiFaceLossLayer : public LossLayer<Dtype> {
   // confidence loss.
   Blob<Dtype> glasses_loss_;
 
-  // The internal confidence category loss layer.
-  shared_ptr<Layer<Dtype> > headpose_loss_layer_;
-  AttriLossType headpose_loss_type_;
-  float headpose_weight_;
-  // bottom vector holder used in Forward function.
-  vector<Blob<Dtype>*> headpose_bottom_vec_;
-  // top vector holder used in Forward function.
-  vector<Blob<Dtype>*> headpose_top_vec_;
-  // blob which stores the confidence prediction.
-  Blob<Dtype> headpose_pred_;
-  // blob which stores the corresponding ground truth label.
-  Blob<Dtype> headpose_gt_;
-  // confidence loss.
-  Blob<Dtype> headpose_loss_;
+
 
   MultiFaceLossParameter multiface_loss_param_;
   int num_gender_;
   int num_glasses_;
-  int num_headpose_;
   int batch_size_;
   
   // How to normalize the loss.

@@ -64,14 +64,14 @@ void faceAnnoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
             // in a specific formate. In specific:
             // All landmarks  are stored in one spatial plane (# x1,...,x5; #y1,...,y5),which has five point 
             // and they are left eye, right eye, nose , left mouse endpoint, right mouse endpoint. And the labels formate:
-            // [item_id(image_id), x1,..,x5, y1,...,y5, gender, glasses, headpose]
+            // [item_id(image_id), x1,..,x5, y1,...,y5, gender, glasses]
             label_shape[0] = 1;
             label_shape[1] = 1;
             // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
             // cpu_data and gpu_data for consistent prefetch thread. Thus we make
             // sure there is at least one bbox.
             label_shape[2] = batch_size;
-            label_shape[3] = 14;
+            label_shape[3] = 13;
             } else {
             LOG(FATAL) << "Unknown annotation type.";
             }
@@ -208,7 +208,7 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             label_shape[1] = 1;
             // Reshape the label and store the annotation.
             label_shape[2] = batch_size;
-            label_shape[3] = 14;
+            label_shape[3] = 13;
             batch->label_.Reshape(label_shape);
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
@@ -227,16 +227,15 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.markface().y5();
                 top_label[idx++] = face.gender();
                 top_label[idx++] = face.glasses();
-                top_label[idx++] = face.headpose();
                 #if 0
-                LOG(INFO)<<" label point: "<<top_label[item_id*14]<<" "<<top_label[item_id*14+1]
-                            <<" "<<top_label[item_id*14+2]
-                            <<" "<<top_label[item_id*14+3]<<" "<<top_label[item_id*14+4]
-                            <<" "<<top_label[item_id*14+5]<<" "<<top_label[item_id*14+6]
-                            <<" "<<top_label[item_id*14+7]<<" "<<top_label[item_id*14+8]
-                            <<" "<<top_label[item_id*14+9]<<" "<<top_label[item_id*14+10]
-                            <<" "<<top_label[item_id*14+11]<<" "<<top_label[item_id*14+12]
-                            <<" "<<top_label[item_id*14+13];
+                LOG(INFO)<<" label point: "<<top_label[item_id*13]<<" "<<top_label[item_id*13+1]
+                            <<" "<<top_label[item_id*13+2]
+                            <<" "<<top_label[item_id*13+3]<<" "<<top_label[item_id*13+3]
+                            <<" "<<top_label[item_id*13+5]<<" "<<top_label[item_id*13+6]
+                            <<" "<<top_label[item_id*13+7]<<" "<<top_label[item_id*13+8]
+                            <<" "<<top_label[item_id*13+9]<<" "<<top_label[item_id*13+10]
+                            <<" "<<top_label[item_id*13+11]<<" "<<top_label[item_id*13+12]
+                            <<" "<<top_label[item_id*13+13];
                 #endif
             }
         } else {
