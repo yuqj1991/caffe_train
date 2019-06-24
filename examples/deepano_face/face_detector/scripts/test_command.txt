@@ -7,7 +7,7 @@ python eval_image_attri.py --model ../prototxt/facelandmarknet/facelandmark_depl
 
 python demo_camera_attri.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v1.prototxt --faceweights ../../face_attributes/snapshot/deepanoFacelandmark_v1_iter_1200000.caffemodel
 
-python demo_camera_attri_angle.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v1.prototxt --faceweights ../../face_attributes/snapshot/deepanoFacelandmark_v1_iter_1200000.caffemodel --anglemodel ../../face_attributes/prototxt/faceanglenet/faceanglenet_deploy_v1.prototxt --angleweights ../../face_attributes/snapshot/deepanoFaceangle_v1_iter_1200000.caffemodel
+python demo_camera_attri_angle.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v1.prototxt --faceweights ../../face_attributes/snapshot/deepanoFacelandmark_v1_iter_1200000.caffemodel --anglemodel ../../face_attributes/prototxt/faceanglenet/faceanglenet_deploy_v1.prototxt --angleweights ../../face_attributes/snapshot/deepanoFaceangle_v1_iter_800000.caffemodel
 
 ===========================================demo_camera.py============================================
 python demo_camera.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel

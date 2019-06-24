@@ -131,7 +131,7 @@ def detect():
              angleImg = angleImg.transpose((2, 0, 1))
              angle_net.blobs['data'].data[...] = angleImg
              angle_out = angle_net.forward()
-             yaw, pitch, roll = angle_out["conv6_angle"][0,0:3]*360
+             yaw, pitch, roll = angle_out["conv6_angle"][0,0:3]
              for jj in range(5):
                  point = (boxpoint[jj], boxpoint[jj+5])
                  cv2.circle(ori_img, point, 3, (0,0,213), -1)
