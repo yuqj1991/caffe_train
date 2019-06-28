@@ -160,47 +160,113 @@ void GenerateBatchSamples(const AnnotatedDatum& anno_datum,
   }
 }
 
-int compareMin(int value_a, int value_b){
+float compareMin(float value_a, float value_b){
   if(value_a >= value_b)
     return value_b;
   else
     return value_a;
 }
 
-void GenerateDataAnchorSamples(const AnnotatedDatum& anno_datum, 
-                                const vector<DataAnchorSampler>& data_anchor_samplers, 
-                                vector<float>* sampled_scaled, vector<int>* sample_index){
-  sampled_scaled->clear();
-  sample_index->clear();
+void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum, 
+                                const DataAnchorSampler& data_anchor_sampler,
+                                const vector<NormalizedBBox>& object_bboxes,
+                                int resized_height, int resized_width,
+                                NormalizedBBox* samplerbox){
+  vector<int>anchorScale;
+  int img_height = anno_datum.datum().height();
+  int img_width = anno_datum.datum().width();
+  anchorScale.clear();
+  for(int s = 0 ; s < data_anchor_sampler.scale_size(); s++){
+    anchorScale.push_back(data_anchor_sampler.scale(s));
+  }
+  int object_bbox_index = caffe_rng_rand() % object_bboxes.size();
+  const float xmin = object_bboxes[object_bbox_index].xmin()*img_width;
+  const float xmax = object_bboxes[object_bbox_index].xmax()*img_width;
+  const float ymin = object_bboxes[object_bbox_index].ymin()*img_height;
+  const float ymax = object_bboxes[object_bbox_index].ymax()*img_height;
+  float bbox_width = xmax - xmin;
+  float bbox_height = ymax - ymin;
+  int anchor_range_size = 0, anchor_choose_index = 0; 
+  float bbox_aera = bbox_height * bbox_width;
+  float scaleChoose = 0.0f;
+  for(int j = 0; j < anchorScale.size() -1; j++){
+    if(bbox_aera >= std::pow(anchorScale[j], 2) && bbox_aera < std::pow(anchorScale[j+1], 2))
+    {
+      anchor_range_size = j + 1;
+    }
+  }
+  if(bbox_aera > std::pow(anchorScale[anchorScale.size() - 2], 2))
+    anchor_range_size = anchorScale.size() - 2;
+  if(anchor_range_size==0){
+    anchor_choose_index = 0;
+  }else{
+    int target_bbox_index = caffe_rng_rand() % (anchor_range_size + 1);
+    anchor_choose_index = target_bbox_index % target_bbox_index;
+  }
+  if(anchor_choose_index == anchor_range_size){
+    float min_resize_val = anchorScale[anchor_choose_index] / 2;
+    float max_resize_val = compareMin((float)anchorScale[anchor_choose_index] * 2,
+                                                  2*std::sqrt(bbox_aera)) ;
+    caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
+  }else{
+    float min_resize_val = anchorScale[anchor_choose_index] / 2;
+    float max_resize_val = (float)anchorScale[anchor_choose_index] * 2;
+    caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
+  }
+  float sample_box_size = (float)bbox_width * resized_width / scaleChoose;
+  float width_offset_org = 0.0f, height_offset_org = 0.0f;
+  if(sample_box_size < std::max(anno_datum.datum().width(), anno_datum.datum().height())){
+    if(bbox_width <= sample_box_size){
+      caffe_rng_uniform(1, bbox_width + xmin - sample_box_size, xmin, &width_offset_org );
+    }else{
+      caffe_rng_uniform(1, xmin, bbox_width + xmin - sample_box_size, &width_offset_org);
+    }
+    if(bbox_height <= sample_box_size){
+      caffe_rng_uniform(1, ymin + bbox_height - sample_box_size, ymin, &height_offset_org);
+    }else{
+      caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_box_size, &height_offset_org);
+    }
+  }else{
+    caffe_rng_uniform(1, img_height-sample_box_size, 0.0f, &height_offset_org);
+    caffe_rng_uniform(1, img_width-sample_box_size, 0.0f, &width_offset_org);
+  }
+  int width_offset_ = std::floor(width_offset_org);
+  int height_offset_ = std::floor(height_offset_org);
+  float w_off = (float) width_offset_ / img_width;
+  float h_off = (float) height_offset_ / img_height;
+  samplerbox->set_xmin(w_off);
+  samplerbox->set_ymin(h_off);
+  samplerbox->set_xmax(w_off + float(sample_box_size/img_width));
+  samplerbox->set_ymax(h_off + float(sample_box_size/img_height));
+  
+}// func GenerateDataAnchorSamples
+
+void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
+                                const vector<DataAnchorSampler>& data_anchor_samplers,
+                                int resized_height, int resized_width, 
+                                vector<NormalizedBBox>* sampled_bboxes) {
+  sampled_bboxes->clear();
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
-  vector<int>anchorScale;
-  for(int i = 0; i < data_anchor_samplers.size(); i++){
-    anchorScale.clear();
-    for(int s = 0 ; s < data_anchor_samplers[i].scale_size(); s++){
-      anchorScale.push_back(data_anchor_samplers[i].scale(s));
-    }
-    if(data_anchor_samplers[i].use_original_image()){
-      int object_bbox_index = caffe_rng_rand() % object_bboxes.size();
-      float bbox_width = anno_datum.datum().width() * (object_bboxes[object_bbox_index].xmax() - 
-                                                        object_bboxes[object_bbox_index].xmin());
-      float bbox_height = anno_datum.datum().height()* (object_bboxes[object_bbox_index].ymax() - 
-                                                        object_bboxes[object_bbox_index].ymin());
-      int anchor_index = 0; 
-      float intersectBox_size = std::abs(anchorScale[0] - bbox_height) * std::abs(anchorScale[0] - bbox_width);
-      for(int j = 0; j < anchorScale.size(); j++){
-        if(intersectBox_size >= std::abs(anchorScale[j] - bbox_height) * std::abs(anchorScale[j] - bbox_width))
-        {
-          anchor_index = j;
+  for (int i = 0; i < data_anchor_samplers.size(); ++i) {
+    if (data_anchor_samplers[i].use_original_image()) {
+      int found = 0;
+      for (int j = 0; j < data_anchor_samplers[i].max_trials(); ++j) {
+        if (data_anchor_samplers[i].has_max_sample() &&
+            found >= data_anchor_samplers[i].max_sample()) {
+          break;
+        }
+        NormalizedBBox samplebox;
+        GenerateDataAnchorSample(anno_datum, data_anchor_samplers[i], object_bboxes, resized_height, 
+                                resized_width, &samplebox);
+        if (SatisfySampleConstraint(samplebox, object_bboxes,
+                                      data_anchor_samplers[i].sample_constraint())){
+          found++;
+          sampled_bboxes->push_back(samplebox);
         }
       }
-      int target_bbox_index = caffe_rng_rand() % compareMin(anchorScale.size()-1, anchor_index + 1);
-      int target_bbox_size = caffe_rng_rand() % (anchorScale[target_bbox_index]*3 / 2) 
-                                                  + 0.5 * anchorScale[target_bbox_index];
-      float scale_ori_image = (float) target_bbox_size / std::sqrt(bbox_width*bbox_height);
-      sampled_scaled->push_back(scale_ori_image);
-      sample_index->push_back(anchor_index);
     }
   }
 }
+
 }  // namespace caffe

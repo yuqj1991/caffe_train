@@ -226,23 +226,26 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     AnnotatedDatum* sampled_datum = NULL;
     bool has_sampled = false;
-    if (sampleProb > sampleProbilty_)
-    {
+    if (sampleProb > sampleProbilty_){
+      int resized_height = transform_param.resize_param().height();
+      int resized_width = transform_param.resize_param().width();
+      vector<NormalizedBBox> sampled_bboxes;
       if(data_anchor_samplers_.size() > 0){
-        vector<float>sampleScaled;
-        vector<int>sampleIndex;
-        GenerateDataAnchorSamples(*expand_datum, data_anchor_samplers_, 
-                                  &sampleScaled, &sampleIndex);
-        CHECK_EQ(sampleScaled.size(), sampleIndex.size());
-        int sample_rnd_index = caffe_rng_rand() % sampleScaled.size();
-        int target_index = sampleIndex[sample_rnd_index];
-        float target_scale = sampleScaled[sample_rnd_index];
-        sampled_datum = new AnnotatedDatum();
-        this->data_transformer_->ResizeImgDAS(*expand_datum, 
-            target_scale, target_index, 
-            sampled_datum);
-      }else
-      {
+        GenerateBatchDataAnchorSamples(*expand_datum, data_anchor_samplers_,
+                                resized_height, resized_width,
+                                &sampled_bboxes);
+        if(sampled_bboxes.size() > 0){
+          int sample_rnd_index = caffe_rng_rand() % sampled_bboxes.size();
+          sampled_datum = new AnnotatedDatum();
+          bool useDas = true;
+          this->data_transformer_->CropImage(*expand_datum,
+																			 sampled_bboxes[sample_rnd_index],
+																			 sampled_datum,
+																			 useDas);
+        }else{
+          sampled_datum = expand_datum;
+        }
+      }else{
         sampled_datum = expand_datum;
       }
     }else{

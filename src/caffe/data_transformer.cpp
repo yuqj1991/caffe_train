@@ -904,61 +904,37 @@ void DataTransformer<Dtype>::CropImage(const Datum& datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::ResizeImgDAS(const AnnotatedDatum& anno_datum, 
-                    float resize_scale, int selected_obj_index, 
-                    AnnotatedDatum* ResizeDas_datum){
-	// resized annotatedDatum
-	uint32_t resize_width = static_cast<uint32_t>(anno_datum.datum().width()*resize_scale);
-	uint32_t resize_height = static_cast<uint32_t>(anno_datum.datum().height()*resize_scale);
-	ResizeParameter param ;
-	param.set_resize_mode(ResizeParameter_Resize_mode_WARP);
-	param.set_height(resize_height);
-	param.set_width(resize_width);
-	if (anno_datum.datum().encoded()) {
-#ifdef USE_OPENCV
-		CHECK(!(param_.force_color() && param_.force_gray()))
-				<< "cannot set both force_color and force_gray";
-		cv::Mat cv_img;
-		if (param_.force_color() || param_.force_gray()) {
-		// If force_color then decode in color otherwise decode in gray.
-			cv_img = DecodeDatumToCVMat(anno_datum.datum(), param_.force_color());
-		} else {
-			cv_img = DecodeDatumToCVMatNative(anno_datum.datum());
-		}
-		// resize cv_img
-		cv::Mat resized_img = ApplyResizeNew(cv_img, param);
-		// Save the image into datum.
-		EncodeCVMatToDatum(resized_img, "jpg", ResizeDas_datum->mutable_datum());
-		// resized label bbox of annotation according to resize infomation
-		RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all= ResizeDas_datum->mutable_annotation_group();
-		for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
-			const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
-			AnnotationGroup transformed_anno_group;
-			for (int a = 0; a < anno_group.annotation_size(); ++a){
-				const Annotation& anno = anno_group.annotation(a);
-				const NormalizedBBox& bbox = anno.bbox();
-				NormalizedBBox resize_bbox = bbox;
-				UpdateBBoxByResizePolicy(param, anno_datum.datum().width(), anno_datum.datum().height(),
-											&resize_bbox);
+void DataTransformer<Dtype>::TransformDAS(const AnnotatedDatum& anno_datum, 
+                    const NormalizedBBox& crop_bbox,
+                    RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all){
+	for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
+		const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
+		AnnotationGroup transformed_anno_group;
+		bool has_valid_annotation = false;
+		for (int a = 0; a < anno_group.annotation_size(); ++a){
+			const Annotation& anno = anno_group.annotation(a);
+			const NormalizedBBox& bbox = anno.bbox();
+			NormalizedBBox resize_bbox = bbox;
+			if (param_.has_emit_constraint() &&
+			!MeetEmitConstraint(crop_bbox, resize_bbox,
+								param_.emit_constraint())) {
+				continue;
+			}
+			NormalizedBBox proj_bbox;
+			if(ProjectBBox(crop_bbox, resize_bbox, &proj_bbox)) {
+				has_valid_annotation = true;
 				Annotation* transformed_anno = transformed_anno_group.add_annotation();
 				transformed_anno->set_instance_id(anno.instance_id());
 				NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
-				transformed_bbox->CopyFrom(resize_bbox);
+				transformed_bbox->CopyFrom(proj_bbox);
 				transformed_bbox->mutable_faceattrib()->set_blur(bbox.faceattrib().blur());
 				transformed_bbox->mutable_faceattrib()->set_occlusion(bbox.faceattrib().occlusion());
 			}
+		}
+		if(has_valid_annotation){
 			transformed_anno_group.set_group_label(anno_group.group_label());
 			transformed_anno_group_all->Add()->CopyFrom(transformed_anno_group);
 		}
-		return ;
-#else
-		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
-#endif  // USE_OPENCV
-	} else {
-		if (param_.force_color() || param_.force_gray()) {
-			LOG(ERROR) << "force_color and force_gray only for encoded datum";
-		}
-		LOG(ERROR) << "this datum is need to be encode by opencv!";
 	}
 }
 
@@ -978,7 +954,27 @@ void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
 	NormalizedBBox crop_bbox;
 	ClipBBox(bbox, &crop_bbox);
 	TransformAnnotation(anno_datum, do_resize, crop_bbox, do_mirror,
-											cropped_anno_datum->mutable_annotation_group());
+										cropped_anno_datum->mutable_annotation_group());
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
+																			 const NormalizedBBox& bbox,
+																			 AnnotatedDatum* cropped_anno_datum,
+																			 bool useDas) {
+	// Crop the datum.
+	NormalizedBBox crop_bbox;
+	ClipBBox(bbox, &crop_bbox);
+	CropImage(anno_datum.datum(), crop_bbox, cropped_anno_datum->mutable_datum());
+	cropped_anno_datum->set_type(anno_datum.type());
+	cropped_anno_datum->set_attri_type(anno_datum.attri_type());
+	// Transform the annotation according to crop_bbox.
+	if(useDas){
+		TransformDAS(anno_datum, crop_bbox, cropped_anno_datum->mutable_annotation_group());
+	}else{
+		LOG(ERROR)<<"must make paramerter useDas true!";
+	}
+	
 }
 
 template<typename Dtype>

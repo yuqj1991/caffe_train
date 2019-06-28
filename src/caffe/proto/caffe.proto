@@ -124,6 +124,10 @@ message DataAnchorSampler {
 	optional bool use_original_image = 1 [default = true];
 	// anchor scale
 	repeated int32 scale = 2;
+	optional SampleConstraint sample_constraint = 3;
+	optional uint32 max_sample = 4;
+	// Maximum number of trials for sampling to avoid infinite loop.
+	optional uint32 max_trials = 5 [default = 100];
 
 }
 
