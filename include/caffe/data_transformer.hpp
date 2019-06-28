@@ -81,6 +81,11 @@ class DataTransformer {
                  Blob<Dtype>* transformed_blob,
                  vector<AnnotationGroup>* transformed_anno_vec);
 
+  void ResizeImgDAS(const AnnotatedDatum& anno_datum, 
+                    float resize_scale, int selected_obj_index, 
+                    AnnotatedDatum* ResizeDas_datum);
+
+
   /**
    * @brief Transform the annotation according to the transformation applied
    * to the datum.

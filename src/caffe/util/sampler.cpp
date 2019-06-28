@@ -160,4 +160,47 @@ void GenerateBatchSamples(const AnnotatedDatum& anno_datum,
   }
 }
 
+int compareMin(int value_a, int value_b){
+  if(value_a >= value_b)
+    return value_b;
+  else
+    return value_a;
+}
+
+void GenerateDataAnchorSamples(const AnnotatedDatum& anno_datum, 
+                                const vector<DataAnchorSampler>& data_anchor_samplers, 
+                                vector<float>* sampled_scaled, vector<int>* sample_index){
+  sampled_scaled->clear();
+  sample_index->clear();
+  vector<NormalizedBBox> object_bboxes;
+  GroupObjectBBoxes(anno_datum, &object_bboxes);
+  vector<int>anchorScale;
+  for(int i = 0; i < data_anchor_samplers.size(); i++){
+    anchorScale.clear();
+    for(int s = 0 ; s < data_anchor_samplers[i].scale_size(); s++){
+      anchorScale.push_back(data_anchor_samplers[i].scale(s));
+    }
+    if(data_anchor_samplers[i].use_original_image()){
+      int object_bbox_index = caffe_rng_rand() % object_bboxes.size();
+      float bbox_width = anno_datum.datum().width() * (object_bboxes[object_bbox_index].xmax() - 
+                                                        object_bboxes[object_bbox_index].xmin());
+      float bbox_height = anno_datum.datum().height()* (object_bboxes[object_bbox_index].ymax() - 
+                                                        object_bboxes[object_bbox_index].ymin());
+      int anchor_index = 0; 
+      float intersectBox_size = std::abs(anchorScale[0] - bbox_height) * std::abs(anchorScale[0] - bbox_width);
+      for(int j = 0; j < anchorScale.size(); j++){
+        if(intersectBox_size >= std::abs(anchorScale[j] - bbox_height) * std::abs(anchorScale[j] - bbox_width))
+        {
+          anchor_index = j;
+        }
+      }
+      int target_bbox_index = caffe_rng_rand() % compareMin(anchorScale.size()-1, anchor_index + 1);
+      int target_bbox_size = caffe_rng_rand() % (anchorScale[target_bbox_index]*3 / 2) 
+                                                  + 0.5 * anchorScale[target_bbox_index];
+      float scale_ori_image = (float) target_bbox_size / std::sqrt(bbox_width*bbox_height);
+      sampled_scaled->push_back(scale_ori_image);
+      sample_index->push_back(anchor_index);
+    }
+  }
+}
 }  // namespace caffe

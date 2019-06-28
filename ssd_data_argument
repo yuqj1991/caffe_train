@@ -11,3 +11,6 @@ BatchSampler: 由于这里选错图了，BatchSampler必须要有GT的存在才�
 Resize：放缩到300x300，最后将图片放缩到300x300，标签框也是线性放缩坐标而已。
 
 Crop：原本data_transformer还会crop的，这个参数是配在prototxt中，默认是原图 所以就和没crop一样。如果要crop的话标签也是会和之前BatchSampler那样处理。
+
+数据增强，data_anchor_sampler
+在一张图像中随机抽取一张sface

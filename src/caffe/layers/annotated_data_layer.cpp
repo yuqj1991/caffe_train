@@ -34,6 +34,10 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
   for (int i = 0; i < anno_data_param.batch_sampler_size(); ++i) {
     batch_samplers_.push_back(anno_data_param.batch_sampler(i));
   }
+  for (int i = 0; i < anno_data_param.data_anchor_sampler_size(); ++i){
+    data_anchor_samplers_.push_back(anno_data_param.data_anchor_sampler(i));
+  }
+  sampleProbilty_ = anno_data_param.sampleprob();
   label_map_file_ = anno_data_param.label_map_file();
   // Make sure dimension is consistent within batch.
   const TransformationParameter& transform_param =
@@ -163,6 +167,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // get a anno_datum
     AnnotatedDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
     read_time += timer.MicroSeconds();
+    float sampleProb = 0.0f;
+    caffe_rng_uniform(1, 0.0f, 1.0f, &sampleProb);
 #if 0
     int size_group = anno_datum.annotation_group_size();
     LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
@@ -220,23 +226,44 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     AnnotatedDatum* sampled_datum = NULL;
     bool has_sampled = false;
-    if (batch_samplers_.size() > 0) {
-      // Generate sampled bboxes from expand_datum.
-      vector<NormalizedBBox> sampled_bboxes;
-      GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
-      if (sampled_bboxes.size() > 0) {
-        // Randomly pick a sampled bbox and crop the expand_datum.
-        int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+    if (sampleProb > sampleProbilty_)
+    {
+      if(data_anchor_samplers_.size() > 0){
+        vector<float>sampleScaled;
+        vector<int>sampleIndex;
+        GenerateDataAnchorSamples(*expand_datum, data_anchor_samplers_, 
+                                  &sampleScaled, &sampleIndex);
+        CHECK_EQ(sampleScaled.size(), sampleIndex.size());
+        int sample_rnd_index = caffe_rng_rand() % sampleScaled.size();
+        int target_index = sampleIndex[sample_rnd_index];
+        float target_scale = sampleScaled[sample_rnd_index];
         sampled_datum = new AnnotatedDatum();
-        this->data_transformer_->CropImage(*expand_datum,
-                                           sampled_bboxes[rand_idx],
-                                           sampled_datum);
-        has_sampled = true;
+        this->data_transformer_->ResizeImgDAS(*expand_datum, 
+            target_scale, target_index, 
+            sampled_datum);
+      }else
+      {
+        sampled_datum = expand_datum;
+      }
+    }else{
+      if (batch_samplers_.size() > 0) {
+        // Generate sampled bboxes from expand_datum.
+        vector<NormalizedBBox> sampled_bboxes;
+        GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
+        if (sampled_bboxes.size() > 0) {
+          // Randomly pick a sampled bbox and crop the expand_datum.
+          int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+          sampled_datum = new AnnotatedDatum();
+          this->data_transformer_->CropImage(*expand_datum,
+                                            sampled_bboxes[rand_idx],
+                                            sampled_datum);
+          has_sampled = true;
+        } else {
+          sampled_datum = expand_datum;
+        }
       } else {
         sampled_datum = expand_datum;
       }
-    } else {
-      sampled_datum = expand_datum;
     }
     CHECK(sampled_datum != NULL);
     timer.Start();
@@ -273,8 +300,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         // Transform datum and annotation_group at the same time
         transformed_anno_vec.clear();
         this->data_transformer_->Transform(*sampled_datum,
-                                           &(this->transformed_data_),
-                                           &transformed_anno_vec);
+                                          &(this->transformed_data_),
+                                          &transformed_anno_vec);
         if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) {
           // Count the number of bboxes.
           for (int g = 0; g < transformed_anno_vec.size(); ++g) {
@@ -286,14 +313,14 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         all_anno[item_id] = transformed_anno_vec;
       } else {
         this->data_transformer_->Transform(sampled_datum->datum(),
-                                           &(this->transformed_data_));
+                                          &(this->transformed_data_));
         // Otherwise, store the label from datum.
         CHECK(sampled_datum->datum().has_label()) << "Cannot find any label.";
         top_label[item_id] = sampled_datum->datum().label();
       }
     } else {
       this->data_transformer_->Transform(sampled_datum->datum(),
-                                         &(this->transformed_data_));
+                                        &(this->transformed_data_));
     }
     // clear memory
     if (has_sampled) {

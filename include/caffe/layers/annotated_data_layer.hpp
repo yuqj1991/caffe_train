@@ -36,6 +36,8 @@ class AnnotatedDataLayer : public BasePrefetchingDataLayer<Dtype> {
   AnnotatedDatum_AnnotationType anno_type_;
   AnnotatedDatum_AnnoataionAttriType anno_attri_type_;
   vector<BatchSampler> batch_samplers_;
+  vector<DataAnchorSampler> data_anchor_samplers_;
+  float sampleProbilty_;
   string label_map_file_;
 };
 

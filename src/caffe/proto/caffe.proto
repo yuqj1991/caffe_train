@@ -116,6 +116,19 @@ message EmitConstraint {
   optional float emit_overlap = 2;
 }
 
+
+
+// data_anchor_sampler of bbox with provided constriants
+message DataAnchorSampler {
+	// Use original image as the source for sampling.
+	optional bool use_original_image = 1 [default = true];
+	// anchor scale
+	repeated int32 scale = 2;
+
+}
+
+
+
 message LicensePlate {
 	optional int32 chichracter = 1;
 	optional int32 engchracter = 2;
@@ -908,6 +921,8 @@ message AnnotatedDataParameter {
   // If provided, it will replace the AnnotationType stored in each
   // AnnotatedDatum.
   optional AnnotatedDatum.AnnotationType anno_type = 3;
+  repeated DataAnchorSampler data_anchor_sampler =4;
+  optional float sampleprob = 5[default=0.4];
 }
 
 message ArgMaxParameter {

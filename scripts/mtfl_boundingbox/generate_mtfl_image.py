@@ -131,7 +131,7 @@ def shuffle_file(filename):
 def parse_arguments(argv):
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--margin', type=int,
-		help='Margin for the crop around the bounding box (height, width) in pixels.', default=44)
+		help='Margin for the crop around the bounding box (height, width) in pixels.', default=66)
 	parser.add_argument('--gpu_memory_fraction', type=float,
 		help='Upper bound on the amount of GPU memory that will be used by the process.', default=0.1)
 	parser.add_argument('--detect_multiple_faces', type=bool,

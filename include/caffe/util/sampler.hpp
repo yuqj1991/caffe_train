@@ -34,6 +34,13 @@ void GenerateBatchSamples(const AnnotatedDatum& anno_datum,
                           const vector<BatchSampler>& batch_samplers,
                           vector<NormalizedBBox>* sampled_bboxes);
 
+// Generate samples by using data_anchor_samples
+// all sampled boxes which satisfy the constraints defined in DataAnchorSampler
+// is stored in sampled bboxes.
+void GenerateDataAnchorSamples(const AnnotatedDatum& anno_datum, 
+                                const vector<DataAnchorSampler>& data_anchor_samplers, 
+                                vector<float>* sampled_scaled, vector<int>* sample_index);
+
 }  // namespace caffe
 
 #endif  // CAFFE_UTIL_SAMPLER_H_

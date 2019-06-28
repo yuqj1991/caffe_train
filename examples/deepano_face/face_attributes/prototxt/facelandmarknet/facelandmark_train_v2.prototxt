@@ -62,9 +62,9 @@ layer {
         decay_mult: 1
     }
     convolution_param {
-        num_output: 64
+        num_output: 32
         kernel_size: 3
-        stride: 2
+        stride: 1
         pad: 0
         weight_filler {
             type: "xavier"
@@ -138,8 +138,8 @@ layer {
     convolution_param {
         num_output: 64
         kernel_size: 3
-        stride: 1
-        pad: 0
+        stride: 2
+        pad: 1
         weight_filler {
             type: "xavier"
         }
@@ -1676,9 +1676,9 @@ layer {
   }
   convolution_param {
     num_output: 256
-    kernel_size: 3
+    kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
      weight_filler {
       type: "xavier"
 	}
@@ -1744,8 +1744,8 @@ layer {
     top: "conv_5_eltsize/pool"
     pooling_param {
         pool: MAX
-        kernel_size: 2
-        stride: 2
+        kernel_size: 3
+        stride: 3
     }
 }
 layer {
@@ -1764,7 +1764,7 @@ layer {
   convolution_param {
     num_output: 128
     kernel_size: 3
-    stride: 2
+    stride: 1
     pad: 1
      weight_filler {
       type: "xavier"
