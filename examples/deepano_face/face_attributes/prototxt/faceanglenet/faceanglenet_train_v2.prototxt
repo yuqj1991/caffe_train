@@ -1,7 +1,7 @@
 name: "deepano_face_anglenet"
 layer {
 	name: "data"
-	type: "ccpdData"
+	type: "faceAngleData"
 	top: "data"
 	top: "label"
 	include {
@@ -16,16 +16,13 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 64
-			width: 64
+			height: 96
+			width: 96
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
 			interp_mode: CUBIC
 			interp_mode: LANCZOS4
-		}
-		emit_constraint {
-			emit_type: CENTER
 		}
 		distort_param {
 			brightness_prob: 0.5
@@ -39,10 +36,6 @@ layer {
 			saturation_lower: 0.5
 			saturation_upper: 1.5
 			random_order_prob: 0.0
-		}
-		expand_param {
-			prob: 0.5
-			max_expand_ratio: 2.0
 		}
 	}
 	data_param {
