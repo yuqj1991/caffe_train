@@ -959,9 +959,9 @@ void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
 
 template<typename Dtype>
 void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
-																			 const NormalizedBBox& bbox,
-																			 AnnotatedDatum* cropped_anno_datum,
-																			 bool useDas) {
+											const NormalizedBBox& bbox,
+											AnnotatedDatum* cropped_anno_datum,
+											bool useDas) {
 	// Crop the datum.
 	NormalizedBBox crop_bbox;
 	ClipBBox(bbox, &crop_bbox);
