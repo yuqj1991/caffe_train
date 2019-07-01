@@ -16,14 +16,14 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 512
-			width: 512
+			height: 1024
+			width: 1024
 			interp_mode: LINEAR
 		}
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
-		batch_size: 8
+		batch_size: 1
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -653,15 +653,15 @@ layer {
     type: "ReLU"
 }
 layer {
-  name: "res5a_priorbox"
+  name: "res4a_priorbox"
   type: "PriorBox"
-  bottom: "res5a"
+  bottom: "res4a"
   bottom: "data"
-  top: "res5a_priorbox"
+  top: "res4a_priorbox"
   prior_box_param {
+    fixed_size: 16
     fixed_size: 32
     fixed_size: 64
-    fixed_size: 128
     density: 4
     density: 2
     density: 1
@@ -675,10 +675,10 @@ layer {
 }
 
 layer {
-  name: "res5a_loc"
+  name: "res4a_loc"
   type: "Convolution"
-  bottom: "res5a"
-  top: "res5a_loc"
+  bottom: "res4a"
+  top: "res4a_loc"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -703,10 +703,10 @@ layer {
   }
 }
 layer {
-  name: "res5a_loc_perm"
+  name: "res4a_loc_perm"
   type: "Permute"
-  bottom: "res5a_loc"
-  top: "res5a_loc_perm"
+  bottom: "res4a_loc"
+  top: "res4a_loc_perm"
   permute_param {
     order: 0
     order: 2
@@ -715,20 +715,20 @@ layer {
   }
 }
 layer {
-  name: "res5a_loc_flat"
+  name: "res4a_loc_flat"
   type: "Flatten"
-  bottom: "res5a_loc_perm"
-  top: "res5a_loc_flat"
+  bottom: "res4a_loc_perm"
+  top: "res4a_loc_flat"
   flatten_param {
     axis: 1
   }
 }
 
 layer {
-  name: "res5a_conf"
+  name: "res4a_conf"
   type: "Convolution"
-  bottom: "res5a"
-  top: "res5a_conf"
+  bottom: "res4a"
+  top: "res4a_conf"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -753,10 +753,10 @@ layer {
   }
 }
 layer {
-  name: "res5a_conf_perm"
+  name: "res4a_conf_perm"
   type: "Permute"
-  bottom: "res5a_conf"
-  top: "res5a_conf_perm"
+  bottom: "res4a_conf"
+  top: "res4a_conf_perm"
   permute_param {
     order: 0
     order: 2
@@ -765,20 +765,20 @@ layer {
   }
 }
 layer {
-  name: "res5a_conf_flat"
+  name: "res4a_conf_flat"
   type: "Flatten"
-  bottom: "res5a_conf_perm"
-  top: "res5a_conf_flat"
+  bottom: "res4a_conf_perm"
+  top: "res4a_conf_flat"
   flatten_param {
     axis: 1
   }
 }
 
 layer {
-	name: "res5a_blur"
+	name: "res4a_blur"
 	type: "Convolution"
-	bottom: "res5a"
-	top: "res5a_blur"
+	bottom: "res4a"
+	top: "res4a_blur"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
@@ -800,10 +800,10 @@ layer {
 	}
 }
 layer {
-	name: "res5a_blur_perm"
+	name: "res4a_blur_perm"
 	type: "Permute"
-	bottom: "res5a_blur"
-	top: "res5a_blur_perm"
+	bottom: "res4a_blur"
+	top: "res4a_blur_perm"
 	permute_param {
 		order: 0
 		order: 2
@@ -812,10 +812,10 @@ layer {
 	}
 }
 layer {
-	name: "res5a_blur_flat"
+	name: "res4a_blur_flat"
 	type: "Flatten"
-	bottom: "res5a_blur_perm"
-	top: "res5a_blur_flat"
+	bottom: "res4a_blur_perm"
+	top: "res4a_blur_flat"
 	flatten_param {
 		axis: 1
 	}
@@ -823,10 +823,10 @@ layer {
 
 
 layer {
-	name: "res5a_occlu"
+	name: "res4a_occlu"
 	type: "Convolution"
-	bottom: "res5a"
-	top: "res5a_occlu"
+	bottom: "res4a"
+	top: "res4a_occlu"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
@@ -848,10 +848,10 @@ layer {
 	}
 }
 layer {
-	name: "res5a_occlu_perm"
+	name: "res4a_occlu_perm"
 	type: "Permute"
-	bottom: "res5a_occlu"
-	top: "res5a_occlu_perm"
+	bottom: "res4a_occlu"
+	top: "res4a_occlu_perm"
 	permute_param {
 		order: 0
 		order: 2
@@ -860,10 +860,10 @@ layer {
 	}
 }
 layer {
-	name: "res5a_occlu_flat"
+	name: "res4a_occlu_flat"
 	type: "Flatten"
-	bottom: "res5a_occlu_perm"
-	top: "res5a_occlu_flat"
+	bottom: "res4a_occlu_perm"
+	top: "res4a_occlu_flat"
 	flatten_param {
 		axis: 1
 	}
@@ -1022,15 +1022,16 @@ layer {
   bottom: "data"
   top: "conv3_2_priorbox"
   prior_box_param {
-    fixed_size: 256
-    density: 1
-    step: 64
-    variance: 0.1
-    variance: 0.1
-    variance: 0.2
-    variance: 0.2
-    offset: 0.5
-  }
+	min_size: 128.0
+	max_size: 256.0
+	flip: true
+	clip: false
+	variance: 0.1
+	variance: 0.1
+	variance: 0.2
+	variance: 0.2
+	offset: 0.5
+ }
 }
 
 layer {
@@ -1047,7 +1048,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 4
+    num_output: 8
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1097,7 +1098,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 2
+    num_output: 4
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1147,7 +1148,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 3
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -1195,7 +1196,7 @@ layer {
 		decay_mult: 0.0
 	}
 	convolution_param {
-		num_output: 3
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -1591,7 +1592,7 @@ layer {
 layer {
   name: "mbox_priorbox"
   type: "Concat"
-  bottom: "res5a_priorbox"
+  bottom: "res4a_priorbox"
   bottom: "conv3_2_priorbox"
   bottom: "conv4_2_priorbox"
   top: "mbox_priorbox"
@@ -1603,7 +1604,7 @@ layer {
 layer {
   name: "mbox_loc"
   type: "Concat"
-  bottom: "res5a_loc_flat"
+  bottom: "res4a_loc_flat"
   bottom: "conv3_2_loc_flat"
   bottom: "conv4_2_loc_flat"
   top: "mbox_loc"
@@ -1616,7 +1617,7 @@ layer {
 layer {
   name: "mbox_conf"
   type: "Concat"
-  bottom: "res5a_conf_flat"
+  bottom: "res4a_conf_flat"
   bottom: "conv3_2_conf_flat"
   bottom: "conv4_2_conf_flat"
   top: "mbox_conf"
@@ -1627,7 +1628,7 @@ layer {
 layer {
   name: "mbox_blur"
   type: "Concat"
-  bottom: "res5a_blur_flat"
+  bottom: "res4a_blur_flat"
   bottom: "conv3_2_blur_flat"
   bottom: "conv4_2_blur_flat"
   top: "mbox_blur"
@@ -1639,7 +1640,7 @@ layer {
 layer {
   name: "mbox_occlu"
   type: "Concat"
-  bottom: "res5a_occlu_flat"
+  bottom: "res4a_occlu_flat"
   bottom: "conv3_2_occlu_flat"
   bottom: "conv4_2_occlu_flat"
   top: "mbox_occlu"
