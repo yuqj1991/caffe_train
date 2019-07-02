@@ -3671,7 +3671,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		pad: 1
 		kernel_size: 3
 		stride: 1
