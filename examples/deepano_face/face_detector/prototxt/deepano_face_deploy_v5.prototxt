@@ -4031,7 +4031,7 @@ layer {
 
 layer{
 	name: "conv4_3_lfpn/dec"
-	type: "DeConvolution"
+	type: "Deconvolution"
 	bottom: "conv4_3_lfpn"
 	top: "conv4_3_lfpn/dec"
 	param {
@@ -4573,7 +4573,7 @@ layer {
 
 layer{
 	name: "conv4_1/incep_lfpn/dec"
-	type: "DeConvolution"
+	type: "Deconvolution"
 	bottom: "conv4_1/incep_lfpn"
 	top: "conv4_1/incep_lfpn/dec"
 	param {
@@ -5042,7 +5042,7 @@ layer {
 
 layer{
 	name: "conv11_1_block2_lfpn/dec"
-	type: "DeConvolution"
+	type: "Deconvolution"
 	bottom: "conv11_1_block2_lfpn"
 	top: "conv11_1_block2_lfpn/dec"
 	param {
