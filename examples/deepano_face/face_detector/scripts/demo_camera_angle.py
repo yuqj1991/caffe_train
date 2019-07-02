@@ -96,7 +96,7 @@ def detect():
              
              ori_img = frame[y1:y2, x1:x2, :]     
              #####face angles
-             angleImg = preprocess(ori_img, (48, 48))
+             angleImg = preprocess(ori_img, (96, 96))
              angleImg = angleImg.astype(np.float32)
              angleImg = angleImg.transpose((2, 0, 1))
              angle_net.blobs['data'].data[...] = angleImg
