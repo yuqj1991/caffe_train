@@ -10,4 +10,4 @@ if ! test -f ../prototxt/faceanglenet/faceanglenet_test_v2.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=../solver/faceangle_solver_train_v2.prototxt -gpu 0 \
---snapshot=../snapshot/deepanoFaceangle_v2_iter_760446.solverstate
+--snapshot=../snapshot/deepanoFaceangle_v2_iter_778976.solverstate
