@@ -884,11 +884,11 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1017,11 +1017,11 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1160,11 +1160,11 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1293,11 +1293,11 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1436,11 +1436,11 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1569,11 +1569,11 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1846,7 +1846,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 1024
+		num_output: 512
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -2050,7 +2050,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 1024
+		num_output: 512
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
