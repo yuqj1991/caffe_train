@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 32
+		batch_size: 1
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -4104,7 +4104,7 @@ layer {
 }
 layer {
 	name: "mbox_loss"
-	type: "MultiBoxLoss"
+	type: "MultiBoxFaceLoss"
 	bottom: "mbox_loc"
 	bottom: "mbox_conf"
 	bottom: "mbox_priorbox"
