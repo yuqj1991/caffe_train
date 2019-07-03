@@ -5,7 +5,7 @@ import logging
 import math
 
 try:
-    caffe_root = '/home/stive/workspace/caffe_deeplearning_train/'
+    caffe_root = '../../../../../caffe_deeplearning_train/'
     sys.path.insert(0, caffe_root + 'python')
     import caffe
     from caffe.proto import caffe_pb2
