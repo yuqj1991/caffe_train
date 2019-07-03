@@ -43,7 +43,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 1
+		batch_size: 10
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -2270,7 +2270,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 192
+		num_output: 144
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -2344,7 +2344,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 192
+		num_output: 144
 		kernel_size: 4
 		stride: 2
 		pad: 1
