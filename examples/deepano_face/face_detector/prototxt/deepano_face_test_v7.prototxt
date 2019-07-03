@@ -52,50 +52,6 @@ layer {
   }
 }
 layer {
-  name: "Conv/bn"
-  type: "BatchNorm"
-  bottom: "Conv"
-  top: "Conv"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "Conv/scale"
-  type: "Scale"
-  bottom: "Conv"
-  top: "Conv"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "Conv/relu"
   type: "ReLU"
   bottom: "Conv"
@@ -118,50 +74,6 @@ layer {
     group: 32
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv/depthwise"
-  top: "conv/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv/depthwise/scale"
-  type: "Scale"
-  bottom: "conv/depthwise"
-  top: "conv/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -190,50 +102,6 @@ layer {
   }
 }
 layer {
-  name: "conv/project/bn"
-  type: "BatchNorm"
-  bottom: "conv/project"
-  top: "conv/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv/project/scale"
-  type: "Scale"
-  bottom: "conv/project"
-  top: "conv/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_1/expand"
   type: "Convolution"
   bottom: "conv/project"
@@ -248,50 +116,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_1/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_1/expand"
-  top: "conv_1/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_1/expand/scale"
-  type: "Scale"
-  bottom: "conv_1/expand"
-  top: "conv_1/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -323,50 +147,6 @@ layer {
   }
 }
 layer {
-  name: "conv_1/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_1/depthwise"
-  top: "conv_1/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_1/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_1/depthwise"
-  top: "conv_1/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_1/depthwise/relu"
   type: "ReLU"
   bottom: "conv_1/depthwise"
@@ -391,50 +171,6 @@ layer {
   }
 }
 layer {
-  name: "conv_1/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_1/project"
-  top: "conv_1/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_1/project/scale"
-  type: "Scale"
-  bottom: "conv_1/project"
-  top: "conv_1/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_2/expand"
   type: "Convolution"
   bottom: "conv_1/project"
@@ -449,50 +185,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_2/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_2/expand"
-  top: "conv_2/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_2/expand/scale"
-  type: "Scale"
-  bottom: "conv_2/expand"
-  top: "conv_2/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -523,50 +215,6 @@ layer {
   }
 }
 layer {
-  name: "conv_2/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_2/depthwise"
-  top: "conv_2/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_2/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_2/depthwise"
-  top: "conv_2/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_2/depthwise/relu"
   type: "ReLU"
   bottom: "conv_2/depthwise"
@@ -587,50 +235,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_2/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_2/project"
-  top: "conv_2/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_2/project/scale"
-  type: "Scale"
-  bottom: "conv_2/project"
-  top: "conv_2/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -656,50 +260,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_3/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_3/expand"
-  top: "conv_3/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_3/expand/scale"
-  type: "Scale"
-  bottom: "conv_3/expand"
-  top: "conv_3/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -731,50 +291,6 @@ layer {
   }
 }
 layer {
-  name: "conv_3/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_3/depthwise"
-  top: "conv_3/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_3/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_3/depthwise"
-  top: "conv_3/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_3/depthwise/relu"
   type: "ReLU"
   bottom: "conv_3/depthwise"
@@ -799,50 +315,6 @@ layer {
   }
 }
 layer {
-  name: "conv_3/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_3/project"
-  top: "conv_3/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_3/project/scale"
-  type: "Scale"
-  bottom: "conv_3/project"
-  top: "conv_3/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_4/expand"
   type: "Convolution"
   bottom: "conv_3/project"
@@ -857,50 +329,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_4/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_4/expand"
-  top: "conv_4/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_4/expand/scale"
-  type: "Scale"
-  bottom: "conv_4/expand"
-  top: "conv_4/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -931,50 +359,6 @@ layer {
   }
 }
 layer {
-  name: "conv_4/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_4/depthwise"
-  top: "conv_4/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_4/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_4/depthwise"
-  top: "conv_4/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_4/depthwise/relu"
   type: "ReLU"
   bottom: "conv_4/depthwise"
@@ -995,50 +379,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_4/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_4/project"
-  top: "conv_4/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_4/project/scale"
-  type: "Scale"
-  bottom: "conv_4/project"
-  top: "conv_4/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -1064,50 +404,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_5/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_5/expand"
-  top: "conv_5/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_5/expand/scale"
-  type: "Scale"
-  bottom: "conv_5/expand"
-  top: "conv_5/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -1138,50 +434,6 @@ layer {
   }
 }
 layer {
-  name: "conv_5/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_5/depthwise"
-  top: "conv_5/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_5/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_5/depthwise"
-  top: "conv_5/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_5/depthwise/relu"
   type: "ReLU"
   bottom: "conv_5/depthwise"
@@ -1202,50 +454,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_5/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_5/project"
-  top: "conv_5/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_5/project/scale"
-  type: "Scale"
-  bottom: "conv_5/project"
-  top: "conv_5/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -1271,50 +479,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_6/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_6/expand"
-  top: "conv_6/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_6/expand/scale"
-  type: "Scale"
-  bottom: "conv_6/expand"
-  top: "conv_6/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -1346,50 +510,6 @@ layer {
   }
 }
 layer {
-  name: "conv_6/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_6/depthwise"
-  top: "conv_6/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_6/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_6/depthwise"
-  top: "conv_6/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_6/depthwise/relu"
   type: "ReLU"
   bottom: "conv_6/depthwise"
@@ -1414,50 +534,6 @@ layer {
   }
 }
 layer {
-  name: "conv_6/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_6/project"
-  top: "conv_6/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_6/project/scale"
-  type: "Scale"
-  bottom: "conv_6/project"
-  top: "conv_6/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_7/expand"
   type: "Convolution"
   bottom: "conv_6/project"
@@ -1472,50 +548,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_7/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_7/expand"
-  top: "conv_7/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_7/expand/scale"
-  type: "Scale"
-  bottom: "conv_7/expand"
-  top: "conv_7/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -1546,50 +578,6 @@ layer {
   }
 }
 layer {
-  name: "conv_7/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_7/depthwise"
-  top: "conv_7/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_7/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_7/depthwise"
-  top: "conv_7/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_7/depthwise/relu"
   type: "ReLU"
   bottom: "conv_7/depthwise"
@@ -1610,50 +598,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_7/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_7/project"
-  top: "conv_7/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_7/project/scale"
-  type: "Scale"
-  bottom: "conv_7/project"
-  top: "conv_7/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -1679,50 +623,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_8/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_8/expand"
-  top: "conv_8/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_8/expand/scale"
-  type: "Scale"
-  bottom: "conv_8/expand"
-  top: "conv_8/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -1753,50 +653,6 @@ layer {
   }
 }
 layer {
-  name: "conv_8/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_8/depthwise"
-  top: "conv_8/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_8/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_8/depthwise"
-  top: "conv_8/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_8/depthwise/relu"
   type: "ReLU"
   bottom: "conv_8/depthwise"
@@ -1817,50 +673,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_8/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_8/project"
-  top: "conv_8/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_8/project/scale"
-  type: "Scale"
-  bottom: "conv_8/project"
-  top: "conv_8/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -1886,50 +698,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_9/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_9/expand"
-  top: "conv_9/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_9/expand/scale"
-  type: "Scale"
-  bottom: "conv_9/expand"
-  top: "conv_9/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -1960,50 +728,6 @@ layer {
   }
 }
 layer {
-  name: "conv_9/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_9/depthwise"
-  top: "conv_9/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_9/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_9/depthwise"
-  top: "conv_9/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_9/depthwise/relu"
   type: "ReLU"
   bottom: "conv_9/depthwise"
@@ -2024,50 +748,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_9/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_9/project"
-  top: "conv_9/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_9/project/scale"
-  type: "Scale"
-  bottom: "conv_9/project"
-  top: "conv_9/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -2093,50 +773,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_10/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_10/expand"
-  top: "conv_10/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_10/expand/scale"
-  type: "Scale"
-  bottom: "conv_10/expand"
-  top: "conv_10/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -2167,50 +803,6 @@ layer {
   }
 }
 layer {
-  name: "conv_10/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_10/depthwise"
-  top: "conv_10/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_10/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_10/depthwise"
-  top: "conv_10/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_10/depthwise/relu"
   type: "ReLU"
   bottom: "conv_10/depthwise"
@@ -2235,50 +827,6 @@ layer {
   }
 }
 layer {
-  name: "conv_10/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_10/project"
-  top: "conv_10/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_10/project/scale"
-  type: "Scale"
-  bottom: "conv_10/project"
-  top: "conv_10/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_11/expand"
   type: "Convolution"
   bottom: "conv_10/project"
@@ -2293,50 +841,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_11/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_11/expand"
-  top: "conv_11/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_11/expand/scale"
-  type: "Scale"
-  bottom: "conv_11/expand"
-  top: "conv_11/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -2367,50 +871,6 @@ layer {
   }
 }
 layer {
-  name: "conv_11/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_11/depthwise"
-  top: "conv_11/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_11/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_11/depthwise"
-  top: "conv_11/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_11/depthwise/relu"
   type: "ReLU"
   bottom: "conv_11/depthwise"
@@ -2431,50 +891,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_11/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_11/project"
-  top: "conv_11/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_11/project/scale"
-  type: "Scale"
-  bottom: "conv_11/project"
-  top: "conv_11/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -2500,50 +916,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_12/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_12/expand"
-  top: "conv_12/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_12/expand/scale"
-  type: "Scale"
-  bottom: "conv_12/expand"
-  top: "conv_12/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -2574,50 +946,6 @@ layer {
   }
 }
 layer {
-  name: "conv_12/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_12/depthwise"
-  top: "conv_12/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_12/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_12/depthwise"
-  top: "conv_12/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_12/depthwise/relu"
   type: "ReLU"
   bottom: "conv_12/depthwise"
@@ -2638,50 +966,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_12/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_12/project"
-  top: "conv_12/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_12/project/scale"
-  type: "Scale"
-  bottom: "conv_12/project"
-  top: "conv_12/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -2707,50 +991,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_13/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_13/expand"
-  top: "conv_13/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_13/expand/scale"
-  type: "Scale"
-  bottom: "conv_13/expand"
-  top: "conv_13/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -2782,50 +1022,6 @@ layer {
   }
 }
 layer {
-  name: "conv_13/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_13/depthwise"
-  top: "conv_13/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_13/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_13/depthwise"
-  top: "conv_13/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_13/depthwise/relu"
   type: "ReLU"
   bottom: "conv_13/depthwise"
@@ -2850,50 +1046,6 @@ layer {
   }
 }
 layer {
-  name: "conv_13/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_13/project"
-  top: "conv_13/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_13/project/scale"
-  type: "Scale"
-  bottom: "conv_13/project"
-  top: "conv_13/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_14/expand"
   type: "Convolution"
   bottom: "conv_13/project"
@@ -2908,50 +1060,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_14/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_14/expand"
-  top: "conv_14/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_14/expand/scale"
-  type: "Scale"
-  bottom: "conv_14/expand"
-  top: "conv_14/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -2982,50 +1090,6 @@ layer {
   }
 }
 layer {
-  name: "conv_14/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_14/depthwise"
-  top: "conv_14/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_14/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_14/depthwise"
-  top: "conv_14/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_14/depthwise/relu"
   type: "ReLU"
   bottom: "conv_14/depthwise"
@@ -3046,50 +1110,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_14/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_14/project"
-  top: "conv_14/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_14/project/scale"
-  type: "Scale"
-  bottom: "conv_14/project"
-  top: "conv_14/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -3115,50 +1135,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_15/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_15/expand"
-  top: "conv_15/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_15/expand/scale"
-  type: "Scale"
-  bottom: "conv_15/expand"
-  top: "conv_15/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -3189,50 +1165,6 @@ layer {
   }
 }
 layer {
-  name: "conv_15/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_15/depthwise"
-  top: "conv_15/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_15/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_15/depthwise"
-  top: "conv_15/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_15/depthwise/relu"
   type: "ReLU"
   bottom: "conv_15/depthwise"
@@ -3253,50 +1185,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_15/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_15/project"
-  top: "conv_15/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_15/project/scale"
-  type: "Scale"
-  bottom: "conv_15/project"
-  top: "conv_15/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -3322,50 +1210,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "conv_16/expand/bn"
-  type: "BatchNorm"
-  bottom: "conv_16/expand"
-  top: "conv_16/expand"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_16/expand/scale"
-  type: "Scale"
-  bottom: "conv_16/expand"
-  top: "conv_16/expand"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -3396,50 +1240,6 @@ layer {
   }
 }
 layer {
-  name: "conv_16/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "conv_16/depthwise"
-  top: "conv_16/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_16/depthwise/scale"
-  type: "Scale"
-  bottom: "conv_16/depthwise"
-  top: "conv_16/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "conv_16/depthwise/relu"
   type: "ReLU"
   bottom: "conv_16/depthwise"
@@ -3464,50 +1264,6 @@ layer {
   }
 }
 layer {
-  name: "conv_16/project/bn"
-  type: "BatchNorm"
-  bottom: "conv_16/project"
-  top: "conv_16/project"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "conv_16/project/scale"
-  type: "Scale"
-  bottom: "conv_16/project"
-  top: "conv_16/project"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "Conv_1"
   type: "Convolution"
   bottom: "conv_16/project"
@@ -3522,50 +1278,6 @@ layer {
     kernel_size: 1
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "Conv_1/bn"
-  type: "BatchNorm"
-  bottom: "Conv_1"
-  top: "Conv_1"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "Conv_1/scale"
-  type: "Scale"
-  bottom: "Conv_1"
-  top: "Conv_1"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }
@@ -3594,50 +1306,6 @@ layer {
   }
 }
 layer {
-  name: "layer_19_1_2/bn"
-  type: "BatchNorm"
-  bottom: "layer_19_1_2"
-  top: "layer_19_1_2"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "layer_19_1_2/scale"
-  type: "Scale"
-  bottom: "layer_19_1_2"
-  top: "layer_19_1_2"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
-    }
-  }
-}
-layer {
   name: "layer_19_1_2/relu"
   type: "ReLU"
   bottom: "layer_19_1_2"
@@ -3661,50 +1329,6 @@ layer {
     stride: 2
     weight_filler {
       type: "msra"
-    }
-  }
-}
-layer {
-  name: "layer_19_2_2/depthwise/bn"
-  type: "BatchNorm"
-  bottom: "layer_19_2_2/depthwise"
-  top: "layer_19_2_2/depthwise"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  batch_norm_param {
-    eps: 0.001
-  }
-}
-layer {
-  name: "layer_19_2_2/depthwise/scale"
-  type: "Scale"
-  bottom: "layer_19_2_2/depthwise"
-  top: "layer_19_2_2/depthwise"
-  param {
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  scale_param {
-    filler {
-      value: 1
-    }
-    bias_term: true
-    bias_filler {
-      value: 0
     }
   }
 }

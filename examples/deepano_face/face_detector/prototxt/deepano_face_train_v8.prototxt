@@ -287,7 +287,7 @@ layer {
 	bottom: "pool3"
 	top: "conv4_1"
 	convolution_param {
-	num_output: 512
+	num_output: 256
 		pad: 1
 		kernel_size: 3
 	}
@@ -304,7 +304,7 @@ layer {
 	bottom: "conv4_1"
 	top: "conv4_2"
 	convolution_param {
-	num_output: 512
+	num_output: 256
 		pad: 1
 		kernel_size: 3
 	}
@@ -321,7 +321,7 @@ layer {
 	bottom: "conv4_2"
 	top: "conv4_3"
 	convolution_param {
-	num_output: 512
+	num_output: 256
 	pad: 1
 	kernel_size: 3
 	}
@@ -349,7 +349,7 @@ layer {
 	bottom: "pool4"
 	top: "conv5_1"
 	convolution_param {
-	num_output: 512
+	num_output: 256
 		pad: 1
 		kernel_size: 3
 	}
@@ -366,7 +366,7 @@ layer {
 	bottom: "conv5_1"
 	top: "conv5_2"
 	convolution_param {
-	num_output: 512
+	num_output: 256
 	pad: 1
 	kernel_size: 3
 	}
@@ -383,7 +383,7 @@ layer {
 	bottom: "conv5_2"
 	top: "conv5_3"
 	convolution_param {
-	num_output: 512
+	num_output: 256
 		pad: 1
 		kernel_size: 3
 	}
@@ -517,7 +517,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -591,7 +591,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		kernel_size: 4
 		stride: 2
 		pad: 1
@@ -665,7 +665,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		kernel_size: 1
 		stride: 1
 		pad: 0
@@ -750,7 +750,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -759,6 +759,47 @@ layer{
 		}
 		bias_filler {
 			type: "constant"
+			value: 0
+		}
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3/bn"
+	type: "BatchNorm"
+	bottom: "lfpn_1_moudle_cpm_3_3"
+	top: "lfpn_1_moudle_cpm_3_3"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3/scale"
+	type: "Scale"
+	bottom: "lfpn_1_moudle_cpm_3_3"
+	top: "lfpn_1_moudle_cpm_3_3"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
 			value: 0
 		}
 	}
@@ -783,7 +824,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -792,6 +833,47 @@ layer{
 		}
 		bias_filler {
 			type: "constant"
+			value: 0
+		}
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3_one_channel/bn"
+	type: "BatchNorm"
+	bottom: "lfpn_1_moudle_cpm_3_3_one_channel"
+	top: "lfpn_1_moudle_cpm_3_3_one_channel"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3_one_channel/scale"
+	type: "Scale"
+	bottom: "lfpn_1_moudle_cpm_3_3_one_channel"
+	top: "lfpn_1_moudle_cpm_3_3_one_channel"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
 			value: 0
 		}
 	}
@@ -817,7 +899,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -826,6 +908,47 @@ layer{
 		}
 		bias_filler {
 			type: "constant"
+			value: 0
+		}
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3_two_channel/bn"
+	type: "BatchNorm"
+	bottom: "lfpn_1_moudle_cpm_3_3_two_channel"
+	top: "lfpn_1_moudle_cpm_3_3_two_channel"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3_two_channel/scale"
+	type: "Scale"
+	bottom: "lfpn_1_moudle_cpm_3_3_two_channel"
+	top: "lfpn_1_moudle_cpm_3_3_two_channel"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
 			value: 0
 		}
 	}
@@ -851,7 +974,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -936,7 +1059,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -1010,7 +1133,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		kernel_size: 4
 		stride: 2
 		pad: 1
@@ -1096,7 +1219,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -1170,7 +1293,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -1245,7 +1368,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -1320,7 +1443,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 1
