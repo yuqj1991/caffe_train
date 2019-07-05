@@ -8,7 +8,9 @@
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
-
+#ifdef USE_OPENCV
+#include <opencv2/opencv.hpp>
+#endif
 using google::protobuf::RepeatedPtrField;
 
 namespace caffe {
@@ -84,6 +86,10 @@ class DataTransformer {
   void TransformDAS(const AnnotatedDatum& anno_datum, 
                     const NormalizedBBox& crop_bbox,
                     RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all);
+
+  void RotateImage(const AnnoFaceDatum& anno_datum,
+												AnnoFaceDatum* Rotate_datum);
+
 
 
   /**
@@ -282,6 +288,20 @@ class DataTransformer {
   void TransformInv(const Blob<Dtype>* blob, vector<cv::Mat>* cv_imgs);
   void TransformInv(const Dtype* data, cv::Mat* cv_img, const int height,
                     const int width, const int channels);
+  vector<cv::Point2f> getRotatePoint(int row, 
+                    const vector<cv::Point2f> Points, 
+                    const cv::Point2f rotate_center, 
+                    const double angle);
+  void CropRotateImg(const int cols, const int rows, cv::Mat& dst , 
+                const double angle, const vector<cv::Point2f> Points , 
+                vector<cv::Point2f>* dstPoints);
+  cv::Mat RotateImage(const cv::Mat& img, const int rotate_angle
+                            );
+  void RotateImage(const Datum& datum,
+                            const double rotate_angle,
+                            Datum* Rotate_datum, 
+                            const vector<cv::Point2f> Points,
+                            vector<cv::Point2f>* dstPoints);
 #endif  // USE_OPENCV
 
   /**

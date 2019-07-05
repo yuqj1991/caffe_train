@@ -1605,8 +1605,8 @@ layer {
     glass_weight: 0.5
     num_gender: 2
     num_glasses: 2
-    conf_gender_loss_type: SOFTMAX
-    conf_glasses_loss_type: SOFTMAX
+    conf_gender_loss_type: SOFTMAX #LOGISTIC
+    conf_glasses_loss_type: SOFTMAX #LOGISTIC
   }
 }
 
