@@ -145,7 +145,7 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                     expand_datum = new AnnoFaceDatum();
                     this->data_transformer_->ExpandImage(*rotate_datum, expand_datum);
                 }else{
-                    expand_datum = rotate_datum;
+                    expand_datum->CopyFrom(*rotate_datum);
                 }
             }else{
                 if (transform_param.has_expand_param()) {
@@ -163,7 +163,7 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                     expand_datum = new AnnoFaceDatum();
                     this->data_transformer_->ExpandImage(*rotate_datum, expand_datum);
                 }else{
-                    expand_datum = rotate_datum;
+                    expand_datum->CopyFrom(*rotate_datum);
                 }
             }else{
                 if (transform_param.has_expand_param()) {
