@@ -41,10 +41,6 @@ layer {
 			prob: 0.5
 			max_expand_ratio: 2.0
 		}
-		rotate_param{
-			prob: 0.3
-			max_rotate_angle: 170
-		}
     }
     data_param {
         source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_training_lmdb/"
