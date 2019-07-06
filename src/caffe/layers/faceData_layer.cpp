@@ -140,14 +140,14 @@ void faceAnnoDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             if (transform_param.has_expand_param()) {
                 expand_datum = new AnnoFaceDatum();
                 this->data_transformer_->ExpandImage(distort_datum, expand_datum);
-            } else {
-                expand_datum = &distort_datum;
+            }else{
+                expand_datum =& distort_datum;
             }
         } else {
             if (transform_param.has_expand_param()) {
                 expand_datum = new AnnoFaceDatum();
                 this->data_transformer_->ExpandImage(anno_datum, expand_datum);
-            } else {
+            }else{
                 expand_datum = &anno_datum;
             }
         }

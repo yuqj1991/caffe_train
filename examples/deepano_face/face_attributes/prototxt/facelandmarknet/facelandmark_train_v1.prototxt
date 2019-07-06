@@ -39,7 +39,7 @@ layer {
 	    }
 	    expand_param {
 			prob: 0.5
-			max_expand_ratio: 4.0
+			max_expand_ratio: 2.0
 		}
     }
     data_param {
@@ -2030,8 +2030,8 @@ layer {
     glass_weight: 0.5
     num_gender: 2
     num_glasses: 2
-    conf_gender_loss_type: SOFTMAX
-    conf_glasses_loss_type: SOFTMAX
+    conf_gender_loss_type: SOFTMAX #LOGISTIC
+    conf_glasses_loss_type: SOFTMAX #LOGISTIC
   }
 }
 

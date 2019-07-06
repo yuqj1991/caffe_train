@@ -1124,6 +1124,121 @@ void DataTransformer<Dtype>::ExpandImage(const AnnoFaceDatum& anno_datum,
 }
 
 template<typename Dtype>
+void DataTransformer<Dtype>::RotateImage(const AnnoFaceDatum& anno_datum,
+												AnnoFaceDatum* Rotate_datum) {
+	if (!param_.has_rotate_param()) {
+		Rotate_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const RotateParameter& rotate_param = param_.rotate_param();
+	const float rotate_prob = rotate_param.prob();
+	float prob;
+	caffe_rng_uniform(1, 0.f, 1.f, &prob);
+	if (prob > rotate_prob) {
+		Rotate_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const double max_angle = rotate_param.max_rotate_angle();
+	if (max_angle < -180 && max_angle > 180) {
+		Rotate_datum->CopyFrom(anno_datum);
+		return;
+	}
+	double rotate_angle;
+	caffe_rng_uniform(1, -180.0, max_angle, &rotate_angle);
+	bool do_rotate = true;
+
+	const int img_height = anno_datum.datum().height();
+	const int img_width = anno_datum.datum().width();
+	int maxBorder =(int) (std::max(img_width, img_height)* 1.414 );
+	int dx = (maxBorder - img_width)/2;
+    int dy = (maxBorder - img_height)/2;
+	AnnotationFace src_annoface = anno_datum.annoface();
+	AnnotationFace* transformed_annoface_all = Rotate_datum->mutable_annoface();
+	LandmarkFace* face = src_annoface.mutable_markface();
+	vector<cv::Point2f> srcPoints;
+	vector<cv::Point2f> dstPoints;
+	if(anno_datum.type() == AnnoFaceDatum_AnnotationType_FACEMARK){
+		if(do_rotate){
+			float x1 = face->x1() * img_width +dx;
+			float x2 = face->x2() * img_width +dx;
+			float x3 = face->x3() * img_width +dx;
+			float x4 = face->x4() * img_width +dx;
+			float x5 = face->x5() * img_width +dx;
+			float y1 = face->y1() * img_height +dy;
+			float y2 = face->y2() * img_height +dy;
+			float y3 = face->y3() * img_height +dy;
+			float y4 = face->y4() * img_height +dy;
+			float y5 = face->y5() * img_height +dy;
+			srcPoints.push_back(cv::Point2f(x1, y1));
+			srcPoints.push_back(cv::Point2f(x2, y2));
+			srcPoints.push_back(cv::Point2f(x3, y3));
+			srcPoints.push_back(cv::Point2f(x4, y4));
+			srcPoints.push_back(cv::Point2f(x5, y5));
+			RotateImage(anno_datum.datum(), rotate_angle,
+							Rotate_datum->mutable_datum(), 
+										srcPoints, &dstPoints);
+			Rotate_datum->set_type(anno_datum.type());
+			const int Rot_height = Rotate_datum->datum().height();
+			const int Rot_width = Rotate_datum->datum().width();
+			face->set_x1((float) dstPoints.at(0).x / Rot_width);
+			face->set_x2((float) dstPoints.at(1).x / Rot_width);
+			face->set_x3((float) dstPoints.at(2).x / Rot_width);
+			face->set_x4((float) dstPoints.at(3).x / Rot_width);
+			face->set_x5((float) dstPoints.at(4).x / Rot_width);
+			face->set_y1((float) dstPoints.at(0).y / Rot_height);
+			face->set_y2((float) dstPoints.at(1).y / Rot_height);
+			face->set_y3((float) dstPoints.at(2).y / Rot_height);
+			face->set_y4((float) dstPoints.at(3).y / Rot_height);
+			face->set_y5((float) dstPoints.at(4).y / Rot_height);
+		}
+		LandmarkFace* annolandface = transformed_annoface_all->mutable_markface();
+		annolandface->CopyFrom(*face);
+		transformed_annoface_all->set_gender(src_annoface.gender());
+		transformed_annoface_all->set_glasses(src_annoface.glasses());
+	}
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::RotateImage(const Datum& datum,
+															const double rotate_angle,
+															Datum* Rotate_datum, 
+															const vector<cv::Point2f> Points,
+															vector<cv::Point2f>* dstPoints) {
+	// If datum is encoded, decode and crop the cv::image.
+	if (datum.encoded()) {
+#ifdef USE_OPENCV
+		CHECK(!(param_.force_color() && param_.force_gray()))
+				<< "cannot set both force_color and force_gray";
+		cv::Mat cv_img;
+		if (param_.force_color() || param_.force_gray()) {
+			// If force_color then decode in color otherwise decode in gray.
+			cv_img = DecodeDatumToCVMat(datum, param_.force_color());
+		} else {
+			cv_img = DecodeDatumToCVMatNative(datum);
+		}
+		// Expand the image.
+		cv::Mat rotate_img = RotateImage(cv_img, rotate_angle);
+		//LOG(INFO)<<"cols: "<<rotate_img.cols << " source cols: "<<cv_img.cols;
+		cv::Point2f center(rotate_img.cols / 2., rotate_img.rows / 2.);
+		vector<cv::Point2f> dstTempPoints = getRotatePoint(rotate_img.rows, Points, center, rotate_angle);
+		CropRotateImg(cv_img.cols, cv_img.rows, rotate_img, 
+								rotate_angle, dstTempPoints , 
+								dstPoints);
+		// Save the image into datum.
+		EncodeCVMatToDatum(rotate_img, "jpg", Rotate_datum);
+		Rotate_datum->set_label(datum.label());
+		return;
+#else
+		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
+#endif  // USE_OPENCV
+	} else {
+		LOG(FATAL) << "dataum must be encoded by USE_OPENCV.";
+	}
+}
+
+
+
+template<typename Dtype>
 void DataTransformer<Dtype>::ExpandImage(const AnnoFacePoseDatum& anno_datum,
 																				 AnnoFacePoseDatum* expanded_anno_datum) {
 	if (!param_.has_expand_param()) {
@@ -1615,6 +1730,62 @@ void DataTransformer<Dtype>::ExpandImage(const cv::Mat& img,
 
 	cv::Rect bbox_roi(w_off, h_off, img_width, img_height);
 	img.copyTo((*expand_img)(bbox_roi));
+}
+template <typename Dtype>
+vector<cv::Point2f> DataTransformer<Dtype>::getRotatePoint(int row, 
+											const vector<cv::Point2f> Points, 
+											const cv::Point2f rotate_center, 
+											const double angle) {
+    vector<cv::Point2f> dstPoints;
+    float x1 = 0, y1 = 0;
+    for (size_t i = 0; i < Points.size(); i++){
+        x1 = Points.at(i).x;
+        y1 = row - Points.at(i).y;
+        float x2 = rotate_center.x;
+        float y2 = row - rotate_center.y;
+        float x = (x1 - x2)*cos(M_PI / 180.0 * angle) - (y1 - y2)*sin(M_PI / 180.0 * angle) + x2;
+        float y = (x1 - x2)*sin(M_PI / 180.0 * angle) + (y1 - y2)*cos(M_PI / 180.0 * angle) + y2;
+        y = row - y;
+        dstPoints.push_back(cv::Point2f(x, y));
+    }
+    return dstPoints;
+}
+template <typename Dtype>
+void DataTransformer<Dtype>::CropRotateImg(const int cols, const int rows, cv::Mat& dst , 
+								const double angle, const vector<cv::Point2f> Points , 
+								vector<cv::Point2f>* dstPoints){
+    float radian = (float) (angle /180.0 * M_PI);
+    //计算图像旋转之后包含图像的最大的矩形
+    float sinVal = fabs(sin(radian));
+    float cosVal = fabs(cos(radian));
+    cv::Size targetSize( (int)(cols * cosVal +rows * sinVal),
+                     (int)(cols * sinVal + rows * cosVal) );
+    //剪掉多余边框
+
+    float x = (dst.cols - targetSize.width) / 2;
+    float y = (dst.rows - targetSize.height) / 2;
+    cv::Rect rect(x, y, targetSize.width, targetSize.height);
+    dst = cv::Mat(dst,rect);
+    for(int i=0; i<Points.size(); i++){
+        float point_x =  Points.at(i).x - x;
+        float point_y = Points.at(i).y - y;
+        dstPoints->push_back(cv::Point2i(point_x, point_y));
+    }
+}
+template <typename Dtype>
+cv::Mat DataTransformer<Dtype>::RotateImage(const cv::Mat& img, const int rotate_angle
+														) {
+	cv::Mat rotate_img;
+    int maxBorder =(int) (std::max(img.cols, img.rows)* 1.414 ); //即为sqrt(2)*max
+    int dx = (maxBorder - img.cols)/2;
+    int dy = (maxBorder - img.rows)/2;
+    cv::copyMakeBorder(img, rotate_img, dy, dy, dx, dx, cv::BORDER_CONSTANT);
+
+    //旋转
+    cv::Point2f center( (float)(rotate_img.cols/2) , (float) (rotate_img.rows/2));
+    cv::Mat affine_matrix = cv::getRotationMatrix2D( center, rotate_angle, 1.0 );//求得旋转矩阵
+    cv::warpAffine(rotate_img, rotate_img, affine_matrix, rotate_img.size());
+	return rotate_img;
 }
 
 #endif  // USE_OPENCV

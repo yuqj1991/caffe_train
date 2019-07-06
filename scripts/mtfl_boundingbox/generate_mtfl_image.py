@@ -102,7 +102,7 @@ def convert_src_anno_label(split_file, args, pnet, rnet, onet, minsize, threshol
 						x_crop = np.array(x_a).astype(np.int32)
 						y_a = [y11, y22, y33, y44, y55]
 						y_crop = np.array(y_a).astype(np.int32)
-						if 1:
+						if 0:
 							crop_img = cv2.imread(annoImg_dir+"/"+str(img_file.split("/")[-1]))
 							for ii in range(5):
 								cv2.circle(crop_img, (x_crop[ii], y_crop[ii]), 5,(0,0,213),-1)
