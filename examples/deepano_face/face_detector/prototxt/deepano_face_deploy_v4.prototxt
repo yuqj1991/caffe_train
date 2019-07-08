@@ -2845,10 +2845,10 @@ layer {
 	top: "conv11_1_block2_lfpn/dec"
 }
 layer{
-	name: "conv5/dw_lfpn"
+	name: "conv5_lfpn"
 	type: "Convolution"
-	bottom: "conv5/dw"
-	top: "conv5/dw_lfpn"
+	bottom: "conv5"
+	top: "conv5_lfpn"
 	param {
 		lr_mult: 1
 		decay_mult: 1
@@ -2871,10 +2871,10 @@ layer{
 	}
 }
 layer {
-	name: "conv5/dw_lfpn/bn"
+	name: "conv5_lfpn/bn"
 	type: "BatchNorm"
-	bottom: "conv5/dw_lfpn"
-	top: "conv5/dw_lfpn"
+	bottom: "conv5_lfpn"
+	top: "conv5_lfpn"
 	param {
 		lr_mult: 0
 		decay_mult: 0
@@ -2889,10 +2889,10 @@ layer {
 	}
 }
 layer {
-	name: "conv5/dw_lfpn/scale"
+	name: "conv5_lfpn/scale"
 	type: "Scale"
-	bottom: "conv5/dw_lfpn"
-	top: "conv5/dw_lfpn"
+	bottom: "conv5_lfpn"
+	top: "conv5_lfpn"
 	param {
 		lr_mult: 1.0
 		decay_mult: 0.0
@@ -2912,16 +2912,16 @@ layer {
 	}
 }
 layer {
-	name: "conv5/dw_lfpn/relu"
+	name: "conv5_lfpn/relu"
 	type: "ReLU"
-	bottom: "conv5/dw_lfpn"
-	top: "conv5/dw_lfpn"
+	bottom: "conv5_lfpn"
+	top: "conv5_lfpn"
 }
 layer{
 	name: "lfpn_1/eltwise"
 	type: "Eltwise"
 	bottom: "conv11_1_block2_lfpn/dec"
-	bottom: "conv5/dw_lfpn"
+	bottom: "conv5_lfpn"
 	top: "lfpn_1_moudle"
 	eltwise_param {
 		operation: SUM
