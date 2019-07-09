@@ -10,7 +10,7 @@ gamma: 0.5
 weight_decay: 0.0001
 snapshot: 5000
 snapshot_prefix: "../snapshot/deepanoface_v3"
-solver_mode: CPU
+solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
 test_initialization: false
