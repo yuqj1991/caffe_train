@@ -43,11 +43,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-<<<<<<< HEAD
-		batch_size: 8 
-=======
-		batch_size:3
->>>>>>> 7763b930da47d3e46f5b8b0bfcf723ed31845882
+		batch_size: 16 
 		backend: LMDB
 	}
 	annotated_data_param {
