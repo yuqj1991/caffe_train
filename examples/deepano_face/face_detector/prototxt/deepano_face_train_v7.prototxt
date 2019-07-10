@@ -8111,7 +8111,7 @@ layer {
 		num_occlusion: 3
 		share_location: true
 		match_type: PER_PREDICTION
-		overlap_threshold: 0.3
+		overlap_threshold: 0.85
 		use_prior_for_matching: true
 		background_label_id: 0
 		use_difficult_gt: true
