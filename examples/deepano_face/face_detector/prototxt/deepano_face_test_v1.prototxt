@@ -5798,3 +5798,20 @@ layer {
 		confidence_threshold: 0.25
 	}
 }
+layer {
+	name: "detection_eval"
+	type: "DetectionEvaluate"
+	bottom: "detection_out"
+	bottom: "label"
+	top: "detection_eval"
+	include {
+		phase: TEST
+	}
+	detection_evaluate_param {
+	    attri_type: FACE
+		num_classes: 2
+		background_label_id: 0
+		overlap_threshold: 0.5
+		evaluate_difficult_gt: false
+	}
+}
