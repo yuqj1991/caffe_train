@@ -4591,6 +4591,215 @@ layer {
 }
 
 ############################################################
+#######################priorBox moudle three ###############
+############################################################
+layer {
+	name: "dectction_moudle_three_priorbox"
+	type: "PriorBox"
+	bottom: "dectction_moudle_three"
+	bottom: "data"
+	top: "dectction_moudle_three_priorbox"
+	prior_box_param {
+		min_size: 32.0
+		max_size: 64.0
+		flip: true
+		clip: false
+		variance: 0.1
+		variance: 0.1
+		variance: 0.2
+		variance: 0.2
+		offset: 0.5
+	}
+}
+
+layer {
+	name: "dectction_moudle_three_loc"
+	type: "Convolution"
+	bottom: "dectction_moudle_three"
+	top: "dectction_moudle_three_loc"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	convolution_param {
+		num_output: 8
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0.0
+		}
+	}
+}
+layer {
+	name: "dectction_moudle_three_loc_perm"
+	type: "Permute"
+	bottom: "dectction_moudle_three_loc"
+	top: "dectction_moudle_three_loc_perm"
+	permute_param {
+		order: 0
+		order: 2
+		order: 3
+		order: 1
+	}
+}
+layer {
+	name: "dectction_moudle_three_loc_flat"
+	type: "Flatten"
+	bottom: "dectction_moudle_three_loc_perm"
+	top: "dectction_moudle_three_loc_flat"
+	flatten_param {
+		axis: 1
+	}
+}
+
+layer {
+	name: "dectction_moudle_three_conf"
+	type: "Convolution"
+	bottom: "dectction_moudle_three"
+	top: "dectction_moudle_three_conf"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	convolution_param {
+		num_output: 4
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0.0
+		}
+	}
+}
+layer {
+	name: "dectction_moudle_three_conf_concat_perm"
+	type: "Permute"
+	bottom: "dectction_moudle_three_conf"
+	top: "dectction_moudle_three_conf_concat_perm"
+	permute_param {
+		order: 0
+		order: 2
+		order: 3
+		order: 1
+	}
+}
+layer {
+	name: "dectction_moudle_three_conf_concat_flat"
+	type: "Flatten"
+	bottom: "dectction_moudle_three_conf_concat_perm"
+	top: "dectction_moudle_three_conf_concat_flat"
+	flatten_param {
+		axis: 1
+	}
+}
+
+layer {
+	name: "dectction_moudle_three_blur"
+	type: "Convolution"
+	bottom: "dectction_moudle_three"
+	top: "dectction_moudle_three_blur"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	convolution_param {
+		num_output: 6
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0.0
+		}
+	}
+}
+layer {
+	name: "dectction_moudle_three_blur_perm"
+	type: "Permute"
+	bottom: "dectction_moudle_three_blur"
+	top: "dectction_moudle_three_blur_perm"
+	permute_param {
+		order: 0
+		order: 2
+		order: 3
+		order: 1
+	}
+}
+layer {
+	name: "dectction_moudle_three_blur_flat"
+	type: "Flatten"
+	bottom: "dectction_moudle_three_blur_perm"
+	top: "dectction_moudle_three_blur_flat"
+	flatten_param {
+		axis: 1
+	}
+}
+layer {
+	name: "dectction_moudle_three_occlu"
+	type: "Convolution"
+	bottom: "dectction_moudle_three"
+	top: "dectction_moudle_three_occlu"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	convolution_param {
+		num_output: 6
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0.0
+		}
+	}
+}
+layer {
+	name: "dectction_moudle_three_occlu_perm"
+	type: "Permute"
+	bottom: "dectction_moudle_three_occlu"
+	top: "dectction_moudle_three_occlu_perm"
+	permute_param {
+		order: 0
+		order: 2
+		order: 3
+		order: 1
+	}
+}
+layer {
+	name: "dectction_moudle_three_occlu_flat"
+	type: "Flatten"
+	bottom: "dectction_moudle_three_occlu_perm"
+	top: "dectction_moudle_three_occlu_flat"
+	flatten_param {
+		axis: 1
+	}
+}
+
+############################################################
 #######################priorBox moudle four ################
 ############################################################
 layer {
@@ -4600,8 +4809,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 32.0
-		max_size: 64.0
+		min_size: 64.0
+		max_size: 128.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4798,7 +5007,6 @@ layer {
 		axis: 1
 	}
 }
-
 ############################################################
 #######################priorBox moudle five ################
 ############################################################
@@ -4809,8 +5017,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 64.0
-		max_size: 128.0
+		min_size: 128.0
+		max_size: 256.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4941,10 +5149,10 @@ layer {
 	}
 }
 layer {
-	name: "dectction_moudle_five_blur_perm"
+	name: "dectction_moudle_six_blur_perm"
 	type: "Permute"
-	bottom: "dectction_moudle_five_blur"
-	top: "dectction_moudle_five_blur_perm"
+	bottom: "dectction_moudle_six_blur"
+	top: "dectction_moudle_six_blur_perm"
 	permute_param {
 		order: 0
 		order: 2
@@ -5007,6 +5215,7 @@ layer {
 		axis: 1
 	}
 }
+
 ############################################################
 #######################priorBox moudle six ################
 ############################################################
@@ -5211,215 +5420,6 @@ layer {
 	type: "Flatten"
 	bottom: "dectction_moudle_six_occlu_perm"
 	top: "dectction_moudle_six_occlu_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-
-############################################################
-#######################priorBox moudle seven ###############
-############################################################
-layer {
-	name: "dectction_moudle_seven_priorbox"
-	type: "PriorBox"
-	bottom: "dectction_moudle_seven"
-	bottom: "data"
-	top: "dectction_moudle_seven_priorbox"
-	prior_box_param {
-		min_size: 128.0
-		max_size: 256.0
-		flip: true
-		clip: false
-		variance: 0.1
-		variance: 0.1
-		variance: 0.2
-		variance: 0.2
-		offset: 0.5
-	}
-}
-
-layer {
-	name: "dectction_moudle_seven_loc"
-	type: "Convolution"
-	bottom: "dectction_moudle_seven"
-	top: "dectction_moudle_seven_loc"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 8
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "dectction_moudle_seven_loc_perm"
-	type: "Permute"
-	bottom: "dectction_moudle_seven_loc"
-	top: "dectction_moudle_seven_loc_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "dectction_moudle_seven_loc_flat"
-	type: "Flatten"
-	bottom: "dectction_moudle_seven_loc_perm"
-	top: "dectction_moudle_seven_loc_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-
-layer {
-	name: "dectction_moudle_seven_conf"
-	type: "Convolution"
-	bottom: "dectction_moudle_seven"
-	top: "dectction_moudle_seven_conf"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 4
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "dectction_moudle_seven_conf_concat_perm"
-	type: "Permute"
-	bottom: "dectction_moudle_seven_conf"
-	top: "dectction_moudle_seven_conf_concat_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "dectction_moudle_seven_conf_concat_flat"
-	type: "Flatten"
-	bottom: "dectction_moudle_seven_conf_concat_perm"
-	top: "dectction_moudle_seven_conf_concat_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-
-layer {
-	name: "dectction_moudle_seven_blur"
-	type: "Convolution"
-	bottom: "dectction_moudle_seven"
-	top: "dectction_moudle_seven_blur"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	convolution_param {
-		num_output: 6
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "dectction_moudle_seven_blur_perm"
-	type: "Permute"
-	bottom: "dectction_moudle_seven_blur"
-	top: "dectction_moudle_seven_blur_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "dectction_moudle_seven_blur_flat"
-	type: "Flatten"
-	bottom: "dectction_moudle_seven_blur_perm"
-	top: "dectction_moudle_seven_blur_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-layer {
-	name: "dectction_moudle_seven_occlu"
-	type: "Convolution"
-	bottom: "dectction_moudle_seven"
-	top: "dectction_moudle_seven_occlu"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	convolution_param {
-		num_output: 6
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "dectction_moudle_seven_occlu_perm"
-	type: "Permute"
-	bottom: "dectction_moudle_seven_occlu"
-	top: "dectction_moudle_seven_occlu_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "dectction_moudle_seven_occlu_flat"
-	type: "Flatten"
-	bottom: "dectction_moudle_seven_occlu_perm"
-	top: "dectction_moudle_seven_occlu_flat"
 	flatten_param {
 		axis: 1
 	}
