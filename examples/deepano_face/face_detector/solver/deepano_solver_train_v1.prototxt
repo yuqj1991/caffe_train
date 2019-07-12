@@ -9,7 +9,7 @@ lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.0001
 snapshot: 5000
-snapshot_prefix: "../snapshot/deepanoface_v1"
+snapshot_prefix: "../snapshot/face_detector_v1"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true

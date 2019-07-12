@@ -33,7 +33,7 @@ CLASSES = ('background',
 
 def preprocess(src):
     img = cv2.resize(src, (300,300))
-    img = img - 127.5
+    img = img - 127.5 #[103.94, 116.78, 123.68]
     img = img * 0.007843
     return img
 
