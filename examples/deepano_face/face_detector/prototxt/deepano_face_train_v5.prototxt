@@ -5628,8 +5628,8 @@ layer {
 	bottom: "mbox_loc"
 	bottom: "mbox_conf"
 	bottom: "mbox_priorbox"
-	bottom: "mbox_blur"
-	bottom: "mbox_occlu"
+	bottom: "mbox_blur_conf"
+	bottom: "mbox_occlusion_conf"
 	bottom: "label"
 	top: "mbox_loss"
 	include {
