@@ -425,11 +425,11 @@ void MultiBoxFaceLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
   }
   if(this->layer_param_.propagate_down(3)) {
     top[0]->mutable_cpu_data()[0] += 
-          0.5*conf_blur_loss_.cpu_data()[0] / normalizer;
+          conf_blur_loss_.cpu_data()[0] / normalizer;
   }
   if(this->layer_param_.propagate_down(4)) {
     top[0]->mutable_cpu_data()[0] += 
-          0.5*conf_occlussion_loss_.cpu_data()[0] / normalizer;
+          conf_occlussion_loss_.cpu_data()[0] / normalizer;
   }
   #if 0
   LOG(INFO)<<"num_matches_: "<<num_matches_<<" num_gtBoxes: "<<num_gt_<<" num_conf_: "<<num_conf_;
