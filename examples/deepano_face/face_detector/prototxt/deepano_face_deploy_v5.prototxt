@@ -5149,10 +5149,10 @@ layer {
 	}
 }
 layer {
-	name: "dectction_moudle_six_blur_perm"
+	name: "dectction_moudle_five_blur_perm"
 	type: "Permute"
-	bottom: "dectction_moudle_six_blur"
-	top: "dectction_moudle_six_blur_perm"
+	bottom: "dectction_moudle_five_blur"
+	top: "dectction_moudle_five_blur_perm"
 	permute_param {
 		order: 0
 		order: 2

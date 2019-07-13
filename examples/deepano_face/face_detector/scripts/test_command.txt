@@ -17,4 +17,5 @@ python demo_camera_angle.py --model ../prototxt/deepano_face_deploy_v3.prototxt 
 python demo_camera.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel
 
 ===========================================demo_image.py=============================================
-python demo_image.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel
+python demo_image.py --model ../prototxt/deepano_face_deploy_v3.prototxt  --weights ../snapshot/deepanoFace_res_v3_iter_305000.caffemodel --input 300 --sameAvg 1
+python demo_image.py --model ../prototxt/deepano_face_deploy_v4.prototxt  --weights ../snapshot/face_detevtor_v4_iter_305000.caffemodel --input 320 --sameAvg 0
