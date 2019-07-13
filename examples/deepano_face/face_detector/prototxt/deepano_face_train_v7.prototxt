@@ -7553,7 +7553,7 @@ layer {
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
 		min_size: 128.0
-		max_size: 256.0
+		max_size: 214.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -7760,8 +7760,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
-		min_size: 256.0
-		max_size: 512.0
+		min_size: 214.0
+		max_size: 300.0
 		flip: true
 		clip: false
 		variance: 0.1
