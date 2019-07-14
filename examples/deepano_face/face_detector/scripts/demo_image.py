@@ -19,7 +19,7 @@ net_file= args.model
 caffe_model= args.weights
 test_dir = "../images"
 
-inputsize = args.inputsize
+inputsize = args.input
 mean_value = [127.5, 127.5, 127.5]
 if not args.sameAvg:
     mean_value = [103.94, 116.78, 123.68]
