@@ -8,13 +8,13 @@ layer {
 		phase: TRAIN
 	}
 	transform_param {
-		mirror: false
 		scale: 0.007843
-		mean_value: 103.94
-		mean_value: 116.78
-		mean_value: 123.68
+		mirror: false
+		mean_value: 127.5
+		mean_value: 127.5
+		mean_value: 127.5
 		resize_param {
-			prob: 1
+			prob: 1.0
 			resize_mode: WARP
 			height: 320
 			width: 320
@@ -29,16 +29,20 @@ layer {
 		}
 		distort_param {
 			brightness_prob: 0.5
-			brightness_delta: 32
+			brightness_delta: 32.0
 			contrast_prob: 0.5
 			contrast_lower: 0.5
 			contrast_upper: 1.5
 			hue_prob: 0.5
-			hue_delta: 18
+			hue_delta: 18.0
 			saturation_prob: 0.5
 			saturation_lower: 0.5
 			saturation_upper: 1.5
 			random_order_prob: 0.0
+		}
+		expand_param {
+			prob: 0.5
+			max_expand_ratio: 4.0
 		}
 	}
 	data_param {
@@ -48,76 +52,54 @@ layer {
 	}
 	annotated_data_param {
 		batch_sampler {
+			max_sample: 1
+			max_trials: 1
+		}
+		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.1
 				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
-				min_jaccard_overlap: 1.0
+				min_jaccard_overlap: 0.6
 			}
 			max_sample: 1
 			max_trials: 50
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 0.1
 				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
-				min_jaccard_overlap: 1.0
+				min_jaccard_overlap: 0.8
 			}
 			max_sample: 1
 			max_trials: 50
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 0.1
 				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
-				min_jaccard_overlap: 1.0
+				min_jaccard_overlap: 0.9
 			}
 			max_sample: 1
 			max_trials: 50
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 0.1
 				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
 				max_jaccard_overlap: 1.0
