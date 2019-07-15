@@ -43,23 +43,9 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 12
+		batch_size: 16
 		backend: LMDB
 	}
-	annotated_data_param {
-		batch_sampler {
-			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
 	annotated_data_param {
 		batch_sampler {
 			max_sample: 1
