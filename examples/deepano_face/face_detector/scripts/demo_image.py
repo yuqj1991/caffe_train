@@ -10,12 +10,19 @@ def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, required=True, help='.prototxt file for inference')
     parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
+    parser.add_argument('--input', type = int, required = True, help='net input')
+    parser.add_argument('--sameAvg', type = bool, required = True, help='net input')
     return parser
 parser1 = make_parser()
 args = parser1.parse_args()
 net_file= args.model
 caffe_model= args.weights
 test_dir = "../images"
+
+inputsize = args.input
+mean_value = [127.5, 127.5, 127.5]
+if not args.sameAvg:
+    mean_value = [103.94, 116.78, 123.68]
 
 if not os.path.exists(caffe_model):
     print(caffe_model + " does not exist")
@@ -31,9 +38,9 @@ CLASSES = ('background',
            'face')
 
 
-def preprocess(src):
-    img = cv2.resize(src, (300,300))
-    img = img - 127.5 #[103.94, 116.78, 123.68]
+def preprocess(src, inputsize, mean_value):
+    img = cv2.resize(src, (inputsize,inputsize))
+    img = img -mean_value # [103.94, 116.78, 123.68] # 127.5 #
     img = img * 0.007843
     return img
 
@@ -48,7 +55,7 @@ def postprocess(img, out):
 
 def detect(imgfile):
     origimg = cv2.imread(imgfile)
-    img = preprocess(origimg)
+    img = preprocess(origimg, inputsize, mean_value)
     
     img = img.astype(np.float32)
     img = img.transpose((2, 0, 1))

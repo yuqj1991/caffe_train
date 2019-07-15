@@ -570,7 +570,7 @@ class CaffeNetGenerator:
         self.tfpad = FLAGS.tfpad
         self.gen_ssd = not FLAGS.classifier
         if self.gen_ssd:
-            self.input_size = 640
+            self.input_size = 300
         else:
             self.input_size = 224
         self.size = FLAGS.size
