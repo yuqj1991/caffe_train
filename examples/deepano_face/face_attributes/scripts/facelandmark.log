@@ -16,6 +16,12 @@ eval_gender: 0.833560, eval_glass: 0.981658, eval_headpose: 0.737092
 left eye : 0.175055, right eye: 0.200845, nose : 0.159597, left cornor mouth: 0.174445, right cornor mouth: 0.173554
 v6 version
 
+v1 version
+eval_gender: 0.800272, eval_glass: 0.964674
+left eye : 0.199685, right eye: 0.234076, nose : 0.172885, left cornor mouth: 0.142510, right cornor mouth: 0.159478
+
+v2 version
+not good i will delete it!
 
 
 

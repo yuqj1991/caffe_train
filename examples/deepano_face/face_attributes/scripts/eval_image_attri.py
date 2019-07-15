@@ -118,7 +118,7 @@ with open(val_list_file, 'r') as listfile_:
 		if not val_image:
 			break
 		val_imageinfo = listfile_.readline().split(' ')
-		sum, gender, glasses, headpose = detect(val_imageinfo[0], val_imageinfo[1].replace('\n', ''))
+		sum, gender, glasses = detect(val_imageinfo[0], val_imageinfo[1].replace('\n', ''))
 		mtfl_eval_landmakrs.append(sum)
 		if gender:
 			mtfl_eval_gender += 1
