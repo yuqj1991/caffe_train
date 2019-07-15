@@ -10,9 +10,9 @@ layer {
 	transform_param {
 		mirror: false
 		scale: 0.007843
-		mean_value: 103.94
-		mean_value: 116.78
-		mean_value: 123.68
+		mean_value: 127.5
+		mean_value: 127.5
+		mean_value: 127.5
 		resize_param {
 			prob: 1
 			resize_mode: WARP
@@ -48,76 +48,54 @@ layer {
 	}
 	annotated_data_param {
 		batch_sampler {
+			max_sample: 1
+			max_trials: 1
+		}
+		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.1
 				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
-				min_jaccard_overlap: 1.0
+				min_jaccard_overlap: 0.6
 			}
 			max_sample: 1
 			max_trials: 50
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 0.1
 				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
-				min_jaccard_overlap: 1.0
+				min_jaccard_overlap: 0.8
 			}
 			max_sample: 1
 			max_trials: 50
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 0.1
 				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
-				min_jaccard_overlap: 1.0
+				min_jaccard_overlap: 0.9
 			}
 			max_sample: 1
 			max_trials: 50
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 0.1
 				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.4
 			}
 			sample_constraint {
 				max_jaccard_overlap: 1.0
@@ -2774,9 +2752,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 512
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -2848,9 +2825,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -2923,9 +2899,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -2998,9 +2973,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3082,10 +3056,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
-		kernel_size: 3
+		num_output: 1024
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3156,10 +3129,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 3
+		num_output: 512
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3231,10 +3203,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 3
+		num_output: 512
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3306,10 +3277,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 3
+		num_output: 512
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3392,9 +3362,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 512
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3466,9 +3435,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3541,9 +3509,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3616,9 +3583,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}

@@ -2652,9 +2652,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 512
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -2726,9 +2725,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -2801,9 +2799,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -2876,9 +2873,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -2960,10 +2956,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
-		kernel_size: 3
+		num_output: 1024
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3034,10 +3029,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 3
+		num_output: 512
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3109,10 +3103,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 3
+		num_output: 512
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3184,10 +3177,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 3
+		num_output: 512
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3270,9 +3262,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 512
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3344,9 +3335,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3419,9 +3409,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3494,9 +3483,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
-		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
