@@ -4,7 +4,7 @@ cd $root_dir/scripts
 redo=1
 data_root_dir="../../dataset/facedata"
 dataset_name="wider_face"
-mapfile="../examples/deepano_face/face_detector/labelmap_face.prototxt"
+mapfile="../examples/face/face_detector/labelmap_face.prototxt"
 anno_type="detection_face"
 db="lmdb"
 min_dim=0

@@ -4,7 +4,7 @@ cd $root_dir/scripts
 redo=1
 data_root_dir="../../dataset/facedata"
 dataset_name="umdface"
-mapfile="../examples/deepano_face/face_attributes/labelmap_face.prototxt"
+mapfile="../examples/face/face_attributes/labelmap_face.prototxt"
 anno_type="faceangle"
 label_type="txt"
 db="lmdb"
