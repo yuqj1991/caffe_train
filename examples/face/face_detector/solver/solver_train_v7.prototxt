@@ -2,13 +2,13 @@ train_net: "../prototxt/face_train_v7.prototxt"
 test_net: "../prototxt/face_test_v7.prototxt"
 test_iter: 3083
 test_interval: 10000
-base_lr: 0.001
+base_lr: 0.005
 display: 100
 max_iter: 400000
 lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.0001
-snapshot: 5000
+snapshot: 10000
 snapshot_prefix: "../snapshot/face_detector_v7"
 solver_mode: GPU
 debug_info: false
@@ -21,8 +21,8 @@ stepvalue: 120000
 stepvalue: 180000
 stepvalue: 300000
 iter_size: 1
-momentum2 : 0.99
-type: "RMSProp"
+#momentum2 : 0.99
+#type: "RMSProp"
 eval_type: "detectionface"
 ap_version: "11point"
 
