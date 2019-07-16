@@ -19,5 +19,5 @@ stepvalue: 300000
 stepvalue: 400000
 stepvalue: 600000
 eval_type: "faceattri"
-type: "RMSProp"
-momentum2: 0.99
+#type: "RMSProp"
+#momentum2: 0.99
