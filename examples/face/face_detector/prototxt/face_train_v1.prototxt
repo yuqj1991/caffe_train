@@ -2684,7 +2684,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		stride: 1
+		stride: 2
 		weight_filler {
 			type: "msra"
 		}
@@ -2816,6 +2816,7 @@ layer {
 		bias_term: false
 		kernel_size: 3
 		stride: 2
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -3789,7 +3790,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv14_2"
 	type: "Convolution"
-	bottom: "conv17_2"
+	bottom: "conv16_2"
 	top: "cpm_moudle_conv14_2"
 	param {
 		lr_mult: 1
@@ -5753,7 +5754,7 @@ layer {
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
 		min_size: 214.0
-		max_size: 300.0
+		max_size: 320.0
 		flip: true
 		clip: false
 		variance: 0.1
