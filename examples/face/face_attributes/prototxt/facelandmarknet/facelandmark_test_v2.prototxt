@@ -2062,7 +2062,7 @@ layer {
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		pad: 0
