@@ -4391,20 +4391,14 @@ layer{
 		lr_mult: 1
 		decay_mult: 1
 	}
-	param {
-		lr_mult: 2
-		decay_mult: 1
-	}
 	convolution_param {
 		num_output: 576
-		kernel_size: 1
-		stride: 1
+		bias_term: false
+		kernel_size: 3
+		group: 576
+		pad: 1
 		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
+			type: "msra"
 		}
 	}
 }
@@ -4695,20 +4689,14 @@ layer{
 		lr_mult: 1
 		decay_mult: 1
 	}
-	param {
-		lr_mult: 2
-		decay_mult: 1
-	}
 	convolution_param {
 		num_output: 1280
-		kernel_size: 1
-		stride: 1
+		bias_term: false
+		kernel_size: 3
+		group: 1280
+		pad: 1
 		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
+			type: "msra"
 		}
 	}
 }
@@ -5000,20 +4988,14 @@ layer{
 		lr_mult: 1
 		decay_mult: 1
 	}
-	param {
-		lr_mult: 2
-		decay_mult: 1
-	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
+		bias_term: false
+		kernel_size: 3
+		group: 256
+		pad: 1
 		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
+			type: "msra"
 		}
 	}
 }
