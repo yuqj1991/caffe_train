@@ -14,7 +14,7 @@ minsize2select = 20
 usepadding = True
 
 datasetprefix = "../../dataset/facedata/wider_face"  #
-
+use_blur_occlu_attri = False # True
 
 def convertimgset(img_set="train"):
     imgdir = rootdir + '/wider_face/' + "JPEGImages/wider_" + img_set + "/images"
@@ -183,12 +183,13 @@ def convertimgset(img_set="train"):
                     truncated = doc.createElement('truncated')
                     truncated.appendChild(doc.createTextNode('1'))
                     objects.appendChild(truncated)
-                    blur_node = doc.createElement('blur')
-                    blur_node.appendChild(doc.createTextNode(str(blur)))
-                    objects.appendChild(blur_node)
-                    occlusion_node = doc.createElement('occlusion')
-                    occlusion_node.appendChild(doc.createTextNode(str(occlu)))
-                    objects.appendChild(occlusion_node)
+                    if use_blur_occlu_attri:
+                        blur_node = doc.createElement('blur')
+                        blur_node.appendChild(doc.createTextNode(str(blur)))
+                        objects.appendChild(blur_node)
+                        occlusion_node = doc.createElement('occlusion')
+                        occlusion_node.appendChild(doc.createTextNode(str(occlu)))
+                        objects.appendChild(occlusion_node)
                     difficult = doc.createElement('difficult')
                     difficult.appendChild(doc.createTextNode('0'))
                     objects.appendChild(difficult)
