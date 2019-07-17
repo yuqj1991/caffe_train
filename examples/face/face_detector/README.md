@@ -61,7 +61,7 @@ landmarks：点回归损失函数
 
 先不用思考如何设计主体思路，还是应该需要拓宽数据库，这是因为我们这边需要从最开始，aflw and wilder face 这两部分，不和整理数据集，进行训练
 
-deepano-face的AI 网络框架：
+deep-face的AI 网络框架：
 1、数据层：主要包括什么：image/data/  label：person and whether partial face (iou <0.4):
 数据集：widerface，and aflw landmarks
 还得要剔除到wideface上很多人脸过小的数据，因为过小的人脸会影响到数据（为什么不能剔除人脸呢？过小的人脸像素不够充足，不能影响，那么需要该如何去测试，像素的图片大小，那么在对比像素的面积呢）

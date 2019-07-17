@@ -11,7 +11,7 @@ import random
 import matplotlib.pyplot as plot
 
 root_dir = "../../dataset/car_person_data/car_license/ccpd_dataset"
-ccpd_anno_img_dir = "/home/deepano/workspace/dataset/car_person_data/car_license/ccpd_dataset/annoImg"
+ccpd_anno_img_dir = "/home/deep/workspace/dataset/car_person_data/car_license/ccpd_dataset/annoImg"
 if not os.path.exists(ccpd_anno_img_dir):
 	os.makedirs(ccpd_anno_img_dir)
 set_dir = "ImageSets/Main"

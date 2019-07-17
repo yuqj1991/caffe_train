@@ -1,5 +1,5 @@
-train_net: "../prototxt/deepano_ccpd_rec_train_v2.prototxt"
-test_net: "../prototxt/deepano_ccpd_rec_test_v2.prototxt"
+train_net: "../prototxt/deep_ccpd_rec_train_v2.prototxt"
+test_net: "../prototxt/deep_ccpd_rec_test_v2.prototxt"
 test_iter: 1500
 test_interval: 5000
 base_lr: 0.05
@@ -9,7 +9,7 @@ lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.0001
 snapshot: 200000
-snapshot_prefix: "../snapshot/deepanoccpd_rec_v2"
+snapshot_prefix: "../snapshot/deepccpd_rec_v2"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true

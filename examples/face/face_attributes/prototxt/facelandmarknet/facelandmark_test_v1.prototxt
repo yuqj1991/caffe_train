@@ -1,4 +1,4 @@
-name: "deepano_face_landmarknet"
+name: "deep_face_landmarknet"
 layer {
   name: "data"
   type: "faceAnnoData"

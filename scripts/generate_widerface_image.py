@@ -321,10 +321,10 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 	owner = doc.createElement('owner')  # company element
 	annotation.appendChild(owner)
 	flickrid_o = doc.createElement('flickrid')
-	flickrid_o.appendChild(doc.createTextNode('deepano'))
+	flickrid_o.appendChild(doc.createTextNode('deep'))
 	owner.appendChild(flickrid_o)
 	name_o = doc.createElement('name')
-	name_o.appendChild(doc.createTextNode('deepano'))
+	name_o.appendChild(doc.createTextNode('deep'))
 	owner.appendChild(name_o)
 	size = doc.createElement('size')   # img size info element
 	annotation.appendChild(size)

@@ -1,4 +1,4 @@
-name: "DeepanoLpnet"
+name: "deepLpnet"
 layer {
 	name: "data"
 	type: "AnnotatedData"

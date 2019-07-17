@@ -5,7 +5,7 @@ import argparse
 import sys,os
 import math
 import cv2
-caffe_root = '../../../../../caffe_deeplearning_train/'
+caffe_root = '../../../../../caffe_train/'
 sys.path.insert(0, caffe_root + 'python')  
 import caffe  
 

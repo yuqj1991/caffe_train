@@ -20,4 +20,4 @@ python demo_camera_angle.py --model ../prototxt/face_deploy_v3.prototxt  --weigh
 
 
 ===========================================scp file==================================================
-scp deepano@192.168.1.60:/home/deepano/workspace/caffe_deeplearning_train/examples/face/face_detector/snapshot/face_detector_v8_iter_100000.caffemodel examples/face/face_detector/snapshot/
+scp deep@192.168.1.60:/home/deep/workspace/caffe_deeplearning_train/examples/face/face_detector/snapshot/face_detector_v8_iter_100000.caffemodel examples/face/face_detector/snapshot/

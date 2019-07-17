@@ -1,4 +1,4 @@
-root_dir="../../../../../caffe_deeplearning_train"
+root_dir="../../../../../caffe_train"
 cd $root_dir/scripts
 
 redo=1

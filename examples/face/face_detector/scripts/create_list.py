@@ -3,7 +3,7 @@ import sys
 import os
 import random
 wider_directory = ['wider_train', 'wider_val']
-root_dir ='../../../../../caffe_deeplearning_train/examples/deepano_face/face_detector/scripts/'
+root_dir ='../../../../../caffe_train/examples/deep_face/face_detector/scripts/'
 root_dataset = '../../../../../dataset/facedata/wider_face/Annotations/'
 def shuffle_file(filename):
 	f = open(filename, 'r+')
@@ -29,7 +29,7 @@ def generate_list(imageSetDir):
 				xmlline = os.path.abspath(xmlline_) + '\n'
 				#print (os.path.abspath(xmlline_))
 				#print(xmlline)
-				newline = imgline.strip().replace('stive', 'deepano')+'.jpg'+' '+xmlline
+				newline = imgline.strip().replace('stive', 'deep')+'.jpg'+' '+xmlline
 				#print(newline)
 				#break
 				newfile.write(newline)

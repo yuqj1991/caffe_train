@@ -3,7 +3,7 @@ import sys
 import os
 import random
 wider_directory = ['training','testing']
-root_dir ='../../../../../caffe_deeplearning_train/examples/face/face_attributes/scripts/'
+root_dir ='../../../../../caffe_train/examples/face/face_attributes/scripts/'
 root_dataset = '../../../../../dataset/facedata/mtfl/label/'
 def shuffle_file(filename):
 	f = open(filename, 'r+')
