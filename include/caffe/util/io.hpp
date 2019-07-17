@@ -289,6 +289,24 @@ inline bool ReadRichCcpdToAnnotatedDatum(const string& filename,
 }
 
 
+bool ReadRichBlurToAnnotatedDatum(const string& filename,
+    const string& labelfile, const int height, const int width,
+    const int min_dim, const int max_dim, const bool is_color,
+    const string& encoding, const AnnoBlurDatum_AnnoType type,
+    const string& labeltype, const std::map<string, int>& name_to_label, 
+    AnnoBlurDatum* anno_datum);
+
+inline bool ReadRichBlurToAnnotatedDatum(const string& filename,
+    const string& labelname, const int height, const int width,
+    const bool is_color, const std::string & encoding,
+    const AnnoBlurDatum_AnnoType type, const string& labeltype,
+    const std::map<string, int>& name_to_label,
+    AnnoBlurDatum* anno_datum) {
+  return ReadRichBlurToAnnotatedDatum(filename, labelname, height, width, 0, 0,
+                      is_color, encoding, type, labeltype, 
+                      name_to_label, anno_datum);
+}
+
 bool ReadXMLToAnnotatedDatum(const string& labelname, const int img_height,
     const int img_width, const std::map<string, int>& name_to_label,
     AnnotatedDatum* anno_datum);
@@ -302,6 +320,10 @@ bool ReadTxtToAnnotatedDatum(const string& labelname, const int height,
 bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
     const int width, const std::map<string, int>& name_to_label,
     AnnotatedCCpdDatum* anno_datum);
+
+bool ReadBlurTxtToAnnotatedDatum(const string& labelfile, const int height,
+    const int width, const std::map<string, int>& name_to_label,
+    AnnoBlurDatum* anno_datum);
 
 bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
     const int width, AnnoFaceDatum* anno_datum);

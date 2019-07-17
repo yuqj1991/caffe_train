@@ -95,6 +95,7 @@ template class BlockingQueue<AnnoFacePoseDatum*>;
 template class BlockingQueue<AnnoFaceContourDatum*>;
 template class BlockingQueue<AnnoFaceAngleDatum*>;
 template class BlockingQueue<AnnotatedCCpdDatum*>;
+template class BlockingQueue<AnnoBlurDatum*>;
 template class BlockingQueue<shared_ptr<DataReader<Datum>::QueuePair> >;
 template class BlockingQueue<shared_ptr<DataReader<AnnotatedDatum>::QueuePair> >;
 template class BlockingQueue<shared_ptr<DataReader<AnnoFaceDatum>::QueuePair> >;
@@ -102,6 +103,7 @@ template class BlockingQueue<shared_ptr<DataReader<AnnoFacePoseDatum>::QueuePair
 template class BlockingQueue<shared_ptr<DataReader<AnnoFaceContourDatum>::QueuePair> >;
 template class BlockingQueue<shared_ptr<DataReader<AnnoFaceAngleDatum>::QueuePair> >;
 template class BlockingQueue<shared_ptr<DataReader<AnnotatedCCpdDatum>::QueuePair> >;
+template class BlockingQueue<shared_ptr<DataReader<AnnoBlurDatum>::QueuePair> >;
 template class BlockingQueue<P2PSync<float>*>;
 template class BlockingQueue<P2PSync<double>*>;
 

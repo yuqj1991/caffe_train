@@ -95,6 +95,7 @@ int main(int argc, char** argv) {
   AnnoFaceContourDatum_AnnoType anno_facecontour_type;
   AnnoFaceAngleDatum_AnnoType anno_faceangle_type;
   AnnotatedCCpdDatum_AnnotationType anno_ccpd_type;
+  AnnoBlurDatum_AnnoType anno_Blur_type;
   const string label_type = FLAGS_label_type;
   const string label_map_file = FLAGS_label_map_file;
   const bool check_label = FLAGS_check_label;
@@ -160,7 +161,17 @@ int main(int argc, char** argv) {
         << "Failed to convert name to label.";
     while (infile >> filename >> labelname) {
       lines.push_back(std::make_pair(filename, labelname));
-    }
+    } 
+  }else if (anno_type == "faceBlur") {
+    anno_Blur_type = AnnoBlurDatum_AnnoType_FACEBLUR;
+    LabelMap label_map;
+    CHECK(ReadProtoFromTextFile(label_map_file, &label_map))
+        << "Failed to read label map file.";
+    CHECK(MapNameToLabel(label_map, check_label, &name_to_label))
+        << "Failed to convert name to label.";
+    while (infile >> filename >> labelname) {
+      lines.push_back(std::make_pair(filename, labelname));
+    } 
   }
   if (FLAGS_shuffle) {
     // randomly shuffle data
@@ -191,6 +202,7 @@ int main(int argc, char** argv) {
   AnnoFaceContourDatum anno_faceContourDatum;
   AnnoFaceAngleDatum anno_faceAngleDatum;
   AnnotatedCCpdDatum anno_ccpdDatum;
+  AnnoBlurDatum anno_BlurDatum;
   int count = 0;
   int data_size = 0;
   bool data_size_initialized = false;
@@ -256,6 +268,12 @@ int main(int argc, char** argv) {
           resize_width, min_dim, max_dim, is_color, enc, anno_ccpd_type, label_type,
           name_to_label, &anno_ccpdDatum);
       anno_ccpdDatum.set_type(AnnotatedCCpdDatum_AnnotationType_CCPD);
+    }else if (anno_type == "faceBlur") {
+      labelname = boost::get<std::string>(lines[line_id].second);
+      status = ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
+          resize_width, min_dim, max_dim, is_color, enc, anno_ccpd_type, label_type,
+          name_to_label, &anno_BlurDatum);
+      anno_BlurDatum.set_type(AnnoBlurDatum_AnnoType_FACEBLUR);
     }
     if (status == false) {
       LOG(WARNING) << "Failed to read " << lines[line_id].first;
@@ -294,6 +312,9 @@ int main(int argc, char** argv) {
       txn->Put(key_str, out);
     }else if(anno_type == "Rec_ccpd") {
       CHECK(anno_ccpdDatum.SerializeToString(&out));
+      txn->Put(key_str, out);
+    }else if(anno_type == "faceBlur") {
+      CHECK(anno_BlurDatum.SerializeToString(&out));
       txn->Put(key_str, out);
     }
     if (++count % 1000 == 0) {

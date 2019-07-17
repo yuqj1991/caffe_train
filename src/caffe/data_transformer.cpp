@@ -474,6 +474,25 @@ void DataTransformer<Dtype>::Transform(const AnnotatedCCpdDatum& anno_datum,
 											transformed_annoface_all);
 }
 
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoBlurDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 FaceAttributes* transformed_annoface_all,
+                 bool* do_mirror){
+	// Transform datum.
+	const Datum& datum = anno_datum.datum();
+	NormalizedBBox crop_bbox;
+	Transform(datum, transformed_blob, &crop_bbox, do_mirror);
+
+	// Transform annotation.
+	const bool do_resize = true;
+	const bool do_expand = false;
+	TransformFaceBlur(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
+											transformed_annoface_all);
+}
+
+
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceDatum& anno_datum, 
 				Blob<Dtype>* transformed_blob,
@@ -510,6 +529,14 @@ template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnotatedCCpdDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
                  LicensePlate* transformed_anno_vec){
+	bool do_mirror;
+	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoBlurDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 FaceAttributes* transformed_anno_vec){
 	bool do_mirror;
 	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
 }
@@ -719,6 +746,18 @@ void DataTransformer<Dtype>::TransformAnnoCcpd(
 		transformed_annoface_all->set_letternum_3(anno_datum.lpnumber().letternum_3());
 		transformed_annoface_all->set_letternum_4(anno_datum.lpnumber().letternum_4());
 		transformed_annoface_all->set_letternum_5(anno_datum.lpnumber().letternum_5());
+	}
+}
+
+
+template<typename Dtype>
+void DataTransformer<Dtype>::TransformFaceBlur(
+    const AnnoBlurDatum& anno_datum, const bool do_resize,
+    const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
+    FaceAttributes* transformed_annoface_all){
+	if(anno_datum.type() == AnnoBlurDatum_AnnoType_FACEBLUR){
+		transformed_annoface_all->set_occlusion(anno_datum.faceatti().occlusion());
+		transformed_annoface_all->set_blur(anno_datum.faceatti().blur());
 	}
 }
 
@@ -1343,6 +1382,42 @@ void DataTransformer<Dtype>::ExpandImage(const AnnotatedCCpdDatum& anno_datum,
 	const bool do_mirror = false;
 	const bool do_expand = true;
 	TransformAnnoCcpd(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
+											expanded_anno_datum->mutable_lpnumber());
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::ExpandImage(const AnnoBlurDatum& anno_datum,
+																				 AnnoBlurDatum* expanded_anno_datum) {
+	if (!param_.has_expand_param()) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const ExpansionParameter& expand_param = param_.expand_param();
+	const float expand_prob = expand_param.prob();
+	float prob;
+	caffe_rng_uniform(1, 0.f, 1.f, &prob);
+	if (prob > expand_prob) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	const float max_expand_ratio = expand_param.max_expand_ratio();
+	if (fabs(max_expand_ratio - 1.) < 1e-2) {
+		expanded_anno_datum->CopyFrom(anno_datum);
+		return;
+	}
+	float expand_ratio;
+	caffe_rng_uniform(1, 1.f, max_expand_ratio, &expand_ratio);
+	// Expand the datum.
+	NormalizedBBox expand_bbox;
+	ExpandImage(anno_datum.datum(), expand_ratio, &expand_bbox,
+							expanded_anno_datum->mutable_datum());
+	expanded_anno_datum->set_type(anno_datum.type());
+
+	// Transform the annotation according to crop_bbox.
+	const bool do_resize = false;
+	const bool do_mirror = false;
+	const bool do_expand = true;
+	TransformFaceBlur(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
 											expanded_anno_datum->mutable_lpnumber());
 }
 

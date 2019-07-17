@@ -162,6 +162,16 @@ message FaceAttributes {
   optional int32 occlusion = 2;
 }
 
+
+message AnnoBlurDatum{
+  enum AnnoType{
+    FACEBLUR = 0;
+  }
+  optional Datum datum =1;
+  optional AnnoType type =2;
+  optional FaceAttributes faceatti = 3;
+}
+
 // The normalized bounding box [0, 1] w.r.t. the input image size.
 message NormalizedBBox {
   optional float xmin = 1;

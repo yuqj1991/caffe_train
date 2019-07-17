@@ -427,6 +427,42 @@ bool ReadRichCcpdToAnnotatedDatum(const string& filename,
   }
 }
 
+bool ReadRichBlurToAnnotatedDatum(const string& filename,
+    const string& labelfile, const int height, const int width,
+    const int min_dim, const int max_dim, const bool is_color,
+    const string& encoding, const AnnoBlurDatum_AnnoType type,
+    const string& labeltype, const std::map<string, int>& name_to_label, 
+    AnnoBlurDatum* anno_datum){
+  // Read image to datum.
+  bool status = ReadImageToDatum(filename, -1, height, width,
+                                 min_dim, max_dim, is_color, encoding,
+                                 anno_datum->mutable_datum());
+  if (status == false) {
+    return status;
+  }
+  anno_datum->clear_lpnumber();
+  if (!boost::filesystem::exists(labelfile)) {
+    return true;
+  }
+  // annno type bbox or attributes
+  switch (type) {
+    case AnnotatedCCpdDatum_AnnotationType_CCPD:
+      int ori_height, ori_width;
+      GetImageSize(filename, &ori_height, &ori_width);
+      if (labeltype == "txt") {
+        return ReadBlurTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                       name_to_label, anno_datum);
+      } else {
+        LOG(FATAL) << "Unknown label file type.";
+        return false;
+      }
+      break;
+    default:
+      LOG(FATAL) << "Unknown annotation type.";
+      return false;
+  }
+}
+
 #endif  // USE_OPENCV
 
 bool ReadFileToDatum(const string& filename, const int label,
@@ -783,6 +819,40 @@ bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
     LOG(INFO)<<"chi: "<<anno->chichracter()<< " eng: "<<anno->engchracter()<<" let1: "<<anno->letternum_1()
               << " let2: "<<anno->letternum_2()<<" let3: "<<anno->letternum_3()<<" let4: "<<anno->letternum_4()
               <<" let5: "<<anno->letternum_5();
+    #endif
+  }
+  return true;
+}
+
+
+bool ReadBlurTxtToAnnotatedDatum(const string& labelfile, const int height,
+    const int width, const std::map<string, int>& name_to_label,
+    AnnoBlurDatum* anno_datum){
+  std::ifstream infile(labelfile.c_str());
+  std::string lineStr ;
+  std::stringstream sstr ;
+  if (!infile.good()) {
+    LOG(INFO) << "Cannot open " << labelfile;
+    return false;
+  }
+  LOG(INFO)<<labelfile;
+  int blur, occlu;
+  while (std::getline(infile, lineStr )) {
+    sstr << lineStr;
+    sstr >> blur>>occlu;
+    #if 1
+    LOG(INFO)<<blur<<" "<<occlu;
+    #endif
+    FaceAttributes* anno = NULL;
+    anno = anno_datum->mutable_lpnumber();
+    string name = "faceAttributes";
+    if (name_to_label.find(name) == name_to_label.end()) {
+            LOG(FATAL) << "Unknown name: " << name;
+    }
+    anno->set_blur(blur);
+    anno->set_occlusion(occlu);
+    #if 1
+    LOG(INFO)<<"blur: "<<anno->blur()<< " occlusion: "<<anno->occlusion();
     #endif
   }
   return true;
