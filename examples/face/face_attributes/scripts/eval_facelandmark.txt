@@ -1,1 +1,0 @@
-python eval_image_attri.py --model ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v9.prototxt --weights ../../face_attributes/snapshot/deepanoFacelandmark_v9_iter_800000.caffemodel

@@ -1,4 +1,4 @@
-name: "deepano_face_posenet"
+name: "deep_face_posenet"
 layer {
     name: "data"
     type: "facePoseData"

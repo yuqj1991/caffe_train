@@ -1,4 +1,4 @@
-name: "DeepanoLpnet"
+name: "deepLpnet"
 input: "data"
 input_shape {
   dim: 1

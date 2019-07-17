@@ -1,4 +1,4 @@
-name: "deepano_face_anglenet"
+name: "deep_face_anglenet"
 input: "data"
 input_shape {
   dim: 1

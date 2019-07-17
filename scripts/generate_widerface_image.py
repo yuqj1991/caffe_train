@@ -16,7 +16,7 @@ sys.setrecursionlimit(1000000)
 ANNOTATIONS_DIR = '../../dataset/facedata/wider_face/Annotations'
 LABEL_DIR = '../../dataset/facedata/wider_face/label'
 wider_directory = ['wider_train', 'wider_test', 'wider_val']
-Annotation_img_dir = '../../dataset/facedata/wider_face/Annotation_img'
+Annotation_img_dir = '../../dataset/facedata/wider_face/annoImg'
 root_dir = "../../dataset/facedata/"
 anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
@@ -321,10 +321,10 @@ def generate_xml_from_wider_face(label_source_folder, img_filename, xml_save_fol
 	owner = doc.createElement('owner')  # company element
 	annotation.appendChild(owner)
 	flickrid_o = doc.createElement('flickrid')
-	flickrid_o.appendChild(doc.createTextNode('deepano'))
+	flickrid_o.appendChild(doc.createTextNode('deep'))
 	owner.appendChild(flickrid_o)
 	name_o = doc.createElement('name')
-	name_o.appendChild(doc.createTextNode('deepano'))
+	name_o.appendChild(doc.createTextNode('deep'))
 	owner.appendChild(name_o)
 	size = doc.createElement('size')   # img size info element
 	annotation.appendChild(size)

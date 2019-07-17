@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     while (infile >> filename >> labelname) {
       lines.push_back(std::make_pair(filename, labelname));
     }
-  }else if (anno_type == "detection_ccpd") {
+  }else if (anno_type == "detection") {
     type = AnnotatedDatum_AnnotationType_BBOX;
     ccpd_det_attri_type = AnnotatedDatum_AnnoataionAttriType_NORMALL;
     LabelMap label_map;
@@ -231,7 +231,7 @@ int main(int argc, char** argv) {
           name_to_label, &anno_datum);
       anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
       anno_datum.set_attri_type(AnnotatedDatum_AnnoataionAttriType_FACE);
-    }else if (anno_type == "detection_ccpd") {
+    }else if (anno_type == "detection") {
       labelname = boost::get<std::string>(lines[line_id].second);
       status = ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
           resize_width, min_dim, max_dim, is_color, enc, type, ccpd_det_attri_type, label_type,
@@ -294,7 +294,7 @@ int main(int argc, char** argv) {
 
     // Put in db
     string out;
-    if(anno_type == "classification" || anno_type == "detection_face"|| anno_type == "detection_ccpd")
+    if(anno_type == "classification" || anno_type == "detection_face"|| anno_type == "detection")
     {
       CHECK(anno_datum.SerializeToString(&out));
       txn->Put(key_str, out);

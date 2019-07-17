@@ -3,7 +3,7 @@ import sys
 import os
 import random
 ccpd_directory = ['training', 'testing']
-root_dir ='../../../../caffe_deeplearning_train/examples/deepano_liceneseplate/scripts/'
+root_dir ='../../../../caffe_train/examples/deep_liceneseplate/scripts/'
 root_dataset = '../../../../dataset/car_person_data/car_license/ccpd_dataset/label/'
 def shuffle_file(filename):
 	f = open(filename, 'r+')
