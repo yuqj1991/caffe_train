@@ -10,9 +10,9 @@ layer {
 	transform_param {
 		scale: 0.007843
 		mirror: false
-		mean_value: 127.5
-		mean_value: 127.5
-		mean_value: 127.5
+		mean_value: 103.94
+		mean_value: 116.78
+		mean_value: 123.68
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
@@ -46,18 +46,31 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
+		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_train_lmdb/"
 		batch_size: 16
 		backend: LMDB
 	}
-	annotated_data_param {
+annotated_data_param {
 		batch_sampler {
 			max_sample: 1
 			max_trials: 1
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.1
+				min_scale: 0.3
+				max_scale: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.4
+			}
+			sample_constraint {
+				min_jaccard_overlap: 0.4
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 0.7
 				max_aspect_ratio: 1.4
@@ -70,7 +83,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.1
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 0.7
 				max_aspect_ratio: 1.4
@@ -83,7 +96,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.1
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 0.7
 				max_aspect_ratio: 1.4
@@ -96,7 +109,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.1
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 0.7
 				max_aspect_ratio: 1.4

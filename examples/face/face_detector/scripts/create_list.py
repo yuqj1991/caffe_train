@@ -2,8 +2,8 @@ import shutil
 import sys
 import os
 import random
-wider_directory = ['wider_train', 'wider_val']
-root_dir ='../../../../../caffe_train/examples/deep_face/face_detector/scripts/'
+wider_directory = ['train', 'val']
+root_dir ='../../../../../caffe_train/examples/face/face_detector/scripts/'
 root_dataset = '../../../../../dataset/facedata/wider_face/Annotations/'
 def shuffle_file(filename):
 	f = open(filename, 'r+')
