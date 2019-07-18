@@ -139,8 +139,8 @@ void MultiBlurLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   LOG(INFO)<<"==================loss layer groundth======";
   LOG(INFO)<<"batch_size_: "<<batch_size_;
   for(int idx =0; idx<batch_size_; idx++){
-    LOG(INFO) <<" chi: "<<all_blur[idx]
-              <<" eng: "<<all_occlu[idx];
+    LOG(INFO) <<" blur: "<<all_blur[idx]
+              <<" occlu: "<<all_occlu[idx];
   }
   LOG(INFO)<<"=================END=======================";
   #endif

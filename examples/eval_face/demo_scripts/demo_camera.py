@@ -32,7 +32,7 @@ blur_classes = ('clear', 'normal', 'heavy')
 occlu_classes = ('clear', 'partial', 'heavy')
 
 def preprocess(src):
-    img = cv2.resize(src, (320,320))
+    img = cv2.resize(src, (300,300))
     img = img - 127.5
     img = img * 0.007843
     return img

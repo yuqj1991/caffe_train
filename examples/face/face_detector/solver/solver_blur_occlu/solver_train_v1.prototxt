@@ -1,0 +1,28 @@
+train_net: "../../prototxt/single_blur_occlu/train_crop.prototxt"
+test_net: "../../prototxt/single_blur_occlu/test_crop.prototxt"
+test_iter: 10000
+test_interval: 5000
+base_lr: 0.005
+display: 100
+max_iter: 400000
+lr_policy: "multistep"
+gamma: 0.5
+weight_decay: 0.0005
+snapshot: 5000
+snapshot_prefix: "../../snapshot/single_blur_occlu"
+solver_mode: GPU
+debug_info: false
+snapshot_after_train: true
+test_initialization: false
+average_loss: 10
+stepvalue: 50000
+stepvalue: 100000
+stepvalue: 120000
+stepvalue: 180000
+stepvalue: 300000
+iter_size: 2
+momentum2 : 0.99
+type: "RMSProp"
+eval_type: "face_Blur"
+ap_version: "11point"
+
