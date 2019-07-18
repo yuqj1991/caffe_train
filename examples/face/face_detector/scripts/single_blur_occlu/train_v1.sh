@@ -10,4 +10,4 @@ if ! test -f ../../prototxt/single_blur_occlu/test_crop.prototxt ;then
         exit 1
 fi
 ../../../../../build/tools/caffe train --solver=../../solver/solver_blur_occlu/solver_train_v1.prototxt -gpu 0 \
---snapshot=../../snapshot/single_blur_occlu_iter_5898.solverstate
+#--snapshot=../../snapshot/single_blur_occlu_iter_5898.solverstate
