@@ -848,7 +848,7 @@ bool ReadBlurTxtToAnnotatedDatum(const string& labelfile, const int height,
     #endif
     FaceAttributes* anno = NULL;
     anno = anno_datum->mutable_faceatti();
-    string name = "faceAttributes";
+    string name = "face";
     if (name_to_label.find(name) == name_to_label.end()) {
             LOG(FATAL) << "Unknown name: " << name;
     }
