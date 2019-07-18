@@ -165,4 +165,5 @@ template class DataReader<AnnoFacePoseDatum>;
 template class DataReader<AnnoFaceContourDatum>;
 template class DataReader<AnnoFaceAngleDatum>;
 template class DataReader<AnnotatedCCpdDatum>;
+template class DataReader<AnnoBlurDatum>;
 }  // namespace caffe

@@ -23,6 +23,6 @@ stepvalue: 300000
 iter_size: 2
 momentum2 : 0.99
 type: "RMSProp"
-eval_type: "detectionface"
+eval_type: "detection"
 ap_version: "11point"
 

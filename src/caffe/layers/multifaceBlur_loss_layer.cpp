@@ -23,9 +23,9 @@ void MultiBlurLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   batch_size_ = bottom[0]->num();
   // Get other parameters.
   CHECK(multibox_loss_param.has_num_blur()) << "Must prodived num_blur";
-  CHECK(multibox_loss_param.has_num_occlu()) << "Must provide num_occlu";
+  CHECK(multibox_loss_param.has_num_occlusion()) << "Must provide num_occlu";
   num_blur_ = multibox_loss_param.num_blur();
-  num_occlu_ = multibox_loss_param.num_occlu();
+  num_occlu_ = multibox_loss_param.num_occlusion();
 
   if (!this->layer_param_.loss_param().has_normalization() &&
     this->layer_param_.loss_param().has_normalize()) {
@@ -114,7 +114,7 @@ void MultiBlurLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 }
 
 template <typename Dtype>
-void MulticcpdLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
+void MultiBlurLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
   int num_blur = bottom[0]->shape(1);  //bottom[0]: landmarks , 
@@ -124,14 +124,14 @@ void MulticcpdLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 }
 
 template <typename Dtype>
-void MulticcpdLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+void MultiBlurLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
   const Dtype* gt_data = bottom[2]->cpu_data();
   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   vector<int> all_blur;
   vector<int> all_occlu;
   for(int item_id =0; item_id<batch_size_; item_id++){
-    int idxg = item_id*3;
+    int idxg = item_id*2;
     all_blur.push_back(gt_data[idxg+0]);
     all_occlu.push_back(gt_data[idxg+1]);
   }

@@ -43,7 +43,6 @@ class LpEvaluateLayer : public Layer<Dtype> {
   int num_chinese_;
   int num_english_;
   int num_letter_;
-  FaceEvaluateParameter_FaceType facetype_;
 };
 
 }  // namespace caffe

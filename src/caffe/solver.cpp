@@ -354,6 +354,8 @@ void Solver<Dtype>::TestAll() {
       TestRecoccpdNumber(test_net_id);
     }else if (param_.eval_type() == "faceangle") {
       TestRecoFaceAngle(test_net_id);
+    }else if (param_.eval_type() == "face_Blur") {
+      TestRecFaceBlur(test_net_id);
     }else {
       LOG(FATAL) << "Unknown evaluation type: " << param_.eval_type();
     }
@@ -837,6 +839,55 @@ void Solver<Dtype>::TestRecoccpdNumber(const int test_net_id) {
   }
 }
 
+
+template <typename Dtype>
+void Solver<Dtype>::TestRecFaceBlur(const int test_net_id) {
+  CHECK(Caffe::root_solver());
+  LOG(INFO) << "Iteration " << iter_
+            << ", Testing net (#" << test_net_id << ")";
+  CHECK_NOTNULL(test_nets_[test_net_id].get())->
+      ShareTrainedLayersWith(net_.get());
+  const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
+  Dtype blur_precison = 0.0;
+  Dtype occlu_precison = 0.0;
+  int batch_size =0;
+  for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
+    SolverAction::Enum request = GetRequestedAction();
+    // Check to see if stoppage of testing/training has been requested.
+    while (request != SolverAction::NONE) {
+        if (SolverAction::SNAPSHOT == request) {
+          Snapshot();
+        } else if (SolverAction::STOP == request) {
+          requested_early_exit_ = true;
+        }
+        request = GetRequestedAction();
+    }
+    if (requested_early_exit_) {
+      // break out of test loop.
+      break;
+    }
+    Dtype iter_loss;
+    const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
+    for (int j = 0; j < result.size(); ++j) {
+      const Dtype* result_vec = result[j]->cpu_data();
+      batch_size = result[j]->height();
+      for(int ii = 0; ii<batch_size; ii++){
+        if (result_vec[ii*2]==1)
+          blur_precison++;
+        if (result_vec[ii*2+ 1]==1)
+          occlu_precison++;
+      } 
+    }    
+  }
+  int total_images = param_.test_iter(test_net_id)* batch_size;
+  LOG(INFO) << "total_images: "<< total_images
+             << " blur_precison: "<< blur_precison/total_images 
+             << " occlu_precison: "<< occlu_precison/total_images;       
+  if (requested_early_exit_) {
+    LOG(INFO)     << "Test interrupted.";
+    return;
+  }
+}
 
 template <typename Dtype>
 void Solver<Dtype>::Snapshot() {

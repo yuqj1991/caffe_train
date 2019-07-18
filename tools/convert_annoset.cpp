@@ -270,8 +270,8 @@ int main(int argc, char** argv) {
       anno_ccpdDatum.set_type(AnnotatedCCpdDatum_AnnotationType_CCPD);
     }else if (anno_type == "faceBlur") {
       labelname = boost::get<std::string>(lines[line_id].second);
-      status = ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
-          resize_width, min_dim, max_dim, is_color, enc, anno_ccpd_type, label_type,
+      status = ReadRichBlurToAnnotatedDatum(filename, labelname, resize_height,
+          resize_width, min_dim, max_dim, is_color, enc, anno_Blur_type, label_type,
           name_to_label, &anno_BlurDatum);
       anno_BlurDatum.set_type(AnnoBlurDatum_AnnoType_FACEBLUR);
     }

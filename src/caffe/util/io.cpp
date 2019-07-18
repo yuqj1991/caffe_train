@@ -443,13 +443,13 @@ bool ReadRichBlurToAnnotatedDatum(const string& filename,
   if (status == false) {
     return status;
   }
-  anno_datum->clear_lpnumber();
+  anno_datum->clear_faceatti();
   if (!boost::filesystem::exists(labelfile)) {
     return true;
   }
   // annno type bbox or attributes
   switch (type) {
-    case AnnotatedCCpdDatum_AnnotationType_CCPD:
+    case AnnoBlurDatum_AnnoType_FACEBLUR:
       int ori_height, ori_width;
       GetImageSize(filename, &ori_height, &ori_width);
       if (labeltype == "txt") {
@@ -847,7 +847,7 @@ bool ReadBlurTxtToAnnotatedDatum(const string& labelfile, const int height,
     LOG(INFO)<<blur<<" "<<occlu;
     #endif
     FaceAttributes* anno = NULL;
-    anno = anno_datum->mutable_lpnumber();
+    anno = anno_datum->mutable_faceatti();
     string name = "faceAttributes";
     if (name_to_label.find(name) == name_to_label.end()) {
             LOG(FATAL) << "Unknown name: " << name;

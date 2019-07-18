@@ -69,7 +69,7 @@ void faceBlurDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
             // cpu_data and gpu_data for consistent prefetch thread. Thus we make
             // sure there is at least one bbox.
             label_shape[2] = batch_size;
-            label_shape[3] = 3;
+            label_shape[3] = 2;
             } else {
             LOG(FATAL) << "Unknown annotation type.";
             }
@@ -185,24 +185,23 @@ void faceBlurDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             delete expand_datum;
         }
         trans_time += timer.MicroSeconds();
-        reader_.free().push(const_cast<AnnoFaceDatum*>(&anno_datum));
+        reader_.free().push(const_cast<AnnoBlurDatum*>(&anno_datum));
     }
 
     // store "rich " landmark, face attributes
     if (this->output_labels_ && has_anno_type_) {
         vector<int> label_shape(4);
-        if (anno_type_ == AnnoFaceDatum_AnnotationType_FACEMARK) {
+        if (anno_type_ == AnnoBlurDatum_AnnoType_FACEBLUR) {
             label_shape[0] = 1;
             label_shape[1] = 1;
             // Reshape the label and store the annotation.
             label_shape[2] = batch_size;
-            label_shape[3] = 3;
+            label_shape[3] = 2;
             batch->label_.Reshape(label_shape);
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
             for (int item_id = 0; item_id < batch_size; ++item_id) {
                 FaceAttributes face = all_anno[item_id];
-                top_label[idx++] = item_id;
                 top_label[idx++] = face.blur();
                 top_label[idx++] = face.occlusion();
                 #if 0

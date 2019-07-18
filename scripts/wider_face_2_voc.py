@@ -14,7 +14,7 @@ minsize2select = 20
 usepadding = True
 
 datasetprefix = "../../dataset/facedata/wider_face"  #
-use_blur_occlu_attri = False # True
+use_blur_occlu_attri = True #False #
 
 def convertimgset(img_set="train"):
     imgdir = rootdir + '/wider_face/' + "JPEGImages/wider_" + img_set + "/images"
@@ -22,12 +22,19 @@ def convertimgset(img_set="train"):
     imagesdir = rootdir + '/wider_face/' + "/annoImg"
     vocannotationdir = rootdir + '/wider_face/' + "/Annotations"
     labelsdir = rootdir + '/wider_face/' + "/labels"
+    cropImgsDir = rootdir + '/wider_face/' + "/CropImg"
+    croplabelsdir = rootdir + '/wider_face/' + "/Croplabel"
     if not os.path.exists(imagesdir):
         os.mkdir(imagesdir)
     if not os.path.exists(rootdir + '/wider_face/' + "/ImageSets"):
         os.mkdir(rootdir + '/wider_face/' + "/ImageSets")
     if not os.path.exists(rootdir + '/wider_face/' + "/ImageSets/Main"):
         os.mkdir(rootdir + '/wider_face/' + "/ImageSets/Main")
+    if use_blur_occlu_attri:
+        if not os.path.exists(croplabelsdir):
+            os.mkdir(croplabelsdir)
+        if not os.path.exists(cropImgsDir):
+            os.mkdir(cropImgsDir)
 
     if convet2yoloformat:
         if not os.path.exists(labelsdir):
@@ -38,6 +45,8 @@ def convertimgset(img_set="train"):
     index = 0
 
     f_set = open(rootdir + '/wider_face/' + "/ImageSets/Main/" + img_set + ".txt", 'w')
+    if use_blur_occlu_attri:
+        f_set_crop = open(rootdir + '/wider_face/' + "/ImageSets/Main/crop_" + img_set + ".txt", 'w')
     with open(gtfilepath, 'r') as gtfile:
         while (True):  # and len(faces)<10
             filename = gtfile.readline()[:-1]
@@ -84,13 +93,21 @@ def convertimgset(img_set="train"):
                     bboxes.append(bbox)
                     occlus.append(occlu)
                     blurs.append(blur)
+                    if use_blur_occlu_attri:
+                        cropImgFileName = cropImgsDir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i) + '.jpg'
+                        cropLableFileName = croplabelsdir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i)
+                        x11 = np.maximum(x - 44/2, 0)
+                        y11 = np.maximum(y - 44/2, 0)
+                        x22 = np.minimum(x2 + 44/2, img.shape[1])
+                        y22 = np.minimum(y2 + 44/2, img.shape[0])
+                        cropImg = img[int(y11):int(y22),int(x11):int(x22),:]
+                        cv2.imwrite(cropImgFileName, cropImg)
+                        croplabel_file = open(cropLableFileName, 'w')
+                        txtline = str(blur) + ' ' + str(occlu) + '\n'
+                        croplabel_file.write(txtline)
+                        croplabel_file.close()
+                        f_set_crop.write(os.path.abspath(cropImgFileName).split('.jpg')[0] + '\n')
                     cv2.rectangle(showimg, (x, y), (x2, y2), (0, 255, 0))
-                    # maxl=max(width,height)
-                    # x3=(int)(x+(width-maxl)*0.5)
-                    # y3=(int)(y+(height-maxl)*0.5)
-                    # x4=(int)(x3+maxl)
-                    # y4=(int)(y3+maxl)
-                    # cv2.rectangle(img,(x3,y3),(x4,y4),(255,0,0))
                 else:
                     saveimg[y:y2, x:x2, :] = (104,117,123)
                     cv2.rectangle(showimg, (x, y), (x2, y2), (0, 0, 255))
@@ -260,6 +277,6 @@ def convertdataset():
 
 
 if __name__ == "__main__":
-    #convertdataset()
+    convertdataset()
     shutil.move(rootdir + '/wider_face/' + "/ImageSets/Main/" + "train.txt", rootdir + '/wider_face/' + "/ImageSets/Main/" + "train.txt")
     shutil.move(rootdir +  '/wider_face/' + "/ImageSets/Main/" + "val.txt", rootdir + '/wider_face/' + "/ImageSets/Main/" + "val.txt")

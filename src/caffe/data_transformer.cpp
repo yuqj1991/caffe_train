@@ -1418,7 +1418,7 @@ void DataTransformer<Dtype>::ExpandImage(const AnnoBlurDatum& anno_datum,
 	const bool do_mirror = false;
 	const bool do_expand = true;
 	TransformFaceBlur(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
-											expanded_anno_datum->mutable_lpnumber());
+											expanded_anno_datum->mutable_faceatti());
 }
 
 template<typename Dtype>
