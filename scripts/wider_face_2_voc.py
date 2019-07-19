@@ -96,10 +96,10 @@ def convertimgset(img_set="train"):
                     if use_blur_occlu_attri:
                         cropImgFileName = cropImgsDir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i) + '.jpg'
                         cropLableFileName = croplabelsdir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i)
-                        x11 = np.maximum(x - 44/2, 0)
-                        y11 = np.maximum(y - 44/2, 0)
-                        x22 = np.minimum(x2 + 44/2, img.shape[1])
-                        y22 = np.minimum(y2 + 44/2, img.shape[0])
+                        x11 = np.maximum(x - 22/2, 0)
+                        y11 = np.maximum(y - 22/2, 0)
+                        x22 = np.minimum(x2 + 22/2, img.shape[1])
+                        y22 = np.minimum(y2 + 22/2, img.shape[0])
                         cropImg = img[int(y11):int(y22),int(x11):int(x22),:]
                         cv2.imwrite(cropImgFileName, cropImg)
                         croplabel_file = open(cropLableFileName, 'w')

@@ -121,6 +121,8 @@ void MultiBlurLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   int num_occlu = bottom[1]->shape(1); //bottom[1]: num_gender;
   CHECK_EQ(num_blur, num_blur_)<<"number of num_blur_ point value must equal";
   CHECK_EQ(num_occlu, num_occlu_)<<"number of num_occlu_ must match prototxt provided";
+  CHECK_EQ(bottom[0]->count(), num_blur_*batch_size_)<<"count must equal";
+  CHECK_EQ(bottom[1]->count(), num_occlu_*batch_size_)<<"count must equal";
 }
 
 template <typename Dtype>
@@ -222,8 +224,8 @@ void MultiBlurLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
   }
   Dtype* occlu_pred_data = occlu_pred_.mutable_cpu_data();
-  const Dtype* eng_data = bottom[1]->cpu_data();
-  caffe_copy<Dtype>(bottom[1]->count(), eng_data, occlu_pred_data);
+  const Dtype* occlu_data = bottom[1]->cpu_data();
+  caffe_copy<Dtype>(bottom[1]->count(), occlu_data, occlu_pred_data);
   occlu_loss_layer_->Reshape(occlu_bottom_vec_, occlu_top_vec_);
   occlu_loss_layer_->Forward(occlu_bottom_vec_, occlu_top_vec_);
 
@@ -233,7 +235,7 @@ void MultiBlurLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         normalization_, batch_size_, 1, -1);
   if(this->layer_param_.propagate_down(0)) {
     top[0]->mutable_cpu_data()[0] += 
-          1*blur_loss_.cpu_data()[0] / normalizer;
+          blur_loss_.cpu_data()[0] / normalizer;
   }
   if(this->layer_param_.propagate_down(1)) {
     top[0]->mutable_cpu_data()[0] += 
