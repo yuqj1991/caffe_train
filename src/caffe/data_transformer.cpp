@@ -756,8 +756,7 @@ void DataTransformer<Dtype>::TransformFaceBlur(
     const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
     FaceAttributes* transformed_annoface_all){
 	if(anno_datum.type() == AnnoBlurDatum_AnnoType_FACEBLUR){
-		transformed_annoface_all->set_occlusion(anno_datum.faceatti().occlusion());
-		transformed_annoface_all->set_blur(anno_datum.faceatti().blur());
+		transformed_annoface_all->CopyFrom(anno_datum.faceatti());
 	}
 }
 
