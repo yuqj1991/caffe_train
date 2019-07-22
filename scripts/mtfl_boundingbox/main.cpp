@@ -40,6 +40,15 @@ Mat rotateImg(Mat src, int angle){
     return dst;
 }
 
+Mat rotateSameImg(Mat src, int angle){
+    Mat dst;
+    //旋转
+    Point2f center( (float)(src.cols/2) , (float) (src.rows/2));
+    Mat affine_matrix = getRotationMatrix2D( center, angle, 1.0 );//求得旋转矩阵
+    warpAffine(src, dst, affine_matrix, dst.size());
+    return dst;
+}
+
 vector<cv::Point2f> CropImg(Mat src, Mat& dst , int angle, vector<cv::Point2f> Points){
     float radian = (float) (angle /180.0 * M_PI);
     vector<cv::Point2f> dstPoints;
@@ -127,6 +136,65 @@ void RotateBatchImage(string& srcfilePath, string &labelPath, string &newTrainin
     setFile.close();
 }
 
+void RotateSameBatchImage(string& srcfilePath, string &labelPath, string &newTrainingSetFile){
+    ofstream setFile(newTrainingSetFile, ios::out|ios::app);
+    if(!setFile.is_open()){
+        std::cout<< "cannot open lablefile , the file" << newTrainingSetFile << "does not exit!"<<std::endl;
+        return;
+    }
+    Mat src = imread(srcfilePath);
+    vector<cv::Point2f> Points;
+    std::ifstream infile(labelPath.c_str());
+    std::string lineStr ;
+    std::stringstream sstr ;
+    if (!infile.good()) {
+        std::cout << "Cannot open " << labelPath<<std::endl;
+        return;
+    }
+    float x[5];
+    float y[5];
+    int gender;
+    int glass;
+    while (std::getline(infile, lineStr )) {
+        sstr << lineStr;
+        sstr >> x[0] >> x[1] >> x[2] >> x[3] >> x[4] >> y[0] >> y[1] >> y[2] >> y[3] >> y[4] >> gender >> glass;
+        for(size_t ii=0; ii<5; ii++){
+            Points.push_back(cv::Point2f(x[ii], y[ii]));
+        }
+        lineStr.clear();
+    }
+    double angle ;
+    srand((int)time(0));
+    size_t iPos = srcfilePath.find(".jpg");
+    string s2 = srcfilePath.substr(0, iPos);
+    for(int iter = 0; iter < 5; iter++){
+        string newImgFilepath = s2 + "_"+std::to_string(iter)+".jpg";
+        string newImgFilepath_rotete = s2 + "_"+std::to_string(iter)+"_rotate.jpg";
+        string newLablePath = labelPath + "_"+std::to_string(iter);
+        angle = Random(-120, 120);
+        std::cout<<"angle: "<<angle<<std::endl;
+        Mat dst =  rotateSameImg(src, angle);
+        cv::Point2f center(dst.cols / 2., dst.rows / 2.);
+        vector<cv::Point2f> dstPoints = getRotatePoint(dst.rows, Points, center, angle);
+        ofstream file(newLablePath, ios::out);
+        if(!file.is_open()){
+            std::cout<< "cannot open lablefile , the file" << newLablePath << "does not exit!"<<std::endl;
+            return;
+        }
+        file << dstPoints.at(0).x << " " << dstPoints.at(1).x << " " << dstPoints.at(2).x << " " << dstPoints.at(3).x << " "
+            << dstPoints.at(4).x << " " << dstPoints.at(0).y << " " << dstPoints.at(1).y << " " << dstPoints.at(2).y << " " << dstPoints.at(3).y << " "
+            << dstPoints.at(4).y << " "<<gender<<" "<<glass<< std::endl;
+        cv::imwrite(newImgFilepath, dst);
+        for(size_t ii=0; ii<dstPoints.size(); ii++){
+            cv::circle(dst, dstPoints.at(ii), 5, cv::Scalar(0, 0, 255), 2);
+        }
+        cv::imwrite(newImgFilepath_rotete, dst);
+        file.close();
+        setFile << newImgFilepath <<std::endl;
+    }
+    setFile.close();
+}
+
 
 int main() {
     string srcTrainsetFile = "/home/stive/workspace/dataset/facedata/mtfl/ImageSets/training.txt";
@@ -153,7 +221,8 @@ int main() {
             std::stringstream newsster(lineStr) ;
             newsster >> imgPath >> labelPath;
             std:: cout << "imgPath: "<<imgPath<<" labelPath: "<<labelPath<<std::endl;
-            RotateBatchImage(imgPath, labelPath, newTrainsetFile);
+            //RotateBatchImage(imgPath, labelPath, newTrainsetFile);
+            RotateSameBatchImage(imgPath, labelPath, newTrainsetFile);
         }
     }
     infile.close();
