@@ -16,8 +16,8 @@ layer {
 		resize_param {
 			prob: 1
 			resize_mode: WARP
-			height: 320
-			width: 320
+			height: 512
+			width: 512
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
@@ -2536,7 +2536,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -2610,7 +2610,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -2684,7 +2684,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -2834,7 +2834,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -2908,7 +2908,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -2982,7 +2982,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3133,7 +3133,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3207,7 +3207,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3281,7 +3281,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3365,7 +3365,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3438,7 +3438,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3512,7 +3512,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3586,7 +3586,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3670,7 +3670,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3743,7 +3743,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3817,7 +3817,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3891,7 +3891,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -3976,7 +3976,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -4049,7 +4049,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -4123,7 +4123,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -4197,7 +4197,7 @@ layer{
 		kernel_size: 1
 		stride: 1
 		weight_filler {
-			type: "xavier"
+			type: "msra"
 		}
 		bias_filler {
 			type: "constant"
@@ -4271,6 +4271,8 @@ layer {
 	prior_box_param {
 		min_size: 10.0
 		max_size: 16.0
+		aspect_ratio: 2.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4295,7 +4297,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 24
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4342,7 +4344,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4388,6 +4390,7 @@ layer {
 		min_size: 16.0
 		max_size: 32.0
 		aspect_ratio: 2.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4412,7 +4415,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 24
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4459,7 +4462,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4504,6 +4507,8 @@ layer {
 	prior_box_param {
 		min_size: 32.0
 		max_size: 64.0
+		aspect_ratio: 2.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4528,7 +4533,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 24
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4575,7 +4580,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4620,6 +4625,8 @@ layer {
 	prior_box_param {
 		min_size: 64.0
 		max_size: 128.0
+		aspect_ratio: 2.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4644,7 +4651,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 24
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4691,7 +4698,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4735,7 +4742,9 @@ layer {
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
 		min_size: 128.0
-		max_size: 214.0
+		max_size: 256.0
+		aspect_ratio: 2.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4760,7 +4769,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 24
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4807,7 +4816,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4850,8 +4859,10 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
-		min_size: 214.0
-		max_size: 300.0
+		min_size: 256.0
+		max_size: 512.0
+		aspect_ratio: 2.0
+		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4876,7 +4887,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 24
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4923,7 +4934,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
