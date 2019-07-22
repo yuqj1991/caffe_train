@@ -12,6 +12,7 @@ weight_decay: 0.004
 snapshot: 100000
 snapshot_prefix: "../snapshot/facelandmark_v2"
 solver_mode: GPU
+average_loss: 10
 snapshot_after_train: true
 stepvalue: 50000
 stepvalue: 100000
