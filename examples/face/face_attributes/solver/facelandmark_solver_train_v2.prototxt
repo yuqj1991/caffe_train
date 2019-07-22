@@ -18,6 +18,9 @@ stepvalue: 100000
 stepvalue: 300000
 stepvalue: 400000
 stepvalue: 600000
+stepvalue: 1200000
+stepvalue: 1600000
+stepvalue: 2000000
 eval_type: "faceattri"
 #type: "RMSProp"
 #momentum2: 0.99
