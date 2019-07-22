@@ -32,8 +32,8 @@ blur_classes = ('clear', 'normal', 'heavy')
 occlu_classes = ('clear', 'partial', 'heavy')
 
 def preprocess(src):
-    img = cv2.resize(src, (300,300))
-    img = img - 127.5
+    img = cv2.resize(src, (320,320))
+    img = img - [103.94, 116.78, 123.68] # 127.5
     img = img * 0.007843
     return img
 
@@ -43,9 +43,7 @@ def postprocess(img, out):
     box = out['detection_out'][0,0,:,3:7] * np.array([w, h, w, h])
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
-    blur_max_index = out['detection_out'][0,0,:,7]
-    blur_max_index = out['detection_out'][0,0,:,8]
-    return (box.astype(np.int32), conf, cls, blur_max_index.astype(np.int32), blur_max_index.astype(np.int32))
+    return (box.astype(np.int32), conf, cls)
 
 def detect():
     cap = cv2.VideoCapture(0)
@@ -57,14 +55,14 @@ def detect():
 
        net.blobs['data'].data[...] = img
        out = net.forward()
-       box, conf, cls , blur, occlu= postprocess(frame, out)
+       box, conf, cls= postprocess(frame, out)
        for i in range(len(box)):
           if conf[i]>=0.25:
              p1 = (box[i][0], box[i][1])
              p2 = (box[i][2], box[i][3])
              cv2.rectangle(frame, p1, p2, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "%s:%.2f, %s, %s" % (CLASSES[int(cls[i])], conf[i], blur_classes[int(blur[i])], occlu_classes[int(occlu[i])] )
+             title = "%s:%.2f" % (CLASSES[int(cls[i])], conf[i])
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("facedetector", frame)
        k = cv2.waitKey(30) & 0xff

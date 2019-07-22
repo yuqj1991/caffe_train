@@ -19,11 +19,11 @@ def parser():
     parser.add_argument('--gpu', dest='gpu_id', help='The GPU ide to be used',
                         default=0, type=int)
     parser.add_argument('--prototxt', dest='prototxt', help='face caffe test prototxt',
-                        default='net/face_detector_deploy_v3.prototxt', type=str)
+                        default='net/face_detector.prototxt', type=str)
     parser.add_argument('--out_path', dest='out_path', help='Output path for saving the figure',
                         default='output', type=str)
     parser.add_argument('--model', dest='model', help='face trained caffemodel',
-                        default='net/face_detector_v3_final.caffemodel', type=str)
+                        default='net/face_detector.caffemodel', type=str)
     parser.add_argument('--net_name', dest='net_name',
                         help='The name of the experiment',
                         default='face_detector',type=str)
@@ -31,8 +31,8 @@ def parser():
 
 
 def preprocess(src):
-    img = cv2.resize(src, (300,300))
-    img = img - 127.5
+    img = cv2.resize(src, (320,320))
+    img = img - [103.94, 116.78, 123.68] # 127.5
     img = img * 0.007843
     return img
 
@@ -43,9 +43,7 @@ def postprocess(img, out):
     box = out['detection_out'][0,0,:,3:7] * np.array([w, h, w, h])
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
-    blur_max_index = out['detection_out'][0,0,:,7]
-    blur_max_index = out['detection_out'][0,0,:,8]
-    return (box.astype(np.int32), conf, cls, blur_max_index.astype(np.int32), blur_max_index.astype(np.int32))
+    return (box.astype(np.int32), conf, cls)
 
 
 def detect(net, im_path, thresh=0.05, timers=None):
@@ -70,7 +68,7 @@ def detect(net, im_path, thresh=0.05, timers=None):
     img = img.transpose((2, 0, 1))
     net.blobs['data'].data[...] = img
     out = net.forward()
-    boxes, conf, cls , blur, occlu= postprocess(im, out)
+    boxes, conf, cls = postprocess(im, out)
     timers['detect'].toc()
     timers['misc'].tic()
     inds = np.where(conf[:] > thresh)[0]
