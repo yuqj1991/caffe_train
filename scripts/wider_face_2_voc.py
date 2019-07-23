@@ -11,7 +11,7 @@ convert2vocformat = True
 
 # 最小取20大小的脸，并且补齐
 minsize2select = 20
-cropsize2select = 40
+cropsize2select = 60
 usepadding = True
 
 datasetprefix = "../../dataset/facedata/wider_face"  #
