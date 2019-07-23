@@ -12,12 +12,16 @@ weight_decay: 0.004
 snapshot: 100000
 snapshot_prefix: "../snapshot/facelandmark_v1"
 solver_mode: GPU
+average_loss: 10
 snapshot_after_train: true
 stepvalue: 50000
 stepvalue: 100000
 stepvalue: 300000
 stepvalue: 400000
 stepvalue: 600000
+stepvalue: 1200000
+stepvalue: 1600000
+stepvalue: 2000000
 eval_type: "faceattri"
 #type: "RMSProp"
 #momentum2: 0.99
