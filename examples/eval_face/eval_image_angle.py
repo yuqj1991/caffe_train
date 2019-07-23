@@ -54,12 +54,7 @@ def detect(imgfile, labelpath):
     net.blobs['data'].data[...] = img
     out = net.forward()
     yaw, pitch, roll = out['conv6_angle'][0, 0:3] * 360
-    sum_nmse = [0.0,0.0,0.0,0.0,0.0]
-
-    correct_gender = False
-    correct_glasses = False
-    correct_headpose = False
-
+    sum_nmse = [0.0,0.0,0.0]
     with open(labelpath, 'r') as labelfile_:
         while True:
             labelInfo = labelfile_.readline().split(' ')
@@ -68,49 +63,32 @@ def detect(imgfile, labelpath):
             x1 = float(labelInfo[0])
             x2 = float(labelInfo[1])
             x3 = float(labelInfo[2])
-
-            intal_eye_w = float(pow((pow((x1-x2), 2) + pow((y1-y2), 2)), 0.5))
-            for ii in range(5):
-                sum_n = float(pow(pow((x[ii]-point[ii]), 2) + pow((y[ii]-point[ii+5]), 2), 0.5))
-                sum_nmse[ii] = sum_n/intal_eye_w
+            x = [x1, x2, x3]
+            y = [yaw, pitch, roll]
+            for ii in range(3):
+                sum_n = float(abs(x[ii]-y[ii]))
+                sum_nmse[ii] = sum_n
     labelfile_.close()
-    return sum_nmse, correct_gender, correct_glasses, correct_headpose
+    return sum_nmse
 
 
-mtfl_eval_landmakrs = []
-mtfl_eval_gender = 0
-mtfl_eval_glass =0
-mtfl_eval_headpose = 0
-sum_landmark = [0.0,0.0,0.0,0.0,0.0]
+eval_angle = []
+sum_angle= [0.0,0.0,0.0]
 with open(val_list_file, 'r') as listfile_:
 	while True:
 		val_image = listfile_.readline()
 		if not val_image:
 			break
 		val_imageinfo = listfile_.readline().split(' ')
-		sum, gender, glasses, headpose = detect(val_imageinfo[0], val_imageinfo[1].replace('\n', ''))
-		mtfl_eval_landmakrs.append(sum)
-		if gender:
-			mtfl_eval_gender += 1
-		if glasses:
-			mtfl_eval_glass += 1
-		if headpose:
-			mtfl_eval_headpose += 1
+		sum = detect(val_imageinfo[0], val_imageinfo[1].replace('\n', ''))
+		eval_angle.append(sum)
 		num_image += 1
 
-# static
-for nn in range(len(mtfl_eval_landmakrs)):
-    for ii in range(5):
-        sum_landmark[ii] += float(mtfl_eval_landmakrs[nn][ii]/num_image)
-eval_gender = float(mtfl_eval_gender/num_image)
-eval_glass = float(mtfl_eval_glass/num_image)
-eval_headpose = float(mtfl_eval_headpose/num_image)
 
-print ("eval_gender: %f, eval_glass: %f, eval_headpose: %f" % (eval_gender, eval_glass, eval_headpose))
-print ("left eye : %f, right eye: %f, nose : %f, left cornor mouth: %f, right cornor mouth: %f" % (sum_landmark[0],
-                                                                                                   sum_landmark[1],
-                                                                                                   sum_landmark[2],
-                                                                                                   sum_landmark[3],
-                                                                                                   sum_landmark[4]))
+# static
+for nn in range(len(eval_angle)):
+    for ii in range(3):
+        sum_angle[ii] += float(eval_angle[nn][ii]/num_image)
+print ("yaw : %f, pitch: %f, roll : %f," % (sum_angle[0], sum_angle[1], sum_angle[2]))
 
 

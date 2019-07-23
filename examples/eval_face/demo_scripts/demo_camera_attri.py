@@ -9,10 +9,10 @@ import caffe
 
 def make_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, required=True, help='.prototxt file for inference')
-    parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
-    parser.add_argument('--facemodel', type=str, required=True, help='.prototxt file for inference face landmarks')
-    parser.add_argument('--faceweights', type=str, required=True, help='.caffemodel file for inference face landmarks weights')
+    parser.add_argument('--model', type=str, help='.prototxt file for inference', default = '../../../../net/face_detector.prototxt')
+    parser.add_argument('--weights', type=str, help='.caffemodel file for inference', default = '../../../../net/face_detector.caffemodel')
+    parser.add_argument('--facemodel', type=str, help='.prototxt file for inference face landmarks', default = '../../../../net/face_attributes.prototxt')
+    parser.add_argument('--faceweights', type=str, help='.caffemodel file for inference face landmarks weights', default = '../../../../net/face_attributes.caffemodel')
     return parser
     
 
@@ -36,11 +36,8 @@ net = caffe.Net(net_file,caffe_model,caffe.TEST)
 face_net = caffe.Net(face_file,face_model,caffe.TEST) 
 
 CLASSES = ('background', 'face')
-blur_classes = ('clear', 'normal', 'heavy')
-occlu_classes = ('clear', 'partial', 'heavy')
 gender_content = ('male', 'female')
 glasses_content = ('wearing glasses', 'not wearing glasses')
-headpose_content = ('left profile', 'left', 'frontal', 'right', 'right profile')
 
 
 def max_(m,n):
@@ -55,6 +52,12 @@ def min_(m,n):
 	return m
 
 
+def preprocessdet(src, size):
+    img = cv2.resize(src, size)
+    img = img - [103.94, 116.78, 123.68] # 127.5
+    img = img * 0.007843
+    return img
+
 def preprocess(src, size):
     img = cv2.resize(src, size)
     img = img - 127.5
@@ -62,18 +65,16 @@ def preprocess(src, size):
     return img
 
 
-def postprocess(img, out):   
+def postprocess(img, out):
     h = img.shape[0]
     w = img.shape[1]
     box = out['detection_out'][0,0,:,3:7] * np.array([w, h, w, h])
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
-    blur_max_index = out['detection_out'][0,0,:,7]
-    blur_max_index = out['detection_out'][0,0,:,8]
-    return (box.astype(np.int32), conf, cls, blur_max_index.astype(np.int32), blur_max_index.astype(np.int32))
+    return (box.astype(np.int32), conf, cls)
 
 
-def postprocessface(img, out):   
+def postprocessattri(img, out):
     h = img.shape[0]
     w = img.shape[1]
     facepoints = out['multiface_output'][0,0:10] * np.array([w, w, w, w, w, h, h, h, h, h])
@@ -90,7 +91,7 @@ def detect():
        ret, frame = cap.read()
        h = frame.shape[0]
        w = frame.shape[1]
-       img = preprocess(frame, (300, 300))
+       img = preprocessdet(frame, (320, 320))
        img = img.astype(np.float32)
        img = img.transpose((2, 0, 1))
 
@@ -123,7 +124,7 @@ def detect():
                  cv2.circle(ori_img, point, 3, (0,0,213), -1)
              cv2.rectangle(frame, p1, p2, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "%s:%.2f,%s, %s, %s, %s" % (CLASSES[int(cls[i])], conf[i], blur_classes[int(blur[i])], occlu_classes[int(occlu[i])], gender, glasses)
+             title = "%s:%.2f, %s, %s" % (CLASSES[int(cls[i])], conf[i], gender, glasses)
              print(title)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("face", frame)

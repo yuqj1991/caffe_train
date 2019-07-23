@@ -16,7 +16,7 @@ python demo_camera_attri.py --model ../prototxt/face_deploy_v3.prototxt  --weigh
 
 
 ===========================================demo camera attri angle.py=================================
-python demo_camera_attri_angle.py --model ../prototxt/face_deploy_v3.prototxt  --weights ../snapshot/face_detector_v3_final.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v1.prototxt --faceweights ../../face_attributes/snapshot/facelandmark_v1_final.caffemodel --anglemodel ../../face_attributes/prototxt/faceanglenet/faceanglenet_deploy_v2.prototxt --angleweights ../../face_attributes/snapshot/faceangle_v2_final.caffemodel
+python demo_camera_attri_angle.py
 
 
 
@@ -27,10 +27,6 @@ python demo_camera_angle.py --model ../prototxt/face_deploy_v3.prototxt  --weigh
 
 ===========================================scp file==================================================
 scp deep@192.168.1.60:/home/deep/workspace/caffe_deeplearning_train/examples/face/face_detector/snapshot/face_detector_v8_iter_100000.caffemodel examples/face/face_detector/snapshot/
-
-
-
-
 
 
 

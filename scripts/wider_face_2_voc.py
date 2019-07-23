@@ -11,6 +11,7 @@ convert2vocformat = True
 
 # 最小取20大小的脸，并且补齐
 minsize2select = 20
+cropsize2select = 40
 usepadding = True
 
 datasetprefix = "../../dataset/facedata/wider_face"  #
@@ -93,7 +94,7 @@ def convertimgset(img_set="train"):
                     bboxes.append(bbox)
                     occlus.append(occlu)
                     blurs.append(blur)
-                    if use_blur_occlu_attri:
+                    if use_blur_occlu_attri and width >= cropsize2select and height >= cropsize2select:
                         cropImgFileName = cropImgsDir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i) + '.jpg'
                         cropLableFileName = croplabelsdir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i)
                         x11 = np.maximum(x - 0/2, 0)
