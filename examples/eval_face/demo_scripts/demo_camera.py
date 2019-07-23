@@ -10,12 +10,19 @@ def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, required=True, help='.prototxt file for inference')
     parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
+    parser.add_argument('--input', type = int, help='net input', default = 300)
+    parser.add_argument('--sameAvg', type = bool, help='net input', default = True)
     return parser
 parser1 = make_parser()
 args = parser1.parse_args()
 net_file= args.model
 caffe_model= args.weights
-test_dir = "../images"
+
+inputsize = 300
+mean_value = [127.5, 127.5, 127.5]
+if not args.sameAvg:
+    mean_value = [103.94, 116.78, 123.68]
+    inputsize = args.input
 
 if not os.path.exists(caffe_model):
     print(caffe_model + " does not exist")
@@ -31,9 +38,9 @@ CLASSES = ('background', 'face')
 blur_classes = ('clear', 'normal', 'heavy')
 occlu_classes = ('clear', 'partial', 'heavy')
 
-def preprocess(src):
-    img = cv2.resize(src, (320,320))
-    img = img - [103.94, 116.78, 123.68] # 127.5
+def preprocess(src, inputsize, mean_value):
+    img = cv2.resize(src, (inputsize,inputsize))
+    img = img -mean_value # [103.94, 116.78, 123.68] # 127.5 #
     img = img * 0.007843
     return img
 
@@ -49,7 +56,7 @@ def detect():
     cap = cv2.VideoCapture(0)
     while True:
        ret, frame = cap.read()
-       img = preprocess(frame)
+       img = preprocess(frame, inputsize, mean_value)
        img = img.astype(np.float32)
        img = img.transpose((2, 0, 1))
 

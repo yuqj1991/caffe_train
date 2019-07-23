@@ -59,7 +59,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 32
@@ -133,7 +133,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 64
@@ -208,7 +208,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 64
@@ -282,7 +282,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 128
@@ -357,7 +357,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 128
@@ -443,7 +443,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 128
@@ -517,7 +517,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 128
@@ -592,7 +592,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 128
@@ -677,7 +677,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 128
@@ -829,7 +829,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 256
@@ -905,7 +905,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 256
@@ -979,7 +979,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 256
@@ -1054,7 +1054,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 256
@@ -1142,7 +1142,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 64
@@ -1218,7 +1218,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 64
@@ -1292,7 +1292,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 128
@@ -1366,7 +1366,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 128
@@ -1440,7 +1440,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 64
@@ -1515,7 +1515,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 64
@@ -1591,7 +1591,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 128
@@ -1754,7 +1754,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 256
@@ -1828,7 +1828,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 256
@@ -1903,7 +1903,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	inner_product_param {
 		num_output: 96
@@ -1933,7 +1933,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	inner_product_param {
 		num_output: 32
@@ -1964,7 +1964,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	inner_product_param {
 		num_output: 2
@@ -1991,7 +1991,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	inner_product_param {
 		num_output: 96
@@ -2021,7 +2021,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	inner_product_param {
 		num_output: 32
@@ -2051,7 +2051,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	inner_product_param {
 		num_output: 2
@@ -2077,7 +2077,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 256
@@ -2151,7 +2151,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	convolution_param {
 		num_output: 256
@@ -2225,7 +2225,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	inner_product_param {
 		num_output: 512
@@ -2255,7 +2255,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	inner_product_param {
 		num_output: 64
@@ -2285,7 +2285,7 @@ layer {
 	}
 	param {
 		lr_mult: 2
-		decay_mult: 1
+		decay_mult: 0
 	}
 	inner_product_param {
 		num_output: 10

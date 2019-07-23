@@ -9,12 +9,14 @@ import caffe
 
 def make_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, required=True, help='.prototxt file for inference')
-    parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
-    parser.add_argument('--facemodel', type=str, required=True, help='.prototxt file for inference face landmarks')
-    parser.add_argument('--faceweights', type=str, required=True, help='.caffemodel file for inference face landmarks weights')
-    parser.add_argument('--anglemodel', type=str, required=True, help='.prototxt file for inference face angle')
-    parser.add_argument('--angleweights', type=str, required=True, help='.caffemodel file for inference face angle weights')
+    parser.add_argument('--model', type=str, help='.prototxt file for inference', default = '../../../../net/face_detector.prototxt')
+    parser.add_argument('--weights', type=str, help='.caffemodel file for inference', default = '../../../../net/face_detector.caffemodel')
+    parser.add_argument('--blurmodel', type=str, help='.prototxt file for inference face blur', default = '../../../../net/face_blur.prototxt')
+    parser.add_argument('--blurweights', type=str, help='.caffemodel file for inference face blur weights', , default = '../../../../net/face_blur.caffemodel')
+    parser.add_argument('--facemodel', type=str, help='.prototxt file for inference face landmarks', default = '../../../../net/face_attributes.prototxt')
+    parser.add_argument('--faceweights', type=str, help='.caffemodel file for inference face landmarks weights', default = '../../../../net/face_attributes.caffemodel')
+    parser.add_argument('--anglemodel', type=str, help='.prototxt file for inference face angle', default = '../../../../net/face_angle.prototxt')
+    parser.add_argument('--angleweights', type=str, help='.caffemodel file for inference face angle weights', default = '../../../../net/face_angle.caffemodel')
     return parser
     
 
@@ -41,11 +43,8 @@ face_net = caffe.Net(face_file,face_model,caffe.TEST)
 angle_net = caffe.Net(angle_file,angle_model,caffe.TEST)  
 
 CLASSES = ('background', 'face')
-blur_classes = ('clear', 'normal', 'heavy')
-occlu_classes = ('clear', 'partial', 'heavy')
 gender_content = ('male', 'female')
 glasses_content = ('wearing glasses', 'not wearing glasses')
-headpose_content = ('left profile', 'left', 'frontal', 'right', 'right profile')
 
 
 def max_(m,n):
@@ -58,6 +57,13 @@ def min_(m,n):
 	if m > n:
 		return n
 	return m
+
+
+def preprocessdet(src, size):
+    img = cv2.resize(src, size)
+    img = img - [103.94, 116.78, 123.68] # 127.5
+    img = img * 0.007843
+    return img
 
 
 def preprocess(src, size):
@@ -97,7 +103,7 @@ def detect():
        ret, frame = cap.read()
        h = frame.shape[0]
        w = frame.shape[1]
-       img = preprocess(frame, (300, 300))
+       img = preprocessdet(frame, (320, 320))
        img = img.astype(np.float32)
        img = img.transpose((2, 0, 1))
 

@@ -13,6 +13,7 @@ def make_parser():
     parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
     parser.add_argument('--anglemodel', type=str, required=True, help='.prototxt file for inference face angle')
     parser.add_argument('--angleweights', type=str, required=True, help='.caffemodel file for inference face angle weights')
+    parser.add_argument()
     return parser
     
 
@@ -63,9 +64,7 @@ def postprocess(img, out):
     box = out['detection_out'][0,0,:,3:7] * np.array([w, h, w, h])
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
-    blur_max_index = out['detection_out'][0,0,:,7]
-    blur_max_index = out['detection_out'][0,0,:,8]
-    return (box.astype(np.int32), conf, cls, blur_max_index.astype(np.int32), blur_max_index.astype(np.int32))
+    return (box.astype(np.int32), conf, cls)
 
 
 def detect():
