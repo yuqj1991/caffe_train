@@ -19,12 +19,15 @@ from time import sleep
 LABEL_DIR = '../../../dataset/facedata/mtfl/label'
 annoImg_dir = '../../../dataset/facedata/mtfl/annoImage'
 root_dir = "../../../dataset/facedata/"
-anno_mtfl_dir = ['training.txt', 'testing.txt']
+anno_mtfl_dir = ['training.txt','testing.txt']
+rewritelabelFile = False
 
 
 # generate label txt file for each image
 def convert_src_anno_label(split_file, args, pnet, rnet, onet, minsize, threshold, factor):
 	mainSetFile = open(root_dir+ "mtfl/ImageSets/Main/" +str(split_file.split("/")[-1]), "w")
+	if rewritelabelFile:
+		rewritefile_ = open(root_dir+ "mtfl/ImageSets/Main/" +str(split_file.split("/")[-1])+"_re", "w")
 	with open(split_file, 'r') as label_file:
 		while True:
 			img_file_info = label_file.readline().split(' ')
@@ -84,6 +87,9 @@ def convert_src_anno_label(split_file, args, pnet, rnet, onet, minsize, threshol
 						bb[1] = np.maximum(det[1]-args.margin/2, 0)
 						bb[2] = np.minimum(det[2]+args.margin/2, img_size[1])
 						bb[3] = np.minimum(det[3]+args.margin/2, img_size[0])
+						if rewritelabelFile:
+							content = img_file_info[1] + ' ' + str(bb[0]) + ' ' + str(bb[2]) + ' ' + str(bb[1]) + ' ' + str(bb[3]) + ' '+ str(x1) + " " + str(y1) + " " + str(x2) + " " + str(y2) + " " + str(x3) + " " + str(y3) + " " + str(x4) + " " + str(y4) + ' '+ str(x5) + " " + str(y5) + " " + gender + " " + glass +'\n'
+							rewritefile_.write(content)
 						cropped = img[bb[1]:bb[3],bb[0]:bb[2],:]
 						cropped = cv2.cvtColor(cropped, cv2.COLOR_RGB2BGR)
 						#nrof_successfully_aligned += 1
@@ -115,6 +121,8 @@ def convert_src_anno_label(split_file, args, pnet, rnet, onet, minsize, threshol
 						mainSetFile.writelines(os.path.abspath(annoImg_dir+"/"+str(img_file.split("/")[-1]))+'\n')
 						################################
 	mainSetFile.close()
+	if rewritelabelFile:
+		rewritefile_.close()
 
 
 # shuffle samples
@@ -131,7 +139,7 @@ def shuffle_file(filename):
 def parse_arguments(argv):
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--margin', type=int,
-		help='Margin for the crop around the bounding box (height, width) in pixels.', default=44)
+		help='Margin for the crop around the bounding box (height, width) in pixels.', default=0)
 	parser.add_argument('--gpu_memory_fraction', type=float,
 		help='Upper bound on the amount of GPU memory that will be used by the process.', default=0.1)
 	parser.add_argument('--detect_multiple_faces', type=bool,

@@ -71,6 +71,18 @@ vector<cv::Point2f> CropImg(Mat src, Mat& dst , int angle, vector<cv::Point2f> P
     return dstPoints;
 }
 
+string& replace_all(string&   str,const   string&   old_value,const   string&   new_value)
+{
+    while(true)   {
+        string::size_type   pos(0);
+        if(   (pos=str.find(old_value))!=string::npos   )
+            str.replace(pos,old_value.length(),new_value);
+        else   break;
+    }
+    return   str;
+}
+
+
 void RotateBatchImage(string& srcfilePath, string &labelPath, string &newTrainingSetFile){
     ofstream setFile(newTrainingSetFile, ios::out|ios::app);
     if(!setFile.is_open()){
@@ -169,7 +181,7 @@ void RotateSameBatchImage(string& srcfilePath, string &labelPath, string &newTra
     string s2 = srcfilePath.substr(0, iPos);
     for(int iter = 0; iter < 5; iter++){
         string newImgFilepath = s2 + "_"+std::to_string(iter)+".jpg";
-        string newImgFilepath_rotete = s2 + "_"+std::to_string(iter)+"_rotate.jpg";
+        //string newImgFilepath_rotete = replace_all(s2, "annoImage", "cropImg") + "_"+std::to_string(iter)+"_rotate.jpg";
         string newLablePath = labelPath + "_"+std::to_string(iter);
         angle = Random(-120, 120);
         std::cout<<"angle: "<<angle<<std::endl;
@@ -185,10 +197,10 @@ void RotateSameBatchImage(string& srcfilePath, string &labelPath, string &newTra
             << dstPoints.at(4).x << " " << dstPoints.at(0).y << " " << dstPoints.at(1).y << " " << dstPoints.at(2).y << " " << dstPoints.at(3).y << " "
             << dstPoints.at(4).y << " "<<gender<<" "<<glass<< std::endl;
         cv::imwrite(newImgFilepath, dst);
-        for(size_t ii=0; ii<dstPoints.size(); ii++){
+        /*for(size_t ii=0; ii<dstPoints.size(); ii++){
             cv::circle(dst, dstPoints.at(ii), 5, cv::Scalar(0, 0, 255), 2);
         }
-        cv::imwrite(newImgFilepath_rotete, dst);
+        cv::imwrite(newImgFilepath_rotete, dst);*/
         file.close();
         setFile << newImgFilepath <<std::endl;
     }
