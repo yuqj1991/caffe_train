@@ -1462,7 +1462,7 @@ layer {
 	}
 }
 layer {
-	name: "conv8_block0_conv/dw"
+	name: "conv8_block0_conv/dw/relu"
 	type: "ReLU"
 	bottom: "conv8_block0_conv/dw"
 	top: "conv8_block0_conv/dw"

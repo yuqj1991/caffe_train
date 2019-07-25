@@ -40,13 +40,17 @@ layer {
 			saturation_upper: 1.5
 			random_order_prob: 0.0
 		}
+		expand_param {
+			prob: 0.5
+			max_expand_ratio: 4.0
+		}
 	}
 	data_param {
 		source: "../../../../../../dataset/facedata/wider_face/lmdb/wider_face_train_lmdb/"
 		batch_size: 12
 		backend: LMDB
 	}
-annotated_data_param {
+	annotated_data_param {
 		batch_sampler {
 			max_sample: 1
 			max_trials: 1
