@@ -14,7 +14,7 @@ layer {
 		mean_value: 116.78
 		mean_value: 123.68
 		resize_param {
-			prob: 1
+			prob: 1.0
 			resize_mode: WARP
 			height: 640
 			width: 640
@@ -29,16 +29,20 @@ layer {
 		}
 		distort_param {
 			brightness_prob: 0.5
-			brightness_delta: 32
+			brightness_delta: 32.0
 			contrast_prob: 0.5
 			contrast_lower: 0.5
 			contrast_upper: 1.5
 			hue_prob: 0.5
-			hue_delta: 18
+			hue_delta: 18.0
 			saturation_prob: 0.5
 			saturation_lower: 0.5
 			saturation_upper: 1.5
 			random_order_prob: 0.0
+		}
+		expand_param {
+			prob: 0.5
+			max_expand_ratio: 4.0
 		}
 	}
 	data_param {
@@ -46,7 +50,7 @@ layer {
 		batch_size: 16
 		backend: LMDB
 	}
-annotated_data_param {
+	annotated_data_param {
 		batch_sampler {
 			max_sample: 1
 			max_trials: 1
@@ -55,8 +59,8 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 1
+				max_aspect_ratio: 1
 			}
 			sample_constraint {
 				min_jaccard_overlap: 0.9
@@ -68,8 +72,8 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 1
+				max_aspect_ratio: 1
 			}
 			sample_constraint {
 				min_jaccard_overlap: 0.9
@@ -81,8 +85,8 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 1
+				max_aspect_ratio: 1
 			}
 			sample_constraint {
 				min_jaccard_overlap: 0.9
@@ -94,8 +98,8 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.0
 			}
 			sample_constraint {
 				min_jaccard_overlap: 0.9
@@ -107,8 +111,8 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.0
 			}
 			sample_constraint {
 				max_jaccard_overlap: 1.0
@@ -867,7 +871,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		stride: 2
+		stride: 1
 		group: 256
 		engine: CAFFE
 		weight_filler {
@@ -932,7 +936,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -991,11 +995,11 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1059,7 +1063,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -1124,11 +1128,11 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1192,7 +1196,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -1261,11 +1265,12 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		stride: 2
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1512,10 +1517,137 @@ layer {
 	}
 }
 layer {
+	name: "conv8_block0_conv/dw"
+	type: "Convolution"
+	bottom: "conv8_block0"
+	top: "conv8_block0_conv/dw"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 256
+		bias_term: false
+		kernel_size: 3
+		stride: 2
+		pad: 1
+		group: 256
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv8_block0_conv/dw/bn"
+	type: "BatchNorm"
+	bottom: "conv8_block0_conv/dw"
+	top: "conv8_block0_conv/dw"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv8_block0_conv/dw/scale"
+	type: "Scale"
+	bottom: "conv8_block0_conv/dw"
+	top: "conv8_block0_conv/dw"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv8_block0_conv/dw"
+	type: "ReLU"
+	bottom: "conv8_block0_conv/dw"
+	top: "conv8_block0_conv/dw"
+}
+layer {
+	name: "conv8_block0_conv"
+	type: "Convolution"
+	bottom: "conv8_block0_conv/dw"
+	top: "conv8_block0_conv"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 512
+		bias_term: false
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv8_block0_conv/bn"
+	type: "BatchNorm"
+	bottom: "conv8_block0_conv"
+	top: "conv8_block0_conv"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv8_block0_conv/scale"
+	type: "Scale"
+	bottom: "conv8_block0_conv"
+	top: "conv8_block0_conv"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
 	name: "conv10_block1"
 	type: "Eltwise"
 	bottom: "conv10_1"
-	bottom: "conv8_block0"
+	bottom: "conv8_block0_conv"
 	top: "conv10_block1"
 	eltwise_param {
 		operation: SUM
@@ -1535,7 +1667,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 512
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -2723,7 +2855,7 @@ layer {
 layer{
 	name: "lfpn_1_moudle_cpm_3_3"
 	type: "Convolution"
-	bottom: "conv5"
+	bottom: "conv8_block0"
 	top: "lfpn_1_moudle_cpm_3_3"
 	param {
 		lr_mult: 1

@@ -43,9 +43,9 @@ layer {
   convolution_param {
     num_output: 32
     bias_term: false
-    pad: 1
-    kernel_size: 3
-    stride: 2
+    pad: 3
+    kernel_size: 7
+    stride: 4
     weight_filler {
       type: "msra"
     }
@@ -4410,17 +4410,17 @@ layer {
 layer{
 	name: "lfpn_1_moudle_cpm_3_3"
 	type: "Convolution"
-	bottom: "conv_13/expand"
+	bottom: "conv_5/depthwise"
 	top: "lfpn_1_moudle_cpm_3_3"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 576
+		num_output: 192
 		bias_term: false
 		kernel_size: 3
-		group: 576
+		group: 192
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -4488,7 +4488,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -4562,7 +4562,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -4635,17 +4635,17 @@ layer {
 layer{
 	name: "lfpn_2_moudle_cpm_4_3"
 	type: "Convolution"
-	bottom: "Conv_1"
+	bottom: "conv_13/expand"
 	top: "lfpn_2_moudle_cpm_4_3"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 1280
+		num_output: 576
 		bias_term: false
 		kernel_size: 3
-		group: 1280
+		group: 576
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -4713,7 +4713,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 640
+		num_output: 256
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -4787,7 +4787,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 640
+		num_output: 256
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -4862,17 +4862,17 @@ layer {
 layer{
 	name: "cpm_moudle_conv13_block3"
 	type: "Convolution"
-	bottom: "layer_19_2_2"
+	bottom: "Conv_1"
 	top: "cpm_moudle_conv13_block3"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 1280
 		bias_term: false
 		kernel_size: 3
-		group: 256
+		group: 1280
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -4940,7 +4940,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 640
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -5014,7 +5014,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 640
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -5088,7 +5088,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv14_2"
 	type: "Convolution"
-	bottom: "layer_19_2_3"
+	bottom: "layer_19_2_2"
 	top: "cpm_moudle_conv14_2"
 	param {
 		lr_mult: 1
