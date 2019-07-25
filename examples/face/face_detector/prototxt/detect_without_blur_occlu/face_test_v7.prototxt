@@ -15,8 +15,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 320
-			width: 320
+			height: 640
+			width: 640
 			interp_mode: LINEAR
 		}
 	}
@@ -5100,8 +5100,9 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
+		group: 256
 		weight_filler {
 			type: "msra"
 		}
@@ -5333,8 +5334,9 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
+		group: 256
 		weight_filler {
 			type: "msra"
 		}
