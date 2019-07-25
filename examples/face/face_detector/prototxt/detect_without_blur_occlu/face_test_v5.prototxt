@@ -3743,9 +3743,9 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-        fixed_size: 12
+        fixed_size: 10
+		fixed_size: 15
 		fixed_size: 20
-		fixed_size: 32
 		density: 4
 		density: 2
 		density: 1
