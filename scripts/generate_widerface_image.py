@@ -18,10 +18,16 @@ LABEL_DIR = '../../dataset/facedata/wider_face/label'
 wider_directory = ['wider_train', 'wider_test', 'wider_val']
 Annotation_img_dir = '../../dataset/facedata/wider_face/annoImg'
 root_dir = "../../dataset/facedata/"
-anno_src_wider_dir = ['wider_face_train_bbx_gt.txt', 'wider_face_val_bbx_gt.txt']
+anno_src_wider_dir = ['wider_face_train_bbx_gt.txt' , 'wider_face_val_bbx_gt.txt']
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
-thread_hold = 40 ##map:72.5%, thread_hold=40; now i want to detector 30 pixels, just like 6-10m distance
+thread_hold = 20 ##map:72.5%, thread_hold=40; now i want to detector 30 pixels, just like 6-10m distance
 classfyFile = "../../dataset/facedata/wider_face/wider_face_classfy_distance_data.txt"
+
+
+samples_width = 0
+samples_height = 0
+min_size = 50 
+max_size = 60
 
 class ConfigureHistogram(object):
 	def __init__(self):
@@ -218,6 +224,8 @@ def generate_label_file(label_line):
 
 # generate label txt file for each image
 def load_wider_split(split_file):
+	global samples_width
+	global samples_height
 	with open(split_file, 'r') as label_file:
 		while True:  # and len(faces)<10
 			img_filename = label_file.readline()[:-1]
@@ -247,6 +255,10 @@ def load_wider_split(split_file):
 					continue
 				if int(width)< thread_hold or int(height)< thread_hold:
 					continue
+				if int(width)>= min_size and int(width)< max_size:
+					samples_width  += 1
+				if int(height)>= min_size and int(height)< max_size:
+					samples_height +=1
 				lab_file.writelines(newline)
 			lab_file.close()
 			data = open(label_image_file, "r").read()
@@ -394,9 +406,10 @@ def main():
 		for sub in anno_src_wider_dir:
 			dir = "../../dataset/facedata/wider_face_split/"+sub
 			load_wider_split(dir)
-		generate_pascal_image_set(root_dir+'wider_face/JPEGImages', root_dir+'wider_face/ImageSets/Main')
-		for file in wider_directory:
-			shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
+			print("samples_width: %d, and samples_height: %d"%(samples_width, samples_height))
+		#generate_pascal_image_set(root_dir+'wider_face/JPEGImages', root_dir+'wider_face/ImageSets/Main')
+		#for file in wider_directory:
+		#	shuffle_file('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+file+'.txt')
 	# static and get classfyFile
 	if 0:
 		draw_histogram_specfic_range_base_data()
