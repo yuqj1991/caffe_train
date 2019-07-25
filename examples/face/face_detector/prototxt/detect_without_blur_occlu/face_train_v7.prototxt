@@ -6000,8 +6000,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
-		min_size: 16.0
-		max_size: 32.0
+		min_size: 25.0
+		max_size: 50.0
 		aspect_ratio: 2.0
 		aspect_ratio: 3.0
 		flip: true
@@ -6118,8 +6118,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
-		min_size: 32.0
-		max_size: 64.0
+		min_size: 50.0
+		max_size: 100.0
 		aspect_ratio: 2.0
 		aspect_ratio: 3.0
 		flip: true
@@ -6236,8 +6236,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 64.0
-		max_size: 128.0
+		min_size: 100.0
+		max_size: 200.0
 		aspect_ratio: 2.0
 		aspect_ratio: 3.0
 		flip: true
@@ -6354,8 +6354,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 128.0
-		max_size: 214.0
+		min_size: 200.0
+		max_size: 400.0
 		aspect_ratio: 2.0
 		aspect_ratio: 3.0
 		flip: true
@@ -6472,8 +6472,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
-		min_size: 214.0
-		max_size: 320.0
+		min_size: 400.0
+		max_size: 640.0
 		aspect_ratio: 2.0
 		aspect_ratio: 3.0
 		flip: true
