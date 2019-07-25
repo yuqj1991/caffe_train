@@ -10,4 +10,4 @@ if ! test -f ../../prototxt/detect_without_blur_occlu/face_test_v4.prototxt ;the
         exit 1
 fi
 ../../../../../build/tools/caffe train --solver=../../solver/solver_without_blur_occlu/solver_train_v4.prototxt -gpu 0 \
---snapshot=../../snapshot/face_detector_without_v4_iter_42723.solverstate
+#--snapshot=../../snapshot/face_detector_without_v4_iter_90038.solverstate
