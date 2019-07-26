@@ -59,8 +59,34 @@ layer {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 1
-				max_aspect_ratio: 1
+				min_aspect_ratio: 0.8
+				max_aspect_ratio: 1.2
+			}
+			sample_constraint {
+				min_jaccard_overlap: 0.6
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.3
+				max_scale: 1.0
+				min_aspect_ratio: 0.8
+				max_aspect_ratio: 1.2
+			}
+			sample_constraint {
+				min_jaccard_overlap: 0.8
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.3
+				max_scale: 1.0
+				min_aspect_ratio: 0.8
+				max_aspect_ratio: 1.2
 			}
 			sample_constraint {
 				min_jaccard_overlap: 0.9
@@ -72,8 +98,8 @@ layer {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 1
-				max_aspect_ratio: 1
+				min_aspect_ratio: 0.8
+				max_aspect_ratio: 1.2
 			}
 			sample_constraint {
 				min_jaccard_overlap: 0.9
@@ -85,34 +111,8 @@ layer {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 1
-				max_aspect_ratio: 1
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.9
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.9
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				min_aspect_ratio: 0.8
+				max_aspect_ratio: 1.2
 			}
 			sample_constraint {
 				max_jaccard_overlap: 1.0
@@ -4129,13 +4129,14 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		fixed_size: 12
-		fixed_size: 18
-		fixed_size: 24
-		density: 4
-		density: 2
-		density: 1
-		step: 12
+		min_size: 12
+        max_size: 18
+		min_size: 18
+		max_size: 24
+        aspect_ratio: 1.2
+        aspect_ratio: 1.6
+		flip: true
+		clip: false
 		variance: 0.1
 		variance: 0.1
 		variance: 0.2
@@ -4158,7 +4159,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 84
+		num_output: 32
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4205,7 +4206,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 42
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4249,9 +4250,11 @@ layer {
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
 		min_size: 25.0
+        min_size: 37.5
+        max_size: 37.5
 		max_size: 50.0
-		aspect_ratio: 2.0
-		aspect_ratio: 3.0
+		aspect_ratio: 1.25
+		aspect_ratio: 1.6
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4276,7 +4279,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 32
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4323,7 +4326,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4368,8 +4371,8 @@ layer {
 	prior_box_param {
 		min_size: 50.0
 		max_size: 100.0
-		aspect_ratio: 2.0
-		aspect_ratio: 3.0
+		aspect_ratio: 1.25
+		aspect_ratio: 1.6
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4488,8 +4491,8 @@ layer {
 	prior_box_param {
 		min_size: 100.0
 		max_size: 200.0
-		aspect_ratio: 2.0
-		aspect_ratio: 3.0
+		aspect_ratio: 1.25
+		aspect_ratio: 1.6
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4606,8 +4609,8 @@ layer {
 	prior_box_param {
 		min_size: 200.0
 		max_size: 400.0
+		aspect_ratio: 1.5
 		aspect_ratio: 2.0
-		aspect_ratio: 3.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4725,7 +4728,7 @@ layer {
 		min_size: 400.0
 		max_size: 640.0
 		aspect_ratio: 2.0
-		aspect_ratio: 3.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
