@@ -4036,12 +4036,13 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		min_size: 12
-        max_size: 18
-		min_size: 18
-		max_size: 24
-        aspect_ratio: 1.2
-        aspect_ratio: 1.6
+	    fixed_size: 12
+		fixed_size: 18
+		fixed_size: 24
+		density: 4
+		density: 2
+		density: 1
+		step: 16
 		variance: 0.1
 		variance: 0.1
 		variance: 0.2
@@ -4064,7 +4065,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 48
+		num_output: 84
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4111,7 +4112,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 42
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
