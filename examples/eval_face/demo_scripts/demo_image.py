@@ -8,10 +8,10 @@ import caffe
 
 def make_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, help='.prototxt file for inference', default ='../../../../model/face_detector.prototxt')
-    parser.add_argument('--weights', type=str, help='.caffemodel file for inference', default ='../../../../model/face_detector.caffemodel')
-    parser.add_argument('--input', type = int, help='net input', default = 300)
-    parser.add_argument('--sameAvg', type = bool, help='net input', default = True)
+    parser.add_argument('--model', type=str, help='.prototxt file for inference', default ='../net/face_detector.prototxt')
+    parser.add_argument('--weights', type=str, help='.caffemodel file for inference', default ='../net/face_detector.caffemodel')
+    parser.add_argument('--input', type = int, help='net input', default = 320)
+    parser.add_argument('--sameAvg', type = int, help='net input', default = 1)
     return parser
 parser1 = make_parser()
 args = parser1.parse_args()
@@ -19,7 +19,7 @@ net_file= args.model
 caffe_model= args.weights
 test_dir = "../images"
 
-inputsize = 300
+inputsize = args.input
 mean_value = [127.5, 127.5, 127.5]
 if not args.sameAvg:
     mean_value = [103.94, 116.78, 123.68]
