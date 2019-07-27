@@ -4937,8 +4937,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
-		min_size: 256.0
-		max_size: 428.0
+		min_size: 409.6
+		max_size: 684.8
 		aspect_ratio: 2.0
 		aspect_ratio: 1.5
 		flip: true
@@ -5054,7 +5054,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_seven_priorbox"
 	prior_box_param {
-		min_size: 409.6
+		min_size: 684.6
 		max_size: 1024
 		aspect_ratio: 2.0
 		aspect_ratio: 1.5
