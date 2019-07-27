@@ -16,8 +16,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 640
-			width: 640
+			height: 1024
+			width: 1024
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../../dataset/facedata/wider_face/lmdb/wider_face_train_lmdb/"
-		batch_size: 6
+		batch_size: 12
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -4341,10 +4341,10 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		min_size: 16
-		max_size: 20
 		min_size: 20
-		max_size: 24
+		max_size: 30
+		min_size: 30
+		max_size: 40
 		aspect_ratio: 1.2
 		aspect_ratio: 1.6
 		flip: true
@@ -4461,10 +4461,10 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
-		min_size: 20.0
-		min_size: 26.5
-		max_size: 26.5
-		max_size: 32.0
+		min_size: 40.0
+		min_size: 45.0
+		max_size: 45.0
+		max_size: 51.2
 		aspect_ratio: 1.25
 		aspect_ratio: 1.6
 		flip: true
@@ -4581,8 +4581,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
-		min_size: 32.0
-		max_size: 64.0
+		min_size: 50.0
+		max_size: 100.0
 		aspect_ratio: 1.25
 		aspect_ratio: 1.6
 		flip: true
@@ -4701,8 +4701,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 64.0
-		max_size: 128.0
+		min_size: 100.0
+		max_size: 204.0
 		aspect_ratio: 1.25
 		aspect_ratio: 1.6
 		flip: true
@@ -4819,8 +4819,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 128.0
-		max_size: 256.0
+		min_size: 204.0
+		max_size: 409.6
 		aspect_ratio: 1.5
 		aspect_ratio: 2.0
 		flip: true
@@ -5054,8 +5054,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_seven_priorbox"
 	prior_box_param {
-		min_size: 428.0
-		max_size: 640.0
+		min_size: 409.6
+		max_size: 1024
 		aspect_ratio: 2.0
 		aspect_ratio: 1.5
 		flip: true
