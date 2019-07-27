@@ -1390,55 +1390,6 @@ layer {
 
 layer {
     bottom: "conv4_2"
-    top: "blur_fds"
-    name: "blur_fds"
-    type: "InnerProduct"
-    param {
-        lr_mult: 1
-        decay_mult: 1
-    }
-    param {
-        lr_mult: 2
-        decay_mult: 1
-    }
-    inner_product_param {
-        num_output: 64
-        weight_filler {
-            type: "xavier"
-        }
-        bias_filler {
-            type: "constant"
-            value: 0
-        }
-    }
-}
-
-layer {
-    bottom: "blur_fds"
-    top: "blur_fds_2"
-    name: "blur_fds_2"
-    type: "InnerProduct"
-    param {
-        lr_mult: 1
-        decay_mult: 1
-    }
-    param {
-        lr_mult: 2
-        decay_mult: 1
-    }
-    inner_product_param {
-        num_output: 3
-        weight_filler {
-            type: "xavier"
-        }
-        bias_filler {
-            type: "constant"
-            value: 0
-        }
-    }
-}
-layer {
-    bottom: "conv4_2"
     top: "occlu_fds"
     name: "occlu_fds"
     type: "InnerProduct"
@@ -1490,8 +1441,8 @@ layer {
 layer {
 	name: "Muti_face_loss"
 	type: "MultiBlurLoss"
-	bottom: "blur_fds_2"
 	bottom: "occlu_fds_2"
+	bottom: "conv4_2"
 	bottom: "label"
 	top: "Muti_face_loss"
 	include {
@@ -1504,12 +1455,11 @@ layer {
 		normalization: VALID
 	}
 	multibox_loss_param {
-		conf_blur_loss_type: SOFTMAX #LOGISTIC #
+		#conf_blur_loss_type: SOFTMAX #LOGISTIC #
 		conf_occlu_loss_type: SOFTMAX #LOGISTIC #
-		letter_lp_loss_type: SOFTMAX #LOGISTIC #
 		loc_weight: 1.0
 		num_occlusion: 3
-		num_blur: 3
+		#num_blur: 3
 	}
 }
 

@@ -14,7 +14,7 @@ void MultiBlurLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   LossLayer<Dtype>::LayerSetUp(bottom, top);
   if (this->layer_param_.propagate_down_size() == 0) {
     this->layer_param_.add_propagate_down(true);
-    this->layer_param_.add_propagate_down(true);
+    //this->layer_param_.add_propagate_down(true);
     this->layer_param_.add_propagate_down(false);
   }
   const MultiBoxLossParameter& multibox_loss_param =
@@ -22,9 +22,9 @@ void MultiBlurLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   multibox_loss_param_ = this->layer_param_.multibox_loss_param();
   batch_size_ = bottom[0]->num();
   // Get other parameters.
-  CHECK(multibox_loss_param.has_num_blur()) << "Must prodived num_blur";
+  //CHECK(multibox_loss_param.has_num_blur()) << "Must prodived num_blur";
   CHECK(multibox_loss_param.has_num_occlusion()) << "Must provide num_occlu";
-  num_blur_ = multibox_loss_param.num_blur();
+  //num_blur_ = multibox_loss_param.num_blur();
   num_occlu_ = multibox_loss_param.num_occlusion();
 
   if (!this->layer_param_.loss_param().has_normalization() &&
@@ -37,6 +37,7 @@ void MultiBlurLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   }
 
   vector<int> loss_shape(1, 1);
+  #if 0
   // Set up blur confidence loss layer.
   blur_loss_type_ = multibox_loss_param.conf_blur_loss_type();
   blur_bottom_vec_.push_back(&blur_pred_);
@@ -74,6 +75,7 @@ void MultiBlurLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
+  #endif
   // Set up occlu confidence loss layer.
   occlu_loss_type_ = multibox_loss_param.conf_occlu_loss_type();
   occlu_bottom_vec_.push_back(&occlu_pred_);
@@ -117,12 +119,12 @@ template <typename Dtype>
 void MultiBlurLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
-  int num_blur = bottom[0]->shape(1);  //bottom[0]: landmarks , 
-  int num_occlu = bottom[1]->shape(1); //bottom[1]: num_gender;
-  CHECK_EQ(num_blur, num_blur_)<<"number of num_blur_ point value must equal";
+  int num_occlu = bottom[0]->shape(1); //bottom[0]: num_occlu;
+  //int num_blur = bottom[1]->shape(1);  //bottom[1]: blur , 
   CHECK_EQ(num_occlu, num_occlu_)<<"number of num_occlu_ must match prototxt provided";
-  CHECK_EQ(bottom[0]->count(), num_blur_*batch_size_)<<"count must equal";
-  CHECK_EQ(bottom[1]->count(), num_occlu_*batch_size_)<<"count must equal";
+  //CHECK_EQ(num_blur, num_blur_)<<"number of num_blur_ point value must equal";
+  CHECK_EQ(bottom[0]->count(), num_occlu_*batch_size_)<<"count must equal";
+  //CHECK_EQ(bottom[1]->count(), num_blur_*batch_size_)<<"count must equal";
 }
 
 template <typename Dtype>
@@ -146,48 +148,6 @@ void MultiBlurLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   LOG(INFO)<<"=================END=======================";
   #endif
-  
-  /*~~~~~~~~~~~~~~~~~~~~~~blur loss layer  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-  // Reshape the blur confidence data.
-  vector<int> blur_shape;
-  if (blur_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
-    blur_shape.push_back(batch_size_);
-    blur_gt_.Reshape(blur_shape);
-    blur_shape.push_back(num_blur_);
-    blur_pred_.Reshape(blur_shape);
-    //blur_pred_.CopyFrom(*bottom[0]);
-  } else if (blur_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
-    //blur_shape.push_back(1);
-    blur_shape.push_back(batch_size_);
-    blur_shape.push_back(num_blur_);
-    blur_gt_.Reshape(blur_shape);
-    blur_pred_.Reshape(blur_shape);
-    /************************************************/
-    //blur_pred_.CopyFrom(*bottom[0]);
-  } else {
-    LOG(FATAL) << "Unknown confidence loss type.";
-  }
-  Dtype* blur_gt_data = blur_gt_.mutable_cpu_data();
-  caffe_set(blur_gt_.count(), Dtype(0), blur_gt_data);
-  for(int ii=0;ii<batch_size_; ii++){
-    switch (blur_loss_type_)
-    {
-    case MultiBoxLossParameter_ConfLossType_SOFTMAX:
-      blur_gt_data[ii] = all_blur[ii];
-      break;
-    case MultiBoxLossParameter_ConfLossType_LOGISTIC:
-      blur_gt_data[ii * num_blur_ + all_blur[ii]] = 1;
-      break;
-    default:
-      LOG(FATAL) << "Unknown conf loss type.";
-    }
-  }
-  Dtype* blur_pred_data = blur_pred_.mutable_cpu_data();
-  const Dtype* blur_data = bottom[0]->cpu_data();
-  caffe_copy<Dtype>(bottom[0]->count(), blur_data, blur_pred_data);
-  blur_loss_layer_->Reshape(blur_bottom_vec_, blur_top_vec_);
-  blur_loss_layer_->Forward(blur_bottom_vec_, blur_top_vec_);
-
   /*~~~~~~~~~~~~~~~~~~~~~~~occlu_loss_layer~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   // conf occlu layer
   vector<int> occlu_shape;
@@ -196,15 +156,12 @@ void MultiBlurLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     occlu_gt_.Reshape(occlu_shape);
     occlu_shape.push_back(num_occlu_);
     occlu_pred_.Reshape(occlu_shape);
-    //occlu_pred_.CopyFrom(*bottom[1]);
   } else if (occlu_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
     //occlu_shape.push_back(1);
     occlu_shape.push_back(batch_size_);
     occlu_shape.push_back(num_occlu_);
     occlu_gt_.Reshape(occlu_shape);
     occlu_pred_.Reshape(occlu_shape);
-    /************************************************/
-    //occlu_pred_.CopyFrom(*bottom[1]);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -224,19 +181,60 @@ void MultiBlurLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
   }
   Dtype* occlu_pred_data = occlu_pred_.mutable_cpu_data();
-  const Dtype* occlu_data = bottom[1]->cpu_data();
-  caffe_copy<Dtype>(bottom[1]->count(), occlu_data, occlu_pred_data);
+  const Dtype* occlu_data = bottom[0]->cpu_data();
+  caffe_copy<Dtype>(bottom[0]->count(), occlu_data, occlu_pred_data);
   occlu_loss_layer_->Reshape(occlu_bottom_vec_, occlu_top_vec_);
   occlu_loss_layer_->Forward(occlu_bottom_vec_, occlu_top_vec_);
+  
+  #if 0
+  /*~~~~~~~~~~~~~~~~~~~~~~blur loss layer  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  // Reshape the blur confidence data.
+  vector<int> blur_shape;
+  if (blur_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
+    blur_shape.push_back(batch_size_);
+    blur_gt_.Reshape(blur_shape);
+    blur_shape.push_back(num_blur_);
+    blur_pred_.Reshape(blur_shape);
+  } else if (blur_loss_type_ == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
+    //blur_shape.push_back(1);
+    blur_shape.push_back(batch_size_);
+    blur_shape.push_back(num_blur_);
+    blur_gt_.Reshape(blur_shape);
+    blur_pred_.Reshape(blur_shape);
+    /************************************************/
+  } else {
+    LOG(FATAL) << "Unknown confidence loss type.";
+  }
+  Dtype* blur_gt_data = blur_gt_.mutable_cpu_data();
+  caffe_set(blur_gt_.count(), Dtype(0), blur_gt_data);
+  for(int ii=0;ii<batch_size_; ii++){
+    switch (blur_loss_type_)
+    {
+    case MultiBoxLossParameter_ConfLossType_SOFTMAX:
+      blur_gt_data[ii] = all_blur[ii];
+      break;
+    case MultiBoxLossParameter_ConfLossType_LOGISTIC:
+      blur_gt_data[ii * num_blur_ + all_blur[ii]] = 1;
+      break;
+    default:
+      LOG(FATAL) << "Unknown conf loss type.";
+    }
+  }
+  Dtype* blur_pred_data = blur_pred_.mutable_cpu_data();
+  const Dtype* blur_data = bottom[1]->cpu_data();
+  caffe_copy<Dtype>(bottom[1]->count(), blur_data, blur_pred_data);
+  blur_loss_layer_->Reshape(blur_bottom_vec_, blur_top_vec_);
+  blur_loss_layer_->Forward(blur_bottom_vec_, blur_top_vec_);
+  #endif
 
   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   top[0]->mutable_cpu_data()[0] = 0;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, batch_size_, 1, -1);
-  if(this->layer_param_.propagate_down(0)) {
+  /*if(this->layer_param_.propagate_down(0)) {
     top[0]->mutable_cpu_data()[0] += 
           blur_loss_.cpu_data()[0] / normalizer;
-  }
+  }*/
   if(this->layer_param_.propagate_down(1)) {
     top[0]->mutable_cpu_data()[0] += 
           1*occlu_loss_.cpu_data()[0] / normalizer;
@@ -254,10 +252,31 @@ void MultiBlurLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     LOG(FATAL) << this->type()
         << " Layer cannot backpropagate to label inputs.";
   }
-  // Back propagate on blur_loss_ prediction.
+  // Back propagate on occlu prediction.
   if (propagate_down[0]) {
-    Dtype* blur_bottom_diff = bottom[0]->mutable_cpu_diff();
-    caffe_set(bottom[0]->count(), Dtype(0), blur_bottom_diff);
+    Dtype* occlu_bottom_diff = bottom[0]->mutable_cpu_diff();
+    caffe_set(bottom[0]->count(), Dtype(0), occlu_bottom_diff);
+    vector<bool> occlu_propagate_down;
+    // Only back propagate on prediction, not ground truth.
+    occlu_propagate_down.push_back(true);
+    occlu_propagate_down.push_back(false);
+    occlu_loss_layer_->Backward(occlu_top_vec_, occlu_propagate_down,
+                                occlu_bottom_vec_);
+    // Scale gradient.
+    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+        normalization_, batch_size_, 1, -1);
+    Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+    caffe_scal(occlu_pred_.count(), loss_weight,
+                occlu_pred_.mutable_cpu_diff());
+    // Copy gradient back to bottom[0].
+    
+    bottom[0]->ShareDiff(occlu_pred_);
+  }
+  #if 0
+  // Back propagate on blur_loss_ prediction.
+  if (propagate_down[1]) {
+    Dtype* blur_bottom_diff = bottom[1]->mutable_cpu_diff();
+    caffe_set(bottom[1]->count(), Dtype(0), blur_bottom_diff);
     vector<bool> blur_propagate_down;
     // Only back propagate on prediction, not ground truth.
     blur_propagate_down.push_back(true);
@@ -271,29 +290,9 @@ void MultiBlurLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     caffe_scal(blur_pred_.count(), loss_weight,
                 blur_pred_.mutable_cpu_diff());
         // The diff is already computed and stored.
-    bottom[0]->ShareDiff(blur_pred_);
+    bottom[1]->ShareDiff(blur_pred_);
   }
-
-  // Back propagate on occlu prediction.
-  if (propagate_down[1]) {
-    Dtype* occlu_bottom_diff = bottom[1]->mutable_cpu_diff();
-    caffe_set(bottom[1]->count(), Dtype(0), occlu_bottom_diff);
-    vector<bool> occlu_propagate_down;
-    // Only back propagate on prediction, not ground truth.
-    occlu_propagate_down.push_back(true);
-    occlu_propagate_down.push_back(false);
-    occlu_loss_layer_->Backward(occlu_top_vec_, occlu_propagate_down,
-                                occlu_bottom_vec_);
-    // Scale gradient.
-    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-        normalization_, batch_size_, 1, -1);
-    Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
-    caffe_scal(occlu_pred_.count(), loss_weight,
-                occlu_pred_.mutable_cpu_diff());
-    // Copy gradient back to bottom[1].
-    
-    bottom[1]->ShareDiff(occlu_pred_);
-  }
+  #endif
 }
 
 INSTANTIATE_CLASS(MultiBlurLossLayer);
