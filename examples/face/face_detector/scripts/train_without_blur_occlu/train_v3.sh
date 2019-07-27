@@ -9,5 +9,5 @@ if ! test -f ../../prototxt/detect_without_blur_occlu/face_test_v3.prototxt ;the
 	echo "please generate your own model prototxt primarily."
         exit 1
 fi
-../../../../../build/tools/caffe train --solver=../../solver/solver_without_blur_occlu/solver_train_v3.prototxt -gpu 0 \
---snapshot=../../snapshot/face_detector_without_v3_iter_5000.solverstate
+../../../../../build/tools/caffe train --solver=../../solver/solver_without_blur_occlu/solver_train_v3.prototxt -gpu 2 \
+#--snapshot=../../snapshot/face_detector_without_v3_iter_5000.solverstate
