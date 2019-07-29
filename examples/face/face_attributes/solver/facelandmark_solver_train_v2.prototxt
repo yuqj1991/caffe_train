@@ -9,7 +9,7 @@ lr_policy: "multistep"
 gamma: 0.8
 weight_decay: 0.004
 #momentum: 0.9
-snapshot: 100000
+snapshot: 5000
 snapshot_prefix: "../snapshot/facelandmark_v2"
 solver_mode: GPU
 average_loss: 10
