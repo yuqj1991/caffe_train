@@ -22,11 +22,13 @@ def convertimgset(img_set="train"):
     gtfilepath = rootdir + "/wider_face_split/wider_face_" + img_set + "_bbx_gt.txt"
     imagesdir = rootdir + '/wider_face/' + "/annoImg"
     vocannotationdir = rootdir + '/wider_face/' + "/Annotations"
-    labelsdir = rootdir + '/wider_face/' + "/labels"
+    labelsdir = rootdir + '/wider_face/' + "/label"
     cropImgsDir = rootdir + '/wider_face/' + "/CropImg"
     croplabelsdir = rootdir + '/wider_face/' + "/Croplabel"
     if not os.path.exists(imagesdir):
         os.mkdir(imagesdir)
+    if not os.path.exists(labelsdir):
+        os.mkdir(labelsdir)
     if not os.path.exists(rootdir + '/wider_face/' + "/ImageSets"):
         os.mkdir(rootdir + '/wider_face/' + "/ImageSets")
     if not os.path.exists(rootdir + '/wider_face/' + "/ImageSets/Main"):
@@ -37,9 +39,6 @@ def convertimgset(img_set="train"):
         if not os.path.exists(cropImgsDir):
             os.mkdir(cropImgsDir)
 
-    if convet2yoloformat:
-        if not os.path.exists(labelsdir):
-            os.mkdir(labelsdir)
     if convert2vocformat:
         if not os.path.exists(vocannotationdir):
             os.mkdir(vocannotationdir)
@@ -94,6 +93,11 @@ def convertimgset(img_set="train"):
                     bboxes.append(bbox)
                     occlus.append(occlu)
                     blurs.append(blur)
+                    LableFileName = labelsdir + '/' + filename.replace("/", "_").split('.jpg')[0]
+                    content = str(x) + ' ' + str(y) + ' ' + str(width) + ' ' + str(height) + ' ' + str(blur) + ' ' + str(occlu) +'\n'
+                    label_file = open(LableFileName, 'a+')
+                    label_file.writelines(content)
+                    label_file.close()
                     if use_blur_occlu_attri and width >= cropsize2select and height >= cropsize2select:
                         cropImgFileName = cropImgsDir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i) + '.jpg'
                         cropLableFileName = croplabelsdir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i)

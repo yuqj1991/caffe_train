@@ -62,7 +62,9 @@ class PriorBoxLayer : public Layer<Dtype> {
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
     return;
   }
-
+  
+  vector<float> default_size_;
+  vector<float> dafault_ratios_;
   vector<float> min_sizes_;
   vector<float> max_sizes_;
   vector<float> fixed_sizes_;

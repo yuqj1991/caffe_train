@@ -1703,6 +1703,8 @@ message PriorBoxParameter {
   repeated float fixed_size = 14;
   repeated float fixed_ratio = 15;
   repeated float density = 16;
+  repeated float default_size = 17;
+  repeated float default_ratio = 18;
 }
 
 message FaceEvaluateParameter{

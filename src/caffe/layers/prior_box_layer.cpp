@@ -89,6 +89,19 @@ void PriorBoxLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     }
   }
 
+    dafault_ratios_.clear();
+  if(prior_box_param.default_ratio_size()>0){
+    CHECK_EQ(prior_box_param.default_size_size(), prior_box_param.default_ratio_size())
+                                                  << "default_ratio_size must be equal to default_size";
+    for(int i=0; i < prior_box_param.default_ratio_size(); ++i){
+      float ar = prior_box_param.default_ratio(i);
+      dafault_ratios_.push_back(ar);
+      default_size_.push_back(prior_box_param.default_size(i));
+      num_priors_ += 1;
+    }
+  }
+
+
   clip_ = prior_box_param.clip();
   if (prior_box_param.variance_size() > 1) {
     // Must and only provide 4 variance.
@@ -341,6 +354,18 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
           // ymax
           top_data[idx++] = (center_y + box_height / 2.) / img_height;
         }
+      }
+      for(int s = 0; s < default_size_.size(); ++s){
+        box_width = default_size_[s];
+        box_height = box_width * dafault_ratios_[s];
+        // xmin
+        top_data[idx++] = (center_x - box_width / 2.) / img_width;
+        // ymin
+        top_data[idx++] = (center_y - box_height / 2.) / img_height;
+        // xmax
+        top_data[idx++] = (center_x + box_width / 2.) / img_width;
+        // ymax
+        top_data[idx++] = (center_y + box_height / 2.) / img_height;
       }
     }
   }
