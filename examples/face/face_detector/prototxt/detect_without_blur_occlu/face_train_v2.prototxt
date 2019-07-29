@@ -135,8 +135,8 @@ layer {
 	convolution_param {
 		num_output: 32
 		bias_term: false
-		pad: 3
-		kernel_size: 7
+		pad: 1
+		kernel_size: 5
 		stride: 4
 		weight_filler {
 			type: "msra"
