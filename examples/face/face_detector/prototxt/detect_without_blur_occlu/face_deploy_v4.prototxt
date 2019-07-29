@@ -1,127 +1,10 @@
 name: "deepFace"
-layer {
-	name: "data"
-	type: "AnnotatedData"
-	top: "data"
-	top: "label"
-	include {
-		phase: TRAIN
-	}
-	transform_param {
-		mirror: false
-		scale: 0.007843
-		mean_value: 103.94
-		mean_value: 116.78
-		mean_value: 123.68
-		resize_param {
-			prob: 1.0
-			resize_mode: WARP
-			height: 640
-			width: 640
-			interp_mode: LINEAR
-			interp_mode: AREA
-			interp_mode: NEAREST
-			interp_mode: CUBIC
-			interp_mode: LANCZOS4
-		}
-		emit_constraint {
-			emit_type: CENTER
-		}
-		distort_param {
-			brightness_prob: 0.5
-			brightness_delta: 32.0
-			contrast_prob: 0.5
-			contrast_lower: 0.5
-			contrast_upper: 1.5
-			hue_prob: 0.5
-			hue_delta: 18.0
-			saturation_prob: 0.5
-			saturation_lower: 0.5
-			saturation_upper: 1.5
-			random_order_prob: 0.0
-		}
-		expand_param {
-			prob: 0.5
-			max_expand_ratio: 4.0
-		}
-	}
-	data_param {
-		source: "../../../../../../dataset/facedata/wider_face/lmdb/wider_face_train_lmdb/"
-		batch_size: 16
-		backend: LMDB
-	}
-	annotated_data_param {
-		batch_sampler {
-			max_sample: 1
-			max_trials: 1
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.2
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.6
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.2
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.8
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.2
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.9
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.2
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.9
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.2
-			}
-			sample_constraint {
-				max_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		label_map_file: "../labelmap_face.prototxt"
-	}
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 640
+  dim: 640
 }
 layer {
 	name: "conv0"
@@ -4339,12 +4222,16 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		fixed_size: 12
-		fixed_size: 16
-		fixed_size: 20
-		density: 4
-		density: 2
-		density: 1
+		min_size: 18
+		min_size: 24
+		max_size: 24
+		max_size: 36
+		aspect_ratio: 1.6
+		aspect_ratio: 2.0
+		default_size: 15.93
+		default_size: 24.09
+		default_ratio: 1.6
+		default_ratio: 1.8
 		variance: 0.1
 		variance: 0.1
 		variance: 0.2
@@ -4367,7 +4254,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 84
+		num_output: 56
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4414,7 +4301,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 42
+		num_output: 28
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4457,12 +4344,14 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
-		min_size: 20.0
-		min_size: 26.5
-		max_size: 26.5
-		max_size: 32.0
-		aspect_ratio: 1.25
+		min_size: 34.09
+		min_size: 48.54
+		max_size: 48.0
+		max_size: 64.0
 		aspect_ratio: 1.6
+		aspect_ratio: 2.0
+		default_size: 39.54
+		default_ratio: 1.7
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4487,7 +4376,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 48
+		num_output: 52
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4534,7 +4423,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 26
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4577,10 +4466,14 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
-		min_size: 32.0
-		max_size: 64.0
-		aspect_ratio: 1.25
+		min_size: 68.13
+		max_size: 128.5
 		aspect_ratio: 1.6
+		aspect_ratio: 2.0
+		default_size: 65.13
+		default_size: 104.5
+		default_ratio: 1.6
+		default_ratio: 1.65
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4605,7 +4498,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 32
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4652,7 +4545,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4695,10 +4588,12 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 64.0
-		max_size: 128.0
-		aspect_ratio: 1.25
+		min_size: 135.5
+		max_size: 256.89
 		aspect_ratio: 1.6
+		aspect_ratio: 2.0
+		default_size: 178.89
+		default_ratio: 1.44
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4723,7 +4618,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 28
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4770,7 +4665,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 14
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4813,10 +4708,12 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 128.0
-		max_size: 256.0
+		min_size: 271.0
+		max_size: 543.0
+		aspect_ratio: 1.6
 		aspect_ratio: 2.0
-		aspect_ratio: 1.5
+		default_size: 294.18
+		default_ratio: 1.33
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4841,7 +4738,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 28
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4888,7 +4785,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 14
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4931,8 +4828,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
-		min_size: 256.0
-		max_size: 428.0
+		min_size: 540.0
+		max_size: 640.0
 		aspect_ratio: 2.0
 		aspect_ratio: 1.5
 		flip: true
@@ -5048,7 +4945,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_seven_priorbox"
 	prior_box_param {
-		min_size: 428.0
+		min_size: 540.0
 		max_size: 640
 		aspect_ratio: 2.0
 		aspect_ratio: 1.5
@@ -5206,39 +5103,58 @@ layer {
 }
 
 layer {
-	name: "mbox_loss"
-	type: "MultiBoxSSDLoss"
-	bottom: "mbox_loc"
+	name: "mbox_conf_reshape"
+	type: "Reshape"
 	bottom: "mbox_conf"
+	top: "mbox_conf_reshape"
+	reshape_param {
+		shape {
+			dim: 0
+			dim: -1
+			dim: 2
+		}
+	}
+}
+layer {
+	name: "mbox_conf_softmax"
+	type: "Softmax"
+	bottom: "mbox_conf_reshape"
+	top: "mbox_conf_softmax"
+	softmax_param {
+		axis: 2
+	}
+}
+layer {
+	name: "mbox_conf_flatten"
+	type: "Flatten"
+	bottom: "mbox_conf_softmax"
+	top: "mbox_conf_flatten"
+	flatten_param {
+		axis: 1
+	}
+}
+
+layer {
+	name: "detection_out"
+	type: "DetectionOutput"
+	bottom: "mbox_loc"
+	bottom: "mbox_conf_flatten"
 	bottom: "mbox_priorbox"
-	bottom: "label"
-	top: "mbox_loss"
+	top: "detection_out"
 	include {
-		phase: TRAIN
+	phase: TEST
 	}
-	propagate_down: true
-	propagate_down: true
-	propagate_down: false
-	propagate_down: false
-	loss_param {
-		normalization: VALID
-	}
-	loss_weight: 0.5
-	multibox_loss_param {
-		loc_loss_type: SMOOTH_L1
-		conf_loss_type: SOFTMAX
-		loc_weight: 1.0
+	detection_output_param {
+		attri_type: NORMALL
 		num_classes: 2
 		share_location: true
-		match_type: PER_PREDICTION
-		overlap_threshold: 0.65
-		use_prior_for_matching: true
 		background_label_id: 0
-		use_difficult_gt: true
-		neg_pos_ratio: 3.0
-		neg_overlap: 0.65
+		nms_param {
+			nms_threshold: 0.55
+			top_k: 50
+		}
 		code_type: CENTER_SIZE
-		ignore_cross_boundary_bbox: false
-		mining_type: MAX_NEGATIVE
+		keep_top_k: 50
+		confidence_threshold: 0.25
 	}
 }
