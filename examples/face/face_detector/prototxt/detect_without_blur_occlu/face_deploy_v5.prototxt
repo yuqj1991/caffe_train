@@ -685,7 +685,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -750,12 +750,12 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		bias_term: false
 		pad: 1
 		kernel_size: 3
 		stride: 1
-		group: 256
+		group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -4060,11 +4060,11 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		min_size: 16
+		min_size: 18
 		min_size: 24
 		max_size: 24
-		max_size: 32
-		aspect_ratio: 3.0
+		max_size: 36
+		aspect_ratio: 1.6.0
 		aspect_ratio: 2.0
 		default_size: 15.93
 		default_size: 24.09
@@ -4184,11 +4184,11 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
-		min_size: 32.09
+		min_size: 34.09
 		min_size: 48.54
 		max_size: 48.0
 		max_size: 64.0
-		aspect_ratio: 3.0
+		aspect_ratio: 1.6
 		aspect_ratio: 2.0
 		default_size: 39.54
 		default_ratio: 1.7
@@ -4306,7 +4306,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
-		min_size: 64.13
+		min_size: 68.13
 		max_size: 128.5
 		aspect_ratio: 1.6
 		aspect_ratio: 2.0
@@ -4428,9 +4428,9 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 128.5
+		min_size: 135.5
 		max_size: 256.89
-		aspect_ratio: 3.0
+		aspect_ratio: 1.6
 		aspect_ratio: 2.0
 		default_size: 104.5
 		default_size: 178.89
@@ -4550,8 +4550,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 256.0
-		max_size: 448.0
+		min_size: 271.0
+		max_size: 543.0
 		aspect_ratio: 1.6
 		aspect_ratio: 2.0
 		default_size: 294.18
@@ -4670,7 +4670,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
-		min_size: 448.0
+		min_size: 543.0
 		max_size: 640.0
 		aspect_ratio: 2.0
 		aspect_ratio: 1.5
@@ -4787,7 +4787,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_seven_priorbox"
 	prior_box_param {
-		min_size: 448.0
+		min_size: 543.0
 		max_size: 640.0
 		aspect_ratio: 2.0
 		aspect_ratio: 1.5
