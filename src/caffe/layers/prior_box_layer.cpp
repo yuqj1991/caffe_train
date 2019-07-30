@@ -310,6 +310,7 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       }
 
       for (int s = 0; s < min_sizes_.size(); ++s) {
+        int min_size_ = min_sizes_[s];
         if (min_size_ == 32) {
           for (int i = -2; i<2; i++) {
         	  for (int j = -2; j<2; j++) {
