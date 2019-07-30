@@ -1400,7 +1400,7 @@ layer {
 		}
 	}
 }
-Layer{
+layer{
 	name: "conv10_1/relu"
 	type: "ReLU"
 	bottom: "conv10_1"
