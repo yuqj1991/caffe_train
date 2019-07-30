@@ -552,12 +552,7 @@ layer {
 		}
 	}
 }
-layer {
-	name: "conv_2_2_1/relu"
-	type: "ReLU"
-	bottom: "conv_2_2_1"
-	top: "conv_2_2_1"
-}
+
 
 layer {
 	name: "conv_2_2_concat"
@@ -626,12 +621,6 @@ layer {
 			value: 0
 		}
 	}
-}
-layer {
-	name: "conv_2_2_concat/relu"
-	type: "ReLU"
-	bottom: "conv_2_2_concat"
-	top: "conv_2_2_concat"
 }
 layer{
 	name: "conv_two_eltwise"
@@ -734,7 +723,7 @@ layer {
 	decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 64
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -810,7 +799,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -884,7 +873,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 64
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -945,18 +934,12 @@ layer {
 	top: "conv_3_1"
 }
 
-
-
-
 layer{
 	name: "conv_three_eltsize"
-	type: "Eltwise"
+	type: "Concat"
 	bottom: "conv_3_1"
 	bottom: "conv_3_2"
 	top: "conv_three_eltsize"
-	eltwise_param {
-	    operation: SUM
-	}
 }
 
 ####
@@ -1051,7 +1034,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 64
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -1203,7 +1186,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 64
 		kernel_size: 3
 		stride: 2
 		pad: 1
