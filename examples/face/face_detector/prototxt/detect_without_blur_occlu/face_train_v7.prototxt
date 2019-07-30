@@ -59,11 +59,11 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 0.9
+				max_aspect_ratio: 1.1
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.4
+				min_jaccard_overlap: 0.95
 			}
 			max_sample: 1
 			max_trials: 50
@@ -72,11 +72,11 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 0.9
+				max_aspect_ratio: 1.1
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.6
+				min_jaccard_overlap: 0.95
 			}
 			max_sample: 1
 			max_trials: 50
@@ -85,11 +85,11 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 0.9
+				max_aspect_ratio: 1.1
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.8
+				min_jaccard_overlap: 0.95
 			}
 			max_sample: 1
 			max_trials: 50
@@ -98,11 +98,11 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 0.9
+				max_aspect_ratio: 1.1
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.9
+				min_jaccard_overlap: 0.95
 			}
 			max_sample: 1
 			max_trials: 50
@@ -6995,12 +6995,12 @@ layer {
 		num_classes: 2
 		share_location: true
 		match_type: PER_PREDICTION
-		overlap_threshold: 0.65
+		overlap_threshold: 0.35
 		use_prior_for_matching: true
 		background_label_id: 0
 		use_difficult_gt: true
 		neg_pos_ratio: 3.0
-		neg_overlap: 0.65
+		neg_overlap: 0.35
 		code_type: CENTER_SIZE
 		ignore_cross_boundary_bbox: false
 		mining_type: MAX_NEGATIVE
