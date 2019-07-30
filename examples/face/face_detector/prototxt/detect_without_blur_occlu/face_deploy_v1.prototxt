@@ -1774,7 +1774,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 64
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -1840,7 +1840,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		bias_term: false
 		kernel_size: 3
 		stride: 2
@@ -1977,7 +1977,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 64
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -2650,7 +2650,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		bias_term: false
@@ -2717,7 +2717,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -2861,7 +2861,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -2928,7 +2928,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -3006,10 +3006,10 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		kernel_size: 3
-		group: 512
+		#group: 256
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -3073,7 +3073,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -3140,7 +3140,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -3286,7 +3286,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -3353,7 +3353,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -3432,8 +3432,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
