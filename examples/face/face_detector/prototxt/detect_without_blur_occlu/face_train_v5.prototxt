@@ -4181,7 +4181,7 @@ layer {
 		min_size: 24
 		max_size: 24
 		max_size: 36
-		aspect_ratio: 1.6.0
+		aspect_ratio: 1.6
 		aspect_ratio: 2.0
 		default_size: 15.93
 		default_size: 24.09
