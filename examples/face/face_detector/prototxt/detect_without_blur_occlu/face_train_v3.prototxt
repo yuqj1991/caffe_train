@@ -1650,7 +1650,7 @@ layer {
 		}
 	}
 }
-Layer{
+layer{
 	name: "conv8_block0_conv/relu"
 	type: "ReLU"
 	bottom: "conv8_block0_conv"
