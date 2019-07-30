@@ -1811,7 +1811,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 256
+		group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
