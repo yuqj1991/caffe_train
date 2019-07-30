@@ -60,7 +60,11 @@ void PriorBoxLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   }
 
   if (min_sizes_.size()>0){
-    num_priors_ = aspect_ratios_.size() * min_sizes_.size();
+      if(min_sizes_.size()==3 && min_sizes_[0]==32&&min_sizes_[1]==64)
+	        num_priors_ = 21;
+      else{
+        num_priors_ = aspect_ratios_.size() * min_sizes_.size();
+      }
   }
 
   if (fixed_sizes_.size()>0){
