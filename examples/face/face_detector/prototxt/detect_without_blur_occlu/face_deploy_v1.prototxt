@@ -4992,10 +4992,10 @@ layer {
 		background_label_id: 0
 		nms_param {
 			nms_threshold: 0.55
-			top_k: 50
+			top_k: 100
 		}
 		code_type: CENTER_SIZE
-		keep_top_k: 50
+		keep_top_k: 100
 		confidence_threshold: 0.25
 	}
 }
