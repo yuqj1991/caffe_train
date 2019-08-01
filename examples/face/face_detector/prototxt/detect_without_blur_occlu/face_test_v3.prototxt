@@ -45,7 +45,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		stride: 2
+		stride: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -93,16 +93,17 @@ layer {
 	}
 }
 layer {
-	name: "conv0/relu"
+	name: "conv0/ReLU"
 	type: "ReLU"
 	bottom: "conv0"
 	top: "conv0"
 }
+
 layer {
-	name: "conv1/dw"
+	name: "conv1"
 	type: "Convolution"
 	bottom: "conv0"
-	top: "conv1/dw"
+	top: "conv1"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
@@ -110,75 +111,8 @@ layer {
 	convolution_param {
 		num_output: 32
 		bias_term: false
-		pad: 1
 		kernel_size: 3
-		group: 32
-		engine: CAFFE
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv1/dw/bn"
-	type: "BatchNorm"
-	bottom: "conv1/dw"
-	top: "conv1/dw"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv1/dw/scale"
-	type: "Scale"
-	bottom: "conv1/dw"
-	top: "conv1/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv1/dw/relu"
-	type: "ReLU"
-	bottom: "conv1/dw"
-	top: "conv1/dw"
-}
-layer {
-	name: "conv1"
-	type: "Convolution"
-	bottom: "conv1/dw"
-	top: "conv1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 64
-		bias_term: false
-		kernel_size: 1
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -226,16 +160,17 @@ layer {
 	}
 }
 layer {
-	name: "conv1/relu"
+	name: "conv1/ReLU"
 	type: "ReLU"
 	bottom: "conv1"
 	top: "conv1"
 }
+
 layer {
-	name: "conv2/dw"
+	name: "conv2"
 	type: "Convolution"
 	bottom: "conv1"
-	top: "conv2/dw"
+	top: "conv2"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
@@ -243,76 +178,9 @@ layer {
 	convolution_param {
 		num_output: 64
 		bias_term: false
-		pad: 1
 		kernel_size: 3
 		stride: 2
-		group: 64
-		engine: CAFFE
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv2/dw/bn"
-	type: "BatchNorm"
-	bottom: "conv2/dw"
-	top: "conv2/dw"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv2/dw/scale"
-	type: "Scale"
-	bottom: "conv2/dw"
-	top: "conv2/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv2/dw/relu"
-	type: "ReLU"
-	bottom: "conv2/dw"
-	top: "conv2/dw"
-}
-layer {
-	name: "conv2"
-	type: "Convolution"
-	bottom: "conv2/dw"
-	top: "conv2"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		kernel_size: 1
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -360,92 +228,26 @@ layer {
 	}
 }
 layer {
-	name: "conv2/relu"
+	name: "conv2/ReLU"
 	type: "ReLU"
 	bottom: "conv2"
 	top: "conv2"
 }
-layer {
-	name: "conv3/dw"
-	type: "Convolution"
-	bottom: "conv2"
-	top: "conv3/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		pad: 1
-		kernel_size: 3
-		group: 128
-		engine: CAFFE
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv3/dw/bn"
-	type: "BatchNorm"
-	bottom: "conv3/dw"
-	top: "conv3/dw"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv3/dw/scale"
-	type: "Scale"
-	bottom: "conv3/dw"
-	top: "conv3/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv3/dw/relu"
-	type: "ReLU"
-	bottom: "conv3/dw"
-	top: "conv3/dw"
-}
+
 layer {
 	name: "conv3"
 	type: "Convolution"
-	bottom: "conv3/dw"
+	bottom: "conv2"
 	top: "conv3"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 64
 		bias_term: false
-		kernel_size: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -493,16 +295,17 @@ layer {
 	}
 }
 layer {
-	name: "conv3/relu"
+	name: "conv3/ReLU"
 	type: "ReLU"
 	bottom: "conv3"
 	top: "conv3"
 }
+
 layer {
-	name: "conv4/dw"
+	name: "conv4"
 	type: "Convolution"
 	bottom: "conv3"
-	top: "conv4/dw"
+	top: "conv4"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
@@ -510,76 +313,9 @@ layer {
 	convolution_param {
 		num_output: 128
 		bias_term: false
-		pad: 1
 		kernel_size: 3
 		stride: 2
-		group: 128
-		engine: CAFFE
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv4/dw/bn"
-	type: "BatchNorm"
-	bottom: "conv4/dw"
-	top: "conv4/dw"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv4/dw/scale"
-	type: "Scale"
-	bottom: "conv4/dw"
-	top: "conv4/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv4/dw/relu"
-	type: "ReLU"
-	bottom: "conv4/dw"
-	top: "conv4/dw"
-}
-layer {
-	name: "conv4"
-	type: "Convolution"
-	bottom: "conv4/dw"
-	top: "conv4"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 256
-		bias_term: false
-		kernel_size: 1
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -627,7 +363,7 @@ layer {
 	}
 }
 layer {
-	name: "conv4/relu"
+	name: "conv4/ReLU"
 	type: "ReLU"
 	bottom: "conv4"
 	top: "conv4"
@@ -4137,16 +3873,10 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		min_size: 9
-		min_size: 12
-		max_size: 12
-		max_size: 18
+		min_size: 32
+		max_size: 64
 		aspect_ratio: 1.6
 		aspect_ratio: 2.0
-		default_size: 7.93
-		default_size: 12.09
-		default_ratio: 1.6
-		default_ratio: 1.8
 		variance: 0.1
 		variance: 0.1
 		variance: 0.2
