@@ -26,13 +26,13 @@ def parser():
                         default='net/face_detector.caffemodel', type=str)
     parser.add_argument('--net_name', dest='net_name',
                         help='The name of the experiment',
-                        default='face_detector',type=str)
+                        default='face-detector',type=str)
     return parser.parse_args()
 
 
 def preprocess(src):
-    img = cv2.resize(src, (320,320))
-    img = img - [103.94, 116.78, 123.68] # 127.5
+    img = cv2.resize(src, (300,300))
+    img = img - 127.5# [103.94, 116.78, 123.68] # 127.5
     img = img * 0.007843
     return img
 

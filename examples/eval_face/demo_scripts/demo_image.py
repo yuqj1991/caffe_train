@@ -11,7 +11,7 @@ def make_parser():
     parser.add_argument('--model', type=str, help='.prototxt file for inference', default ='../net/face_detector.prototxt')
     parser.add_argument('--weights', type=str, help='.caffemodel file for inference', default ='../net/face_detector.caffemodel')
     parser.add_argument('--input', type = int, help='net input', default = 320)
-    parser.add_argument('--sameAvg', type = int, help='net input', default = 1)
+    parser.add_argument('--sameAvg', type = int, help='net input', default = 0)
     return parser
 parser1 = make_parser()
 args = parser1.parse_args()
