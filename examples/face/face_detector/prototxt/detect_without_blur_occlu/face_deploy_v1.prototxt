@@ -2587,7 +2587,7 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 3
+		kernel_size: 1
 		stride: 1
 		weight_filler {
 			type: "msra"
@@ -3929,11 +3929,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-<<<<<<< HEAD
 		min_size: 8
-=======
-		max_size: 8
->>>>>>> 8222ca4fa1d1526d92cc91befcd5280523df029d
 		max_size: 16
 		flip: true
 		clip: false
