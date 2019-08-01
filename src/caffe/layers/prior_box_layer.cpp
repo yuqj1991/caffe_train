@@ -60,11 +60,7 @@ void PriorBoxLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   }
 
   if (min_sizes_.size()>0){
-      if(min_sizes_.size()==3 && min_sizes_[0]==32&&min_sizes_[1]==64)
-	        num_priors_ = 21;
-      else{
-        num_priors_ = aspect_ratios_.size() * min_sizes_.size();
-      }
+    num_priors_ = aspect_ratios_.size() * min_sizes_.size();
   }
 
   if (fixed_sizes_.size()>0){
@@ -315,42 +311,16 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 
       for (int s = 0; s < min_sizes_.size(); ++s) {
         int min_size_ = min_sizes_[s];
-        # if 0
-        if (min_size_ == 32) {
-          for (int i = -2; i<2; i++) {
-        	  for (int j = -2; j<2; j++) {
-        	    box_width = box_height = min_size_;
-        	    top_data[idx++] = (center_x + j * 8 - (box_width-1) / 2.) / img_width;
-        	    top_data[idx++] = (center_y + i * 8 - (box_width-1) / 2.) / img_height;
-        	    top_data[idx++] = (center_x + j * 8 + (box_width-1) / 2.) / img_width;
-        	    top_data[idx++] = (center_y + i * 8 + (box_width-1) / 2.) / img_height;
-        	  }
-          }
-        }
-        else if (min_size_ == 64) {
-          for (int i = -1; i<1; i++) {
-        	  for (int j = -1; j<1; j++) {
-        	    box_width = box_height = min_size_;
-        	    top_data[idx++] = (center_x + j * 16 - (box_width-1) / 2.) / img_width;
-        	    top_data[idx++] = (center_y + i * 16 - (box_width-1) / 2.) / img_height;
-        	    top_data[idx++] = (center_x + j * 16 + (box_width-1) / 2.) / img_width;
-        	    top_data[idx++] = (center_y + i * 16 + (box_width-1) / 2.) / img_height;
-        	  }
-          }
-        }
-        #endif
-        {
-          // first prior: aspect_ratio = 1, size = min_size
-          box_width = box_height = min_size_;
-          // xmin
-          top_data[idx++] = (center_x - box_width / 2.) / img_width;
-          // ymin
-          top_data[idx++] = (center_y - box_height / 2.) / img_height;
-          // xmax
-          top_data[idx++] = (center_x + box_width / 2.) / img_width;
-          // ymax
-          top_data[idx++] = (center_y + box_height / 2.) / img_height;
-        }
+        // first prior: aspect_ratio = 1, size = min_size
+        box_width = box_height = min_size_;
+        // xmin
+        top_data[idx++] = (center_x - box_width / 2.) / img_width;
+        // ymin
+        top_data[idx++] = (center_y - box_height / 2.) / img_height;
+        // xmax
+        top_data[idx++] = (center_x + box_width / 2.) / img_width;
+        // ymax
+        top_data[idx++] = (center_y + box_height / 2.) / img_height;
         if (max_sizes_.size() > 0) {
           CHECK_EQ(min_sizes_.size(), max_sizes_.size());
           int max_size_ = max_sizes_[s];
