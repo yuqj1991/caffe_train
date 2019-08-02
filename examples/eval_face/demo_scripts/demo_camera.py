@@ -10,18 +10,17 @@ def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, required=True, help='.prototxt file for inference')
     parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
-    parser.add_argument('--input', type = int, help='net input', default = 300)
-    parser.add_argument('--sameAvg', type = int, help='net input', default = 1)
+    parser.add_argument('--input', type = int, help='net input', default = 320)
+    parser.add_argument('--sameAvg', type = int, help='net input', default = 0)
     return parser
 parser1 = make_parser()
 args = parser1.parse_args()
 net_file= args.model
 caffe_model= args.weights
 
-inputsize = 300
+inputsize = 320
 mean_value = [127.5, 127.5, 127.5]
 if not args.sameAvg:
-    print("==")
     mean_value = [103.94, 116.78, 123.68]
     inputsize = args.input
 
