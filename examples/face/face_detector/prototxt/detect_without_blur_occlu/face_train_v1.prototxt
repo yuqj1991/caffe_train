@@ -4276,7 +4276,7 @@ layer {
 		background_label_id: 0
 		use_difficult_gt: true
 		neg_pos_ratio: 3.0
-		neg_overlap: 0.65
+		neg_overlap: 0.35
 		code_type: CENTER_SIZE
 		ignore_cross_boundary_bbox: false
 		mining_type: MAX_NEGATIVE
