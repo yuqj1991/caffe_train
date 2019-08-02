@@ -629,280 +629,18 @@ layer {
 		}
 	}
 }
+
 layer {
-	name: "conv7/dw"
-	type: "Convolution"
+	name: "conv6/relu"
+	type: "ReLU"
 	bottom: "conv6"
-	top: "conv7/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		pad: 1
-		kernel_size: 3
-		group: 128
-		engine: CAFFE
-		weight_filler {
-			type: "msra"
-		}
-	}
+	top: "conv6"
 }
-layer {
-	name: "conv7/dw/bn"
-	type: "BatchNorm"
-	bottom: "conv7/dw"
-	top: "conv7/dw"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv7/dw/scale"
-	type: "Scale"
-	bottom: "conv7/dw"
-	top: "conv7/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv7/dw/relu"
-	type: "ReLU"
-	bottom: "conv7/dw"
-	top: "conv7/dw"
-}
-layer {
-	name: "conv7"
-	type: "Convolution"
-	bottom: "conv7/dw"
-	top: "conv7"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv7/bn"
-	type: "BatchNorm"
-	bottom: "conv7"
-	top: "conv7"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv7/scale"
-	type: "Scale"
-	bottom: "conv7"
-	top: "conv7"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv7/relu"
-	type: "ReLU"
-	bottom: "conv7"
-	top: "conv7"
-}
-layer {
-	name: "conv8/dw"
-	type: "Convolution"
-	bottom: "conv7"
-	top: "conv8/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		pad: 1
-		kernel_size: 3
-		group: 128
-		engine: CAFFE
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv8/dw/bn"
-	type: "BatchNorm"
-	bottom: "conv8/dw"
-	top: "conv8/dw"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv8/dw/scale"
-	type: "Scale"
-	bottom: "conv8/dw"
-	top: "conv8/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv8/dw/relu"
-	type: "ReLU"
-	bottom: "conv8/dw"
-	top: "conv8/dw"
-}
-layer {
-	name: "conv8"
-	type: "Convolution"
-	bottom: "conv8/dw"
-	top: "conv8"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv8/bn"
-	type: "BatchNorm"
-	bottom: "conv8"
-	top: "conv8"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv8/scale"
-	type: "Scale"
-	bottom: "conv8"
-	top: "conv8"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv8_block0"
-	type: "Eltwise"
-	bottom: "conv8"
-	bottom: "conv6"
-	top: "conv8_block0"
-	eltwise_param {
-	operation: SUM
-	}
-}
+
 layer {
 	name: "conv9/dw"
 	type: "Convolution"
-	bottom: "conv8_block0"
+	bottom: "conv6"
 	top: "conv9/dw"
 	param {
 		lr_mult: 1.0
@@ -1036,7 +774,7 @@ layer {
 layer {
 	name: "conv10_1/dw"
 	type: "Convolution"
-	bottom: "conv8_block0"
+	bottom: "conv6"
 	top: "conv10_1/dw"
 	param {
 		lr_mult: 1.0
@@ -1170,7 +908,7 @@ layer{
 layer {
 	name: "conv8_block0_conv/dw"
 	type: "Convolution"
-	bottom: "conv8_block0"
+	bottom: "conv6"
 	top: "conv8_block0_conv/dw"
 	param {
 		lr_mult: 1.0
@@ -2389,7 +2127,7 @@ layer {
 layer{
 	name: "lfpn_1_moudle_cpm_3_3"
 	type: "Convolution"
-	bottom: "conv8_block0"
+	bottom: "conv6"
 	top: "lfpn_1_moudle_cpm_3_3"
 	param {
 		lr_mult: 1
@@ -3875,7 +3613,6 @@ layer {
 	prior_box_param {
 		min_size: 16
 		min_size: 32
-		min_size: 64
 		aspect_ratio: 1.6
 		aspect_ratio: 2.0
 		variance: 0.1
@@ -3900,7 +3637,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 60
+		num_output: 40
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3947,7 +3684,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 30
+		num_output: 20
 		kernel_size: 1
 		weight_filler {
 			type: "msra"

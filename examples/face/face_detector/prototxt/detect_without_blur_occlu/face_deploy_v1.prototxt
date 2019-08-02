@@ -6,78 +6,11 @@ input_shape {
 	dim: 320
 	dim: 320
 }
-layer {
-	name: "conv0"
-	type: "Convolution"
-	bottom: "data"
-	top: "conv0"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 32
-		bias_term: false
-		pad: 1
-		kernel_size: 3
-		stride: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv0/bn"
-	type: "BatchNorm"
-	bottom: "conv0"
-	top: "conv0"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv0/scale"
-	type: "Scale"
-	bottom: "conv0"
-	top: "conv0"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv0/ReLU"
-	type: "ReLU"
-	bottom: "conv0"
-	top: "conv0"
-}
 
 layer {
 	name: "conv1"
 	type: "Convolution"
-	bottom: "conv0"
+	bottom: "data"
 	top: "conv1"
 	param {
 		lr_mult: 1.0
@@ -2305,138 +2238,7 @@ layer {
 	bottom: "conv16_2"
 	top: "conv16_2"
 }
-layer {
-	name: "conv17_1"
-	type: "Convolution"
-	bottom: "conv16_2"
-	top: "conv17_1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv17_1/bn"
-	type: "BatchNorm"
-	bottom: "conv17_1"
-	top: "conv17_1"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv17_1/scale"
-	type: "Scale"
-	bottom: "conv17_1"
-	top: "conv17_1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv17_1/ReLU"
-	type: "ReLU"
-	bottom: "conv17_1"
-	top: "conv17_1"
-}
-layer {
-	name: "conv17_2"
-	type: "Convolution"
-	bottom: "conv17_1"
-	top: "conv17_2"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		pad: 1
-		kernel_size: 3
-		stride: 2
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv17_2/bn"
-	type: "BatchNorm"
-	bottom: "conv17_2"
-	top: "conv17_2"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv17_2/scale"
-	type: "Scale"
-	bottom: "conv17_2"
-	top: "conv17_2"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv17_2/ReLU"
-	type: "ReLU"
-	bottom: "conv17_2"
-	top: "conv17_2"
-}
+
 
 #######################################################################
 #                             modeule one                             #
@@ -2656,7 +2458,7 @@ layer {
 layer{
 	name: "lfpn_2_moudle_cpm_4_3"
 	type: "Convolution"
-	bottom: "conv11_1_block2"
+	bottom: "conv8_block0"
 	top: "lfpn_2_moudle_cpm_4_3"
 	param {
 		lr_mult: 1
@@ -2868,7 +2670,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv13_block3"
 	type: "Convolution"
-	bottom: "conv13_block3"
+	bottom: "conv11_1_block2"
 	top: "cpm_moudle_conv13_block3"
 	param {
 		lr_mult: 1
@@ -3081,7 +2883,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv14_2"
 	type: "Convolution"
-	bottom: "conv14_2"
+	bottom: "conv13_block3"
 	top: "cpm_moudle_conv14_2"
 	param {
 		lr_mult: 1
@@ -3293,7 +3095,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv16_2"
 	type: "Convolution"
-	bottom: "conv15_2"
+	bottom: "conv14_2"
 	top: "cpm_moudle_conv16_2"
 	param {
 		lr_mult: 1
@@ -3504,7 +3306,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv17_2"
 	type: "Convolution"
-	bottom: "conv16_2"
+	bottom: "conv15_2"
 	top: "cpm_moudle_conv17_2"
 	param {
 		lr_mult: 1
@@ -3715,7 +3517,7 @@ layer {
 layer{
 	name: "cpm_moudle_seven"
 	type: "Convolution"
-	bottom: "conv17_2"
+	bottom: "conv16_2"
 	top: "cpm_moudle_seven"
 	param {
 		lr_mult: 1
@@ -3930,7 +3732,7 @@ layer {
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
 		min_size: 8
-		max_size: 16
+		min_size: 16
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4046,7 +3848,7 @@ layer {
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
 		min_size: 16
-		max_size: 32
+		min_size: 32
 		flip: true
 		clip: false
 		variance: 0.1
@@ -4162,7 +3964,7 @@ layer {
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
 		min_size: 32
-		max_size: 64
+		min_size: 64
 		aspect_ratio: 1.6
 		aspect_ratio: 2.0
 		flip: true
@@ -4189,7 +3991,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 40
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4236,7 +4038,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 20
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
