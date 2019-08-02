@@ -3675,12 +3675,12 @@ layer {
 		num_classes: 2
 		share_location: true
 		match_type: PER_PREDICTION
-		overlap_threshold: 0.55
+		overlap_threshold: 0.65
 		use_prior_for_matching: true
 		background_label_id: 0
 		use_difficult_gt: true
 		neg_pos_ratio: 3.0
-		neg_overlap: 0.55
+		neg_overlap: 0.65
 		code_type: CENTER_SIZE
 		ignore_cross_boundary_bbox: false
 		mining_type: MAX_NEGATIVE
