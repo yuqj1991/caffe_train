@@ -6001,16 +6001,10 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		min_size: 18
-		min_size: 24
-		max_size: 24
-		max_size: 36
-		aspect_ratio: 1.6
-		aspect_ratio: 2.0
-		default_size: 15.93
-		default_size: 24.09
-		default_ratio: 1.6
-		default_ratio: 1.8
+		min_size: 8
+		min_size: 16
+		min_size: 32
+		aspect_ratio: 1.2
 		variance: 0.1
 		variance: 0.1
 		variance: 0.2
@@ -6033,7 +6027,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 56
+		num_output: 48
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -6080,7 +6074,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 28
+		num_output: 24
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -6122,14 +6116,10 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
-		min_size: 34.09
-		min_size: 48.54
-		max_size: 48.0
-		max_size: 64.0
-		aspect_ratio: 1.6
+		min_size: 32.0
+		min_size: 64.0
+		aspect_ratio: 1.5
 		aspect_ratio: 2.0
-		default_size: 39.54
-		default_ratio: 1.7
 		flip: true
 		clip: false
 		variance: 0.1
@@ -6154,7 +6144,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 52
+		num_output: 40
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -6201,7 +6191,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 26
+		num_output: 20
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -6244,8 +6234,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
-		min_size: 64.13
-		max_size: 128.5
+		min_size: 64.0
+		max_size: 128.0
 		aspect_ratio: 1.6
 		aspect_ratio: 2.0
 		default_size: 65.13
@@ -6366,8 +6356,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 64.0
-		max_size: 128.0
+		min_size: 128.0
+		max_size: 256.0
 		aspect_ratio: 1.25
 		aspect_ratio: 1.6
 		default_size: 178.89
@@ -6486,8 +6476,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 128.0
-		max_size: 256.0
+		min_size: 256.0
+		max_size: 320.0
 		aspect_ratio: 2.0
 		aspect_ratio: 3.0
 		flip: true
@@ -6605,7 +6595,7 @@ layer {
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
 		min_size: 256.0
-		max_size: 428.0
+		max_size: 320.0
 		aspect_ratio: 2.0
 		aspect_ratio: 3.0
 		flip: true
@@ -6721,8 +6711,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_seven_priorbox"
 	prior_box_param {
-		min_size: 409.6
-		max_size: 640
+		min_size: 256
+		max_size: 320
 		aspect_ratio: 2.0
 		aspect_ratio: 1.5
 		flip: true
