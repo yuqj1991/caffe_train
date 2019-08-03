@@ -5031,7 +5031,6 @@ layer {
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
 		min_size: 8
-		min_size: 16
 		variance: 0.1
 		variance: 0.1
 		variance: 0.2
@@ -5054,7 +5053,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5101,7 +5100,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 2
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5143,9 +5142,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
-		min_size: 32.0
-		max_size: 64.0
-		aspect_ratio: 1.5
+		min_size: 16.0
+		max_size: 32.0
 		aspect_ratio: 2.0
 		flip: true
 		clip: false
@@ -5171,7 +5169,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5218,7 +5216,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5261,9 +5259,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
-		min_size: 64.0
-		max_size: 128.0
-		aspect_ratio: 1.6
+		min_size: 32.0
+		max_size: 64.0
 		aspect_ratio: 2.0
 		flip: true
 		clip: false
@@ -5289,7 +5286,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5336,7 +5333,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5379,10 +5376,9 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 128.0
-		max_size: 256.0
+		min_size: 64.0
+		max_size: 128.0
 		aspect_ratio: 2.0
-		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -5407,7 +5403,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5454,7 +5450,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5497,8 +5493,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 256.0
-		max_size: 320.0
+		min_size: 128.0
+		max_size: 256.0
 		aspect_ratio: 2.0
 		aspect_ratio: 3.0
 		flip: true
