@@ -2173,6 +2173,7 @@ layer {
 	bottom: "conv15_2"
 	top: "conv15_2"
 }
+
 #######################################################################
 #                             modeule one                             #
 #######################################################################
@@ -3103,7 +3104,7 @@ layer{
 	convolution_param {
 		num_output: 256
 		kernel_size: 1
-		stride: 1
+		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -3247,8 +3248,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
