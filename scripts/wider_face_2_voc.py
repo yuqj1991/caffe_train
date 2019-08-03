@@ -113,9 +113,9 @@ def convertimgset(img_set="train"):
                         croplabel_file.close()
                         f_set_crop.write(os.path.abspath(cropImgFileName).split('.jpg')[0] + '\n')
                     cv2.rectangle(showimg, (x, y), (x2, y2), (0, 255, 0))
-                else:
-                    saveimg[y:y2, x:x2, :] = (104,117,123)
-                    cv2.rectangle(showimg, (x, y), (x2, y2), (0, 0, 255))
+                #else:
+                #    saveimg[y:y2, x:x2, :] = (104,117,123)
+                #    cv2.rectangle(showimg, (x, y), (x2, y2), (0, 0, 255))
             filename = filename.replace("/", "_")
             if len(bboxes) == 0:
                 print
