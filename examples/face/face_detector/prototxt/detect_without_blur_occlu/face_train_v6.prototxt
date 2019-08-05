@@ -3839,6 +3839,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
+		step: 8
 	}
 }
 
@@ -3956,6 +3957,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
+		step: 16
 	}
 }
 
@@ -4073,6 +4075,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
+		step: 32
 	}
 }
 
@@ -4192,6 +4195,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
+		step: 32
 	}
 }
 
@@ -4310,6 +4314,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
+		step: 64
 	}
 }
 
@@ -4426,6 +4431,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
+		step: 128
 	}
 }
 
