@@ -6,7 +6,7 @@ base_lr: 0.001
 display: 100
 max_iter: 400000
 lr_policy: "multistep"
-gamma: 0.5
+gamma: 0.1
 weight_decay: 0.0005
 snapshot: 5000
 snapshot_prefix: "../../snapshot/face_detector_without_v1"

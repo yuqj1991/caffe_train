@@ -31,7 +31,7 @@ if not os.path.exists(net_file):
     print(net_file + " does not exist")
     exit()
 caffe.set_mode_gpu();
-caffe.set_device(0);
+caffe.set_device(2);
 net = caffe.Net(net_file,caffe_model,caffe.TEST)  
 
 CLASSES = ('background', 'face')
