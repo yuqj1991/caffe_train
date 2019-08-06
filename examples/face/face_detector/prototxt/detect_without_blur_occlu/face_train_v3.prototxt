@@ -3363,7 +3363,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		min_size: 8
+		min_size: 16
+        aspect_ratio: 2.0
 		variance: 0.1
 		variance: 0.1
 		variance: 0.2
@@ -3387,7 +3388,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3434,7 +3435,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 2
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3477,7 +3478,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
-		min_size: 16
+		min_size: 32
+        aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3503,7 +3505,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3550,7 +3552,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 2
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3593,8 +3595,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
-		min_size: 32
-		max_size: 64.0
+		min_size: 64.0
+		max_size: 128.0
 		aspect_ratio: 2.0
 		flip: true
 		clip: false
@@ -3711,8 +3713,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 64.0
-		max_size: 128.0
+		min_size: 128.0
+		max_size: 256.0
 		aspect_ratio: 2.0
 		flip: true
 		clip: false
@@ -3829,8 +3831,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 128.0
-		max_size: 256.0
+		min_size: 256.0
+		max_size: 320.0
 		aspect_ratio: 2.0
 		flip: true
 		clip: false
