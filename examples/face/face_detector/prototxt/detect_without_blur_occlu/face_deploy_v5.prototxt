@@ -2106,138 +2106,6 @@ layer {
 	bottom: "conv15_2"
 	top: "conv15_2"
 }
-layer {
-	name: "conv16_1"
-	type: "Convolution"
-	bottom: "conv15_2"
-	top: "conv16_1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv16_1/bn"
-	type: "BatchNorm"
-	bottom: "conv16_1"
-	top: "conv16_1"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv16_1/scale"
-	type: "Scale"
-	bottom: "conv16_1"
-	top: "conv16_1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv16_1/relu"
-	type: "ReLU"
-	bottom: "conv16_1"
-	top: "conv16_1"
-}
-layer {
-	name: "conv16_2"
-	type: "Convolution"
-	bottom: "conv16_1"
-	top: "conv16_2"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 256
-		bias_term: false
-		pad: 1
-		kernel_size: 3
-		stride: 2
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv16_2/bn"
-	type: "BatchNorm"
-	bottom: "conv16_2"
-	top: "conv16_2"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv16_2/scale"
-	type: "Scale"
-	bottom: "conv16_2"
-	top: "conv16_2"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv16_2/relu"
-	type: "ReLU"
-	bottom: "conv16_2"
-	top: "conv16_2"
-}
 
 #######################################################################
 #                             modeule one                             #
@@ -2253,10 +2121,10 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		bias_term: false
 		kernel_size: 3
-		group: 256
+		group: 128
 		pad: 1
 		weight_filler {
 			type: "msra"
