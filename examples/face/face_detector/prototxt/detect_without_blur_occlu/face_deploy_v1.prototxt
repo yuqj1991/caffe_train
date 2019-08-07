@@ -1564,138 +1564,6 @@ layer {
 	bottom: "conv14_2"
 	top: "conv14_2"
 }
-layer {
-	name: "conv15_1"
-	type: "Convolution"
-	bottom: "conv14_2"
-	top: "conv15_1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 256
-		bias_term: false
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv15_1/bn"
-	type: "BatchNorm"
-	bottom: "conv15_1"
-	top: "conv15_1"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv15_1/scale"
-	type: "Scale"
-	bottom: "conv15_1"
-	top: "conv15_1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv15_1/ReLU"
-	type: "ReLU"
-	bottom: "conv15_1"
-	top: "conv15_1"
-}
-layer {
-	name: "conv15_2"
-	type: "Convolution"
-	bottom: "conv15_1"
-	top: "conv15_2"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 256
-		bias_term: false
-		pad: 1
-		kernel_size: 3
-		stride: 2
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv15_2/bn"
-	type: "BatchNorm"
-	bottom: "conv15_2"
-	top: "conv15_2"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv15_2/scale"
-	type: "Scale"
-	bottom: "conv15_2"
-	top: "conv15_2"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv15_2/ReLU"
-	type: "ReLU"
-	bottom: "conv15_2"
-	top: "conv15_2"
-}
 
 #######################################################################
 #                             modeule one                             #
@@ -1704,17 +1572,17 @@ layer {
 layer{
 	name: "lfpn_1_moudle_cpm_3_3"
 	type: "Convolution"
-	bottom: "conv6_1"
+	bottom: "conv6"
 	top: "lfpn_1_moudle_cpm_3_3"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		bias_term: false
 		kernel_size: 3
-		group: 256
+		group: 128
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -1779,8 +1647,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 1
-        stride: 1
+		kernel_size: 3
+        pad: 1
 		bias_term: false
 		weight_filler {
 			type: "msra"
@@ -1846,8 +1714,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1915,7 +1783,7 @@ layer {
 layer{
 	name: "lfpn_2_moudle_cpm_4_3"
 	type: "Convolution"
-	bottom: "conv10_block1"
+	bottom: "conv6_1"
 	top: "lfpn_2_moudle_cpm_4_3"
 	param {
 		lr_mult: 1
@@ -1989,9 +1857,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2056,9 +1924,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2127,7 +1995,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv13_block3"
 	type: "Convolution"
-	bottom: "conv13_block3"
+	bottom: "conv10_block1"
 	top: "cpm_moudle_conv13_block3"
 	param {
 		lr_mult: 1
@@ -2201,9 +2069,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2268,9 +2136,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2340,7 +2208,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv14_2"
 	type: "Convolution"
-	bottom: "conv14_2"
+	bottom: "conv13_block3"
 	top: "cpm_moudle_conv14_2"
 	param {
 		lr_mult: 1
@@ -2414,9 +2282,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2481,9 +2349,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2552,7 +2420,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv16_2"
 	type: "Convolution"
-	bottom: "conv15_2"
+	bottom: "conv14_2"
 	top: "cpm_moudle_conv16_2"
 	param {
 		lr_mult: 1
@@ -2625,9 +2493,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2692,9 +2560,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
