@@ -2281,8 +2281,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 1
-        stride: 1
+		kernel_size: 3
+        	pad: 1
 		bias_term: false
 		weight_filler {
 			type: "msra"
@@ -2348,8 +2348,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2491,9 +2491,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2558,9 +2558,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 128
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -3484,7 +3484,7 @@ layer {
 	prior_box_param {
 		min_size: 16
 		max_size: 32
-        aspect_ratio: 2.0
+		aspect_ratio: 2.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3492,7 +3492,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		step: 8
+		#step: 8
 	}
 }
 
@@ -3610,7 +3610,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		step: 16
+		#step: 16
 	}
 }
 
@@ -3728,7 +3728,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		step: 32
+		#step: 32
 	}
 }
 
@@ -3826,8 +3826,6 @@ layer {
 	}
 }
 
-
-
 ############################################################
 #######################priorBox moudle four ################
 ############################################################
@@ -3848,7 +3846,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		step: 32
+		#step: 32
 	}
 }
 
@@ -3966,7 +3964,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		step: 64
+		#step: 64
 	}
 }
 
@@ -4083,7 +4081,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		step: 128
+		#step: 128
 	}
 }
 
