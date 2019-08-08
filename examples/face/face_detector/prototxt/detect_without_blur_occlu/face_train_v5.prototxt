@@ -4389,7 +4389,7 @@ layer {
 	loss_param {
 		normalization: VALID
 	}
-	loss_weight: 0.5
+	loss_weight: 1.0
 	multibox_loss_param {
 		loc_loss_type: SMOOTH_L1
 		conf_loss_type: SOFTMAX

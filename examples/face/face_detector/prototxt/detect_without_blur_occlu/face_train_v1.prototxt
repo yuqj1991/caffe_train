@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../../dataset/facedata/wider_face/lmdb/wider_face_train_lmdb/"
-		batch_size: 8
+		batch_size: 6
 		backend: LMDB
 	}
 annotated_data_param {
@@ -3394,10 +3394,10 @@ layer {
 	loss_param {
 		normalization: VALID
 	}
-	loss_weight: 0.5
+	loss_weight: 1.0
 	multibox_loss_param {
 		loc_loss_type: SMOOTH_L1
-		conf_loss_type: SOFTMAX
+		conf_loss_type: SOFTMAX #LOGISTIC #
 		loc_weight: 1.0
 		num_classes: 2
 		share_location: true
