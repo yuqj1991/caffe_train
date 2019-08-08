@@ -50,20 +50,16 @@ layer {
 		batch_size: 4
 		backend: LMDB
 	}
-annotated_data_param {
-		batch_sampler {
-			max_sample: 1
-			max_trials: 1
-		}
+	annotated_data_param {
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 1.0
 				max_scale: 1.0
-				min_aspect_ratio: 0.9
-				max_aspect_ratio: 1.1
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.0
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.95
+				min_object_coverage: 1.0
 			}
 			max_sample: 1
 			max_trials: 50
@@ -72,11 +68,11 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.9
-				max_aspect_ratio: 1.1
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.0
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.95
+				min_object_coverage: 1.0
 			}
 			max_sample: 1
 			max_trials: 50
@@ -85,11 +81,11 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.9
-				max_aspect_ratio: 1.1
-			}
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.0
+				}
 			sample_constraint {
-				min_jaccard_overlap: 0.95
+				min_object_coverage: 1.0
 			}
 			max_sample: 1
 			max_trials: 50
@@ -98,11 +94,11 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.9
-				max_aspect_ratio: 1.1
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.0
 			}
 			sample_constraint {
-				min_jaccard_overlap: 0.95
+				min_object_coverage: 1.0
 			}
 			max_sample: 1
 			max_trials: 50
@@ -111,11 +107,11 @@ annotated_data_param {
 			sampler {
 				min_scale: 0.3
 				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.4
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.0
 			}
 			sample_constraint {
-				max_jaccard_overlap: 1.0
+				min_object_coverage: 1.0
 			}
 			max_sample: 1
 			max_trials: 50
