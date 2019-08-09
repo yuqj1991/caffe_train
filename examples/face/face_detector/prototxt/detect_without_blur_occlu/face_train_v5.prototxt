@@ -1333,9 +1333,9 @@ layer {
 	convolution_param {
 		num_output: 256
 		bias_term: false
-		kernel_size: 3
+		kernel_size: 7
 		stride: 2
-		pad: 1
+		pad: 3
 		group: 256
 		weight_filler {
 			type: "msra"
@@ -1813,7 +1813,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 64
+		num_output: 128
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -1870,10 +1870,10 @@ layer {
 }
 
 layer {
-	name: "conv13"
+	name: "conv13_block2_conv/dw"
 	type: "Convolution"
-	bottom: "conv11_1_block2"
-	top: "conv13"
+	bottom: "conv12"
+	top: "conv13_block2_conv/dw"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
@@ -1882,76 +1882,9 @@ layer {
 		num_output: 128
 		bias_term: false
 		kernel_size: 3
-		stride: 2
-		pad: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv13/bn"
-	type: "BatchNorm"
-	bottom: "conv13"
-	top: "conv13"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv13/scale"
-	type: "Scale"
-	bottom: "conv13"
-	top: "conv13"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv13/ReLU"
-	type: "ReLU"
-	bottom: "conv13"
-	top: "conv13"
-}
-layer {
-	name: "conv13_block2_conv/dw"
-	type: "Convolution"
-	bottom: "conv11_1_block2"
-	top: "conv13_block2_conv/dw"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 256
-		bias_term: false
-		kernel_size: 3
-		stride: 2
+		#stride: 2
 		pad:1
-		group: 256
+		group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -2016,7 +1949,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 64
+		num_output: 256
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -2071,18 +2004,11 @@ layer {
 	bottom: "conv13_block2_conv"
 	top: "conv13_block2_conv"
 }
-layer {
-	name: "conv13_block3"
-	type: "Concat"
-	bottom: "conv12"
-	bottom: "conv13"
-	bottom: "conv13_block2_conv"
-	top: "conv13_block3"
-}
+
 layer {
 	name: "conv14_1"
 	type: "Convolution"
-	bottom: "conv13_block3"
+	bottom: "conv13_block2_conv"
 	top: "conv14_1"
 	param {
 		lr_mult: 1.0
@@ -2987,7 +2913,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv14_2"
 	type: "Convolution"
-	bottom: "conv13_block3"
+	bottom: "conv13_block2_conv"
 	top: "cpm_moudle_conv14_2"
 	param {
 		lr_mult: 1
@@ -3341,8 +3267,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 3
-		pad: 1
+		kernel_size: 1
+		#pad: 1
 		weight_filler {
 			type: "msra"
 		}

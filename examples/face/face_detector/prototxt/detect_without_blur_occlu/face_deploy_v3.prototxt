@@ -758,8 +758,8 @@ layer {
 	convolution_param {
 		num_output: 128
 		bias_term: false
-		pad: 1
-		kernel_size: 3
+		pad: 2
+		kernel_size: 5
 		stride: 2
 		group: 128
 		engine: CAFFE
@@ -892,9 +892,9 @@ layer {
 	convolution_param {
 		num_output: 128
 		bias_term: false
-		kernel_size: 3
+		kernel_size: 7
 		stride: 2
-		pad: 1
+		pad: 3
 		group: 128
 		weight_filler {
 			type: "msra"
@@ -1428,19 +1428,19 @@ layer {
 layer {
 	name: "conv13_block2_conv/dw"
 	type: "Convolution"
-	bottom: "conv11_1_block2"
+	bottom: "conv12"
 	top: "conv13_block2_conv/dw"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		stride: 2
-		group: 256
+		#stride: 2
+		group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1505,7 +1505,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -1560,26 +1560,21 @@ layer{
 	bottom: "conv13_block2_conv"
 	top: "conv13_block2_conv"
 }
-layer {
-	name: "conv13_block3"
-	type: "Concat"
-	bottom: "conv12"
-	bottom: "conv13_block2_conv"
-	top: "conv13_block3"
-}
+
 layer {
 	name: "conv14_1"
 	type: "Convolution"
-	bottom: "conv13_block3"
+	bottom: "conv13_block2_conv"
 	top: "conv14_1"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		bias_term: false
-		kernel_size: 1
+		kernel_size: 3
+        pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1642,7 +1637,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
@@ -1711,7 +1706,8 @@ layer {
 	convolution_param {
 		num_output: 128
 		bias_term: false
-		kernel_size: 1
+		kernel_size: 3
+        pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2475,7 +2471,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv14_2"
 	type: "Convolution"
-	bottom: "conv13_block3"
+	bottom: "conv13_block2_conv"
 	top: "cpm_moudle_conv14_2"
 	param {
 		lr_mult: 1
@@ -2974,8 +2970,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 3
-		pad: 1
+		kernel_size: 1
+		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -3041,8 +3037,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 3
-		pad: 1
+		kernel_size: 1
+		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
