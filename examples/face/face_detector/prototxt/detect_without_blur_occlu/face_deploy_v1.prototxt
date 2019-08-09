@@ -2971,7 +2971,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		step: 8
+		#step: 8
 	}
 }
 
