@@ -1,6 +1,6 @@
 train_net: "../../prototxt/detect_without_blur_occlu/face_train_v6.prototxt"
 test_net: "../../prototxt/detect_without_blur_occlu/face_test_v6.prototxt"
-test_iter: 3083
+test_iter: 2580
 test_interval: 5000
 base_lr: 0.001
 display: 100

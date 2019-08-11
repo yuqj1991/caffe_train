@@ -15,7 +15,7 @@ layer {
 		mean_value: 123.68
 		resize_param {
 			prob: 1.0
-			resize_mode: WARP
+			resize_mode: FIT_LARGE_SIZE_AND_PAD
 			height: 320
 			width: 320
 			interp_mode: LINEAR
@@ -2471,9 +2471,9 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		min_size: 16
-		max_size: 32
-		aspect_ratio: 2.0
+		min_size: 12
+		max_size: 24
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2589,9 +2589,9 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
-		min_size: 32
-		max_size: 64
-		aspect_ratio: 2.0
+		min_size: 24
+		max_size: 48
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2707,9 +2707,9 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
-		min_size: 64
-		max_size: 128
-		aspect_ratio: 2.0
+		min_size: 48
+		max_size: 96
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2825,9 +2825,9 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 128
-		max_size: 256
-		aspect_ratio: 2.0
+		min_size: 96
+		max_size: 192
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2943,9 +2943,9 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 256.0
+		min_size: 192.0
 		max_size: 320.0
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1

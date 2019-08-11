@@ -14,7 +14,7 @@ layer {
 		mean_value: 123.68
 		resize_param {
 			prob: 1.0
-			resize_mode: WARP
+			resize_mode: FIT_LARGE_SIZE_AND_PAD
 			height: 640
 			width: 640
 			interp_mode: LINEAR
@@ -3021,7 +3021,7 @@ layer {
 	prior_box_param {
 		min_size: 64
 		max_size: 128
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3141,7 +3141,7 @@ layer {
 	prior_box_param {
 		min_size: 128
 		max_size: 256
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3259,8 +3259,7 @@ layer {
 	prior_box_param {
 		min_size: 256.0
 		max_size: 512.0
-		aspect_ratio: 1.6
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3286,7 +3285,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3333,7 +3332,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3377,7 +3376,7 @@ layer {
 	prior_box_param {
 		min_size: 512.0
 		max_size: 640.0
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
