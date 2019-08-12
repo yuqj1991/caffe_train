@@ -596,7 +596,7 @@ layer {
 layer {
 	name: "conv9"
 	type: "Convolution"
-	bottom: "conv8"
+	bottom: "conv8_block0"
 	top: "conv9"
 	param {
 		lr_mult: 1.0
@@ -733,7 +733,7 @@ layer {
 layer {
 	name: "conv12"
 	type: "Convolution"
-	bottom: "conv11"
+	bottom: "conv11_1_block2"
 	top: "conv12"
 	param {
 		lr_mult: 1.0
