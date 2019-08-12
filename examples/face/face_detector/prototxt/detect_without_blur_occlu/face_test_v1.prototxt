@@ -507,9 +507,78 @@ layer {
 	}
 }
 layer {
-	name: "conv9"
+	name: "conv8"
 	type: "Convolution"
 	bottom: "conv8_block0"
+	top: "conv8"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 128
+		bias_term: false
+		#pad: 1
+		kernel_size: 1
+		#stride: 2
+		#group: 256
+		#engine: CAFFE
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv8/bn"
+	type: "BatchNorm"
+	bottom: "conv8"
+	top: "conv8"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv8/scale"
+	type: "Scale"
+	bottom: "conv8"
+	top: "conv8"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer{
+    name: "conv8/relu"
+    type: "ReLU"
+    bottom: "conv8"
+    top: "conv8"
+}
+layer {
+	name: "conv9"
+	type: "Convolution"
+	bottom: "conv8"
 	top: "conv9"
 	param {
 		lr_mult: 1.0
@@ -643,11 +712,79 @@ layer {
 		operation: SUM
 	}
 }
-
+layer {
+	name: "conv11"
+	type: "Convolution"
+	bottom: "conv10_block1"
+	top: "conv11"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 128
+		bias_term: false
+		#pad: 1
+		kernel_size: 1
+		#stride: 2
+		#group: 256
+		#engine: CAFFE
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv11/bn"
+	type: "BatchNorm"
+	bottom: "conv11"
+	top: "conv11"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv11/scale"
+	type: "Scale"
+	bottom: "conv11"
+	top: "conv11"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer{
+    name: "conv11/relu"
+    type: "ReLU"
+    bottom: "conv11"
+    top: "conv11"
+}
 layer {
 	name: "conv12"
 	type: "Convolution"
-	bottom: "conv10_block1"
+	bottom: "conv11"
 	top: "conv12"
 	param {
 		lr_mult: 1.0
@@ -1282,8 +1419,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 3
-		pad: 1
+		kernel_size: 1
+		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
