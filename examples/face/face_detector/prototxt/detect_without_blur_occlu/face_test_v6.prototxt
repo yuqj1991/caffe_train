@@ -2778,7 +2778,7 @@ layer {
 	prior_box_param {
 		min_size: 16
 		max_size: 32
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2896,7 +2896,7 @@ layer {
 	prior_box_param {
 		min_size: 32
 		max_size: 64
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3014,7 +3014,7 @@ layer {
 	prior_box_param {
 		min_size: 64
 		max_size: 128
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3132,7 +3132,7 @@ layer {
 	prior_box_param {
 		min_size: 128
 		max_size: 256
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3250,7 +3250,7 @@ layer {
 	prior_box_param {
 		min_size: 256.0
 		max_size: 320.0
-		aspect_ratio: 2.0
+		aspect_ratio: 1.5
 		flip: true
 		clip: false
 		variance: 0.1
