@@ -3534,7 +3534,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_loc"
 	type: "Convolution"
-	bottom: "dectction_moudle_five"
+	bottom: "cpm_moudle_conv16_2"
 	top: "dectction_moudle_five_loc"
 	param {
 		lr_mult: 1
@@ -3581,7 +3581,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_conf"
 	type: "Convolution"
-	bottom: "dectction_moudle_five"
+	bottom: "cpm_moudle_conv16_2"
 	top: "dectction_moudle_five_conf"
 	param {
 		lr_mult: 1
@@ -3651,7 +3651,7 @@ layer {
 layer {
 	name: "dectction_moudle_six_loc"
 	type: "Convolution"
-	bottom: "dectction_moudle_six"
+	bottom: "cpm_moudle_conv17_2"
 	top: "dectction_moudle_six_loc"
 	param {
 		lr_mult: 1
@@ -3698,7 +3698,7 @@ layer {
 layer {
 	name: "dectction_moudle_six_conf"
 	type: "Convolution"
-	bottom: "dectction_moudle_six"
+	bottom: "cpm_moudle_conv17_2"
 	top: "dectction_moudle_six_conf"
 	param {
 		lr_mult: 1
