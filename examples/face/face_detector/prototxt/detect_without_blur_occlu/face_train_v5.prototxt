@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../../dataset/facedata/wider_face/lmdb/wider_face_train_lmdb/"
-		batch_size: 4
+		batch_size: 5
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -3545,7 +3545,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 24
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3592,7 +3592,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
