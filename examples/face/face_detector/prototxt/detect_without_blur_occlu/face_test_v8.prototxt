@@ -190,7 +190,7 @@ layer {
 	bottom: "pool3"
 	top: "conv4_1"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 		pad: 1
 		kernel_size: 3
 	}
@@ -207,7 +207,7 @@ layer {
 	bottom: "conv4_1"
 	top: "conv4_2"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 		pad: 1
 		kernel_size: 3
 	}
@@ -224,7 +224,7 @@ layer {
 	bottom: "conv4_2"
 	top: "conv4_3"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 	pad: 1
 	kernel_size: 3
 	}
@@ -252,7 +252,7 @@ layer {
 	bottom: "pool4"
 	top: "conv5_1"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 		pad: 1
 		kernel_size: 3
 	}
@@ -269,7 +269,7 @@ layer {
 	bottom: "conv5_1"
 	top: "conv5_2"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 	pad: 1
 	kernel_size: 3
 	}
@@ -286,7 +286,7 @@ layer {
 	bottom: "conv5_2"
 	top: "conv5_3"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 		pad: 1
 		kernel_size: 3
 	}
@@ -421,8 +421,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -569,9 +569,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
-		pad: 0
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -962,9 +961,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 512
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -1036,7 +1035,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		kernel_size: 4
 		stride: 2
 		pad: 1
@@ -1122,7 +1121,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -1196,7 +1195,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -1271,9 +1270,8 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
-		stride: 1
 		pad: 1
 		weight_filler {
 			type: "xavier"
@@ -1346,7 +1344,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -1432,8 +1430,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}

@@ -1,132 +1,10 @@
 name: "deepFace"
-layer {
-	name: "data"
-	type: "AnnotatedData"
-	top: "data"
-	top: "label"
-	include {
-		phase: TRAIN
-	}
-	transform_param {
-		mirror: false
-		scale: 0.007843
-		mean_value: 103.94
-		mean_value: 116.78
-		mean_value: 123.68
-		resize_param {
-			prob: 1
-			resize_mode: WARP
-			height: 640
-			width: 640
-			interp_mode: LINEAR
-			interp_mode: AREA
-			interp_mode: NEAREST
-			interp_mode: CUBIC
-			interp_mode: LANCZOS4
-		}
-		emit_constraint {
-			emit_type: CENTER
-		}
-		distort_param {
-			brightness_prob: 0.5
-			brightness_delta: 32
-			contrast_prob: 0.5
-			contrast_lower: 0.5
-			contrast_upper: 1.5
-			hue_prob: 0.5
-			hue_delta: 18
-			saturation_prob: 0.5
-			saturation_lower: 0.5
-			saturation_upper: 1.5
-			random_order_prob: 0.0
-		}
-	}
-	data_param {
-		source: "../../../../../../dataset/facedata/wider_face/lmdb/wider_face_train_lmdb/"
-		batch_size: 3
-		backend: LMDB
-	}
-	annotated_data_param {
-		batch_sampler {
-			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				max_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		label_map_file: "../labelmap_face.prototxt"
-	}
+input: "data"
+input_shape {
+	dim: 1
+	dim: 3
+	dim: 640
+	dim: 640
 }
 layer {
 	name: "conv1_1"
@@ -287,7 +165,7 @@ layer {
 	bottom: "pool3"
 	top: "conv4_1"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 		pad: 1
 		kernel_size: 3
 	}
@@ -304,7 +182,7 @@ layer {
 	bottom: "conv4_1"
 	top: "conv4_2"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 		pad: 1
 		kernel_size: 3
 	}
@@ -321,7 +199,7 @@ layer {
 	bottom: "conv4_2"
 	top: "conv4_3"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 	pad: 1
 	kernel_size: 3
 	}
@@ -349,7 +227,7 @@ layer {
 	bottom: "pool4"
 	top: "conv5_1"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 		pad: 1
 		kernel_size: 3
 	}
@@ -366,7 +244,7 @@ layer {
 	bottom: "conv5_1"
 	top: "conv5_2"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 	pad: 1
 	kernel_size: 3
 	}
@@ -383,7 +261,7 @@ layer {
 	bottom: "conv5_2"
 	top: "conv5_3"
 	convolution_param {
-	num_output: 256
+	num_output: 512
 		pad: 1
 		kernel_size: 3
 	}
@@ -518,8 +396,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -666,9 +544,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
-		pad: 0
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -1059,9 +936,9 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
-		kernel_size: 1
-		stride: 1
+		num_output: 512
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -1133,7 +1010,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		kernel_size: 4
 		stride: 2
 		pad: 1
@@ -1219,7 +1096,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -1293,7 +1170,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -1368,9 +1245,8 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
-		stride: 1
 		pad: 1
 		weight_filler {
 			type: "xavier"
@@ -1443,7 +1319,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -1529,8 +1405,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		stride: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -3144,6 +3020,7 @@ layer {
 		axis: 1
 	}
 }
+
 ############################################################
 #######################priorBox moudle two##################
 ############################################################
@@ -3870,40 +3747,60 @@ layer {
 		axis: 1
 	}
 }
+
 layer {
-	name: "mbox_loss"
-	type: "MultiBoxSSDLoss"
-	bottom: "mbox_loc"
+	name: "mbox_conf_reshape"
+	type: "Reshape"
 	bottom: "mbox_conf"
+	top: "mbox_conf_reshape"
+	reshape_param {
+		shape {
+			dim: 0
+			dim: -1
+			dim: 2
+		}
+	}
+}
+layer {
+	name: "mbox_conf_softmax"
+	type: "Softmax"
+	bottom: "mbox_conf_reshape"
+	top: "mbox_conf_softmax"
+	softmax_param {
+		axis: 2
+	}
+}
+layer {
+	name: "mbox_conf_flatten"
+	type: "Flatten"
+	bottom: "mbox_conf_softmax"
+	top: "mbox_conf_flatten"
+	flatten_param {
+		axis: 1
+	}
+}
+
+layer {
+	name: "detection_out"
+	type: "DetectionOutput"
+	bottom: "mbox_loc"
+	bottom: "mbox_conf_flatten"
 	bottom: "mbox_priorbox"
-	bottom: "label"
-	top: "mbox_loss"
+	top: "detection_out"
 	include {
-		phase: TRAIN
+	phase: TEST
 	}
-	propagate_down: true
-	propagate_down: true
-	propagate_down: false
-	propagate_down: false
-	loss_param {
-		normalization: VALID
-	}
-	loss_weight: 0.5
-	multibox_loss_param {
-		loc_loss_type: SMOOTH_L1
-		conf_loss_type: SOFTMAX
-		loc_weight: 1.0
+	detection_output_param {
+		attri_type: NORMAL
 		num_classes: 2
 		share_location: true
-		match_type: PER_PREDICTION
-		overlap_threshold: 0.85
-		use_prior_for_matching: true
 		background_label_id: 0
-		use_difficult_gt: true
-		neg_pos_ratio: 3.0
-		neg_overlap: 0.3
+		nms_param {
+			nms_threshold: 0.55
+			top_k: 50
+		}
 		code_type: CENTER_SIZE
-		ignore_cross_boundary_bbox: false
-		mining_type: MAX_NEGATIVE
+		keep_top_k: 50
+		confidence_threshold: 0.25
 	}
 }
