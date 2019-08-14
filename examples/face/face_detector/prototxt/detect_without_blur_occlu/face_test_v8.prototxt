@@ -961,7 +961,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		kernel_size: 3
 		pad: 1
 		weight_filler {
@@ -1035,7 +1035,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 512
+		num_output: 256
 		kernel_size: 4
 		stride: 2
 		pad: 1
