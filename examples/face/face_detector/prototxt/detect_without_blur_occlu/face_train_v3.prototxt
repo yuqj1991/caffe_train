@@ -2192,6 +2192,7 @@ layer{
 	eltwise_param {
 		operation: SUM
 	}
+}
 #################context moudle####################
 layer{
 	name: "lfpn_2_moudle_cpm_4_3"
