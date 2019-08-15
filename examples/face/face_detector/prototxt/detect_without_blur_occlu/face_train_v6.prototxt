@@ -795,7 +795,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -860,11 +860,11 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		group: 128
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1200,7 +1200,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -1268,12 +1268,12 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		bias_term: false
 		pad: 1
 		kernel_size: 3
 		stride: 2
-		group: 256
+		group: 512
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1470,7 +1470,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -1536,10 +1536,10 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		bias_term: false
-		kernel_size: 3
-		pad: 1
+		kernel_size: 1
+		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1602,7 +1602,7 @@ layer {
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		bias_term: false
 		pad: 1
 		kernel_size: 3
@@ -1663,170 +1663,11 @@ layer {
 #######################################################################
 #                             modeule one                             #
 #######################################################################
-##########################LFPN MOUDLE#######################
-layer{
-	name: "conv4_3_lfpn"
-	type: "Convolution"
-	bottom: "conv8_block0"
-	top: "conv4_3_lfpn"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 128
-		kernel_size: 3
-		pad: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv4_3_lfpn/bn"
-	type: "BatchNorm"
-	bottom: "conv4_3_lfpn"
-	top: "conv4_3_lfpn"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv4_3_lfpn/scale"
-	type: "Scale"
-	bottom: "conv4_3_lfpn"
-	top: "conv4_3_lfpn"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv4_3_lfpn/relu"
-	type: "ReLU"
-	bottom: "conv4_3_lfpn"
-	top: "conv4_3_lfpn"
-}
-
-layer{
-	name: "conv4_3_lfpn/dec"
-	type: "Deconvolution"
-	bottom: "conv4_3_lfpn"
-	top: "conv4_3_lfpn/dec"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 128
-		kernel_size: 4
-		stride: 2
-		pad: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv4_3_lfpn/dec/bn"
-	type: "BatchNorm"
-	bottom: "conv4_3_lfpn/dec"
-	top: "conv4_3_lfpn/dec"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv4_3_lfpn/dec/scale"
-	type: "Scale"
-	bottom: "conv4_3_lfpn/dec"
-	top: "conv4_3_lfpn/dec"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv4_3_lfpn/dec/relu"
-	type: "ReLU"
-	bottom: "conv4_3_lfpn/dec"
-	top: "conv4_3_lfpn/dec"
-}
-layer{
-	name: "lfpn_1/eltwise"
-	type: "Eltwise"
-	bottom: "conv4_3_lfpn/dec"
-	bottom: "conv6"
-	top: "lfpn_1/eltwise"
-	eltwise_param {
-		operation: SUM
-	}
-}
 #################context moudle####################
 layer{
 	name: "lfpn_1_moudle_cpm_3_3"
 	type: "Convolution"
-	bottom: "lfpn_1/eltwise"
+	bottom: "conv6"
 	top: "lfpn_1_moudle_cpm_3_3"
 	param {
 		lr_mult: 1
@@ -2034,171 +1875,12 @@ layer {
 #######################################################################
 #                             modeule two                             #
 #######################################################################
-##########################LFPN MOUDLE##################################
-layer{
-	name: "conv5_3_lfpn"
-	type: "Convolution"
-	bottom: "conv10_1"
-	top: "conv5_3_lfpn"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 256
-		kernel_size: 3
-		pad: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv5_3_lfpn/bn"
-	type: "BatchNorm"
-	bottom: "conv5_3_lfpn"
-	top: "conv5_3_lfpn"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv5_3_lfpn/scale"
-	type: "Scale"
-	bottom: "conv5_3_lfpn"
-	top: "conv5_3_lfpn"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv5_3_lfpn/relu"
-	type: "ReLU"
-	bottom: "conv5_3_lfpn"
-	top: "conv5_3_lfpn"
-}
 
-layer{
-	name: "conv5_3_lfpn/dec"
-	type: "Deconvolution"
-	bottom: "conv5_3_lfpn"
-	top: "conv5_3_lfpn/dec"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 256
-		kernel_size: 4
-		stride: 2
-		pad: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv5_3_lfpn/dec/bn"
-	type: "BatchNorm"
-	bottom: "conv5_3_lfpn/dec"
-	top: "conv5_3_lfpn/dec"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv5_3_lfpn/dec/scale"
-	type: "Scale"
-	bottom: "conv5_3_lfpn/dec"
-	top: "conv5_3_lfpn/dec"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv5_3_lfpn/dec/relu"
-	type: "ReLU"
-	bottom: "conv5_3_lfpn/dec"
-	top: "conv5_3_lfpn/dec"
-}
-
-layer{
-	name: "lfpn_2/eltwise"
-	type: "Eltwise"
-	bottom: "conv5_3_lfpn/dec"
-	bottom: "conv8_block0"
-	top: "lfpn_2/eltwise"
-	eltwise_param {
-		operation: SUM
-	}
-}
 #################context moudle####################
 layer{
 	name: "lfpn_2_moudle_cpm_4_3"
 	type: "Convolution"
-	bottom: "lfpn_2/eltwise"
+	bottom: "conv8_block0"
 	top: "lfpn_2_moudle_cpm_4_3"
 	param {
 		lr_mult: 1
@@ -2417,10 +2099,10 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		bias_term: false
 		kernel_size: 3
-		group: 256
+		group: 512
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -2484,7 +2166,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		pad: 1
 		weight_filler {
@@ -2551,7 +2233,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		pad: 1
 		weight_filler {
@@ -2630,11 +2312,11 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		bias_term: false
 		kernel_size: 3
 		pad: 1
-		group: 256
+		group: 512
 		weight_filler {
 			type: "msra"
 		}
@@ -2697,7 +2379,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		pad: 1
 		weight_filler {
@@ -2764,7 +2446,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		pad: 1
 		weight_filler {
@@ -2842,10 +2524,10 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		kernel_size: 3
 		pad: 1
-		group: 256
+		group: 512
 		weight_filler {
 			type: "msra"
 		}
@@ -2909,7 +2591,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		pad: 1
 		weight_filler {
@@ -2976,7 +2658,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		pad: 1
 		weight_filler {
