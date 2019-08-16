@@ -53,10 +53,10 @@ layer {
 	annotated_data_param {
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
+				min_scale: 0.05
+				max_scale: 0.1
 				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				max_aspect_ratio: 1.5
 			}
 			sample_constraint {
 				min_object_coverage: 1.0
@@ -66,10 +66,10 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
+				min_scale: 0.1
+				max_scale: 0.2
 				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				max_aspect_ratio: 1.5
 			}
 			sample_constraint {
 				min_object_coverage: 1.0
@@ -79,10 +79,23 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
+				min_scale: 0.2
+				max_scale: 0.4
 				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				max_aspect_ratio: 1.5
+			}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.4
+				max_scale: 0.6
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.5
 				}
 			sample_constraint {
 				min_object_coverage: 1.0
@@ -92,10 +105,10 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 0.6
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				max_aspect_ratio: 1.5
 			}
 			sample_constraint {
 				min_object_coverage: 1.0
@@ -105,10 +118,10 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 0.6
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
+				max_aspect_ratio: 1.5
 			}
 			sample_constraint {
 				min_object_coverage: 1.0
