@@ -150,7 +150,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
 }
 
 #ifdef CPU_ONLY
-STUB_GPU_FORWARD(DetectionOutputLayer, Forward);
+STUB_GPU_FORWARD(DetectionCcpdOutputLayer, Forward);
 #endif
 
 INSTANTIATE_CLASS(DetectionCcpdOutputLayer);
