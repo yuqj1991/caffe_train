@@ -600,6 +600,7 @@ message ParamSpec {
 
   // The multiplier on the global weight decay for this parameter.
   optional float decay_mult = 4 [default = 1.0];
+  optional float momentum_mult = 5 [default = 1.0];
 }
 
 // NOTE
@@ -715,6 +716,19 @@ message LayerParameter {
   optional FaceEvaluateParameter face_evaluate_param = 210;
   optional LpEvaluateParameter lp_evaluate_param = 211;
   optional LpDetParameter lp_det_param = 212;
+  optional SampleTripletParameter sample_triplet_param = 145;
+  optional TripletLossParameter triplet_loss_param = 146;
+}
+
+message TripletLossParameter {
+  optional float margin = 1 [default = 0.1];
+  optional float eps = 2 [default = 1e-5];
+}
+
+message SampleTripletParameter {
+  optional uint32 label_num = 1;
+  optional uint32 sample_num = 2;
+  optional float eps = 3 [default = 1e-5];
 }
 
 // Message that stores parameters used to apply transformation
