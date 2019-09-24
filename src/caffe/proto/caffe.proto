@@ -716,8 +716,8 @@ message LayerParameter {
   optional FaceEvaluateParameter face_evaluate_param = 210;
   optional LpEvaluateParameter lp_evaluate_param = 211;
   optional LpDetParameter lp_det_param = 212;
-  optional SampleTripletParameter sample_triplet_param = 145;
-  optional TripletLossParameter triplet_loss_param = 146;
+  optional SampleTripletParameter sample_triplet_param = 213;
+  optional TripletLossParameter triplet_loss_param = 214;
 }
 
 message TripletLossParameter {
