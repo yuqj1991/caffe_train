@@ -57,11 +57,6 @@ def batch_work(ori, csvFile, setFile):
             nose_point_y = row[1]['P15Y'] - ymin
             left_mouse_point_y = row[1]['P18Y'] -ymin
             right_mouse_point_y = row[1]['P20Y'] - ymin
-            vis_left_eye = row[1]['VIS8']
-            vis_right_eye = row[1]['VIS11']
-            vis_nose = row[1]['VIS15']
-            vis_left_mouse = row[1]['VIS18']
-            vis_right_mouse = row[1]['VIS20']
             if 0:
                 pointSet = []
                 pointSet.append((int(left_eye_point_x), int(left_eye_point_y)))
@@ -76,7 +71,7 @@ def batch_work(ori, csvFile, setFile):
             cv2.imwrite(ang_path_image_name, cropRoi)
             #break
             setfile_.writelines(os.path.abspath(ang_path_image_name) + '\n')
-            content = str(left_eye_point_x) + ' ' + str(right_eye_point_x) + ' ' + str(nose_point_x) + ' ' + str(left_mouse_point_x) + ' ' + str(right_mouse_point_x) + ' ' + str(left_eye_point_y) + ' ' + str(right_eye_point_y) + ' ' + str(nose_point_y) + ' ' + str(left_mouse_point_y) + ' ' + str(right_mouse_point_y) + ' ' + str(vis_left_eye) + ' ' + str(vis_right_eye) + ' ' + str(vis_nose) + ' '+ str(vis_left_mouse) + ' ' + str(vis_right_mouse) + ' '+ str(yaw) + ' ' + str(pitch) + ' ' + str(roll) + ' ' + str(pr_female) + ' ' + str(pr_male) + ' ' + str(boolGlass) + '\n'
+            content = str(left_eye_point_x) + ' ' + str(right_eye_point_x) + ' ' + str(nose_point_x) + ' ' + str(left_mouse_point_x) + ' ' + str(right_mouse_point_x) + ' ' + str(left_eye_point_y) + ' ' + str(right_eye_point_y) + ' ' + str(nose_point_y) + ' ' + str(left_mouse_point_y) + ' ' + str(right_mouse_point_y) + ' ' + str(yaw) + ' ' + str(pitch) + ' ' + str(roll) + ' ' + str(pr_female) + ' ' + str(pr_male) + ' ' + str(boolGlass) + '\n'
             label_file_.write(content)
             #label_file_angle.write(str(yaw) + ' ' + str(pitch) + ' ' + str(roll) + '\n')
             #label_file_angle.close()
