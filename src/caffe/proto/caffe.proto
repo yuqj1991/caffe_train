@@ -1624,7 +1624,7 @@ message PriorBoxParameter {
 
 message FaceEvaluateParameter{
     enum FaceType{
-        FACE_21_TYPE =0;
+        FACEATTRIBUTE =0;
         FACE_5_TYPE =1;
         FACE_ANGLE = 2;
     }

@@ -562,7 +562,8 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
   CHECK_NOTNULL(test_nets_[test_net_id].get())->
       ShareTrainedLayersWith(net_.get());
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
-  Dtype nme =0.0, gender_precision =0.0, glasses_presion=0.0;
+  Dtype lefteye =0.0, righteye = 0.0, nose = 0.0, leftmouth = 0.0, rightmouth = 0.0, gender_precision =0.0, glasses_presion=0.0;
+  Dtype pitch_precision =0.0, yaw_presion=0.0, roll_presicon=0.0;
   int batch_size =0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
     SolverAction::Enum request = GetRequestedAction();
@@ -585,22 +586,33 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
       const Dtype* result_vec = result[j]->cpu_data();
       batch_size = result[j]->height();
       for(int ii = 0; ii<batch_size; ii++){
-        nme +=result_vec[ii*3 + 0];
-        if (result_vec[ii*3 + 1]==1)
+        lefteye += result_vec[ii*10 + 0];
+        righteye += result_vec[ii*10 + 1];
+        nose += result_vec[ii*10 + 2];
+        leftmouth += result_vec[ii*10 + 3];
+        rightmouth += result_vec[ii*10 + 4];
+        if (result_vec[ii*3 + 5]==1)
           gender_precision++;
-        if (result_vec[ii*3 + 2]==1)
+        if (result_vec[ii*3 + 6]==1)
           glasses_presion++;
+        yaw_presion += result_vec[ii*10 + 7];
+        pitch_precision += result_vec[ii*10 + 8];
+        roll_presicon += result_vec[ii*10 + 9];
       } 
     }    
   }
   int total_images = param_.test_iter(test_net_id)* batch_size;
   LOG(INFO) << "total_images: "<< total_images
-             << " NME: "<< nme/total_images
-             <<" gender : "<<gender_precision
+             << " lefteye: "<< lefteye/total_images
+             << " righteye: "<< righteye/total_images
+             << " nose: "<< nose/total_images
+             << " leftmouth: "<< leftmouth/total_images
+             << " rightmouth: "<< rightmouth/total_images
              <<" gender accuracy: "<<gender_precision/total_images
-             <<" glasses : "<<glasses_presion
-             <<" glasses accuracy: "<<glasses_presion/total_images;
-             
+             <<" glasses accuracy: "<<glasses_presion/total_images
+             <<" yaw accuracy: "<< yaw_presion/total_images
+             <<" pitch accuracy: "<< pitch_precision/total_images
+             <<" roll accuracy: "<< roll_presicon/total_images;        
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";
     return;
