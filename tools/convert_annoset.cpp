@@ -198,7 +198,7 @@ int main(int argc, char** argv) {
           resize_width, min_dim, max_dim, is_color, enc, type, label_type,
           name_to_label, &anno_datum);
       anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
-    } else if(anno_type == "faceattri") {
+    } else if(anno_type == "faceattributes") {
       labelname = boost::get<std::string>(lines[line_id].second); // lines contain imagename & label.txt
 		  status = ReadRichFaceAttributeToAnnotatedDatum(filename,
           labelname, resize_height, resize_width, min_dim, max_dim, is_color,
@@ -246,7 +246,7 @@ int main(int argc, char** argv) {
     {
       CHECK(anno_datum.SerializeToString(&out));
       txn->Put(key_str, out);
-    }else if(anno_type == "faceattri") {
+    }else if(anno_type == "faceattributes") {
       CHECK(anno_faceAttriDatum.SerializeToString(&out));
       txn->Put(key_str, out);
     }else if(anno_type == "facecontour") {
