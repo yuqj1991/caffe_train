@@ -6,11 +6,78 @@ input_shape {
 	dim: 320
 	dim: 320
 }
+layer {
+	name: "conv0"
+	type: "Convolution"
+	bottom: "data"
+	top: "conv0"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 32
+		bias_term: false
+		pad: 1
+		kernel_size: 3
+		stride: 1
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv0/bn"
+	type: "BatchNorm"
+	bottom: "conv0"
+	top: "conv0"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv0/scale"
+	type: "Scale"
+	bottom: "conv0"
+	top: "conv0"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv0/ReLU"
+	type: "ReLU"
+	bottom: "conv0"
+	top: "conv0"
+}
 
 layer {
 	name: "conv1"
 	type: "Convolution"
-	bottom: "data"
+	bottom: "conv0"
 	top: "conv1"
 	param {
 		lr_mult: 1.0
@@ -537,7 +604,6 @@ layer {
 		}
 	}
 }
-
 layer {
 	name: "conv7/dw"
 	type: "Convolution"
@@ -956,7 +1022,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		#stride: 2
+		stride: 1
 		group: 512
 		engine: CAFFE
 		weight_filler {
@@ -1071,8 +1137,9 @@ layer {
 	}
 }
 
-layer{
-	name: "conv10_1/relu"
+
+layer {
+	name: "conv10_1/ReLU"
 	type: "ReLU"
 	bottom: "conv10_1"
 	top: "conv10_1"
@@ -1226,10 +1293,8 @@ layer {
 		num_output: 512
 		bias_term: false
 		kernel_size: 3
-		#stride: 2
-		pad:1
+		pad: 1
 		group: 512
-		engine: CAFFE
 		weight_filler {
 			type: "msra"
 		}
@@ -1282,7 +1347,6 @@ layer {
 	bottom: "conv13/dw"
 	top: "conv13/dw"
 }
-
 layer {
 	name: "conv13"
 	type: "Convolution"
@@ -1502,8 +1566,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 128
-		kernel_size: 1
-		#pad: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -1725,7 +1789,7 @@ layer{
 	convolution_param {
 		num_output: 128
 		kernel_size: 3
-        pad: 1
+        	pad: 1
 		bias_term: false
 		weight_filler {
 			type: "msra"
@@ -1873,8 +1937,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		#pad: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -2668,6 +2732,7 @@ layer{
 		num_output: 512
 		kernel_size: 3
 		pad: 1
+		group: 512
 		weight_filler {
 			type: "msra"
 		}
@@ -2732,8 +2797,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		#pad: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2799,8 +2864,8 @@ layer{
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 1
-		#pad: 1
+		kernel_size: 3
+		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2874,6 +2939,7 @@ layer {
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
 		min_size: 16
+		max_size: 32
 		aspect_ratio: 1.5
 		flip: true
 		clip: false
@@ -2900,7 +2966,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2947,7 +3013,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2991,6 +3057,7 @@ layer {
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
 		min_size: 32
+		max_size: 64
 		aspect_ratio: 1.5
 		flip: true
 		clip: false
@@ -2999,7 +3066,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		#step: 8
+		#step: 16
 	}
 }
 
@@ -3017,7 +3084,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3064,7 +3131,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 6
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3117,7 +3184,7 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		#step: 16
+		#step: 32
 	}
 }
 
@@ -3214,8 +3281,6 @@ layer {
 		axis: 1
 	}
 }
-
-
 
 ############################################################
 #######################priorBox moudle four ################
@@ -3453,7 +3518,6 @@ layer {
 	}
 }
 
-
 ################################################
 layer {
 	name: "mbox_priorbox"
@@ -3544,11 +3608,11 @@ layer {
 		share_location: true
 		background_label_id: 0
 		nms_param {
-			nms_threshold: 0.75
-			top_k: 50
+			nms_threshold: 0.55
+			top_k: 100
 		}
 		code_type: CENTER_SIZE
-		keep_top_k: 50
-		confidence_threshold: 0.55
+		keep_top_k: 100
+		confidence_threshold: 0.25
 	}
 }

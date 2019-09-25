@@ -196,7 +196,6 @@ bool ReadRichImageToAnnotatedDatum(const string& filename,
     const string& labelfile, const int height, const int width,
     const int min_dim, const int max_dim, const bool is_color,
     const string& encoding, const AnnotatedDatum_AnnotationType type,
-    const AnnotatedDatum_AnnoataionAttriType attri_type,
     const string& labeltype, const std::map<string, int>& name_to_label,
     AnnotatedDatum* anno_datum) {
   // Read image to datum.
@@ -215,71 +214,13 @@ bool ReadRichImageToAnnotatedDatum(const string& filename,
     case AnnotatedDatum_AnnotationType_BBOX:
       int ori_height, ori_width;
       GetImageSize(filename, &ori_height, &ori_width);
-      switch(attri_type){
-        case AnnotatedDatum_AnnoataionAttriType_FACE:
-        if (labeltype == "xml") {
-          return ReadXMLToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                        name_to_label, anno_datum);
-        } else if (labeltype == "json") {
-          return ReadJSONToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                          name_to_label, anno_datum);
-        } else if (labeltype == "txt") {
-          return ReadTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                        anno_datum);
-        } else {
-          LOG(FATAL) << "Unknown label file type.";
-          return false;
-        }
-        break;
-      case AnnotatedDatum_AnnoataionAttriType_NORMALL:
-        if (labeltype == "txt") {
-          return ReadTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                        anno_datum);
-        }else if(labeltype == "xml") {
-          return ReadXMLToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                        name_to_label, anno_datum); 
-          }else {
-          LOG(FATAL) << "Unknown label file type.";
-          return false;
-        }
-        break;
-      default:
-        LOG(FATAL) << "Unknown attri type.";
-        return false;
-      }
-      break;
-    default:
-      LOG(FATAL) << "Unknown annotation type.";
-      return false;
-  }
-}
-
-bool ReadRichFaceToAnnotatedDatum(const string& filename,
-    const string& labelfile, const int height, const int width,
-    const int min_dim, const int max_dim, const bool is_color,
-    const string& encoding, const AnnoFaceDatum_AnnotationType type,
-    const string& labeltype, AnnoFaceDatum* anno_datum) {
-  // Read image to datum.
-  //return true;
-  bool status = ReadImageToDatum(filename, -1, height, width,
-                                 min_dim, max_dim, is_color, encoding,
-                                 anno_datum->mutable_datum());
-  if (status == false) {
-    return status;
-  }
-  anno_datum->clear_annoface();
-  if (!boost::filesystem::exists(labelfile)) {
-    return true;
-  }
-  // annno type bbox or attributes
-  switch (type) {
-    case AnnoFaceDatum_AnnotationType_FACEMARK:
-      int ori_height, ori_width;
-      GetImageSize(filename, &ori_height, &ori_width);
       if (labeltype == "txt") {
-        return ReadFaceAttriTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                       anno_datum);
-      } else {
+        return ReadTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                      anno_datum);
+      }else if(labeltype == "xml") {
+        return ReadXMLToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                      name_to_label, anno_datum); 
+        }else {
         LOG(FATAL) << "Unknown label file type.";
         return false;
       }
@@ -290,7 +231,8 @@ bool ReadRichFaceToAnnotatedDatum(const string& filename,
   }
 }
 
-bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
+
+bool ReadRichFaceAttributeToAnnotatedDatum(const string& filename,
     const string& labelfile, const int height, const int width,
     const int min_dim, const int max_dim, const bool is_color,
     const string& encoding, const AnnoFaceAttributeDatum_AnnoType type,
@@ -302,13 +244,13 @@ bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
   if (status == false) {
     return status;
   }
-  anno_datum->clear_facepose();
+  anno_datum->clear_faceattri();
   if (!boost::filesystem::exists(labelfile)) {
     return true;
   }
   // annno type bbox or attributes
   switch (type) {
-    case AnnoFaceAttributeDatum_AnnoType_FACEPOSE:
+    case AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE:
       int ori_height, ori_width;
       GetImageSize(filename, &ori_height, &ori_width);
       if (labeltype == "txt") {
@@ -430,42 +372,6 @@ bool ReadRichCcpdToAnnotatedDatum(const string& filename,
   }
 }
 
-bool ReadRichBlurToAnnotatedDatum(const string& filename,
-    const string& labelfile, const int height, const int width,
-    const int min_dim, const int max_dim, const bool is_color,
-    const string& encoding, const AnnoBlurDatum_AnnoType type,
-    const string& labeltype, const std::map<string, int>& name_to_label, 
-    AnnoBlurDatum* anno_datum){
-  // Read image to datum.
-  bool status = ReadImageToDatum(filename, -1, height, width,
-                                 min_dim, max_dim, is_color, encoding,
-                                 anno_datum->mutable_datum());
-  if (status == false) {
-    return status;
-  }
-  anno_datum->clear_faceatti();
-  if (!boost::filesystem::exists(labelfile)) {
-    return true;
-  }
-  // annno type bbox or attributes
-  switch (type) {
-    case AnnoBlurDatum_AnnoType_FACEBLUR:
-      int ori_height, ori_width;
-      GetImageSize(filename, &ori_height, &ori_width);
-      if (labeltype == "txt") {
-        return ReadBlurTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                       name_to_label, anno_datum);
-      } else {
-        LOG(FATAL) << "Unknown label file type.";
-        return false;
-      }
-      break;
-    default:
-      LOG(FATAL) << "Unknown annotation type.";
-      return false;
-  }
-}
-
 #endif  // USE_OPENCV
 
 bool ReadFileToDatum(const string& filename, const int label,
@@ -518,8 +424,6 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
       Annotation* anno = NULL;
       bool difficult = false;
       ptree object = v1.second;
-      int blured = object.get<int>("blur");
-      int occlusioned = object.get<int>("occlusion");
       BOOST_FOREACH(ptree::value_type &v2, object.get_child("")) {
         ptree pt2 = v2.second;
         if (v2.first == "name") {
@@ -585,8 +489,6 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
           bbox->set_ymin(static_cast<float>(ymin) / height);
           bbox->set_xmax(static_cast<float>(xmax) / width);
           bbox->set_ymax(static_cast<float>(ymax) / height);
-          bbox->mutable_faceattrib()->set_blur(blured);
-          bbox->mutable_faceattrib()->set_occlusion(occlusioned);
           bbox->set_difficult(difficult);
         }
       }
@@ -608,7 +510,6 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
       NormalizedBBox bbox = anno.bbox();
       LOG(INFO) << "bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
                 <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                <<" bbox->blur: "<<bbox.faceattrib().blur()<<" bbox->occlusion: "<<bbox.faceattrib().occlusion()
                 <<" bbox->label: "<<bbox.label();
     }
   }
@@ -827,41 +728,6 @@ bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
   return true;
 }
 
-
-bool ReadBlurTxtToAnnotatedDatum(const string& labelfile, const int height,
-    const int width, const std::map<string, int>& name_to_label,
-    AnnoBlurDatum* anno_datum){
-  std::ifstream infile(labelfile.c_str());
-  std::string lineStr ;
-  std::stringstream sstr ;
-  if (!infile.good()) {
-    LOG(INFO) << "Cannot open " << labelfile;
-    return false;
-  }
-  LOG(INFO)<<labelfile;
-  int blur, occlu;
-  while (std::getline(infile, lineStr )) {
-    sstr << lineStr;
-    sstr >> blur>>occlu;
-    #if 1
-    LOG(INFO)<<blur<<" "<<occlu;
-    #endif
-    FaceAttributes* anno = NULL;
-    anno = anno_datum->mutable_faceatti();
-    string name = "face";
-    if (name_to_label.find(name) == name_to_label.end()) {
-            LOG(FATAL) << "Unknown name: " << name;
-    }
-    anno->set_blur(blur);
-    anno->set_occlusion(occlu);
-    #if 1
-    LOG(INFO)<<"blur: "<<anno->blur()<< " occlusion: "<<anno->occlusion();
-    #endif
-  }
-  return true;
-}
-
-
 // Parse plain txt detection annotation: label_id, xmin, ymin, xmax, ymax.
 bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
     const int width, AnnoFaceAttributeDatum* anno_datum) {
@@ -873,41 +739,43 @@ bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
     return false;
   }
   LOG(INFO)<<labelfile;
-  float x1, x2, x3, x4, x5, y1, y2, y3, y4, y5, vis_point_1, vis_point_2, vis_point_3, vis_point_4, vis_point_5;
+  float x1, x2, x3, x4, x5, y1, y2, y3, y4, y5;
   float yaw, pitch, roll;
   float pr_female, pr_male;
-  int booGlass;
+  int boolGlass;
+  int gender = 0;
   while (std::getline(infile, lineStr )) {
     sstr << lineStr;
-    sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5 >> vis_point_1 >> vis_point_2 >> vis_point_3
-        >> vis_point_4 >> vis_point_5 >> yaw >> pitch >> roll >> pr_female >> pr_male >> booGlass;
+    sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5 >> yaw >> pitch >> roll >> pr_female >> pr_male >> boolGlass;
     float xf1 = float(x1/width), yf1 = float(y1/height);float xf2 = float(x2/width), yf2 = float(y2/height);
     float xf3 = float(x3/width), yf3 = float(y3/height);float xf4 = float(x4/width), yf4 = float(y4/height);
     float xf5 = float(x5/width), yf5 = float(y5/height);
     LOG(INFO)<<"origin height: "<< height << " origin width:  "<<width << " point: " << x1 <<" "<<y1<<" "
-             << x2 <<" "<< y2<<" "<< x3 <<" "<< y3 <<" "<< x4 <<" " << y4 <<" "<< x5 <<" "<< y5 <<" " 
-             << x6 <<" "<< y6<<" "<< x7 <<" "<< y7 <<" "<< x8 <<" "<< y8 <<" "<< x9 <<" "<< y9 <<" "
-             << x10 <<" "<< y10 <<" "<< x11 <<" "<<y11 << " "<< x12 <<" "<< y12 <<" "<< x13 <<" "<< y13 <<" "
-             << x14 <<" " << y14 <<" "<< x15 <<" " << y15 <<" "<< x16 <<" "<< y16 <<" "<< x17 <<" "<< y17 <<" "
-             << x18 <<" "<< y18 <<" "<< x19 <<" " << y19 <<" "<< x20 <<" " << y20 <<" "<< x21<<" "<<y21 << " "<< yaw <<" "<< pitch <<" "<< roll;
+             << x2 <<" "<< y2<<" "<< x3 <<" "<< y3 <<" "<< x4 <<" " << y4 <<" "<< x5 <<" "<< y5 <<" "<< yaw <<" "<< pitch <<" "<< roll;
     AnnoFaceAttribute* anno = NULL;
-    anno = anno_datum->mutable_facepose();
+    anno = anno_datum->mutable_faceattri();
     // Store the normalized bounding box.
-    AnnoFaceLandmarks* landface = anno->mutable_landMark();
+    AnnoFaceLandmarks* landface = anno->mutable_landmark();
     AnnoFaceOritation* faceOri = anno->mutable_faceoritation();
     faceOri->set_yaw(float(yaw));
     faceOri->set_pitch(float(pitch));
     faceOri->set_roll(float(roll));
-    landface->mutable_leftEye()->set_x(xf1);
-    landface->mutable_leftEye()->set_y(yf1);
-    landface->mutable_rightEye()->set_x(xf2);
-    landface->mutable_rightEye()->set_y(yf2);
+    landface->mutable_lefteye()->set_x(xf1);
+    landface->mutable_lefteye()->set_y(yf1);
+    landface->mutable_righteye()->set_x(xf2);
+    landface->mutable_righteye()->set_y(yf2);
     landface->mutable_nose()->set_x(xf3);
     landface->mutable_nose()->set_y(yf3);
     landface->mutable_leftmouth()->set_x(xf4);
     landface->mutable_leftmouth()->set_y(yf4);
-    landface->mutable_point_5()->set_x(xf5);
-    landface->mutable_point_5()->set_y(yf5);
+    landface->mutable_rightmouth()->set_x(xf5);
+    landface->mutable_rightmouth()->set_y(yf5);
+    if(pr_female >= pr_male)
+      gender = 1;
+    else
+      gender = 0;
+    anno->set_gender(gender);
+    anno->set_glass(boolGlass);
     sstr.clear();
   }
   infile.close();
@@ -931,16 +799,16 @@ bool ReadFaceContourTxtToAnnotatedDatum(const string& labelfile, const int heigh
     sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5;
     // Store the normalized bounding box.
     AnnoFaceLandmarks* landface = anno_datum->mutable_facecontour();
-    landface->mutable_leftEye()->set_x(float(x1/width));
-    landface->mutable_leftEye()->set_y(float(y1/height));
-    landface->mutable_rightEye()->set_x(float(x2/width));
-    landface->mutable_rightEye()->set_y(float(y2/height));
+    landface->mutable_lefteye()->set_x(float(x1/width));
+    landface->mutable_lefteye()->set_y(float(y1/height));
+    landface->mutable_righteye()->set_x(float(x2/width));
+    landface->mutable_righteye()->set_y(float(y2/height));
     landface->mutable_nose()->set_x(float(x3/width));
     landface->mutable_nose()->set_y(float(y3/height));
     landface->mutable_leftmouth()->set_x(float(x4/width));
     landface->mutable_leftmouth()->set_y(float(y4/height));
-    landface->mutable_point_5()->set_x(float(x5/width));
-    landface->mutable_point_5()->set_y(float(y5/height));
+    landface->mutable_rightmouth()->set_x(float(x5/width));
+    landface->mutable_rightmouth()->set_y(float(y5/height));
     sstr.clear();
   }
   infile.close();
@@ -966,88 +834,6 @@ bool ReadFaceAngleTxtToAnnotatedDatum(const string& labelfile, const int height,
     faceOri->set_yaw(float(yaw));
     faceOri->set_pitch(float(pitch));
     faceOri->set_roll(float(roll));
-    sstr.clear();
-  }
-  infile.close();
-  return true;
-}
-
-
-bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
-    const int width, AnnoFaceDatum* anno_datum) {
-  std::ifstream infile(labelfile.c_str());
-  std::string lineStr ;
-  std::stringstream sstr ;
-  if (!infile.good()) {
-    LOG(INFO) << "Cannot open " << labelfile;
-    return false;
-  }
-  LOG(INFO)<<labelfile;
-  float x1, x2, x3, x4, x5, y1, y2, y3, y4, y5;
-  float x11, x22, x33, x44, x55, y11, y22, y33, y44, y55;
-  int gender;
-  int glass;
-  while (std::getline(infile, lineStr )) {
-    sstr << lineStr;
-    sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5
-          >> gender >> glass;
-    #if 0
-    LOG(INFO)<< x1 <<" "<< x2 <<" "<< x3 <<" "<< x4 <<" " << x5 <<" "<< y1 <<" "<< y2 <<" "
-             << y3 <<" "<< y4 <<" "<< y5 <<" "<< gender <<" "<< glass;
-    #endif
-    AnnotationFace* anno = NULL;
-    anno = anno_datum->mutable_annoface();
-    LOG_IF(WARNING, x1 > width) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, y1 > height) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, x2 > width) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, y2 > height) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, x3 > width) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, y3 > height) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, x4 > width) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, y4 > height) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, x5 > width) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, y5 > height) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, x1 < 0) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, y1 < 0) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, x2 < 0) << labelfile <<
-      " bounding box exceeds image boundary.";
-    LOG_IF(WARNING, x2 < 0) << labelfile <<
-      " bounding box exceeds image boundary.";
-    // Store the normalized bounding box.
-    LandmarkFace* landface = anno->mutable_markface();
-    anno->set_gender(gender - 1);
-    anno->set_glasses(glass -1);
-    x11 = float(x1/width);y11 = float(y1/height);
-    x22 = float(x2/width);y22 = float(y2/height);
-    x33 = float(x3/width);y33 = float(y3/height);
-    x44 = float(x4/width);y44 = float(y4/height);
-    x55 = float(x5/width);y55 = float(y5/height);
-    #if 1
-    LOG(INFO)<< x11 <<" "<< x22 <<" "<< x33 <<" "<< x44 <<" " << x55 <<" "<< y11 <<" "<< y22 <<" "
-             << y33 <<" "<< y44 <<" "<< y55 <<" "<< gender <<" "<< glass;
-    #endif
-    landface->set_x1(x11);
-    landface->set_x2(x22);
-    landface->set_x3(x33);
-    landface->set_x4(x44);
-    landface->set_x5(x55);
-    landface->set_y1(y11);
-    landface->set_y2(y22);
-    landface->set_y3(y33);
-    landface->set_y4(y44);
-    landface->set_y5(y55);
     sstr.clear();
   }
   infile.close();

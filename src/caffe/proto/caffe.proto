@@ -187,17 +187,11 @@ message AnnotatedDatum {
   enum AnnotationType {
     BBOX = 0;
   }
-  enum AnnoataionAttriType {
-	  FACE = 0;
-	  NORMALL = 1;
-  }
   optional Datum datum = 1;
   // If there are "rich" annotations, specify the type of annotation.
   // Currently it only supports bounding box.
   // If there are no "rich" annotations, use label in datum instead.
   optional AnnotationType type = 2;
-  // label attri
-  optional AnnoataionAttriType attri_type = 3;
   // Each group contains annotation for a particular class.
   repeated AnnotationGroup annotation_group = 4;
 }
@@ -211,16 +205,11 @@ message point{
 
 // Annotation for face 21 points(coordinate for x and y)
 message AnnoFaceLandmarks{
-  optional point leftEye = 1;
-  optional float visLeftEye = 2;
-  optional point rightEye = 3;
-  optional float visRightEye = 4;
-  optional point nose = 5;
-  optional float visNose = 6;
-  optional point leftMouth = 7;
-  optional float visLeftMouth = 8;
-  optional point rightMouth = 9;
-  optional float visRightMouth = 10;
+  optional point lefteye = 1;
+  optional point righteye = 2;
+  optional point nose = 3;
+  optional point leftmouth = 4;
+  optional point rightmouth = 5;
 }
 
 // Annotation for face headpose contain yaw, roll, pitch 
@@ -231,8 +220,8 @@ message AnnoFaceOritation{
 }
 // Annotation for face headpose contain yaw, roll, pitch
 message AnnoFaceAttribute{
-  optional AnnoFaceOritation faceOritation = 1;
-  optional AnnoFaceLandmarks landMark=2;
+  optional AnnoFaceOritation faceoritation = 1;
+  optional AnnoFaceLandmarks landmark=2;
   optional int32 gender = 3 ;
   optional int32 glass = 4;
 }
@@ -244,7 +233,7 @@ message AnnoFaceAttributeDatum{
   }
   optional Datum datum =1;
   optional AnnoType type =2;
-  optional AnnoFaceAttribute faceAttri =3;
+  optional AnnoFaceAttribute faceattri =3;
 }
 
 // AnnofaceDataum with datum, and facepoints contour
@@ -656,8 +645,7 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional VideoDataParameter video_data_param = 207;
   optional WindowDataParameter window_data_param = 129;
-  optional MultiFaceLossParameter multiface_loss_param = 208;
-  optional MultiFacePoseLossParameter multiface_pose_loss_param = 209;
+  optional MultiFaceAttriLossParameter multiface_loss_param = 208;
   optional FaceEvaluateParameter face_evaluate_param = 210;
   optional LpEvaluateParameter lp_evaluate_param = 211;
   optional LpDetParameter lp_det_param = 212;
@@ -1109,11 +1097,6 @@ message DetectionEvaluateParameter {
   optional string name_size_file = 5;
   // The resize parameter used in converting NormalizedBBox to original image.
   optional ResizeParameter resize_param = 6;
-  enum AnnoataionAttriType{
-    FACE = 0;
-    NORMALL = 1;
-  }
-  optional AnnoataionAttriType attri_type = 7[default =FACE ];
 }
 
 message NonMaximumSuppressionParameter {
@@ -1181,16 +1164,9 @@ message DetectionOutputParameter {
   optional float visualize_threshold = 11;
   // If provided, save outputs to video file.
   optional string save_file = 12;
-  optional uint32 num_blur = 13;
-  optional uint32 num_occlusion = 14;
   optional uint32 num_lpchinese = 15;
   optional uint32 num_lpenglish = 16;
   optional uint32 num_lpletter = 17;
-  enum AnnoataionAttriType{
-    FACE = 0;
-    NORMALL = 1;
-  }
-  optional AnnoataionAttriType attri_type = 18;
 }
 
 message DropoutParameter {
@@ -1469,14 +1445,6 @@ message MultiBoxLossParameter {
   optional NonMaximumSuppressionParameter nms_param = 21;
   optional int32 sample_size = 22 [default = 64];
   optional bool use_prior_for_nms = 23 [default = false];
-  // Number of blur to be predicted. Required!
-  optional uint32 num_blur = 24;
-  //Number of occlusion to be predicted. Required!
-  optional uint32 num_occlusion = 25;
-  // blur conf loss types
-  optional ConfLossType conf_blur_loss_type = 26;
-  // occlusion conf loss types
-  optional ConfLossType conf_occlu_loss_type = 27;
   optional uint32 num_chinese = 28;
   optional ConfLossType chineselp_loss_type = 29;
   optional uint32 num_english = 30;
@@ -1486,13 +1454,14 @@ message MultiBoxLossParameter {
 }
 
 // Message that store parameters used by MultiBoxLossLayer
-message MultiFaceLossParameter {
+message MultiFaceAttriLossParameter {
   // Localization loss type.
   enum MarkLossType {
     L2 = 0;
     SMOOTH_L1 = 1;
   }
   optional MarkLossType mark_loss_type = 2 [default = SMOOTH_L1];
+  optional MarkLossType angle_loss_type = 9 [default = SMOOTH_L1];
   // Confidence loss type.
   enum AttriLossType {
     SOFTMAX = 0;
@@ -1504,28 +1473,15 @@ message MultiFaceLossParameter {
   // If match_type is PER_PREDICTION, use overlap_threshold to
   // determine the extra matching bboxes.
   optional uint32 num_glasses = 5;
-  // blur gender loss types
+  // gender loss types
   optional AttriLossType conf_gender_loss_type = 7 [default = SOFTMAX];
   // glass conf loss types
   optional AttriLossType conf_glasses_loss_type = 8 [default = SOFTMAX];
-  // add new background id realeated id r.w.t blur & occlusion
   optional float gender_weight = 10 [default = 1.0];
   optional float glass_weight = 11 [default = 1.0];
+  optional float angle_weight = 12;
 }
 
-// Message that store parameters used by MultiBoxLossLayer
-message MultiFacePoseLossParameter {
-  enum AttriLossType {
-    LOGISTIC = 0;
-    SMOOTH_L1 = 1;
-    L2 = 2;
-  }
-  optional float pose_weights = 1 [default = 1.0];
-  // facecontour loss types
-  optional AttriLossType regs_face_contour_loss_type = 2 [default = SMOOTH_L1];
-  // facepose loss types
-  optional AttriLossType regs_face_pose_loss_type = 3 [default = SMOOTH_L1];
-}
 // Message that store parameters used by MultiBoxLossLayer
 message MultiFaceContourLossParameter {
   enum AttriLossType {

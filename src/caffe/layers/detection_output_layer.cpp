@@ -20,14 +20,6 @@ void DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   const DetectionOutputParameter& detection_output_param =
       this->layer_param_.detection_output_param();
   CHECK(detection_output_param.has_num_classes()) << "Must specify num_classes";
-  CHECK(detection_output_param.has_attri_type()) << "Must specify attri_type";
-  attri_type_ = detection_output_param.attri_type();
-  if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_FACE){
-    num_blur_ = detection_output_param.num_blur();
-    num_occlusion_ = detection_output_param.num_occlusion();
-    blur_permute_.ReshapeLike(*(bottom[3]));
-    occlu_permute_.ReshapeLike(*(bottom[4]));
-  }
   num_classes_ = detection_output_param.num_classes();
   share_location_ = detection_output_param.share_location();
   num_loc_classes_ = share_location_ ? 1 : num_classes_;
@@ -175,39 +167,15 @@ void DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       << "Number of priors must match number of location predictions.";
   CHECK_EQ(num_priors_ * num_classes_, bottom[1]->channels())
       << "Number of priors must match number of confidence predictions.";
-  if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_FACE){
-    if (blur_permute_.num() != bottom[3]->num() ||
-      blur_permute_.count(1) != bottom[3]->count(1)) {
-    blur_permute_.ReshapeLike(*(bottom[3]));
-    }
-    if (occlu_permute_.num() != bottom[4]->num() ||
-        occlu_permute_.count(1) != bottom[4]->count(1)) {
-      occlu_permute_.ReshapeLike(*(bottom[4]));
-    }
-    CHECK_EQ(num_priors_ * num_blur_, bottom[3]->channels())
-        << "Number of priors must match number of blur predictions.";
-    CHECK_EQ(num_priors_ * num_occlusion_, bottom[4]->channels())
-        << "Number of priors must match number of occlussion predictions.";
-    // num() and channels() are 1.
-    vector<int> top_shape(2, 1);
-    // Since the number of bboxes to be kept is unknown before nms, we manually
-    // set it to (fake) 1.
-    top_shape.push_back(1);
-    // Each row is a 9 dimension vector, which stores
-    // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
-    top_shape.push_back(9);
-    top[0]->Reshape(top_shape);
-  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_NORMALL){
-    // num() and channels() are 1.
-    vector<int> top_shape(2, 1);
-    // Since the number of bboxes to be kept is unknown before nms, we manually
-    // set it to (fake) 1.
-    top_shape.push_back(1);
-    // Each row is a 9 dimension vector, which stores
-    // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
-    top_shape.push_back(7);
-    top[0]->Reshape(top_shape);
-  }  
+  // num() and channels() are 1.
+  vector<int> top_shape(2, 1);
+  // Since the number of bboxes to be kept is unknown before nms, we manually
+  // set it to (fake) 1.
+  top_shape.push_back(1);
+  // Each row is a 9 dimension vector, which stores
+  // [image_id, label, confidence, xmin, ymin, xmax, ymax]
+  top_shape.push_back(7);
+  top[0]->Reshape(top_shape);
 }
 
 template <typename Dtype>
@@ -307,154 +275,62 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
   }
   vector<int> top_shape(2, 1);
   top_shape.push_back(num_kept);
-  if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_FACE){
-    const Dtype* blur_data = bottom[3]->cpu_data();
-    const Dtype* occlu_data = bottom[4]->cpu_data();
-
-    //Retrieve all blur_data confidences.
-    vector<map<int, vector<float> > > all_blur_scores;
-    GetConfidenceScores(blur_data, num, num_priors_, num_blur_,
-                      &all_blur_scores);
-    //Retrieve all blur_data confidences.
-    vector<map<int, vector<float> > > all_occlu_scores;
-    GetConfidenceScores(occlu_data, num, num_priors_, num_occlusion_,
-                      &all_occlu_scores);
-    top_shape.push_back(9);
-    Dtype* top_data;
-    if (num_kept == 0) {
-      LOG(INFO) << "Couldn't find any detections";
-      top_shape[2] = num;
-      top[0]->Reshape(top_shape);
-      top_data = top[0]->mutable_cpu_data();
-      caffe_set<Dtype>(top[0]->count(), -1, top_data);
-      // Generate fake results per image.
-      for (int i = 0; i < num; ++i) {
-        top_data[0] = i;
-        top_data += 9;
-      }
-    } else {
-      top[0]->Reshape(top_shape);
-      top_data = top[0]->mutable_cpu_data();
-    }
-    int count = 0;
-    boost::filesystem::path output_directory(output_directory_);
+  top_shape.push_back(7);
+  Dtype* top_data;
+  if (num_kept == 0) {
+    LOG(INFO) << "Couldn't find any detections";
+    top_shape[2] = num;
+    top[0]->Reshape(top_shape);
+    top_data = top[0]->mutable_cpu_data();
+    caffe_set<Dtype>(top[0]->count(), -1, top_data);
+    // Generate fake results per image.
     for (int i = 0; i < num; ++i) {
-      const map<int, vector<float> >& conf_scores = all_conf_scores[i];
-      const map<int, vector<float> >& blur_scores = all_blur_scores[i];
-      const map<int, vector<float> >& occlu_scores = all_occlu_scores[i];
-      const LabelBBox& decode_bboxes = all_decode_bboxes[i];
-      for (map<int, vector<int> >::iterator it = all_indices[i].begin();
-          it != all_indices[i].end(); ++it) {
-        int label = it->first;
-        if (conf_scores.find(label) == conf_scores.end()) {
-          // Something bad happened if there are no predictions for current label.
-          LOG(FATAL) << "Could not find confidence predictions for " << label;
-          continue;
-        }
-        const vector<float>& scores = conf_scores.find(label)->second;
-        int loc_label = share_location_ ? -1 : label;
-        if (decode_bboxes.find(loc_label) == decode_bboxes.end()) {
-          // Something bad happened if there are no predictions for current label.
-          LOG(FATAL) << "Could not find location predictions for " << loc_label;
-          continue;
-        }
-        const vector<NormalizedBBox>& bboxes =
-            decode_bboxes.find(loc_label)->second;
-        vector<int>& indices = it->second;
-        if (need_save_) {
-          CHECK(label_to_name_.find(label) != label_to_name_.end())
-            << "Cannot find label: " << label << " in the label map.";
-          CHECK_LT(name_count_, names_.size());
-        }
-        for (int j = 0; j < indices.size(); ++j) {
-          int idx = indices[j];
-          top_data[count * 9] = i;
-          top_data[count * 9 + 1] = label;
-          top_data[count * 9 + 2] = scores[idx];
-          const NormalizedBBox& bbox = bboxes[idx];
-          top_data[count * 9 + 3] = bbox.xmin();
-          top_data[count * 9 + 4] = bbox.ymin();
-          top_data[count * 9 + 5] = bbox.xmax();
-          top_data[count * 9 + 6] = bbox.ymax();
-          int blur_index = 0; int occlu_index = 0;
-          float blur_temp =0; float occlu_temp =0.0;
-          for (int ii = 0; ii< 3; ii++ )
-          {
-            if (blur_temp <  blur_scores.find(ii)->second[idx])
-            {
-              blur_index = ii;
-              blur_temp = blur_scores.find(ii)->second[idx];
-            }
-            if (occlu_temp <  occlu_scores.find(ii)->second[idx])
-            {
-              occlu_index = ii;
-              occlu_temp = occlu_scores.find(ii)->second[idx];
-            }
-          }
-          top_data[count * 9 + 7] = blur_index;
-          top_data[count * 9 + 8] = occlu_index;
-          ++count;
-        }
-      }
+      top_data[0] = i;
+      top_data += 7;
     }
-  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_NORMALL){
-    top_shape.push_back(7);
-    Dtype* top_data;
-    if (num_kept == 0) {
-      LOG(INFO) << "Couldn't find any detections";
-      top_shape[2] = num;
-      top[0]->Reshape(top_shape);
-      top_data = top[0]->mutable_cpu_data();
-      caffe_set<Dtype>(top[0]->count(), -1, top_data);
-      // Generate fake results per image.
-      for (int i = 0; i < num; ++i) {
-        top_data[0] = i;
-        top_data += 7;
+  } else {
+    top[0]->Reshape(top_shape);
+    top_data = top[0]->mutable_cpu_data();
+  }
+  int count = 0;
+  boost::filesystem::path output_directory(output_directory_);
+  for (int i = 0; i < num; ++i) {
+    const map<int, vector<float> >& conf_scores = all_conf_scores[i];
+    const LabelBBox& decode_bboxes = all_decode_bboxes[i];
+    for (map<int, vector<int> >::iterator it = all_indices[i].begin();
+        it != all_indices[i].end(); ++it) {
+      int label = it->first;
+      if (conf_scores.find(label) == conf_scores.end()) {
+        // Something bad happened if there are no predictions for current label.
+        LOG(FATAL) << "Could not find confidence predictions for " << label;
+        continue;
       }
-    } else {
-      top[0]->Reshape(top_shape);
-      top_data = top[0]->mutable_cpu_data();
-    }
-    int count = 0;
-    boost::filesystem::path output_directory(output_directory_);
-    for (int i = 0; i < num; ++i) {
-      const map<int, vector<float> >& conf_scores = all_conf_scores[i];
-      const LabelBBox& decode_bboxes = all_decode_bboxes[i];
-      for (map<int, vector<int> >::iterator it = all_indices[i].begin();
-          it != all_indices[i].end(); ++it) {
-        int label = it->first;
-        if (conf_scores.find(label) == conf_scores.end()) {
-          // Something bad happened if there are no predictions for current label.
-          LOG(FATAL) << "Could not find confidence predictions for " << label;
-          continue;
-        }
-        const vector<float>& scores = conf_scores.find(label)->second;
-        int loc_label = share_location_ ? -1 : label;
-        if (decode_bboxes.find(loc_label) == decode_bboxes.end()) {
-          // Something bad happened if there are no predictions for current label.
-          LOG(FATAL) << "Could not find location predictions for " << loc_label;
-          continue;
-        }
-        const vector<NormalizedBBox>& bboxes =
-            decode_bboxes.find(loc_label)->second;
-        vector<int>& indices = it->second;
-        if (need_save_) {
-          CHECK(label_to_name_.find(label) != label_to_name_.end())
-            << "Cannot find label: " << label << " in the label map.";
-          CHECK_LT(name_count_, names_.size());
-        }
-        for (int j = 0; j < indices.size(); ++j) {
-          int idx = indices[j];
-          top_data[count * 7] = i;
-          top_data[count * 7 + 1] = label;
-          top_data[count * 7 + 2] = scores[idx];
-          const NormalizedBBox& bbox = bboxes[idx];
-          top_data[count * 7 + 3] = bbox.xmin();
-          top_data[count * 7 + 4] = bbox.ymin();
-          top_data[count * 7 + 5] = bbox.xmax();
-          top_data[count * 7 + 6] = bbox.ymax();
-          ++count;
-        }
+      const vector<float>& scores = conf_scores.find(label)->second;
+      int loc_label = share_location_ ? -1 : label;
+      if (decode_bboxes.find(loc_label) == decode_bboxes.end()) {
+        // Something bad happened if there are no predictions for current label.
+        LOG(FATAL) << "Could not find location predictions for " << loc_label;
+        continue;
+      }
+      const vector<NormalizedBBox>& bboxes =
+          decode_bboxes.find(loc_label)->second;
+      vector<int>& indices = it->second;
+      if (need_save_) {
+        CHECK(label_to_name_.find(label) != label_to_name_.end())
+          << "Cannot find label: " << label << " in the label map.";
+        CHECK_LT(name_count_, names_.size());
+      }
+      for (int j = 0; j < indices.size(); ++j) {
+        int idx = indices[j];
+        top_data[count * 7] = i;
+        top_data[count * 7 + 1] = label;
+        top_data[count * 7 + 2] = scores[idx];
+        const NormalizedBBox& bbox = bboxes[idx];
+        top_data[count * 7 + 3] = bbox.xmin();
+        top_data[count * 7 + 4] = bbox.ymin();
+        top_data[count * 7 + 5] = bbox.xmax();
+        top_data[count * 7 + 6] = bbox.ymax();
+        ++count;
       }
     }
   }
