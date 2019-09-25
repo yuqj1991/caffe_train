@@ -224,7 +224,7 @@ void UpdateLandmarkFaceByResizePolicy(const ResizeParameter& param,
 
 void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
                               const int old_width, const int old_height,
-                              AnnoFaceContourPoints* lface){
+                              AnnoFaceLandmarks* lface){
   float new_height = param.height();
   float new_width = param.width();
   float x1 = lface->point_1().x()* old_width;
@@ -337,17 +337,17 @@ void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
     default:
       LOG(FATAL) << "Unknown resize mode.";
   }
-  lface->mutable_point_1()->set_x(float(x1/new_width));
-  lface->mutable_point_1()->set_y(float(y1/new_height));
+  lface->mutable_leftEye()->set_x(float(x1/new_width));
+  lface->mutable_leftEye()->set_y(float(y1/new_height));
 
-  lface->mutable_point_2()->set_x(float(x2/new_width));
-  lface->mutable_point_2()->set_y(float(y2/new_height));
+  lface->mutable_rightEye()->set_x(float(x2/new_width));
+  lface->mutable_rightEye()->set_y(float(y2/new_height));
 
-  lface->mutable_point_3()->set_x(float(x3/new_width));
-  lface->mutable_point_3()->set_y(float(x3/new_height));
+  lface->mutable_nose()->set_x(float(x3/new_width));
+  lface->mutable_nose()->set_y(float(x3/new_height));
 
-  lface->mutable_point_4()->set_x(float(x4/new_width));
-  lface->mutable_point_4()->set_y(float(y4/new_height));
+  lface->mutable_leftmouth()->set_x(float(x4/new_width));
+  lface->mutable_leftmouth()->set_y(float(y4/new_height));
 
   lface->mutable_point_5()->set_x(float(x5/new_width));
   lface->mutable_point_5()->set_y(float(y5/new_height));
@@ -364,41 +364,41 @@ void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
   lface->mutable_point_9()->set_x(float(x9/new_width));
   lface->mutable_point_9()->set_y(float(y9/new_height));
 
-  lface->mutable_point_10()->set_x(float(x11/new_width));
-  lface->mutable_point_10()->set_y(float(y10/new_height));
+  lface->mutable_leftEye0()->set_x(float(x11/new_width));
+  lface->mutable_leftEye0()->set_y(float(y10/new_height));
 
-  lface->mutable_point_11()->set_x(float(x11/new_width));
-  lface->mutable_point_11()->set_y(float(y11/new_height));
+  lface->mutable_leftEye1()->set_x(float(x11/new_width));
+  lface->mutable_leftEye1()->set_y(float(y11/new_height));
 
-  lface->mutable_point_12()->set_x(float(x12/new_width));
-  lface->mutable_point_12()->set_y(float(y12/new_height));
+  lface->mutable_leftEye2()->set_x(float(x12/new_width));
+  lface->mutable_leftEye2()->set_y(float(y12/new_height));
 
-  lface->mutable_point_13()->set_x(float(x13/new_width));
-  lface->mutable_point_13()->set_y(float(y13/new_height));
+  lface->mutable_leftEye3()->set_x(float(x13/new_width));
+  lface->mutable_leftEye3()->set_y(float(y13/new_height));
 
-  lface->mutable_point_14()->set_x(float(x14/new_width));
-  lface->mutable_point_14()->set_y(float(y14/new_height));
+  lface->mutable_leftEye4()->set_x(float(x14/new_width));
+  lface->mutable_leftEye4()->set_y(float(y14/new_height));
 
-  lface->mutable_point_15()->set_x(float(x15/new_width));
-  lface->mutable_point_15()->set_y(float(y15/new_height));
+  lface->mutable_leftEye5()->set_x(float(x15/new_width));
+  lface->mutable_leftEye5()->set_y(float(y15/new_height));
 
-  lface->mutable_point_16()->set_x(float(x16/new_width));
-  lface->mutable_point_16()->set_y(float(y16/new_height));
+  lface->mutable_leftEye6()->set_x(float(x16/new_width));
+  lface->mutable_leftEye6()->set_y(float(y16/new_height));
 
-  lface->mutable_point_17()->set_x(float(x17/new_width));
-  lface->mutable_point_17()->set_y(float(y17/new_height));
+  lface->mutable_leftEye7()->set_x(float(x17/new_width));
+  lface->mutable_leftEye7()->set_y(float(y17/new_height));
 
-  lface->mutable_point_18()->set_x(float(x18/new_width));
-  lface->mutable_point_18()->set_y(float(y18/new_height));
+  lface->mutable_leftEye8()->set_x(float(x18/new_width));
+  lface->mutable_leftEye8()->set_y(float(y18/new_height));
 
-  lface->mutable_point_19()->set_x(float(x19/new_width));
-  lface->mutable_point_19()->set_y(float(y19/new_height));
+  lface->mutable_leftEye9()->set_x(float(x19/new_width));
+  lface->mutable_leftEye9()->set_y(float(y19/new_height));
 
-  lface->mutable_point_20()->set_x(float(x20/new_width));
-  lface->mutable_point_20()->set_y(float(y20/new_height));
+  lface->mutable_rightEye0()->set_x(float(x20/new_width));
+  lface->mutable_rightEye0()->set_y(float(y20/new_height));
 
-  lface->mutable_point_21()->set_x(float(x21/new_width));
-  lface->mutable_point_21()->set_y(float(y21/new_height));
+  lface->mutable_rightEye1()->set_x(float(x21/new_width));
+  lface->mutable_rightEye1()->set_y(float(y21/new_height));
 }
 
 

@@ -225,14 +225,14 @@ inline bool ReadRichFaceToAnnotatedDatum(const string& filename,
 bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
     const string& labelfile, const int height, const int width,
     const int min_dim, const int max_dim, const bool is_color,
-    const string& encoding, const AnnoFacePoseDatum_AnnoType type,
-    const string& labeltype, AnnoFacePoseDatum* anno_datum);
+    const string& encoding, const AnnoFaceAttributeDatum_AnnoType type,
+    const string& labeltype, AnnoFaceAttributeDatum* anno_datum);
 
 inline bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
     const string& labelname, const int height, const int width,
     const bool is_color, const std::string & encoding,
-    const AnnoFacePoseDatum_AnnoType type, const string& labeltype,
-    AnnoFacePoseDatum* anno_datum) {
+    const AnnoFaceAttributeDatum_AnnoType type, const string& labeltype,
+    AnnoFaceAttributeDatum* anno_datum) {
   return ReadRichFacePoseToAnnotatedDatum(filename, labelname, height, width, 0, 0,
                       is_color, encoding, type, labeltype, 
                       anno_datum);
@@ -329,7 +329,7 @@ bool ReadFaceAttriTxtToAnnotatedDatum(const string& labelfile, const int height,
     const int width, AnnoFaceDatum* anno_datum);
 
 bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
-    const int width, AnnoFacePoseDatum* anno_datum);
+    const int width, AnnoFaceAttributeDatum* anno_datum);
 
 bool ReadFaceContourTxtToAnnotatedDatum(const string& labelfile, const int height,
     const int width, AnnoFaceContourDatum* anno_datum);

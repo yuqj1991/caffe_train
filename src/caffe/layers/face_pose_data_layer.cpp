@@ -38,7 +38,7 @@ void facePoseDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
     }
     }
     // Read a data point, and use it to initialize the top blob.
-    AnnoFacePoseDatum& anno_datum = *(reader_.full().peek());
+    AnnoFaceAttributeDatum& anno_datum = *(reader_.full().peek());
 
     // Use data_transformer to infer the expected blob shape from anno_datum.
     vector<int> top_shape =
@@ -59,7 +59,7 @@ void facePoseDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
         vector<int> label_shape(4, 1);
         if (has_anno_type_) {
             anno_type_ = anno_datum.type();
-            if (anno_type_ == AnnoFacePoseDatum_AnnoType_FACEPOSE) {
+            if (anno_type_ == AnnoFaceAttributeDatum_AnnoType_FACEPOSE) {
             label_shape[0] = 1;
             label_shape[1] = 1;
             // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
@@ -95,7 +95,7 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // on single input batches allows for inputs of varying dimension.
     const int batch_size = this->layer_param_.data_param().batch_size();
     const TransformationParameter& transform_param = this->layer_param_.transform_param();
-    AnnoFacePoseDatum& anno_datum = *(reader_.full().peek());
+    AnnoFaceAttributeDatum& anno_datum = *(reader_.full().peek());
     // Use data_transformer to infer the expected blob shape from datum.
     vector<int> top_shape = this->data_transformer_->InferBlobShape(anno_datum.datum());
     this->transformed_data_.Reshape(top_shape);
@@ -107,7 +107,7 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     Dtype* top_label = NULL;  // suppress warnings about uninitialized variables
 
       // Store transformed annotation.
-    map<int, AnnoFacePose > all_anno;
+    map<int, AnnoFaceAttribute > all_anno;
 
     if (this->output_labels_ && !has_anno_type_) {
         top_label = batch->label_.mutable_cpu_data();
@@ -115,49 +115,49 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     for (int item_id = 0; item_id < batch_size; ++item_id) {
         timer.Start();
         // get a anno_datum
-        AnnoFacePoseDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
+        AnnoFaceAttributeDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
         #if 0
         LOG(INFO) <<" image->height: "<<anno_datum.datum().height()<<" image->width: "<<anno_datum.datum().width()
-                  <<" point_1: "<<anno_datum.facepose().facecour().point_1().x()<<" "<<anno_datum.facepose().facecour().point_1().y()
-                  <<" point_2: "<<anno_datum.facepose().facecour().point_2().x()<<" "<<anno_datum.facepose().facecour().point_2().y()
-                  <<" point_3: "<<anno_datum.facepose().facecour().point_3().x()<<" "<<anno_datum.facepose().facecour().point_3().y()
-                  <<" point_4: "<<anno_datum.facepose().facecour().point_4().x()<<" "<<anno_datum.facepose().facecour().point_4().y()
-                  <<" point_5: "<<anno_datum.facepose().facecour().point_5().x()<<" "<<anno_datum.facepose().facecour().point_5().y()
-                  <<" point_6: "<<anno_datum.facepose().facecour().point_6().x()<<" "<<anno_datum.facepose().facecour().point_6().y()
-                  <<" point_7: "<<anno_datum.facepose().facecour().point_7().x()<<" "<<anno_datum.facepose().facecour().point_7().y()
-                  <<" point_8: "<<anno_datum.facepose().facecour().point_8().x()<<" "<<anno_datum.facepose().facecour().point_8().y()
-                  <<" point_9: "<<anno_datum.facepose().facecour().point_9().x()<<" "<<anno_datum.facepose().facecour().point_9().y()
-                  <<" point_10: "<<anno_datum.facepose().facecour().point_10().x()<<" "<<anno_datum.facepose().facecour().point_10().y()
-                  <<" point_11: "<<anno_datum.facepose().facecour().point_11().x()<<" "<<anno_datum.facepose().facecour().point_11().y()
-                  <<" point_12: "<<anno_datum.facepose().facecour().point_12().x()<<" "<<anno_datum.facepose().facecour().point_12().y()
-                  <<" point_13: "<<anno_datum.facepose().facecour().point_13().x()<<" "<<anno_datum.facepose().facecour().point_13().y()
-                  <<" point_14: "<<anno_datum.facepose().facecour().point_14().x()<<" "<<anno_datum.facepose().facecour().point_14().y()
-                  <<" point_15: "<<anno_datum.facepose().facecour().point_15().x()<<" "<<anno_datum.facepose().facecour().point_15().y()
-                  <<" point_16: "<<anno_datum.facepose().facecour().point_16().x()<<" "<<anno_datum.facepose().facecour().point_16().y()
-                  <<" point_17: "<<anno_datum.facepose().facecour().point_17().x()<<" "<<anno_datum.facepose().facecour().point_17().y()
-                  <<" point_18: "<<anno_datum.facepose().facecour().point_18().x()<<" "<<anno_datum.facepose().facecour().point_18().y()
-                  <<" point_19: "<<anno_datum.facepose().facecour().point_19().x()<<" "<<anno_datum.facepose().facecour().point_19().y()
-                  <<" point_20: "<<anno_datum.facepose().facecour().point_20().x()<<" "<<anno_datum.facepose().facecour().point_20().y()
-                  <<" point_21: "<<anno_datum.facepose().facecour().point_21().x()<<" "<<anno_datum.facepose().facecour().point_21().y();
+                  <<" point_1: "<<anno_datum.facepose().landMark().point_1().x()<<" "<<anno_datum.facepose().landMark().point_1().y()
+                  <<" point_2: "<<anno_datum.facepose().landMark().point_2().x()<<" "<<anno_datum.facepose().landMark().point_2().y()
+                  <<" point_3: "<<anno_datum.facepose().landMark().point_3().x()<<" "<<anno_datum.facepose().landMark().point_3().y()
+                  <<" point_4: "<<anno_datum.facepose().landMark().point_4().x()<<" "<<anno_datum.facepose().landMark().point_4().y()
+                  <<" point_5: "<<anno_datum.facepose().landMark().point_5().x()<<" "<<anno_datum.facepose().landMark().point_5().y()
+                  <<" point_6: "<<anno_datum.facepose().landMark().point_6().x()<<" "<<anno_datum.facepose().landMark().point_6().y()
+                  <<" point_7: "<<anno_datum.facepose().landMark().point_7().x()<<" "<<anno_datum.facepose().landMark().point_7().y()
+                  <<" point_8: "<<anno_datum.facepose().landMark().point_8().x()<<" "<<anno_datum.facepose().landMark().point_8().y()
+                  <<" point_9: "<<anno_datum.facepose().landMark().point_9().x()<<" "<<anno_datum.facepose().landMark().point_9().y()
+                  <<" point_10: "<<anno_datum.facepose().landMark().point_10().x()<<" "<<anno_datum.facepose().landMark().point_10().y()
+                  <<" point_11: "<<anno_datum.facepose().landMark().point_11().x()<<" "<<anno_datum.facepose().landMark().point_11().y()
+                  <<" point_12: "<<anno_datum.facepose().landMark().point_12().x()<<" "<<anno_datum.facepose().landMark().point_12().y()
+                  <<" point_13: "<<anno_datum.facepose().landMark().point_13().x()<<" "<<anno_datum.facepose().landMark().point_13().y()
+                  <<" point_14: "<<anno_datum.facepose().landMark().point_14().x()<<" "<<anno_datum.facepose().landMark().point_14().y()
+                  <<" point_15: "<<anno_datum.facepose().landMark().point_15().x()<<" "<<anno_datum.facepose().landMark().point_15().y()
+                  <<" point_16: "<<anno_datum.facepose().landMark().point_16().x()<<" "<<anno_datum.facepose().landMark().point_16().y()
+                  <<" point_17: "<<anno_datum.facepose().landMark().point_17().x()<<" "<<anno_datum.facepose().landMark().point_17().y()
+                  <<" point_18: "<<anno_datum.facepose().landMark().point_18().x()<<" "<<anno_datum.facepose().landMark().point_18().y()
+                  <<" point_19: "<<anno_datum.facepose().landMark().point_19().x()<<" "<<anno_datum.facepose().landMark().point_19().y()
+                  <<" point_20: "<<anno_datum.facepose().landMark().point_20().x()<<" "<<anno_datum.facepose().landMark().point_20().y()
+                  <<" point_21: "<<anno_datum.facepose().landMark().point_21().x()<<" "<<anno_datum.facepose().landMark().point_21().y();
                   << " yaw : "<<anno_datum.facepose().faceoritation().yaw() << " "<<" pitch: "<< anno_datum.facepose().faceoritation().pitch()
                   <<" "<<" roll: "<<anno_datum.facepose().faceoritation().roll();
         LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~End Read Raw Annodation Data~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
         #endif
-        AnnoFacePoseDatum distort_datum;
-        AnnoFacePoseDatum* expand_datum = NULL;
+        AnnoFaceAttributeDatum distort_datum;
+        AnnoFaceAttributeDatum* expand_datum = NULL;
         if (transform_param.has_distort_param()) {
             distort_datum.CopyFrom(anno_datum);
             this->data_transformer_->DistortImage(anno_datum.datum(),
                                                     distort_datum.mutable_datum());
             if (transform_param.has_expand_param()) {
-                expand_datum = new AnnoFacePoseDatum();
+                expand_datum = new AnnoFaceAttributeDatum();
                 this->data_transformer_->ExpandImage(distort_datum, expand_datum);
             } else {
                 expand_datum = &distort_datum;
             }
             } else {
             if (transform_param.has_expand_param()) {
-                expand_datum = new AnnoFacePoseDatum();
+                expand_datum = new AnnoFaceAttributeDatum();
                 this->data_transformer_->ExpandImage(anno_datum, expand_datum);
             } else {
                 expand_datum = &anno_datum;
@@ -188,7 +188,7 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         // Apply data transformations (mirror, scale, crop...)
         int offset = batch->data_.offset(item_id);
         this->transformed_data_.set_cpu_data(top_data + offset);
-        AnnoFacePose transformed_anno_vec;
+        AnnoFaceAttribute transformed_anno_vec;
         if (this->output_labels_) {
             if (has_anno_type_) {
                 // Transform datum and annotation_group at the same time
@@ -209,13 +209,13 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             delete expand_datum;
         }
         trans_time += timer.MicroSeconds();
-        reader_.free().push(const_cast<AnnoFacePoseDatum*>(&anno_datum));
+        reader_.free().push(const_cast<AnnoFaceAttributeDatum*>(&anno_datum));
     }
 
     // store "rich " landmark, face attributes
     if (this->output_labels_ && has_anno_type_) {
         vector<int> label_shape(4);
-        if (anno_type_ == AnnoFacePoseDatum_AnnoType_FACEPOSE) {
+        if (anno_type_ == AnnoFaceAttributeDatum_AnnoType_FACEPOSE) {
             label_shape[0] = 1;
             label_shape[1] = 1;
             // Reshape the label and store the annotation.
@@ -225,50 +225,50 @@ void facePoseDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
             for (int item_id = 0; item_id < batch_size; ++item_id) {
-                AnnoFacePose face = all_anno[item_id];
+                AnnoFaceAttribute face = all_anno[item_id];
                 top_label[idx++] = item_id;
-                top_label[idx++] = face.facecour().point_1().x();
-                top_label[idx++] = face.facecour().point_2().x();
-                top_label[idx++] = face.facecour().point_3().x();
-                top_label[idx++] = face.facecour().point_4().x();
-                top_label[idx++] = face.facecour().point_5().x();
-                top_label[idx++] = face.facecour().point_6().x();
-                top_label[idx++] = face.facecour().point_7().x();
-                top_label[idx++] = face.facecour().point_8().x();
-                top_label[idx++] = face.facecour().point_9().x();
-                top_label[idx++] = face.facecour().point_10().x();
-                top_label[idx++] = face.facecour().point_11().x();
-                top_label[idx++] = face.facecour().point_12().x();
-                top_label[idx++] = face.facecour().point_13().x();
-                top_label[idx++] = face.facecour().point_14().x();
-                top_label[idx++] = face.facecour().point_15().x();
-                top_label[idx++] = face.facecour().point_16().x();
-                top_label[idx++] = face.facecour().point_17().x();
-                top_label[idx++] = face.facecour().point_18().x();
-                top_label[idx++] = face.facecour().point_19().x();
-                top_label[idx++] = face.facecour().point_20().x();
-                top_label[idx++] = face.facecour().point_21().x();
-                top_label[idx++] = face.facecour().point_1().y();
-                top_label[idx++] = face.facecour().point_2().y();
-                top_label[idx++] = face.facecour().point_3().y();
-                top_label[idx++] = face.facecour().point_4().y();
-                top_label[idx++] = face.facecour().point_5().y();
-                top_label[idx++] = face.facecour().point_6().y();
-                top_label[idx++] = face.facecour().point_7().y();
-                top_label[idx++] = face.facecour().point_8().y();
-                top_label[idx++] = face.facecour().point_9().y();
-                top_label[idx++] = face.facecour().point_10().y();
-                top_label[idx++] = face.facecour().point_11().y();
-                top_label[idx++] = face.facecour().point_12().y();
-                top_label[idx++] = face.facecour().point_13().y();
-                top_label[idx++] = face.facecour().point_14().y();
-                top_label[idx++] = face.facecour().point_15().y();
-                top_label[idx++] = face.facecour().point_16().y();
-                top_label[idx++] = face.facecour().point_17().y();
-                top_label[idx++] = face.facecour().point_18().y();
-                top_label[idx++] = face.facecour().point_19().y();
-                top_label[idx++] = face.facecour().point_20().y();
-                top_label[idx++] = face.facecour().point_21().y();
+                top_label[idx++] = face.landMark().point_1().x();
+                top_label[idx++] = face.landMark().point_2().x();
+                top_label[idx++] = face.landMark().point_3().x();
+                top_label[idx++] = face.landMark().point_4().x();
+                top_label[idx++] = face.landMark().point_5().x();
+                top_label[idx++] = face.landMark().point_6().x();
+                top_label[idx++] = face.landMark().point_7().x();
+                top_label[idx++] = face.landMark().point_8().x();
+                top_label[idx++] = face.landMark().point_9().x();
+                top_label[idx++] = face.landMark().point_10().x();
+                top_label[idx++] = face.landMark().point_11().x();
+                top_label[idx++] = face.landMark().point_12().x();
+                top_label[idx++] = face.landMark().point_13().x();
+                top_label[idx++] = face.landMark().point_14().x();
+                top_label[idx++] = face.landMark().point_15().x();
+                top_label[idx++] = face.landMark().point_16().x();
+                top_label[idx++] = face.landMark().point_17().x();
+                top_label[idx++] = face.landMark().point_18().x();
+                top_label[idx++] = face.landMark().point_19().x();
+                top_label[idx++] = face.landMark().point_20().x();
+                top_label[idx++] = face.landMark().point_21().x();
+                top_label[idx++] = face.landMark().point_1().y();
+                top_label[idx++] = face.landMark().point_2().y();
+                top_label[idx++] = face.landMark().point_3().y();
+                top_label[idx++] = face.landMark().point_4().y();
+                top_label[idx++] = face.landMark().point_5().y();
+                top_label[idx++] = face.landMark().point_6().y();
+                top_label[idx++] = face.landMark().point_7().y();
+                top_label[idx++] = face.landMark().point_8().y();
+                top_label[idx++] = face.landMark().point_9().y();
+                top_label[idx++] = face.landMark().point_10().y();
+                top_label[idx++] = face.landMark().point_11().y();
+                top_label[idx++] = face.landMark().point_12().y();
+                top_label[idx++] = face.landMark().point_13().y();
+                top_label[idx++] = face.landMark().point_14().y();
+                top_label[idx++] = face.landMark().point_15().y();
+                top_label[idx++] = face.landMark().point_16().y();
+                top_label[idx++] = face.landMark().point_17().y();
+                top_label[idx++] = face.landMark().point_18().y();
+                top_label[idx++] = face.landMark().point_19().y();
+                top_label[idx++] = face.landMark().point_20().y();
+                top_label[idx++] = face.landMark().point_21().y();
                 top_label[idx++] = face.faceoritation().yaw();
                 top_label[idx++] = face.faceoritation().pitch();
                 top_label[idx++] = face.faceoritation().roll();

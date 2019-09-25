@@ -108,7 +108,7 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     Dtype* top_label = NULL;  // suppress warnings about uninitialized variables
 
       // Store transformed annotation.
-    map<int, AnnoFacePoseOritation > all_anno;
+    map<int, AnnoFaceOritation > all_anno;
 
     if (this->output_labels_ && !has_anno_type_) {
         top_label = batch->label_.mutable_cpu_data();
@@ -176,7 +176,7 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         // Apply data transformations (mirror, scale, crop...)
         int offset = batch->data_.offset(item_id);
         this->transformed_data_.set_cpu_data(top_data + offset);
-        AnnoFacePoseOritation transformed_anno_vec;
+        AnnoFaceOritation transformed_anno_vec;
         if (this->output_labels_) {
             if (has_anno_type_) {
                 // Transform datum and annotation_group at the same time
@@ -214,7 +214,7 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
             for (int item_id = 0; item_id < batch_size; ++item_id) {
-                AnnoFacePoseOritation face = all_anno[item_id];
+                AnnoFaceOritation face = all_anno[item_id];
                 top_label[idx++] = face.yaw();
                 top_label[idx++] = face.pitch();
                 top_label[idx++] = face.roll();

@@ -30,9 +30,9 @@ class facePoseDataLayer: public BasePrefetchingDataLayer<Dtype>{
     protected:
         virtual void load_batch(Batch<Dtype>* batch);
 
-        DataReader<AnnoFacePoseDatum> reader_;
+        DataReader<AnnoFaceAttributeDatum> reader_;
         bool has_anno_type_;
-        AnnoFacePoseDatum_AnnoType anno_type_;
+        AnnoFaceAttributeDatum_AnnoType anno_type_;
 };
 
 }  //cafe

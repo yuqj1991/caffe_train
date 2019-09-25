@@ -407,9 +407,9 @@ void DataTransformer<Dtype>::Transform(const AnnoFaceDatum& anno_datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const AnnoFacePoseDatum& anno_datum,
+void DataTransformer<Dtype>::Transform(const AnnoFaceAttributeDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePose* transformed_annoface_all,
+                 AnnoFaceAttribute* transformed_annoface_all,
                  bool* do_mirror){
 	// Transform datum.
 	const Datum& datum = anno_datum.datum();
@@ -419,14 +419,14 @@ void DataTransformer<Dtype>::Transform(const AnnoFacePoseDatum& anno_datum,
 	// Transform annotation.
 	const bool do_resize = true;
 	const bool do_expand = false;
-	TransformAnnoFacePose(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
+	TransformAnnoFaceAttribute(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
 											transformed_annoface_all);
 }
 
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceContourDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFaceContourPoints* transformed_annoface_all,
+                 AnnoFaceLandmarks* transformed_annoface_all,
                  bool* do_mirror){
 	// Transform datum.
 	const Datum& datum = anno_datum.datum();
@@ -443,7 +443,7 @@ void DataTransformer<Dtype>::Transform(const AnnoFaceContourDatum& anno_datum,
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePoseOritation* transformed_annoface_all,
+                 AnnoFaceOritation* transformed_annoface_all,
                  bool* do_mirror){
 	// Transform datum.
 	const Datum& datum = anno_datum.datum();
@@ -502,9 +502,9 @@ void DataTransformer<Dtype>::Transform(const AnnoFaceDatum& anno_datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const AnnoFacePoseDatum& anno_datum, 
+void DataTransformer<Dtype>::Transform(const AnnoFaceAttributeDatum& anno_datum, 
 				Blob<Dtype>* transformed_blob,
-				AnnoFacePose* transformed_anno_vec){
+				AnnoFaceAttribute* transformed_anno_vec){
 	bool do_mirror;
 	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
 }
@@ -512,7 +512,7 @@ void DataTransformer<Dtype>::Transform(const AnnoFacePoseDatum& anno_datum,
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceContourDatum& anno_datum, 
 				Blob<Dtype>* transformed_blob,
-				AnnoFaceContourPoints* transformed_anno_vec){
+				AnnoFaceLandmarks* transformed_anno_vec){
 	bool do_mirror;
 	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
 }
@@ -520,7 +520,7 @@ void DataTransformer<Dtype>::Transform(const AnnoFaceContourDatum& anno_datum,
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum, 
 				Blob<Dtype>* transformed_blob,
-				AnnoFacePoseOritation* transformed_anno_vec){
+				AnnoFaceOritation* transformed_anno_vec){
 	bool do_mirror;
 	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
 }
@@ -593,36 +593,36 @@ void DataTransformer<Dtype>::TransformAnnoFace(
 
 // transfer label face pose depender expand
 template<typename Dtype>
-void DataTransformer<Dtype>::TransformAnnoFacePose(
-		const AnnoFacePoseDatum& anno_datum,const bool do_resize,
+void DataTransformer<Dtype>::TransformAnnoFaceAttribute(
+		const AnnoFaceAttributeDatum& anno_datum,const bool do_resize,
 		const NormalizedBBox& crop_bbox, const bool do_mirror, const bool do_expand,
-		AnnoFacePose* transformed_annoface_all){
+		AnnoFaceAttribute* transformed_annoface_all){
 	const int img_height = anno_datum.datum().height();
 	const int img_width = anno_datum.datum().width();
-	AnnoFacePose src_annoface = anno_datum.facepose();
-	AnnoFaceContourPoints* face = src_annoface.mutable_facecour();
-	ContourPoint * point_1 = face->mutable_point_1();
-	ContourPoint * point_2 = face->mutable_point_2();
-	ContourPoint * point_3 = face->mutable_point_3();
-	ContourPoint * point_4 = face->mutable_point_4();
+	AnnoFaceAttribute src_annoface = anno_datum.facepose();
+	AnnoFaceLandmarks* face = src_annoface.mutable_landMark();
+	ContourPoint * point_1 = face->mutable_leftEye();
+	ContourPoint * point_2 = face->mutable_rightEye();
+	ContourPoint * point_3 = face->mutable_nose();
+	ContourPoint * point_4 = face->mutable_leftmouth();
 	ContourPoint * point_5 = face->mutable_point_5();
 	ContourPoint * point_6 = face->mutable_point_6();
 	ContourPoint * point_7 = face->mutable_point_7();
 	ContourPoint * point_8 = face->mutable_point_8();
 	ContourPoint * point_9 = face->mutable_point_9();
-	ContourPoint * point_10 = face->mutable_point_10();
-	ContourPoint * point_11 = face->mutable_point_11();
-	ContourPoint * point_12 = face->mutable_point_12();
-	ContourPoint * point_13 = face->mutable_point_13();
-	ContourPoint * point_14 = face->mutable_point_14();
-	ContourPoint * point_15 = face->mutable_point_15();
-	ContourPoint * point_16 = face->mutable_point_16();
-	ContourPoint * point_17 = face->mutable_point_17();
-	ContourPoint * point_18 = face->mutable_point_18();
-	ContourPoint * point_19 = face->mutable_point_19();
-	ContourPoint * point_20 = face->mutable_point_20();
-	ContourPoint * point_21 = face->mutable_point_21();
-	if(anno_datum.type() == AnnoFacePoseDatum_AnnoType_FACEPOSE){
+	ContourPoint * point_10 = face->mutable_leftEye0();
+	ContourPoint * point_11 = face->mutable_leftEye1();
+	ContourPoint * point_12 = face->mutable_leftEye2();
+	ContourPoint * point_13 = face->mutable_leftEye3();
+	ContourPoint * point_14 = face->mutable_leftEye4();
+	ContourPoint * point_15 = face->mutable_leftEye5();
+	ContourPoint * point_16 = face->mutable_leftEye6();
+	ContourPoint * point_17 = face->mutable_leftEye7();
+	ContourPoint * point_18 = face->mutable_leftEye8();
+	ContourPoint * point_19 = face->mutable_leftEye9();
+	ContourPoint * point_20 = face->mutable_rightEye0();
+	ContourPoint * point_21 = face->mutable_rightEye1();
+	if(anno_datum.type() == AnnoFaceAttributeDatum_AnnoType_FACEPOSE){
 		if(do_resize && param_.has_resize_param()){
 			CHECK_GT(img_height, 0);
 			CHECK_GT(img_width, 0);
@@ -708,7 +708,7 @@ void DataTransformer<Dtype>::TransformAnnoFacePose(
 			point_21->set_x((point_21->x()-crop_bbox.xmin())/src_width);
 			point_21->set_y((point_21->y()-crop_bbox.ymin())/src_height);
 		}
-		AnnoFaceContourPoints* annolandface = transformed_annoface_all->mutable_facecour();
+		AnnoFaceLandmarks* annolandface = transformed_annoface_all->mutable_landMark();
 		annolandface->CopyFrom(*face);
 	}
 }
@@ -718,7 +718,7 @@ template<typename Dtype>
 void DataTransformer<Dtype>::TransformAnnoFaceAngle(
 		const AnnoFaceAngleDatum& anno_datum,const bool do_resize,
 		const NormalizedBBox& crop_bbox, const bool do_mirror, const bool do_expand,
-		AnnoFacePoseOritation* transformed_annoface_all){
+		AnnoFaceOritation* transformed_annoface_all){
 	if(anno_datum.type() == AnnoFaceAngleDatum_AnnoType_FACEANGLE){
 		if(do_mirror){
 			transformed_annoface_all->set_yaw(-anno_datum.faceangle().yaw());
@@ -765,31 +765,31 @@ template<typename Dtype>
 void DataTransformer<Dtype>::TransformAnnoFaceContour(
 		const AnnoFaceContourDatum& anno_datum,const bool do_resize,
 		const NormalizedBBox& crop_bbox, const bool do_mirror, const bool do_expand,
-		AnnoFaceContourPoints* transformed_annoface_all){
+		AnnoFaceLandmarks* transformed_annoface_all){
 	const int img_height = anno_datum.datum().height();
 	const int img_width = anno_datum.datum().width();
-	AnnoFaceContourPoints face = anno_datum.facecontour();
-	ContourPoint * point_1 = face.mutable_point_1();
-	ContourPoint * point_2 = face.mutable_point_2();
-	ContourPoint * point_3 = face.mutable_point_3();
-	ContourPoint * point_4 = face.mutable_point_4();
+	AnnoFaceLandmarks face = anno_datum.facecontour();
+	ContourPoint * point_1 = face.mutable_leftEye();
+	ContourPoint * point_2 = face.mutable_rightEye();
+	ContourPoint * point_3 = face.mutable_nose();
+	ContourPoint * point_4 = face.mutable_leftmouth();
 	ContourPoint * point_5 = face.mutable_point_5();
 	ContourPoint * point_6 = face.mutable_point_6();
 	ContourPoint * point_7 = face.mutable_point_7();
 	ContourPoint * point_8 = face.mutable_point_8();
 	ContourPoint * point_9 = face.mutable_point_9();
-	ContourPoint * point_10 = face.mutable_point_10();
-	ContourPoint * point_11 = face.mutable_point_11();
-	ContourPoint * point_12 = face.mutable_point_12();
-	ContourPoint * point_13 = face.mutable_point_13();
-	ContourPoint * point_14 = face.mutable_point_14();
-	ContourPoint * point_15 = face.mutable_point_15();
-	ContourPoint * point_16 = face.mutable_point_16();
-	ContourPoint * point_17 = face.mutable_point_17();
-	ContourPoint * point_18 = face.mutable_point_18();
-	ContourPoint * point_19 = face.mutable_point_19();
-	ContourPoint * point_20 = face.mutable_point_20();
-	ContourPoint * point_21 = face.mutable_point_21();
+	ContourPoint * point_10 = face.mutable_leftEye0();
+	ContourPoint * point_11 = face.mutable_leftEye1();
+	ContourPoint * point_12 = face.mutable_leftEye2();
+	ContourPoint * point_13 = face.mutable_leftEye3();
+	ContourPoint * point_14 = face.mutable_leftEye4();
+	ContourPoint * point_15 = face.mutable_leftEye5();
+	ContourPoint * point_16 = face.mutable_leftEye6();
+	ContourPoint * point_17 = face.mutable_leftEye7();
+	ContourPoint * point_18 = face.mutable_leftEye8();
+	ContourPoint * point_19 = face.mutable_leftEye9();
+	ContourPoint * point_20 = face.mutable_rightEye0();
+	ContourPoint * point_21 = face.mutable_rightEye1();
 	if(anno_datum.type() == AnnoFaceContourDatum_AnnoType_FACECONTOUR){
 		if(do_resize && param_.has_resize_param()){
 			CHECK_GT(img_height, 0);
@@ -1277,8 +1277,8 @@ void DataTransformer<Dtype>::RotateImage(const Datum& datum,
 
 
 template<typename Dtype>
-void DataTransformer<Dtype>::ExpandImage(const AnnoFacePoseDatum& anno_datum,
-																				 AnnoFacePoseDatum* expanded_anno_datum) {
+void DataTransformer<Dtype>::ExpandImage(const AnnoFaceAttributeDatum& anno_datum,
+																				 AnnoFaceAttributeDatum* expanded_anno_datum) {
 	if (!param_.has_expand_param()) {
 		expanded_anno_datum->CopyFrom(anno_datum);
 		return;
@@ -1308,7 +1308,7 @@ void DataTransformer<Dtype>::ExpandImage(const AnnoFacePoseDatum& anno_datum,
 	const bool do_resize = false;
 	const bool do_mirror = false;
 	const bool do_expand = true;
-	TransformAnnoFacePose(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
+	TransformAnnoFaceAttribute(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
 											expanded_anno_datum->mutable_facepose());
 }
 

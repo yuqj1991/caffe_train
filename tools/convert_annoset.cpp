@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
   AnnotatedDatum_AnnoataionAttriType face_det_attri_type;
   AnnotatedDatum_AnnoataionAttriType ccpd_det_attri_type;
   AnnoFaceDatum_AnnotationType anno_face_attri_type;
-  AnnoFacePoseDatum_AnnoType anno_facepose_type;
+  AnnoFaceAttributeDatum_AnnoType anno_facepose_type;
   AnnoFaceContourDatum_AnnoType anno_facecontour_type;
   AnnoFaceAngleDatum_AnnoType anno_faceangle_type;
   AnnotatedCCpdDatum_AnnotationType anno_ccpd_type;
@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
       lines.push_back(std::make_pair(filename, labelname));
     }
 	} else if(anno_type == "facepose") {
-		anno_facepose_type = AnnoFacePoseDatum_AnnoType_FACEPOSE;
+		anno_facepose_type = AnnoFaceAttributeDatum_AnnoType_FACEPOSE;
     while (infile >> filename >> labelname) {
       lines.push_back(std::make_pair(filename, labelname));
     }
@@ -198,7 +198,7 @@ int main(int argc, char** argv) {
   AnnotatedDatum anno_datum;
   Datum* datum = anno_datum.mutable_datum();
   AnnoFaceDatum anno_faceDatum;
-  AnnoFacePoseDatum anno_faceposeDatum;
+  AnnoFaceAttributeDatum anno_faceposeDatum;
   AnnoFaceContourDatum anno_faceContourDatum;
   AnnoFaceAngleDatum anno_faceAngleDatum;
   AnnotatedCCpdDatum anno_ccpdDatum;
@@ -249,7 +249,7 @@ int main(int argc, char** argv) {
 		  status = ReadRichFacePoseToAnnotatedDatum(filename,
           labelname, resize_height, resize_width, min_dim, max_dim, is_color,
           enc, anno_facepose_type, label_type, &anno_faceposeDatum);
-      anno_faceposeDatum.set_type(AnnoFacePoseDatum_AnnoType_FACEPOSE);
+      anno_faceposeDatum.set_type(AnnoFaceAttributeDatum_AnnoType_FACEPOSE);
 	  }else if(anno_type == "facecontour") {
       labelname = boost::get<std::string>(lines[line_id].second); // lines contain imagename & label.txt
 		  status = ReadRichFaceContourToAnnotatedDatum(filename,

@@ -11,5 +11,5 @@ if ! test -f ../../prototxt/detect_without_blur_occlu/face_test_v1.prototxt ;the
 fi
 
 ../../../../../build/tools/caffe train --solver=../../solver/solver_without_blur_occlu/solver_train_v1.prototxt -gpu 0 \
-#--snapshot=../../snapshot/face_detector_without_v1_iter_6796.solverstate
+#--snapshot=../../snapshot/face_detector_without_v1_iter_12241.solverstate
 

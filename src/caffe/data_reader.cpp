@@ -30,9 +30,9 @@ map<const string, weak_ptr<DataReader<AnnoFaceDatum>::Body> >
   DataReader<AnnoFaceDatum>::bodies_
   = map<const string, weak_ptr<DataReader<AnnoFaceDatum>::Body> >();
 template <>
-map<const string, weak_ptr<DataReader<AnnoFacePoseDatum>::Body> >
-  DataReader<AnnoFacePoseDatum>::bodies_
-  = map<const string, weak_ptr<DataReader<AnnoFacePoseDatum>::Body> >();
+map<const string, weak_ptr<DataReader<AnnoFaceAttributeDatum>::Body> >
+  DataReader<AnnoFaceAttributeDatum>::bodies_
+  = map<const string, weak_ptr<DataReader<AnnoFaceAttributeDatum>::Body> >();
 
 template <>
 map<const string, weak_ptr<DataReader<AnnoFaceContourDatum>::Body> >
@@ -161,7 +161,7 @@ void DataReader<T>::Body::read_one(db::Cursor* cursor, QueuePair* qp) {
 template class DataReader<Datum>;
 template class DataReader<AnnotatedDatum>;
 template class DataReader<AnnoFaceDatum>;
-template class DataReader<AnnoFacePoseDatum>;
+template class DataReader<AnnoFaceAttributeDatum>;
 template class DataReader<AnnoFaceContourDatum>;
 template class DataReader<AnnoFaceAngleDatum>;
 template class DataReader<AnnotatedCCpdDatum>;

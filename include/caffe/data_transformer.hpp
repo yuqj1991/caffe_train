@@ -146,29 +146,29 @@ class DataTransformer {
                  Blob<Dtype>* transformed_blob,
                  AnnotationFace* transformed_anno_vec);
 
-  void Transform(const AnnoFacePoseDatum& anno_datum,
+  void Transform(const AnnoFaceAttributeDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePose* transformed_annoface_all,
+                 AnnoFaceAttribute* transformed_annoface_all,
                  bool* do_mirror);
-  void Transform(const AnnoFacePoseDatum& anno_datum,
+  void Transform(const AnnoFaceAttributeDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePose* transformed_anno_vec);
+                 AnnoFaceAttribute* transformed_anno_vec);
   
   void Transform(const AnnoFaceContourDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFaceContourPoints* transformed_annoface_all,
+                 AnnoFaceLandmarks* transformed_annoface_all,
                  bool* do_mirror);
   void Transform(const AnnoFaceContourDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFaceContourPoints* transformed_anno_vec);
+                 AnnoFaceLandmarks* transformed_anno_vec);
   
   void Transform(const AnnoFaceAngleDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePoseOritation* transformed_annoface_all,
+                 AnnoFaceOritation* transformed_annoface_all,
                  bool* do_mirror);
   void Transform(const AnnoFaceAngleDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePoseOritation* transformed_anno_vec);
+                 AnnoFaceOritation* transformed_anno_vec);
 
   void Transform(const AnnotatedCCpdDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
@@ -202,20 +202,20 @@ class DataTransformer {
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
       AnnotationFace* transformed_annoface_all);
 
-  void TransformAnnoFacePose(
-      const AnnoFacePoseDatum& anno_datum, const bool do_resize,
+  void TransformAnnoFaceAttribute(
+      const AnnoFaceAttributeDatum& anno_datum, const bool do_resize,
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      AnnoFacePose* transformed_annoface_all);
+      AnnoFaceAttribute* transformed_annoface_all);
 
   void TransformAnnoFaceContour(
       const AnnoFaceContourDatum& anno_datum, const bool do_resize,
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      AnnoFaceContourPoints* transformed_annoface_all);
+      AnnoFaceLandmarks* transformed_annoface_all);
 
   void TransformAnnoFaceAngle(
       const AnnoFaceAngleDatum& anno_datum, const bool do_resize,
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      AnnoFacePoseOritation* transformed_annoface_all);
+      AnnoFaceOritation* transformed_annoface_all);
 
   void TransformAnnoCcpd(
       const AnnotatedCCpdDatum& anno_datum, const bool do_resize,
@@ -244,8 +244,8 @@ class DataTransformer {
   void ExpandImage(const AnnoFaceDatum& anno_datum,
                     AnnoFaceDatum* expanded_anno_datum);
 
-  void ExpandImage(const AnnoFacePoseDatum& anno_datum,
-                    AnnoFacePoseDatum* expanded_anno_datum);
+  void ExpandImage(const AnnoFaceAttributeDatum& anno_datum,
+                    AnnoFaceAttributeDatum* expanded_anno_datum);
   void ExpandImage(const AnnoFaceAngleDatum& anno_datum,
                     AnnoFaceAngleDatum* expanded_anno_datum);
   void ExpandImage(const AnnoFaceContourDatum& anno_datum,

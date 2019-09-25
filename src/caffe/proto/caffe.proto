@@ -157,21 +157,6 @@ message AnnotatedCCpdDatum {
   optional LicensePlate lpnumber = 3;
 }
 
-message FaceAttributes {
-  optional int32 blur = 1;
-  optional int32 occlusion = 2;
-}
-
-
-message AnnoBlurDatum{
-  enum AnnoType{
-    FACEBLUR = 0;
-  }
-  optional Datum datum =1;
-  optional AnnoType type =2;
-  optional FaceAttributes faceatti = 3;
-}
-
 // The normalized bounding box [0, 1] w.r.t. the input image size.
 message NormalizedBBox {
   optional float xmin = 1;
@@ -182,7 +167,6 @@ message NormalizedBBox {
   optional bool difficult = 6;
   optional float score = 7;
   optional float size = 8;
-  optional FaceAttributes faceattrib = 9;
 }
 
 // Annotation for each object instance.
@@ -204,8 +188,8 @@ message AnnotatedDatum {
     BBOX = 0;
   }
   enum AnnoataionAttriType {
-	FACE = 0;
-	NORMALL = 1;
+	  FACE = 0;
+	  NORMALL = 1;
   }
   optional Datum datum = 1;
   // If there are "rich" annotations, specify the type of annotation.
@@ -218,88 +202,49 @@ message AnnotatedDatum {
   repeated AnnotationGroup annotation_group = 4;
 }
 
-// the normalized lanmarks of five points which has been normalized [0, 1] w.r.t. the input image size.
-message LandmarkFace{
-  optional float x1 = 1;
-  optional float x2 = 2;
-  optional float x3 = 3;
-  optional float x4 = 4;
-  optional float x5 = 5;
-  optional float y1 = 6;
-  optional float y2 = 7;
-  optional float y3 = 8;
-  optional float y4 = 9;
-  optional float y5 = 10;
-}
-
-// Annotation face attritubite for each object.
-message AnnotationFace{
-  optional LandmarkFace markface = 1;
-  optional int32 gender = 2 [default = 0];
-  optional bool glasses = 3 [default = false];
-}
-
-// An extension of Datum which have "rich " face attributes
-message AnnoFaceDatum{
-  enum AnnotationType {
-    FACEMARK = 0;
-  }
-  optional Datum datum = 1;
-  optional AnnotationType type = 2;
-  optional AnnotationFace annoface = 3;
-}
 
 // the anno point has been normolizsed!
-message ContourPoint{
+message point{
   optional float x = 1;
   optional float y = 2;
 }
 
 // Annotation for face 21 points(coordinate for x and y)
-message AnnoFaceContourPoints{
-  optional ContourPoint point_1 = 1;
-  optional ContourPoint point_2 = 2;
-  optional ContourPoint point_3 = 3;
-  optional ContourPoint point_4 = 4;
-  optional ContourPoint point_5 = 5;
-  optional ContourPoint point_6 = 6;
-  optional ContourPoint point_7 = 7;
-  optional ContourPoint point_8 = 8;
-  optional ContourPoint point_9 = 9;
-  optional ContourPoint point_10 = 10;
-  optional ContourPoint point_11 = 11;
-  optional ContourPoint point_12 = 12;
-  optional ContourPoint point_13 = 13;
-  optional ContourPoint point_14 = 14;
-  optional ContourPoint point_15 = 15;
-  optional ContourPoint point_16 = 16;
-  optional ContourPoint point_17 = 17;
-  optional ContourPoint point_18 = 18;
-  optional ContourPoint point_19 = 19;
-  optional ContourPoint point_20 = 20;
-  optional ContourPoint point_21 = 21;
+message AnnoFaceLandmarks{
+  optional point leftEye = 1;
+  optional float visLeftEye = 2;
+  optional point rightEye = 3;
+  optional float visRightEye = 4;
+  optional point nose = 5;
+  optional float visNose = 6;
+  optional point leftMouth = 7;
+  optional float visLeftMouth = 8;
+  optional point rightMouth = 9;
+  optional float visRightMouth = 10;
 }
 
 // Annotation for face headpose contain yaw, roll, pitch 
-message AnnoFacePoseOritation{
+message AnnoFaceOritation{
   optional float yaw = 1;
   optional float pitch = 2;
   optional float roll = 3;
 }
 // Annotation for face headpose contain yaw, roll, pitch
-message AnnoFacePose{
-  optional AnnoFacePoseOritation faceOritation = 1;
-  optional AnnoFaceContourPoints faceCour=2;
+message AnnoFaceAttribute{
+  optional AnnoFaceOritation faceOritation = 1;
+  optional AnnoFaceLandmarks landMark=2;
+  optional int32 gender = 3 ;
+  optional int32 glass = 4;
 }
 
-// AnnofaceDataum with datum, and facepoints & AnnofacePose
-message AnnoFacePoseDatum{
+// AnnofaceDataum with datum, and facepoints & AnnoFaceAttribute
+message AnnoFaceAttributeDatum{
   enum AnnoType{
-    FACEPOSE =0;
+    FACEATTRIBUTE =0;
   }
   optional Datum datum =1;
   optional AnnoType type =2;
-  optional AnnoFacePose facePose =3;
+  optional AnnoFaceAttribute faceAttri =3;
 }
 
 // AnnofaceDataum with datum, and facepoints contour
@@ -309,7 +254,7 @@ message AnnoFaceContourDatum{
   }
   optional Datum datum =1;
   optional AnnoType type =2;
-  optional AnnoFaceContourPoints facecontour =3;
+  optional AnnoFaceLandmarks facecontour =3;
 }
 
 // AnnofaceDataum with datum, and faceangle
@@ -319,7 +264,7 @@ message AnnoFaceAngleDatum{
   }
   optional Datum datum =1;
   optional AnnoType type =2;
-  optional AnnoFacePoseOritation faceangle =3;
+  optional AnnoFaceOritation faceangle =3;
 }
 
 message FillerParameter {

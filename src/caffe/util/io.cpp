@@ -293,8 +293,8 @@ bool ReadRichFaceToAnnotatedDatum(const string& filename,
 bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
     const string& labelfile, const int height, const int width,
     const int min_dim, const int max_dim, const bool is_color,
-    const string& encoding, const AnnoFacePoseDatum_AnnoType type,
-    const string& labeltype, AnnoFacePoseDatum* anno_datum){
+    const string& encoding, const AnnoFaceAttributeDatum_AnnoType type,
+    const string& labeltype, AnnoFaceAttributeDatum* anno_datum){
   // Read image to datum.
   bool status = ReadImageToDatum(filename, -1, height, width,
                                  min_dim, max_dim, is_color, encoding,
@@ -308,7 +308,7 @@ bool ReadRichFacePoseToAnnotatedDatum(const string& filename,
   }
   // annno type bbox or attributes
   switch (type) {
-    case AnnoFacePoseDatum_AnnoType_FACEPOSE:
+    case AnnoFaceAttributeDatum_AnnoType_FACEPOSE:
       int ori_height, ori_width;
       GetImageSize(filename, &ori_height, &ori_width);
       if (labeltype == "txt") {
@@ -864,7 +864,7 @@ bool ReadBlurTxtToAnnotatedDatum(const string& labelfile, const int height,
 
 // Parse plain txt detection annotation: label_id, xmin, ymin, xmax, ymax.
 bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
-    const int width, AnnoFacePoseDatum* anno_datum) {
+    const int width, AnnoFaceAttributeDatum* anno_datum) {
   std::ifstream infile(labelfile.c_str());
   std::string lineStr ;
   std::stringstream sstr ;
@@ -873,89 +873,41 @@ bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
     return false;
   }
   LOG(INFO)<<labelfile;
-  float x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21; 
-  float y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12, y13, y14, y15, y16, y17, y18, y19, y20, y21;
+  float x1, x2, x3, x4, x5, y1, y2, y3, y4, y5, vis_point_1, vis_point_2, vis_point_3, vis_point_4, vis_point_5;
   float yaw, pitch, roll;
+  float pr_female, pr_male;
+  int booGlass;
   while (std::getline(infile, lineStr )) {
     sstr << lineStr;
-    sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> x6 >> x7 >> x8 >> x9 >> x10 >> x11 >> x12 >> x13 >> x14 
-        >> x15 >> x16 >> x17 >> x18 >> x19 >> x20 >> x21 >> y1 >> y2 >> y3 >> y4 >> y5 >> y6 >> y7 >> y8
-        >> y9 >> y10 >> y11 >> y12 >> y13 >> y14 >> y15 >> y16 >> y17 >> y18 >> y19 >> y20 >> y21 >> yaw
-        >> pitch >> roll;
+    sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5 >> vis_point_1 >> vis_point_2 >> vis_point_3
+        >> vis_point_4 >> vis_point_5 >> yaw >> pitch >> roll >> pr_female >> pr_male >> booGlass;
     float xf1 = float(x1/width), yf1 = float(y1/height);float xf2 = float(x2/width), yf2 = float(y2/height);
     float xf3 = float(x3/width), yf3 = float(y3/height);float xf4 = float(x4/width), yf4 = float(y4/height);
-    float xf5 = float(x5/width), yf5 = float(y5/height);float xf6 = float(x6/width), yf6 = float(y6/height);
-    float xf7 = float(x7/width), yf7 = float(y7/height);float xf8 = float(x8/width), yf8 = float(y8/height);
-    float xf9 = float(x9/width), yf9 = float(y9/height);float xf10 = float(x10/width), yf10 = float(y10/height);
-    float xf11 = float(x11/width), yf11 = float(y11/height);float xf12 = float(x12/width), yf12 = float(y12/height);
-    float xf13 = float(x13/width), yf13 = float(y13/height);float xf14 = float(x14/width), yf14 = float(y14/height);
-    float xf15 = float(x15/width), yf15 = float(y15/height);float xf16 = float(x16/width), yf16 = float(y16/height);
-    float xf17 = float(x17/width), yf17 = float(y17/height);float xf18 = float(x18/width), yf18 = float(y18/height);
-    float xf19 = float(x19/width), yf19 = float(y19/height);float xf20 = float(x20/width), yf20 = float(y20/height);
-    float xf21 = float(x21/width), yf21 = float(y21/height);
+    float xf5 = float(x5/width), yf5 = float(y5/height);
     LOG(INFO)<<"origin height: "<< height << " origin width:  "<<width << " point: " << x1 <<" "<<y1<<" "
              << x2 <<" "<< y2<<" "<< x3 <<" "<< y3 <<" "<< x4 <<" " << y4 <<" "<< x5 <<" "<< y5 <<" " 
              << x6 <<" "<< y6<<" "<< x7 <<" "<< y7 <<" "<< x8 <<" "<< y8 <<" "<< x9 <<" "<< y9 <<" "
              << x10 <<" "<< y10 <<" "<< x11 <<" "<<y11 << " "<< x12 <<" "<< y12 <<" "<< x13 <<" "<< y13 <<" "
              << x14 <<" " << y14 <<" "<< x15 <<" " << y15 <<" "<< x16 <<" "<< y16 <<" "<< x17 <<" "<< y17 <<" "
              << x18 <<" "<< y18 <<" "<< x19 <<" " << y19 <<" "<< x20 <<" " << y20 <<" "<< x21<<" "<<y21 << " "<< yaw <<" "<< pitch <<" "<< roll;
-    LOG(INFO)<< xf1 <<" "<<yf1 <<" "<< xf2 <<" "<< yf2 <<" "<< xf3 <<" "<< yf3 <<" "<< xf4 << yf4 <<" "
-             << xf5 <<" "<< yf5 <<" "<< xf6 <<" "<< yf6 <<" "<< xf7 <<" "<< yf7 <<" "<< xf8 <<" "<< yf8 <<" "
-             << xf9 <<" " << yf9 <<" "<< xf10 <<" " << yf10 <<" "<< xf11 <<" "<< yf11 <<" "<< xf12 <<" "<< yf12 <<" "
-             << xf13 <<" "<< yf13 <<" "<< xf14 <<" " << yf14 <<" "<< xf15 <<" "<< yf15 <<" "<< xf16 <<" "<< yf16 <<" "
-             << xf17 <<" "<< yf17 <<" "<< xf18 <<" "<< yf18 <<" "<< xf19 <<" " << yf19 <<" " << xf20 <<" "<< yf20 <<" "<< xf21<<" "
-             <<yf21 << " "<< yaw <<" "<< pitch <<" "<< roll;
-    AnnoFacePose* anno = NULL;
+    AnnoFaceAttribute* anno = NULL;
     anno = anno_datum->mutable_facepose();
     // Store the normalized bounding box.
-    AnnoFaceContourPoints* landface = anno->mutable_facecour();
-    AnnoFacePoseOritation* faceOri = anno->mutable_faceoritation();
-    faceOri->set_yaw(float(yaw/360));
-    faceOri->set_pitch(float(pitch/360));
-    faceOri->set_roll(float(roll/360));
-    landface->mutable_point_1()->set_x(xf1);
-    landface->mutable_point_1()->set_y(yf1);
-    landface->mutable_point_2()->set_x(xf2);
-    landface->mutable_point_2()->set_y(yf2);
-    landface->mutable_point_3()->set_x(xf3);
-    landface->mutable_point_3()->set_y(yf3);
-    landface->mutable_point_4()->set_x(xf4);
-    landface->mutable_point_4()->set_y(yf4);
+    AnnoFaceLandmarks* landface = anno->mutable_landMark();
+    AnnoFaceOritation* faceOri = anno->mutable_faceoritation();
+    faceOri->set_yaw(float(yaw));
+    faceOri->set_pitch(float(pitch));
+    faceOri->set_roll(float(roll));
+    landface->mutable_leftEye()->set_x(xf1);
+    landface->mutable_leftEye()->set_y(yf1);
+    landface->mutable_rightEye()->set_x(xf2);
+    landface->mutable_rightEye()->set_y(yf2);
+    landface->mutable_nose()->set_x(xf3);
+    landface->mutable_nose()->set_y(yf3);
+    landface->mutable_leftmouth()->set_x(xf4);
+    landface->mutable_leftmouth()->set_y(yf4);
     landface->mutable_point_5()->set_x(xf5);
     landface->mutable_point_5()->set_y(yf5);
-    landface->mutable_point_6()->set_x(xf6);
-    landface->mutable_point_6()->set_y(yf6);
-    landface->mutable_point_7()->set_x(xf7);
-    landface->mutable_point_7()->set_y(yf7);
-    landface->mutable_point_8()->set_x(xf8);
-    landface->mutable_point_8()->set_y(yf8);
-    landface->mutable_point_9()->set_x(xf9);
-    landface->mutable_point_9()->set_y(yf9);
-    landface->mutable_point_10()->set_x(xf10);
-    landface->mutable_point_10()->set_y(yf10);
-
-    landface->mutable_point_11()->set_x(xf11);
-    landface->mutable_point_11()->set_y(yf11);
-    landface->mutable_point_12()->set_x(xf12);
-    landface->mutable_point_12()->set_y(yf12);
-    landface->mutable_point_13()->set_x(xf13);
-    landface->mutable_point_13()->set_y(yf13);
-    landface->mutable_point_14()->set_x(xf14);
-    landface->mutable_point_14()->set_y(yf14);
-    landface->mutable_point_15()->set_x(xf15);
-    landface->mutable_point_15()->set_y(yf15);
-    landface->mutable_point_16()->set_x(xf16);
-    landface->mutable_point_16()->set_y(yf16);
-    landface->mutable_point_17()->set_x(xf17);
-    landface->mutable_point_17()->set_y(yf17);
-    landface->mutable_point_18()->set_x(xf18);
-    landface->mutable_point_18()->set_y(yf18);
-    landface->mutable_point_19()->set_x(xf19);
-    landface->mutable_point_19()->set_y(yf19);
-    landface->mutable_point_20()->set_x(xf20);
-    landface->mutable_point_20()->set_y(yf20);
-    landface->mutable_point_21()->set_x(xf21);
-    landface->mutable_point_21()->set_y(yf21);
     sstr.clear();
   }
   infile.close();
@@ -972,62 +924,23 @@ bool ReadFaceContourTxtToAnnotatedDatum(const string& labelfile, const int heigh
     LOG(INFO) << "Cannot open " << labelfile;
     return false;
   }
-  float x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21; 
-  float y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12, y13, y14, y15, y16, y17, y18, y19, y20, y21;
+  float x1, x2, x3, x4, x5; 
+  float y1, y2, y3, y4, y5;
   while (std::getline(infile, lineStr )) {
     sstr << lineStr;
-    sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> x6 >> x7 >> x8 >> x9 >> x10 >> x11 >> x12 >> x13 >> x14 
-        >> x15 >> x16 >> x17 >> x18 >> x19 >> x20 >> x21 >> y1 >> y2 >> y3 >> y4 >> y5 >> y6 >> y7 >> y8
-        >> y9 >> y10 >> y11 >> y12 >> y13 >> y14 >> y15 >> y16 >> y17 >> y18 >> y19 >> y20 >> y21 ;
-    LOG(INFO)<< x1 <<" "<< x2 <<" "<< x3 <<" "<< x4 <<" " << x5 <<" "<< x6 <<" "<< x7 <<" "<< x8 <<" "<< x9 <<" " << x10 <<" "
-             << x11 <<" "<< x12 <<" "<< x13 <<" "<< x14 <<" " << x15 <<" "<< x16 <<" "<< x17 <<" "<< x18 <<" "<< x19 <<" " << x20 <<" "<< x21<<" "
-             <<y1 <<" "<< y2 <<" "<< y3 <<" "<< y4 <<" " << y5 <<" "<< y6 <<" "<< y7 <<" "<< y8 <<" "<< y9 <<" " << y10 <<" "
-             << y11 <<" "<< y12 <<" "<< y13 <<" "<< y14 <<" " << y15 <<" "<< y16 <<" "<< y17 <<" "<< y18 <<" "<< y19 <<" " << y20 <<" "
-             <<y21;
+    sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5;
     // Store the normalized bounding box.
-    AnnoFaceContourPoints* landface = anno_datum->mutable_facecontour();
-    landface->mutable_point_1()->set_x(float(x1/width));
-    landface->mutable_point_1()->set_y(float(y1/height));
-    landface->mutable_point_2()->set_x(float(x2/width));
-    landface->mutable_point_2()->set_y(float(y2/height));
-    landface->mutable_point_3()->set_x(float(x3/width));
-    landface->mutable_point_3()->set_y(float(y3/height));
-    landface->mutable_point_4()->set_x(float(x4/width));
-    landface->mutable_point_4()->set_y(float(y4/height));
+    AnnoFaceLandmarks* landface = anno_datum->mutable_facecontour();
+    landface->mutable_leftEye()->set_x(float(x1/width));
+    landface->mutable_leftEye()->set_y(float(y1/height));
+    landface->mutable_rightEye()->set_x(float(x2/width));
+    landface->mutable_rightEye()->set_y(float(y2/height));
+    landface->mutable_nose()->set_x(float(x3/width));
+    landface->mutable_nose()->set_y(float(y3/height));
+    landface->mutable_leftmouth()->set_x(float(x4/width));
+    landface->mutable_leftmouth()->set_y(float(y4/height));
     landface->mutable_point_5()->set_x(float(x5/width));
     landface->mutable_point_5()->set_y(float(y5/height));
-    landface->mutable_point_6()->set_x(float(x6/width));
-    landface->mutable_point_6()->set_y(float(y6/height));
-    landface->mutable_point_7()->set_x(float(x7/width));
-    landface->mutable_point_7()->set_y(float(y7/height));
-    landface->mutable_point_8()->set_x(float(x8/width));
-    landface->mutable_point_8()->set_y(float(y8/height));
-    landface->mutable_point_9()->set_x(float(x9/width));
-    landface->mutable_point_9()->set_y(float(y9/height));
-    landface->mutable_point_10()->set_x(float(x10/width));
-    landface->mutable_point_10()->set_y(float(y10/height));
-    landface->mutable_point_11()->set_x(float(x11/width));
-    landface->mutable_point_11()->set_y(float(y11/height));
-    landface->mutable_point_12()->set_x(float(x12/width));
-    landface->mutable_point_12()->set_y(float(y12/height));
-    landface->mutable_point_13()->set_x(float(x13/width));
-    landface->mutable_point_13()->set_y(float(y13/height));
-    landface->mutable_point_14()->set_x(float(x14/width));
-    landface->mutable_point_14()->set_y(float(y14/height));
-    landface->mutable_point_15()->set_x(float(x15/width));
-    landface->mutable_point_15()->set_y(float(y15/height));
-    landface->mutable_point_16()->set_x(float(x16/width));
-    landface->mutable_point_16()->set_y(float(y16/height));
-    landface->mutable_point_17()->set_x(float(x17/width));
-    landface->mutable_point_17()->set_y(float(y17/height));
-    landface->mutable_point_18()->set_x(float(x18/width));
-    landface->mutable_point_18()->set_y(float(y18/height));
-    landface->mutable_point_19()->set_x(float(x19/width));
-    landface->mutable_point_19()->set_y(float(y19/height));
-    landface->mutable_point_20()->set_x(float(x20/width));
-    landface->mutable_point_20()->set_y(float(y20/height));
-    landface->mutable_point_21()->set_x(float(x21/width));
-    landface->mutable_point_21()->set_y(float(y21/height));
     sstr.clear();
   }
   infile.close();
@@ -1049,7 +962,7 @@ bool ReadFaceAngleTxtToAnnotatedDatum(const string& labelfile, const int height,
     sstr << lineStr;
     sstr >> yaw >> pitch >> roll;
     LOG(INFO)<< " "<< yaw <<" "<< pitch <<" "<< roll;
-    AnnoFacePoseOritation* faceOri = anno_datum->mutable_faceangle();
+    AnnoFaceOritation* faceOri = anno_datum->mutable_faceangle();
     faceOri->set_yaw(float(yaw));
     faceOri->set_pitch(float(pitch));
     faceOri->set_roll(float(roll));
