@@ -1,7 +1,7 @@
-name: "deep_face_landmarknet"
+name: "deep_face_attribute"
 layer {
 	name: "data"
-	type: "faceAnnoData"
+	type: "faceAttributeData"
 	top: "data"
 	top: "label"
 	include {
@@ -16,8 +16,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 128
-			width: 128
+			height: 96
+			width: 96
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
@@ -43,8 +43,8 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../../dataset/facedata/mtfl/lmdb/mtfl_training_lmdb/"
-		batch_size: 16
+		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_training_umdface_pose_lmdb/"
+		batch_size: 48
 		backend: LMDB
 	}
 }
@@ -1841,7 +1841,7 @@ layer {
     name: "res5a_branch1"
     type: "Convolution"
     convolution_param {
-        num_output: 512
+        num_output: 256
         kernel_size: 1
         pad: 0
         stride: 2
@@ -1879,7 +1879,7 @@ layer {
     name: "res5a_branch2a"
     type: "Convolution"
     convolution_param {
-        num_output: 512
+        num_output: 256
         kernel_size: 3
         pad: 1
         stride: 2
@@ -1925,7 +1925,7 @@ layer {
     name: "res5a_branch2b"
     type: "Convolution"
     convolution_param {
-        num_output: 512
+        num_output: 256
         kernel_size: 3
         pad: 1
         stride: 1
@@ -1982,7 +1982,7 @@ layer {
     name: "res5b_branch2a"
     type: "Convolution"
     convolution_param {
-        num_output: 512
+        num_output: 256
         kernel_size: 3
         pad: 1
         stride: 1
@@ -2028,7 +2028,7 @@ layer {
     name: "res5b_branch2b"
     type: "Convolution"
     convolution_param {
-        num_output: 512
+        num_output: 256
         kernel_size: 3
         pad: 1
         stride: 1
@@ -2093,7 +2093,7 @@ layer {
 	}
 	inner_product_param {
 		#kernel_size: 1
-		num_output: 256
+		num_output: 64
 		weight_filler {
 			type: "xavier"
 		}
@@ -2118,7 +2118,7 @@ layer {
 	}
 	inner_product_param {
 		#kernel_size: 1
-		num_output: 64
+		num_output: 16
 		weight_filler {
 			type: "xavier"
 		}

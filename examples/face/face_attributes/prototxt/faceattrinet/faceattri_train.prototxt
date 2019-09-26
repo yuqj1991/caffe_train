@@ -1,7 +1,7 @@
 name: "deep_face_attribute"
 layer {
 	name: "data"
-	type: "faceAngleData"
+	type: "faceAttributeData"
 	top: "data"
 	top: "label"
 	include {
@@ -9,15 +9,15 @@ layer {
 	}
 	transform_param {
 		scale: 0.007843
-		mirror: false
+		mirror: true
 		mean_value: 127.5
 		mean_value: 127.5
 		mean_value: 127.5
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 128
-			width: 128
+			height: 96
+			width: 96
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
