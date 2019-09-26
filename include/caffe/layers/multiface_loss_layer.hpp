@@ -33,11 +33,12 @@ class MultiFaceLossLayer : public LossLayer<Dtype> {
       const vector<Blob<Dtype>*>& top);
 
   virtual inline const char* type() const { return "MultiFaceLoss"; }
-  // bottom[0] stores the landmark predictions.
-  // bottom[1] stores the gender predictions.
-  // bottom[2] stores the glasses predictions.
-  // bottom[3] stores the groundtruth labels.
-  virtual inline int ExactNumBottomBlobs() const { return 4; }
+  // bottom[0] stores the landmark predictions. 
+  // bottom[1] stores the faceangle predictions
+  // bottom[2] stores the gender predictions.
+  // bottom[3] stores the glasses predictions.
+  // bottom[4] stores the groundtruth labels.
+  virtual inline int ExactNumBottomBlobs() const { return 5; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
@@ -91,9 +92,22 @@ class MultiFaceLossLayer : public LossLayer<Dtype> {
   // confidence loss.
   Blob<Dtype> glasses_loss_;
 
+  // The internal category loss layer.
+  shared_ptr<Layer<Dtype> > angle_loss_layer_;
+  MarkLossType angle_loss_type_;
+  float angle_weight_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> angle_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> angle_top_vec_;
+  // blob which stores the  prediction.
+  Blob<Dtype> angle_pred_;
+  // blob which stores the corresponding ground truth label.
+  Blob<Dtype> angle_gt_;
+  //  loss.
+  Blob<Dtype> angle_loss_;
 
-
-  MultiFaceLossParameter multiface_loss_param_;
+  MultiFaceAttriLossParameter multiface_loss_param_;
   int num_gender_;
   int num_glasses_;
   int batch_size_;

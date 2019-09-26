@@ -1,9 +1,11 @@
 name: "deep_face_landmarknet"
 input: "data"
-input_dim: 1
-input_dim: 3
-input_dim: 96
-input_dim: 96
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 96
+  dim: 96
+}
 layer {
 	name: "conv_0"
 	type: "Convolution"

@@ -108,7 +108,7 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     Dtype* top_label = NULL;  // suppress warnings about uninitialized variables
 
       // Store transformed annotation.
-    map<int, AnnoFacePoseOritation > all_anno;
+    map<int, AnnoFaceOritation > all_anno;
 
     if (this->output_labels_ && !has_anno_type_) {
         top_label = batch->label_.mutable_cpu_data();
@@ -117,24 +117,6 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         timer.Start();
         // get a anno_datum
         AnnoFaceAngleDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
-        #if 0
-        int size_group = anno_datum.annotation_group_size();
-        LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
-        for(int ii=0; ii< size_group; ii++)
-        {
-            const AnnotationGroup& anno_group = anno_datum.annotation_group(ii);
-            int anno_size = anno_group.annotation_size();
-            for(int jj=0; jj<anno_size; jj++)
-            {
-                const Annotation& anno = anno_group.annotation(jj);
-                const NormalizedBBox& bbox = anno.bbox();
-                LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
-                        <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                        <<" bbox->blur: "<<bbox.blur()<<" bbox->occlusion: "<<bbox.occlusion();
-            }
-        }
-        LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";
-    #endif
         AnnoFaceAngleDatum distort_datum;
         AnnoFaceAngleDatum* expand_datum = NULL;
         if (transform_param.has_distort_param()) {
@@ -176,7 +158,7 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         // Apply data transformations (mirror, scale, crop...)
         int offset = batch->data_.offset(item_id);
         this->transformed_data_.set_cpu_data(top_data + offset);
-        AnnoFacePoseOritation transformed_anno_vec;
+        AnnoFaceOritation transformed_anno_vec;
         if (this->output_labels_) {
             if (has_anno_type_) {
                 // Transform datum and annotation_group at the same time
@@ -214,7 +196,7 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
             for (int item_id = 0; item_id < batch_size; ++item_id) {
-                AnnoFacePoseOritation face = all_anno[item_id];
+                AnnoFaceOritation face = all_anno[item_id];
                 top_label[idx++] = face.yaw();
                 top_label[idx++] = face.pitch();
                 top_label[idx++] = face.roll();
@@ -223,22 +205,6 @@ void faceAngleDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             LOG(FATAL) << "Unknown annotation type.";
         }
     }
-#if 0
-  LOG(INFO)<< "start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& single image: num_bboxes: "<<num_bboxes;
-  const Dtype* top_label_data = batch->label_.cpu_data();
-  for(int ii=0; ii < num_bboxes; ii++)
-  {
-    int id = ii*10;
-    LOG(INFO) <<"batch_id: "<<top_label_data[id]<<" anno_label: "<<top_label_data[id+1]
-              <<" anno.instance_id: "<<top_label_data[id+2];
-    LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
-              <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
-              <<" bbox->blur: "<<top_label_data[id+7]<<" bbox->occlusion: "<<top_label_data[id+8]
-              <<" bbox->difficult: "<<top_label_data[id+9];
-  }
-  LOG(INFO)<< "finished **************************************************** end ";
-#endif 
-
     timer.Stop();
     batch_timer.Stop();
     DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";

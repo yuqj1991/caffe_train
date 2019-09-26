@@ -6,7 +6,6 @@
 #include "caffe/common.hpp"
 #include "caffe/data_reader.hpp"
 #include "caffe/layers/annotated_data_layer.hpp"
-#include "caffe/layers/faceData_layer.hpp"
 #include "caffe/layers/data_layer.hpp"
 #include "caffe/proto/caffe.pb.h"
 
@@ -26,13 +25,9 @@ map<const string, weak_ptr<DataReader<AnnotatedDatum>::Body> >
   DataReader<AnnotatedDatum>::bodies_
   = map<const string, weak_ptr<DataReader<AnnotatedDatum>::Body> >();
 template <>
-map<const string, weak_ptr<DataReader<AnnoFaceDatum>::Body> >
-  DataReader<AnnoFaceDatum>::bodies_
-  = map<const string, weak_ptr<DataReader<AnnoFaceDatum>::Body> >();
-template <>
-map<const string, weak_ptr<DataReader<AnnoFacePoseDatum>::Body> >
-  DataReader<AnnoFacePoseDatum>::bodies_
-  = map<const string, weak_ptr<DataReader<AnnoFacePoseDatum>::Body> >();
+map<const string, weak_ptr<DataReader<AnnoFaceAttributeDatum>::Body> >
+  DataReader<AnnoFaceAttributeDatum>::bodies_
+  = map<const string, weak_ptr<DataReader<AnnoFaceAttributeDatum>::Body> >();
 
 template <>
 map<const string, weak_ptr<DataReader<AnnoFaceContourDatum>::Body> >
@@ -46,10 +41,6 @@ template <>
 map<const string, weak_ptr<DataReader<AnnotatedCCpdDatum>::Body> >
   DataReader<AnnotatedCCpdDatum>::bodies_
   = map<const string, weak_ptr<DataReader<AnnotatedCCpdDatum>::Body> >();
-template <>
-map<const string, weak_ptr<DataReader<AnnoBlurDatum>::Body> >
-  DataReader<AnnoBlurDatum>::bodies_
-  = map<const string, weak_ptr<DataReader<AnnoBlurDatum>::Body> >();
 static boost::mutex bodies_mutex_;
 
 template <typename T>
@@ -160,10 +151,8 @@ void DataReader<T>::Body::read_one(db::Cursor* cursor, QueuePair* qp) {
 // Instance class
 template class DataReader<Datum>;
 template class DataReader<AnnotatedDatum>;
-template class DataReader<AnnoFaceDatum>;
-template class DataReader<AnnoFacePoseDatum>;
+template class DataReader<AnnoFaceAttributeDatum>;
 template class DataReader<AnnoFaceContourDatum>;
 template class DataReader<AnnoFaceAngleDatum>;
 template class DataReader<AnnotatedCCpdDatum>;
-template class DataReader<AnnoBlurDatum>;
 }  // namespace caffe

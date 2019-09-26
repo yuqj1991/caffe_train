@@ -86,11 +86,11 @@ class DataTransformer {
   void TransformDAS(const AnnotatedDatum& anno_datum, 
                     const NormalizedBBox& crop_bbox,
                     RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all);
-
+/*
   void RotateImage(const AnnoFaceDatum& anno_datum,
 												AnnoFaceDatum* Rotate_datum);
 
-
+*/
 
   /**
    * @brief Transform the annotation according to the transformation applied
@@ -126,49 +126,30 @@ class DataTransformer {
   void CropImage(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
                  AnnotatedDatum* cropped_anno_datum);
 
-  /**
-   * @brief Applies the transformation defined in the data layer's
-   * transform_param block to the annotated data.
-   *
-   * @param anno_datum
-   *    AnnoFaceDatum containing the data and annotation to be transformed.
-   * @param transformed_blob
-   *    This is destination blob. It can be part of top blob's data if
-   *    set_cpu_data() is used. See annotated_data_layer.cpp for an example.
-   * @param transformed_anno_vec
-   *    This is destination annotation.
-   */
-  void Transform(const AnnoFaceDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 AnnotationFace* transformed_anno_vec,
-                 bool* do_mirror);
-  void Transform(const AnnoFaceDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 AnnotationFace* transformed_anno_vec);
 
-  void Transform(const AnnoFacePoseDatum& anno_datum,
+  void Transform(const AnnoFaceAttributeDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePose* transformed_annoface_all,
+                 AnnoFaceAttribute* transformed_annoface_all,
                  bool* do_mirror);
-  void Transform(const AnnoFacePoseDatum& anno_datum,
+  void Transform(const AnnoFaceAttributeDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePose* transformed_anno_vec);
+                 AnnoFaceAttribute* transformed_anno_vec);
   
   void Transform(const AnnoFaceContourDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFaceContourPoints* transformed_annoface_all,
+                 AnnoFaceLandmarks* transformed_annoface_all,
                  bool* do_mirror);
   void Transform(const AnnoFaceContourDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFaceContourPoints* transformed_anno_vec);
+                 AnnoFaceLandmarks* transformed_anno_vec);
   
   void Transform(const AnnoFaceAngleDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePoseOritation* transformed_annoface_all,
+                 AnnoFaceOritation* transformed_annoface_all,
                  bool* do_mirror);
   void Transform(const AnnoFaceAngleDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
-                 AnnoFacePoseOritation* transformed_anno_vec);
+                 AnnoFaceOritation* transformed_anno_vec);
 
   void Transform(const AnnotatedCCpdDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
@@ -177,55 +158,28 @@ class DataTransformer {
   void Transform(const AnnotatedCCpdDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
                  LicensePlate* transformed_anno_vec);
-  void Transform(const AnnoBlurDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 FaceAttributes* transformed_annoface_all,
-                 bool* do_mirror);
-  void Transform(const AnnoBlurDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 FaceAttributes* transformed_anno_vec);
-  /**
-   * @brief Transform the annotation according to the transformation applied
-   * to the datum.
-   *
-   * @param anno_datum
-   *    AnnoFaceDatum containing the data and annotation to be transformed.
-   * @param do_resize
-   *    If true, resize the annotation accordingly before crop.
-   * @param do_mirror
-   *    If true, meaning the datum has mirrored.
-   * @param transformed_anno_group_all
-   *    Stores all transformed AnnotationFace.
-   */
-  void TransformAnnoFace(
-      const AnnoFaceDatum& anno_datum, const bool do_resize,
-      const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      AnnotationFace* transformed_annoface_all);
 
-  void TransformAnnoFacePose(
-      const AnnoFacePoseDatum& anno_datum, const bool do_resize,
+
+  void TransformAnnoFaceAttribute(
+      const AnnoFaceAttributeDatum& anno_datum, const bool do_resize,
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      AnnoFacePose* transformed_annoface_all);
+      AnnoFaceAttribute* transformed_annoface_all);
 
   void TransformAnnoFaceContour(
       const AnnoFaceContourDatum& anno_datum, const bool do_resize,
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      AnnoFaceContourPoints* transformed_annoface_all);
+      AnnoFaceLandmarks* transformed_annoface_all);
 
   void TransformAnnoFaceAngle(
       const AnnoFaceAngleDatum& anno_datum, const bool do_resize,
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      AnnoFacePoseOritation* transformed_annoface_all);
+      AnnoFaceOritation* transformed_annoface_all);
 
   void TransformAnnoCcpd(
       const AnnotatedCCpdDatum& anno_datum, const bool do_resize,
       const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
       LicensePlate* transformed_annoface_all);
 
-  void TransformFaceBlur(
-    const AnnoBlurDatum& anno_datum, const bool do_resize,
-    const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-    FaceAttributes* transformed_annoface_all);
 
 
 
@@ -241,19 +195,15 @@ class DataTransformer {
   void ExpandImage(const AnnotatedDatum& anno_datum,
                    AnnotatedDatum* expanded_anno_datum);
 
-  void ExpandImage(const AnnoFaceDatum& anno_datum,
-                    AnnoFaceDatum* expanded_anno_datum);
 
-  void ExpandImage(const AnnoFacePoseDatum& anno_datum,
-                    AnnoFacePoseDatum* expanded_anno_datum);
+  void ExpandImage(const AnnoFaceAttributeDatum& anno_datum,
+                    AnnoFaceAttributeDatum* expanded_anno_datum);
   void ExpandImage(const AnnoFaceAngleDatum& anno_datum,
                     AnnoFaceAngleDatum* expanded_anno_datum);
   void ExpandImage(const AnnoFaceContourDatum& anno_datum,
                     AnnoFaceContourDatum* expanded_anno_datum);
   void ExpandImage(const AnnotatedCCpdDatum& anno_datum,
                     AnnotatedCCpdDatum* expanded_anno_datum);
-  void ExpandImage(const AnnoBlurDatum& anno_datum,
-                    AnnoBlurDatum* expanded_anno_datum);
   /**
    * @brief Apply distortion to the datum.
    */

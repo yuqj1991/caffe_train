@@ -31,7 +31,7 @@ def init_my_logger():
 
     return logger
 
-def read_from_file(file_name, chunk_size=50000):
+def read_from_file(file_name, chunk_size=500000):
     reader = pd.read_csv(file_name, iterator=True)
     chunks = []
     mark = True

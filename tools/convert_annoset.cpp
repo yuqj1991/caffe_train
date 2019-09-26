@@ -41,7 +41,7 @@ DEFINE_bool(shuffle, false,
 DEFINE_string(backend, "lmdb",
     "The backend {lmdb, leveldb} for storing the result");
 DEFINE_string(anno_type, "classification",
-    "The type of annotation {classification, detection, faceattributes, facepose}.");
+    "The type of annotation {classification, detection, faceattributes, faceattri}.");
 DEFINE_string(label_type, "xml",
     "The type of annotation file format.{xml , txt}");
 DEFINE_string(label_map_file, "",
@@ -88,14 +88,10 @@ int main(int argc, char** argv) {
   const string encode_type = FLAGS_encode_type;
   const string anno_type = FLAGS_anno_type;
   AnnotatedDatum_AnnotationType type;
-  AnnotatedDatum_AnnoataionAttriType face_det_attri_type;
-  AnnotatedDatum_AnnoataionAttriType ccpd_det_attri_type;
-  AnnoFaceDatum_AnnotationType anno_face_attri_type;
-  AnnoFacePoseDatum_AnnoType anno_facepose_type;
+  AnnoFaceAttributeDatum_AnnoType anno_face;
   AnnoFaceContourDatum_AnnoType anno_facecontour_type;
   AnnoFaceAngleDatum_AnnoType anno_faceangle_type;
   AnnotatedCCpdDatum_AnnotationType anno_ccpd_type;
-  AnnoBlurDatum_AnnoType anno_Blur_type;
   const string label_type = FLAGS_label_type;
   const string label_map_file = FLAGS_label_map_file;
   const bool check_label = FLAGS_check_label;
@@ -110,9 +106,8 @@ int main(int argc, char** argv) {
     while (infile >> filename >> label) {
       lines.push_back(std::make_pair(filename, label));
     }
-  } else if (anno_type == "detection_face") {
+  } else if (anno_type == "detection") {
     type = AnnotatedDatum_AnnotationType_BBOX;
-    face_det_attri_type = AnnotatedDatum_AnnoataionAttriType_FACE;
     LabelMap label_map;
     CHECK(ReadProtoFromTextFile(label_map_file, &label_map))
         << "Failed to read label map file.";
@@ -121,24 +116,8 @@ int main(int argc, char** argv) {
     while (infile >> filename >> labelname) {
       lines.push_back(std::make_pair(filename, labelname));
     }
-  }else if (anno_type == "detection") {
-    type = AnnotatedDatum_AnnotationType_BBOX;
-    ccpd_det_attri_type = AnnotatedDatum_AnnoataionAttriType_NORMALL;
-    LabelMap label_map;
-    CHECK(ReadProtoFromTextFile(label_map_file, &label_map))
-        << "Failed to read label map file.";
-    CHECK(MapNameToLabel(label_map, check_label, &name_to_label))
-        << "Failed to convert name to label.";
-    while (infile >> filename >> labelname) {
-      lines.push_back(std::make_pair(filename, labelname));
-    }
-  }else if(anno_type == "faceattributes") {
-		anno_face_attri_type = AnnoFaceDatum_AnnotationType_FACEMARK;
-    while (infile >> filename >> labelname) {
-      lines.push_back(std::make_pair(filename, labelname));
-    }
-	} else if(anno_type == "facepose") {
-		anno_facepose_type = AnnoFacePoseDatum_AnnoType_FACEPOSE;
+  } else if(anno_type == "faceattributes") {
+		anno_face = AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE;
     while (infile >> filename >> labelname) {
       lines.push_back(std::make_pair(filename, labelname));
     }
@@ -154,16 +133,6 @@ int main(int argc, char** argv) {
     }
 	} else if (anno_type == "Rec_ccpd") {
     anno_ccpd_type = AnnotatedCCpdDatum_AnnotationType_CCPD;
-    LabelMap label_map;
-    CHECK(ReadProtoFromTextFile(label_map_file, &label_map))
-        << "Failed to read label map file.";
-    CHECK(MapNameToLabel(label_map, check_label, &name_to_label))
-        << "Failed to convert name to label.";
-    while (infile >> filename >> labelname) {
-      lines.push_back(std::make_pair(filename, labelname));
-    } 
-  }else if (anno_type == "faceBlur") {
-    anno_Blur_type = AnnoBlurDatum_AnnoType_FACEBLUR;
     LabelMap label_map;
     CHECK(ReadProtoFromTextFile(label_map_file, &label_map))
         << "Failed to read label map file.";
@@ -197,12 +166,11 @@ int main(int argc, char** argv) {
   std::string root_folder(argv[1]);
   AnnotatedDatum anno_datum;
   Datum* datum = anno_datum.mutable_datum();
-  AnnoFaceDatum anno_faceDatum;
-  AnnoFacePoseDatum anno_faceposeDatum;
+  AnnoFaceAttributeDatum anno_faceAttriDatum;
   AnnoFaceContourDatum anno_faceContourDatum;
   AnnoFaceAngleDatum anno_faceAngleDatum;
   AnnotatedCCpdDatum anno_ccpdDatum;
-  AnnoBlurDatum anno_BlurDatum;
+
   int count = 0;
   int data_size = 0;
   bool data_size_initialized = false;
@@ -224,32 +192,18 @@ int main(int argc, char** argv) {
       label = boost::get<int>(lines[line_id].second);
       status = ReadImageToDatum(filename, label, resize_height, resize_width,
           min_dim, max_dim, is_color, enc, datum);
-    } else if (anno_type == "detection_face") {
-      labelname = boost::get<std::string>(lines[line_id].second);
-      status = ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
-          resize_width, min_dim, max_dim, is_color, enc, type, face_det_attri_type, label_type,
-          name_to_label, &anno_datum);
-      anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
-      anno_datum.set_attri_type(AnnotatedDatum_AnnoataionAttriType_FACE);
     }else if (anno_type == "detection") {
       labelname = boost::get<std::string>(lines[line_id].second);
       status = ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
-          resize_width, min_dim, max_dim, is_color, enc, type, ccpd_det_attri_type, label_type,
+          resize_width, min_dim, max_dim, is_color, enc, type, label_type,
           name_to_label, &anno_datum);
       anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
-      anno_datum.set_attri_type(AnnotatedDatum_AnnoataionAttriType_NORMALL);
     } else if(anno_type == "faceattributes") {
-      labelname = boost::get<std::string>(lines[line_id].second); // lines  contain imagename & label.txt
-		  status = ReadRichFaceToAnnotatedDatum(filename,
-          labelname, resize_height, resize_width, min_dim, max_dim, is_color,
-          enc, anno_face_attri_type, label_type, &anno_faceDatum);
-      anno_faceDatum.set_type(AnnoFaceDatum_AnnotationType_FACEMARK);
-	  } else if(anno_type == "facepose") {
       labelname = boost::get<std::string>(lines[line_id].second); // lines contain imagename & label.txt
-		  status = ReadRichFacePoseToAnnotatedDatum(filename,
+		  status = ReadRichFaceAttributeToAnnotatedDatum(filename,
           labelname, resize_height, resize_width, min_dim, max_dim, is_color,
-          enc, anno_facepose_type, label_type, &anno_faceposeDatum);
-      anno_faceposeDatum.set_type(AnnoFacePoseDatum_AnnoType_FACEPOSE);
+          enc, anno_face, label_type, &anno_faceAttriDatum);
+      anno_faceAttriDatum.set_type(AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE);
 	  }else if(anno_type == "facecontour") {
       labelname = boost::get<std::string>(lines[line_id].second); // lines contain imagename & label.txt
 		  status = ReadRichFaceContourToAnnotatedDatum(filename,
@@ -268,12 +222,6 @@ int main(int argc, char** argv) {
           resize_width, min_dim, max_dim, is_color, enc, anno_ccpd_type, label_type,
           name_to_label, &anno_ccpdDatum);
       anno_ccpdDatum.set_type(AnnotatedCCpdDatum_AnnotationType_CCPD);
-    }else if (anno_type == "faceBlur") {
-      labelname = boost::get<std::string>(lines[line_id].second);
-      status = ReadRichBlurToAnnotatedDatum(filename, labelname, resize_height,
-          resize_width, min_dim, max_dim, is_color, enc, anno_Blur_type, label_type,
-          name_to_label, &anno_BlurDatum);
-      anno_BlurDatum.set_type(AnnoBlurDatum_AnnoType_FACEBLUR);
     }
     if (status == false) {
       LOG(WARNING) << "Failed to read " << lines[line_id].first;
@@ -294,15 +242,12 @@ int main(int argc, char** argv) {
 
     // Put in db
     string out;
-    if(anno_type == "classification" || anno_type == "detection_face"|| anno_type == "detection")
+    if(anno_type == "classification" || anno_type == "detection")
     {
       CHECK(anno_datum.SerializeToString(&out));
       txn->Put(key_str, out);
     }else if(anno_type == "faceattributes") {
-      CHECK(anno_faceDatum.SerializeToString(&out));
-      txn->Put(key_str, out);
-    }else if(anno_type == "facepose") {
-      CHECK(anno_faceposeDatum.SerializeToString(&out));
+      CHECK(anno_faceAttriDatum.SerializeToString(&out));
       txn->Put(key_str, out);
     }else if(anno_type == "facecontour") {
       CHECK(anno_faceContourDatum.SerializeToString(&out));
@@ -312,9 +257,6 @@ int main(int argc, char** argv) {
       txn->Put(key_str, out);
     }else if(anno_type == "Rec_ccpd") {
       CHECK(anno_ccpdDatum.SerializeToString(&out));
-      txn->Put(key_str, out);
-    }else if(anno_type == "faceBlur") {
-      CHECK(anno_BlurDatum.SerializeToString(&out));
       txn->Put(key_str, out);
     }
     if (++count % 1000 == 0) {

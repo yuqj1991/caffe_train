@@ -26,9 +26,9 @@ typedef MultiBoxLossParameter_MatchType MatchType;
 typedef MultiBoxLossParameter_LocLossType LocLossType;
 typedef MultiBoxLossParameter_ConfLossType ConfLossType;
 typedef MultiBoxLossParameter_MiningType MiningType;
-typedef MultiFaceLossParameter_MarkLossType MarkLossType;
-typedef MultiFaceLossParameter_AttriLossType AttriLossType;
-typedef MultiFacePoseLossParameter_AttriLossType PoseAttriLossType;
+typedef MultiFaceAttriLossParameter_MarkLossType MarkLossType;
+typedef MultiFaceAttriLossParameter_AttriLossType AttriLossType;
+typedef MultiFaceAttriLossParameter_AttriLossType PoseAttriLossType;
 
 typedef map<int, vector<NormalizedBBox> > LabelBBox;
 
@@ -200,12 +200,12 @@ void MineHardExamples(const Blob<Dtype>& conf_blob,
 template <typename Dtype>
 void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, vector<NormalizedBBox> >* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type);
+      map<int, vector<NormalizedBBox> >* all_gt_bboxes);
 // Store ground truth bboxes of same label in a group.
 template <typename Dtype>
 void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, LabelBBox>* all_gt_bboxes, AnnotatedDatum_AnnoataionAttriType attri_type);
+      map<int, LabelBBox>* all_gt_bboxes);
 
 // Get location predictions from loc_data.
 //    loc_data: num x num_preds_per_class * num_loc_classes * 4 blob.
@@ -333,31 +333,6 @@ void EncodeConfPrediction(const Dtype* conf_data, const int num,
       const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
       Dtype* conf_pred_data, Dtype* conf_gt_data);
 
-// Encode the blur confidence predictions and ground truth for each matched prior.
-//    conf_data: num x num_priors * num_blur blob.
-//    num: number of images.
-//    num_priors: number of priors (predictions) per image.
-//    multibox_loss_param: stores the parameters for MultiBoxLossLayer.
-//    all_match_indices: stores mapping between predictions and ground truth.
-//    all_neg_indices: stores the indices for negative samples.
-//    all_gt_bboxes: stores ground truth bboxes for the batch.
-//    conf_pred_data: stores the confidence prediction results.
-//    conf_gt_data: stores the confidence ground truth.
-template <typename Dtype>
-void EncodeBlurConfPrediction(const Dtype* conf_data, const int num,
-      const int num_priors, const MultiBoxLossParameter& multibox_loss_param,
-      const vector<map<int, vector<int> > >& all_match_indices,
-      const vector<vector<int> >& all_neg_indices,
-      const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
-      Dtype* conf_pred_data, Dtype* conf_gt_data);
-
-template <typename Dtype>
-void EncodeOcclusConfPrediction(const Dtype* conf_data, const int num,
-      const int num_priors, const MultiBoxLossParameter& multibox_loss_param,
-      const vector<map<int, vector<int> > >& all_match_indices,
-      const vector<vector<int> >& all_neg_indices,
-      const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
-      Dtype* conf_pred_data, Dtype* conf_gt_data);
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~new~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 template <typename Dtype>
 void EncodeChinConfPrediction(const Dtype* conf_data, const int num,
@@ -402,8 +377,7 @@ void GetPriorBBoxes(const Dtype* prior_data, const int num_priors,
 template <typename Dtype>
 void GetDetectionResults(const Dtype* det_data, const int num_det,
       const int background_label_id,
-      map<int, LabelBBox>* all_detections,
-      DetectionEvaluateParameter_AnnoataionAttriType attri_type);
+      map<int, LabelBBox>* all_detections);
 
 // Get top_k scores with corresponding indices.
 //    scores: a set of scores.
