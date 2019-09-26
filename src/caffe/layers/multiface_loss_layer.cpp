@@ -188,8 +188,8 @@ void MultiFaceLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
     LossLayer<Dtype>::Reshape(bottom, top);
     int num_landmarks = bottom[0]->shape(1);  //bottom[0]: landmarks , 
-    int num_gender = bottom[1]->shape(1); //bottom[1]: num_gender;
-    int num_glasses = bottom[2]->shape(1); // bottom[2]: num_glasses;
+    int num_gender = bottom[2]->shape(1); //bottom[1]: num_gender;
+    int num_glasses = bottom[3]->shape(1); // bottom[2]: num_glasses;
     CHECK_EQ(num_landmarks, 10)<<"number of lanmarks point value must equal to 10";
     CHECK_EQ(num_gender_, num_gender)<<"number of gender must match prototxt provided";
     CHECK_EQ(num_glasses_, num_glasses)<<"number of glasses must match prototxt provided";
@@ -200,12 +200,10 @@ void MultiFaceLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 const vector<Blob<Dtype>*>& top) {
     const Dtype* label_data = bottom[4]->cpu_data();
  
-    /***************************************retrive all ground truth****************************************/
-    // Retrieve all landmarks , gender, and glasses.
- 
+    /***********************************************************************************/
+    // Retrieve all landmarks , gender, and glasses.***********.
     vector<int> all_gender;
     vector<int> all_glasses;
-
     // landmark ground thruth**********************************.
     vector<int> landmark_shape(2);
     landmark_shape[0] = 1;
@@ -218,10 +216,9 @@ const vector<Blob<Dtype>*>& top) {
     vector<int> angle_shape(2);
     angle_shape[0] = 1;
     angle_shape[1] =  batch_size_ *3;
-    angle_pred_.Reshape(landmark_shape);
-    angle_gt_.Reshape(landmark_shape);
+    angle_pred_.Reshape(angle_shape);
+    angle_gt_.Reshape(angle_shape);
     Dtype* angle_gt_data = angle_gt_.mutable_cpu_data();
-
 
     for(int item_id = 0; item_id < batch_size_; item_id++){
         int idxg = item_id*16;
@@ -238,12 +235,12 @@ const vector<Blob<Dtype>*>& top) {
         landmark_gt_data[item_id * 10+1] = label_data[idxg+2]   ;
         landmark_gt_data[item_id * 10+2] = label_data[idxg+3]   ;
         landmark_gt_data[item_id * 10+3] = label_data[idxg+4]   ;
-        landmark_gt_data[item_id * 10+4] = label_data[idxg+5] ;
-        landmark_gt_data[item_id * 10+5] = label_data[idxg+6] ;
-        landmark_gt_data[item_id * 10+6] = label_data[idxg+7] ;
-        landmark_gt_data[item_id * 10+7] = label_data[idxg+8] ;
-        landmark_gt_data[item_id * 10+8] = label_data[idxg+9] ;
-        landmark_gt_data[item_id * 10+9] = label_data[idxg+10] ;
+        landmark_gt_data[item_id * 10+4] = label_data[idxg+5]   ;
+        landmark_gt_data[item_id * 10+5] = label_data[idxg+6]   ;
+        landmark_gt_data[item_id * 10+6] = label_data[idxg+7]   ;
+        landmark_gt_data[item_id * 10+7] = label_data[idxg+8]   ;
+        landmark_gt_data[item_id * 10+8] = label_data[idxg+9]   ;
+        landmark_gt_data[item_id * 10+9] = label_data[idxg+10]  ;
 
         angle_gt_data[item_id * 3 + 0] = label_data[idxg+11];
         angle_gt_data[item_id * 3 + 1] = label_data[idxg+12];
@@ -310,16 +307,7 @@ const vector<Blob<Dtype>*>& top) {
     Dtype* gender_pred_data = gender_pred_.mutable_cpu_data();
     const Dtype* gender_data = bottom[2]->cpu_data();
     caffe_copy(batch_size_ *num_gender_, gender_data, gender_pred_data);
-    #if 0
-    const Dtype* gender_pred_data = gender_pred_.cpu_data();
-    const Dtype* bottom_pred_data = bottom[2]->cpu_data();
-    for(int ii = 0; ii< 3; ii++)
-    {
-        LOG(INFO)<< "gender_gt_data: "<<gender_gt_data[ii];
-        LOG(INFO)<< "gender_pr_data: "<<gender_pred_data[ii*2]<<" "<<gender_pred_data[ii*2+1];
-        LOG(INFO)<< "bottom_01_data: "<<bottom_pred_data[ii*2]<<" "<<bottom_pred_data[ii*2+1];
-    }
-    #endif
+    
     gender_loss_layer_->Reshape(gender_bottom_vec_, gender_top_vec_);
     gender_loss_layer_->Forward(gender_bottom_vec_, gender_top_vec_);
 
@@ -348,16 +336,7 @@ const vector<Blob<Dtype>*>& top) {
     for(int ii = 0; ii < batch_size_; ii++){
         glasses_gt_data[ii] = all_glasses[ii];
     }
-    #if 0
-    const Dtype* glasses_pred_data = glasses_pred_.cpu_data();
-    const Dtype* bottom2_pred_data = bottom[2]->cpu_data();
-    for(int ii = 0; ii< 3; ii++)
-    {
-        LOG(INFO)<< "glasses_gt_data: "<<glasses_gt_data[ii];
-        LOG(INFO)<< "glasses_pr_data: "<<glasses_pred_data[ii*2]<<" "<<glasses_pred_data[ii*2+1];
-        LOG(INFO)<< "bottom_02_data: "<<bottom2_pred_data[ii*2]<<" "<<bottom2_pred_data[ii*2+1];
-    }
-    #endif
+    
     glasses_loss_layer_->Reshape(glasses_bottom_vec_, glasses_top_vec_);
     glasses_loss_layer_->Forward(glasses_bottom_vec_, glasses_top_vec_);
 
@@ -416,9 +395,7 @@ const vector<Blob<Dtype>*>& bottom) {
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, batch_size_, 1, -1);
         Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
-        #if 0
-            LOG(INFO)<<"top[0]->cpu_diff()[0]: "<<top[0]->cpu_diff()[0];
-        #endif
+
         caffe_scal(landmark_pred_.count(), loss_weight, landmark_pred_.mutable_cpu_diff());
         bottom[0]->ShareDiff(landmark_pred_);
         // Copy gradient back to bottom[0].
@@ -442,18 +419,9 @@ const vector<Blob<Dtype>*>& bottom) {
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, batch_size_, 1, -1);
         Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
-        #if 0
-            LOG(INFO)<<"top[0]->cpu_diff()[0]: "<<top[0]->cpu_diff()[0];
-        #endif
+        
         caffe_scal(angle_pred_.count(), loss_weight, angle_pred_.mutable_cpu_diff());
         bottom[1]->ShareDiff(angle_pred_);
-        // Copy gradient back to bottom[0].
-        /*const Dtype* landmark_pred_diff = landmark_pred_.cpu_diff();
-        for (int ii = 0; ii < batch_size_; ++ii) {
-            caffe_copy<Dtype>(10, landmark_pred_diff + ii * 10,
-                                mark_bottom_diff + ii*10);
-            mark_bottom_diff += bottom[0]->offset(1);
-        }*/
     }
 
     /*************************************************************************************/
@@ -495,8 +463,6 @@ const vector<Blob<Dtype>*>& bottom) {
         Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
         caffe_scal(glasses_pred_.count(), loss_weight,
                     glasses_pred_.mutable_cpu_diff());
-        // Copy gradient back to bottom[2].
-        // The diff is already computed and stored.
         bottom[3]->ShareDiff(glasses_pred_);
     }
 }

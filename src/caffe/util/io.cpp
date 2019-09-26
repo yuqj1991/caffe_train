@@ -738,7 +738,7 @@ bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
     LOG(INFO) << "Cannot open " << labelfile;
     return false;
   }
-  LOG(INFO)<<labelfile;
+  LOG(INFO)<<labelfile.c_str();
   float x1, x2, x3, x4, x5, y1, y2, y3, y4, y5;
   float yaw, pitch, roll;
   float pr_female, pr_male;
