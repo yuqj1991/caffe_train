@@ -2643,7 +2643,7 @@ layer {
 layer {
   name: "mbox_conf"
   type: "Concat"
-  bottom: "conv_mbox_module_conf_flat"
+  bottom: "conv_mbox_loc_module_conf_flat"
   bottom: "conv_mbox_loc_module_two_conf_flat"
   bottom: "conv_mbox_loc_module_three_conf_flat"
   bottom: "conv_mbox_loc_module_four_conf_flat"

@@ -11,8 +11,8 @@ layer {
     scale: 0.007843
     mirror: true
     mean_value: 103.94
-	mean_value: 116.78
-	mean_value: 123.68
+    mean_value: 116.78
+    mean_value: 123.68
     resize_param {
       prob: 1.0
       resize_mode: WARP
@@ -133,7 +133,7 @@ layer {
       max_sample: 1
       max_trials: 50
     }
-    label_map_file: "/home/dmitrii/Work/Projects/FaceCaffe/models/labelmap.prototxt"
+    label_map_file: "../labelmap_face.prototxt"
   }
 }
 layer {
@@ -2773,7 +2773,7 @@ layer {
 layer {
   name: "mbox_conf"
   type: "Concat"
-  bottom: "conv_mbox_module_conf_flat"
+  bottom: "conv_mbox_loc_module_conf_flat"
   bottom: "conv_mbox_loc_module_two_conf_flat"
   bottom: "conv_mbox_loc_module_three_conf_flat"
   bottom: "conv_mbox_loc_module_four_conf_flat"
@@ -2799,7 +2799,7 @@ layer {
 ########################
 layer {
   name: "mbox_loss"
-  type: "MultiBoxLoss"
+  type: "MultiBoxSSDLoss"
   bottom: "mbox_loc"
   bottom: "mbox_conf"
   bottom: "mbox_priorbox"

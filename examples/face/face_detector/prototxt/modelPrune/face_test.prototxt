@@ -21,14 +21,14 @@ layer {
     }
   }
   data_param {
-    source: "/home/dmitrii/Work/Projects/FaceCaffe/data/wider_fddb_test_lmdb/"
+    source: "../../../../../../dataset/facedata/wider_face/lmdb/wider_face_val_lmdb/"
     batch_size: 8
     backend: LMDB
   }
   annotated_data_param {
     batch_sampler {
     }
-    label_map_file: "/home/dmitrii/Work/Projects/FaceCaffe/models/labelmap.prototxt"
+    label_map_file: "../labelmap_face.prototxt"
   }
 }
 layer {
@@ -2668,7 +2668,7 @@ layer {
 layer {
   name: "mbox_conf"
   type: "Concat"
-  bottom: "conv_mbox_module_conf_flat"
+  bottom: "conv_mbox_loc_module_conf_flat"
   bottom: "conv_mbox_loc_module_two_conf_flat"
   bottom: "conv_mbox_loc_module_three_conf_flat"
   bottom: "conv_mbox_loc_module_four_conf_flat"
