@@ -494,7 +494,7 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
       }
     }
   }
-#if 0
+#if 1
   int group_size = anno_datum->annotation_group_size();
   LOG(INFO)<<"group_size: "<<group_size;
   for(int nn = 0; nn< group_size; nn++)
