@@ -105,16 +105,20 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
     map<int, vector<int> > all_gt_face_attributes;
     map<int, vector<float> > all_prediction_face_angle;
     map<int, vector<float> > all_gt_face_angle;
+    map<int, vector<int>> datamShape;
     for(int ii = 0; ii<batch_size; ii++){
       /**********ground truth************/
       for(int jj =1; jj<11; jj++){
-        all_gt_face_points[ii].push_back(gt_data[ii*16+jj]);
+        all_gt_face_points[ii].push_back(gt_data[ii*18+jj]);
       }
       for(int jj =11; jj<14; jj++){
-        all_gt_face_angle[ii].push_back(gt_data[ii*16+jj]);
+        all_gt_face_angle[ii].push_back(gt_data[ii*18+jj]);
       }
       for(int jj =14; jj<16; jj++){
-        all_gt_face_attributes[ii].push_back(gt_data[ii*16+jj]);
+        all_gt_face_attributes[ii].push_back(gt_data[ii*18+jj]);
+      }
+      for(int jj =16; jj<18; jj++){
+        datamShape[ii].push_back(gt_data[ii*18+jj]);
       }
       /**********prediction************/
       for(int jj =0; jj< 5*2; jj++){
@@ -136,8 +140,8 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
     float correct_precisive_roll =0;
     for(int ii = 0; ii<batch_size; ii++){
       for(int jj = 0; jj< 5; jj++){
-        double pow_x = pow((all_prediction_face_points[ii][jj]-all_gt_face_points[ii][jj]), 2);
-        double pow_y = pow((all_prediction_face_points[ii][jj + 5]-all_gt_face_points[ii][jj + 5]), 2);
+        double pow_x = pow(datamShape[ii][0]*(all_prediction_face_points[ii][jj]-all_gt_face_points[ii][jj]), 2);
+        double pow_y = pow(datamShape[ii][1]*(all_prediction_face_points[ii][jj + 5]-all_gt_face_points[ii][jj + 5]), 2);
         top_data[ii*10 + jj] = std::sqrt(pow_x + pow_y);
       }
       int gender_index=0; 
