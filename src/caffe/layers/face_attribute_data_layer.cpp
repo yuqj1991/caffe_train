@@ -130,7 +130,7 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             } else {
                 expand_datum = &distort_datum;
             }
-            } else {
+        } else {
             if (transform_param.has_expand_param()) {
                 expand_datum = new AnnoFaceAttributeDatum();
                 this->data_transformer_->ExpandImage(anno_datum, expand_datum);
@@ -156,7 +156,7 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                              <<top_shape[3];
             }
         } else {
-        CHECK(std::equal(top_shape.begin() + 1, top_shape.begin() + 4,
+            CHECK(std::equal(top_shape.begin() + 1, top_shape.begin() + 4,
                 shape.begin() + 1));
         }
         read_time += timer.MicroSeconds();
@@ -185,7 +185,6 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         }
         trans_time += timer.MicroSeconds();
         reader_.free().push(const_cast<AnnoFaceAttributeDatum*>(&anno_datum));
-        
     }
 
     // store "rich " landmark, face attributes

@@ -221,7 +221,7 @@ const vector<Blob<Dtype>*>& top) {
     Dtype* angle_gt_data = angle_gt_.mutable_cpu_data();
 
     for(int item_id = 0; item_id < batch_size_; item_id++){
-        int idxg = item_id*16;
+        int idxg = item_id*18;
         int id = label_data[idxg];
         if(id == -1)
         {

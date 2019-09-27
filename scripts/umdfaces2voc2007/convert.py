@@ -23,7 +23,6 @@ def batch_work(ori, csvFile, setFile):
             file_name = row[1]['FILE']
             img_file_name_no_jpg = file_name.split('/')[1].split('.jpg')[0]
             label_full_anno_file_name = LABEL_FILE_FOLDER + img_file_name_no_jpg + '.txt'
-            #label_angle_anno_file_name = LABEL_FILE_FOLDER + img_file_name_no_jpg + '_crop.txt'
             full_path_image_name = SOURCE_IMG_FILE_FOLDER + ori[ii] + file_name
             if not os.path.exists(CROP_IMG_FILE_FOLDER + ori[ii] + file_name.split('/')[0]):
                 os.mkdir(CROP_IMG_FILE_FOLDER + ori[ii] + file_name.split('/')[0])
@@ -31,7 +30,6 @@ def batch_work(ori, csvFile, setFile):
             fullImg = os.path.abspath(full_path_image_name) + '\n'
             print('label file: %s, and full_path_img : %s'%(label_full_anno_file_name, full_path_image_name))
             label_file_ = open(label_full_anno_file_name, 'w')
-            #label_file_angle = open(label_angle_anno_file_name, 'w')
             roi_x = int(row[1]['FACE_X'])
             roi_y = int(row[1]['FACE_Y'])
             roi_w = int(row[1]['FACE_WIDTH'])
@@ -66,16 +64,15 @@ def batch_work(ori, csvFile, setFile):
                 pointSet.append((int(left_mouse_point_x), int(left_mouse_point_y)))
                 pointSet.append((int(right_mouse_point_x), int(right_mouse_point_y)))
                 for ii in range(5):
-                    cv2.circle(src, pointSet[ii], 3, (0,0,213), -1)
-                cv2.imshow("face", src)
+                    cv2.circle(cropRoi, pointSet[ii], 3, (0,0,213), -1)
+                cv2.imshow("face", cropRoi)
                 k = cv2.waitKey(0)
+                break
             cv2.imwrite(ang_path_image_name, cropRoi)
-            #break
+
             setfile_.writelines(os.path.abspath(ang_path_image_name) + '\n')
             content = str(left_eye_point_x) + ' ' + str(right_eye_point_x) + ' ' + str(nose_point_x) + ' ' + str(left_mouse_point_x) + ' ' + str(right_mouse_point_x) + ' ' + str(left_eye_point_y) + ' ' + str(right_eye_point_y) + ' ' + str(nose_point_y) + ' ' + str(left_mouse_point_y) + ' ' + str(right_mouse_point_y) + ' ' + str(yaw) + ' ' + str(pitch) + ' ' + str(roll) + ' ' + str(pr_female) + ' ' + str(pr_male) + ' ' + str(boolGlass) + '\n'
             label_file_.write(content)
-            #label_file_angle.write(str(yaw) + ' ' + str(pitch) + ' ' + str(roll) + '\n')
-            #label_file_angle.close()
             label_file_.close()
         #break
     setfile_.close()

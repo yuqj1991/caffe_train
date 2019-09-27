@@ -337,7 +337,6 @@ void DataTransformer<Dtype>::TransformAnnotation(
 	}
 }
 
-
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceAttributeDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
@@ -353,6 +352,72 @@ void DataTransformer<Dtype>::Transform(const AnnoFaceAttributeDatum& anno_datum,
 	const bool do_expand = false;
 	TransformAnnoFaceAttribute(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
 											transformed_annoface_all);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoFaceAttributeDatum& anno_datum, 
+				Blob<Dtype>* transformed_blob,
+				AnnoFaceAttribute* transformed_anno_vec){
+	bool do_mirror;
+	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
+}
+
+// transfer label face pose depender expand
+template<typename Dtype>
+void DataTransformer<Dtype>::TransformAnnoFaceAttribute(
+		const AnnoFaceAttributeDatum& anno_datum,const bool do_resize,
+		const NormalizedBBox& crop_bbox, const bool do_mirror, const bool do_expand,
+		AnnoFaceAttribute* transformed_annoface_all){
+	const int img_height = anno_datum.datum().height();
+	const int img_width = anno_datum.datum().width();
+	AnnoFaceAttribute src_annoface = anno_datum.faceattri();
+	AnnoFaceLandmarks* face = src_annoface.mutable_landmark();
+	if(anno_datum.type() == AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE){
+		if(do_resize && param_.has_resize_param()){
+			CHECK_GT(img_height, 0);
+			CHECK_GT(img_width, 0);
+			UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
+											img_width, img_height,
+											face);
+		}
+		point * point_1 = face->mutable_lefteye();
+		point * point_2 = face->mutable_righteye();
+		point * point_3 = face->mutable_nose();
+		point * point_4 = face->mutable_leftmouth();
+		point * point_5 = face->mutable_rightmouth();
+		if(do_mirror){
+			point_1->set_x(1-point_1->x());
+			point_2->set_x(1-point_2->x());
+			point_3->set_x(1-point_3->x());
+			point_4->set_x(1-point_4->x());
+			point_5->set_x(1-point_5->x());
+			transformed_annoface_all->mutable_faceoritation()->set_yaw(-src_annoface.faceoritation().yaw());
+			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
+			transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
+		}else{
+			transformed_annoface_all->mutable_faceoritation()->set_yaw(src_annoface.faceoritation().yaw());
+			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
+			transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
+		}
+		if(do_expand){
+			float src_width = crop_bbox.xmax() - crop_bbox.xmin();
+			float src_height = crop_bbox.ymax() - crop_bbox.ymin();
+			point_1->set_x((point_1->x()-crop_bbox.xmin())/src_width);
+			point_1->set_y((point_1->y()-crop_bbox.ymin())/src_height);
+			point_2->set_x((point_2->x()-crop_bbox.xmin())/src_width);
+			point_2->set_y((point_2->y()-crop_bbox.ymin())/src_height);
+			point_3->set_x((point_3->x()-crop_bbox.xmin())/src_width);
+			point_3->set_y((point_3->y()-crop_bbox.ymin())/src_height);
+			point_4->set_x((point_4->x()-crop_bbox.xmin())/src_width);
+			point_4->set_y((point_4->y()-crop_bbox.ymin())/src_height);
+			point_5->set_x((point_5->x()-crop_bbox.xmin())/src_width);
+			point_5->set_y((point_5->y()-crop_bbox.ymin())/src_height);
+		}
+		AnnoFaceLandmarks* annolandface = transformed_annoface_all->mutable_landmark();
+		annolandface->CopyFrom(*face);
+		transformed_annoface_all->set_gender(src_annoface.gender());
+		transformed_annoface_all->set_glass(src_annoface.glass());
+	}
 }
 
 template<typename Dtype>
@@ -373,6 +438,14 @@ void DataTransformer<Dtype>::Transform(const AnnoFaceContourDatum& anno_datum,
 }
 
 template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoFaceContourDatum& anno_datum, 
+				Blob<Dtype>* transformed_blob,
+				AnnoFaceLandmarks* transformed_anno_vec){
+	bool do_mirror;
+	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
+}
+
+template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
                  AnnoFaceOritation* transformed_annoface_all,
@@ -388,6 +461,15 @@ void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum,
 	TransformAnnoFaceAngle(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
 											transformed_annoface_all);
 }
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum, 
+				Blob<Dtype>* transformed_blob,
+				AnnoFaceOritation* transformed_anno_vec){
+	bool do_mirror;
+	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
+}
+
 
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnotatedCCpdDatum& anno_datum,
@@ -406,96 +488,12 @@ void DataTransformer<Dtype>::Transform(const AnnotatedCCpdDatum& anno_datum,
 											transformed_annoface_all);
 }
 
-
-
-template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const AnnoFaceAttributeDatum& anno_datum, 
-				Blob<Dtype>* transformed_blob,
-				AnnoFaceAttribute* transformed_anno_vec){
-	bool do_mirror;
-	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
-}
-
-template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const AnnoFaceContourDatum& anno_datum, 
-				Blob<Dtype>* transformed_blob,
-				AnnoFaceLandmarks* transformed_anno_vec){
-	bool do_mirror;
-	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
-}
-
-template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const AnnoFaceAngleDatum& anno_datum, 
-				Blob<Dtype>* transformed_blob,
-				AnnoFaceOritation* transformed_anno_vec){
-	bool do_mirror;
-	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
-}
-
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const AnnotatedCCpdDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
                  LicensePlate* transformed_anno_vec){
 	bool do_mirror;
 	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
-}
-
-// transfer label face pose depender expand
-template<typename Dtype>
-void DataTransformer<Dtype>::TransformAnnoFaceAttribute(
-		const AnnoFaceAttributeDatum& anno_datum,const bool do_resize,
-		const NormalizedBBox& crop_bbox, const bool do_mirror, const bool do_expand,
-		AnnoFaceAttribute* transformed_annoface_all){
-	const int img_height = anno_datum.datum().height();
-	const int img_width = anno_datum.datum().width();
-	AnnoFaceAttribute src_annoface = anno_datum.faceattri();
-	AnnoFaceLandmarks* face = src_annoface.mutable_landmark();
-	point * point_1 = face->mutable_lefteye();
-	point * point_2 = face->mutable_righteye();
-	point * point_3 = face->mutable_nose();
-	point * point_4 = face->mutable_leftmouth();
-	point * point_5 = face->mutable_rightmouth();
-	if(anno_datum.type() == AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE){
-		if(do_resize && param_.has_resize_param()){
-			CHECK_GT(img_height, 0);
-			CHECK_GT(img_width, 0);
-			UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
-											img_width, img_height,
-											face);
-		}
-		if(do_mirror){
-			point_1->set_x(1-point_1->x());
-			point_2->set_x(1-point_2->x());
-			point_3->set_x(1-point_3->x());
-			point_4->set_x(1-point_4->x());
-			point_5->set_x(1-point_5->x());
-			transformed_annoface_all->mutable_faceoritation()->set_yaw(-src_annoface.faceoritation().yaw());
-			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
-			transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
-		}else
-		{
-			transformed_annoface_all->mutable_faceoritation()->set_yaw(src_annoface.faceoritation().yaw());
-			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
-			transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
-		}
-		
-		if(do_expand){
-			float src_width = crop_bbox.xmax() - crop_bbox.xmin();
-			float src_height = crop_bbox.ymax() - crop_bbox.ymin();
-			point_1->set_x((point_1->x()-crop_bbox.xmin())/src_width);
-			point_1->set_y((point_1->y()-crop_bbox.ymin())/src_height);
-			point_2->set_x((point_2->x()-crop_bbox.xmin())/src_width);
-			point_2->set_y((point_2->y()-crop_bbox.ymin())/src_height);
-			point_3->set_x((point_3->x()-crop_bbox.xmin())/src_width);
-			point_3->set_y((point_3->y()-crop_bbox.ymin())/src_height);
-			point_4->set_x((point_4->x()-crop_bbox.xmin())/src_width);
-			point_4->set_y((point_4->y()-crop_bbox.ymin())/src_height);
-			point_5->set_x((point_5->x()-crop_bbox.xmin())/src_width);
-			point_5->set_y((point_5->y()-crop_bbox.ymin())/src_height);
-		}
-		AnnoFaceLandmarks* annolandface = transformed_annoface_all->mutable_landmark();
-		annolandface->CopyFrom(*face);
-	}
 }
 
 // transfer label face pose depender expand
@@ -1103,7 +1101,7 @@ void DataTransformer<Dtype>::DistortImage(const Datum& datum,
 	}
 	// If datum is encoded, decode and crop the cv::image.
 	if (datum.encoded()) {
-#ifdef USE_OPENCV
+	#ifdef USE_OPENCV
 		CHECK(!(param_.force_color() && param_.force_gray()))
 				<< "cannot set both force_color and force_gray";
 		cv::Mat cv_img;
@@ -1119,9 +1117,9 @@ void DataTransformer<Dtype>::DistortImage(const Datum& datum,
 		EncodeCVMatToDatum(distort_img, "jpg", distort_datum);
 		distort_datum->set_label(datum.label());
 		return;
-#else
+	#else
 		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
-#endif  // USE_OPENCV
+	#endif  // USE_OPENCV
 	} else {
 		LOG(ERROR) << "Only support encoded datum now";
 	}
@@ -1168,6 +1166,7 @@ void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
 	const int crop_size = param_.crop_size();
 	const Dtype scale = param_.scale();
 	*do_mirror = param_.mirror() && Rand(2);
+	//LOG(INFO) << "MIRROR: "<<Rand(2);
 	const bool has_mean_file = param_.has_mean_file();
 	const bool has_mean_values = mean_values_.size() > 0;
 
