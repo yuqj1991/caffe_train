@@ -72,7 +72,6 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
     vector<int> label_shape(4, 1);
     if (has_anno_type_) {
       anno_type_ = anno_datum.type();
-      anno_attri_type_ = anno_datum.attri_type();
       if (anno_data_param.has_anno_type()) {
         // If anno_type is provided in AnnotatedDataParameter, replace
         // the type stored in each individual AnnotatedDatum.
@@ -89,29 +88,16 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
         // [item_id, group_label, instance_id, xmin, ymin, xmax, ymax, diff]
         // Note: Refer to caffe.proto for details about group_label and
         // instance_id.
-        if (anno_attri_type_ ==AnnotatedDatum_AnnoataionAttriType_FACE) {
-          for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
-            num_bboxes += anno_datum.annotation_group(g).annotation_size();
-          }
-          label_shape[0] = 1;
-          label_shape[1] = 1;
-          // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
-          // cpu_data and gpu_data for consistent prefetch thread. Thus we make
-          // sure there is at least one bbox.
-          label_shape[2] = std::max(num_bboxes, 1);
-          label_shape[3] = 10;
-        }else if(anno_attri_type_ ==AnnotatedDatum_AnnoataionAttriType_NORMALL){
-          for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
-            num_bboxes += anno_datum.annotation_group(g).annotation_size();
-          }
-          label_shape[0] = 1;
-          label_shape[1] = 1;
-          // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
-          // cpu_data and gpu_data for consistent prefetch thread. Thus we make
-          // sure there is at least one bbox.
-          label_shape[2] = std::max(num_bboxes, 1);
-          label_shape[3] = 8;
+        for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
+          num_bboxes += anno_datum.annotation_group(g).annotation_size();
         }
+        label_shape[0] = 1;
+        label_shape[1] = 1;
+        // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
+        // cpu_data and gpu_data for consistent prefetch thread. Thus we make
+        // sure there is at least one bbox.
+        label_shape[2] = std::max(num_bboxes, 1);
+        label_shape[3] = 8;
       } else {
         LOG(FATAL) << "Unknown annotation type.";
       }
@@ -169,24 +155,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     read_time += timer.MicroSeconds();
     float sampleProb = 0.0f;
     caffe_rng_uniform(1, 0.0f, 1.0f, &sampleProb);
-#if 0
-    int size_group = anno_datum.annotation_group_size();
-    LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
-    for(int ii=0; ii< size_group; ii++)
-    {
-      const AnnotationGroup& anno_group = anno_datum.annotation_group(ii);
-      int anno_size = anno_group.annotation_size();
-      for(int jj=0; jj<anno_size; jj++)
-      {
-        const Annotation& anno = anno_group.annotation(jj);
-        const NormalizedBBox& bbox = anno.bbox();
-        LOG(INFO) <<" bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
-                  <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                  <<" bbox->blur: "<<bbox.faceattrib().blur()<<" bbox->occlusion: "<<bbox.faceattrib().occlusion();
-      }
-    }
-    LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";
-#endif
 #if 0
     int size_group = anno_datum.annotation_group_size();
     LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
@@ -333,7 +301,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       delete expand_datum;
     }
     trans_time += timer.MicroSeconds();
-
     reader_.free().push(const_cast<AnnotatedDatum*>(&anno_datum));
   }
 
@@ -341,43 +308,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   if (this->output_labels_ && has_anno_type_) {
     vector<int> label_shape(4);
     if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) {
-      if (anno_attri_type_ ==AnnotatedDatum_AnnoataionAttriType_FACE) {
-        label_shape[0] = 1;
-        label_shape[1] = 1;
-        label_shape[3] = 10;
-        if (num_bboxes == 0) {
-          // Store all -1 in the label.
-          label_shape[2] = 1;
-          batch->label_.Reshape(label_shape);
-          caffe_set<Dtype>(10, -1, batch->label_.mutable_cpu_data());
-        } else {
-          // Reshape the label and store the annotation.
-          label_shape[2] = num_bboxes;
-          batch->label_.Reshape(label_shape);
-          top_label = batch->label_.mutable_cpu_data();
-          int idx = 0;
-          for (int item_id = 0; item_id < batch_size; ++item_id) {
-            const vector<AnnotationGroup>& anno_vec = all_anno[item_id];
-            for (int g = 0; g < anno_vec.size(); ++g) {
-              const AnnotationGroup& anno_group = anno_vec[g];
-              for (int a = 0; a < anno_group.annotation_size(); ++a) {
-                const Annotation& anno = anno_group.annotation(a);
-                const NormalizedBBox& bbox = anno.bbox();
-                top_label[idx++] = item_id;
-                top_label[idx++] = anno_group.group_label();
-                top_label[idx++] = anno.instance_id();
-                top_label[idx++] = bbox.xmin();
-                top_label[idx++] = bbox.ymin();
-                top_label[idx++] = bbox.xmax();
-                top_label[idx++] = bbox.ymax();
-                top_label[idx++] = bbox.faceattrib().blur();
-                top_label[idx++] = bbox.faceattrib().occlusion();
-                top_label[idx++] = bbox.difficult();
-              }
-            }
-          }
-        }
-      }else if(anno_attri_type_ ==AnnotatedDatum_AnnoataionAttriType_NORMALL){
         label_shape[0] = 1;
         label_shape[1] = 1;
         label_shape[3] = 8;
@@ -408,7 +338,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = bbox.ymax();
                 top_label[idx++] = bbox.difficult();
               }
-            }
           }
         }
       }
@@ -426,30 +355,10 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
               <<" anno.instance_id: "<<top_label_data[id+2];
     LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
               <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
-              <<" bbox->blur: "<<top_label_data[id+7]<<" bbox->occlusion: "<<top_label_data[id+8]
-              <<" bbox->difficult: "<<top_label_data[id+9];
+              <<" bbox->difficult: "<<top_label_data[id+7];
   }
   LOG(INFO)<< "finished **************************************************** end ";
-#endif 
-
-#if 0
-  LOG(INFO)<< "start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& single image: num_bboxes: "<<num_bboxes;
-  const Dtype* top_label_data = batch->label_.cpu_data();
-  for(int ii=0; ii < num_bboxes; ii++)
-  {
-    int id = ii*15;
-    LOG(INFO) <<"batch_id: "<<top_label_data[id]<<" anno_label: "<<top_label_data[id+1]
-              <<" anno.instance_id: "<<top_label_data[id+2];
-    LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
-              <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
-              <<" bbox->chi: "<<top_label_data[id+7]<<" bbox->eng: "<<top_label_data[id+8]
-              <<" bbox->let1: "<<top_label_data[id+9]<<" bbox->let2: "<<top_label_data[id+10]
-              <<" bbox->let3: "<<top_label_data[id+11]<<" bbox->let4: "<<top_label_data[id+12]
-              <<" bbox->let5: "<<top_label_data[id+13];
-  }
-  LOG(INFO)<< "finished **************************************************** end ";
-#endif 
-
+#endif
   timer.Stop();
   batch_timer.Stop();
   DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";

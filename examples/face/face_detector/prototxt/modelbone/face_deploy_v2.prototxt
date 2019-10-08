@@ -5147,7 +5147,7 @@ layer {
 	phase: TEST
 	}
 	detection_output_param {
-		attri_type: NORMALL
+		: NORMALL
 		num_classes: 2
 		share_location: true
 		background_label_id: 0

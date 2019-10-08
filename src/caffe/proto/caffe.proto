@@ -157,21 +157,6 @@ message AnnotatedCCpdDatum {
   optional LicensePlate lpnumber = 3;
 }
 
-message FaceAttributes {
-  optional int32 blur = 1;
-  optional int32 occlusion = 2;
-}
-
-
-message AnnoBlurDatum{
-  enum AnnoType{
-    FACEBLUR = 0;
-  }
-  optional Datum datum =1;
-  optional AnnoType type =2;
-  optional FaceAttributes faceatti = 3;
-}
-
 // The normalized bounding box [0, 1] w.r.t. the input image size.
 message NormalizedBBox {
   optional float xmin = 1;
@@ -182,7 +167,6 @@ message NormalizedBBox {
   optional bool difficult = 6;
   optional float score = 7;
   optional float size = 8;
-  optional FaceAttributes faceattrib = 9;
 }
 
 // Annotation for each object instance.
@@ -203,103 +187,53 @@ message AnnotatedDatum {
   enum AnnotationType {
     BBOX = 0;
   }
-  enum AnnoataionAttriType {
-	FACE = 0;
-	NORMALL = 1;
-  }
   optional Datum datum = 1;
   // If there are "rich" annotations, specify the type of annotation.
   // Currently it only supports bounding box.
   // If there are no "rich" annotations, use label in datum instead.
   optional AnnotationType type = 2;
-  // label attri
-  optional AnnoataionAttriType attri_type = 3;
   // Each group contains annotation for a particular class.
   repeated AnnotationGroup annotation_group = 4;
 }
 
-// the normalized lanmarks of five points which has been normalized [0, 1] w.r.t. the input image size.
-message LandmarkFace{
-  optional float x1 = 1;
-  optional float x2 = 2;
-  optional float x3 = 3;
-  optional float x4 = 4;
-  optional float x5 = 5;
-  optional float y1 = 6;
-  optional float y2 = 7;
-  optional float y3 = 8;
-  optional float y4 = 9;
-  optional float y5 = 10;
-}
-
-// Annotation face attritubite for each object.
-message AnnotationFace{
-  optional LandmarkFace markface = 1;
-  optional int32 gender = 2 [default = 0];
-  optional bool glasses = 3 [default = false];
-}
-
-// An extension of Datum which have "rich " face attributes
-message AnnoFaceDatum{
-  enum AnnotationType {
-    FACEMARK = 0;
-  }
-  optional Datum datum = 1;
-  optional AnnotationType type = 2;
-  optional AnnotationFace annoface = 3;
-}
 
 // the anno point has been normolizsed!
-message ContourPoint{
+message point{
   optional float x = 1;
   optional float y = 2;
 }
 
 // Annotation for face 21 points(coordinate for x and y)
-message AnnoFaceContourPoints{
-  optional ContourPoint point_1 = 1;
-  optional ContourPoint point_2 = 2;
-  optional ContourPoint point_3 = 3;
-  optional ContourPoint point_4 = 4;
-  optional ContourPoint point_5 = 5;
-  optional ContourPoint point_6 = 6;
-  optional ContourPoint point_7 = 7;
-  optional ContourPoint point_8 = 8;
-  optional ContourPoint point_9 = 9;
-  optional ContourPoint point_10 = 10;
-  optional ContourPoint point_11 = 11;
-  optional ContourPoint point_12 = 12;
-  optional ContourPoint point_13 = 13;
-  optional ContourPoint point_14 = 14;
-  optional ContourPoint point_15 = 15;
-  optional ContourPoint point_16 = 16;
-  optional ContourPoint point_17 = 17;
-  optional ContourPoint point_18 = 18;
-  optional ContourPoint point_19 = 19;
-  optional ContourPoint point_20 = 20;
-  optional ContourPoint point_21 = 21;
+message AnnoFaceLandmarks{
+  optional point lefteye = 1;
+  optional point righteye = 2;
+  optional point nose = 3;
+  optional point leftmouth = 4;
+  optional point rightmouth = 5;
 }
 
 // Annotation for face headpose contain yaw, roll, pitch 
-message AnnoFacePoseOritation{
+message AnnoFaceOritation{
   optional float yaw = 1;
   optional float pitch = 2;
   optional float roll = 3;
 }
 // Annotation for face headpose contain yaw, roll, pitch
-message AnnoFacePose{
-  optional AnnoFacePoseOritation faceOritation = 1;
-  optional AnnoFaceContourPoints faceCour=2;
+message AnnoFaceAttribute{
+  optional AnnoFaceOritation faceoritation = 1;
+  optional AnnoFaceLandmarks landmark=2;
+  optional int32 gender = 3 ;
+  optional int32 glass = 4;
 }
 
-// AnnofaceDataum with datum, and facepoints & AnnofacePose
-message AnnoFacePoseDatum{
+// AnnofaceDataum with datum, and facepoints & AnnoFaceAttribute
+message AnnoFaceAttributeDatum{
   enum AnnoType{
-    FACEPOSE =0;
+    FACEATTRIBUTE =0;
   }
   optional Datum datum =1;
   optional AnnoType type =2;
-  optional AnnoFacePose facePose =3;
+  optional AnnoFaceAttribute faceattri =3;
 }
 
 // AnnofaceDataum with datum, and facepoints contour
@@ -309,7 +243,7 @@ message AnnoFaceContourDatum{
   }
   optional Datum datum =1;
   optional AnnoType type =2;
-  optional AnnoFaceContourPoints facecontour =3;
+  optional AnnoFaceLandmarks facecontour =3;
 }
 
 // AnnofaceDataum with datum, and faceangle
@@ -319,7 +253,7 @@ message AnnoFaceAngleDatum{
   }
   optional Datum datum =1;
   optional AnnoType type =2;
-  optional AnnoFacePoseOritation faceangle =3;
+  optional AnnoFaceOritation faceangle =3;
 }
 
 message FillerParameter {
@@ -600,6 +534,7 @@ message ParamSpec {
 
   // The multiplier on the global weight decay for this parameter.
   optional float decay_mult = 4 [default = 1.0];
+  optional float momentum_mult = 5 [default = 1.0];
 }
 
 // NOTE
@@ -710,11 +645,24 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional VideoDataParameter video_data_param = 207;
   optional WindowDataParameter window_data_param = 129;
-  optional MultiFaceLossParameter multiface_loss_param = 208;
-  optional MultiFacePoseLossParameter multiface_pose_loss_param = 209;
+  optional MultiFaceAttriLossParameter multiface_loss_param = 208;
   optional FaceEvaluateParameter face_evaluate_param = 210;
   optional LpEvaluateParameter lp_evaluate_param = 211;
   optional LpDetParameter lp_det_param = 212;
+  optional SampleTripletParameter sample_triplet_param = 213;
+  optional TripletLossParameter triplet_loss_param = 214;
+  optional CPMTransformationParameter cpm_transform_param = 147;
+}
+
+message TripletLossParameter {
+  optional float margin = 1 [default = 0.1];
+  optional float eps = 2 [default = 1e-5];
+}
+
+message SampleTripletParameter {
+  optional uint32 label_num = 1;
+  optional uint32 sample_num = 2;
+  optional float eps = 3 [default = 1e-5];
 }
 
 // Message that stores parameters used to apply transformation
@@ -753,6 +701,59 @@ message TransformationParameter {
   // Constraint for emitting the annotation after transformation.
   optional EmitConstraint emit_constraint = 10;
 }
+
+// Message that stores parameters used to apply transformation
+// to the CPMData layer's data
+message CPMTransformationParameter {
+  // For data pre-processing, we can do simple scaling and subtracting the
+  // data mean, if provided. Note that the mean subtraction is always carried
+  // out before scaling.
+  optional float scale = 1 [default = 1];
+  // Specify if we want to randomly mirror data.
+  optional bool mirror = 2 [default = false];
+  // Specify if we would like to randomly crop an image.
+  optional uint32 crop_size = 3 [default = 0];
+  // mean_file and mean_value cannot be specified at the same time
+  optional string mean_file = 4;
+  // if specified can be repeated once (would substract it from all the channels)
+  // or can be repeated the same number of times as channels
+  // (would subtract them from the corresponding channel)
+  repeated float mean_value = 5;
+  optional uint32 stride = 6 [default = 4];
+  optional float scale_cvg = 7 [default = 0.5];
+  optional uint32 max_cvg_len = 8 [default = 50];
+  optional uint32 min_cvg_len = 9 [default = 50];
+  optional bool opaque_coverage = 10 [default = true];
+  optional string coverage = 11 [default = "gridbox_max"];
+  optional float flip_prob = 12 [default = 0.5];
+  optional float max_rotate_degree = 13 [default = 5.0];
+  optional bool visualize = 14 [default = false];
+  optional uint32 crop_size_x = 15 [default = 368];
+  optional uint32 crop_size_y = 16 [default = 368];
+  optional float scale_prob = 17 [default = 0.5];
+  optional float scale_min = 18 [default = 0.9];
+  optional float scale_max = 19 [default = 1.1];
+  optional float bbox_norm_factor = 20 [default = 300];
+  optional string img_header = 21 [default = "."];
+  // Force the decoded image to have 3 color channels.
+  optional bool force_color = 22 [default = false];
+  // Force the decoded image to have 1 color channels.
+  optional bool force_gray = 23 [default = false];
+  optional float target_dist = 24 [default = 1.0];
+  optional float center_perterb_max = 25 [default = 10.0];
+  optional float sigma = 26 [default = 7.0];
+  optional float sigma_center = 27 [default = 21.0];
+  optional float clahe_tile_size = 28 [default = 8.0];
+  optional float clahe_clip_limit = 29 [default = 4.0];
+  optional bool do_clahe = 30 [default = false];
+  optional uint32 num_parts = 31 [default = 14];
+  optional uint32 num_total_augs = 32 [default = 82];
+  optional string aug_way = 33 [default = "rand"];
+  optional uint32 gray = 34 [default = 0];
+  optional uint32 np_in_lmdb = 35 [default = 16];
+  optional bool transform_body_joint = 38 [default = true];
+}
+
 
 // Message that stores parameters used by data transformer for resize policy
 message ResizeParameter {
@@ -1150,11 +1151,6 @@ message DetectionEvaluateParameter {
   optional string name_size_file = 5;
   // The resize parameter used in converting NormalizedBBox to original image.
   optional ResizeParameter resize_param = 6;
-  enum AnnoataionAttriType{
-    FACE = 0;
-    NORMALL = 1;
-  }
-  optional AnnoataionAttriType attri_type = 7[default =FACE ];
 }
 
 message NonMaximumSuppressionParameter {
@@ -1222,16 +1218,9 @@ message DetectionOutputParameter {
   optional float visualize_threshold = 11;
   // If provided, save outputs to video file.
   optional string save_file = 12;
-  optional uint32 num_blur = 13;
-  optional uint32 num_occlusion = 14;
   optional uint32 num_lpchinese = 15;
   optional uint32 num_lpenglish = 16;
   optional uint32 num_lpletter = 17;
-  enum AnnoataionAttriType{
-    FACE = 0;
-    NORMALL = 1;
-  }
-  optional AnnoataionAttriType attri_type = 18;
 }
 
 message DropoutParameter {
@@ -1510,14 +1499,6 @@ message MultiBoxLossParameter {
   optional NonMaximumSuppressionParameter nms_param = 21;
   optional int32 sample_size = 22 [default = 64];
   optional bool use_prior_for_nms = 23 [default = false];
-  // Number of blur to be predicted. Required!
-  optional uint32 num_blur = 24;
-  //Number of occlusion to be predicted. Required!
-  optional uint32 num_occlusion = 25;
-  // blur conf loss types
-  optional ConfLossType conf_blur_loss_type = 26;
-  // occlusion conf loss types
-  optional ConfLossType conf_occlu_loss_type = 27;
   optional uint32 num_chinese = 28;
   optional ConfLossType chineselp_loss_type = 29;
   optional uint32 num_english = 30;
@@ -1527,13 +1508,14 @@ message MultiBoxLossParameter {
 }
 
 // Message that store parameters used by MultiBoxLossLayer
-message MultiFaceLossParameter {
+message MultiFaceAttriLossParameter {
   // Localization loss type.
   enum MarkLossType {
     L2 = 0;
     SMOOTH_L1 = 1;
   }
   optional MarkLossType mark_loss_type = 2 [default = SMOOTH_L1];
+  optional MarkLossType angle_loss_type = 9 [default = SMOOTH_L1];
   // Confidence loss type.
   enum AttriLossType {
     SOFTMAX = 0;
@@ -1545,28 +1527,15 @@ message MultiFaceLossParameter {
   // If match_type is PER_PREDICTION, use overlap_threshold to
   // determine the extra matching bboxes.
   optional uint32 num_glasses = 5;
-  // blur gender loss types
+  // gender loss types
   optional AttriLossType conf_gender_loss_type = 7 [default = SOFTMAX];
   // glass conf loss types
   optional AttriLossType conf_glasses_loss_type = 8 [default = SOFTMAX];
-  // add new background id realeated id r.w.t blur & occlusion
   optional float gender_weight = 10 [default = 1.0];
   optional float glass_weight = 11 [default = 1.0];
+  optional float angle_weight = 12;
 }
 
-// Message that store parameters used by MultiBoxLossLayer
-message MultiFacePoseLossParameter {
-  enum AttriLossType {
-    LOGISTIC = 0;
-    SMOOTH_L1 = 1;
-    L2 = 2;
-  }
-  optional float pose_weights = 1 [default = 1.0];
-  // facecontour loss types
-  optional AttriLossType regs_face_contour_loss_type = 2 [default = SMOOTH_L1];
-  // facepose loss types
-  optional AttriLossType regs_face_pose_loss_type = 3 [default = SMOOTH_L1];
-}
 // Message that store parameters used by MultiBoxLossLayer
 message MultiFaceContourLossParameter {
   enum AttriLossType {
@@ -1709,7 +1678,7 @@ message PriorBoxParameter {
 
 message FaceEvaluateParameter{
     enum FaceType{
-        FACE_21_TYPE =0;
+        FACEATTRIBUTE =0;
         FACE_5_TYPE =1;
         FACE_ANGLE = 2;
     }

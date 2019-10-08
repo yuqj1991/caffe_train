@@ -106,149 +106,57 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
 
   vector<int> top_shape(2, 1);
   top_shape.push_back(num_kept);
-  if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_FACE){
-    // Retrieve all confidences.
-    Dtype* blur_permute_data = blur_permute_.mutable_gpu_data();
-    PermuteDataGPU<Dtype>(bottom[3]->count(), bottom[3]->gpu_data(),
-        num_blur_, num_priors_, 1, blur_permute_data);
-    const Dtype* blur_cpu_data = blur_permute_.cpu_data();
-
-    // Retrieve all confidences.
-    Dtype* occlu_permute_data = occlu_permute_.mutable_gpu_data();
-    PermuteDataGPU<Dtype>(bottom[4]->count(), bottom[4]->gpu_data(),
-        num_occlusion_, num_priors_, 1, occlu_permute_data);
-    const Dtype* occlu_cpu_data = occlu_permute_.cpu_data();
-
-    top_shape.push_back(9);
-    Dtype* top_data;
-    if (num_kept == 0) {
-      LOG(INFO) << "Couldn't find any detections";
-      top_shape[2] = num;
-      top[0]->Reshape(top_shape);
-      top_data = top[0]->mutable_cpu_data();
-      caffe_set<Dtype>(top[0]->count(), -1, top_data);
-      // Generate fake results per image.
-      for (int i = 0; i < num; ++i) {
-        top_data[0] = i;
-        top_data += 9;
-      }
-    } else {
-      top[0]->Reshape(top_shape);
-      top_data = top[0]->mutable_cpu_data();
-    }
-    int count = 0;
-    boost::filesystem::path output_directory(output_directory_);
+  top_shape.push_back(7);
+  Dtype* top_data;
+  if (num_kept == 0) {
+    LOG(INFO) << "Couldn't find any detections";
+    top_shape[2] = num;
+    top[0]->Reshape(top_shape);
+    top_data = top[0]->mutable_cpu_data();
+    caffe_set<Dtype>(top[0]->count(), -1, top_data);
+    // Generate fake results per image.
     for (int i = 0; i < num; ++i) {
-      const int conf_idx = i * num_classes_ * num_priors_;
-      const int blur_idx = i * num_blur_ * num_priors_;
-      const int occlu_idx = i * num_occlusion_ * num_priors_;
-      int bbox_idx;
-      if (share_location_) {
-        bbox_idx = i * num_priors_ * 4;
-      } else {
-        bbox_idx = conf_idx * 4;
-      }
-      for (map<int, vector<int> >::iterator it = all_indices[i].begin();
-          it != all_indices[i].end(); ++it) {
-        int label = it->first;
-        vector<int>& indices = it->second;
-        if (need_save_) {
-          CHECK(label_to_name_.find(label) != label_to_name_.end())
-            << "Cannot find label: " << label << " in the label map.";
-          CHECK_LT(name_count_, names_.size());
-        }
-        const Dtype* cur_conf_data =
-          conf_cpu_data + conf_idx + label * num_priors_;
-        const Dtype* cur_blur_data =
-          blur_cpu_data + blur_idx;
-        const Dtype* cur_occlu_data =
-          occlu_cpu_data + occlu_idx;
-        const Dtype* cur_bbox_data = bbox_cpu_data + bbox_idx;
-        if (!share_location_) {
-          cur_bbox_data += label * num_priors_ * 4;
-        }
-        for (int j = 0; j < indices.size(); ++j) {
-          int idx = indices[j];
-          top_data[count * 9] = i;
-          top_data[count * 9 + 1] = label;
-          top_data[count * 9 + 2] = cur_conf_data[idx];
-          for (int k = 0; k < 4; ++k) {
-            top_data[count * 9 + 3 + k] = cur_bbox_data[idx * 4 + k];
-          }
-          int blur_index = 0; int occlu_index = 0;
-          float blur_temp =0; float occlu_temp =0.0;
-          for (int ii = 0; ii< 3; ii++ )
-          {
-            if (blur_temp <  cur_blur_data[idx+ num_priors_*ii])
-            {
-              blur_index = ii;
-              blur_temp = cur_blur_data[idx+ num_priors_*ii];
-            }
-            if (occlu_temp < cur_occlu_data[idx + num_priors_*ii])
-            {
-              occlu_index = ii;
-              occlu_temp = cur_occlu_data[idx+num_priors_*ii];
-            }
-          }
-          top_data[count * 9 + 7] = blur_index;
-          top_data[count * 9 + 8] = occlu_index;
-          ++count;
-        }
-      }
+      top_data[0] = i;
+      top_data += 7;
     }
-  }else if(attri_type_ == DetectionOutputParameter_AnnoataionAttriType_NORMALL){
-    top_shape.push_back(7);
-    Dtype* top_data;
-    if (num_kept == 0) {
-      LOG(INFO) << "Couldn't find any detections";
-      top_shape[2] = num;
-      top[0]->Reshape(top_shape);
-      top_data = top[0]->mutable_cpu_data();
-      caffe_set<Dtype>(top[0]->count(), -1, top_data);
-      // Generate fake results per image.
-      for (int i = 0; i < num; ++i) {
-        top_data[0] = i;
-        top_data += 7;
-      }
+  } else {
+    top[0]->Reshape(top_shape);
+    top_data = top[0]->mutable_cpu_data();
+  }
+  int count = 0;
+  boost::filesystem::path output_directory(output_directory_);
+  for (int i = 0; i < num; ++i) {
+    const int conf_idx = i * num_classes_ * num_priors_;
+    int bbox_idx;
+    if (share_location_) {
+      bbox_idx = i * num_priors_ * 4;
     } else {
-      top[0]->Reshape(top_shape);
-      top_data = top[0]->mutable_cpu_data();
+      bbox_idx = conf_idx * 4;
     }
-    int count = 0;
-    boost::filesystem::path output_directory(output_directory_);
-    for (int i = 0; i < num; ++i) {
-      const int conf_idx = i * num_classes_ * num_priors_;
-      int bbox_idx;
-      if (share_location_) {
-        bbox_idx = i * num_priors_ * 4;
-      } else {
-        bbox_idx = conf_idx * 4;
+    const Dtype* cur_bbox_data = bbox_cpu_data + bbox_idx;
+    for (map<int, vector<int> >::iterator it = all_indices[i].begin();
+        it != all_indices[i].end(); ++it) {
+      int label = it->first;
+      vector<int>& indices = it->second;
+      if (need_save_) {
+        CHECK(label_to_name_.find(label) != label_to_name_.end())
+          << "Cannot find label: " << label << " in the label map.";
+        CHECK_LT(name_count_, names_.size());
       }
-      const Dtype* cur_bbox_data = bbox_cpu_data + bbox_idx;
-      for (map<int, vector<int> >::iterator it = all_indices[i].begin();
-          it != all_indices[i].end(); ++it) {
-        int label = it->first;
-        vector<int>& indices = it->second;
-        if (need_save_) {
-          CHECK(label_to_name_.find(label) != label_to_name_.end())
-            << "Cannot find label: " << label << " in the label map.";
-          CHECK_LT(name_count_, names_.size());
+      const Dtype* cur_conf_data =
+        conf_cpu_data + conf_idx + label * num_priors_;
+      if (!share_location_) {
+        cur_bbox_data += label * num_priors_ * 4;
+      }
+      for (int j = 0; j < indices.size(); ++j) {
+        int idx = indices[j];
+        top_data[count * 7] = i;
+        top_data[count * 7 + 1] = label;
+        top_data[count * 7 + 2] = cur_conf_data[idx];
+        for (int k = 0; k < 4; ++k) {
+          top_data[count * 7 + 3 + k] = cur_bbox_data[idx * 4 + k];
         }
-        const Dtype* cur_conf_data =
-          conf_cpu_data + conf_idx + label * num_priors_;
-        if (!share_location_) {
-          cur_bbox_data += label * num_priors_ * 4;
-        }
-        for (int j = 0; j < indices.size(); ++j) {
-          int idx = indices[j];
-          top_data[count * 7] = i;
-          top_data[count * 7 + 1] = label;
-          top_data[count * 7 + 2] = cur_conf_data[idx];
-          for (int k = 0; k < 4; ++k) {
-            top_data[count * 7 + 3 + k] = cur_bbox_data[idx * 4 + k];
-          }
-          ++count;
-        }
+        ++count;
       }
     }
   }

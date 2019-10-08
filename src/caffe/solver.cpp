@@ -344,9 +344,7 @@ void Solver<Dtype>::TestAll() {
        ++test_net_id) {
     if (param_.eval_type() == "classification") {
       TestClassification(test_net_id);
-    } else if (param_.eval_type() == "detectionface") {
-      TestDetectionFACE(test_net_id);
-    }else if (param_.eval_type() == "detection") {
+    } else if (param_.eval_type() == "detection") {
       TestDetection(test_net_id);
     }else if (param_.eval_type() == "faceattri") {
       TestRecoFaceAttri(test_net_id);
@@ -354,8 +352,6 @@ void Solver<Dtype>::TestAll() {
       TestRecoccpdNumber(test_net_id);
     }else if (param_.eval_type() == "faceangle") {
       TestRecoFaceAngle(test_net_id);
-    }else if (param_.eval_type() == "face_Blur") {
-      TestRecFaceBlur(test_net_id);
     }else {
       LOG(FATAL) << "Unknown evaluation type: " << param_.eval_type();
     }
@@ -436,141 +432,6 @@ void Solver<Dtype>::TestClassification(const int test_net_id) {
               << mean_score << loss_msg_stream.str();
   }
 }
-
-template <typename Dtype>
-void Solver<Dtype>::TestDetectionFACE(const int test_net_id) {
-  CHECK(Caffe::root_solver());
-  LOG(INFO) << "Iteration " << iter_
-            << ", Testing net (#" << test_net_id << ")";
-  CHECK_NOTNULL(test_nets_[test_net_id].get())->
-      ShareTrainedLayersWith(net_.get());
-  map<int, map<int, vector<pair<float, int> > > > all_true_pos;
-  map<int, map<int, vector<pair<float, int> > > > all_false_pos;
-  map<int, map<int, int> > all_num_pos;
-  Dtype all_num_pos_blur = 0.0;
-  Dtype all_num_pos_occlu = 0.0;
-  const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
-  Dtype loss = 0;
-  Dtype num_ground_postitve_face = 0.0;
-  for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
-    SolverAction::Enum request = GetRequestedAction();
-    // Check to see if stoppage of testing/training has been requested.
-    while (request != SolverAction::NONE) {
-        if (SolverAction::SNAPSHOT == request) {
-          Snapshot();
-        } else if (SolverAction::STOP == request) {
-          requested_early_exit_ = true;
-        }
-        request = GetRequestedAction();
-    }
-    if (requested_early_exit_) {
-      // break out of test loop.
-      break;
-    }
-    Dtype iter_loss;
-    const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
-    if (param_.test_compute_loss()) {
-      loss += iter_loss;
-    }
-    for (int j = 0; j < result.size(); ++j) {
-      CHECK_EQ(result[j]->width(), 7);
-      const Dtype* result_vec = result[j]->cpu_data();
-      int num_det = result[j]->height();
-      for (int k = 0; k < num_det; ++k) {
-        int item_id = static_cast<int>(result_vec[k * 7]);
-        int label = static_cast<int>(result_vec[k * 7+ 1]);
-        if (item_id == -1) {
-          // Special row of storing number of positives for a label.
-          if (all_num_pos[j].find(label) == all_num_pos[j].end()) {
-            all_num_pos[j][label] = static_cast<int>(result_vec[k * 7 + 2]);
-            num_ground_postitve_face = static_cast<int>(result_vec[k * 7 + 2]);
-          } else {
-            all_num_pos[j][label] += static_cast<int>(result_vec[k * 7 + 2]);
-            num_ground_postitve_face += static_cast<int>(result_vec[k * 7 + 2]);
-          }
-        } else {
-          // Normal row storing detection status.
-          float score = result_vec[k * 7 + 2];
-          int tp = static_cast<int>(result_vec[k * 7 + 3]);
-          int fp = static_cast<int>(result_vec[k * 7 + 4]);
-          if (static_cast<int>(result_vec[k * 7 + 5]) == 1)
-            all_num_pos_blur ++ ;
-          if (static_cast<int>(result_vec[k * 7 + 6]) == 1)
-            all_num_pos_occlu ++ ;
-
-          if (tp == 0 && fp == 0) {
-            // Ignore such case. It happens when a detection bbox is matched to
-            // a difficult gt bbox and we don't evaluate on difficult gt bbox.
-            continue;
-          }
-          all_true_pos[j][label].push_back(std::make_pair(score, tp));
-          all_false_pos[j][label].push_back(std::make_pair(score, fp));
-        }
-      }
-    }
-  }
-
-  if (requested_early_exit_) {
-    LOG(INFO)     << "Test interrupted.";
-    return;
-  }
-  if (param_.test_compute_loss()) {
-    loss /= param_.test_iter(test_net_id);
-    LOG(INFO) << "Test loss: " << loss;
-  }
-  for (int i = 0; i < all_true_pos.size(); ++i) {
-    if (all_true_pos.find(i) == all_true_pos.end()) {
-      LOG(FATAL) << "Missing output_blob true_pos: " << i;
-    }
-    const map<int, vector<pair<float, int> > >& true_pos =
-        all_true_pos.find(i)->second;
-    if (all_false_pos.find(i) == all_false_pos.end()) {
-      LOG(FATAL) << "Missing output_blob false_pos: " << i;
-    }
-    const map<int, vector<pair<float, int> > >& false_pos =
-        all_false_pos.find(i)->second;
-    if (all_num_pos.find(i) == all_num_pos.end()) {
-      LOG(FATAL) << "Missing output_blob num_pos: " << i;
-    }
-    const map<int, int>& num_pos = all_num_pos.find(i)->second;
-    map<int, float> APs;
-    float mAP = 0.;
-    // Sort true_pos and false_pos with descend scores.
-    for (map<int, int>::const_iterator it = num_pos.begin();
-         it != num_pos.end(); ++it) {
-      int label = it->first;
-      int label_num_pos = it->second;
-      if (true_pos.find(label) == true_pos.end()) {
-        LOG(WARNING) << "Missing true_pos for label: " << label;
-        continue;
-      }
-      const vector<pair<float, int> >& label_true_pos =
-          true_pos.find(label)->second;
-      if (false_pos.find(label) == false_pos.end()) {
-        LOG(WARNING) << "Missing false_pos for label: " << label;
-        continue;
-      }
-      const vector<pair<float, int> >& label_false_pos =
-          false_pos.find(label)->second;
-      vector<float> prec, rec;
-      ComputeAP(label_true_pos, label_num_pos, label_false_pos,
-                param_.ap_version(), &prec, &rec, &(APs[label]));
-      mAP += APs[label];
-      if (param_.show_per_class_result()) {
-        LOG(INFO) << "class" << label << ": " << APs[label];
-      }
-    }
-    mAP /= num_pos.size();
-    LOG(INFO)<<"num_ground_postitve_face: "<<num_ground_postitve_face
-             <<" all_num_pos_blur: "<<all_num_pos_blur<<" all_num_pos_occlu: "<<all_num_pos_occlu;
-    const int output_blob_index = test_net->output_blob_indices()[i];
-    const string& output_name = test_net->blob_names()[output_blob_index];
-    LOG(INFO) << "Test net output #" << i << ": map of " << output_name << " = "
-              << mAP << ", blur accuracy: "<< all_num_pos_blur/num_ground_postitve_face
-              << ", occlussion accuracy: "<< all_num_pos_occlu/num_ground_postitve_face;
-  }
-}
-
 template <typename Dtype>
 void Solver<Dtype>::TestDetection(const int test_net_id) {
   CHECK(Caffe::root_solver());
@@ -701,7 +562,8 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
   CHECK_NOTNULL(test_nets_[test_net_id].get())->
       ShareTrainedLayersWith(net_.get());
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
-  Dtype nme =0.0, gender_precision =0.0, glasses_presion=0.0;
+  Dtype lefteye =0.0, righteye = 0.0, nose = 0.0, leftmouth = 0.0, rightmouth = 0.0, gender_precision =0.0, glasses_presion=0.0;
+  Dtype pitch_precision =0.0, yaw_presion=0.0, roll_presicon=0.0;
   int batch_size =0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
     SolverAction::Enum request = GetRequestedAction();
@@ -724,22 +586,33 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
       const Dtype* result_vec = result[j]->cpu_data();
       batch_size = result[j]->height();
       for(int ii = 0; ii<batch_size; ii++){
-        nme +=result_vec[ii*3 + 0];
-        if (result_vec[ii*3 + 1]==1)
+        lefteye += result_vec[ii*10 + 0];
+        righteye += result_vec[ii*10 + 1];
+        nose += result_vec[ii*10 + 2];
+        leftmouth += result_vec[ii*10 + 3];
+        rightmouth += result_vec[ii*10 + 4];
+        if (result_vec[ii*10 + 5]==1)
           gender_precision++;
-        if (result_vec[ii*3 + 2]==1)
+        if (result_vec[ii*10 + 6]==1)
           glasses_presion++;
+        yaw_presion += result_vec[ii*10 + 7];
+        pitch_precision += result_vec[ii*10 + 8];
+        roll_presicon += result_vec[ii*10 + 9];
       } 
     }    
   }
   int total_images = param_.test_iter(test_net_id)* batch_size;
   LOG(INFO) << "total_images: "<< total_images
-             << " NME: "<< nme/total_images
-             <<" gender : "<<gender_precision
+             << " lefteye: "<< lefteye/total_images
+             << " righteye: "<< righteye/total_images
+             << " nose: "<< nose/total_images
+             << " leftmouth: "<< leftmouth/total_images
+             << " rightmouth: "<< rightmouth/total_images
              <<" gender accuracy: "<<gender_precision/total_images
-             <<" glasses : "<<glasses_presion
-             <<" glasses accuracy: "<<glasses_presion/total_images;
-             
+             <<" glasses accuracy: "<<glasses_presion/total_images
+             <<" yaw accuracy: "<< yaw_presion/total_images
+             <<" pitch accuracy: "<< pitch_precision/total_images
+             <<" roll accuracy: "<< roll_presicon/total_images;        
   if (requested_early_exit_) {
     LOG(INFO)     << "Test interrupted.";
     return;
@@ -839,71 +712,20 @@ void Solver<Dtype>::TestRecoccpdNumber(const int test_net_id) {
   }
 }
 
-
 template <typename Dtype>
-void Solver<Dtype>::TestRecFaceBlur(const int test_net_id) {
-  CHECK(Caffe::root_solver());
-  LOG(INFO) << "Iteration " << iter_
-            << ", Testing net (#" << test_net_id << ")";
-  CHECK_NOTNULL(test_nets_[test_net_id].get())->
-      ShareTrainedLayersWith(net_.get());
-  const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
-  Dtype blur_precison = 0.0;
-  Dtype occlu_precison = 0.0;
-  int batch_size =0;
-  for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
-    SolverAction::Enum request = GetRequestedAction();
-    // Check to see if stoppage of testing/training has been requested.
-    while (request != SolverAction::NONE) {
-        if (SolverAction::SNAPSHOT == request) {
-          Snapshot();
-        } else if (SolverAction::STOP == request) {
-          requested_early_exit_ = true;
-        }
-        request = GetRequestedAction();
-    }
-    if (requested_early_exit_) {
-      // break out of test loop.
-      break;
-    }
-    Dtype iter_loss;
-    const vector<Blob<Dtype>*>& result = test_net->Forward(&iter_loss);
-    for (int j = 0; j < result.size(); ++j) {
-      const Dtype* result_vec = result[j]->cpu_data();
-      batch_size = result[j]->height();
-      for(int ii = 0; ii<batch_size; ii++){
-        if (result_vec[ii*2]==1)
-          blur_precison++;
-        if (result_vec[ii*2+ 1]==1)
-          occlu_precison++;
-      } 
-    }    
-  }
-  int total_images = param_.test_iter(test_net_id)* batch_size;
-  LOG(INFO) << "total_images: "<< total_images
-             << " blur_precison: "<< blur_precison/total_images 
-             << " occlu_precison: "<< occlu_precison/total_images;       
-  if (requested_early_exit_) {
-    LOG(INFO)     << "Test interrupted.";
-    return;
-  }
-}
-
-template <typename Dtype>
-void Solver<Dtype>::Snapshot() {
+void Solver<Dtype>::Snapshot(){
   CHECK(Caffe::root_solver());
   string model_filename;
-  switch (param_.snapshot_format()) {
-  case caffe::SolverParameter_SnapshotFormat_BINARYPROTO:
-    model_filename = SnapshotToBinaryProto();
-    break;
-  case caffe::SolverParameter_SnapshotFormat_HDF5:
-    model_filename = SnapshotToHDF5();
-    break;
-  default:
-    LOG(FATAL) << "Unsupported snapshot format.";
+  switch(param_.snapshot_format()){
+    case caffe::SolverParameter_SnapshotFormat_BINARYPROTO:
+      model_filename = SnapshotToBinaryProto();
+      break;
+    case caffe::SolverParameter_SnapshotFormat_HDF5:
+      model_filename = SnapshotToHDF5();
+      break;
+    default:
+      LOG(FATAL) << "unsupported snapshot format.";
   }
-
   SnapshotSolverState(model_filename);
 }
 

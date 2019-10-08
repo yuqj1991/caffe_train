@@ -155,120 +155,21 @@ void UpdateBBoxByResizePolicy(ResizeParameter& param,
   bbox->set_ymax(y_max / new_height);
 }
 
-void UpdateLandmarkFaceByResizePolicy(const ResizeParameter& param,
-                              const int old_width, const int old_height,
-                              LandmarkFace* lface) {
-  float new_height = param.height();
-  float new_width = param.width();
-  float x1 = lface->x1() * old_width;
-  float x2 = lface->x2() * old_width;
-  float x3 = lface->x3() * old_width;
-  float x4 = lface->x4() * old_width;
-  float x5 = lface->x5() * old_width;
-  float y1 = lface->y1() * old_height;
-  float y2 = lface->y2() * old_height;
-  float y3 = lface->y3() * old_height;
-  float y4 = lface->y4() * old_height;
-  float y5 = lface->y5() * old_height;
-  #if 0
-  LOG(INFO)<<"x1: "<<x1<<" "<<y1
-           <<" x2: "<<x2<<" "<<y2
-           <<" x3: "<<x3<<" "<<y3
-           <<" x4: "<<x4<<" "<<y4
-           <<" x5: "<<x5<<" "<<y5;
-  LOG(INFO)<<"old width: "<<old_width<<" old height: "<<old_height;
-  #endif
-  switch (param.resize_mode()) {
-    case ResizeParameter_Resize_mode_WARP:
-      x1 = std::min(new_width,std::max(0.f, x1 * new_width / old_width));
-      y1 = std::min(new_height,std::max(0.f, y1 * new_height / old_height));
-      x2 = std::min(new_width,std::max(0.f, x2 * new_width / old_width));
-      y2 = std::min(new_height,std::max(0.f, y2 * new_height / old_height));
-      x3 = std::min(new_width,std::max(0.f, x3 * new_width / old_width));
-      y3 = std::min(new_height,std::max(0.f, y3 * new_height / old_height));
-      x4 = std::min(new_width,std::max(0.f, x4 * new_width / old_width));
-      y4 = std::min(new_height, std::max(0.f, y4 * new_height / old_height));
-      x5 = std::min(new_width,std::max(0.f, x5 * new_width / old_width));
-      y5 = std::min(new_height,std::max(0.f, y5 * new_height / old_height));
-      break;
-    default:
-      LOG(FATAL) << "Unknown resize mode.";
-  }
-   #if 0
-  LOG(INFO)<<"x1: "<<x1<<" "<<y1
-           <<" x2: "<<x2<<" "<<y2
-           <<" x3: "<<x3<<" "<<y3
-           <<" x4: "<<x4<<" "<<y4
-           <<" x5: "<<x5<<" "<<y5;
-  #endif
-  lface->set_x1(float(x1/new_width));
-  lface->set_y1(float(y1/new_height));
-  lface->set_x2(float(x2/new_width));
-  lface->set_y2(float(y2/new_height));
-  lface->set_x3(float(x3/new_width));
-  lface->set_y3(float(y3/new_height));
-  lface->set_x4(float(x4/new_width));
-  lface->set_y4(float(y4/new_height));
-  lface->set_x5(float(x5/new_width));
-  lface->set_y5(float(y5/new_height));
-  #if 0
-  LOG(INFO)<<"new_width: "<<new_width<<" "<<" new_height: "<<new_height;
-  LOG(INFO)<<"fx1: "<<float(x1/new_width)<<" "<<float(y1/new_height)
-           <<" fx2: "<<float(x2/new_width)<<" "<<float(y2/new_height)
-           <<" fx3: "<<float(x3/new_width)<<" "<<float(y3/new_height)
-           <<" fx4: "<<float(x4/new_width)<<" "<<float(y4/new_height)
-           <<" fx5: "<<float(x5/new_width)<<" "<<float(y5/new_height);
-  LOG(INFO)<<"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&";
-  #endif
-}
-
 void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
                               const int old_width, const int old_height,
-                              AnnoFaceContourPoints* lface){
+                              AnnoFaceLandmarks* lface){
   float new_height = param.height();
   float new_width = param.width();
-  float x1 = lface->point_1().x()* old_width;
-  float y1 = lface->point_1().y()* old_height;
-  float x2 = lface->point_2().x()* old_width;
-  float y2 = lface->point_2().y()* old_height;
-  float x3 = lface->point_3().x()* old_width;
-  float y3 = lface->point_3().y()* old_height;
-  float x4 = lface->point_4().x()* old_width;
-  float y4 = lface->point_4().y()* old_height;
-  float x5 = lface->point_5().x()* old_width;
-  float y5 = lface->point_5().y()* old_height;
-  float x6 = lface->point_6().x()* old_width;
-  float y6 = lface->point_6().y()* old_height;
-  float x7 = lface->point_7().x()* old_width;
-  float y7 = lface->point_7().y()* old_height;
-  float x8 = lface->point_8().x()* old_width;
-  float y8 = lface->point_8().y()* old_height;
-  float x9 = lface->point_9().x()* old_width;
-  float y9 = lface->point_9().y()* old_height;
-  float x10 = lface->point_10().x()* old_width;
-  float y10 = lface->point_10().y()* old_height;
-  float x11 = lface->point_11().x()* old_width;
-  float y11 = lface->point_11().y()* old_height;
-  float x12 = lface->point_12().x()* old_width;
-  float y12 = lface->point_12().y()* old_height;
-  float x13 = lface->point_13().x()* old_width;
-  float y13 = lface->point_13().y()* old_height;
-  float x14 = lface->point_14().x()* old_width;
-  float y14 = lface->point_14().y()* old_height;
-  float x15 = lface->point_15().x()* old_width;
-  float y15 = lface->point_15().y()* old_height;
-  float x16 = lface->point_16().x()* old_width;
-  float y16 = lface->point_16().y()* old_height;
-  float x17 = lface->point_17().x()* old_width;
-  float y17 = lface->point_17().y()* old_height;
-  float x18 = lface->point_18().x()* old_width;
-  float y18 = lface->point_18().y()* old_height;
-  float x19 = lface->point_19().x()* old_width;
-  float y19 = lface->point_19().y()* old_height;
-  float x20 = lface->point_20().x()* old_width;
-  float y20 = lface->point_20().y()* old_height;
-  float x21 = lface->point_21().x()* old_width;
-  float y21 = lface->point_21().y()* old_height;
+  float x1 = lface->lefteye().x()* old_width;
+  float y1 = lface->lefteye().y()* old_height;
+  float x2 = lface->righteye().x()* old_width;
+  float y2 = lface->righteye().y()* old_height;
+  float x3 = lface->nose().x()* old_width;
+  float y3 = lface->nose().y()* old_height;
+  float x4 = lface->leftmouth().x()* old_width;
+  float y4 = lface->leftmouth().y()* old_height;
+  float x5 = lface->rightmouth().x()* old_width;
+  float y5 = lface->rightmouth().y()* old_height;
   switch (param.resize_mode()) {
     case ResizeParameter_Resize_mode_WARP:
       x1 = std::min(new_width, std::max(0.f, x1 * new_width / old_width));
@@ -285,120 +186,24 @@ void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
 
       x5 = std::min(new_width, std::max(0.f, x5 * new_width / old_width));
       y5 = std::min(new_height,std::max(0.f, y5 * new_height / old_height));
-
-      x6 = std::min(new_width, std::max(0.f, x6 * new_width / old_width));
-      y6 = std::min(new_height,std::max(0.f, y6 * new_height / old_height));
-
-      x7 = std::min(new_width, std::max(0.f, x7 * new_width / old_width));
-      y7 = std::min(new_height,std::max(0.f, y7 * new_height / old_height));
-
-      x8 = std::min(new_width, std::max(0.f, x8 * new_width / old_width));
-      y8 = std::min(new_height,std::max(0.f, y8 * new_height / old_height));
-
-      x9 = std::min(new_width, std::max(0.f, x9 * new_width / old_width));
-      y9 = std::min(new_height,std::max(0.f, y9 * new_height / old_height));
-
-      x10 = std::min(new_width, std::max(0.f, x10 * new_width / old_width));
-      y10 = std::min(new_height,std::max(0.f, y10 * new_height / old_height));
-
-      x11 = std::min(new_width, std::max(0.f, x11 * new_width / old_width));
-      y11 = std::min(new_height,std::max(0.f, y11 * new_height / old_height));
-
-      x12 = std::min(new_width, std::max(0.f, x12 * new_width / old_width));
-      y12 = std::min(new_height,std::max(0.f, y12 * new_height / old_height));
-
-      x13 = std::min(new_width, std::max(0.f, x13 * new_width / old_width));
-      y13 = std::min(new_height,std::max(0.f, y13 * new_height / old_height));
-
-      x14 = std::min(new_width, std::max(0.f, x14 * new_width / old_width));
-      y14 = std::min(new_height,std::max(0.f, y14 * new_height / old_height));
-
-      x15 = std::min(new_width, std::max(0.f, x15 * new_width / old_width));
-      y15 = std::min(new_height,std::max(0.f, y15 * new_height / old_height));
-
-      x16 = std::min(new_width, std::max(0.f, x16 * new_width / old_width));
-      y16 = std::min(new_height,std::max(0.f, y16 * new_height / old_height));
-
-      x17 = std::min(new_width, std::max(0.f, x17 * new_width / old_width));
-      y17 = std::min(new_height,std::max(0.f, y17 * new_height / old_height));
-
-      x18 = std::min(new_width, std::max(0.f, x18 * new_width / old_width));
-      y18 = std::min(new_height,std::max(0.f, y18 * new_height / old_height));
-
-      x19 = std::min(new_width, std::max(0.f, x19 * new_width / old_width));
-      y19 = std::min(new_height,std::max(0.f, y19 * new_height / old_height));
-
-      x20 = std::min(new_width, std::max(0.f, x20 * new_width / old_width));
-      y20 = std::min(new_height,std::max(0.f, y20 * new_height / old_height));
-
-      x21 = std::min(new_width, std::max(0.f, x21 * new_width / old_width));
-      y21 = std::min(new_height,std::max(0.f, y21 * new_height / old_height));
       break;
     default:
       LOG(FATAL) << "Unknown resize mode.";
   }
-  lface->mutable_point_1()->set_x(float(x1/new_width));
-  lface->mutable_point_1()->set_y(float(y1/new_height));
+  lface->mutable_lefteye()->set_x(float(x1/new_width));
+  lface->mutable_lefteye()->set_y(float(y1/new_height));
 
-  lface->mutable_point_2()->set_x(float(x2/new_width));
-  lface->mutable_point_2()->set_y(float(y2/new_height));
+  lface->mutable_righteye()->set_x(float(x2/new_width));
+  lface->mutable_righteye()->set_y(float(y2/new_height));
 
-  lface->mutable_point_3()->set_x(float(x3/new_width));
-  lface->mutable_point_3()->set_y(float(x3/new_height));
+  lface->mutable_nose()->set_x(float(x3/new_width));
+  lface->mutable_nose()->set_y(float(x3/new_height));
 
-  lface->mutable_point_4()->set_x(float(x4/new_width));
-  lface->mutable_point_4()->set_y(float(y4/new_height));
+  lface->mutable_leftmouth()->set_x(float(x4/new_width));
+  lface->mutable_leftmouth()->set_y(float(y4/new_height));
 
-  lface->mutable_point_5()->set_x(float(x5/new_width));
-  lface->mutable_point_5()->set_y(float(y5/new_height));
-
-  lface->mutable_point_6()->set_x(float(x6/new_width));
-  lface->mutable_point_6()->set_y(float(y6/new_height));
-
-  lface->mutable_point_7()->set_x(float(x7/new_width));
-  lface->mutable_point_7()->set_y(float(y7/new_height));
-
-  lface->mutable_point_8()->set_x(float(x8/new_width));
-  lface->mutable_point_8()->set_y(float(y8/new_height));
-
-  lface->mutable_point_9()->set_x(float(x9/new_width));
-  lface->mutable_point_9()->set_y(float(y9/new_height));
-
-  lface->mutable_point_10()->set_x(float(x11/new_width));
-  lface->mutable_point_10()->set_y(float(y10/new_height));
-
-  lface->mutable_point_11()->set_x(float(x11/new_width));
-  lface->mutable_point_11()->set_y(float(y11/new_height));
-
-  lface->mutable_point_12()->set_x(float(x12/new_width));
-  lface->mutable_point_12()->set_y(float(y12/new_height));
-
-  lface->mutable_point_13()->set_x(float(x13/new_width));
-  lface->mutable_point_13()->set_y(float(y13/new_height));
-
-  lface->mutable_point_14()->set_x(float(x14/new_width));
-  lface->mutable_point_14()->set_y(float(y14/new_height));
-
-  lface->mutable_point_15()->set_x(float(x15/new_width));
-  lface->mutable_point_15()->set_y(float(y15/new_height));
-
-  lface->mutable_point_16()->set_x(float(x16/new_width));
-  lface->mutable_point_16()->set_y(float(y16/new_height));
-
-  lface->mutable_point_17()->set_x(float(x17/new_width));
-  lface->mutable_point_17()->set_y(float(y17/new_height));
-
-  lface->mutable_point_18()->set_x(float(x18/new_width));
-  lface->mutable_point_18()->set_y(float(y18/new_height));
-
-  lface->mutable_point_19()->set_x(float(x19/new_width));
-  lface->mutable_point_19()->set_y(float(y19/new_height));
-
-  lface->mutable_point_20()->set_x(float(x20/new_width));
-  lface->mutable_point_20()->set_y(float(y20/new_height));
-
-  lface->mutable_point_21()->set_x(float(x21/new_width));
-  lface->mutable_point_21()->set_y(float(y21/new_height));
+  lface->mutable_rightmouth()->set_x(float(x5/new_width));
+  lface->mutable_rightmouth()->set_y(float(y5/new_height));
 }
 
 

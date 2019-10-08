@@ -59,14 +59,13 @@ class DetectionCcpdOutputLayer : public Layer<Dtype> {
    *      N is the number of detections after nms, and each row is:
    *      [image_id, label, confidence, xmin, ymin, xmax, ymax]
    */
-  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   /// @brief Not implemented
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
     NOT_IMPLEMENTED;
   }
-
   int num_chinese_;
   int num_english_;
   int num_letter_;

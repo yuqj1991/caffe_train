@@ -42,7 +42,7 @@ void DetectionCcpdOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom
   // set it to (fake) 1.
   top_shape.push_back(1);
   // Each row is a 9 dimension vector, which stores
-  // [image_id, label, confidence, xmin, ymin, xmax, ymax, blur, occlussion]
+  // [image_id, label, confidence, xmin, ymin, xmax, ymax]
   top_shape.push_back(7);
   top[0]->Reshape(top_shape);
 }
@@ -150,7 +150,7 @@ void DetectionCcpdOutputLayer<Dtype>::Forward_cpu(
 }
 
 #ifdef CPU_ONLY
-STUB_GPU_FORWARD(DetectionOutputLayer, Forward);
+STUB_GPU_FORWARD(DetectionCcpdOutputLayer, Forward);
 #endif
 
 INSTANTIATE_CLASS(DetectionCcpdOutputLayer);
