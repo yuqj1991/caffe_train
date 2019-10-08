@@ -591,9 +591,9 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
         nose += result_vec[ii*10 + 2];
         leftmouth += result_vec[ii*10 + 3];
         rightmouth += result_vec[ii*10 + 4];
-        if (result_vec[ii*3 + 5]==1)
+        if (result_vec[ii*10 + 5]==1)
           gender_precision++;
-        if (result_vec[ii*3 + 6]==1)
+        if (result_vec[ii*10 + 6]==1)
           glasses_presion++;
         yaw_presion += result_vec[ii*10 + 7];
         pitch_precision += result_vec[ii*10 + 8];

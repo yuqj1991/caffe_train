@@ -203,14 +203,14 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 AnnoFaceAttribute face = all_anno[item_id];
                 top_label[idx++] = item_id;
                 top_label[idx++] = face.landmark().lefteye().x();
-                top_label[idx++] = face.landmark().lefteye().x();
-                top_label[idx++] = face.landmark().righteye().x();
                 top_label[idx++] = face.landmark().righteye().x();
                 top_label[idx++] = face.landmark().nose().x();
+                top_label[idx++] = face.landmark().leftmouth().x();
+                top_label[idx++] = face.landmark().rightmouth().x();
+                top_label[idx++] = face.landmark().lefteye().y();
+                top_label[idx++] = face.landmark().righteye().y();
                 top_label[idx++] = face.landmark().nose().y();
                 top_label[idx++] = face.landmark().leftmouth().y();
-                top_label[idx++] = face.landmark().leftmouth().y();
-                top_label[idx++] = face.landmark().rightmouth().y();
                 top_label[idx++] = face.landmark().rightmouth().y();
                 top_label[idx++] = face.faceoritation().yaw();
                 top_label[idx++] = face.faceoritation().pitch();
@@ -224,6 +224,16 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             LOG(FATAL) << "Unknown annotation type.";
         }
     }
+    #if 0
+    for(int ii =0; ii < batch_size; ii ++){
+        int idx = ii * 18;
+        LOG(INFO)<<top_label[idx+1] << " " << top_label[idx+2] << " " << top_label[idx+3] << " " << top_label[idx+4] << 
+        " " << top_label[idx+5] << " " << top_label[idx+6] << " " << top_label[idx+7] << " " << top_label[idx+8] << 
+        " " << top_label[idx+9] << " " << top_label[idx+11] << " " << top_label[idx+12] <<
+        " " << top_label[idx+13] <<  " " << top_label[idx+14] << " " << top_label[idx+15] << " " << top_label[idx+16] << 
+        " " << top_label[idx+17];
+    }
+    #endif
     timer.Stop();
     batch_timer.Stop();
     DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";

@@ -170,11 +170,6 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
       top_data[ii* 10 + 8]=float(correct_precisive_pitch);
       top_data[ii* 10 + 9]=float(correct_precisive_roll);
     }
-    // face angle precision
-    
-    for(int ii = 0; ii<batch_size; ii++){
-      
-    }
   }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_ANGLE){
     map<int, vector<float> > all_prediction_;
     map<int, vector<float> > all_gt_;
