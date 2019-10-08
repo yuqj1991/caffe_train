@@ -25,11 +25,11 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
     batch_size_ = bottom[0]->num();
     // Get other parameters.
-    CHECK_EQ(multiface_loss_param.num_gender(), 2) << "Must provide num_gender, and the num_gender must is 2.";
-    CHECK_EQ(multiface_loss_param.num_glasses(), 2) << "Must prodived num_glasses, and the num_glasses must is 2";
     num_gender_ = multiface_loss_param.num_gender();
     num_glasses_ = multiface_loss_param.num_glasses();
-
+    CHECK_EQ(num_gender_, 2) << "Must provide num_gender, and the num_gender must is 2.";
+    CHECK_EQ(num_glasses_, 2) << "Must prodived num_glasses, and the num_glasses must is 2";
+   
     if (!this->layer_param_.loss_param().has_normalization() &&
         this->layer_param_.loss_param().has_normalize()) {
         normalization_ = this->layer_param_.loss_param().normalize() ?
@@ -68,7 +68,7 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         landmark_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
         landmark_loss_layer_->SetUp(landmark_bottom_vec_, landmark_top_vec_);
     } else {
-    LOG(FATAL) << "Unknown localization loss type.";
+        LOG(FATAL) << "Unknown localization loss type.";
     }
 
     /*****************************************************************************************/
@@ -350,15 +350,15 @@ const vector<Blob<Dtype>*>& top) {
     }
     if (this->layer_param_.propagate_down(1)) {
     top[0]->mutable_cpu_data()[0] += 
-            angle_weight_*angle_loss_.cpu_data()[0] / normalizer;
+            angle_weight_ * angle_loss_.cpu_data()[0] / normalizer;
     }
     if (this->layer_param_.propagate_down(2)) {
     top[0]->mutable_cpu_data()[0] += 
-            gender_weight_*gender_loss_.cpu_data()[0] / normalizer;
+            gender_weight_ * gender_loss_.cpu_data()[0] / normalizer;
     }
     if(this->layer_param_.propagate_down(3)) {
     top[0]->mutable_cpu_data()[0] += 
-            glasses_weight_*glasses_loss_.cpu_data()[0] / normalizer;
+            glasses_weight_ * glasses_loss_.cpu_data()[0] / normalizer;
     }
     #if 0
     LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
@@ -367,7 +367,7 @@ const vector<Blob<Dtype>*>& top) {
     LOG(INFO)<<"total origin glassess_loss_: "<< glasses_loss_.cpu_data()[0];
     LOG(INFO)<<"total loss_layer loss value: "<<top[0]->cpu_data()[0]
              <<" normalizer: "<<normalizer;
-    //LOG(FATAL)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    //LOG(FATAL)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     #endif
 }
 
@@ -406,6 +406,9 @@ const vector<Blob<Dtype>*>& bottom) {
             mark_bottom_diff += bottom[0]->offset(1);
         }*/
     }
+
+    /*************************************************************************************/
+    // Back propagate on angle prediction.
     if (propagate_down[1]) {
         Dtype* angle_bottom_diff = bottom[1]->mutable_cpu_diff();
         caffe_set(bottom[1]->count(), Dtype(0), angle_bottom_diff);

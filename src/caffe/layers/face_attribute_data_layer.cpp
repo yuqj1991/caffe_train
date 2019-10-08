@@ -108,7 +108,7 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
       // Store transformed annotation.
     map<int, AnnoFaceAttribute > all_anno;
-    map<int, vector<int>> datamShape;
+    map<int, vector<int>> batchImgShape;
     if (this->output_labels_ && !has_anno_type_) {
         top_label = batch->label_.mutable_cpu_data();
     }
@@ -116,8 +116,8 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         timer.Start();
         // get a anno_datum
         AnnoFaceAttributeDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
-        datamShape[item_id].push_back (anno_datum.datum().width());
-        datamShape[item_id].push_back (anno_datum.datum().height());
+        batchImgShape[item_id].push_back (anno_datum.datum().width());
+        batchImgShape[item_id].push_back (anno_datum.datum().height());
         AnnoFaceAttributeDatum distort_datum;
         AnnoFaceAttributeDatum* expand_datum = NULL;
         if (transform_param.has_distort_param()) {
@@ -217,8 +217,8 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.faceoritation().roll();
                 top_label[idx++] = face.gender();
                 top_label[idx++] = face.glass();
-                top_label[idx++] = datamShape[item_id][0];
-                top_label[idx++] = datamShape[item_id][1];
+                top_label[idx++] = batchImgShape[item_id][0];
+                top_label[idx++] = batchImgShape[item_id][1];
             }
         } else {
             LOG(FATAL) << "Unknown annotation type.";
