@@ -10,7 +10,7 @@ convet2yoloformat = False
 convert2vocformat = True
 
 # 最小取20大小的脸，并且补齐
-minsize2select = 32
+minsize2select = 19.2
 cropsize2select = 60
 usepadding = True
 

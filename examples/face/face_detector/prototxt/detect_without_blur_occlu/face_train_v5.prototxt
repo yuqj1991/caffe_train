@@ -47,101 +47,10 @@ layer {
 	}
 	data_param {
 		source: "../../../../../../dataset/facedata/wider_face/lmdb/wider_face_train_lmdb/"
-		batch_size: 4
+		batch_size: 3
 		backend: LMDB
 	}
 	annotated_data_param {
-		batch_sampler {
-			sampler {
-				min_scale: 0.025
-				max_scale: 0.05
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.5
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.05
-				max_scale: 0.1
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.5
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.1
-				max_scale: 0.2
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.5
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.2
-				max_scale: 0.4
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.5
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.4
-				max_scale: 0.6
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.5
-				}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.6
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.5
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.6
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.5
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
 		label_map_file: "../labelmap_face.prototxt"
 	}
 }
