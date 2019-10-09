@@ -1,5 +1,5 @@
-train_net: "../../prototxt/detect_without_blur_occlu/face_train_v2.prototxt"
-test_net: "../../prototxt/detect_without_blur_occlu/face_test_v2.prototxt"
+train_net: "../../prototxt/modelfull/face_train_v2.prototxt"
+test_net: "../../prototxt/modelfull/face_test_v2.prototxt"
 test_iter: 3083
 test_interval: 5000
 base_lr: 0.001
@@ -9,7 +9,7 @@ lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.0005
 snapshot: 5000
-snapshot_prefix: "../../snapshot/face_detector_without_v2"
+snapshot_prefix: "../../snapshot/face_v2"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
