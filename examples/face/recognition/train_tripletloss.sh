@@ -1,0 +1,13 @@
+python3 src/train_tripletloss.py \
+--logs_base_dir ./logs/ \
+--models_base_dir ./models/  \
+--data_dir ../../../../dataset/facedata/lfw/lfw_160 \
+--model_def models.inception_resnet_v1 \
+--optimizer RMSPROP \
+--image_size 160 \
+--batch_size 10 \
+--learning_rate 0.01 \
+--weight_decay 1e-4 \
+--max_nrof_epochs 50 \
+--epoch_size 50 \
+--gpu_memory_fraction 1.0
