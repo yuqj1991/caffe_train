@@ -5,7 +5,7 @@ import cv2
 import lmdb
 import sys, os
 # change your caffe path here
-sys.path.insert(0, os.path.join('/home/zhecao/caffe/', 'python/'))
+sys.path.insert(0, os.path.join('../../../../caffe_train/', 'python/'))
 import caffe
 import os.path
 import struct
@@ -28,7 +28,7 @@ def writeLMDB(datasets, lmdb_path, validation):
 			print numSample
 		elif(datasets[d] == "COCO"):
 			print datasets[d]
-			with open('dataset/COCO/json/COCO.json') as data_file:
+			with open('../../../../dataset/posedata/COCO/json/COCO.json') as data_file:
 				data_this = json.load(data_file)
 				data_this = data_this['root']
 				data = data + data_this

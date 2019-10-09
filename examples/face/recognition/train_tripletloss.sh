@@ -5,9 +5,9 @@ python3 src/train_tripletloss.py \
 --model_def models.inception_resnet_v1 \
 --optimizer RMSPROP \
 --image_size 160 \
---batch_size 10 \
+--batch_size 30 \
 --learning_rate 0.01 \
 --weight_decay 1e-4 \
 --max_nrof_epochs 50 \
---epoch_size 50 \
+--epoch_size 50000 \
 --gpu_memory_fraction 1.0
