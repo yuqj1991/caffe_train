@@ -3,14 +3,14 @@ function genJSON(dataset)
     addpath('../testing/util/jsonlab/');
 
     if(strcmp(dataset, 'COCO'))
-        mkdir('dataset/COCO/json')
+        mkdir('../../../../dataset/posedata/COCO/json')
         count = 1;
         makeFigure = 0;
         validationCount = 0;
         isValidation = 0;
         
-        load('dataset/COCO/mat/coco_kpt.mat');
-        load('dataset/COCO/mat/coco_val.mat');
+        load('../../../../dataset/posedata/COCO/mat/coco_kpt.mat');
+        load('../../../../dataset/posedata/COCO/mat/coco_val.mat');
         
         for mode = 0:1
             if mode == 0
@@ -154,7 +154,7 @@ function genJSON(dataset)
                     joint_all(count).numOtherPeople = length(joint_all(count).joint_others);
 
                     if(makeFigure) % visualizing to debug
-                        imshow(['dataset/COCO/images/', joint_all(count).img_paths]);
+                        imshow(['../../../../dataset/posedata/COCO/images/', joint_all(count).img_paths]);
                         xlim([-joint_all(count).img_width*0.6 joint_all(count).img_width*1.6]) 
                         ylim([-joint_all(count).img_height*0.6 joint_all(count).img_height*1.6])
                         hold on;
@@ -189,7 +189,7 @@ function genJSON(dataset)
             end
         end
         
-        opt.FileName = 'dataset/COCO/json/COCO.json';
+        opt.FileName = '../../../../dataset/posedata/COCO/json/COCO.json';
         opt.FloatFormat = '%.3f';
         savejson('root', joint_all, opt);
     end 
