@@ -1294,7 +1294,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -1368,7 +1368,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 0
@@ -1617,7 +1617,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -1691,7 +1691,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 0
@@ -1841,7 +1841,7 @@ layer {
     name: "res5b_branch2a"
     type: "Convolution"
     convolution_param {
-        num_output: 256
+        num_output: 128
         kernel_size: 3
         pad: 1
         stride: 2
@@ -1887,7 +1887,7 @@ layer {
     name: "res5b_branch2b"
     type: "Convolution"
     convolution_param {
-        num_output: 256
+        num_output: 128
         kernel_size: 3
         pad: 1
         stride: 1
@@ -1925,7 +1925,7 @@ layer {
     name: "res5a_branch2a"
     type: "Convolution"
     convolution_param {
-        num_output: 256
+        num_output: 128
         kernel_size: 3
         pad: 1
         stride: 2
@@ -1988,7 +1988,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 0

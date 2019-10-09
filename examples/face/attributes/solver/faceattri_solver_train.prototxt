@@ -1,5 +1,5 @@
-train_net: "../prototxt/faceattrinet/faceattri_train.prototxt"
-test_net: "../prototxt/faceattrinet/faceattri_test.prototxt"
+train_net: "../prototxt/faceattrinet/train.prototxt"
+test_net: "../prototxt/faceattrinet/test.prototxt"
 test_iter: 1000
 test_interval: 10000
 base_lr: 0.001
@@ -14,6 +14,7 @@ snapshot_prefix: "../snapshot/faceattri"
 solver_mode: GPU
 average_loss: 10
 snapshot_after_train: true
+test_initialization: false
 stepvalue: 50000
 stepvalue: 100000
 stepvalue: 300000

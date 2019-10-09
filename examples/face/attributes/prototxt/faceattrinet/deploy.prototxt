@@ -1,52 +1,10 @@
 name: "deep_face_attribute"
-layer {
-	name: "data"
-	type: "faceAttributeData"
-	top: "data"
-	top: "label"
-	include {
-		phase: TRAIN
-	}
-	transform_param {
-		scale: 0.007843
-		mirror: false
-		mean_value: 127.5
-		mean_value: 127.5
-		mean_value: 127.5
-		resize_param {
-			prob: 1.0
-			resize_mode: WARP
-			height: 96
-			width: 96
-			interp_mode: LINEAR
-			interp_mode: AREA
-			interp_mode: NEAREST
-			interp_mode: CUBIC
-			interp_mode: LANCZOS4
-		}
-		distort_param {
-			brightness_prob: 0.5
-			brightness_delta: 32.0
-			contrast_prob: 0.5
-			contrast_lower: 0.5
-			contrast_upper: 1.5
-			hue_prob: 0.5
-			hue_delta: 18.0
-			saturation_prob: 0.5
-			saturation_lower: 0.5
-			saturation_upper: 1.5
-			random_order_prob: 0.0
-		}
-		expand_param {
-			prob: 0.5
-			max_expand_ratio: 2.0
-		}
-	}
-	data_param {
-		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_training_umdface_pose_lmdb/"
-		batch_size: 32
-		backend: LMDB
-	}
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 96
+  dim: 96
 }
 layer {
 	name: "conv_0"
@@ -1294,7 +1252,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -1368,7 +1326,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 0
@@ -1617,7 +1575,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -1691,7 +1649,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 0
@@ -1841,7 +1799,7 @@ layer {
     name: "res5b_branch2a"
     type: "Convolution"
     convolution_param {
-        num_output: 256
+        num_output: 128
         kernel_size: 3
         pad: 1
         stride: 2
@@ -1887,7 +1845,7 @@ layer {
     name: "res5b_branch2b"
     type: "Convolution"
     convolution_param {
-        num_output: 256
+        num_output: 128
         kernel_size: 3
         pad: 1
         stride: 1
@@ -1925,7 +1883,7 @@ layer {
     name: "res5a_branch2a"
     type: "Convolution"
     convolution_param {
-        num_output: 256
+        num_output: 128
         kernel_size: 3
         pad: 1
         stride: 2
@@ -1988,7 +1946,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 0
@@ -2123,36 +2081,39 @@ layer {
 		}
 	}
 }
+
 layer {
-	name: "multiface_loss"
-	type: "MultiFaceLoss"
+	name: "conv6_gender"
+	type: "Softmax"
+	bottom: "conv6_gender"
+	top: "conv6_gender"
+	softmax_param {
+		axis: 1
+	}
+}
+layer {
+	name: "conv6_glasses"
+	type: "Softmax"
+	bottom: "conv6_glasses"
+	top: "conv6_glasses"
+	softmax_param {
+		axis: 1
+	}
+}
+
+layer {
+	name: "multiface_output"
+	type: "Concat"
 	bottom: "conv6_landmark"
     bottom: "conv6_angle"
 	bottom: "conv6_gender"
 	bottom: "conv6_glasses"
-	bottom: "label"
-	top: "multiface_loss"
+	top: "multiface_output"
+	concat_param {
+		axis: 1
+	}
 	include {
-		phase: TRAIN
-	}
-	propagate_down: true
-	propagate_down: true
-	propagate_down: true
-    propagate_down: true
-	propagate_down: false
-	loss_param {
-		normalization: VALID
-	}
-	multiface_loss_param{
-		mark_loss_type : L2
-        angle_loss_type: L2
-		mark_weight: 1
-        angle_weight: 1
-		gender_weight: 1
-		glass_weight: 0.5
-		num_gender: 2
-		num_glasses: 2
-		conf_gender_loss_type: SOFTMAX #LOGISTIC
-		conf_glasses_loss_type: SOFTMAX #LOGISTIC
+		phase: TEST
 	}
 }
+

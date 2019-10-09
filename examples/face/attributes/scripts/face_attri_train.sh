@@ -1,11 +1,11 @@
 #!/bin/sh
-if ! test -f ../prototxt/faceattrinet/faceattri_train.prototxt ;then
-	echo "error: ../prototxt/faceattri_train.prototxt does not exit."
+if ! test -f ../prototxt/faceattrinet/train.prototxt ;then
+	echo "error: ../prototxt/train.prototxt does not exit."
 	echo "please generate your own model prototxt primarily."
         exit 1
 fi
-if ! test -f ../prototxt/faceattrinet/faceattri_test.prototxt ;then
-	echo "error: ../prototxt/faceattri_test.prototxt does not exit."
+if ! test -f ../prototxt/faceattrinet/test.prototxt ;then
+	echo "error: ../prototxt/test.prototxt does not exit."
 	echo "please generate your own model prototxt primarily."
         exit 1
 fi
