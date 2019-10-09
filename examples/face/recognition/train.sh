@@ -1,10 +1,10 @@
 python3 src/train_softmax.py \
---logs_base_dir ~/logs/facenet/ \
---models_base_dir ~/models/facenet/ \
---data_dir ~/datasets/casia/casia_maxpy_mtcnnalign_182_160/ \
+--logs_base_dir ~/logs/ \
+--models_base_dir ~/models/ \
+--data_dir ../../../../dataset/facedata/casia/casia_maxpy_mtcnnalign_182_160/ \
 --image_size 160 \
 --model_def models.inception_resnet_v1 \
---lfw_dir ~/datasets/lfw/lfw_mtcnnalign_160/ \
+--lfw_dir ../../../../dataset/facedata/lfw/lfw_160/ \
 --optimizer ADAM \
 --learning_rate -1 \
 --max_nrof_epochs 150 \
