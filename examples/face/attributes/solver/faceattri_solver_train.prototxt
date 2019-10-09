@@ -15,7 +15,6 @@ solver_mode: GPU
 average_loss: 10
 snapshot_after_train: true
 test_initialization: false
-stepvalue: 50000
 stepvalue: 100000
 stepvalue: 300000
 stepvalue: 400000
