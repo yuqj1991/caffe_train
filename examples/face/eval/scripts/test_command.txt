@@ -11,8 +11,7 @@ python demo_image.py --model ../prototxt/face_deploy_v7.prototxt  --weights ../s
 
 ===========================================demo_camera_attri.py======================================
 
-python demo_camera_attri.py --model ../prototxt/face_deploy_v3.prototxt  --weights ../snapshot/face_detector_v3_final.caffemodel --facemodel ../../face_attributes/prototxt/facelandmarknet/facelandmark_deploy_v1.prototxt --faceweights ../../face_attributes/snapshot/facelandmark_v1_final.caffemodel
-
+python demo_camera_attri.py --model /home/stive/model/faceCaffe/face_detector.prototxt --weights /home/stive/model/faceCaffe/face_detector.caffemodel --facemodel ../../attributes/prototxt/faceattrinet/deploy.prototxt --faceweights ../../attributes/snapshot/faceattri_iter_270761.caffemodel
 
 ===========================================scp file==================================================
 scp deep@192.168.1.60:/home/deep/workspace/caffe_deeplearning_train/examples/face/face_detector/snapshot/face_detector_v8_iter_100000.caffemodel examples/face/face_detector/snapshot/

@@ -2,7 +2,7 @@ import numpy as np
 import argparse
 import sys,os  
 import cv2
-caffe_root = '../../../../caffe_train/'
+caffe_root = '../../../../../caffe_train/'
 sys.path.insert(0, caffe_root + 'python')  
 import caffe  
 
@@ -67,16 +67,16 @@ def preprocess(src, size):
     return img
 
 
-def postprocess(img, out):   
+def postprocess(img, out):
     h = img.shape[0]
     w = img.shape[1]
     box = out['detection_out'][0,0,:,3:7] * np.array([w, h, w, h])
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
-    return (box.astype(np.int32), conf, cls
+    return box.astype(np.int32), conf, cls
 
 
-def postprocessface(img, out):   
+def postprocessface(img, out):
     h = img.shape[0]
     w = img.shape[1]
     facepoints = out['multiface_output'][0,0:10] * np.array([w, w, w, w, w, h, h, h, h, h])
@@ -85,7 +85,7 @@ def postprocessface(img, out):
     gender_index = np.argmax(gender)
     glasses = out['multiface_output'][0,15:17]
     glasses_index = np.argmax(glasses)
-    return (facepoints.astype(np.int32), faceangle, gender_content[gender_index], glasses_content[glasses_index]
+    return facepoints.astype(np.int32), faceangle, gender_content[gender_index], glasses_content[glasses_index]
 
 
 def detect():
@@ -100,7 +100,7 @@ def detect():
 
        net.blobs['data'].data[...] = img
        out = net.forward()
-       box, conf, cls , blur, occlu= postprocess(frame, out)
+       box, conf, cls = postprocess(frame, out)
        for i in range(len(box)):
           if conf[i]>=0.25:
              p1 = (box[i][0], box[i][1])

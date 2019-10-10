@@ -44,9 +44,8 @@ from tensorflow.python.ops import data_flow_ops
 from six.moves import xrange  # @UnresolvedImport
 
 def main(args):
-  
-    network = importlib.import_module(args.model_def)
-
+###############################################################################################
+######################################not important############################################
     subdir = datetime.strftime(datetime.now(), '%Y%m%d-%H%M%S')
     log_dir = os.path.join(os.path.expanduser(args.logs_base_dir), subdir)
     if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
@@ -76,8 +75,9 @@ def main(args):
         pairs = lfw.read_pairs(os.path.expanduser(args.lfw_pairs))
         # Get the paths for the corresponding images
         lfw_paths, actual_issame = lfw.get_paths(os.path.expanduser(args.lfw_dir), pairs)
-        
-    
+######################################not important############################################
+###############################################################################################
+    network = importlib.import_module(args.model_def)
     with tf.Graph().as_default():
         tf.set_random_seed(args.seed)
         global_step = tf.Variable(0, trainable=False)
