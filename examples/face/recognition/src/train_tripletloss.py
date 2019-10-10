@@ -210,7 +210,7 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
     while batch_number < args.epoch_size:
         # Sample people randomly from the dataset
         image_paths, num_per_class = sample_people(dataset, args.people_per_batch, args.images_per_person)
-        
+        print("\nlength image_paths : %d, num_per_class: %d"%(len(image_paths), len(num_per_class)))
         print('Running forward pass on sampled images: ', end='')
         start_time = time.time()
         nrof_examples = args.people_per_batch * args.images_per_person
@@ -219,6 +219,7 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
         sess.run(enqueue_op, {image_paths_placeholder: image_paths_array, labels_placeholder: labels_array})
         emb_array = np.zeros((nrof_examples, embedding_size))
         nrof_batches = int(np.ceil(nrof_examples / args.batch_size))
+        print("nrof_examples: %d, batch_size: %d, nrof_batches: %d"%(nrof_examples, args.batch_size, nrof_batches))
         for i in range(nrof_batches):
             batch_size = min(nrof_examples-i*args.batch_size, args.batch_size)
             emb, lab = sess.run([embeddings, labels_batch], feed_dict={batch_size_placeholder: batch_size, 
@@ -262,6 +263,7 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
             train_time += duration
             summary.value.add(tag='loss', simple_value=err)
             
+        #print("nrof_batches: %d, length of emb_array: %d"%(nrof_batches, len(emb_array)))
         # Add validation loss and accuracy to summary
         #pylint: disable=maybe-no-member
         summary.value.add(tag='time/selection', simple_value=selection_time)
@@ -330,6 +332,7 @@ def sample_people(dataset, people_per_batch, images_per_person):
         np.random.shuffle(image_indices)
         nrof_images_from_class = min(nrof_images_in_class, images_per_person, nrof_images-len(image_paths))
         idx = image_indices[0:nrof_images_from_class]
+        #print("nrof_images_in_class: %d, nrof_images_from_class: %d, idx: %d"%(nrof_images_in_class, nrof_images_from_class, len(idx)))
         image_paths_for_class = [dataset[class_index].image_paths[j] for j in idx]
         sampled_class_indices += [class_index]*nrof_images_from_class
         image_paths += image_paths_for_class
