@@ -1494,92 +1494,6 @@ layer {
 }
 
 
-####
-layer {
-	name: "conv6_glasses_fds_1"
-	type: "InnerProduct"
-	bottom: "conv_5_2_1"
-	top: "conv6_glasses_fds_1"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
-		num_output: 96
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv6_glasses_fds_1/relu"
-	type: "ReLU"
-	bottom: "conv6_glasses_fds_1"
-	top: "conv6_glasses_fds_1"
-}
-layer {
-	name: "conv6_glasses_fds_2"
-	type: "InnerProduct"
-	bottom: "conv6_glasses_fds_1"
-	top: "conv6_glasses_fds_2"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
-		num_output: 32
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv6_glasses_fds_2/relu"
-	type: "ReLU"
-	bottom: "conv6_glasses_fds_2"
-	top: "conv6_glasses_fds_2"
-}
-layer {
-	name: "conv6_glasses"
-	type: "InnerProduct"
-	bottom: "conv6_glasses_fds_2"
-	top: "conv6_glasses"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
-		num_output: 2
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-
 ################################
 layer {
 	name: "conv_5_1"
@@ -1595,7 +1509,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -1669,7 +1583,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		stride: 1
 		pad: 0
@@ -2111,15 +2025,7 @@ layer {
 		axis: 1
 	}
 }
-layer {
-	name: "conv6_glasses"
-	type: "Softmax"
-	bottom: "conv6_glasses"
-	top: "conv6_glasses"
-	softmax_param {
-		axis: 1
-	}
-}
+
 
 layer {
 	name: "multiface_output"
@@ -2127,7 +2033,6 @@ layer {
 	bottom: "conv6_landmark"
     bottom: "conv6_angle"
 	bottom: "conv6_gender"
-	bottom: "conv6_glasses"
 	top: "multiface_output"
 	concat_param {
 		axis: 1
@@ -2149,6 +2054,6 @@ layer{
 		facetype: FACEATTRIBUTE
 		facepoints: 5
 		num_gender: 2
-		num_glasses: 2
+		#num_glasses: 2
 	}
 }

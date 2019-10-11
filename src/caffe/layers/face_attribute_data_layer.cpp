@@ -195,7 +195,7 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             label_shape[1] = 1;
             // Reshape the label and store the annotation.
             label_shape[2] = batch_size;
-            label_shape[3] = 18;
+            label_shape[3] = 17;
             batch->label_.Reshape(label_shape);
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
@@ -216,7 +216,7 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.faceoritation().pitch();
                 top_label[idx++] = face.faceoritation().roll();
                 top_label[idx++] = face.gender();
-                top_label[idx++] = face.glass();
+                //top_label[idx++] = face.glass();
                 top_label[idx++] = batchImgShape[item_id][0];
                 top_label[idx++] = batchImgShape[item_id][1];
             }
@@ -226,7 +226,7 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     #if 0
     for(int ii =0; ii < batch_size; ii ++){
-        int idx = ii * 18;
+        int idx = ii * 17;
         LOG(INFO)<<top_label[idx+1] << " " << top_label[idx+2] << " " << top_label[idx+3] << " " << top_label[idx+4] << 
         " " << top_label[idx+5] << " " << top_label[idx+6] << " " << top_label[idx+7] << " " << top_label[idx+8] << 
         " " << top_label[idx+9] << " " << top_label[idx+11] << " " << top_label[idx+12] <<
