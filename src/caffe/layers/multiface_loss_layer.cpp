@@ -16,7 +16,7 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         this->layer_param_.add_propagate_down(true);
         this->layer_param_.add_propagate_down(true);
         this->layer_param_.add_propagate_down(true);
-        this->layer_param_.add_propagate_down(true);
+        //this->layer_param_.add_propagate_down(true);
         this->layer_param_.add_propagate_down(false);
     }
     const MultiFaceAttriLossParameter& multiface_loss_param =
@@ -26,9 +26,9 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     batch_size_ = bottom[0]->num();
     // Get other parameters.
     num_gender_ = multiface_loss_param.num_gender();
-    num_glasses_ = multiface_loss_param.num_glasses();
+    //num_glasses_ = multiface_loss_param.num_glasses();
     CHECK_EQ(num_gender_, 2) << "Must provide num_gender, and the num_gender must is 2.";
-    CHECK_EQ(num_glasses_, 2) << "Must prodived num_glasses, and the num_glasses must is 2";
+    //CHECK_EQ(num_glasses_, 2) << "Must prodived num_glasses, and the num_glasses must is 2";
    
     if (!this->layer_param_.loss_param().has_normalization() &&
         this->layer_param_.loss_param().has_normalize()) {
@@ -144,6 +144,7 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
     /*****************************************************************************************/
     // Set up glasses confidence loss layer.
+    #if 0
     glasses_weight_ = multiface_loss_param.glass_weight();
     glasses_loss_type_ = multiface_loss_param.conf_glasses_loss_type();
     glasses_bottom_vec_.push_back(&glasses_pred_);
@@ -181,6 +182,7 @@ void MultiFaceLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     } else {
     LOG(FATAL) << "Unknown face attributes glasses loss type.";
     }
+    #endif
 }
 
 template <typename Dtype>
@@ -189,21 +191,21 @@ void MultiFaceLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     LossLayer<Dtype>::Reshape(bottom, top);
     int num_landmarks = bottom[0]->shape(1);  //bottom[0]: landmarks , 
     int num_gender = bottom[2]->shape(1); //bottom[1]: num_gender;
-    int num_glasses = bottom[3]->shape(1); // bottom[2]: num_glasses;
+    //int num_glasses = bottom[3]->shape(1); // bottom[2]: num_glasses;
     CHECK_EQ(num_landmarks, 10)<<"number of lanmarks point value must equal to 10";
     CHECK_EQ(num_gender_, num_gender)<<"number of gender must match prototxt provided";
-    CHECK_EQ(num_glasses_, num_glasses)<<"number of glasses must match prototxt provided";
+    //CHECK_EQ(num_glasses_, num_glasses)<<"number of glasses must match prototxt provided";
 }
 
 template <typename Dtype>
 void MultiFaceLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 const vector<Blob<Dtype>*>& top) {
-    const Dtype* label_data = bottom[4]->cpu_data();
+    const Dtype* label_data = bottom[3]->cpu_data();
  
     /***********************************************************************************/
     // Retrieve all landmarks , gender, and glasses.***********.
     vector<int> all_gender;
-    vector<int> all_glasses;
+    //vector<int> all_glasses;
     // landmark ground thruth**********************************.
     vector<int> landmark_shape(2);
     landmark_shape[0] = 1;
@@ -221,7 +223,7 @@ const vector<Blob<Dtype>*>& top) {
     Dtype* angle_gt_data = angle_gt_.mutable_cpu_data();
 
     for(int item_id = 0; item_id < batch_size_; item_id++){
-        int idxg = item_id*18;
+        int idxg = item_id*17;
         int id = label_data[idxg];
         if(id == -1)
         {
@@ -247,7 +249,7 @@ const vector<Blob<Dtype>*>& top) {
         angle_gt_data[item_id * 3 + 2] = label_data[idxg+13];
 
         all_gender.push_back(label_data[idxg+14]);
-        all_glasses.push_back(label_data[idxg+15]);
+        //all_glasses.push_back(label_data[idxg+15]);
     }
     CHECK_EQ(batch_size_, all_gender.size())<<"ground truth label size should match batch_size_";
     /***********************************************************************************/
@@ -313,6 +315,7 @@ const vector<Blob<Dtype>*>& top) {
 
     /********************************************************************************/
     // glasses_loss_layer_********************************
+    #if 0
     vector<int> glasses_shape;
     if (glasses_loss_type_ == MultiFaceAttriLossParameter_AttriLossType_SOFTMAX) {
         glasses_shape.push_back(batch_size_);
@@ -339,7 +342,7 @@ const vector<Blob<Dtype>*>& top) {
     
     glasses_loss_layer_->Reshape(glasses_bottom_vec_, glasses_top_vec_);
     glasses_loss_layer_->Forward(glasses_bottom_vec_, glasses_top_vec_);
-
+    #endif
     /**************************************sum loss value****************************/
     top[0]->mutable_cpu_data()[0] = 0;
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
@@ -356,10 +359,12 @@ const vector<Blob<Dtype>*>& top) {
     top[0]->mutable_cpu_data()[0] += 
             gender_weight_ * gender_loss_.cpu_data()[0] / normalizer;
     }
+    #if 0
     if(this->layer_param_.propagate_down(3)) {
     top[0]->mutable_cpu_data()[0] += 
             glasses_weight_ * glasses_loss_.cpu_data()[0] / normalizer;
     }
+    #endif
     #if 0
     LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     LOG(INFO)<<"total origin facepoint_loss_: "<< landmark_loss_.cpu_data()[0];
@@ -451,6 +456,7 @@ const vector<Blob<Dtype>*>& bottom) {
 
     /*************************************************************************************/
     // Back propagate on glasses confidence prediction.
+    #if 0
     if (propagate_down[3]) {
         Dtype* glasses_bottom_diff = bottom[3]->mutable_cpu_diff();
         caffe_set(bottom[3]->count(), Dtype(0), glasses_bottom_diff);
@@ -468,6 +474,7 @@ const vector<Blob<Dtype>*>& bottom) {
                     glasses_pred_.mutable_cpu_diff());
         bottom[3]->ShareDiff(glasses_pred_);
     }
+    #endif
 }
 
 INSTANTIATE_CLASS(MultiFaceLossLayer);

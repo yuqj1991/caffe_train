@@ -38,7 +38,7 @@ class MultiFaceLossLayer : public LossLayer<Dtype> {
   // bottom[2] stores the gender predictions.
   // bottom[3] stores the glasses predictions.
   // bottom[4] stores the groundtruth labels.
-  virtual inline int ExactNumBottomBlobs() const { return 5; }
+  virtual inline int ExactNumBottomBlobs() const { return 4; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
