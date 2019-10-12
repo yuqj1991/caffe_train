@@ -368,8 +368,8 @@ const vector<Blob<Dtype>*>& top) {
     #if 0
     LOG(INFO)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     LOG(INFO)<<"total origin facepoint_loss_: "<< landmark_loss_.cpu_data()[0];
-    LOG(INFO)<<"total origin _gender_loss_: "<< gender_loss_.cpu_data()[0];
-    LOG(INFO)<<"total origin glassess_loss_: "<< glasses_loss_.cpu_data()[0];
+    LOG(INFO)<<"total origin gender_loss_: "<< gender_loss_.cpu_data()[0];
+    LOG(INFO)<<"total origin angle_loss_: "<< angle_loss_.cpu_data()[0];
     LOG(INFO)<<"total loss_layer loss value: "<<top[0]->cpu_data()[0]
              <<" normalizer: "<<normalizer;
     //LOG(FATAL)<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
