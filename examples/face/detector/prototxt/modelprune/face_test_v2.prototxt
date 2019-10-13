@@ -1,10 +1,35 @@
 name: "faceDetctor-Prune"
-input: "data"
-input_shape {
-  dim: 1
-  dim: 3
-  dim: 320
-  dim: 320
+layer {
+  name: "data"
+  type: "AnnotatedData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    scale: 0.007843
+    mean_value: 103.94
+    mean_value: 116.78
+    mean_value: 123.68
+    resize_param {
+      prob: 1.0
+      resize_mode: WARP
+      height: 320
+      width: 320
+      interp_mode: LINEAR
+    }
+  }
+  data_param {
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_val_lmdb/"
+    batch_size: 8
+    backend: LMDB
+  }
+  annotated_data_param {
+    batch_sampler {
+    }
+    label_map_file: "../labelmap_face.prototxt"
+  }
 }
 layer {
   name: "conv0"
@@ -2929,12 +2954,9 @@ layer {
 }
 layer {
   name: "mbox_conf_softmax"
-  type: "Softmax"
+  type: "Sigmoid"
   bottom: "mbox_conf_reshape"
   top: "mbox_conf_softmax"
-  softmax_param {
-    axis: 2
-  }
 }
 layer {
   name: "mbox_conf_flatten"
@@ -2961,10 +2983,26 @@ layer {
     background_label_id: 0
     nms_param {
       nms_threshold: 0.44999998807907104
-      top_k: 100
+      top_k: 400
     }
     code_type: CENTER_SIZE
-    keep_top_k: 100
-    confidence_threshold: 0.25
+    keep_top_k: 200
+    confidence_threshold: 0.009999999776482582
+  }
+}
+layer {
+  name: "detection_eval"
+  type: "DetectionEvaluate"
+  bottom: "detection_out"
+  bottom: "label"
+  top: "detection_eval"
+  include {
+    phase: TEST
+  }
+  detection_evaluate_param {
+    num_classes: 2
+    background_label_id: 0
+    overlap_threshold: 0.5
+    evaluate_difficult_gt: false
   }
 }
