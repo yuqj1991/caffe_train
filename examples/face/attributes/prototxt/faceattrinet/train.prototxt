@@ -49,6 +49,19 @@ layer {
 	}
 }
 layer {
+  name: "label_slice"
+  type: "Slice"
+  bottom: "label"
+  top: "label_landmark"
+  top: "label_angle"
+  top: "label_gender"
+  slice_param {
+    slice_point: 10
+    slice_point: 13
+    axis: 1
+  }
+}
+layer {
 	name: "conv_0"
 	type: "Convolution"
 	bottom: "data"
@@ -1046,15 +1059,6 @@ layer {
 		}
 	}
 }
-layer {
-  name: "res5b_innerproduct"
-  type: "Dropout"
-  bottom: "res5b_innerproduct"
-  top: "res5b_innerproduct"
-  dropout_param {
-    dropout_ratio: 0.25
-  }
-}
 
 layer {
 	name: "res5b_innerproduct/relu"
@@ -1139,33 +1143,41 @@ layer {
 	}
 }
 layer {
-	name: "multiface_loss"
-	type: "MultiFaceLoss"
-	bottom: "conv6_landmark"
+	name: "faceangleloss"
+	type: "EuclideanLoss"
 	bottom: "conv6_angle"
-	bottom: "conv6_gender"
-	bottom: "label"
-	top: "multiface_loss"
+	bottom: "label_angle"
+	top: "faceangleloss"
+	loss_weight: 0.5
 	include {
 		phase: TRAIN
 	}
-	propagate_down: true
-	propagate_down: true
 	propagate_down: true
 	propagate_down: false
 	loss_param {
 		normalization: VALID
 	}
-	multiface_loss_param{
-		mark_loss_type : L2
-        angle_loss_type: L2
-		mark_weight: 1
-        angle_weight: 1
-		gender_weight: 1
-		glass_weight: 0.5
-		num_gender: 2
-		#num_glasses: 2
-		conf_gender_loss_type: SOFTMAX #LOGISTIC
-		#conf_glasses_loss_type: SOFTMAX #LOGISTIC
+}
+layer {
+	name: "gender_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "conv6_gender"
+	bottom: "label_gender"
+	top: "gender_loss"
+	propagate_down: true
+	propagate_down: false
+	loss_weight: 1
+}
+layer {
+	name: "landmark_loss"
+	type: "EuclideanLoss"
+	bottom: "conv6_landmark"
+	bottom: "label_landmark"
+	top: "landmark_loss"
+	loss_weight: 1
+	propagate_down: true
+	propagate_down: false
+	loss_param {
+		normalization: VALID
 	}
 }

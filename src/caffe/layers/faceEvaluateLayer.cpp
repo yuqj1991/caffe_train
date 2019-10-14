@@ -108,17 +108,17 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
     map<int, vector<float>> batchImgShape;
     for(int ii = 0; ii<batch_size; ii++){
       /**********ground truth************/
-      for(int jj =1; jj<11; jj++){
-        all_gt_face_points[ii].push_back(gt_data[ii*17+jj]);
+      for(int jj =0; jj<10; jj++){
+        all_gt_face_points[ii].push_back(gt_data[ii*16+jj]);
       }
-      for(int jj =11; jj<14; jj++){
-        all_gt_face_angle[ii].push_back(gt_data[ii*17+jj]);
+      for(int jj =10; jj<13; jj++){
+        all_gt_face_angle[ii].push_back(gt_data[ii*16+jj]);
       }
-      for(int jj =14; jj<15; jj++){
-        all_gt_face_attributes[ii].push_back(gt_data[ii*17+jj]);
+      for(int jj =13; jj<14; jj++){
+        all_gt_face_attributes[ii].push_back(gt_data[ii*16+jj]);
       }
-      for(int jj =15; jj<17; jj++){
-        batchImgShape[ii].push_back(gt_data[ii*17+jj]);
+      for(int jj =14; jj<16; jj++){
+        batchImgShape[ii].push_back(gt_data[ii*16+jj]);
       }
       /**********prediction************/
       for(int jj =0; jj< 5*2; jj++){
