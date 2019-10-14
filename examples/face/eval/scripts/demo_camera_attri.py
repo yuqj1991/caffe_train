@@ -92,6 +92,7 @@ def detect():
     cap = cv2.VideoCapture(0)
     while True:
        ret, frame = cap.read()
+       #frame=cv2.flip(frame,1)
        h = frame.shape[0]
        w = frame.shape[1]
        img = preprocessdet(frame, (320, 320))
