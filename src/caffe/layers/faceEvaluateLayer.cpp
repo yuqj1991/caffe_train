@@ -12,7 +12,7 @@ void FaceAttriEvaluateLayer<Dtype>::LayerSetUp(
       const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   const FaceEvaluateParameter& face_paramer = this->layer_param_.face_evaluate_param();
   num_gender_ = face_paramer.num_gender();
-  num_glasses_ = face_paramer.num_glasses();
+  //num_glasses_ = face_paramer.num_glasses();
   num_facepoints_ = face_paramer.facepoints();
   CHECK(face_paramer.has_facetype())
       << "Must provide facetype.";
@@ -32,7 +32,7 @@ void FaceAttriEvaluateLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   {
     vector<int> top_shape(2, 1);
     top_shape.push_back(bottom[0]->num());
-    top_shape.push_back(10);
+    top_shape.push_back(9);
     top[0]->Reshape(top_shape);
   }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_ANGLE){
     vector<int> top_shape(4, 1);
@@ -108,17 +108,17 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
     map<int, vector<float>> batchImgShape;
     for(int ii = 0; ii<batch_size; ii++){
       /**********ground truth************/
-      for(int jj =1; jj<11; jj++){
-        all_gt_face_points[ii].push_back(gt_data[ii*18+jj]);
+      for(int jj =0; jj<10; jj++){
+        all_gt_face_points[ii].push_back(gt_data[ii*16+jj]);
       }
-      for(int jj =11; jj<14; jj++){
-        all_gt_face_angle[ii].push_back(gt_data[ii*18+jj]);
+      for(int jj =10; jj<13; jj++){
+        all_gt_face_angle[ii].push_back(gt_data[ii*16+jj]);
+      }
+      for(int jj =13; jj<14; jj++){
+        all_gt_face_attributes[ii].push_back(gt_data[ii*16+jj]);
       }
       for(int jj =14; jj<16; jj++){
-        all_gt_face_attributes[ii].push_back(gt_data[ii*18+jj]);
-      }
-      for(int jj =16; jj<18; jj++){
-        batchImgShape[ii].push_back(gt_data[ii*18+jj]);
+        batchImgShape[ii].push_back(gt_data[ii*16+jj]);
       }
       /**********prediction************/
       for(int jj =0; jj< 5*2; jj++){
@@ -127,14 +127,14 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
       for(int jj =5*2; jj< 13; jj++){
         all_prediction_face_angle[ii].push_back(det_data[ii*bottom[0]->channels()+jj]);
       }
-      for(int jj =13; jj< 17; jj++){
+      for(int jj =13; jj< 15; jj++){
         all_face_prediction_attributes[ii].push_back(det_data[ii*bottom[0]->channels()+jj]);
       }
     }
     /**#####################################################**/
     // face precision
     int correct_precisive_gender =0;
-    int correct_precisive_glasses =0;
+    //int correct_precisive_glasses =0;
     float correct_precisive_yaw =0;
     float correct_precisive_pitch =0;
     float correct_precisive_roll =0;
@@ -142,33 +142,33 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
       for(int jj = 0; jj< 5; jj++){
         double pow_x = pow(batchImgShape[ii][0]*(all_prediction_face_points[ii][jj]-all_gt_face_points[ii][jj]), 2);
         double pow_y = pow(batchImgShape[ii][1]*(all_prediction_face_points[ii][jj + 5]-all_gt_face_points[ii][jj + 5]), 2);
-        top_data[ii*10 + jj] = std::sqrt(pow_x + pow_y);
+        top_data[ii*9 + jj] = std::sqrt(pow_x + pow_y);
       }
       int gender_index=0; 
-      int glasses_index=0; 
-      float gender_temp=0.0, glasses_temp=0.0;
+      //int glasses_index=0; 
+      float gender_temp=0.0;// glasses_temp=0.0;
       for(int jj=0; jj<2; jj++){
         if(gender_temp<all_face_prediction_attributes[ii][jj]){
           gender_index = jj;
           gender_temp = all_face_prediction_attributes[ii][jj];
-        }
+        }/*
         if(glasses_temp<all_face_prediction_attributes[ii][jj+2]){
           glasses_index = jj;
           glasses_temp = all_face_prediction_attributes[ii][jj+2];
-        }
+        }*/
       }
       if(all_gt_face_attributes[ii][0]==gender_index)
         correct_precisive_gender=1;
-      if(all_gt_face_attributes[ii][1]==glasses_index)
-        correct_precisive_glasses=1;
-      top_data[ii*10 + 5] = correct_precisive_gender;
-      top_data[ii*10 + 6] = correct_precisive_glasses;
+      /*if(all_gt_face_attributes[ii][1]==glasses_index)
+        correct_precisive_glasses=1;*/
+      top_data[ii*9 + 5] = correct_precisive_gender;
+      //top_data[ii*9 + 6] = correct_precisive_glasses;
       correct_precisive_yaw = cos(double((all_prediction_face_angle[ii][0] - all_gt_face_angle[ii][0])/180 * M_PI));
       correct_precisive_pitch = cos(double((all_prediction_face_angle[ii][1] - all_gt_face_angle[ii][1])/180 * M_PI));
       correct_precisive_roll = cos(double((all_prediction_face_angle[ii][2] - all_gt_face_angle[ii][2])/180 * M_PI));
-      top_data[ii* 10 + 7]=float(correct_precisive_yaw);
-      top_data[ii* 10 + 8]=float(correct_precisive_pitch);
-      top_data[ii* 10 + 9]=float(correct_precisive_roll);
+      top_data[ii* 9 + 6]=float(correct_precisive_yaw);
+      top_data[ii* 9 + 7]=float(correct_precisive_pitch);
+      top_data[ii* 9 + 8]=float(correct_precisive_roll);
     }
   }else if (facetype_ == FaceEvaluateParameter_FaceType_FACE_ANGLE){
     map<int, vector<float> > all_prediction_;

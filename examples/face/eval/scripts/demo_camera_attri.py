@@ -38,7 +38,7 @@ face_net = caffe.Net(face_file,face_model,caffe.TEST)
 
 CLASSES = ('background', 'face')
 gender_content = ('male', 'female')
-glasses_content = ('wearing glasses', 'not wearing glasses')
+#glasses_content = ('wearing glasses', 'not wearing glasses')
 
 
 def max_(m,n):
@@ -83,15 +83,16 @@ def postprocessface(img, out):
     faceangle = out['multiface_output'][0,10:13]
     gender = out['multiface_output'][0,13:15]
     gender_index = np.argmax(gender)
-    glasses = out['multiface_output'][0,15:17]
-    glasses_index = np.argmax(glasses)
-    return facepoints.astype(np.int32), faceangle, gender_content[gender_index], glasses_content[glasses_index]
+    #glasses = out['multiface_output'][0,15:17]
+    #glasses_index = np.argmax(glasses)
+    return facepoints.astype(np.int32), faceangle, gender_content[gender_index]#, glasses_content[glasses_index]
 
 
 def detect():
     cap = cv2.VideoCapture(0)
     while True:
        ret, frame = cap.read()
+       #frame=cv2.flip(frame,1)
        h = frame.shape[0]
        w = frame.shape[1]
        img = preprocessdet(frame, (320, 320))
@@ -121,14 +122,14 @@ def detect():
              oimg = oimg.transpose((2, 0, 1))
              face_net.blobs['data'].data[...] = oimg
              face_out = face_net.forward()
-             boxpoint, faceangle, gender, glasses = postprocessface(ori_img, face_out)
+             boxpoint, faceangle, gender = postprocessface(ori_img, face_out)
              yaw, pitch, roll = faceangle
              for jj in range(5):
                  point = (boxpoint[jj], boxpoint[jj+5])
                  cv2.circle(ori_img, point, 3, (0,0,213), -1)
              cv2.rectangle(frame, p1, p2, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "yaw: %f, pitch: %f, roll: %f, %s, %s" % (yaw, pitch, roll, gender, glasses)
+             title = "yaw: %f, pitch: %f, roll: %f, %s" % (yaw, pitch, roll, gender)
              print(title)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("face", frame)

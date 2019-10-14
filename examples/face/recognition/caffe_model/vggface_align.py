@@ -4,9 +4,10 @@ import sys
 import cv2
 import numpy as np
 
-image_dir = "./train"
-list_file = "./bb_landmark/loose_bb_train.csv"
-output_dir = "./train_align"
+root_dir = "/media/resideo/502E485A2E483AEC/yuqianjin/dataset/facedata/vggface2_train"
+image_dir = "/train"
+list_file = "/bb_landmark/loose_bb_train.csv"
+output_dir = "/train_align"
 
 
 def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
@@ -65,24 +66,24 @@ def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
 
     cv2.imwrite(img_path_out_full, img_crop_scale)
 
-if not os.path.exists(output_dir):
-    os.mkdir(output_dir)
+if not os.path.exists(root_dir + output_dir):
+    os.mkdir(root_dir + output_dir)
 
-if not os.path.exists(image_dir):
-    print("{} does not exist".format(image_dir))
+if not os.path.exists(root_dir + image_dir):
+    print("{} does not exist".format(root_dir + image_dir))
     exit()
 
-if not os.path.exists(list_file):
-    print("{} does not exist".format(list_file))
+if not os.path.exists(root_dir + list_file):
+    print("{} does not exist".format(root_dir + list_file))
     exit()
 
-csv_fd = open(list_file, "rb")
+csv_fd = open(root_dir + list_file, "rb")
 reader = csv.reader(csv_fd)
 
 for idx, item in enumerate(reader):
     if idx == 0:
         continue
     # print(item[1], item[2], item[3], item[4])
-    crop_face(image_dir, item[0], output_dir, int(item[1]), int(item[2]), int(item[3]), int(item[4]))
+    crop_face(root_dir + image_dir, item[0], root_dir + output_dir, int(item[1]), int(item[2]), int(item[3]), int(item[4]))
 
 csv_fd.close()

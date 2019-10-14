@@ -3,14 +3,14 @@
 # N.B. set the path to the imagenet train + val data dirs
 set -e
 
-EXAMPLE=examples/face_recog
+EXAMPLE=../../../../../dataset/facedata/recognition
 DATA=data/face_recog
-TOOLS=build/tools
+TOOLS=../../../../build/tools
 
-TRAIN_DATA_ROOT=data/face_recog/vggface2_train_align/
+TRAIN_DATA_ROOT=/media/resideo/502E485A2E483AEC/yuqianjin/dataset/facedata/vggface2_train/train_aglin
 #VAL_DATA_ROOT=/path/to/imagenet/val/
 
-# Set RESIZE=true to resize the images to 256x256. Leave as false if images have
+# Set RESIZE=true to resize the images to 128x128. Leave as false if images have
 # already been resized using another tool.
 RESIZE=false
 if $RESIZE; then

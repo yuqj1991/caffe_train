@@ -47,6 +47,7 @@ void faceAttributeDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& b
     // Reshape top[0] and prefetch_data according to the batch_size.
     top_shape[0] = batch_size;
     top[0]->Reshape(top_shape);
+    phase_ = this->layer_param_.phase();
     for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
         this->prefetch_[i].data_.Reshape(top_shape);
     }
@@ -56,17 +57,21 @@ void faceAttributeDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& b
     // label
     if (this->output_labels_) {
         has_anno_type_ = anno_datum.has_type();
-        vector<int> label_shape(4, 1);
+        vector<int> label_shape(2, 1);
         if (has_anno_type_) {
             anno_type_ = anno_datum.type();
             if (anno_type_ == AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE) {
-            label_shape[0] = 1;
-            label_shape[1] = 1;
             // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
             // cpu_data and gpu_data for consistent prefetch thread. Thus we make
             // sure there is at least one bbox.
-            label_shape[2] = batch_size;
-            label_shape[3] = 21;
+            label_shape[0] = batch_size;
+                if(phase_ == TRAIN){
+                    label_shape[1] = 14;
+                }
+                else{
+                    label_shape[1] = 16;
+                }
+            
             } else {
             LOG(FATAL) << "Unknown annotation type.";
             }
@@ -189,19 +194,21 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
     // store "rich " landmark, face attributes
     if (this->output_labels_ && has_anno_type_) {
-        vector<int> label_shape(4);
+        vector<int> label_shape(2);
         if (anno_type_ == AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE) {
-            label_shape[0] = 1;
-            label_shape[1] = 1;
             // Reshape the label and store the annotation.
-            label_shape[2] = batch_size;
-            label_shape[3] = 18;
+            label_shape[0] = batch_size;
+            if(phase_ == TRAIN){
+                label_shape[1] = 14;
+            }
+            else{
+                label_shape[1] = 16;
+            }
             batch->label_.Reshape(label_shape);
             top_label = batch->label_.mutable_cpu_data();
             int idx = 0;
             for (int item_id = 0; item_id < batch_size; ++item_id) {
                 AnnoFaceAttribute face = all_anno[item_id];
-                top_label[idx++] = item_id;
                 top_label[idx++] = face.landmark().lefteye().x();
                 top_label[idx++] = face.landmark().righteye().x();
                 top_label[idx++] = face.landmark().nose().x();
@@ -216,9 +223,11 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.faceoritation().pitch();
                 top_label[idx++] = face.faceoritation().roll();
                 top_label[idx++] = face.gender();
-                top_label[idx++] = face.glass();
-                top_label[idx++] = batchImgShape[item_id][0];
-                top_label[idx++] = batchImgShape[item_id][1];
+                //top_label[idx++] = face.glass();
+                if(phase_ == TEST){
+                    top_label[idx++] = batchImgShape[item_id][0];
+                    top_label[idx++] = batchImgShape[item_id][1];
+                }
             }
         } else {
             LOG(FATAL) << "Unknown annotation type.";
@@ -226,12 +235,12 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     #if 0
     for(int ii =0; ii < batch_size; ii ++){
-        int idx = ii * 18;
+        int idx = ii * 16;
         LOG(INFO)<<top_label[idx+1] << " " << top_label[idx+2] << " " << top_label[idx+3] << " " << top_label[idx+4] << 
         " " << top_label[idx+5] << " " << top_label[idx+6] << " " << top_label[idx+7] << " " << top_label[idx+8] << 
         " " << top_label[idx+9] << " " << top_label[idx+11] << " " << top_label[idx+12] <<
         " " << top_label[idx+13] <<  " " << top_label[idx+14] << " " << top_label[idx+15] << " " << top_label[idx+16] << 
-        " " << top_label[idx+17];
+        " " << top_label[idx+16];
     }
     #endif
     timer.Stop();
