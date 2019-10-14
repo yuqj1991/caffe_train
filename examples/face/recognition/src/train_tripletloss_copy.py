@@ -42,6 +42,24 @@ import lfw
 from tensorflow.python.ops import data_flow_ops
 
 from six.moves import xrange  # @UnresolvedImport
+random_crop = True
+random_flip = True
+
+def _parse_function(filenames, label):
+    images = []
+    for filename in tf.unstack(filenames):
+        file_contents = tf.read_file(filename)
+        image = tf.image.decode_image(file_contents, channels=3)
+
+        if random_crop:
+            image = tf.random_crop(image, [160, 160, 3])
+        else:
+            image = tf.image.resize_image_with_crop_or_pad(image, 160, 160)
+        if random_flip:
+            image = tf.image.random_flip_left_right(image)
+            image.set_shape((160, 160, 3))
+        images.append(tf.image.per_image_standardization(image))
+    return images, label
 
 def main(args):
 ###############################################################################################
@@ -85,13 +103,14 @@ def main(args):
         # Placeholder for the learning rate
         learning_rate_placeholder = tf.placeholder(tf.float32, name='learning_rate')
         
-        batch_size_placeholder = tf.placeholder(tf.int32, name='batch_size')
+        batch_size_placeholder = tf.placeholder(tf.int64, name='batch_size')
         
         phase_train_placeholder = tf.placeholder(tf.bool, name='phase_train')
-        
         image_paths_placeholder = tf.placeholder(tf.string, shape=(None,3), name='image_paths')
         labels_placeholder = tf.placeholder(tf.int64, shape=(None,3), name='labels')
-        
+######################################################################################################################
+#####################################generate image batch & labels_batch##############################################
+        '''
         input_queue = data_flow_ops.FIFOQueue(capacity=100000,
                                     dtypes=[tf.string, tf.int64],
                                     shapes=[(3,), (3,)],
@@ -104,16 +123,7 @@ def main(args):
             filenames, label = input_queue.dequeue()
             images = []
             for filename in tf.unstack(filenames):
-                file_contents = tf.read_file(filename)
-                image = tf.image.decode_image(file_contents, channels=3)
-                
-                if args.random_crop:
-                    image = tf.random_crop(image, [args.image_size, args.image_size, 3])
-                else:
-                    image = tf.image.resize_image_with_crop_or_pad(image, args.image_size, args.image_size)
-                if args.random_flip:
-                    image = tf.image.random_flip_left_right(image)
-    
+                image = preprocessimage(filename, label, args)
                 #pylint: disable=no-member
                 image.set_shape((args.image_size, args.image_size, 3))
                 images.append(tf.image.per_image_standardization(image))
@@ -124,10 +134,20 @@ def main(args):
             shapes=[(args.image_size, args.image_size, 3), ()], enqueue_many=True,
             capacity=4 * nrof_preprocess_threads * args.batch_size,
             allow_smaller_final_batch=True)
+        '''
+        dataset = tf.data.Dataset.from_tensor_slices((image_paths_placeholder, labels_placeholder))
+        dataset = dataset.map(_parse_function)
+        dataset = dataset.shuffle(buffer_size = batch_size_placeholder)
+        dstaset = dataset.batch(batch_size_placeholder, drop_remainder=True)
+        dataset = dataset.repeat()
+        enqueue_op = dataset.make_initializable_iterator()
+        image_batch, labels_batch = enqueue_op.get_next()
+        
         image_batch = tf.identity(image_batch, 'image_batch')
         image_batch = tf.identity(image_batch, 'input')
         labels_batch = tf.identity(labels_batch, 'label_batch')
-
+#####################################generate image batch & labels_batch##############################################
+######################################################################################################################
         # Build the inference graph
         prelogits, _ = network.inference(image_batch, args.keep_probability, 
             phase_train=phase_train_placeholder, bottleneck_layer_size=args.embedding_size,
@@ -166,7 +186,7 @@ def main(args):
 
         summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
         coord = tf.train.Coordinator()
-        tf.train.start_queue_runners(coord=coord, sess=sess)
+        #tf.train.start_queue_runners(coord=coord, sess=sess)
 
         with sess.as_default():
 
@@ -181,9 +201,9 @@ def main(args):
                 epoch = step // args.epoch_size
                 # Train for one epoch
                 train(args, sess, train_set, epoch, image_paths_placeholder, labels_placeholder, labels_batch,
-                    batch_size_placeholder, learning_rate_placeholder, phase_train_placeholder, enqueue_op, input_queue, global_step, 
+                    batch_size_placeholder, learning_rate_placeholder, phase_train_placeholder, enqueue_op, global_step, 
                     embeddings, total_loss, train_op, summary_op, summary_writer, args.learning_rate_schedule_file,
-                    args.embedding_size, anchor, positive, negative, triplet_loss)
+                    args.embedding_size)
 
                 # Save variables and the metagraph if it doesn't exist already
                 save_variables_and_metagraph(sess, saver, summary_writer, model_dir, subdir, step)
@@ -198,9 +218,9 @@ def main(args):
 
 
 def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholder, labels_batch,
-          batch_size_placeholder, learning_rate_placeholder, phase_train_placeholder, enqueue_op, input_queue, global_step, 
+          batch_size_placeholder, learning_rate_placeholder, phase_train_placeholder, enqueue_op, global_step, 
           embeddings, loss, train_op, summary_op, summary_writer, learning_rate_schedule_file,
-          embedding_size, anchor, positive, negative, triplet_loss):
+          embedding_size):
     batch_number = 0
     
     if args.learning_rate>0.0:
@@ -216,7 +236,7 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
         nrof_examples = args.people_per_batch * args.images_per_person
         labels_array = np.reshape(np.arange(nrof_examples),(-1,3))
         image_paths_array = np.reshape(np.expand_dims(np.array(image_paths),1), (-1,3))
-        sess.run(enqueue_op, {image_paths_placeholder: image_paths_array, labels_placeholder: labels_array})
+        sess.run(enqueue_op.initializer, {image_paths_placeholder: image_paths_array, labels_placeholder: labels_array, batch_size_placeholder: nrof_examples})
         emb_array = np.zeros((nrof_examples, embedding_size))
         nrof_batches = int(np.ceil(nrof_examples / args.batch_size))
         print("nrof_examples: %d, batch_size: %d, nrof_batches: %d"%(nrof_examples, args.batch_size, nrof_batches))
@@ -224,8 +244,6 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
             batch_size = min(nrof_examples-i*args.batch_size, args.batch_size)
             emb, lab = sess.run([embeddings, labels_batch], feed_dict={batch_size_placeholder: batch_size, 
                 learning_rate_placeholder: lr, phase_train_placeholder: True})
-            print("labels_batch shape: ", lab.shape)
-            print("emb shape: ", emb.shape)
             emb_array[lab,:] = emb
         print('%.3f' % (time.time()-start_time))
 
@@ -242,7 +260,7 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
         triplet_paths = list(itertools.chain(*triplets))
         labels_array = np.reshape(np.arange(len(triplet_paths)),(-1,3))
         triplet_paths_array = np.reshape(np.expand_dims(np.array(triplet_paths),1), (-1,3))
-        sess.run(enqueue_op, {image_paths_placeholder: triplet_paths_array, labels_placeholder: labels_array})
+        sess.run(enqueue_op.initializer, {image_paths_placeholder: triplet_paths_array, labels_placeholder: labels_array, batch_size_placeholder: batch_size})
         nrof_examples = len(triplet_paths)
         train_time = 0
         i = 0
@@ -354,7 +372,7 @@ def evaluate(sess, image_paths, embeddings, labels_batch, image_paths_placeholde
     assert(len(image_paths)==nrof_images)
     labels_array = np.reshape(np.arange(nrof_images),(-1,3))
     image_paths_array = np.reshape(np.expand_dims(np.array(image_paths),1), (-1,3))
-    sess.run(enqueue_op, {image_paths_placeholder: image_paths_array, labels_placeholder: labels_array})
+    sess.run(enqueue_op.initializer, {image_paths_placeholder: image_paths_array, labels_placeholder: labels_array})
     emb_array = np.zeros((nrof_images, embedding_size))
     nrof_batches = int(np.ceil(nrof_images / batch_size))
     label_check_array = np.zeros((nrof_images,))

@@ -1,4 +1,4 @@
-python3 src/train_tripletloss.py \
+python3 src/train_tripletloss_copy.py \
 --logs_base_dir ./logs/ \
 --models_base_dir ./models/  \
 --data_dir ../../../../dataset/facedata/lfw/lfw_160 \
@@ -11,4 +11,4 @@ python3 src/train_tripletloss.py \
 --weight_decay 1e-4 \
 --max_nrof_epochs 50000 \
 --epoch_size 50000 \
---gpu_memory_fraction 1.0
+--gpu_memory_fraction 0.7
