@@ -1004,15 +1004,6 @@ layer {
 		}
 	}
 }
-layer {
-  name: "res5b_innerproduct"
-  type: "Dropout"
-  bottom: "res5b_innerproduct"
-  top: "res5b_innerproduct"
-  dropout_param {
-    dropout_ratio: 0.25
-  }
-}
 
 layer {
 	name: "res5b_innerproduct/relu"
