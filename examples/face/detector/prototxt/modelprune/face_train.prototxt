@@ -2347,7 +2347,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 12
+    num_output: 8
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2393,7 +2393,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 4
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2432,7 +2432,6 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox"
   prior_box_param {
-    min_size: 10.0
     min_size: 16.0
     min_size: 24.0
     flip: true
