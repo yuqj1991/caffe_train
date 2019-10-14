@@ -30,6 +30,7 @@ void FocalCrossEntropyLossLayer<Dtype>::LayerSetUp(
   } else {
     normalization_ = LossParameter_NormalizationMode_BATCH_SIZE;
   }
+  gamma_ = this->layer_param_.loss_param().gamma();
 }
 
 template <typename Dtype>
@@ -93,7 +94,7 @@ void FocalCrossEntropyLossLayer<Dtype>::Forward_cpu(
       continue;
     }
     loss -= input_data[i] * (target[i] - (input_data[i] >= 0)) -
-        log(1 + exp(input_data[i] - 2 * input_data[i] * (input_data[i] >= 0)));
+        log(1 + exp(input_data[i] - 2 * input_data[i] * (input_data[i] >= 0))) ;
     ++valid_count;
   }
   normalizer_ = get_normalizer(normalization_, valid_count);
