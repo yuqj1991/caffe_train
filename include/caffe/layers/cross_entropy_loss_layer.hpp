@@ -13,7 +13,7 @@
 namespace caffe {
 
 /**
- * @brief Computes the cross-entropy (logistic) loss @f$
+ * @brief Computes the cross-entropy (logistic) focal loss @f$
  *          E = \frac{-1}{n} \sum\limits_{n=1}^N \left[
  *                  p_n \log \hat{p}_n +
  *                  (1 - p_n) \log(1 - \hat{p}_n)
@@ -21,7 +21,7 @@ namespace caffe {
  *        @f$, often used for predicting targets interpreted as probabilities.
  *
  * This layer is implemented rather than separate
- * SigmoidLayer + CrossEntropyLayer
+ * SigmoidLayer + focal + CrossEntropyLayer
  * as its gradient computation is more numerically stable.
  * At test time, this layer can be replaced simply by a SigmoidLayer.
  *
@@ -42,9 +42,9 @@ namespace caffe {
  *      @f$
  */
 template <typename Dtype>
-class CrossEntropyLossLayer : public LossLayer<Dtype> {
+class FocalCrossEntropyLossLayer : public LossLayer<Dtype> {
  public:
-  explicit CrossEntropyLossLayer(const LayerParameter& param)
+  explicit FocalCrossEntropyLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param),
           sigmoid_layer_(new SigmoidLayer<Dtype>(param)),
           sigmoid_output_(new Blob<Dtype>()) {}
@@ -53,10 +53,10 @@ class CrossEntropyLossLayer : public LossLayer<Dtype> {
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "CrossEntropyLoss"; }
+  virtual inline const char* type() const { return "FocalCrossEntropyLoss"; }
 
  protected:
-  /// @copydoc CrossEntropyLossLayer
+  /// @copydoc FocalFocalCrossEntropyLossLayer
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
@@ -121,6 +121,7 @@ class CrossEntropyLossLayer : public LossLayer<Dtype> {
   LossParameter_NormalizationMode normalization_;
   Dtype normalizer_;
   int outer_num_, inner_num_;
+  float gamma_;
 };
 
 }  // namespace caffe

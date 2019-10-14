@@ -7,7 +7,7 @@
 namespace caffe {
 
 template <typename Dtype>
-void CrossEntropyLossLayer<Dtype>::LayerSetUp(
+void FocalCrossEntropyLossLayer<Dtype>::LayerSetUp(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::LayerSetUp(bottom, top);
   sigmoid_bottom_vec_.clear();
@@ -33,7 +33,7 @@ void CrossEntropyLossLayer<Dtype>::LayerSetUp(
 }
 
 template <typename Dtype>
-void CrossEntropyLossLayer<Dtype>::Reshape(
+void FocalCrossEntropyLossLayer<Dtype>::Reshape(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
   outer_num_ = bottom[0]->shape(0);  // batch size
@@ -46,7 +46,7 @@ void CrossEntropyLossLayer<Dtype>::Reshape(
 // TODO(shelhamer) loss normalization should be pulled up into LossLayer,
 // instead of duplicated here and in SoftMaxWithLossLayer
 template <typename Dtype>
-Dtype CrossEntropyLossLayer<Dtype>::get_normalizer(
+Dtype FocalCrossEntropyLossLayer<Dtype>::get_normalizer(
     LossParameter_NormalizationMode normalization_mode, int valid_count) {
   Dtype normalizer;
   switch (normalization_mode) {
@@ -76,7 +76,7 @@ Dtype CrossEntropyLossLayer<Dtype>::get_normalizer(
 }
 
 template <typename Dtype>
-void CrossEntropyLossLayer<Dtype>::Forward_cpu(
+void FocalCrossEntropyLossLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   // The forward pass computes the sigmoid outputs.
   sigmoid_bottom_vec_[0] = bottom[0];
@@ -101,7 +101,7 @@ void CrossEntropyLossLayer<Dtype>::Forward_cpu(
 }
 
 template <typename Dtype>
-void CrossEntropyLossLayer<Dtype>::Backward_cpu(
+void FocalCrossEntropyLossLayer<Dtype>::Backward_cpu(
     const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
   if (propagate_down[1]) {
@@ -131,10 +131,10 @@ void CrossEntropyLossLayer<Dtype>::Backward_cpu(
 }
 
 #ifdef CPU_ONLY
-STUB_GPU(CrossEntropyLossLayer);
+STUB_GPU(FocalCrossEntropyLossLayer);
 #endif
 
-INSTANTIATE_CLASS(CrossEntropyLossLayer);
-REGISTER_LAYER_CLASS(CrossEntropyLoss);
+INSTANTIATE_CLASS(FocalCrossEntropyLossLayer);
+REGISTER_LAYER_CLASS(FocalCrossEntropyLoss);
 
 }  // namespace caffe
