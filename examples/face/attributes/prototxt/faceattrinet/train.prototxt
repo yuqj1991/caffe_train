@@ -1159,23 +1159,25 @@ layer {
 	}
 }
 layer {
-  name: "gender_loss"
-  type: "SoftmaxWithLoss"
-  bottom: "conv6_gender"
-  bottom: "label_gender"
-  top: "gender_loss"
+	name: "gender_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "conv6_gender"
+	bottom: "label_gender"
+	top: "gender_loss"
 	propagate_down: true
 	propagate_down: false
-  loss_weight: 1
+	loss_weight: 1
 }
 layer {
-  name: "landmark_loss"
-  type: "EuclideanLoss"
-  bottom: "conv6_landmark"
-  bottom: "label_landmark"
-  top: "landmark_loss"
-  loss_weight: 1
-  loss_param {
+	name: "landmark_loss"
+	type: "EuclideanLoss"
+	bottom: "conv6_landmark"
+	bottom: "label_landmark"
+	top: "landmark_loss"
+	loss_weight: 1
+	propagate_down: true
+	propagate_down: false
+	loss_param {
 		normalization: VALID
 	}
 }
