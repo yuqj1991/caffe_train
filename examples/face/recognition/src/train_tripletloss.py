@@ -210,8 +210,8 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
     while batch_number < args.epoch_size:
         # Sample people randomly from the dataset
         image_paths, num_per_class = sample_people(dataset, args.people_per_batch, args.images_per_person)
-        print("\nlength image_paths : %d, num_per_class: %d"%(len(image_paths), len(num_per_class)))
-        print('Running forward pass on sampled images: ', end='')
+        #print("\nlength image_paths : %d, num_per_class: %d"%(len(image_paths), len(num_per_class)))
+        #print('Running forward pass on sampled images: ', end='')
         start_time = time.time()
         nrof_examples = args.people_per_batch * args.images_per_person
         labels_array = np.reshape(np.arange(nrof_examples),(-1,3))
@@ -224,8 +224,8 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
             batch_size = min(nrof_examples-i*args.batch_size, args.batch_size)
             emb, lab = sess.run([embeddings, labels_batch], feed_dict={batch_size_placeholder: batch_size, 
                 learning_rate_placeholder: lr, phase_train_placeholder: True})
-            print("labels_batch shape: ", lab.shape)
-            print("emb shape: ", emb.shape)
+            #print("labels_batch shape: ", lab.shape)
+            #print("emb shape: ", emb.shape)
             emb_array[lab,:] = emb
         print('%.3f' % (time.time()-start_time))
 
