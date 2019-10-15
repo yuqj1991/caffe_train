@@ -3069,6 +3069,7 @@ layer {
     num_classes: 2
     share_location: true
     match_type: PER_PREDICTION
+    bp_inside: true
     overlap_threshold: 0.5
     use_prior_for_matching: true
     background_label_id: 0

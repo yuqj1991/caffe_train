@@ -253,10 +253,16 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
   #if 1
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_priors_, num_matches_);
+  int num_groundtruth = 0;
+  for(int i = 0; i < all_gt_bboxes.size(); i++){
+    vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
+    num_groundtruth += gt_boxes.size();
+  }
   LOG(INFO)<<"loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
-           << "; conf loss: "<< conf_loss_.cpu_data()[0] / normalizer
+           <<"; conf loss: "<< conf_loss_.cpu_data()[0] / normalizer
            <<"; num_prior_: "<< num_priors_ 
-           << "; num_matches_: "<< num_matches_;
+           <<"; num_matches_: "<< num_matches_
+           <<"; num_groundtruth: "<<num_groundtruth;
   #endif
 }
 
