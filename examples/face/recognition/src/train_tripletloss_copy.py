@@ -44,26 +44,32 @@ from tensorflow.python.ops import data_flow_ops
 from six.moves import xrange  # @UnresolvedImport
 random_crop = True
 random_flip = True
+image_size = 160
 
-def _parse_function(filenames, label):
+def _parse_function(filenames, labels):
     images = []
-    for filename in tf.unstack(filenames):
+    #print("filenames shape:". filenames.shape)
+    #print("labels shape:". labels.shape)
+    for filename in tf.unstack(filenames, axis = -1):
         file_contents = tf.read_file(filename)
         image = tf.image.decode_image(file_contents, channels=3)
 
         if random_crop:
-            image = tf.random_crop(image, [160, 160, 3])
+            image = tf.random_crop(image, [image_size, image_size, 3])
         else:
-            image = tf.image.resize_image_with_crop_or_pad(image, 160, 160)
+            image = tf.image.resize_image_with_crop_or_pad(image, image_size, image_size)
         if random_flip:
             image = tf.image.random_flip_left_right(image)
-            image.set_shape((160, 160, 3))
+        image.set_shape((image_size, image_size, 3))
         images.append(tf.image.per_image_standardization(image))
-    return images, label
+    for label in tf.unstack(labels,  axis = -1):
+        lab = label
+        break
+    return images, lab
 
 def main(args):
-###############################################################################################
-######################################not important############################################
+######################################################################################################################
+######################################not important###################################################################
     subdir = datetime.strftime(datetime.now(), '%Y%m%d-%H%M%S')
     log_dir = os.path.join(os.path.expanduser(args.logs_base_dir), subdir)
     if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
@@ -93,8 +99,8 @@ def main(args):
         pairs = lfw.read_pairs(os.path.expanduser(args.lfw_pairs))
         # Get the paths for the corresponding images
         lfw_paths, actual_issame = lfw.get_paths(os.path.expanduser(args.lfw_dir), pairs)
-######################################not important############################################
-###############################################################################################
+######################################not important####################################################################
+#######################################################################################################################
     network = importlib.import_module(args.model_def)
     with tf.Graph().as_default():
         tf.set_random_seed(args.seed)
@@ -102,14 +108,13 @@ def main(args):
 
         # Placeholder for the learning rate
         learning_rate_placeholder = tf.placeholder(tf.float32, name='learning_rate')
-        
         batch_size_placeholder = tf.placeholder(tf.int64, name='batch_size')
-        
         phase_train_placeholder = tf.placeholder(tf.bool, name='phase_train')
+
         image_paths_placeholder = tf.placeholder(tf.string, shape=(None,3), name='image_paths')
         labels_placeholder = tf.placeholder(tf.int64, shape=(None,3), name='labels')
-######################################################################################################################
-#####################################generate image batch & labels_batch##############################################
+#####################################################################################################################
+#####################################generate image batch & labels_batch#############################################
         '''
         input_queue = data_flow_ops.FIFOQueue(capacity=100000,
                                     dtypes=[tf.string, tf.int64],
@@ -137,11 +142,10 @@ def main(args):
         '''
         dataset = tf.data.Dataset.from_tensor_slices((image_paths_placeholder, labels_placeholder))
         dataset = dataset.map(_parse_function)
-        dataset = dataset.shuffle(buffer_size = batch_size_placeholder)
-        dstaset = dataset.batch(batch_size_placeholder, drop_remainder=True)
-        dataset = dataset.repeat()
+        dataset.shuffle(buffer_size=10000).batch(30)
         enqueue_op = dataset.make_initializable_iterator()
         image_batch, labels_batch = enqueue_op.get_next()
+        #image = _parse_function(image_path_batch, labels_path_batch)
         
         image_batch = tf.identity(image_batch, 'image_batch')
         image_batch = tf.identity(image_batch, 'input')
@@ -186,7 +190,7 @@ def main(args):
 
         summary_writer = tf.summary.FileWriter(log_dir, sess.graph)
         coord = tf.train.Coordinator()
-        #tf.train.start_queue_runners(coord=coord, sess=sess)
+        '''tf.train.start_queue_runners(coord=coord, sess=sess)'''
 
         with sess.as_default():
 
@@ -222,7 +226,6 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
           embeddings, loss, train_op, summary_op, summary_writer, learning_rate_schedule_file,
           embedding_size):
     batch_number = 0
-    
     if args.learning_rate>0.0:
         lr = args.learning_rate
     else:
@@ -236,15 +239,17 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
         nrof_examples = args.people_per_batch * args.images_per_person
         labels_array = np.reshape(np.arange(nrof_examples),(-1,3))
         image_paths_array = np.reshape(np.expand_dims(np.array(image_paths),1), (-1,3))
-        sess.run(enqueue_op.initializer, {image_paths_placeholder: image_paths_array, labels_placeholder: labels_array, batch_size_placeholder: nrof_examples})
+        sess.run(enqueue_op.initializer, {image_paths_placeholder: image_paths_array, labels_placeholder: labels_array, batch_size_placeholder: args.batch_size})
         emb_array = np.zeros((nrof_examples, embedding_size))
         nrof_batches = int(np.ceil(nrof_examples / args.batch_size))
-        print("nrof_examples: %d, batch_size: %d, nrof_batches: %d"%(nrof_examples, args.batch_size, nrof_batches))
         for i in range(nrof_batches):
             batch_size = min(nrof_examples-i*args.batch_size, args.batch_size)
             emb, lab = sess.run([embeddings, labels_batch], feed_dict={batch_size_placeholder: batch_size, 
                 learning_rate_placeholder: lr, phase_train_placeholder: True})
+            print("labels_batch shape: ", lab.shape)
+            print("emb shape: ", emb.shape)
             emb_array[lab,:] = emb
+        print("nrof_examples: %d, batch_size: %d, nrof_batches: %d"%(nrof_examples, args.batch_size, nrof_batches))
         print('%.3f' % (time.time()-start_time))
 
         # Select triplets based on the embeddings
@@ -260,7 +265,7 @@ def train(args, sess, dataset, epoch, image_paths_placeholder, labels_placeholde
         triplet_paths = list(itertools.chain(*triplets))
         labels_array = np.reshape(np.arange(len(triplet_paths)),(-1,3))
         triplet_paths_array = np.reshape(np.expand_dims(np.array(triplet_paths),1), (-1,3))
-        sess.run(enqueue_op.initializer, {image_paths_placeholder: triplet_paths_array, labels_placeholder: labels_array, batch_size_placeholder: batch_size})
+        sess.run(enqueue_op.initializer, {image_paths_placeholder: triplet_paths_array, labels_placeholder: labels_array, batch_size_placeholder: nrof_triplets})
         nrof_examples = len(triplet_paths)
         train_time = 0
         i = 0

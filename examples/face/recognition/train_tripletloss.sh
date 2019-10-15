@@ -1,7 +1,7 @@
 python3 src/train_tripletloss_copy.py \
 --logs_base_dir ./logs/ \
 --models_base_dir ./models/  \
---data_dir ../../../../dataset/facedata/lfw/lfw_160 \
+--data_dir ../../../../dataset/facedata/recognition/lfw/lfw_160 \
 --model_def models.inception_resnet_v1 \
 --optimizer RMSPROP \
 --image_size 160 \
