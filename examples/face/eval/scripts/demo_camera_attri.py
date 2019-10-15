@@ -83,9 +83,7 @@ def postprocessface(img, out):
     faceangle = out['multiface_output'][0,10:13]
     gender = out['multiface_output'][0,13:15]
     gender_index = np.argmax(gender)
-    #glasses = out['multiface_output'][0,15:17]
-    #glasses_index = np.argmax(glasses)
-    return facepoints.astype(np.int32), faceangle, gender_content[gender_index]#, glasses_content[glasses_index]
+    return facepoints.astype(np.int32), faceangle, gender_content[gender_index]
 
 
 def detect():
@@ -117,7 +115,7 @@ def detect():
              
              ori_img = frame[y1:y2, x1:x2, :]
              ############face attributes#######################
-             oimg = preprocess(ori_img, (96, 96))
+             oimg = preprocess(ori_img, (72, 72))
              oimg = oimg.astype(np.float32)
              oimg = oimg.transpose((2, 0, 1))
              face_net.blobs['data'].data[...] = oimg
