@@ -124,7 +124,7 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
     top_data[num_det * 5] = -1; //itemid
     top_data[num_det * 5 + 1] = c; //种类
     if (num_pos.find(c) == num_pos.end()) {
-      top_data[num_det * 5 + 2] = 0; // 每一类存在的个数
+      top_data[num_det * 5 + 2] = 0; // score
     } else {
       top_data[num_det * 5 + 2] = num_pos.find(c)->second;
     }

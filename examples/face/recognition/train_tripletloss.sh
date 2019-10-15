@@ -1,6 +1,6 @@
 python3 src/train_tripletloss_copy.py \
---logs_base_dir ./logs/ \
---models_base_dir ./models/  \
+--logs_base_dir ./train/logs/ \
+--models_base_dir ./train/models/  \
 --data_dir ../../../../dataset/facedata/lfw/lfw_160 \
 --model_def models.inception_resnet_v1 \
 --optimizer RMSPROP \
