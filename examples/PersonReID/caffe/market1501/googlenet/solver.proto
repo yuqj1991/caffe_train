@@ -1,0 +1,13 @@
+average_loss: 25
+base_lr: 0.001
+display: 20
+gamma: 0.1
+iter_size: 2
+lr_policy: "step"
+max_iter: 18000
+momentum: 0.9
+snapshot: 2000
+snapshot_prefix: "models/market1501/googlenet/snapshot/googlenet.full"
+stepsize: 16000
+train_net: "models/market1501/googlenet/train.proto"
+weight_decay: 0.0005

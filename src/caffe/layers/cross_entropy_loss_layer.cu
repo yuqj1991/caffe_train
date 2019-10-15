@@ -38,7 +38,7 @@ __global__ void CrossEntropyLossIgnoreDiffGPU(const int count,
 
 
 template <typename Dtype>
-void CrossEntropyLossLayer<Dtype>::Forward_gpu(
+void FocalCrossEntropyLossLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   // The forward pass computes the sigmoid outputs.
   sigmoid_bottom_vec_[0] = bottom[0];
@@ -72,7 +72,7 @@ void CrossEntropyLossLayer<Dtype>::Forward_gpu(
 }
 
 template <typename Dtype>
-void CrossEntropyLossLayer<Dtype>::Backward_gpu(
+void FocalCrossEntropyLossLayer<Dtype>::Backward_gpu(
     const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
   if (propagate_down[1]) {
@@ -99,6 +99,6 @@ void CrossEntropyLossLayer<Dtype>::Backward_gpu(
   }
 }
 
-INSTANTIATE_LAYER_GPU_FUNCS(CrossEntropyLossLayer);
+INSTANTIATE_LAYER_GPU_FUNCS(FocalCrossEntropyLossLayer);
 
 }  // namespace caffe

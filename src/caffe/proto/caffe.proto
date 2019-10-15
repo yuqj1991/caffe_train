@@ -470,6 +470,9 @@ message SolverParameter {
   }
   // DEPRECATED: use type instead of solver_type
   optional SolverType solver_type = 30 [default = SGD];
+
+  // Overlap compute and communication for data parallel training
+  optional bool layer_wise_reduce = 45 [default = true];
 }
 
 // A message that stores the solver snapshots
@@ -615,6 +618,7 @@ message LayerParameter {
   optional HDF5OutputParameter hdf5_output_param = 113;
   optional HingeLossParameter hinge_loss_param = 114;
   optional ImageDataParameter image_data_param = 115;
+  optional ReidDataParameter reid_data_param = 222;
   optional InfogainLossParameter infogain_loss_param = 116;
   optional InnerProductParameter inner_product_param = 117;
   optional InputParameter input_param = 143;
@@ -652,6 +656,9 @@ message LayerParameter {
   optional SampleTripletParameter sample_triplet_param = 213;
   optional TripletLossParameter triplet_loss_param = 214;
   optional CPMTransformationParameter cpm_transform_param = 147;
+  
+    // added wxl
+  optional RankParameter rank_param = 43;
 }
 
 message TripletLossParameter {
@@ -663,6 +670,32 @@ message SampleTripletParameter {
   optional uint32 label_num = 1;
   optional uint32 sample_num = 2;
   optional float eps = 3 [default = 1e-5];
+}
+message RankParameter {
+  optional uint32 neg_num = 1 [default = 1]; 
+  optional uint32 pair_size = 2 [default = 1]; 
+  optional float hard_ratio = 3; 
+  optional float rand_ratio = 4;
+  optional float margin = 5 [default = 0.5];
+}
+
+message ReidDataParameter {
+  // Specify the data source.
+  optional string source = 1;
+  // Specify the batch size.
+  optional uint32 batch_size = 4 [default = 1];
+  // It will also resize images if new_height or new_width are not zero.
+  optional uint32 new_height = 9 [default = 0];
+  optional uint32 new_width = 10 [default = 0];
+  // Specify if the images are color or gray
+  optional bool is_color = 11 [default = true];
+  optional uint32 pos_fraction = 12 [default = 1]; // Strictly positive values
+  optional uint32 neg_fraction = 13 [default = 1]; // Strictly positive values
+  optional float pos_limit = 14 [default = 1]; // Strictly positive values
+  optional float neg_limit = 15 [default = 4]; // Strictly positive values
+  optional float pos_factor = 16 [default = 1]; // Strictly positive values
+  optional float neg_factor = 17 [default = 1.01]; // Strictly positive values
+  //optional uint32 pn_step = 18 [default = 10000]; // Strictly positive values
 }
 
 // Message that stores parameters used to apply transformation
@@ -914,7 +947,7 @@ message LossParameter {
   // is not specified, then setting this to false will be equivalent to
   // normalization = BATCH_SIZE to be consistent with previous behavior.
   optional bool normalize = 2;
-  optional float gamma = 3[default = 0.0];
+  optional float gamma = 4[default = 0.0];
 }
 
 // Messages that store parameters used by individual layer types follow, in
@@ -972,11 +1005,21 @@ message ConcatParameter {
 }
 
 message BatchNormParameter {
-  // If false, accumulate global mean/variance values via a moving average. If
-  // true, use those accumulated values instead of computing mean/variance
-  // across the batch.
+  // If false, normalization is performed over the current mini-batch
+  // and global statistics are accumulated (but not yet used) by a moving
+  // average.
+  // If true, those accumulated mean and variance values are used for the
+  // normalization.
+  // By default, it is set to false when the network is in the training
+  // phase and true when the network is in the testing phase.
   optional bool use_global_stats = 1;
-  // How much does the moving average decay each iteration?
+  // What fraction of the moving average remains each iteration?
+  // Smaller values make the moving average decay faster, giving more
+  // weight to the recent values.
+  // Each iteration updates the moving average @f$S_{t-1}@f$ with the
+  // current mean @f$ Y_t @f$ by
+  // @f$ S_t = (1-\beta)Y_t + \beta \cdot S_{t-1} @f$, where @f$ \beta @f$
+  // is the moving_average_fraction parameter.
   optional float moving_average_fraction = 2 [default = .999];
   // Small value to add to the variance estimate so that we don't divide by
   // zero.
@@ -1127,8 +1170,8 @@ message DataParameter {
   optional bool mirror = 6 [default = false];
   // Force the encoded image to have 3 color channels
   optional bool force_encoded_color = 9 [default = false];
-  // Prefetch queue (Number of batches to prefetch to host memory, increase if
-  // data access bandwidth varies).
+  // Prefetch queue (Increase if data feeding bandwidth varies, within the
+  // limit of device memory for GPU training)
   optional uint32 prefetch = 10 [default = 4];
 }
 
@@ -1362,11 +1405,13 @@ message ImageDataParameter {
   // data.
   optional bool mirror = 6 [default = false];
   optional string root_folder = 12 [default = ""];
+  optional uint32 pair_size = 13 [default = 1];
 }
 
 message InfogainLossParameter {
   // Specify the infogain matrix source.
   optional string source = 1;
+  optional int32 axis = 2 [default = 1]; // axis of prob
 }
 
 message InnerProductParameter {
@@ -2047,6 +2092,11 @@ message V1LayerParameter {
     TANH = 23;
     WINDOW_DATA = 24;
     THRESHOLD = 31;
+    
+    //added by wxl
+    RANK_HARD_LOSS = 40;
+    NORM = 41;
+    
   }
   optional LayerType type = 5;
   repeated BlobProto blobs = 6;
@@ -2090,6 +2140,8 @@ message V1LayerParameter {
   optional TransformationParameter transform_param = 36;
   optional LossParameter loss_param = 42;
   optional V0LayerParameter layer = 1;
+  
+
 }
 
 // DEPRECATED: V0LayerParameter is the old way of specifying layer parameters

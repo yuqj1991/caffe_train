@@ -10,4 +10,4 @@ if ! test -f ../prototxt/faceattrinet/test.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=../solver/faceattri_solver_train.prototxt -gpu 0 \
-#--snapshot=../snapshot/faceattri_iter_246091.solverstate
+--snapshot=../snapshot/faceattri_iter_40046.solverstate
