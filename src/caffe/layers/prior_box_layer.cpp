@@ -101,6 +101,14 @@ void PriorBoxLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     }
   }
 
+  if (prior_box_param.anchor_size()>0){
+    for (int i = 0; i < prior_box_param.anchor_size(); ++i) {
+      anchor_.push_back(prior_box_param.anchor(i));
+      //CHECK_GT(min_sizes_.back(), 0) << "min_size must be positive.";
+      num_priors_ += 1;
+    }
+  }
+
 
   clip_ = prior_box_param.clip();
   if (prior_box_param.variance_size() > 1) {
@@ -365,6 +373,19 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         top_data[idx++] = (center_x + box_width / 2.) / img_width;
         // ymax
         top_data[idx++] = (center_y + box_height / 2.) / img_height;
+      }
+      for(int a = 0; a < anchor_.size(); a++){
+        box_width = anchor_[a].width();
+        box_height = anchor_[a].height();
+        // xmin
+        top_data[idx++] = (center_x - box_width / 2.) / img_width;
+        // ymin
+        top_data[idx++] = (center_y - box_height / 2.) / img_height;
+        // xmax
+        top_data[idx++] = (center_x + box_width / 2.) / img_width;
+        // ymax
+        top_data[idx++] = (center_y + box_height / 2.) / img_height;
+
       }
     }
   }

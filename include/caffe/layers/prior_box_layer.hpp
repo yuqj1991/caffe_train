@@ -82,6 +82,7 @@ class PriorBoxLayer : public Layer<Dtype> {
   float step_h_;
 
   float offset_;
+  vector<anchorBox> anchor_;
 };
 
 }  // namespace caffe

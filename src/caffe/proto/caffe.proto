@@ -1720,6 +1720,12 @@ message PriorBoxParameter {
   repeated float density = 16;
   repeated float default_size = 17;
   repeated float default_ratio = 18;
+  repeated anchorBox anchor = 19;
+}
+
+message anchorBox{
+  optional float width = 1;
+  optional float height = 2;
 }
 
 message FaceEvaluateParameter{

@@ -2263,7 +2263,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 20
+    num_output: 12
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2309,7 +2309,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 10
+    num_output: 6
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2348,9 +2348,18 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox"
   prior_box_param {
-    min_size: 13.0
-    aspect_ratio: 1.5
-    aspect_ratio: 2.0
+	anchor {
+    	width: 8.24
+    	height: 11.54
+    }
+	anchor {
+    	width: 9
+    	height: 17.805
+    }
+    anchor {
+    	width: 13.576
+    	height: 21.18
+    }
     flip: true
     clip: false
     variance: 0.10000000149011612
@@ -2375,7 +2384,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 20
+    num_output: 8
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2421,7 +2430,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 10
+    num_output: 4
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2460,9 +2469,14 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_two"
   prior_box_param {
-    min_size: 26.0
-    aspect_ratio: 1.5
-    aspect_ratio: 2.0
+    anchor {
+    	width: 14.7585
+    	height: 30.417
+    }
+    anchor {
+    	width: 21.48
+    	height: 35.53
+    }
     flip: true
     clip: false
     variance: 0.10000000149011612
@@ -2572,8 +2586,18 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_three"
   prior_box_param {
-    min_size: 48.0
-    aspect_ratio: 2.0
+    anchor {
+    	width: 26.807
+    	height: 54.87
+    }
+    anchor {
+    	width: 38.6953
+    	height: 35.774
+    }
+    anchor {
+    	width: 39.72
+    	height: 79.89
+    }
     flip: true
     clip: false
     variance: 0.10000000149011612
@@ -2598,7 +2622,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 12
+    num_output: 8
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2644,7 +2668,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 4
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2683,8 +2707,14 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_four"
   prior_box_param {
-    min_size: 64.0
-    aspect_ratio: 2.0
+    anchor {
+    	width:59.175
+    	height: 125.233
+    }
+    anchor {
+    	width: 69.9372
+    	height: 67.98778
+    }
     flip: true
     clip: false
     variance: 0.10000000149011612
@@ -2796,7 +2826,14 @@ layer {
   top: "conv_mbox_priorbox_five"
   prior_box_param {
     min_size: 128.0
-    aspect_ratio: 1.2
+    anchor {
+    	width: 108.74
+    	height: 133.347
+    }
+	anchor {
+    	width: 151.447
+    	height: 212.21
+    }
     flip: true
     clip: false
     variance: 0.10000000149011612
@@ -2822,7 +2859,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 8
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2868,7 +2905,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 8
+    num_output: 4
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2907,9 +2944,8 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_six"
   prior_box_param {
-    min_size: 180.0
-    max_size: 256.0
-    aspect_ratio: 1.5
+    min_size: 256.0
+    min_size: 192.0
     flip: true
     clip: false
     variance: 0.10000000149011612
