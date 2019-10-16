@@ -239,9 +239,9 @@ def compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations
 
 def main():
 	if 1:
-		n_anchors = 7
+		n_anchors = 12
 		loss_convergence = 1e-2
-		grid_size = 640
+		grid_size = 320
 		iterations_num = 10000
 		plus = 1
 		compute_centroids(classfyFile,n_anchors,loss_convergence,grid_size,iterations_num,plus)
