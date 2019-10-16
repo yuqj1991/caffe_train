@@ -126,6 +126,7 @@ void MultiBoxSSDLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
+  iterations_ = 0;
 }
 
 template <typename Dtype>
@@ -250,19 +251,22 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
         normalization_, num_, num_priors_, num_matches_);
     top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0] / normalizer;
   }
-  #if 1
-  Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+  #if 1 
+  if(iterations_ % 1000 == 0){
+    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_priors_, num_matches_);
-  int num_groundtruth = 0;
-  for(int i = 0; i < all_gt_bboxes.size(); i++){
-    vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
-    num_groundtruth += gt_boxes.size();
+    int num_groundtruth = 0;
+    for(int i = 0; i < all_gt_bboxes.size(); i++){
+      vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
+      num_groundtruth += gt_boxes.size();
+    }
+    LOG(INFO)<<"loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
+            <<"; conf loss: "<< conf_loss_.cpu_data()[0] / normalizer
+            <<"; num_prior_: "<< num_priors_ 
+            <<"; num_matches_: "<< num_matches_
+            <<"; num_groundtruth: "<<num_groundtruth;
   }
-  LOG(INFO)<<"loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
-           <<"; conf loss: "<< conf_loss_.cpu_data()[0] / normalizer
-           <<"; num_prior_: "<< num_priors_ 
-           <<"; num_matches_: "<< num_matches_
-           <<"; num_groundtruth: "<<num_groundtruth;
+  iterations_++;
   #endif
 }
 
