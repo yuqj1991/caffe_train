@@ -34,6 +34,7 @@ class faceAttributeDataLayer: public BasePrefetchingDataLayer<Dtype>{
         bool has_anno_type_;
         AnnoFaceAttributeDatum_AnnoType anno_type_;
         Phase phase_;
+        int iterations_;
 };
 
 }  //cafe

@@ -83,6 +83,7 @@ void faceAttributeDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& b
             this->prefetch_[i].label_.Reshape(label_shape);
         }
     }
+    iterations_ = 0;
 }
 
 // This function is called on prefetch thread
@@ -233,16 +234,20 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             LOG(FATAL) << "Unknown annotation type.";
         }
     }
-    #if 0
-    for(int ii =0; ii < batch_size; ii ++){
-        int idx = ii * 16;
-        LOG(INFO)<<top_label[idx+1] << " " << top_label[idx+2] << " " << top_label[idx+3] << " " << top_label[idx+4] << 
-        " " << top_label[idx+5] << " " << top_label[idx+6] << " " << top_label[idx+7] << " " << top_label[idx+8] << 
-        " " << top_label[idx+9] << " " << top_label[idx+11] << " " << top_label[idx+12] <<
-        " " << top_label[idx+13] <<  " " << top_label[idx+14] << " " << top_label[idx+15] << " " << top_label[idx+16] << 
-        " " << top_label[idx+16];
+    #if 1
+    if(phase_ == TRAIN){
+        if(iterations_ % 1000 ==0){
+            for(int ii =0; ii < batch_size / 2; ii ++){
+                int idx = ii * 14;
+                LOG(INFO)<<top_label[idx+0] << " " <<top_label[idx+1] << " " << top_label[idx+2] << " " << top_label[idx+3] << " " << top_label[idx+4] << 
+                " " << top_label[idx+5] << " " << top_label[idx+6] << " " << top_label[idx+7] << " " << top_label[idx+8] << 
+                " " << top_label[idx+9] << " " <<top_label[idx+10] << " " << top_label[idx+11] << " " << top_label[idx+12] <<
+                " " << top_label[idx+13];
+            }
+        }
     }
     #endif
+    iterations_++;
     timer.Stop();
     batch_timer.Stop();
     DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";

@@ -371,29 +371,31 @@ void DataTransformer<Dtype>::TransformAnnoFaceAttribute(
 	const int img_height = anno_datum.datum().height();
 	const int img_width = anno_datum.datum().width();
 	AnnoFaceAttribute src_annoface = anno_datum.faceattri();
-	AnnoFaceLandmarks* face = src_annoface.mutable_landmark();
+	AnnoFaceLandmarks src_facemark = src_annoface.landmark();
+	AnnoFaceLandmarks project_facemark;
 	if(anno_datum.type() == AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE){
 		if(do_resize && param_.has_resize_param()){
 			CHECK_GT(img_height, 0);
 			CHECK_GT(img_width, 0);
 			UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
 											img_width, img_height,
-											face);
+											&src_facemark);
 		}
-		point * point_1 = face->mutable_lefteye();
-		point * point_2 = face->mutable_righteye();
-		point * point_3 = face->mutable_nose();
-		point * point_4 = face->mutable_leftmouth();
-		point * point_5 = face->mutable_rightmouth();
+		project_facemark.CopyFrom(src_facemark);
+		point lefteye = src_facemark.lefteye();
+		point righteye = src_facemark.righteye();
+		point nose = src_facemark.nose();
+		point leftmouth = src_facemark.leftmouth();
+		point rightmouth = src_facemark.rightmouth();
 		if(do_mirror){
-			point_1->set_x(1-point_1->x());
-			point_2->set_x(1-point_2->x());
-			point_3->set_x(1-point_3->x());
-			point_4->set_x(1-point_4->x());
-			point_5->set_x(1-point_5->x());
+			project_facemark.mutable_lefteye()->set_x(1-lefteye.x());
+			project_facemark.mutable_righteye()->set_x(1-righteye.x());
+			project_facemark.mutable_nose()->set_x(1-nose.x());
+			project_facemark.mutable_leftmouth()->set_x(1-leftmouth.x());
+			project_facemark.mutable_rightmouth()->set_x(1-rightmouth.x());
 			transformed_annoface_all->mutable_faceoritation()->set_yaw(-src_annoface.faceoritation().yaw());
 			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
-			transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
+			transformed_annoface_all->mutable_faceoritation()->set_roll(-src_annoface.faceoritation().roll());
 		}else{
 			transformed_annoface_all->mutable_faceoritation()->set_yaw(src_annoface.faceoritation().yaw());
 			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
@@ -402,19 +404,18 @@ void DataTransformer<Dtype>::TransformAnnoFaceAttribute(
 		if(do_expand){
 			float src_width = crop_bbox.xmax() - crop_bbox.xmin();
 			float src_height = crop_bbox.ymax() - crop_bbox.ymin();
-			point_1->set_x((point_1->x()-crop_bbox.xmin())/src_width);
-			point_1->set_y((point_1->y()-crop_bbox.ymin())/src_height);
-			point_2->set_x((point_2->x()-crop_bbox.xmin())/src_width);
-			point_2->set_y((point_2->y()-crop_bbox.ymin())/src_height);
-			point_3->set_x((point_3->x()-crop_bbox.xmin())/src_width);
-			point_3->set_y((point_3->y()-crop_bbox.ymin())/src_height);
-			point_4->set_x((point_4->x()-crop_bbox.xmin())/src_width);
-			point_4->set_y((point_4->y()-crop_bbox.ymin())/src_height);
-			point_5->set_x((point_5->x()-crop_bbox.xmin())/src_width);
-			point_5->set_y((point_5->y()-crop_bbox.ymin())/src_height);
+			project_facemark.mutable_lefteye()->set_x((lefteye.x()-crop_bbox.xmin())/src_width);
+			project_facemark.mutable_lefteye()->set_y((lefteye.y()-crop_bbox.ymin())/src_height);
+			project_facemark.mutable_righteye()->set_x((righteye.x()-crop_bbox.xmin())/src_width);
+			project_facemark.mutable_righteye()->set_y((righteye.y()-crop_bbox.ymin())/src_height);
+			project_facemark.mutable_nose()->set_x((nose.x()-crop_bbox.xmin())/src_width);
+			project_facemark.mutable_nose()->set_y((nose.y()-crop_bbox.ymin())/src_height);
+			project_facemark.mutable_leftmouth()->set_x((leftmouth.x()-crop_bbox.xmin())/src_width);
+			project_facemark.mutable_leftmouth()->set_y((leftmouth.y()-crop_bbox.ymin())/src_height);
+			project_facemark.mutable_rightmouth()->set_x((rightmouth.x()-crop_bbox.xmin())/src_width);
+			project_facemark.mutable_rightmouth()->set_y((rightmouth.y()-crop_bbox.ymin())/src_height);
 		}
-		AnnoFaceLandmarks* annolandface = transformed_annoface_all->mutable_landmark();
-		annolandface->CopyFrom(*face);
+		transformed_annoface_all->mutable_landmark()->CopyFrom(project_facemark);
 		transformed_annoface_all->set_gender(src_annoface.gender());
 		transformed_annoface_all->set_glass(src_annoface.glass());
 	}

@@ -171,27 +171,27 @@ void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
   float x5 = lface->rightmouth().x()* old_width;
   float y5 = lface->rightmouth().y()* old_height;
   switch (param.resize_mode()) {
-    case ResizeParameter_Resize_mode_WARP:
+    case ResizeParameter_Resize_mode_WARP:      
       x1 = std::min(new_width, std::max(0.f, x1 * new_width / old_width));
-      y1 = std::min(new_height,std::max(0.f, y1 * new_height / old_height));
+      y1 = std::min(new_height, std::max(0.f, y1 * new_height / old_height));
 
       x2 = std::min(new_width, std::max(0.f, x2 * new_width / old_width));
-      y2 = std::min(new_height,std::max(0.f, y2 * new_height / old_height));
+      y2 = std::min(new_height, std::max(0.f, y2 * new_height / old_height));
 
       x3 = std::min(new_width, std::max(0.f, x3 * new_width / old_width));
-      y3 = std::min(new_height,std::max(0.f, y3 * new_height / old_height));
+      y3 = std::min(new_height, std::max(0.f, y3 * new_height / old_height));
 
       x4 = std::min(new_width, std::max(0.f, x4 * new_width / old_width));
-      y4 = std::min(new_height,std::max(0.f, y4 * new_height / old_height));
+      y4 = std::min(new_height, std::max(0.f, y4 * new_height / old_height));
 
       x5 = std::min(new_width, std::max(0.f, x5 * new_width / old_width));
-      y5 = std::min(new_height,std::max(0.f, y5 * new_height / old_height));
+      y5 = std::min(new_height, std::max(0.f, y5 * new_height / old_height));
       break;
     default:
       LOG(FATAL) << "Unknown resize mode.";
   }
-  lface->mutable_lefteye()->set_x(float(x1/new_width));
-  lface->mutable_lefteye()->set_y(float(y1/new_height));
+  lface->mutable_lefteye()->set_x(x1 / new_width);
+  lface->mutable_lefteye()->set_y(y1 / new_height);
 
   lface->mutable_righteye()->set_x(float(x2/new_width));
   lface->mutable_righteye()->set_y(float(y2/new_height));
