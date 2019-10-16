@@ -3,7 +3,7 @@ test_net: "../prototxt/modelprune/face_test.prototxt"
 test_iter: 2621
 test_interval: 5000
 base_lr: 0.01
-display: 100
+display: 1000
 max_iter: 120000
 lr_policy: "multistep"
 gamma: 0.5
