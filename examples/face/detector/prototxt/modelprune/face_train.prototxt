@@ -2377,7 +2377,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 20
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2423,7 +2423,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 8
+    num_output: 10
     kernel_size: 1
     weight_filler {
       type: "msra"
