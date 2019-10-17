@@ -6,6 +6,10 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <algorithm>
+#include <random> // std::default_random_engine
+#include <chrono> // std::chrono::system_clock
+
 
 #include "caffe/data_transformer.hpp"
 #include "caffe/layers/base_data_layer.hpp"
@@ -143,24 +147,45 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   }
   closedir(dir);
   /**************随机挑选符合要求的人脸图片*************/
-  for (int item_id = 0; item_id < batch_size; ++item_id) {
+  while (choosedImagefile_.size()<batch_size){
     int rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
     while(std::count(labelSet.begin(), labelSet.end(), rand_class_idx)!=0){
       rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
     }else{
-      
+      std::string subDir = fullImageSetDir[rand_class_idx];
+      std::vector<std::string> filelist;
+      dir = opendir(subDir.c_str());
+      if( dir == NULL )
+        LOG(FATAL)<<" is not a directory or not exist!";
+      while ((faceSetDir = readdir(dir)) != NULL) {
+        if(strcmp(dirp->d_name,".")==0 || strcmp(dirp->d_name,"..")==0)
+          continue;
+        else if(dirp->d_name[0] == '.')
+          continue;
+        else if (faceSetDir->d_type == DT_REG) {
+          std::string imgfile = subDir + string("/") + string(faceSetDir->d_name);
+          filelist.push_back(imgfile);
+        }
+      }
+      closedir(dir);
+      int nrof_image_in_class = filelist.size();
+      int nrof_image_from_class = std::min(sample_num_, std::min(nrof_image_in_class, batch_size - choosedImagefile_.size()));
+      caffe::rng_t* prefetch_rng =
+                              static_cast<caffe::rng_t*>(prefetch_rng_->generator());
+      shuffle(filelist.begin(), filelist.end(), prefetch_rng);
+      for(int i = 0; i < nrof_image_from_class; i++){
+        choosedImagefile_.push_back(std::make_pair(filelist[i], rand_class_idx));
+      }
+      labelSet_.push_back(rand_class_idx);
     }
   }
-
-
-
   /**************遍历人脸数据集根目录遍历文件夹**********/
 
   // Reshape according to the first image of each batch
   // on single input batches allows for inputs of varying dimension.
-  cv::Mat cv_img = ReadImageToCVMat(root_folder + lines_[lines_id_].first,
+  cv::Mat cv_img = ReadImageToCVMat(choosedImagefile_[lines_id_].first,
       new_height, new_width, is_color);
-  CHECK(cv_img.data) << "Could not load " << lines_[lines_id_].first;
+  CHECK(cv_img.data) << "Could not load " << choosedImagefile_[lines_id_].first.first;
   // Use data_transformer to infer the expected blob shape from a cv_img.
   vector<int> top_shape = this->data_transformer_->InferBlobShape(cv_img);
   this->transformed_data_.Reshape(top_shape);
@@ -176,10 +201,10 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     // get a blob
     timer.Start();
-    CHECK_GT(lines_size, lines_id_);
-    cv::Mat cv_img = ReadImageToCVMat(root_folder + lines_[lines_id_].first,
+    //CHECK_GT(lines_size, lines_id_);
+    cv::Mat cv_img = ReadImageToCVMat(choosedImagefile_[item_id].first,
         new_height, new_width, is_color);
-    CHECK(cv_img.data) << "Could not load " << lines_[lines_id_].first;
+    CHECK(cv_img.data) << "Could not load " << choosedImagefile_[item_id].first;
     read_time += timer.MicroSeconds();
     timer.Start();
     // Apply transformations (mirror, crop...) to the image
@@ -188,7 +213,8 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
     trans_time += timer.MicroSeconds();
 
-    prefetch_label[item_id] = lines_[lines_id_].second;
+    prefetch_label[item_id] = choosedImagefile_[item_id].second;
+    #if 0 // 前人做的
     // go to the next iter
     lines_id_++;
     if (lines_id_ >= lines_size) {
@@ -199,6 +225,7 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         ShuffleImages();
       }
     }
+    #endif
   }
   batch_timer.Stop();
   DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";
