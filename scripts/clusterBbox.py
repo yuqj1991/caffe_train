@@ -221,8 +221,8 @@ def compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations
         iterations = iterations + 1
         print("~~~~~~~~~~~~~~~the %d times iterations~~~~~~~~~~~~~~~~~~~~~~~"%(iterations+1))
         print("old_loss = %f, loss = %f" % (old_loss, loss))
-        #if abs(old_loss-loss) < loss_convergence or iterations > iterations_num:
-        if (assignments == prev_assignments).all() :
+        if abs(old_loss-loss) < loss_convergence or iterations > iterations_num:
+        #if (assignments == prev_assignments).all() :
             break
         old_loss = loss 
         prev_assignments = assignments.copy()
