@@ -1,7 +1,7 @@
 python3 src/train_softmax.py \
 --logs_base_dir ./train/logs/ \
 --models_base_dir ./train/models/ \
---data_dir ../../../../dataset/facedata/recognition/align_vggface_train/ \
+--data_dir ../../../../dataset/facedata/recognition/vggface2_align_train/ \
 --image_size 160 \
 --model_def models.inception_resnet_v1 \
 --lfw_dir ../../../../dataset/facedata/recognition/lfw/lfw_160/ \
