@@ -186,22 +186,25 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   const float ymax = object_bboxes[object_bbox_index].ymax()*img_height;
   float bbox_width = xmax - xmin;
   float bbox_height = ymax - ymin;
-  int anchor_range_size = 0, anchor_choose_index = 0; 
+  int anchor_range_size = 0, anchor_choose_index = 0, rng_random_index = 0; 
   float bbox_aera = bbox_height * bbox_width;
   float scaleChoose = 0.0f;
   for(int j = 0; j < anchorScale.size() -1; j++){
     if(bbox_aera >= std::pow(anchorScale[j], 2) && bbox_aera < std::pow(anchorScale[j+1], 2))
     {
-      anchor_range_size = j + 1;
+      if(std::fabs(bbox_aera - std::pow(anchorScale[j], 2)) <= std::fabs(bbox_aera - std::pow(anchorScale[j + 1], 2))){
+        anchor_range_size = j;
+      }else{
+        anchor_range_size = j + 1;
+      }
+      break;
     }
   }
-  if(bbox_aera > std::pow(anchorScale[anchorScale.size() - 2], 2))
-    anchor_range_size = anchorScale.size() - 2;
   if(anchor_range_size==0){
     anchor_choose_index = 0;
   }else{
-    int target_bbox_index = caffe_rng_rand() % (anchor_range_size + 1);
-    anchor_choose_index = target_bbox_index % target_bbox_index;
+    rng_random_index = caffe_rng_rand() % (anchor_range_size + 1);
+    anchor_choose_index = rng_random_index % (anchor_range_size + 1);
   }
   if(anchor_choose_index == anchor_range_size){
     float min_resize_val = anchorScale[anchor_choose_index] / 2;
@@ -214,6 +217,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
   }
   float sample_box_size = (float)bbox_width * resized_width / scaleChoose;
+
   float width_offset_org = 0.0f, height_offset_org = 0.0f;
   if(sample_box_size < std::max(anno_datum.datum().width(), anno_datum.datum().height())){
     if(bbox_width <= sample_box_size){
@@ -238,6 +242,12 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   samplerbox->set_ymin(h_off);
   samplerbox->set_xmax(w_off + float(sample_box_size/img_width));
   samplerbox->set_ymax(h_off + float(sample_box_size/img_height));
+  NormalizedBBox source_bbox;
+  source_bbox.set_xmin(0);
+  source_bbox.set_ymin(0);
+  source_bbox.set_xmax(1);
+  source_bbox.set_ymax(1);
+  LocateBBox(source_bbox, *samplerbox, samplerbox);
   
 }// func GenerateDataAnchorSamples
 
