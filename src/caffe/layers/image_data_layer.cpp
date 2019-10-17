@@ -145,9 +145,8 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   /**************随机挑选符合要求的人脸图片*************/
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     int rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
-    if(std::count(labelSet.begin(), labelSet.end(), rand_class_idx)==0){
-      
-
+    while(std::count(labelSet.begin(), labelSet.end(), rand_class_idx)!=0){
+      rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
     }else{
       
     }
