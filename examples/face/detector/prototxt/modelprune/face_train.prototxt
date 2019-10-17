@@ -51,6 +51,12 @@ layer {
     backend: LMDB
   }
 	annotated_data_param {
+        batch_sampler {
+            sampler{
+                max_sample: 1
+			    max_trials: 1
+            }
+        }
 		batch_sampler {
 			sampler {
 				min_scale: 1.0
