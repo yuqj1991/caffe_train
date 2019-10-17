@@ -12,7 +12,7 @@ layer {
         crop_size: 128
     }
     data_param {
-        source: "../../../../../dataset/facedata/recogniton/lmdb/"
+        source: "../../../../../dataset/facedata/recogniton/face_recog_vggface2_lmdb/"
         batch_size: 128
         backend: LMDB
     }

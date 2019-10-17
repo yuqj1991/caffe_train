@@ -12,7 +12,6 @@ ImageSetFileForder = '../../../dataset/facedata/umdface/ImageSet/Main/'
 annoDict = {common.ORI_BATCH1: 'umdfaces_batch1_ultraface_new.csv', common.ORI_BATCH2: 'umdfaces_batch2_ultraface_new.csv', common.ORI_BATCH3: 'umdfaces_batch3_ultraface_new.csv'}
 trainDataSet = [common.ORI_BATCH1, common.ORI_BATCH2]
 testDataSet = [common.ORI_BATCH3]
-maxMargin = 66
 minMargin = 36
 def batch_work(ori, setFile):
     setfile_ = open(setFile, 'w')
@@ -43,7 +42,7 @@ def batch_work(ori, setFile):
             src = cv2.imread(os.path.abspath(full_path_image_name))
             xmin = np.maximum(roi_x - minMargin / 2, 0)
             xmax = np.minimum(roi_x + roi_w + minMargin / 2, src.shape[1])
-            ymin = np.maximum(roi_y - maxMargin / 2, 0)
+            ymin = np.maximum(roi_y - minMargin / 2, 0)
             ymax = np.minimum(roi_y+roi_h + minMargin / 2, src.shape[0])
             cropRoi = src[ymin:ymax, xmin:xmax, :]
             left_eye_point_x = row[1]['P8X'] - xmin
