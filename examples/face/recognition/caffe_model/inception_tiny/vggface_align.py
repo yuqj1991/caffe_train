@@ -4,7 +4,7 @@ import sys
 import cv2
 import numpy as np
 
-root_dir = "../../../../../../dataset/facedata"
+root_dir = "../../../../../../dataset/facedata/recognition"
 image_dir = "/train"
 list_file = "/bb_landmark/loose_bb_train.csv"
 output_dir = "/vggface2_train"
@@ -64,7 +64,7 @@ def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
     if not os.path.exists(img_path_out_dir):
         os.mkdir(img_path_out_dir)
 
-    cv2.imwrite(img_path_out_full, img_crop_scale)
+    cv2.imwrite(img_path_out_full, img_crop)
 
 if not os.path.exists(root_dir + output_dir):
     os.mkdir(root_dir + output_dir)
