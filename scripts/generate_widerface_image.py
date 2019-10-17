@@ -399,7 +399,7 @@ def generate_annoXml_and_text_from_widerSplit(widerSplit_file, subDir, xml_save_
 
 def main():
 	# generate imagesetfile xmlfile & labelfile
-	if 0:
+	if 1:
 		for sub in widerSetFile:
 			splitfile = "../../dataset/facedata/wider_face_split/"+widerfaceSplitDict[sub]
 			generate_pascal_image_set(splitfile, root_dir + '/JPEGImages/', sub, root_dir+'/ImageSets/Main')
@@ -408,7 +408,7 @@ def main():
 			shuffle_imageSetfile('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+sub+'.txt')
 			
 	# static and get classflyFile
-	if 1:
+	if 0:
 		draw_histogram_specfic_range_base_data()
 if __name__ == '__main__':
 	main()
