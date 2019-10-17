@@ -3,7 +3,7 @@ from __future__ import division
 import numpy as np
 
 
-classfyFile = "../../dataset/facedata/wider_face/wider_face_classfy_distance_data.txt"
+classfyFile = "./wider_face_classfly_distance_data.txt"
 
 # 定义Box类，描述bounding box的坐标
 class Box():

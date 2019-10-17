@@ -12,7 +12,7 @@ layer {
         crop_size: 128
     }
     data_param {
-        source: "../../../../../dataset/facedata/recogniton/lmdb/"
+        source: "../../../../../dataset/facedata/recogniton/face_recog_vggface2_lmdb/"
         batch_size: 128
         backend: LMDB
     }
@@ -5916,4 +5916,41 @@ layer {
   bottom: "classifier"
   bottom: "label"
   top: "loss"
+}
+
+layer {
+	name: "merege_pair"
+	type: "Identity2Verify"
+	bottom: "fc5"
+	bottom: "label"
+	top: "feature1"
+	top: "feature2"
+	top: "sim"
+}
+
+layer {
+	name: "norm1"
+	type: "Normalize"
+	bottom: "feature1"
+	top: "normfeature1"
+}
+
+layer {
+	name: "norm2"
+	type: "Normalize"
+	bottom: "feature2"
+	top: "normfeature2"
+}
+
+layer {
+  name: "loss2"
+  type: "ContrastiveLoss"
+  bottom: "normfeature1"
+  bottom: "normfeature2"
+  bottom: "sim"
+  top: "sim_loss"
+  loss_weight: 0.3
+  contrastive_loss_param {
+    margin: 1
+  }
 }

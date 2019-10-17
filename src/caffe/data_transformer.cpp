@@ -653,38 +653,6 @@ void DataTransformer<Dtype>::CropImage(const Datum& datum,
 	crop_datum->set_data(buffer);
 }
 
-template<typename Dtype>
-void DataTransformer<Dtype>::TransformDAS(const AnnotatedDatum& anno_datum, 
-                    const NormalizedBBox& crop_bbox,
-                    RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all){
-	for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
-		const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
-		AnnotationGroup transformed_anno_group;
-		bool has_valid_annotation = false;
-		for (int a = 0; a < anno_group.annotation_size(); ++a){
-			const Annotation& anno = anno_group.annotation(a);
-			const NormalizedBBox& bbox = anno.bbox();
-			NormalizedBBox resize_bbox = bbox;
-			if (param_.has_emit_constraint() &&
-			!MeetEmitConstraint(crop_bbox, resize_bbox,
-								param_.emit_constraint())) {
-				continue;
-			}
-			NormalizedBBox proj_bbox;
-			if(ProjectBBox(crop_bbox, resize_bbox, &proj_bbox)) {
-				has_valid_annotation = true;
-				Annotation* transformed_anno = transformed_anno_group.add_annotation();
-				transformed_anno->set_instance_id(anno.instance_id());
-				NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
-				transformed_bbox->CopyFrom(proj_bbox);
-			}
-		}
-		if(has_valid_annotation){
-			transformed_anno_group.set_group_label(anno_group.group_label());
-			transformed_anno_group_all->Add()->CopyFrom(transformed_anno_group);
-		}
-	}
-}
 
 template<typename Dtype>
 void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
@@ -701,25 +669,6 @@ void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
 	ClipBBox(bbox, &crop_bbox);
 	TransformAnnotation(anno_datum, do_resize, crop_bbox, do_mirror,
 										cropped_anno_datum->mutable_annotation_group());
-}
-
-template<typename Dtype>
-void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
-											const NormalizedBBox& bbox,
-											AnnotatedDatum* cropped_anno_datum,
-											bool useDas) {
-	// Crop the datum.
-	NormalizedBBox crop_bbox;
-	ClipBBox(bbox, &crop_bbox);
-	CropImage(anno_datum.datum(), crop_bbox, cropped_anno_datum->mutable_datum());
-	cropped_anno_datum->set_type(anno_datum.type());
-		// Transform the annotation according to crop_bbox.
-	if(useDas){
-		TransformDAS(anno_datum, crop_bbox, cropped_anno_datum->mutable_annotation_group());
-	}else{
-		LOG(ERROR)<<"must make paramerter useDas true!";
-	}
-	
 }
 
 template<typename Dtype>

@@ -4,7 +4,7 @@ cd $root_dir/scripts
 redo=1
 data_root_dir="../../dataset/facedata"
 dataset_name="umdface"
-mapfile="../examples/face/face_attributes/labelmap_face.prototxt"
+mapfile="../examples/face/attributes/labelmap_face.prototxt"
 anno_type="faceangle"
 label_type="txt"
 db="lmdb"
@@ -20,5 +20,5 @@ then
 fi
 for subset in training_umdface_pose testing_umdface_pose
 do
-  python create_annoset.py --anno-type=$anno_type --label-map-file=$mapfile --label-type=$label_type --min-dim=$min_dim --max-dim=$max_dim --resize-width=$width --resize-height=$height --check-label $extra_cmd $data_root_dir ../examples/face/face_attributes/scripts/$subset.txt $data_root_dir/$dataset_name/$db/$dataset_name"_"$subset"_"$db $data_root_dir/$dataset_name
+  python create_annoset.py --anno-type=$anno_type --label-map-file=$mapfile --label-type=$label_type --min-dim=$min_dim --max-dim=$max_dim --resize-width=$width --resize-height=$height --check-label $extra_cmd $data_root_dir ../examples/face/attributes/scripts/$subset.txt $data_root_dir/$dataset_name/$db/$dataset_name"_"$subset"_"$db $data_root_dir/$dataset_name
 done
