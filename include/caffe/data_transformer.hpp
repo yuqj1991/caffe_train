@@ -82,10 +82,6 @@ class DataTransformer {
   void Transform(const AnnotatedDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
                  vector<AnnotationGroup>* transformed_anno_vec);
-
-  void TransformDAS(const AnnotatedDatum& anno_datum, 
-                    const NormalizedBBox& crop_bbox,
-                    RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all);
 /*
   void RotateImage(const AnnoFaceDatum& anno_datum,
 												AnnoFaceDatum* Rotate_datum);
@@ -121,8 +117,6 @@ class DataTransformer {
   /**
    * @brief Crops the datum and AnnotationGroup according to bbox.
    */
-  void CropImage(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
-                 AnnotatedDatum* cropped_anno_datum, bool useDas);
   void CropImage(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
                  AnnotatedDatum* cropped_anno_datum);
 
