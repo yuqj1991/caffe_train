@@ -15,6 +15,11 @@
 #include "caffe/util/math_functions.hpp"
 #include "caffe/util/rng.hpp"
 
+#if define(LINUX)
+#include <dirent.h>
+#include <stdio.h>
+#endif
+
 namespace caffe {
 
 template <typename Dtype>
@@ -28,7 +33,10 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   const int new_height = this->layer_param_.image_data_param().new_height();
   const int new_width  = this->layer_param_.image_data_param().new_width();
   const bool is_color  = this->layer_param_.image_data_param().is_color();
+  sample_num_ =  this->layer_param_.image_data_param().sampel_num();
+  label_num_= this->layer_param_.image_data_param().label_num();
   string root_folder = this->layer_param_.image_data_param().root_folder();
+  CHECK_EQ(label_num_*sample_num_, this->layer_param_.image_data_param().batch_size());
 
   CHECK((new_height == 0 && new_width == 0) ||
       (new_height > 0 && new_width > 0)) << "Current implementation requires "
@@ -116,6 +124,38 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   const int new_width = image_data_param.new_width();
   const bool is_color = image_data_param.is_color();
   string root_folder = image_data_param.root_folder();
+
+  /**************遍历人脸数据集根目录文件夹**********/
+  struct dirent *faceSetDir;
+  DIR* dir = opendir(root_folder.c_str());
+  if( dir == NULL )
+    LOG(FATAL)<<" is not a directory or not exist!";
+    
+  while ((faceSetDir = readdir(dir)) != NULL) {
+      if(strcmp(dirp->d_name,".")==0 || strcmp(dirp->d_name,"..")==0)    ///current dir OR parrent dir
+        continue;
+      else if(dirp->d_name[0] == '.')
+        continue;
+      else if (faceSetDir->d_type == DT_DIR) {
+        std::string newDirectory = root_folder + string("/") + string(faceSetDir->d_name);
+        fullImageSetDir_.push_back(newDirectory);
+      }
+  }
+  closedir(dir);
+  /**************随机挑选符合要求的人脸图片*************/
+  for (int item_id = 0; item_id < batch_size; ++item_id) {
+    int rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
+    if(std::count(labelSet.begin(), labelSet.end(), rand_class_idx)==0){
+      
+
+    }else{
+      
+    }
+  }
+
+
+
+  /**************遍历人脸数据集根目录遍历文件夹**********/
 
   // Reshape according to the first image of each batch
   // on single input batches allows for inputs of varying dimension.
