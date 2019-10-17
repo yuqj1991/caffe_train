@@ -139,10 +139,11 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
     float correct_precisive_pitch =0;
     float correct_precisive_roll =0;
     for(int ii = 0; ii<batch_size; ii++){
+      Dtype Dis_diag = std::sqrt(pow(batchImgShape[ii][0], 2) + pow(batchImgShape[ii][1], 2));
       for(int jj = 0; jj< 5; jj++){
         double pow_x = pow(batchImgShape[ii][0]*(all_prediction_face_points[ii][jj]-all_gt_face_points[ii][jj]), 2);
         double pow_y = pow(batchImgShape[ii][1]*(all_prediction_face_points[ii][jj + 5]-all_gt_face_points[ii][jj + 5]), 2);
-        top_data[ii*9 + jj] = std::sqrt(pow_x + pow_y);
+        top_data[ii*9 + jj] = std::sqrt(pow_x + pow_y) / Dis_diag;
       }
       int gender_index=0; 
       //int glasses_index=0; 
