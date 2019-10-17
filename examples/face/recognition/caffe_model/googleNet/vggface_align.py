@@ -4,10 +4,10 @@ import sys
 import cv2
 import numpy as np
 
-root_dir = "/media/resideo/502E485A2E483AEC/yuqianjin/dataset/facedata/vggface2_train"
+root_dir = "../../../../../../dataset/facedata"
 image_dir = "/train"
 list_file = "/bb_landmark/loose_bb_train.csv"
-output_dir = "/train_align"
+output_dir = "/vggface2_train"
 
 
 def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
