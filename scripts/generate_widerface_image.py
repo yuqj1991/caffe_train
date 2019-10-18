@@ -252,8 +252,9 @@ def generate_pascal_image_set(widerSplit_file, wider_source_directory, sub_dir, 
 			img_no_jpg = img_file_.split('.jpg')[0]
 			full_img_file_ = wider_source_directory+'/'+sub_dir+'/images'+'/'+imageDir+'/'+img_no_jpg
 			if sub_dir == 'wider_train' or sub_dir == 'wider_val':
-				imgfileline = os.path.abspath(full_img_file_) + '\n'		
-				setFile.writelines(imgfileline)
+				imgfileline = os.path.abspath(full_img_file_) + '\n'
+				if os.path.exists(os.path.abspath(root_dir + '/label/' + img_no_jpg)):		
+					setFile.writelines(imgfileline)
 	setFile.close()
 
 
