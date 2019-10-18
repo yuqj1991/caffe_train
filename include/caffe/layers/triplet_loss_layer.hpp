@@ -42,6 +42,7 @@ class TripletLossLayer : public LossLayer<Dtype> {
   Blob<Dtype> diff_ap_;
   Blob<Dtype> diff_na_;
   Blob<Dtype> diff_pa_;
+  Blob<Dtype> diff_np_;
   Blob<Dtype> bottom_diff_;
   Blob<Dtype> inner_matrix_;
 };

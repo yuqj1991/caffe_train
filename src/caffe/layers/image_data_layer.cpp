@@ -19,10 +19,10 @@
 #include "caffe/util/math_functions.hpp"
 #include "caffe/util/rng.hpp"
 
-#if define(LINUX)
+
 #include <dirent.h>
 #include <stdio.h>
-#endif
+
 
 namespace caffe {
 
@@ -37,7 +37,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   const int new_height = this->layer_param_.image_data_param().new_height();
   const int new_width  = this->layer_param_.image_data_param().new_width();
   const bool is_color  = this->layer_param_.image_data_param().is_color();
-  sample_num_ =  this->layer_param_.image_data_param().sampel_num();
+  sample_num_ =  this->layer_param_.image_data_param().sample_num();
   label_num_= this->layer_param_.image_data_param().label_num();
   string root_folder = this->layer_param_.image_data_param().root_folder();
   CHECK_EQ(label_num_*sample_num_, this->layer_param_.image_data_param().batch_size());
@@ -98,7 +98,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       << top[0]->channels() << "," << top[0]->height() << ","
       << top[0]->width();
   // label
-  vector<int> label_shape(1, batch_size);
+  vector<int> label_shape(1, label_num_);
   top[1]->Reshape(label_shape);
   for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
     this->prefetch_[i].label_.Reshape(label_shape);
@@ -136,9 +136,9 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     LOG(FATAL)<<" is not a directory or not exist!";
     
   while ((faceSetDir = readdir(dir)) != NULL) {
-      if(strcmp(dirp->d_name,".")==0 || strcmp(dirp->d_name,"..")==0)    ///current dir OR parrent dir
+      if(strcmp(faceSetDir->d_name,".")==0 || strcmp(faceSetDir->d_name,"..")==0)    ///current dir OR parrent dir
         continue;
-      else if(dirp->d_name[0] == '.')
+      else if(faceSetDir->d_name[0] == '.')
         continue;
       else if (faceSetDir->d_type == DT_DIR) {
         std::string newDirectory = root_folder + string("/") + string(faceSetDir->d_name);
@@ -149,43 +149,46 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   /**************随机挑选符合要求的人脸图片*************/
   while (choosedImagefile_.size()<batch_size){
     int rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
-    while(std::count(labelSet.begin(), labelSet.end(), rand_class_idx)!=0){
+    while(std::count(labelSet_.begin(), labelSet_.end(), rand_class_idx)!=0){
       rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
-    }else{
-      std::string subDir = fullImageSetDir[rand_class_idx];
-      std::vector<std::string> filelist;
-      dir = opendir(subDir.c_str());
-      if( dir == NULL )
-        LOG(FATAL)<<" is not a directory or not exist!";
-      while ((faceSetDir = readdir(dir)) != NULL) {
-        if(strcmp(dirp->d_name,".")==0 || strcmp(dirp->d_name,"..")==0)
-          continue;
-        else if(dirp->d_name[0] == '.')
-          continue;
-        else if (faceSetDir->d_type == DT_REG) {
-          std::string imgfile = subDir + string("/") + string(faceSetDir->d_name);
-          filelist.push_back(imgfile);
-        }
-      }
-      closedir(dir);
-      int nrof_image_in_class = filelist.size();
-      int nrof_image_from_class = std::min(sample_num_, std::min(nrof_image_in_class, batch_size - choosedImagefile_.size()));
-      caffe::rng_t* prefetch_rng =
-                              static_cast<caffe::rng_t*>(prefetch_rng_->generator());
-      shuffle(filelist.begin(), filelist.end(), prefetch_rng);
-      for(int i = 0; i < nrof_image_from_class; i++){
-        choosedImagefile_.push_back(std::make_pair(filelist[i], rand_class_idx));
-      }
-      labelSet_.push_back(rand_class_idx);
     }
+    std::string subDir = fullImageSetDir_[rand_class_idx];
+    std::vector<std::string> filelist;
+    dir = opendir(subDir.c_str());
+    if( dir == NULL )
+      LOG(FATAL)<<" is not a directory or not exist!";
+    while ((faceSetDir = readdir(dir)) != NULL) {
+      if(strcmp(faceSetDir->d_name,".")==0 || strcmp(faceSetDir->d_name,"..")==0)
+        continue;
+      else if(faceSetDir->d_name[0] == '.')
+        continue;
+      else if (faceSetDir->d_type == DT_REG) {
+        std::string imgfile = subDir + string("/") + string(faceSetDir->d_name);
+        filelist.push_back(imgfile);
+      }
+    }
+    closedir(dir);
+    int nrof_image_in_class = filelist.size();
+    int length = choosedImagefile_.size();
+    int temp = std::min(nrof_image_in_class, batch_size - length );
+    int nrof_image_from_class = std::min(sample_num_, temp);
+    caffe::rng_t* prefetch_rng =
+                            static_cast<caffe::rng_t*>(prefetch_rng_->generator());
+    shuffle(filelist.begin(), filelist.end(), prefetch_rng);
+    for(int i = 0; i < nrof_image_from_class; i++){
+      choosedImagefile_.push_back(std::make_pair(filelist[i], rand_class_idx));
+    }
+    labelSet_.push_back(rand_class_idx);
+    label.push_back(nrof_image_from_class);
   }
+
   /**************遍历人脸数据集根目录遍历文件夹**********/
 
   // Reshape according to the first image of each batch
   // on single input batches allows for inputs of varying dimension.
   cv::Mat cv_img = ReadImageToCVMat(choosedImagefile_[lines_id_].first,
       new_height, new_width, is_color);
-  CHECK(cv_img.data) << "Could not load " << choosedImagefile_[lines_id_].first.first;
+  CHECK(cv_img.data) << "Could not load " << choosedImagefile_[lines_id_].first;
   // Use data_transformer to infer the expected blob shape from a cv_img.
   vector<int> top_shape = this->data_transformer_->InferBlobShape(cv_img);
   this->transformed_data_.Reshape(top_shape);
@@ -193,11 +196,15 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   top_shape[0] = batch_size;
   batch->data_.Reshape(top_shape);
 
+  label_num_ = labelSet_.size();
+  vector<int> label_shape(1, label_num_);
+  batch->label_.Reshape(label_shape);
+
   Dtype* prefetch_data = batch->data_.mutable_cpu_data();
   Dtype* prefetch_label = batch->label_.mutable_cpu_data();
+  
 
   // datum scales
-  const int lines_size = lines_.size();
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     // get a blob
     timer.Start();
@@ -212,8 +219,6 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     this->transformed_data_.set_cpu_data(prefetch_data + offset);
     this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
     trans_time += timer.MicroSeconds();
-
-    prefetch_label[item_id] = choosedImagefile_[item_id].second;
     #if 0 // 前人做的
     // go to the next iter
     lines_id_++;
@@ -226,6 +231,9 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       }
     }
     #endif
+  }
+  for(int i = 0; i < label_num_; i++){
+    prefetch_label[i] = label[i];
   }
   batch_timer.Stop();
   DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";

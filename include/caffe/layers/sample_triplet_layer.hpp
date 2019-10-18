@@ -41,6 +41,11 @@ class SampleTripletLayer : public NeuronLayer<Dtype> {
   int feature_dim_;
   int batch_size_;
   Blob<Dtype> inner_matrix_;
+  vector< std::pair<int, float> > neg_dist_sqr;
+  float alpha_;
+  vector <int> an_set;
+  vector <int> positive_set;
+  vector <int> neg_set;
 };
 
 }  // namespace caffe

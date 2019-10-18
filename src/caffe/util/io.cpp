@@ -658,15 +658,15 @@ bool ReadTxtToAnnotatedDatum(const string& labelfile, const int height,
     }
     anno->set_instance_id(instance_id++);
     LOG_IF(WARNING, xmin > width) << labelfile <<
-      " bounding box exceeds image boundary.";
+      " bounding box excset_labeleeds image boundary.";
     LOG_IF(WARNING, ymin > height) << labelfile <<
-      " bounding box exceeds image boundary.";
+      " bounding box excset_labeleeds image boundary.";
     LOG_IF(WARNING, xmax > width) << labelfile <<
-      " bounding box exceeds image boundary.";
+      " bounding box excset_labeleeds image boundary.";
     LOG_IF(WARNING, ymax > height) << labelfile <<
-      " bounding box exceeds image boundary.";
+      " bounding box excset_labeleeds image boundary.";
     LOG_IF(WARNING, xmin < 0) << labelfile <<
-      " bounding box exceeds image boundary.";
+      " bounding box excset_labeleeds image boundary.";
     LOG_IF(WARNING, ymin < 0) << labelfile <<
       " bounding box exceeds image boundary.";
     LOG_IF(WARNING, xmax < 0) << labelfile <<

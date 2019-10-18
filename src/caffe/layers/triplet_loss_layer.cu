@@ -37,36 +37,85 @@ void TripletLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     Dtype n_norm = sqrt(inner_matrix_data[n_idx * sample_num_ + n_idx] + eps);
     Dtype inner_ap = inner_matrix_data[a_idx * sample_num_ + p_idx];
     Dtype inner_an = inner_matrix_data[a_idx * sample_num_ + n_idx];
-    Dtype dist_ap = inner_ap / (a_norm * p_norm);
-    Dtype dist_an = inner_an / (a_norm * n_norm);
-    if (dist_ap - dist_an - margin < 0) {
-      ComputeDiff_gpu(a_pointer, p_pointer, a_norm,
-          p_norm, inner_ap, diff_ap_.mutable_gpu_data());
-      ComputeDiff_gpu(a_pointer, n_pointer, a_norm,
-          n_norm, inner_an, diff_an_.mutable_gpu_data());
-      ComputeDiff_gpu(p_pointer, a_pointer, p_norm,
-          a_norm, inner_ap, diff_pa_.mutable_gpu_data());
-      ComputeDiff_gpu(n_pointer, a_pointer, n_norm,
-          a_norm, inner_an, diff_na_.mutable_gpu_data());
-
-      caffe_gpu_axpby(feature_dim_, Dtype(1),
-          diff_an_.gpu_data(), Dtype(1),
-          bottom_diff_.mutable_gpu_data() + (a_idx * feature_dim_));
-      caffe_gpu_axpby(feature_dim_, Dtype(-1),
-          diff_ap_.gpu_data(), Dtype(1),
-          bottom_diff_.mutable_gpu_data() + (a_idx * feature_dim_));
-      caffe_gpu_axpby(feature_dim_, Dtype(-1),
-          diff_pa_.gpu_data(), Dtype(1),
-          bottom_diff_.mutable_gpu_data() + (p_idx * feature_dim_));
-      caffe_gpu_axpby(feature_dim_, Dtype(1),
-          diff_na_.gpu_data(), Dtype(1),
-          bottom_diff_.mutable_gpu_data() + (n_idx * feature_dim_));
-
-      loss += dist_an + margin - dist_ap;
+    //Dtype dist_ap = inner_ap / (a_norm *p_norm)
+    //Dtype dist_an = inner_an / (a_norm *n_norm)
+    /*************以下为自己添加的*********************/
+    Dtype dist_ap, dist_an;
+    for(int i = 0; i< feature_dim_; i++){
+      float diff_apos = std::pow(float(a_pointer[i] / a_norm)- float(p_pointer[i] / p_norm), 2);
+      float diff_aneg = std::pow(float(a_pointer[i] / a_norm)- float(n_pointer[i] / n_norm), 2);
+      dist_ap += diff_apos;
+      dist_an +=diff_aneg;
     }
+    /***********************************************/
+    if (dist_ap - dist_an - margin < 0) {
+        /*
+        ComputeDiff_gpu(a_pointer, p_pointer, a_norm,
+            p_norm, inner_ap, diff_ap_.mutable_gpu_data());
+        ComputeDiff_gpu(a_pointer, n_pointer, a_norm,
+            n_norm, inner_an, diff_an_.mutable_gpu_data());
+        ComputeDiff_gpu(p_pointer, a_pointer, p_norm,
+            a_norm, inner_ap, diff_pa_.mutable_gpu_data());
+        ComputeDiff_gpu(n_pointer, a_pointer, n_norm,
+            a_norm, inner_an, diff_na_.mutable_gpu_data());
+
+        caffe_gpu_axpby(feature_dim_, Dtype(1),
+            diff_an_.gpu_data(), Dtype(1),
+            bottom_diff_.mutable_gpu_data() + (a_idx * feature_dim_));
+        caffe_gpu_axpby(feature_dim_, Dtype(-1),
+            diff_ap_.gpu_data(), Dtype(1),
+            bottom_diff_.mutable_gpu_data() + (a_idx * feature_dim_));
+        caffe_gpu_axpby(feature_dim_, Dtype(-1),
+            diff_pa_.gpu_data(), Dtype(1),
+            bottom_diff_.mutable_gpu_data() + (p_idx * feature_dim_));
+        caffe_gpu_axpby(feature_dim_, Dtype(1),
+            diff_na_.gpu_data(), Dtype(1),
+            bottom_diff_.mutable_gpu_data() + (n_idx * feature_dim_));
+
+        loss += dist_an + margin - dist_ap;
+        */
+        loss += dist_ap + margin - dist_an;
+    }
+    /*********************以下是我自己做的**********************/
+    // backword a
+    caffe_gpu_sub(
+        feature_dim_,
+        n_pointer,  // n
+        p_pointer,  // p
+        diff_np_.mutable_gpu_data());  // n_i - p_i;
+    caffe_gpu_axpby(
+        feature_dim_,
+        Dtype(2.0),
+        diff_np_.mutable_gpu_data(),
+        Dtype(0.0),
+        bottom_diff_.mutable_gpu_data() + (a_idx * feature_dim_));
+    // backward p
+    caffe_gpu_sub(
+        feature_dim_,
+        n_pointer,  // n
+        a_pointer,  // a
+        diff_np_.mutable_gpu_data());  // n_i - a_i;
+    caffe_gpu_axpby(
+        feature_dim_,
+        Dtype(2.0),
+        diff_na_.mutable_gpu_data(),
+        Dtype(0.0),
+        bottom_diff_.mutable_gpu_data() + (p_idx * feature_dim_)); 
+    // backward n
+    caffe_gpu_sub(
+        feature_dim_,
+        p_pointer,  // p
+        a_pointer,  // a
+        diff_pa_.mutable_gpu_data());  // p_i - a_i;
+    caffe_gpu_axpby(
+            feature_dim_,
+            Dtype(2.0),
+            diff_pa_.mutable_gpu_data(),
+            Dtype(0.0),
+            bottom_diff_.mutable_gpu_data() + (n_idx * feature_dim_));
   }
-  //Dtype scalar = Dtype(1) / triplet_num_;
-  Dtype scalar = Dtype(1) / sample_num_;
+  Dtype scalar = Dtype(1) / triplet_num_;
+  //Dtype scalar = Dtype(1) / sample_num_;
   top[0]->mutable_cpu_data()[0] = loss * scalar;
 }
 
@@ -74,8 +123,8 @@ template <typename Dtype>
 void TripletLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
   if (propagate_down[0]) {
-    //Dtype scalar = top[0]->cpu_diff()[0] / triplet_num_;
-    Dtype scalar = top[0]->cpu_diff()[0] / sample_num_;
+    Dtype scalar = top[0]->cpu_diff()[0] / triplet_num_;
+    //Dtype scalar = top[0]->cpu_diff()[0] / sample_num_;
     caffe_gpu_scale(bottom_diff_.count(), scalar, bottom_diff_.gpu_data(),
         bottom[0]->mutable_gpu_diff());
   }

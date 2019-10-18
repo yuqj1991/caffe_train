@@ -13,6 +13,7 @@ void TripletLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   diff_ap_.Reshape(feature_dim_, 1, 1, 1);
   diff_na_.Reshape(feature_dim_, 1, 1, 1);
   diff_pa_.Reshape(feature_dim_, 1, 1, 1);
+  diff_np_.Reshape(feature_dim_, 1, 1, 1);
   bottom_diff_.Reshape(sample_num_, feature_dim_, 1, 1);
   inner_matrix_.Reshape(sample_num_, sample_num_, 1, 1);
 }
@@ -60,9 +61,20 @@ void TripletLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     Dtype n_norm = sqrt(inner_matrix_data[n_idx * sample_num_ + n_idx] + eps);
     Dtype inner_ap = inner_matrix_data[a_idx * sample_num_ + p_idx];
     Dtype inner_an = inner_matrix_data[a_idx * sample_num_ + n_idx];
-    Dtype dist_ap = inner_ap / (a_norm * p_norm);
-    Dtype dist_an = inner_an / (a_norm * n_norm);
-    if (dist_ap - dist_an - margin < 0) {
+    
+    //Dtype dist_ap = inner_ap / (a_norm *p_norm)
+    //Dtype dist_an = inner_an / (a_norm *n_norm)
+    /*************以下为自己添加的*********************/
+    Dtype dist_ap, dist_an;
+    for(int i = 0; i< feature_dim_; i++){
+      float diff_apos = std::pow(float(a_pointer[i] / a_norm)- float(p_pointer[i] / p_norm), 2);
+      float diff_aneg = std::pow(float(a_pointer[i] / a_norm)- float(n_pointer[i] / n_norm), 2);
+      dist_ap += diff_apos;
+      dist_an +=diff_aneg;
+    }
+    /***********************************************/
+    if (dist_ap - dist_an + margin > 0) { //dist_ap - dist_an - margin < 0
+    /*
       ComputeDiff_cpu(a_pointer, p_pointer, a_norm,
           p_norm, inner_ap, diff_ap_.mutable_cpu_data());
       ComputeDiff_cpu(a_pointer, n_pointer, a_norm,
@@ -86,10 +98,50 @@ void TripletLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
           bottom_diff_.mutable_cpu_data() + (n_idx * feature_dim_));
 
       loss += dist_an + margin - dist_ap;
+      */
+      loss += dist_ap + margin - dist_an;
     }
+    /*********************以下是我自己做的**********************/
+    // backword a
+    caffe_sub(
+      feature_dim_,
+      n_pointer,  // n
+      p_pointer,  // p
+      diff_np_.mutable_cpu_data());  // n_i - p_i;
+    caffe_cpu_axpby(
+      feature_dim_,
+      Dtype(2.0),
+      diff_np_.mutable_cpu_data(),
+      Dtype(0.0),
+      bottom_diff_.mutable_cpu_data() + (a_idx * feature_dim_));
+    // backward p
+    caffe_sub(
+      feature_dim_,
+      n_pointer,  // n
+      a_pointer,  // a
+      diff_np_.mutable_cpu_data());  // n_i - a_i;
+    caffe_cpu_axpby(
+      feature_dim_,
+      Dtype(2.0),
+      diff_na_.mutable_cpu_data(),
+      Dtype(0.0),
+      bottom_diff_.mutable_cpu_data() + (p_idx * feature_dim_)); 
+    // backward n
+    caffe_sub(
+      feature_dim_,
+      p_pointer,  // p
+      a_pointer,  // a
+      diff_pa_.mutable_cpu_data());  // p_i - a_i;
+    caffe_cpu_axpby(
+      feature_dim_,
+      Dtype(2.0),
+      diff_pa_.mutable_cpu_data(),
+      Dtype(0.0),
+      bottom_diff_.mutable_cpu_data() + (n_idx * feature_dim_)); 
+    /*********************以上是我自己做的**********************/
   }
-  //Dtype scalar = Dtype(1) / triplet_num_;
-  Dtype scalar = Dtype(1) / sample_num_;
+  Dtype scalar = Dtype(1) / triplet_num_;
+  //Dtype scalar = Dtype(1) / sample_num_;
   top[0]->mutable_cpu_data()[0] = loss * scalar;
 }
 
@@ -97,8 +149,8 @@ template <typename Dtype>
 void TripletLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
   if (propagate_down[0]) {
-    //Dtype scalar = top[0]->cpu_diff()[0] / triplet_num_;
-    Dtype scalar = top[0]->cpu_diff()[0] / sample_num_;
+    Dtype scalar = top[0]->cpu_diff()[0] / triplet_num_;
+    //Dtype scalar = top[0]->cpu_diff()[0] / sample_num_;
     caffe_cpu_scale(bottom_diff_.count(), scalar, bottom_diff_.cpu_data(),
         bottom[0]->mutable_cpu_diff());
   }
