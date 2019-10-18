@@ -51,10 +51,14 @@ def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
     if w < h:
         scale = 128.0 / w
         h = int(h*scale)
+        if h <128:
+            h = 128
         w = 128
     else:
         scale = 128.0 / h
         w = int(w*scale)
+        if h <128:
+            h = 128
         h = 128
 
     print(w, h)
@@ -64,7 +68,7 @@ def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
     if not os.path.exists(img_path_out_dir):
         os.mkdir(img_path_out_dir)
 
-    cv2.imwrite(img_path_out_full, img_crop)
+    cv2.imwrite(img_path_out_full, img_crop_scale)
 
 if not os.path.exists(root_dir + output_dir):
     os.mkdir(root_dir + output_dir)
