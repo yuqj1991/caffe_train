@@ -1,13 +1,4 @@
-# This repository is no longer maintained, and I highly recommend these two repositories, e.g., [open-reid](https://github.com/Cysu/open-reid) and [Person_reID_baseline_pytorch](https://github.com/layumi/Person_reID_baseline_pytorch).
 
-# A Discriminatively Learned CNN Embedding for Person Re-identification
-
-A [caffe](https://github.com/BVLC/caffe)-based implementation of [this paper](https://arxiv.org/abs/1611.05666),
-providing whole training, testing and evaluation codes.
-
-The official code (written in matconvnet) is available [here](https://github.com/layumi/2016_person_re-ID).
-
-![Structure](https://github.com/D-X-Y/caffe-reid/blob/master/figures/person-re-identification-struct.png)
 
 ## Preparation
 - download Market-1501 dataset and put Market-1501 in $HOME/datasets/
@@ -53,19 +44,3 @@ Many scripts (e.g initialization, testing, training, extract feature and evaluat
 - `sh models/market1501/res50/train.sh --gpu 2,3`
 - `sh examples/market1501/extract/extract_prediction.sh 0 res50 pool5`
 - final results are : mAP = 0.585765, r1 precision = 0.790974 [Cos + Eucl]
-
-## Citation
-Please cite the following papers in your publications if it helps your research:
-
-    @article{zheng2018discriminatively,
-      title     = {A Discriminatively Learned CNN Embedding for Person Re-identification},
-      author    = {Zheng, Zhedong and Zheng, Liang and Yang, Yi},
-      journal   = {ACM Transactions on Multimedia Computing, Communications, and Applications (TOMM)},
-      year      = {2018}
-    }
-    @inproceedings{jia2014caffe,
-      title     = {Caffe: Convolutional Architecture for Fast Feature Embedding},
-      author    = {Jia, Yangqing and Shelhamer, Evan and Donahue, Jeff and Karayev, Sergey and Long, Jonathan and Girshick, Ross and Guadarrama, Sergio and Darrell, Trevor},
-      booktitle = {ACM Multimedia},
-      year      = {2014}
-    }
