@@ -3672,7 +3672,7 @@ layer {
     normalization: VALID
   }
   multibox_loss_param {
-    loc_loss_type: L2 #SMOOTH_L1# 
+    loc_loss_type: SMOOTH_L1# L2 #
     conf_loss_type: SOFTMAX
     loc_weight: 1.0
     num_classes: 2
@@ -3683,7 +3683,7 @@ layer {
     background_label_id: 0
     use_difficult_gt: true
     neg_pos_ratio: 3.0
-    neg_overlap: 0.5
+    neg_overlap: 0.3
     code_type: CENTER_SIZE
     ignore_cross_boundary_bbox: false
     mining_type: MAX_NEGATIVE
