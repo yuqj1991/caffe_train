@@ -1252,7 +1252,7 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 256
+    group: 128
     stride: 2
     weight_filler {
       type: "msra"
