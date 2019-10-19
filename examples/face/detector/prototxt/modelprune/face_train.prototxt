@@ -2105,7 +2105,7 @@ layer {
 layer {
   name: "conv_mbox_priorbox_two"
   type: "PriorBox"
-  bottom: "conv_four_eltwise"
+  bottom: "conv_two_eltwise"
   bottom: "data"
   top: "conv_mbox_priorbox_two"
   prior_box_param {
