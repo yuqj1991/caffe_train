@@ -7,13 +7,16 @@ weight_decay: 0.0005
 lr_policy: "multistep"
 gamma: 0.1
 stepvalue: 96000
-stepvalue: 144000
-stepvalue: 192000
+stepvalue: 204000
+stepvalue: 402000
+stepvalue: 602000
+stepvalue: 802000
+stepvalue: 1002000
 
 # Display every 100 iterations
 display: 100
 # The maximum number of iterations
-max_iter: 192000
+max_iter: 1200000
 # snapshot intermediate results
 snapshot: 5000
 snapshot_prefix: "face_recog/tiny"

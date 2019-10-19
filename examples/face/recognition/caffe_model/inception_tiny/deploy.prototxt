@@ -1043,15 +1043,6 @@ layer {
     type: "ReLU"
 }
 layer {
-  name: "res5b_drop"
-  type: "Dropout"
-  bottom: "res5b"
-  top: "res5b_drop"
-  dropout_param {
-    dropout_ratio: 0.2
-  }
-}
-layer {
   name: "fc5"
   type: "InnerProduct"
   bottom: "res5b_drop"

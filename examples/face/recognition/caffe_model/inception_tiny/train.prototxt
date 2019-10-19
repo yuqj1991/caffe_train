@@ -1,42 +1,19 @@
 name: "deep_face_anglenet"
 layer {
 	name: "data"
-	type: "faceAngleData"
+	type: "Data"
 	top: "data"
 	top: "label"
 	include {
 		phase: TRAIN
 	}
 	transform_param {
-		scale: 0.007843
-		mirror: true
-		mean_value: 127.5
-		mean_value: 127.5
-		mean_value: 127.5
-		resize_param {
-			prob: 1.0
-			resize_mode: WARP
-			height: 128
-			width: 128
-			interp_mode: LINEAR
-			interp_mode: AREA
-			interp_mode: NEAREST
-			interp_mode: CUBIC
-			interp_mode: LANCZOS4
-		}
-		distort_param {
-			brightness_prob: 0.5
-			brightness_delta: 32.0
-			contrast_prob: 0.5
-			contrast_lower: 0.5
-			contrast_upper: 1.5
-			hue_prob: 0.5
-			hue_delta: 18.0
-			saturation_prob: 0.5
-			saturation_lower: 0.5
-			saturation_upper: 1.5
-			random_order_prob: 0.0
-		}
+        mirror: true        
+        mean_value: 127.5
+        mean_value: 127.5
+        mean_value: 127.5
+        scale: 0.0078125
+        crop_size: 128
 	}
 	data_param {
 		source: "../../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb"

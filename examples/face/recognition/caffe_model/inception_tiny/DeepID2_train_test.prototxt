@@ -300,16 +300,6 @@ layer {
 }
 
 layer {
-  name: "dropout"
-  type: "Dropout"
-  bottom: "fc160"
-  top: "fc160"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-
-layer {
   name: "fc_identity"
   type: "InnerProduct"
   bottom: "fc160"
