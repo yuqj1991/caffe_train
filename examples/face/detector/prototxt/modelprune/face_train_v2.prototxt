@@ -144,8 +144,9 @@ layer {
 			scale: 64
 			scale: 128
 			scale: 256
+			scale: 512
 			sample_constraint{
-				min_object_coverage: 0.2
+				min_object_coverage: 0.5
 			}
 			max_sample: 1
 			max_trials: 10
