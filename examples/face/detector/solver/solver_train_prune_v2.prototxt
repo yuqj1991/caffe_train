@@ -17,7 +17,7 @@ test_initialization: false
 average_loss: 10
 stepvalue: 50000
 stepvalue: 100000
-iter_size: 1
+iter_size: 8
 #momentum2 : 0.99
 type: "RMSProp"
 eval_type: "detection"
