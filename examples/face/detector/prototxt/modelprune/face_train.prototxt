@@ -49,7 +49,7 @@ layer {
 	annotated_data_param {
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -62,7 +62,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -75,7 +75,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -88,7 +88,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -101,7 +101,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -114,7 +114,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -127,7 +127,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -145,7 +145,7 @@ layer {
 			scale: 128
 			scale: 256
 			sample_constraint{
-				min_object_coverage: 0.2
+				min_object_coverage: 0.5
 			}
 			max_sample: 1
 			max_trials: 10
