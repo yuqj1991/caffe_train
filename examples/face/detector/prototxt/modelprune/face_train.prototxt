@@ -40,10 +40,6 @@ layer {
       saturation_upper: 1.5
       random_order_prob: 0.0
     }
-    expand_param {
-      prob: 0.5
-      max_expand_ratio: 4.0
-    }
   }
   data_param {
     source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
@@ -52,11 +48,31 @@ layer {
   }
 	annotated_data_param {
 		batch_sampler {
-            sampler{
-            }
-			 max_sample: 1
-			 max_trials: 1
-        }
+			sampler {
+				min_scale: 1.0
+				max_scale: 1.0
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.0
+			}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 1.0
+				max_scale: 1.0
+				min_aspect_ratio: 1.0
+				max_aspect_ratio: 1.0
+			}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
 		batch_sampler {
 			sampler {
 				min_scale: 1.0
@@ -85,36 +101,10 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 1.0
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.4
-				max_scale: 0.6
-				min_aspect_ratio: 1.0
-				max_aspect_ratio: 1.5
 				}
 			sample_constraint {
 				min_object_coverage: 1.0
@@ -124,7 +114,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 1.0
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -137,7 +127,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 1.0
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -2480,7 +2470,7 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox"
   prior_box_param {
-    min_size: 8.0
+    min_size: 12.0
     step: 4
     flip: true
     clip: false
@@ -2591,7 +2581,7 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_two"
   prior_box_param {
-    min_size: 16.0
+    min_size: 24.0
     step: 8
     flip: true
     clip: false

@@ -980,7 +980,7 @@ message AnnotatedDataParameter {
   // AnnotatedDatum.
   optional AnnotatedDatum.AnnotationType anno_type = 3;
   repeated DataAnchorSampler data_anchor_sampler =4;
-  optional float sampleprob = 5[default=0.4];
+  optional float sampleprob = 5[default=0.5];
 }
 
 message ArgMaxParameter {
