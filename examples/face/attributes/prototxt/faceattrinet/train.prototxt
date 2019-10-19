@@ -49,6 +49,33 @@ layer {
 	}
 }
 layer {
+	name: "data"
+	type: "faceAttributeData"
+	top: "data"
+	top: "label"
+	include {
+		phase: TEST
+	}
+	transform_param {
+		scale: 0.007843
+		mean_value: 127.5
+		mean_value: 127.5
+		mean_value: 127.5
+		resize_param {
+			prob: 1.0
+			resize_mode: WARP
+			height: 128
+			width: 128
+			interp_mode: LINEAR
+		}
+	}
+	data_param {
+		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_testing_umdface_pose_lmdb/"
+		batch_size: 4
+		backend: LMDB
+	}
+}
+layer {
   name: "label_slice"
   type: "Slice"
   bottom: "label"
@@ -60,6 +87,9 @@ layer {
     slice_point: 13
     axis: 1
   }
+  include {
+		phase: TRAIN
+	}
 }
 layer {
 	name: "conv_0"
@@ -1008,6 +1038,9 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	loss_weight: 1
+	include {
+		phase: TRAIN
+	}
 }
 layer {
 	name: "landmark_loss"
@@ -1016,9 +1049,43 @@ layer {
 	bottom: "label_landmark"
 	top: "landmark_loss"
 	loss_weight: 1
+	include {
+		phase: TRAIN
+	}
 	propagate_down: true
 	propagate_down: false
 	loss_param {
 		normalization: VALID
+	}
+}
+
+layer {
+	name: "multiface_output"
+	type: "Concat"
+	bottom: "conv6_landmark"
+    bottom: "conv6_angle"
+	bottom: "conv6_gender"
+	top: "multiface_output"
+	concat_param {
+		axis: 1
+	}
+	include {
+		phase: TEST
+	}
+}
+layer{
+	name: "faceeval_output"
+	type: "FaceAttriEvaluate"
+	bottom: "multiface_output"
+	bottom: "label"
+	top: "faceeval_output"
+	include {
+		phase: TEST
+	}
+	face_evaluate_param{
+		facetype: FACEATTRIBUTE
+		facepoints: 5
+		num_gender: 2
+		#num_glasses: 2
 	}
 }
