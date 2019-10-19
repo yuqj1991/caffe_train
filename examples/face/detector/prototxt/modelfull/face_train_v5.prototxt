@@ -40,14 +40,10 @@ layer {
 			saturation_upper: 1.5
 			random_order_prob: 0.0
 		}
-		expand_param {
-			prob: 0.5
-			max_expand_ratio: 4.0
-		}
 	}
 	data_param {
-		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_train_lmdb/"
-		batch_size: 3
+		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
+		batch_size: 1
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -141,6 +137,19 @@ layer {
 			}
 			max_sample: 1
 			max_trials: 50
+		}
+		data_anchor_sampler{
+			scale: 16
+			scale: 32
+			scale: 64
+			scale: 128
+			scale: 256
+			scale: 512
+			sample_constraint{
+				min_object_coverage: 0.2
+			}
+			max_sample: 1
+			max_trials: 10
 		}
 		label_map_file: "../labelmap_face.prototxt"
 	}
