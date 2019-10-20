@@ -42,14 +42,14 @@ layer {
     }
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
+    source: "../lmdb/wider_face_wider_train_lmdb/"
     batch_size: 2
     backend: LMDB
   }
 	annotated_data_param {
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 1.0
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -3505,13 +3505,13 @@ layer {
     normalization: VALID
   }
   multibox_loss_param {
-    loc_loss_type: SMOOTH_L1# L2 #
+    loc_loss_type: SMOOTH_L1
     conf_loss_type: SOFTMAX
     loc_weight: 1.0
     num_classes: 2
     share_location: true
     match_type: PER_PREDICTION
-    overlap_threshold: 0.5
+    overlap_threshold: 0.35
     use_prior_for_matching: true
     background_label_id: 0
     use_difficult_gt: true

@@ -10,12 +10,12 @@ convet2yoloformat = False
 convert2vocformat = True
 
 # 最小取20大小的脸，并且补齐
-minsize2select = 19.2
+minsize2select = 32
 cropsize2select = 60
 usepadding = True
 
 datasetprefix = "../../dataset/facedata/wider_face"  #
-use_blur_occlu_attri = True #False #
+use_blur_occlu_attri = False #True #
 
 def convertimgset(img_set="train"):
     imgdir = rootdir + '/wider_face/' + "JPEGImages/wider_" + img_set + "/images"
@@ -283,5 +283,5 @@ def convertdataset():
 
 if __name__ == "__main__":
     convertdataset()
-    shutil.move(rootdir + '/wider_face/' + "/ImageSets/Main/" + "train.txt", rootdir + '/wider_face/' + "/ImageSets/Main/" + "train.txt")
-    shutil.move(rootdir +  '/wider_face/' + "/ImageSets/Main/" + "val.txt", rootdir + '/wider_face/' + "/ImageSets/Main/" + "val.txt")
+    shutil.move(rootdir + '/wider_face/' + "/ImageSets/Main/" + "train.txt", rootdir + '/wider_face/' + "/ImageSets/Main/" + "wider_train.txt")
+    shutil.move(rootdir +  '/wider_face/' + "/ImageSets/Main/" + "val.txt", rootdir + '/wider_face/' + "/ImageSets/Main/" + "wider_val.txt")
