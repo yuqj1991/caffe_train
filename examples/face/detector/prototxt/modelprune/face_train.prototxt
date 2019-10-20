@@ -49,7 +49,7 @@ layer {
 	annotated_data_param {
 		batch_sampler {
 			sampler {
-				min_scale: 0.3
+				min_scale: 1.0
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -1997,7 +1997,7 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox"
   prior_box_param {
-    min_size: 12.0
+    min_size: 10.0
     aspect_ratio: 1.5
     step: 4
     flip: true
@@ -2109,7 +2109,7 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_two"
   prior_box_param {
-    min_size: 32.0
+    min_size: 20.0
     aspect_ratio: 1.5
     step: 8
     flip: true
@@ -2221,7 +2221,7 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_three"
   prior_box_param {
-    min_size: 64
+    min_size: 40
     aspect_ratio: 1.5
     step: 16
     flip: true
@@ -2333,7 +2333,7 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_four"
   prior_box_param {
-    min_size: 128
+    min_size: 80
     aspect_ratio: 1.5
     step: 32
     flip: true
@@ -2361,7 +2361,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 12
+    num_output: 8
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2407,7 +2407,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 4
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2447,7 +2447,7 @@ layer {
   top: "conv_mbox_priorbox_five"
   prior_box_param {
     min_size: 256.0
-    aspect_ratio: 1.5
+    min_size: 160.0
     step: 64
     flip: true
     clip: false
@@ -2529,12 +2529,12 @@ layer {
     num_classes: 2
     share_location: true
     match_type: PER_PREDICTION
-    overlap_threshold: 0.35
+    overlap_threshold: 0.5
     use_prior_for_matching: true
     background_label_id: 0
     use_difficult_gt: true
     neg_pos_ratio: 3.0
-    neg_overlap: 0.35
+    neg_overlap: 0.5
     code_type: CENTER_SIZE
     ignore_cross_boundary_bbox: false
     mining_type: MAX_NEGATIVE
