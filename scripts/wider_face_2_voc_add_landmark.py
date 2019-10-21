@@ -179,7 +179,7 @@ def method_name(bboxes, filename, saveimg, vocannotationdir, lms, img_set):
     annotation.appendChild(segmented)
     for i in range(len(bboxes)):
         bbox = bboxes[i]
-        objects = doc.createElement('object')
+        objects = doc.createElement('objects')
         annotation.appendChild(objects)
         object_name = doc.createElement('name')
         object_name.appendChild(doc.createTextNode('face'))
@@ -193,7 +193,7 @@ def method_name(bboxes, filename, saveimg, vocannotationdir, lms, img_set):
         difficult = doc.createElement('difficult')
         difficult.appendChild(doc.createTextNode('0'))
         objects.appendChild(difficult)
-        bndbox = doc.createElement('bndbox')
+        bndbox = doc.createElement('boundingbox')
         objects.appendChild(bndbox)
         xmin = doc.createElement('xmin')
         xmin.appendChild(doc.createTextNode(str(bbox[0])))
