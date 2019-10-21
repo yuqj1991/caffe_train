@@ -20,7 +20,7 @@ annoImgDir = '../../dataset/facedata/wider_face/annoImg'
 root_dir = "../../dataset/facedata/wider_face"
 widerfaceSplitDict = {'wider_train':'wider_face_train_bbx_gt.txt' , 'wider_val':'wider_face_val_bbx_gt.txt'}
 height_level = [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440,9000]
-minDetectSize = 10 
+minDetectSize = 20 
 classflyFile = "./wider_face_classfly_distance_data.txt"
 
 
