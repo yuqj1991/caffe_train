@@ -27,12 +27,9 @@ def generate_list(imageSetDir):
 				imgname =imgline.split('/')[-1].strip()
 				xmlline_ = root_dataset+imgname+'.xml'
 				xmlline = os.path.abspath(xmlline_) + '\n'
-				#print (os.path.abspath(xmlline_))
-				#print(xmlline)
-				newline = imgline.strip().replace('stive', 'deep')+'.jpg'+' '+xmlline
-				#print(newline)
-				#break
-				newfile.write(newline)
+				if os.path.exists(xmlline_):
+					newline = imgline.strip().replace('stive', 'deep')+'.jpg'+' '+xmlline
+					newfile.write(newline)
 		f.close()
 		newfile.close()
 		shuffle_file(newSetfilepath)

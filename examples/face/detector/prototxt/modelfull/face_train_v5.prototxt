@@ -42,7 +42,7 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
+		source: "../lmdb/wider_face_wider_train_lmdb/"
 		batch_size: 1
 		backend: LMDB
 	}
@@ -2161,11 +2161,11 @@ layer {
 	}
 }
 layer{
-	name: "detector_module_one"
+	name: "dectction_moudle_one"
 	type: "Eltwise"
 	bottom: "lfpn_1_moudle_cpm_3_3_one_channel"
 	bottom: "conv6"
-	top: "detector_module_one"
+	top: "dectction_moudle_one"
 	eltwise_param {
 		operation: SUM
 	}
