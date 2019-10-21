@@ -49,7 +49,7 @@ layer {
 	annotated_data_param {
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -1780,7 +1780,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
@@ -2117,7 +2118,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
@@ -2249,7 +2251,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }

@@ -1307,7 +1307,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
@@ -1644,7 +1645,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
@@ -1776,7 +1778,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
@@ -2529,12 +2532,12 @@ layer {
     num_classes: 2
     share_location: true
     match_type: PER_PREDICTION
-    overlap_threshold: 0.5
+    overlap_threshold: 0.35
     use_prior_for_matching: true
     background_label_id: 0
     use_difficult_gt: true
     neg_pos_ratio: 3.0
-    neg_overlap: 0.5
+    neg_overlap: 0.3
     code_type: CENTER_SIZE
     ignore_cross_boundary_bbox: false
     mining_type: MAX_NEGATIVE

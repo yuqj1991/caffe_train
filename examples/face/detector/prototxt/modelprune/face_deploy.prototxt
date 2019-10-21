@@ -1160,7 +1160,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
@@ -1495,9 +1496,10 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
@@ -1629,7 +1631,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
