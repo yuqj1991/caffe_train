@@ -7,7 +7,7 @@ EXAMPLE=../../../../../../dataset/facedata/recognition
 DATA=.
 TOOLS=../../../../../build/tools
 
-TRAIN_DATA_ROOT=../../../../../../dataset/facedata/recognition/vggface2_align_train/
+TRAIN_DATA_ROOT=../../../../../../dataset/facedata/recognition/lfw_160/
 #VAL_DATA_ROOT=/path/to/imagenet/val/
 
 # Set RESIZE=true to resize the images to 128x128. Leave as false if images have
@@ -32,7 +32,7 @@ fi
 #  echo "Error: VAL_DATA_ROOT is not a path to a directory: $VAL_DATA_ROOT"
 #  echo "Set the VAL_DATA_ROOT variable in create_imagenet.sh to the path" \
 #       "where the ImageNet validation data is stored."
-#  exit 1
+#  exit 1 vggface2_align_train face_recog_vggface2_lmdb
 #fi
 
 echo "Creating train lmdb..."
@@ -41,11 +41,11 @@ GLOG_logtostderr=1 $TOOLS/convert_imageset \
     --resize_height=$RESIZE_HEIGHT \
     --resize_width=$RESIZE_WIDTH \
     --shuffle \
-    --encode_type=jpg \
+    --encode_type=png \
     --encoded=true \
     $TRAIN_DATA_ROOT \
     $DATA/vggface2_train.txt \
-    $EXAMPLE/face_recog_vggface2_lmdb
+    $EXAMPLE/lfw_lmdb
 
 #echo "Creating val lmdb..."
 

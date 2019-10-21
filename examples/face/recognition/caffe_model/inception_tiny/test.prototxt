@@ -1,7 +1,7 @@
 name: "faceRecognition"
 layer {
 	name: "data"
-	type: "faceAngleData"
+	type: "Data"
 	top: "data"
 	top: "label"
 	include {
@@ -21,7 +21,7 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_testing_umdface_pose_lmdb/"
+		source: "../../../../../../dataset/facedata/recognition/lfw_lmdb"
 		batch_size: 12
 		backend: LMDB
 	}
@@ -1574,7 +1574,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 8631
+    num_output: 5752
     weight_filler {
       type: "xavier"
     }
@@ -1584,6 +1584,17 @@ layer {
     }
   }
 }
+
+layer {
+	name: "classifier"
+	type: "Softmax"
+	bottom: "classifier"
+	top: "classifier"
+	softmax_param {
+		axis: 1
+	}
+}
+
 
 layer {
   name: "accuracy1"
