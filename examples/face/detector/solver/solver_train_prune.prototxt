@@ -2,7 +2,7 @@ train_net: "../prototxt/modelprune/face_train.prototxt"
 test_net: "../prototxt/modelprune/face_test.prototxt"
 test_iter: 3226
 test_interval: 5000
-base_lr: 0.01
+base_lr: 0.001
 display: 1000
 max_iter: 120000
 lr_policy: "multistep"
@@ -19,7 +19,7 @@ stepvalue: 20000
 stepvalue: 50000
 stepvalue: 100000
 iter_size: 1
-#momentum2 : 0.99
+momentum2 : 0.99
 type: "RMSProp"
 eval_type: "detection"
 ap_version: "11point"

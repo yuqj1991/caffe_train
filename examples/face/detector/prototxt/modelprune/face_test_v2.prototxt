@@ -21,7 +21,7 @@ layer {
     }
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
+    source: "../lmdb/wider_face_wider_val_lmdb/"
     batch_size: 1
     backend: LMDB
   }
@@ -1657,7 +1657,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
@@ -1994,7 +1995,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
@@ -2126,7 +2128,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 1
+    kernel_size: 3
+    pad: 1
     weight_filler {
       type: "msra"
     }
