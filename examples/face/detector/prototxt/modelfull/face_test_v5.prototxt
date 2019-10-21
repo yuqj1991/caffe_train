@@ -2038,11 +2038,11 @@ layer {
 	}
 }
 layer{
-	name: "detector_module_one"
+	name: "dectction_moudle_one"
 	type: "Eltwise"
 	bottom: "lfpn_1_moudle_cpm_3_3_one_channel"
 	bottom: "conv6"
-	top: "detector_module_one"
+	top: "dectction_moudle_one"
 	eltwise_param {
 		operation: SUM
 	}
