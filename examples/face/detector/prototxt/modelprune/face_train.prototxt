@@ -2001,8 +2001,8 @@ layer {
   top: "conv_mbox_priorbox"
   prior_box_param {
     min_size: 10.0
-    aspect_ratio: 1.5
-    step: 4
+    min_size: 16.0
+    min_size: 24.0
     flip: true
     clip: false
     variance: 0.10000000149011612
@@ -2027,7 +2027,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 12
+    num_output: 8
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2073,7 +2073,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 4
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2112,9 +2112,8 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_two"
   prior_box_param {
-    min_size: 20.0
-    aspect_ratio: 1.5
-    step: 8
+    min_size: 32.0
+    min_size: 48.0
     flip: true
     clip: false
     variance: 0.10000000149011612
@@ -2139,7 +2138,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 12
+    num_output: 8
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2185,7 +2184,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 4
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2224,9 +2223,8 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_three"
   prior_box_param {
-    min_size: 40
-    aspect_ratio: 1.5
-    step: 16
+    min_size: 64
+    min_size: 96
     flip: true
     clip: false
     variance: 0.10000000149011612
@@ -2251,7 +2249,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 12
+    num_output: 8
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2297,7 +2295,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 4
     kernel_size: 1
     weight_filler {
       type: "msra"
@@ -2336,9 +2334,8 @@ layer {
   bottom: "data"
   top: "conv_mbox_priorbox_four"
   prior_box_param {
-    min_size: 80
-    aspect_ratio: 1.5
-    step: 32
+    min_size: 128.0
+    min_size: 192.0
     flip: true
     clip: false
     variance: 0.10000000149011612
@@ -2450,8 +2447,7 @@ layer {
   top: "conv_mbox_priorbox_five"
   prior_box_param {
     min_size: 256.0
-    min_size: 160.0
-    step: 64
+    min_size: 300.0
     flip: true
     clip: false
     variance: 0.10000000149011612
