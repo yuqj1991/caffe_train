@@ -13,6 +13,7 @@ annoDict = {common.ORI_BATCH1: 'umdfaces_batch1_ultraface_new.csv', common.ORI_B
 trainDataSet = [common.ORI_BATCH1, common.ORI_BATCH2]
 testDataSet = [common.ORI_BATCH3]
 minMargin = 36
+vision_threold = 0.8
 def batch_work(ori, setFile):
     setfile_ = open(setFile, 'w')
     for annofile in ori:
@@ -55,6 +56,13 @@ def batch_work(ori, setFile):
             nose_point_y = row[1]['P15Y'] - ymin
             left_mouse_point_y = row[1]['P18Y'] -ymin
             right_mouse_point_y = row[1]['P20Y'] - ymin
+            vision_left_eye = row[1]['VIS8']
+            vision_right_eye = row[1]['VIS11']
+            vision_nose = row[1]['VIS15']
+            vision_left_mouth = row[1]['VIS18']
+            vision_right_mouth = row[1]['VIS20']
+            if vision_left_eye < vision_threold or vision_right_eye < vision_threold or vision_nose < vision_threold or vision_left_mouth < vision_threold or vision_right_mouth < vision_threold:
+                continue
             cv2.imwrite(ang_path_image_name, cropRoi)
             if 1:
                 pointSet = []
