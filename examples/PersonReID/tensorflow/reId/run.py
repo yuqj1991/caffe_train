@@ -1,10 +1,10 @@
 import tensorflow as tf
 import numpy as np
 import cv2
-import cuhk03_dataset
+import data.cuhk03_dataset
 
 FLAGS = tf.flags.FLAGS
-tf.flags.DEFINE_integer('batch_size', '150', 'batch size for training')
+tf.flags.DEFINE_integer('batch_size', '30', 'batch size for training')
 tf.flags.DEFINE_integer('max_steps', '210000', 'max steps for training')
 tf.flags.DEFINE_string('logs_dir', 'logs/', 'path to logs directory')
 tf.flags.DEFINE_string('data_dir', 'data/', 'path to dataset')
@@ -19,12 +19,12 @@ IMAGE_HEIGHT = 160
 def preprocess(images, is_train):
     def train():
         split = tf.split(images, [1, 1])
-        shape = [1 for _ in xrange(split[0].get_shape()[1])]
-        for i in xrange(len(split)):
+        shape = [1 for _ in range(split[0].get_shape()[1])]
+        for i in range(len(split)):
             split[i] = tf.reshape(split[i], [FLAGS.batch_size, IMAGE_HEIGHT, IMAGE_WIDTH, 3])
             split[i] = tf.image.resize_images(split[i], [IMAGE_HEIGHT + 8, IMAGE_WIDTH + 3])
             split[i] = tf.split(split[i], shape)
-            for j in xrange(len(split[i])):
+            for j in range(len(split[i])):
                 split[i][j] = tf.reshape(split[i][j], [IMAGE_HEIGHT + 8, IMAGE_WIDTH + 3, 3])
                 split[i][j] = tf.random_crop(split[i][j], [IMAGE_HEIGHT, IMAGE_WIDTH, 3])
                 split[i][j] = tf.image.random_flip_left_right(split[i][j])
@@ -37,12 +37,12 @@ def preprocess(images, is_train):
             tf.reshape(tf.concat(split[1], axis=0), [FLAGS.batch_size, IMAGE_HEIGHT, IMAGE_WIDTH, 3])]
     def val():
         split = tf.split(images, [1, 1])
-        shape = [1 for _ in xrange(split[0].get_shape()[1])]
-        for i in xrange(len(split)):
+        shape = [1 for _ in range(split[0].get_shape()[1])]
+        for i in range(len(split)):
             split[i] = tf.reshape(split[i], [FLAGS.batch_size, IMAGE_HEIGHT, IMAGE_WIDTH, 3])
             split[i] = tf.image.resize_images(split[i], [IMAGE_HEIGHT, IMAGE_WIDTH])
             split[i] = tf.split(split[i], shape)
-            for j in xrange(len(split[i])):
+            for j in range(len(split[i])):
                 split[i][j] = tf.reshape(split[i][j], [IMAGE_HEIGHT, IMAGE_WIDTH, 3])
                 split[i][j] = tf.image.per_image_standardization(split[i][j])
         return [tf.reshape(tf.concat(split[0], axis=0), [FLAGS.batch_size, IMAGE_HEIGHT, IMAGE_WIDTH, 3]),
@@ -76,8 +76,8 @@ def network(images1, images2, weight_decay):
         reshape = tf.reshape(trans, [1, shape[0], shape[1], shape[2], shape[3]])
         g = []
         pad = tf.pad(reshape, [[0, 0], [0, 0], [0, 0], [2, 2], [2, 2]])
-        for i in xrange(shape[2]):
-            for j in xrange(shape[3]):
+        for i in range(shape[2]):
+            for j in range(shape[3]):
                 g.append(pad[:,:,:,i:i+5,j:j+5])
 
         concat = tf.concat(g, axis=0)
@@ -149,7 +149,7 @@ def main(argv=None):
 
         if FLAGS.mode == 'train':
             step = sess.run(global_step)
-            for i in xrange(step, FLAGS.max_steps + 1):
+            for i in range(step, FLAGS.max_steps + 1):
                 batch_images, batch_labels = cuhk03_dataset.read_data(FLAGS.data_dir, 'train', tarin_num_id,
                     IMAGE_WIDTH, IMAGE_HEIGHT, FLAGS.batch_size)
                 feed_dict = {learning_rate: lr, images: batch_images,
@@ -163,7 +163,7 @@ def main(argv=None):
                     saver.save(sess, FLAGS.logs_dir + 'model.ckpt', i)
         elif FLAGS.mode == 'val':
             total = 0.
-            for _ in xrange(10):
+            for _ in range(10):
                 batch_images, batch_labels = cuhk03_dataset.read_data(FLAGS.data_dir, 'val', val_num_id,
                     IMAGE_WIDTH, IMAGE_HEIGHT, FLAGS.batch_size)
                 feed_dict = {images: batch_images, labels: batch_labels, is_train: False}
@@ -171,13 +171,13 @@ def main(argv=None):
                 prediction = np.argmax(prediction, axis=1)
                 label = np.argmax(batch_labels, axis=1)
 
-                for i in xrange(len(prediction)):
+                for i in range(len(prediction)):
                     if prediction[i] == label[i]:
                         total += 1
             print('Accuracy: %f' % (total / (FLAGS.batch_size * 10)))
 
             '''
-            for i in xrange(len(prediction)):
+            for i in range(len(prediction)):
                 print('Prediction: %s, Label: %s' % (prediction[i] == 0, labels[i] == 0))
                 image1 = cv2.cvtColor(batch_images[0][i], cv2.COLOR_RGB2BGR)
                 image2 = cv2.cvtColor(batch_images[1][i], cv2.COLOR_RGB2BGR)

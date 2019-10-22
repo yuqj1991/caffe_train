@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import cv2
-import market1501_dataset
+import data.market1501_dataset
 
 FLAGS = tf.flags.FLAGS
 tf.flags.DEFINE_integer('batch_size', '50', 'batch size for training')

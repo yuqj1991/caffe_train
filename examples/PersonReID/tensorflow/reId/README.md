@@ -1,6 +1,4 @@
-# An Improved Deep Learning Architecture for Person Re-Identification
-
-[paper link](http://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Ahmed_An_Improved_Deep_2015_CVPR_paper.pdf)
+# yuqianjin
 
 ## Environment
 * Ubuntu 16.04
@@ -8,12 +6,9 @@
 * TensorFlow 1.2.1
 * CUDA 8.0
 * cudnn 5.1
-* NVIDIA GTX Titan X (Pascal)
+* NVIDIA GTX 1070
 
 ## Installation
-```
-git clone https://github.com/thomaspark-pkj/person-reid.git
-```
 
 ## Prepare dataset
 Download CUHK03 dataset from [CUHK Person Re-identification Datasets](http://www.ee.cuhk.edu.hk/~xgwang/CUHK_identification.html) then extract file.

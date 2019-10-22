@@ -7,10 +7,10 @@ import sys
 
 def prepare_data(path):
     f = h5py.File('%s/cuhk-03.mat' % path)
-    labeled = [f['labeled'][0][i] for i in xrange(len(f['labeled'][0]))]
-    labeled = [f[labeled[0]][i] for i in xrange(len(f[labeled[0]]))]
-    detected = [f['detected'][0][i] for i in xrange(len(f['detected'][0]))]
-    detected = [f[detected[0]][i] for i in xrange(len(f[detected[0]]))]
+    labeled = [f['labeled'][0][i] for i in range(len(f['labeled'][0]))]
+    labeled = [f[labeled[0]][i] for i in range(len(f[labeled[0]]))]
+    detected = [f['detected'][0][i] for i in range(len(f['detected'][0]))]
+    detected = [f[detected[0]][i] for i in range(len(f[detected[0]]))]
     datasets = [['labeled', labeled], ['detected', detected]]
     prev_id = 0
 
@@ -20,8 +20,8 @@ def prepare_data(path):
         if not os.path.exists('%s/%s/val' % (path, dataset[0])):
             os.makedirs('%s/%s/val' % (path, dataset[0]))
 
-        for i in xrange(0, len(dataset[1])):
-            for j in xrange(len(dataset[1][0])):
+        for i in range(0, len(dataset[1])):
+            for j in range(len(dataset[1][0])):
                 try:
                     image = np.array(f[dataset[1][i][j]]).transpose((2, 1, 0))
                     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -47,7 +47,7 @@ def get_pair(path, set, num_id, positive):
             if id[0] != id[1]:
                 break
 
-    for i in xrange(2):
+    for i in range(2):
         filepath = ''
         while True:
             index = int(random.random() * 10)
@@ -66,7 +66,7 @@ def get_num_id(path, set):
 def read_data(path, set, num_id, image_width, image_height, batch_size):
     batch_images = []
     labels = []
-    for i in xrange(batch_size // 2):
+    for i in range(batch_size // 2):
         pairs = [get_pair(path, set, num_id, True), get_pair(path, set, num_id, False)]
         for pair in pairs:
             images = []
