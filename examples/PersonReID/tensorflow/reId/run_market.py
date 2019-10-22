@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import cv2
-import data.market1501_dataset
+import data.market1501_dataset as market1501_dataset
 
 FLAGS = tf.flags.FLAGS
 tf.flags.DEFINE_integer('batch_size', '50', 'batch size for training')
@@ -12,6 +12,7 @@ tf.flags.DEFINE_float('learning_rate', '0.01', '')
 tf.flags.DEFINE_string('mode', 'train', 'Mode train, val, test')
 tf.flags.DEFINE_string('image1', '', 'First image path to compare')
 tf.flags.DEFINE_string('image2', '', 'Second image path to compare')
+
 
 IMAGE_WIDTH = 60
 IMAGE_HEIGHT = 160

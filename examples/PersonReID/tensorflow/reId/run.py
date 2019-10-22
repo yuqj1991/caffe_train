@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import cv2
-import data.cuhk03_dataset
+import data.cuhk03_dataset as cuhk03_dataset
 
 FLAGS = tf.flags.FLAGS
 tf.flags.DEFINE_integer('batch_size', '30', 'batch size for training')
