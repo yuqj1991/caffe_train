@@ -16,8 +16,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 128
-			width: 128
+			height: 96
+			width: 96
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
@@ -695,57 +695,12 @@ layer {
 }
 
 
-layer {
-    bottom: "conv_4_1"
-    top: "res5b_branch2a"
-    name: "res5b_branch2a"
-    type: "Convolution"
-    convolution_param {
-        num_output: 256
-        kernel_size: 3
-        pad: 1
-        stride: 2
-        weight_filler {
-            type: "msra"
-        }
-        bias_term: false
-
-    }
-}
-
-layer {
-    bottom: "res5b_branch2a"
-    top: "res5b_branch2a"
-    name: "bn5b_branch2a"
-    type: "BatchNorm"
-    batch_norm_param {
-      moving_average_fraction: 0.9 
-    }
-    
-}
-
-layer {
-    bottom: "res5b_branch2a"
-    top: "res5b_branch2a"
-    name: "scale5b_branch2a"
-    type: "Scale"
-    scale_param {
-        bias_term: true
-    }
-}
-
-layer {
-    bottom: "res5b_branch2a"
-    top: "res5b_branch2a"
-    name: "res5b_branch2a_relu"
-    type: "PReLU"
-}
 
 
 layer {
 	name: "res5b_innerproduct"
 	type: "InnerProduct"
-	bottom: "res5b_branch2a"
+	bottom: "conv_4_1"
 	top: "res5b_innerproduct"
 	param {
 		lr_mult: 1
