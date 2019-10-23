@@ -4,5 +4,5 @@ if ! test -f face_train_v3.prototxt ;then
 	echo "please generate your own model prototxt primarily."
         exit 1
 fi
-../../../../../build/tools/caffe train --solver=solver_v2.prototxt -gpu 2 \
+../../../../../build/tools/caffe train --solver=solver_v3.prototxt -gpu 2 \
 #--snapshot=face_recog/tiny_iter_9740.solverstate
