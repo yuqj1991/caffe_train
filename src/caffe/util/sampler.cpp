@@ -243,12 +243,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   samplerbox->set_ymin(h_off);
   samplerbox->set_xmax(w_off + float(sample_box_size/img_width));
   samplerbox->set_ymax(h_off + float(sample_box_size/img_height));
-  NormalizedBBox source_bbox;
-  source_bbox.set_xmin(0);
-  source_bbox.set_ymin(0);
-  source_bbox.set_xmax(1);
-  source_bbox.set_ymax(1);
-  LocateBBox(source_bbox, *samplerbox, samplerbox);
+  ClipBBox(*samplerbox, samplerbox);
   
 }// func GenerateDataAnchorSamples
 
