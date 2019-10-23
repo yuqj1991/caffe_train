@@ -4,6 +4,8 @@ import os
 import cv2
 import random
 import sys
+import random
+from scipy import misc
 
 def prepare_data(path):
     f = h5py.File('%s/cuhk-03.mat' % path)
@@ -88,6 +90,46 @@ def read_data(path, set, num_id, image_width, image_height, batch_size):
                 exit()
     '''
     return np.transpose(batch_images, (1, 0, 2, 3, 4)), np.array(labels)
+
+
+def getTrainData(imgSetfile, netInputWidth, netInputHeight): #imageSetfile[imagepath, label, ...]
+    batch_images = []
+    labels = []
+    for imgfile in imgSetfile:
+        imgPath = imgfile.split(' ')[0]
+        label = int(imgfile.split(' ')[1])
+        imageData = cv2.imread(imgPath)
+        imageData = cv2.resize(imageData, (netInputWidth, netInputHeight))
+        imageData = cv2.cvtColor(imageData, cv2.COLOR_BGR2RGB)
+        batch_images.append(imageData)
+        labels.append(label)
+
+
+def random_rotate_image(image):
+    random_angle = np.random.uniform(low = -10.0, hight = 10.0)
+    return misc.imrotate(image, angle= random_angle)
+
+
+def random_crop_image(image, crop_shape):
+    assert image.shape[0] >= crop_shape[0]
+    assert image.shape[1] >= crop_shape[1]
+
+    offset_x = random.randint(0, image.shape[1] - crop_shape[1])
+    offset_y = random.randint(0, image.shape[0] - crop_shape[0])
+
+    cropImage = image[offset_y:offset_y + crop_shape[1], offset_x + crop_shape[0]]
+    return cropImage
+
+
+def flip(image, random_flip):
+    if random_flip and np.random.choice([True, False]):
+        image = np.fliplr(image)
+    return image
+
+
+
+
+
 
 if __name__ == '__main__':
     prepare_data(sys.argv[1])
