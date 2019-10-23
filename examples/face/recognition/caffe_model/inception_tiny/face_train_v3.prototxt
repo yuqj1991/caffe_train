@@ -3906,14 +3906,14 @@ layer {
 
 layer {
 	name: "norm1"
-	type: "Normalize"
+	type: "SimpleNormalize"
 	bottom: "feature1"
 	top: "normfeature1"
 }
 
 layer {
 	name: "norm2"
-	type: "Normalize"
+	type: "SimpleNormalize"
 	bottom: "feature2"
 	top: "normfeature2"
 }

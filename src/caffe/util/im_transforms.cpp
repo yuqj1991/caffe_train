@@ -197,7 +197,7 @@ void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
   lface->mutable_righteye()->set_y(float(y2/new_height));
 
   lface->mutable_nose()->set_x(float(x3/new_width));
-  lface->mutable_nose()->set_y(float(x3/new_height));
+  lface->mutable_nose()->set_y(float(y3/new_height));
 
   lface->mutable_leftmouth()->set_x(float(x4/new_width));
   lface->mutable_leftmouth()->set_y(float(y4/new_height));

@@ -8,7 +8,7 @@ import scipy.sparse
 from PIL import Image
 from datasets.imdb import imdb
 
-DATA_DIR = "../../../dataset"
+DATA_DIR = "../../../../dataset"
 
 
 class wider(imdb):
