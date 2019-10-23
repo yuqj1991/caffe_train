@@ -53,7 +53,7 @@ layer {
 	annotated_data_param {
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 1.0
 				max_aspect_ratio: 1.0
@@ -154,6 +154,7 @@ layer {
 			max_sample: 1
 			max_trials: 10
 		}
+		sampleprob: 1.0
 		label_map_file: "../labelmap_face.prototxt"
 	}
 }
