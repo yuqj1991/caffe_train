@@ -43,7 +43,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 8
+		batch_size: 16
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -2928,7 +2928,7 @@ layer {
 		num_classes: 2
 		share_location: true
 		match_type: PER_PREDICTION
-		overlap_threshold: 0.65
+		overlap_threshold: 0.35
 		use_prior_for_matching: true
 		background_label_id: 0
 		use_difficult_gt: true
