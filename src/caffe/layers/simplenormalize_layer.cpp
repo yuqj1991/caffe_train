@@ -9,6 +9,12 @@
 namespace caffe {
 
 template <typename Dtype>
+void SimpleNormalizeLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top) {
+}
+
+
+template <typename Dtype>
 void SimpleNormalizeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   top[0]->Reshape(bottom[0]->num(), bottom[0]->channels(),
