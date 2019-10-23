@@ -1,7 +1,7 @@
 from __future__ import print_function
 import argparse
 import sys
-caffe_root = '../../../caffe_train/'
+caffe_root = '../../../../caffe_train/'
 sys.path.insert(0, caffe_root + 'python') 
 import caffe
 import numpy as np
@@ -31,8 +31,8 @@ def parser():
 
 
 def preprocess(src):
-    img = cv2.resize(src, (300,300))
-    img = img - 127.5# [103.94, 116.78, 123.68] # 127.5
+    img = cv2.resize(src, (320,320))
+    img = img - [103.94, 116.78, 123.68] # 127.5
     img = img * 0.007843
     return img
 
