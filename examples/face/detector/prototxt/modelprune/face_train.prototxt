@@ -139,17 +139,23 @@ layer {
 			max_trials: 50
 		}
 		data_anchor_sampler{
+			scale: 10
 			scale: 16
+			scale: 24
 			scale: 32
 			scale: 64
+			scale: 96
 			scale: 128
+			scale: 192
 			scale: 256
+			scale: 300
 			sample_constraint{
 				min_object_coverage: 0.5
 			}
 			max_sample: 1
 			max_trials: 10
 		}
+		sampleprob: 1.0
 		label_map_file: "../labelmap_face.prototxt"
 	}
 }
@@ -885,12 +891,7 @@ layer {
 	operation: SUM
 	}
 }
-layer {
-	name: "conv_one_eltwise/relu"
-	type: "PReLU"
-	bottom: "conv_one_eltwise"
-	top: "conv_one_eltwise"
-}
+
 layer {
   name: "conv6/dw"
   type: "Convolution"
@@ -1289,12 +1290,7 @@ layer {
 	operation: SUM
 	}
 }
-layer {
-  name: "conv_two_eltwise/relu"
-  type: "PReLU"
-  bottom: "conv_two_eltwise"
-  top: "conv_two_eltwise"
-}
+
 layer {
   name: "conv_two_eltwise_128"
   type: "Convolution"
@@ -1307,8 +1303,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 3
-    pad: 1
+    kernel_size: 1
+    #pad: 1
     weight_filler {
       type: "msra"
     }
@@ -1627,12 +1623,7 @@ layer {
 	operation: SUM
 	}
 }
-layer {
-  name: "conv_five_eltwise/relu"
-  type: "PReLU"
-  bottom: "conv_five_eltwise"
-  top: "conv_five_eltwise"
-}
+
 layer {
   name: "conv14_1"
   type: "Convolution"
@@ -1645,8 +1636,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 3
-    pad: 1
+    kernel_size: 1
+    #pad: 1
     weight_filler {
       type: "msra"
     }
@@ -1778,8 +1769,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 3
-    pad: 1
+    kernel_size: 1
+    #pad: 1
     weight_filler {
       type: "msra"
     }
@@ -1899,12 +1890,154 @@ layer {
   bottom: "conv15_2"
   top: "conv15_2"
 }
+#######################################################################
+#                             modeule one                             #
+#######################################################################
 
+#################context moudle####################
+layer{
+	name: "lfpn_1_moudle_cpm_3_3"
+	type: "Convolution"
+	bottom: "conv_one_eltwise"
+	top: "lfpn_1_moudle_cpm_3_3"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	convolution_param {
+		num_output: 256
+		bias_term: false
+		kernel_size: 3
+		#group: 128
+		pad: 1
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3/bn"
+	type: "BatchNorm"
+	bottom: "lfpn_1_moudle_cpm_3_3"
+	top: "lfpn_1_moudle_cpm_3_3"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3/scale"
+	type: "Scale"
+	bottom: "lfpn_1_moudle_cpm_3_3"
+	top: "lfpn_1_moudle_cpm_3_3"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3/ReLU"
+	type: "ReLU"
+	bottom: "lfpn_1_moudle_cpm_3_3"
+	top: "lfpn_1_moudle_cpm_3_3"
+}
+layer{
+	name: "lfpn_1_moudle_cpm_3_3_one_channel"
+	type: "Convolution"
+	bottom: "lfpn_1_moudle_cpm_3_3"
+	top: "lfpn_1_moudle_cpm_3_3_one_channel"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	convolution_param {
+		num_output: 256
+		kernel_size: 3
+		pad: 1
+		bias_term: false
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3_one_channel/bn"
+	type: "BatchNorm"
+	bottom: "lfpn_1_moudle_cpm_3_3_one_channel"
+	top: "lfpn_1_moudle_cpm_3_3_one_channel"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "lfpn_1_moudle_cpm_3_3_one_channel/scale"
+	type: "Scale"
+	bottom: "lfpn_1_moudle_cpm_3_3_one_channel"
+	top: "lfpn_1_moudle_cpm_3_3_one_channel"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+
+layer{
+	name: "dectction_moudle_one"
+	type: "Eltwise"
+	bottom: "lfpn_1_moudle_cpm_3_3_one_channel"
+	bottom: "conv_one_eltwise"
+	top: "dectction_moudle_one"
+	eltwise_param {
+		operation: SUM
+	}
+}
 ##########first prior-box layer#########
 layer {
   name: "conv_mbox_loc_module"
   type: "Convolution"
-  bottom: "conv_one_eltwise"
+  bottom: "dectction_moudle_one"
   top: "conv_mbox_loc_module"
   param {
     lr_mult: 1.0
@@ -1950,7 +2083,7 @@ layer {
 layer {
   name: "conv_mbox_loc_module_conf"
   type: "Convolution"
-  bottom: "conv_one_eltwise"
+  bottom: "dectction_moudle_one"
   top: "conv_mbox_loc_module_conf"
   param {
     lr_mult: 1.0
@@ -1996,7 +2129,7 @@ layer {
 layer {
   name: "conv_mbox_priorbox"
   type: "PriorBox"
-  bottom: "conv_one_eltwise"
+  bottom: "dectction_moudle_one"
   bottom: "data"
   top: "conv_mbox_priorbox"
   prior_box_param {
