@@ -59,9 +59,9 @@ def main(args):
         face_embedding = face_recognition.faceencoder(frame)
         embedding_file = open(img_file.split('.jpg')[0], 'w')
         if len(face_embedding) > 1:
-            raise Exception("检测到的人数过多")
+            raise Exception("检测到的人数过多, ", filepath)
         if len(face_embedding) == 1:
-            embedding_file.write(face_embedding[0])
+            embedding_file.write(str(face_embedding[0]))
         embedding_file.close()
 
 

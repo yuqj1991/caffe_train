@@ -72,11 +72,12 @@ class Recognition:
             return faces
             
     def faceencoder(self,image):
-        faces = self.detect.find_faces(image)
+        #faces = self.detect.find_faces(image)
+        faces = cv2.resize(image, (160, 160))
         embeddings = []
-        for i, face in enumerate(faces):
-            face.embedding = self.encoder.generate_embedding(face)
-            embeddings.append(face.embedding)
+        #for i, face in enumerate(faces):
+        embedding = self.encoder.generate_embedding(faces)
+        embeddings.append(embedding)
         return embeddings
 
     def identify(self, image):
@@ -114,11 +115,13 @@ class Encoder:
         images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
         embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
         phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
+        face = face - 127.5
+        face = face * 0.007845
 
-        prewhiten_face = facenet.prewhiten(face.image)
+        #prewhiten_face = facenet.prewhiten(face.image)
 
         # Run forward pass to calculate embeddings
-        feed_dict = {images_placeholder: [prewhiten_face], phase_train_placeholder: False}
+        feed_dict = {images_placeholder: [face], phase_train_placeholder: False}
         return self.sess.run(embeddings, feed_dict=feed_dict)[0]
 
 
