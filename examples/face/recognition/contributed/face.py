@@ -60,7 +60,7 @@ class Recognition:
     def __init__(self):
         self.detect = Detection()
         self.encoder = Encoder()
-        self.identifier = Identifier()
+        #self.identifier = Identifier()
 
     def add_identity(self, image, person_name):
         faces = self.detect.find_faces(image)
@@ -70,6 +70,14 @@ class Recognition:
             face.name = person_name
             face.embedding = self.encoder.generate_embedding(face)
             return faces
+            
+    def faceencoder(self,image):
+        faces = self.detect.find_faces(image)
+        embeddings = []
+        for i, face in enumerate(faces):
+            face.embedding = self.encoder.generate_embedding(face)
+            embeddings.append(face.embedding)
+        return embeddings
 
     def identify(self, image):
         faces = self.detect.find_faces(image)
