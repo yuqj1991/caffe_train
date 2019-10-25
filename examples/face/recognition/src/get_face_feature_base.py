@@ -61,7 +61,8 @@ def main(args):
         if len(face_embedding) > 1:
             raise Exception("检测到的人数过多, ", filepath)
         if len(face_embedding) == 1:
-            embedding_file.write(str(face_embedding[0]))
+            for sumber in face_embedding[0]:
+                embedding_file.write(str(sumber) + ' ')
         embedding_file.close()
 
 
