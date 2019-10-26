@@ -17,7 +17,7 @@ def getMark_1501_label(subDir, setfile):
 	for img_file in os.listdir(subDir):
 		label = img_file.split('_')[0]
 		print(label)
-		label_int = int(label)
+		label_int = int(label) -1
 		imgFilePath = subDir + '/' + img_file.split('.jpg')[0]
 		absfullPath = os.path.abspath(imgFilePath)
 		content = absfullPath + ' ' + str(label_int) + '\n'
@@ -29,7 +29,7 @@ def getCUHK_03_label(subDir, setfile):
 	setfile_ = open(setfile, 'w')
 	for img_file in os.listdir(subDir):
 		label = img_file.split('_')[0]
-		label_int = int(label)
+		label_int = int(label) -1
 		imgFilePath = subDir + '/' + img_file.split('.jpg')[0]
 		absfullPath = os.path.abspath(imgFilePath)
 		content = absfullPath +' ' + str(label_int) + '\n'

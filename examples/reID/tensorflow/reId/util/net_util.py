@@ -174,10 +174,30 @@ def freeze_graph_def(sess, input_graph_def, output_node_names, output_file):
         f.write(output_graph_def.SerializeToString())
     print("%d ops in the final graph: %s" % (len(output_graph_def.node), output_file))
 
-def center_loss():
+
+def center_loss(features, label, alfa, nrof_classes):
+    """
+    Center loss based on the paper "A Discriminative Feature Learning Approach for Deep Face Recognition"
+    """
+    nrof_features = features.get_shape()[1]
+    centers = tf.get_variable('centers', [nrof_classes, nrof_features], dtype=tf.float32,
+        initializer=tf.constant_initializer(0), trainable=False)
+    label = tf.reshape(label, [-1])
+    centers_batch = tf.gather(centers, label)
+    diff = (1 - alfa) * (centers_batch - features)
+    centers = tf.scatter_sub(centers, label, diff)
+    with tf.control_dependencies([centers]):
+        loss = tf.reduce_mean(tf.square(features - centers_batch))
+    return loss, centers
 
 
-def cosin_loss():
+def cosin_loss(anchor, postive, negitve, alpha, eps):
+    with tf.variable_scope(name_or_scope="cosin_loss"):
+        pos_cos_distance = tf.reduce_sum(tf.multiply(anchor, postive)/(tf.sqrt(tf.square(anchor)) * tf.sqrt(tf.square(postive)) + eps), axis=1)
+        neg_cos_distance = tf.reduce_sum(tf.multiply(anchor, negitve)/(tf.sqrt(tf.square(anchor)) * tf.sqrt(tf.square(negitve)) + eps), axis=1)
+    basic_loss = tf.add(tf.subtract(pos_cos_distance, neg_cos_distance), alpha)
+    loss = tf.reduce_mean(tf.maximum(basic_loss, 0), 0)
+    return loss
 
 
 def triplet_loss(anchor, postive, negitve, alpha):

@@ -2169,3 +2169,24 @@ layer {
     margin: 1
   }
 }
+
+############## center loss ###############
+layer {
+  name: "center_loss"
+  type: "CenterLoss"
+  bottom: "fc5"
+  bottom: "label"
+  top: "center_loss"
+  param {
+    lr_mult: 1
+    decay_mult: 2 
+  }
+  center_loss_param {
+    num_output: 1501 # 类别数
+    center_filler {
+      type: "xavier"
+    }
+  }
+  loss_weight: 0.008 # 权重
+}
+
