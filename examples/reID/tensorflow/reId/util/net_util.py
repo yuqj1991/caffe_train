@@ -133,17 +133,18 @@ def save_tensorflow_ckptmodel(sess, ckpt_dir, global_step=5000): #save ckpt file
     tf.train.Saver().save(sess, ckpt_dir, global_step= global_step) #模型文件后加上"-5000"，model.ckpt-5000.index
 
 
-def freeze_graph_def(sess, input_graph_def, output_node_names, output_file): #input_graph_def = tf.get_default_graph()
-    #1、freeze_graph_def，最重要的就是要确定“指定输出的节点名称”，这个节点名称必须是原模型中存在的节点，对于freeze操作，我们需要定义输出结点的名字。
+def freeze_graph_def(sess, input_graph_def, output_node_names, output_file):
+    # input_graph_def = tf.get_default_graph()
+    # 1、freeze_graph_def，最重要的就是要确定“指定输出的节点名称”，这个节点名称必须是原模型中存在的节点，对于freeze操作，我们需要定义输出结点的名字。
     # 因为网络其实是比较复杂的，定义了输出结点的名字，那么freeze的时候就只把输出该结点所需要的子图都固化下来，其他无关的就舍弃掉。
     # 因为我们freeze模型的目的是接下来做预测。
     # 所以，output_node_names一般是网络模型最后一层输出的节点名称，或者说就是我们预测的目标。
-    #2、在保存的时候，通过convert_variables_to_constants函数来指定需要固化的节点名称，对于鄙人的代码，需要固化的节点只有一个：output_node_names。
+    # 2、在保存的时候，通过convert_variables_to_constants函数来指定需要固化的节点名称，对于鄙人的代码，需要固化的节点只有一个：output_node_names。
     # 注意节点名称与张量的名称的区别，例如：“input: 0”是张量的名称，而"input"表示的是节点的名称。
 
-    #3、源码中通过graph = tf.get_default_graph()
-    #获得默认的图，这个图就是由saver = tf.train.import_meta_graph(input_checkpoint + '.meta', clear_devices=True)
-    #恢复的图，因此必须先执行tf.train.import_meta_graph，再执行tf.get_default_graph() 。
+    # 3、源码中通过graph = tf.get_default_graph()
+    # 获得默认的图，这个图就是由saver = tf.train.import_meta_graph(input_checkpoint + '.meta', clear_devices=True)
+    # 恢复的图，因此必须先执行tf.train.import_meta_graph，再执行tf.get_default_graph() 。
     for node in input_graph_def.node:
         if node.op == 'RefSwitch':
             node.op = 'Switch'
@@ -172,3 +173,17 @@ def freeze_graph_def(sess, input_graph_def, output_node_names, output_file): #in
     with tf.gfile.GFile(output_file, 'wb') as f:
         f.write(output_graph_def.SerializeToString())
     print("%d ops in the final graph: %s" % (len(output_graph_def.node), output_file))
+
+def center_loss():
+
+
+def cosin_loss():
+
+
+def triplet_loss(anchor, postive, negitve, alpha):
+    with tf.variable_scope(name_or_scope="triple_loss"):
+        pos_distance = tf.reduce_sum(tf.square(anchor - postive), axis=1)
+        neg_distance = tf.reduce_sum(tf.square(anchor - negitve), axis=1)
+    basic_loss = tf.add(tf.subtract(pos_distance, neg_distance), alpha)
+    loss = tf.reduce_mean(tf.maximum(basic_loss, 0), 0)
+    return loss
