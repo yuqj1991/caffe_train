@@ -1651,6 +1651,14 @@ message PermuteParameter {
   repeated uint32 order = 1;
 }
 
+message cosinLossParameter{
+  optional uint32 num_output = 1; // The number of outpSuts for the layer
+  optional FillerParameter cosin_filler = 2; // The filler for the centers 
+  optional int32 axis = 3 [default = 1]; //axis 
+  optional float scale = 4[default = 64.0];
+  optional float margin = 6[default = 0.35];
+}
+
 message PoolingParameter {
   enum PoolMethod {
     MAX = 0;
