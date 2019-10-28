@@ -3946,7 +3946,7 @@ layer {
   }
   cosin_loss_param {
     num_output: 8631
-    center_filler {
+    cosin_filler {
       type: "xavier"
     }
   }
