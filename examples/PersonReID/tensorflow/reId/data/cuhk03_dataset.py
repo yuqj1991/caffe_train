@@ -103,6 +103,7 @@ def getTrainData(imgSetfile, netInputWidth, netInputHeight): #imageSetfile[image
         imageData = cv2.cvtColor(imageData, cv2.COLOR_BGR2RGB)
         batch_images.append(imageData)
         labels.append(label)
+    return batch_images, labels
 
 
 def random_rotate_image(image):
@@ -126,10 +127,8 @@ def flip(image, random_flip):
         image = np.fliplr(image)
     return image
 
-
-
-
-
+def load_batch():
+    
 
 if __name__ == '__main__':
     prepare_data(sys.argv[1])

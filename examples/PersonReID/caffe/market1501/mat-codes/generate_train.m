@@ -3,7 +3,7 @@ clc;clear all;close all;
 root_dir = fullfile(getenv('HOME'), 'datasets', 'Market-1501-v15.09.15');
 train_dir = fullfile(root_dir, 'bounding_box_train');% database directory
 %% calculate the ID and camera for database images
-train_files = dir([train_dir '/*.jpg']);
+train_files = dir([train_dir /*.jpg']);
 trainID = zeros(length(train_files), 1);
 trainCAM = zeros(length(train_files), 1);
 n_train = length(train_files);
