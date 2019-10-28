@@ -60,14 +60,17 @@ namespace caffe {
     template <typename Dtype>
     void CosinL2NormalizeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top){
-        CHECK_EQ(bottom[1]->channels(), 1);
-        CHECK_EQ(bottom[1]->height(), 1);
-        CHECK_EQ(bottom[1]->width(), 1);
-
         vector<int> normail_shape(2);
         normail_shape[0] = Num_BatchSize_;
         normail_shape[1] = Num_Class_;
         top[0]->Reshape(normail_shape);
+        /*****************************/
+        normail_shape[0] = Num_Class_;
+        normail_shape[1] = feature_Dim_;
+        Normalise_Weight_.Reshape(normail_shape);
+        normail_shape[0] = Num_BatchSize_;
+        normail_shape[1] = feature_Dim_;
+        Normalise_feature_.Reshape(normail_shape);
     }
     template <typename Dtype>
     void CosinL2NormalizeLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
