@@ -12,6 +12,8 @@ gamma = 0.9
 MultiStepValue = [20000, 100000, 300000]
 CurrentAdjustStep = 0
 
+log_dir = '../snapshot'
+
 # set learning rate policy adjust
 # set data parall
 # set model net
@@ -20,7 +22,7 @@ CurrentAdjustStep = 0
 # save model to file
 
 
-def adjust_learning_rate_by_policy(base_lr_rate, gamma, iter, step, policy):
+def adjust_learning_rate_by_policy(base_lr_rate, gamma, iter, step=None, policy='MultiStep'):
     if policy == 'MultiStep':
         global CurrentAdjustStep
         if CurrentAdjustStep < len(MultiStepValue) and iter > MultiStepValue[CurrentAdjustStep]:
@@ -52,7 +54,14 @@ def adjust_optimizer_by_tensorflow(optimizer, learning_rate_placeholder):
     return opt
 
 
-def train(sess, dataset, loss, optimizer_op, ):
+def train(sess, feed_dict, loss, train_op, save_opt, iter, log_dir):
+    sess.run(tf.global_variables_initializer())
+    train_op
+
+
+    if iter % 5000 == 0:
+        save_opt.save(sess, log_dir + 'model.ckpt', iter)
+
 
 
 def evaluate(sess, ):
@@ -75,10 +84,36 @@ def main(args):
 
     softmaxWithLoss = net.entropy_softmax_withloss(normalize_output, label_batch)
 
-    lr_rate = adjust_learning_rate_by_policy(learning_rate, gamma= gamma, policy=learning_policy)
+
+    global_step = tf.Variable(0, name='global_step', trainable=False) # zhe yi bu wo you dian bu dong
 
     solver_opt = adjust_optimizer_by_tensorflow(optimizer='SGD', learning_rate_placeholder=learning_rate_placeholder)
+    train_op = solver_opt.minimize(loss=softmaxWithLoss, global_step= global_step)
+
+
+
+    saver_opt = tf.train.Saver()
+    ckpt = tf.train.get_checkpoint_state(log_dir)
+
     with tf.Session() as sess:
+        if ckpt and ckpt.model_checkpoint_path:
+            print('Restore model')
+            saver_opt.restore(sess, ckpt.model_checkpoint_path)
+        sess.run(global_step)
+        for iter in range(max_epoch):
+            lr_rate = adjust_learning_rate_by_policy(learning_rate, gamma=gamma, policy=learning_policy, iter=iter)
+            feed_dict = {images_path_placeholder:images_batch,
+                         learning_rate_placeholder: lr_rate,
+                         batch_size_placeholder:Batch_size,
+                         labels_placeholder: label_batch,
+                         phase_train_placeholder: True}
+
+
+
+
+
+
+
 
 
 
