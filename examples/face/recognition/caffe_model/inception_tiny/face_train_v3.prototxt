@@ -3944,9 +3944,9 @@ layer {
     lr_mult: 1
     decay_mult: 2 
   }
-  cosin_loss_param {
+  center_loss_param {
     num_output: 8631
-    cosin_filler {
+    center_filler {
       type: "xavier"
     }
   }
@@ -3965,7 +3965,7 @@ layer {
     lr_mult: 1
     decay_mult: 2 
   }
-  center_loss_param {
+  cosin_loss_param {
     num_output: 8631
     cosin_filler {
       type: "xavier"
