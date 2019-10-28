@@ -50,6 +50,7 @@ def preprocess(images, is_train):
             tf.reshape(tf.concat(split[1], axis=0), [FLAGS.batch_size, IMAGE_HEIGHT, IMAGE_WIDTH, 3])]
     return tf.cond(is_train, train, val)
 
+
 def network(images1, images2, weight_decay):
     with tf.variable_scope('network'):
         # Tied Convolution
