@@ -34,7 +34,7 @@ namespace caffe {
                 for (size_t i = 0; i < NumBatch; i++)
                 {
                     caffe_powx(featureDim, data + i * featureDim, Dtype(2.0), distData + i*featureDim);
-                    sum_squre = caffe_cpu_asum(featureDim, distData + i*featureDim);
+                    sum_squre = caffe_cpu_asum(featureDim, distData + i*featureDim) + 0.00000000001;
                     caffe_cpu_axpby(featureDim, Dtype(1.0/std::sqrt((double)sum_squre)), data + i * featureDim, Dtype(0.0),distData + i * featureDim);
                 }
             }
