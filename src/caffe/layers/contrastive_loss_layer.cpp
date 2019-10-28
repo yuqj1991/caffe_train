@@ -10,6 +10,11 @@ template <typename Dtype>
 void ContrastiveLossLayer<Dtype>::LayerSetUp(
   const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::LayerSetUp(bottom, top);
+  if (this->layer_param_.propagate_down_size() == 0) {
+    this->layer_param_.add_propagate_down(true);
+    this->layer_param_.add_propagate_down(true);
+    this->layer_param_.add_propagate_down(false);
+  }
   CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
   CHECK_EQ(bottom[0]->height(), 1);
   CHECK_EQ(bottom[0]->width(), 1);

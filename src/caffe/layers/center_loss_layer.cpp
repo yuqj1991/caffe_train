@@ -9,6 +9,10 @@ namespace caffe {
 template <typename Dtype>
 void CenterLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+  if (this->layer_param_.propagate_down_size() == 0) {
+    this->layer_param_.add_propagate_down(true);
+    this->layer_param_.add_propagate_down(false);
+  }
   const int num_output = this->layer_param_.center_loss_param().num_output();  
   N_ = num_output;
   const int axis = bottom[0]->CanonicalAxisIndex(

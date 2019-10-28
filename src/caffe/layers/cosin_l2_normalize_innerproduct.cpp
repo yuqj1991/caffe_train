@@ -8,6 +8,9 @@ namespace caffe {
     template <typename Dtype>
     void CosinL2NormalizeLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         const vector<Blob<Dtype>*>& top) {
+        if (this->layer_param_.propagate_down_size() == 0) {
+            this->layer_param_.add_propagate_down(true);
+        }
         const int num_output = this->layer_param_.cosin_loss_param().num_output();
         margin_ = this->layer_param_.cosin_loss_param().margin();
         scaler_ = this->layer_param_.cosin_loss_param().scale();
