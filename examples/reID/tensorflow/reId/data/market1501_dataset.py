@@ -70,7 +70,7 @@ def get_list_from_label_file(image_label_file_, batch_size):
         for contentline in anno_file_.readlines():
             curLine = contentline.strip().split(' ')
             image_list.append(curLine[0])
-            label_list.append(curLine[1])
+            label_list.append(int(curLine[1]))
             anno_file_.close()
     return image_list, label_list
 
