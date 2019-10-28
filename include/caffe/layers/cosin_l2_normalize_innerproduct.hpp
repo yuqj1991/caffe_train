@@ -1,5 +1,5 @@
-#ifndef CAFFE_COSINE_LOSS_LAYER_HPP_
-#define CAFFE_COSINE_LOSS_LAYER_HPP_
+#ifndef CAFFE_COSINE_NORMALIZEAL_LAYER_HPP_
+#define CAFFE_COSINE_NORMALIZEAL_LAYER_HPP_
 
 #include <vector>
 
@@ -7,21 +7,19 @@
 #include "caffe/layer.hpp"
 #include "caffe/proto/caffe.pb.h"
 
-#include "caffe/layers/loss_layer.hpp"
-
 namespace caffe {
     template <typename Dtype>
-    class CosinLossLayer : public LossLayer<Dtype>{
+    class CosinL2NormalizeLayer : public Layer<Dtype>{
         public:
-            explicit CosinLossLayer()(const LayerParameter& param)
-                : LossLayer<Dtype>(param) {}
+            explicit CosinL2NormalizeLayer(const LayerParameter& param)
+                : Layer<Dtype>(param) {}
             virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
                 const vector<Blob<Dtype>*>& top);
             virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
                 const vector<Blob<Dtype>*>& top);
-              virtual inline const char* type() const { return "CosinLoss"; }
-            virtual inline int ExactNumBottomBlobs() const { return 2; }
-            virtual inline int ExactNumTopBlobs() const { return -1; }
+              virtual inline const char* type() const { return "CosinL2Normalize"; }
+            virtual inline int ExactNumBottomBlobs() const { return 1; }
+            virtual inline int ExactNumTopBlobs() const { return 1; }
         protected:
             virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                 const vector<Blob<Dtype>*>& top); // 前向传播 CPU 实现
@@ -31,21 +29,14 @@ namespace caffe {
                 const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom); // 反向传播 CPU 实现
             virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
                 const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);  //反向传播 GPU 实现
-            inline Blob<Dtype> vector_L2_Normalise(Blob<Dtype>* srcData){
-                const Dtype * data = srcData->cpu_data();
-                Blob<Dtype> Distdata;
-                Distdata.ReshapeLike(&srcData);
-                Dtype * distData = Distdata.mutable_cpu_data();
-                int num = srcData->num();
-                int dim = srcData->count(1);
+            inline void vector_L2_Normalise(const Dtype * data, int NumBatch, int featureDim, Dtype * distData){
                 Dtype sum_squre;
-                for (size_t i = 0; i < num; i++)
+                for (size_t i = 0; i < NumBatch; i++)
                 {
-                    caffe_powx(dim, data + i * dim, Dtype(2.0), distData + i*dim);
-                    sum_squre = caffe_cpu_asum(dim, distData + i*dim);
-                    caffe_cpu_axpby(dim, Dtype(1.0/caffe_sqrt(sum_squre)), data + i * dim, Dtype(0.0),distData + i * dim);
+                    caffe_powx(featureDim, data + i * featureDim, Dtype(2.0), distData + i*featureDim);
+                    sum_squre = caffe_cpu_asum(featureDim, distData + i*featureDim);
+                    caffe_cpu_axpby(featureDim, Dtype(1.0/std::sqrt((double)sum_squre)), data + i * featureDim, Dtype(0.0),distData + i * featureDim);
                 }
-                return Distdata;
             }
 
         Blob<Dtype> Normalise_Weight_;
@@ -56,6 +47,7 @@ namespace caffe {
         int feature_Dim_;
         float margin_;
         float scaler_;
+        #if 0
         shared_ptr<Layer<Dtype> > conf_loss_layer_;
         // bottom vector holder used in Forward function.
         vector<Blob<Dtype>*> conf_bottom_vec_;
@@ -67,7 +59,8 @@ namespace caffe {
         Blob<Dtype> conf_gt_;
         // confidence loss.
         Blob<Dtype> conf_loss_;
-    }
+        #endif
+    };
 } //namespace cafe
 
 #endif // CAFFE_COSINE_LOSS_LAYER_HPP_
