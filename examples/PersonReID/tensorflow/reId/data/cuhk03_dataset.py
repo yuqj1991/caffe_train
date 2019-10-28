@@ -6,6 +6,7 @@ import random
 import sys
 import random
 from scipy import misc
+import tensorflow as tf
 
 def prepare_data(path):
     f = h5py.File('%s/cuhk-03.mat' % path)
@@ -127,8 +128,13 @@ def flip(image, random_flip):
         image = np.fliplr(image)
     return image
 
-def load_batch():
+def load_batch_softmax(imagepath_placeholder, label_placeholder, resized_width, resized_height):
     
+
+
+def load_barch_triplet():
+
+
 
 if __name__ == '__main__':
     prepare_data(sys.argv[1])
