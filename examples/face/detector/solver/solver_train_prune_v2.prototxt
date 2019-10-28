@@ -1,6 +1,6 @@
 train_net: "../prototxt/modelprune/face_train_v2.prototxt"
 test_net: "../prototxt/modelprune/face_test_v2.prototxt"
-test_iter: 3226
+test_iter: 5000
 test_interval: 5000
 base_lr: 0.01
 display: 1000
@@ -19,7 +19,11 @@ stepvalue: 20000
 stepvalue: 160000
 stepvalue: 200000
 iter_size: 8
+<<<<<<< HEAD
 momentum : 0.9
+=======
+momentum: 0.9
+>>>>>>> ec664cc197cb607dcd6d5a33fa1a3cf4d7cce1d3
 #momentum2 : 0.99
 #type: "RMSProp"
 eval_type: "detection"
