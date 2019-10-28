@@ -28,7 +28,7 @@ namespace caffe {
             shared_ptr<Filler<Dtype> > cosin_filler(GetFiller<Dtype>(
                 this->layer_param_.cosin_loss_param().cosin_filler()));
             cosin_filler->Fill(this->blobs_[0].get());
-        }  // 参数初始化
+        } 
         this->param_propagate_down_.resize(this->blobs_.size(), true);
         Normalise_Weight_.ReshapeLike(*(this->blobs_[0]));
         Normalise_feature_.ReshapeLike(*(bottom[0]));
