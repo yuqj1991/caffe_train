@@ -115,7 +115,7 @@ def detect():
              
              ori_img = frame[y1:y2, x1:x2, :]
              ############face attributes#######################
-             oimg = preprocess(ori_img, (96, 96))
+             oimg = preprocess(ori_img, (128, 128))
              oimg = oimg.astype(np.float32)
              oimg = oimg.transpose((2, 0, 1))
              face_net.blobs['data'].data[...] = oimg
