@@ -110,6 +110,7 @@ def network(images1, images2, weight_decay):
 
         return fc2
 
+
 def main(argv=None):
     if FLAGS.mode == 'test':
         FLAGS.batch_size = 1

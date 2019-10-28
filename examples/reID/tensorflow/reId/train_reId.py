@@ -34,19 +34,19 @@ def adjust_learning_rate_by_policy(base_lr_rate, gamma, iter, step, policy):
         return base_lr_rate*math.pow(gamma, iter)
 
 
-def adjust_optimizer_by_tensorflow(optimizer, learning_rate):
+def adjust_optimizer_by_tensorflow(optimizer, learning_rate_placeholder):
     if optimizer == 'ADAGRAD':
-        opt = tf.train.AdagradOptimizer(learning_rate)
+        opt = tf.train.AdagradOptimizer(learning_rate_placeholder)
     elif optimizer == 'ADADELTA':
-        opt = tf.train.AdadeltaOptimizer(learning_rate, rho=0.9, epsilon=1e-6)
+        opt = tf.train.AdadeltaOptimizer(learning_rate_placeholder, rho=0.9, epsilon=1e-6)
     elif optimizer == 'ADAM':
-        opt = tf.train.AdamOptimizer(learning_rate, beta1=0.9, beta2=0.999, epsilon=0.1)
+        opt = tf.train.AdamOptimizer(learning_rate_placeholder, beta1=0.9, beta2=0.999, epsilon=0.1)
     elif optimizer == 'RMSPROP':
-        opt = tf.train.RMSPropOptimizer(learning_rate, decay=0.9, momentum=0.9, epsilon=1.0)
+        opt = tf.train.RMSPropOptimizer(learning_rate_placeholder, decay=0.9, momentum=0.9, epsilon=1.0)
     elif optimizer == 'MOM':
-        opt = tf.train.MomentumOptimizer(learning_rate, 0.9, use_nesterov=True)
+        opt = tf.train.MomentumOptimizer(learning_rate_placeholder, 0.9, use_nesterov=True)
     elif optimizer == 'SGD':
-        opt = tf.train.GradientDescentOptimizer()
+        opt = tf.train.GradientDescentOptimizer(learning_rate_placeholder)
     else:
         raise ValueError('Invalid optimization algorithm')
     return opt
@@ -76,6 +76,11 @@ def main(args):
     softmaxWithLoss = net.entropy_softmax_withloss(normalize_output, label_batch)
 
     lr_rate = adjust_learning_rate_by_policy(learning_rate, gamma= gamma, policy=learning_policy)
+
+    solver_opt = adjust_optimizer_by_tensorflow(optimizer='SGD', learning_rate_placeholder=learning_rate_placeholder)
+    with tf.Session() as sess:
+
+
 
 
 

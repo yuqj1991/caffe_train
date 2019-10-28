@@ -2188,8 +2188,6 @@ layer {
     }
   }
   loss_weight: 0.008
-  propagate_down: true
-  propagate_down: false
 }
 
 
