@@ -15,8 +15,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 128
-			width: 128
+			height: 96
+			width: 96
 			interp_mode: LINEAR
 		}
 	}
@@ -780,6 +780,33 @@ layer {
 
 
 
+#
+layer {
+	name: "res4b_innerproduct_2"
+	type: "InnerProduct"
+	bottom: "conv_4_1"
+	top: "res4b_innerproduct_2"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	inner_product_param {
+		num_output: 256
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+
 
 layer {
 	name: "res5b_innerproduct"
@@ -806,17 +833,12 @@ layer {
 	}
 }
 
-layer {
-	name: "res5b_innerproduct/relu"
-	type: "PReLU"
-	bottom: "res5b_innerproduct"
-	top: "res5b_innerproduct"
-}
+
 
 layer {
 	name: "conv6_gender"
 	type: "InnerProduct"
-	bottom: "res5b_innerproduct"
+	bottom: "res4b_innerproduct_2"
 	top: "conv6_gender"
 	param {
 		lr_mult: 1
@@ -866,7 +888,7 @@ layer {
 layer {
 	name: "conv6_angle"
 	type: "InnerProduct"
-	bottom: "res5b_innerproduct"
+	bottom: "res4b_innerproduct_2"
 	top: "conv6_angle"
 	param {
 		lr_mult: 1
