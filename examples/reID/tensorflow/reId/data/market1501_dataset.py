@@ -62,7 +62,7 @@ def read_data(path, set, ids, image_width, image_height, batch_size):
     return np.transpose(batch_images, (1, 0, 2, 3, 4)), np.array(labels)
 
 
-def get_list_from_label_file(image_label_file_, batch_size):
+def get_list_from_label_file(image_label_file_):
     image_list = []
     label_list = []
     i = 0

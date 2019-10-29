@@ -2,7 +2,7 @@ train_net: "../prototxt/faceattrinet/train.prototxt"
 test_net: "../prototxt/faceattrinet/test.prototxt"
 test_iter: 1000
 test_interval: 10000
-base_lr: 0.01
+base_lr: 0.001
 display: 1000
 max_iter: 2400000
 lr_policy: "multistep"

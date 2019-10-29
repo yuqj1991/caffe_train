@@ -56,42 +56,34 @@ def adjust_optimizer_by_tensorflow(optimizer, learning_rate_placeholder):
 
 def train(sess, feed_dict, loss, train_op, save_opt, iter, log_dir):
     sess.run(tf.global_variables_initializer())
-    train_op
-
-
     if iter % 5000 == 0:
         save_opt.save(sess, log_dir + 'model.ckpt', iter)
 
 
-
-def evaluate(sess, ):
-
-
-
 def main(args):
+    # train_placeholder
     images_path_placeholder = tf.placeholder(name='images_path', dtype=tf.string, shape=[None,])
     labels_placeholder = tf.placeholder(name='labels', dtype=tf.int64, shape=[None,])
     batch_size_placeholder = tf.placeholder(name='batch_size', dtype=tf.int64)
     phase_train_placeholder = tf.placeholder(name='phase_train', dtype=tf.bool)
     learning_rate_placeholder = tf.placeholder(name = 'lr', dtype=tf.float32)
+    #dataset iterator
     dataset_iterator = market1501_dataset.generate_dataset_softmax(images_path_placeholder,
                                                           labels_placeholder, batch_size_placeholder)
     images_batch, label_batch = dataset_iterator.get_next()
-
+    # net input
     net = mobilenet.mobilenet({'image': images_batch}, trainable= True, conv_basechannel= 1.0)
     fc_output = net.get_output(name='fc_output')
     normalize_output = tf.nn.l2_normalize(fc_output, axis= 1, epsilon= 0.000001)
 
     softmaxWithLoss = net.entropy_softmax_withloss(normalize_output, label_batch)
-
-
+    # global train solver op
     global_step = tf.Variable(0, name='global_step', trainable=False) # zhe yi bu wo you dian bu dong
 
     solver_opt = adjust_optimizer_by_tensorflow(optimizer='SGD', learning_rate_placeholder=learning_rate_placeholder)
     train_op = solver_opt.minimize(loss=softmaxWithLoss, global_step= global_step)
 
-
-
+    # saver model
     saver_opt = tf.train.Saver()
     ckpt = tf.train.get_checkpoint_state(log_dir)
 
@@ -100,6 +92,9 @@ def main(args):
             print('Restore model')
             saver_opt.restore(sess, ckpt.model_checkpoint_path)
         sess.run(global_step)
+        sess.run(dataset_iterator.initializer, {images_path_placeholder: images_batch,
+                                                batch_size_placeholder: Batch_size,
+                                                labels_placeholder: label_batch})
         for iter in range(max_epoch):
             lr_rate = adjust_learning_rate_by_policy(learning_rate, gamma=gamma, policy=learning_policy, iter=iter)
             feed_dict = {images_path_placeholder:images_batch,
@@ -107,6 +102,12 @@ def main(args):
                          batch_size_placeholder:Batch_size,
                          labels_placeholder: label_batch,
                          phase_train_placeholder: True}
+            _, train_loss = sess.run([train_op, softmaxWithLoss], feed_dict=feed_dict)
+            print('Step: %d, Learning rate: %f, Train loss: %f' % (iter, lr_rate, train_loss))
+
+            if iter % 5000 == 0:
+                saver_opt.save(sess, log_dir + 'model.ckpt', iter)
+
 
 
 
