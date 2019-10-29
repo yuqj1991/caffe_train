@@ -4,28 +4,37 @@ from data import market1501_dataset
 import numpy as np
 import tensorflow as tf
 
-Batch_size = 64
-max_epoch = 120000
-learning_rate = 0.01
-learning_policy = 'MultiStep'
-gamma = 0.9
-MultiStepValue = [20000, 100000, 300000]
 CurrentAdjustStep = 0
 
-log_dir = '../snapshot'
-
+# set tf.Flages as follow
 # set learning rate policy adjust
-# set data parall
+# set data parallel
 # set model net
 # add train log loss, evaluation
 # set train optimizer gradient
-# save model to file
+# save model to file , save val_list, restore to continue train
+# log loss , accuracy
+# evaluation function
+
+FLAGS = tf.flags.FLAGS
+tf.flags.DEFINE_integer('batch_size', '30', 'batch size for training')
+tf.flags.DEFINE_integer('max_steps', '210000', 'max steps for training')
+
+tf.flags.DEFINE_string('logs_dir', '../snapshot/', 'path to logs directory')
+tf.flags.DEFINE_string('imgaes_path', '../train_market.txt', 'path to dataset')
+
+tf.flags.DEFINE_float('learning_rate', '0.01', '')
+tf.flags.DEFINE_string('learning_policy', 'MultiStep', 'learing rate decay policy')
+tf.flags.DEFINE_float('gamma', '0.9', ' gamma used to decay')
+tf.flags.DEFINE_list('MultiStepValue', '20000, 100000, 300000', 'multiStep value')
+
+tf.flags.DEFINE_string('mode', 'train', 'Mode train, val, test')
 
 
 def adjust_learning_rate_by_policy(base_lr_rate, gamma, iter, step=None, policy='MultiStep'):
     if policy == 'MultiStep':
         global CurrentAdjustStep
-        if CurrentAdjustStep < len(MultiStepValue) and iter > MultiStepValue[CurrentAdjustStep]:
+        if CurrentAdjustStep < len(FLAGS.MultiStepValue) and iter > FLAGS.MultiStepValue[CurrentAdjustStep]:
             CurrentAdjustStep += 1
         return base_lr_rate * math.pow(gamma, CurrentAdjustStep)
     elif policy == 'fixed':
@@ -60,23 +69,23 @@ def train(sess, feed_dict, loss, train_op, save_opt, iter, log_dir):
         save_opt.save(sess, log_dir + 'model.ckpt', iter)
 
 
-def main(args):
+def main():
     # train_placeholder
-    images_path_placeholder = tf.placeholder(name='images_path', dtype=tf.string, shape=[None,])
-    labels_placeholder = tf.placeholder(name='labels', dtype=tf.int64, shape=[None,])
+    images_path_placeholder = tf.placeholder(name='images_path', dtype=tf.string, shape=[None, ])
+    images_placeholder = tf.placeholder(name='images', dtype=tf.float32, shape=[None, 160, 80, 3])
+    labels_placeholder = tf.placeholder(name='labels', dtype=tf.int64, shape=[None, ])
     batch_size_placeholder = tf.placeholder(name='batch_size', dtype=tf.int64)
-    phase_train_placeholder = tf.placeholder(name='phase_train', dtype=tf.bool)
+    phase_train_placeholder = tf.placeholder(name='phase_train', dtype=bool)
     learning_rate_placeholder = tf.placeholder(name = 'lr', dtype=tf.float32)
-    #dataset iterator
+    # dataset iterator
     dataset_iterator = market1501_dataset.generate_dataset_softmax(images_path_placeholder,
                                                           labels_placeholder, batch_size_placeholder)
-    images_batch, label_batch = dataset_iterator.get_next()
     # net input
-    net = mobilenet.mobilenet({'image': images_batch}, trainable= True, conv_basechannel= 1.0)
+    net = mobilenet.mobilenet({'image': images_placeholder}, trainable=True, conv_basechannel=1.0)
     fc_output = net.get_output(name='fc_output')
     normalize_output = tf.nn.l2_normalize(fc_output, axis= 1, epsilon= 0.000001)
 
-    softmaxWithLoss = net.entropy_softmax_withloss(normalize_output, label_batch)
+    softmaxWithLoss = net.entropy_softmax_withloss(normalize_output, labels_placeholder)
     # global train solver op
     global_step = tf.Variable(0, name='global_step', trainable=False) # zhe yi bu wo you dian bu dong
 
@@ -85,28 +94,36 @@ def main(args):
 
     # saver model
     saver_opt = tf.train.Saver()
-    ckpt = tf.train.get_checkpoint_state(log_dir)
+    ckpt = tf.train.get_checkpoint_state(FLAGS.log_dir)
 
     with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
         if ckpt and ckpt.model_checkpoint_path:
             print('Restore model')
             saver_opt.restore(sess, ckpt.model_checkpoint_path)
         sess.run(global_step)
-        sess.run(dataset_iterator.initializer, {images_path_placeholder: images_batch,
-                                                batch_size_placeholder: Batch_size,
-                                                labels_placeholder: label_batch})
-        for iter in range(max_epoch):
-            lr_rate = adjust_learning_rate_by_policy(learning_rate, gamma=gamma, policy=learning_policy, iter=iter)
-            feed_dict = {images_path_placeholder:images_batch,
-                         learning_rate_placeholder: lr_rate,
-                         batch_size_placeholder:Batch_size,
-                         labels_placeholder: label_batch,
-                         phase_train_placeholder: True}
+        imagepaths, labels =market1501_dataset.get_list_from_label_file(FLAGS.imgaes_path)
+        sess.run(dataset_iterator.initializer, {images_path_placeholder: imagepaths,
+                                                batch_size_placeholder: FLAGS.batch_size,
+                                                labels_placeholder: labels})
+        dataelement = dataset_iterator.get_next()
+        for iter in range(FLAGS.max_steps):
+            images_batch, label_batch = sess.run(dataelement)
+            lr_rate = adjust_learning_rate_by_policy(FLAGS.learning_rate, gamma=FLAGS.gamma, policy=FLAGS.learning_policy, iter=iter)
+            # label_batch = tf.transpose(label_batch)
+            feed_dict = {images_placeholder: images_batch,
+                        labels_placeholder: label_batch,
+                         phase_train_placeholder: True,
+                        learning_rate_placeholder: lr_rate}
             _, train_loss = sess.run([train_op, softmaxWithLoss], feed_dict=feed_dict)
             print('Step: %d, Learning rate: %f, Train loss: %f' % (iter, lr_rate, train_loss))
 
             if iter % 5000 == 0:
-                saver_opt.save(sess, log_dir + 'model.ckpt', iter)
+                saver_opt.save(sess, FLAGS.log_dir + 'model.ckpt', iter)
+
+
+if __name__=='__main__':
+    main()
 
 
 

@@ -27,14 +27,6 @@ def get_pair(path, set, ids, positive):
     return pair
 
 
-'''
-def get_num_id(path, set):
-	files = os.listdir('%s/%s' % (path, set))
-	files.sort()
-	return int(files[-1].split('_')[0]) + 1
-'''
-
-
 def get_id(path, set):
     files = os.listdir('%s/%s' % (path, set))
     IDs = []
@@ -68,8 +60,9 @@ def get_list_from_label_file(image_label_file_):
     i = 0
     with open(image_label_file_, 'r') as anno_file_:
         for contentline in anno_file_.readlines():
+            label = []
             curLine = contentline.strip().split(' ')
-            image_list.append(curLine[0])
+            image_list.append(curLine[0] + '.jpg')
             label_list.append(int(curLine[1]))
             anno_file_.close()
     return image_list, label_list
@@ -82,15 +75,14 @@ def _parse_image(filename, label):
     image_string = tf.read_file(filename)
     image_decoded = tf.image.decode_jpeg(image_string)
     image_converted = tf.cast(image_decoded, tf.float32)
-    resized_image = tf.image.resize_images(image_converted, [320, 320], method=0)
+    resized_image = tf.image.resize_images(image_converted, [160, 80], method=0)
     return resized_image, label
 
 
 def train_preprocess(image, label):
     image = tf.image.random_flip_left_right(image)
-
     image = tf.image.random_brightness(image, max_delta=32)
-    image = tf.image.random_saturation(image, lowe=0.5, upper=1.5)
+    image = tf.image.random_saturation(image, lower=0.5, upper=1.5)
     # Make sure the image is still in [0, 1]
     image = tf.clip_by_value(image, 0.0, 1.0)
     return image, label
@@ -98,16 +90,17 @@ def train_preprocess(image, label):
 
 def generate_dataset_softmax(imgpathplace_holder, label_placeholder, batchsize_placeholder):
     dataset = tf.data.Dataset.from_tensor_slices((imgpathplace_holder, label_placeholder))
-    dataset = dataset.shuffle(buffersize=10000)
+    dataset = dataset.shuffle(buffer_size=25259)
     dataset = dataset.map(_parse_image)
     dataset = dataset.map(train_preprocess)
-    dataset = dataset.batch(batchsize_placeholder).repeat()
+    dataset = dataset.batch(batch_size=batchsize_placeholder).repeat()
     iterator = dataset.make_initializable_iterator()
     return iterator
 
 
 class ImageClass():
     "Stores the paths to images for a given class"
+
     def __init__(self, name, image_paths):
         self.name = name
         self.image_paths = image_paths
@@ -138,7 +131,7 @@ def get_image_paths(Dir):
     image_paths = []
     if os.path.isdir(Dir):
         images = os.listdir(Dir)
-        image_paths = [os.path.join(Dir,img) for img in images]
+        image_paths = [os.path.join(Dir, img) for img in images]
     return image_paths
 
 
@@ -195,12 +188,12 @@ def selct_triplet_sample(embeddings, nrof_images_per_class, image_paths, people_
     for i in range(people_per_batch):
         nrof_images = nrof_images_per_class[i]
         for j in range(1, nrof_images):
-            a_idx = emb_start_idx + j -1
+            a_idx = emb_start_idx + j - 1
             neg_distance_sqr = np.sum(np.square(embeddings[a_idx] - embeddings), axis=1)
             for pair in range(j, nrof_images):
                 p_idx = emb_start_idx + pair
                 pos_distance_sqr = np.sum(np.square(embeddings[a_idx] - embeddings[p_idx]), axis=1)
-                neg_distance_sqr[emb_start_idx: emb_start_idx+nrof_images] =np.NaN
+                neg_distance_sqr[emb_start_idx: emb_start_idx + nrof_images] = np.NaN
                 all_neg = np.where(neg_distance_sqr - pos_distance_sqr < alpha)[0]
                 nrof_random_negs = all_neg.shape[0]
                 if nrof_random_negs > 0:
@@ -214,8 +207,6 @@ def selct_triplet_sample(embeddings, nrof_images_per_class, image_paths, people_
         emb_start_idx += nrof_images
     np.random.shuffle(triplets)
     return triplets, num_trips, len(triplets)
-
-
 
 # if __name__ == '__main__':
 # prepare_data(sys.argv[1])

@@ -9,7 +9,7 @@ class mobilenet(network.BaseNetwork):
     def __init__(self, inputs, trainable, conv_basechannel = 1.0, second_channels = None):
         self.base_channels = conv_basechannel
         self.second_channels = second_channels if second_channels else conv_basechannel
-        network.BaseNetwork.__init__(inputs=inputs, trainable=trainable)
+        network.BaseNetwork.__init__(self, inputs=inputs, trainable=trainable)
 
     def setup(self):
         min_depth = 8
@@ -32,9 +32,10 @@ class mobilenet(network.BaseNetwork):
              .fc(1501, name='fc_output', relu=False))
 
     def entropy_softmax_withloss(self, predict, labels):
-        output_predict = self.softmax(input=predict, name="predict_feature")
-        cross_entropy = tf.reduce_mean(-tf.reduce_sum(labels*tf.log(output_predict), axis=1))
-        return cross_entropy
+        # output_predict = tf.nn.softmax(logits=predict, name="predict_feature", axis=1)
+        # cross_entropy = tf.reduce_mean(-tf.reduce_sum(labels*tf.log(output_predict), axis=1))
+        cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=predict, labels=labels)
+        return tf.reduce_mean(cross_entropy)
 
     def restorable_variable(self):
         vs = {v.op.name: v for v in tf.global_variables() if

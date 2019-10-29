@@ -10,8 +10,5 @@ if ! test -f ../prototxt/modelprune/face_test.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=../solver/solver_train_prune.prototxt -gpu 0 \
-<<<<<<< HEAD
---snapshot=../snapshot/face_iter_5000.solverstate
-=======
-#--snapshot=../snapshot/face_iter_105000.solverstate
->>>>>>> 38ee37817b4bbaa94222f18eb150f51cbc3f14b7
+--snapshot=../snapshot/face_iter_137864.solverstate
+

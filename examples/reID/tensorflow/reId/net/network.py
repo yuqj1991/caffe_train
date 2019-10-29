@@ -6,7 +6,7 @@ import abc
 import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-from numpy import basestring
+#from numpy import basestring
 
 DEFAULT_PADDING = 'SAME'
 batchnorm_fused = True
@@ -56,7 +56,7 @@ def layer(op):
 
 
 class BaseNetwork(object):
-    def __init__(self, inputs, trainable=True):
+    def __init__(self, inputs, trainable):
         # The input nodes for this network
         self.inputs = inputs
         # The current list of terminal nodes
@@ -208,7 +208,7 @@ class BaseNetwork(object):
                                         weights_initializer=_init_xavier,
                                         # weights_initializer=tf.truncated_normal_initializer(stddev=0.01),
                                         biases_initializer=_init_zero if set_bias else None,
-                                        trainable=self.trainable,
+                                        trainable=self.trainable ,
                                         activation_fn=activation_fn if relu else None,
                                         scope=name)
             if set_tanh:
