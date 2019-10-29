@@ -9,7 +9,7 @@ gamma: 0.1
 stepvalue: 200000
 stepvalue: 602000
 stepvalue: 1002000
-
+average_loss: 10
 # Display every 100 iterations
 display: 100
 # The maximum number of iterations
