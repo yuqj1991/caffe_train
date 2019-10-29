@@ -1,5 +1,5 @@
 #!/bin/sh
-if ! test -f /googlenet/train.prototxt ;then
+if ! test -f ./googlenet/train.prototxt ;then
 	echo "error: train.prototxt does not exit."
 	echo "please generate your own model prototxt primarily."
         exit 1

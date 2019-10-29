@@ -19,11 +19,7 @@ stepvalue: 20000
 stepvalue: 160000
 stepvalue: 200000
 iter_size: 8
-<<<<<<< HEAD
 momentum : 0.9
-=======
-momentum: 0.9
->>>>>>> ec664cc197cb607dcd6d5a33fa1a3cf4d7cce1d3
 #momentum2 : 0.99
 #type: "RMSProp"
 eval_type: "detection"

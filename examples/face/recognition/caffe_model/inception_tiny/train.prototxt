@@ -7,14 +7,24 @@ layer {
 	include {
 		phase: TRAIN
 	}
-	transform_param {
-        mirror: true
+    transform_param {
+        mirror: true        
         mean_value: 127.5
         mean_value: 127.5
         mean_value: 127.5
         scale: 0.0078125
-        crop_size: 128
-	}
+        resize_param {
+			prob: 1.0
+			resize_mode: WARP
+			height: 128
+			width: 128
+			interp_mode: LINEAR
+			interp_mode: AREA
+			interp_mode: NEAREST
+			interp_mode: CUBIC
+			interp_mode: LANCZOS4
+    	}
+    }
 	data_param {
 		source: "../../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb"
         batch_size: 128
@@ -1622,4 +1632,51 @@ layer {
   contrastive_loss_param {
     margin: 1
   }
+}
+############## center loss ###############
+layer {
+  name: "center_loss"
+  type: "CenterLoss"
+  bottom: "fc5"
+  bottom: "label"
+  top: "center_loss"
+  param {
+    lr_mult: 1
+    decay_mult: 2 
+  }
+  center_loss_param {
+    num_output: 8631
+    center_filler {
+      type: "xavier"
+    }
+  }
+  loss_weight: 0.008
+}
+
+##########################################
+layer {
+  name: "lmcl_cos_l2_normalize"
+  type: "CosinL2Normalize"
+  bottom: "fc5"
+  top: "lmcl_cos_l2_normalize"
+  param {
+    lr_mult: 1
+    decay_mult: 2 
+  }
+  cosin_loss_param {
+    num_output: 8631
+    cosin_filler {
+      type: "xavier"
+    }
+  }
+  propagate_down: true
+}
+layer {
+  name: "cosin_loss"
+  type: "SoftmaxWithLoss"
+  bottom: "lmcl_cos_l2_normalize"
+  bottom: "label"
+  top: "cosin_loss"
+  propagate_down: true
+  propagate_down: false
 }
