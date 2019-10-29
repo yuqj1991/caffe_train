@@ -44,7 +44,7 @@ def batch_work(ori, setFile):
             xmin = np.maximum(roi_x - minMargin / 2, 0)
             xmax = np.minimum(roi_x + roi_w + minMargin / 2, src.shape[1])
             ymin = np.maximum(roi_y - minMargin / 2, 0)
-            ymax = np.minimum(roi_y+roi_h + minMargin / 2, src.shape[0])
+            ymax = np.minimum(roi_y + roi_h + minMargin / 2, src.shape[0])
             cropRoi = src[ymin:ymax, xmin:xmax, :]
             left_eye_point_x = row[1]['P8X'] - xmin
             right_eye_point_x = row[1]['P11X'] -xmin
@@ -61,9 +61,9 @@ def batch_work(ori, setFile):
             vision_nose = row[1]['VIS15']
             vision_left_mouth = row[1]['VIS18']
             vision_right_mouth = row[1]['VIS20']
-            if vision_left_eye < vision_threold or vision_right_eye < vision_threold or vision_nose < vision_threold or vision_left_mouth < vision_threold or vision_right_mouth < vision_threold:
+            if np.min([vision_left_eye, vision_right_eye, vision_nose, vision_left_mouth, vision_right_mouth]) < vision_threold:
                 continue
-            if nose_point_y <= left_eye_point_y or nose_point_y <= right_eye_point_y:
+            if nose_point_y < np.min([left_eye_point_y, right_eye_point_y]):
                 continue
             cv2.imwrite(ang_path_image_name, cropRoi)
             if 1:
