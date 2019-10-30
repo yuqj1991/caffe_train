@@ -49,6 +49,22 @@ layer {
 	}
 }
 layer {
+  name: "label_slice"
+  type: "Slice"
+  bottom: "label"
+  top: "label_landmark"
+  top: "label_angle"
+  top: "label_gender"
+  slice_param {
+    slice_point: 10
+    slice_point: 13
+    axis: 1
+  }
+  include {
+		phase: TRAIN
+	}
+}
+layer {
 	name: "conv_0"
 	type: "Convolution"
 	bottom: "data"
@@ -1516,91 +1532,7 @@ layer {
 }
 
 
-####
-layer {
-	name: "conv6_glasses_fds_1"
-	type: "InnerProduct"
-	bottom: "conv_5_2_1"
-	top: "conv6_glasses_fds_1"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
-		num_output: 96
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv6_glasses_fds_1/relu"
-	type: "ReLU"
-	bottom: "conv6_glasses_fds_1"
-	top: "conv6_glasses_fds_1"
-}
-layer {
-	name: "conv6_glasses_fds_2"
-	type: "InnerProduct"
-	bottom: "conv6_glasses_fds_1"
-	top: "conv6_glasses_fds_2"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
-		num_output: 32
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv6_glasses_fds_2/relu"
-	type: "ReLU"
-	bottom: "conv6_glasses_fds_2"
-	top: "conv6_glasses_fds_2"
-}
-layer {
-	name: "conv6_glasses"
-	type: "InnerProduct"
-	bottom: "conv6_glasses_fds_2"
-	top: "conv6_glasses"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
-		num_output: 2
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
+
 
 ################################
 layer {
@@ -2124,35 +2056,47 @@ layer {
 	}
 }
 layer {
-	name: "multiface_loss"
-	type: "MultiFaceLoss"
-	bottom: "conv6_landmark"
-    bottom: "conv6_angle"
-	bottom: "conv6_gender"
-	bottom: "conv6_glasses"
-	bottom: "label"
-	top: "multiface_loss"
+	name: "faceangleloss"
+	type: "EuclideanLoss"
+	bottom: "conv6_angle"
+	bottom: "label_angle"
+	top: "faceangleloss"
+	loss_weight: 0.05
 	include {
 		phase: TRAIN
 	}
 	propagate_down: true
-	propagate_down: true
-	propagate_down: true
-    propagate_down: true
 	propagate_down: false
 	loss_param {
 		normalization: VALID
 	}
-	multiface_loss_param{
-		mark_loss_type : L2
-        angle_loss_type: L2
-		mark_weight: 1
-        angle_weight: 1
-		gender_weight: 1
-		glass_weight: 0.5
-		num_gender: 2
-		num_glasses: 2
-		conf_gender_loss_type: SOFTMAX #LOGISTIC
-		conf_glasses_loss_type: SOFTMAX #LOGISTIC
+}
+layer {
+	name: "gender_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "conv6_gender"
+	bottom: "label_gender"
+	top: "gender_loss"
+	propagate_down: true
+	propagate_down: false
+	loss_weight: 0.5
+	include {
+		phase: TRAIN
+	}
+}
+layer {
+	name: "landmark_loss"
+	type: "EuclideanLoss"
+	bottom: "conv6_landmark"
+	bottom: "label_landmark"
+	top: "landmark_loss"
+	loss_weight: 1
+	include {
+		phase: TRAIN
+	}
+	propagate_down: true
+	propagate_down: false
+	loss_param {
+		normalization: VALID
 	}
 }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="cce7038a-90ad-41ab-b829-698f395e4713" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../../face/attributes/scripts/face_attri_train.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../../../face/attributes/scripts/face_attri_train.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../face/eval/scripts/demo_camera_attri.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../face/eval/scripts/demo_camera_attri.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/reId.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/cuhk03_dataset.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/market1501_dataset.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/net/init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/net/mobilenet.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/net/network.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_data_batch.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/train_cuhk03.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/train_market1501.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/train_reId.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/net_util.py" beforeDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../../.." />
+  </component>
+  <component name="ProjectId" id="1Sp5VLs0fystnsHoAnaiiImFhDR" />
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cce7038a-90ad-41ab-b829-698f395e4713" name="Default Changelist" comment="" />
+      <created>1572247718401</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1572247718401</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
