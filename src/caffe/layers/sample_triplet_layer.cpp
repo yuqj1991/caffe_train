@@ -83,7 +83,7 @@ void SampleTripletLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   triplet_num_ = neg_set.size();
   top[0]->Reshape(triplet_num_, 3, 1, 1);
-  for(int idx = 0; triplet_num_; idx++){
+  for(int idx = 0; idx<triplet_num_; idx++){
     top_data[idx * 3] = an_set[idx];
     top_data[idx * 3 + 1] = positive_set[idx];
     top_data[idx * 3 + 2] = neg_set[idx];
@@ -132,7 +132,18 @@ void SampleTripletLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   */
 }
+#if 0
+template <typename Dtype>
+void SampleTripletLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down,
+      const vector<Blob<Dtype>*>& bottom) {
+    const Dtype *top_diff = 
+    for(int i = 0; i < batch_size_; i++){
 
+    }
+  
+}
+#endif
 INSTANTIATE_CLASS(SampleTripletLayer);
 REGISTER_LAYER_CLASS(SampleTriplet);
 

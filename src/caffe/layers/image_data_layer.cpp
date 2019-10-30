@@ -40,7 +40,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   sample_num_ =  this->layer_param_.image_data_param().sample_num();
   label_num_= this->layer_param_.image_data_param().label_num();
   string root_folder = this->layer_param_.image_data_param().root_folder();
-  CHECK_EQ(label_num_*sample_num_, this->layer_param_.image_data_param().batch_size());
+  CHECK_EQ(label_num_*sample_num_, this->layer_param_.data_param().batch_size());
 
   CHECK((new_height == 0 && new_width == 0) ||
       (new_height > 0 && new_width > 0)) << "Current implementation requires "
