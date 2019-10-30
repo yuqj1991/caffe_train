@@ -1011,7 +1011,7 @@ layer {
 	top: "gender_loss"
 	propagate_down: true
 	propagate_down: false
-	loss_weight: 1
+	loss_weight: 0.25
 	include {
 		phase: TRAIN
 	}
