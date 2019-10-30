@@ -5,6 +5,55 @@ layer {
 	top: "data"
 	top: "label"
 	include {
+		phase: TRAIN
+	}
+	transform_param {
+		scale: 0.007843
+		mirror: false
+		mean_value: 127.5
+		mean_value: 127.5
+		mean_value: 127.5
+		resize_param {
+			prob: 1.0
+			resize_mode: WARP
+			height: 96
+			width: 96
+			interp_mode: LINEAR
+			interp_mode: AREA
+			interp_mode: NEAREST
+			interp_mode: CUBIC
+			interp_mode: LANCZOS4
+		}
+		distort_param {
+			brightness_prob: 0.5
+			brightness_delta: 32.0
+			contrast_prob: 0.5
+			contrast_lower: 0.5
+			contrast_upper: 1.5
+			hue_prob: 0.5
+			hue_delta: 18.0
+			saturation_prob: 0.5
+			saturation_lower: 0.5
+			saturation_upper: 1.5
+			random_order_prob: 0.0
+		}
+		expand_param {
+			prob: 0.5
+			max_expand_ratio: 2.0
+		}
+	}
+	data_param {
+		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_training_umdface_pose_lmdb/"
+		batch_size: 16
+		backend: LMDB
+	}
+}
+layer {
+	name: "data"
+	type: "faceAttributeData"
+	top: "data"
+	top: "label"
+	include {
 		phase: TEST
 	}
 	transform_param {
@@ -15,8 +64,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 96
-			width: 96
+			height: 128
+			width: 128
 			interp_mode: LINEAR
 		}
 	}
@@ -24,6 +73,22 @@ layer {
 		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_testing_umdface_pose_lmdb/"
 		batch_size: 4
 		backend: LMDB
+	}
+}
+layer {
+  name: "label_slice"
+  type: "Slice"
+  bottom: "label"
+  top: "label_landmark"
+  top: "label_angle"
+  top: "label_gender"
+  slice_param {
+    slice_point: 10
+    slice_point: 13
+    axis: 1
+  }
+  include {
+		phase: TRAIN
 	}
 }
 layer {
@@ -42,7 +107,7 @@ layer {
 	convolution_param {
 		num_output: 32
 		kernel_size: 3
-		stride: 1
+		stride: 2
 		pad: 1
 		weight_filler {
 			type: "xavier"
@@ -247,12 +312,7 @@ layer {
 	operation: SUM
 	}
 }
-layer {
-	name: "conv_one_eltwise/relu"
-	type: "PReLU"
-	bottom: "conv_one_eltwise"
-	top: "conv_one_eltwise"
-}
+
 layer {
 	name: "conv_2"
 	type: "Convolution"
@@ -392,99 +452,18 @@ layer {
 		}
 	}
 }
-layer {
-	name: "conv_2_2/relu"
-	type: "PReLU"
-	bottom: "conv_2_2"
-	top: "conv_2_2"
-}
-layer {
-	name: "conv_2_2_1"
-	type: "Convolution"
-	bottom: "conv_2_2"
-	top: "conv_2_2_1"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 128
-		kernel_size: 3
-		stride: 1
-		pad: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv_2_2_1/bn"
-	type: "BatchNorm"
-	bottom: "conv_2_2_1"
-	top: "conv_2_2_1"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv_2_2_1/scale"
-	type: "Scale"
-	bottom: "conv_2_2_1"
-	top: "conv_2_2_1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-
-
 
 layer{
 	name: "conv_two_eltwise"
 	type: "Eltwise"
-	bottom: "conv_2_2_1"
+	bottom: "conv_2_2"
 	bottom: "conv_2"
 	top: "conv_two_eltwise"
 	eltwise_param {
 		operation: SUM
 	}
 }
-layer {
-	name: "conv_two_eltwise/relu"
-	type: "PReLU"
-	bottom: "conv_two_eltwise"
-	top: "conv_two_eltwise"
-}
+
 ###
 layer {
 	name: "conv_2_4"
@@ -635,12 +614,7 @@ layer {
 	operation: SUM
 	}
 }
-layer {
-	name: "conv_three_eltwise/relu"
-	type: "PReLU"
-	bottom: "conv_three_eltwise"
-	top: "conv_three_eltwise"
-}
+
 ###########################
 
 
@@ -719,59 +693,12 @@ layer {
 	bottom: "conv_4_1"
 	top: "conv_4_1"
 }
-
-
+####
 layer {
-    bottom: "conv_4_1"
-    top: "res5b_branch2a"
-    name: "res5b_branch2a"
-    type: "Convolution"
-    convolution_param {
-        num_output: 256
-        kernel_size: 3
-        pad: 1
-        stride: 2
-        weight_filler {
-            type: "msra"
-        }
-        bias_term: false
-
-    }
-}
-
-layer {
-    bottom: "res5b_branch2a"
-    top: "res5b_branch2a"
-    name: "bn5b_branch2a"
-    type: "BatchNorm"
-    batch_norm_param {
-      moving_average_fraction: 0.9 
-    }
-    
-}
-
-layer {
-    bottom: "res5b_branch2a"
-    top: "res5b_branch2a"
-    name: "scale5b_branch2a"
-    type: "Scale"
-    scale_param {
-        bias_term: true
-    }
-}
-
-layer {
-    bottom: "res5b_branch2a"
-    top: "res5b_branch2a"
-    name: "res5b_branch2a_relu"
-    type: "PReLU"
-}
-
-layer {
-	name: "res5b_0"
+	name: "conv_4_2"
 	type: "Convolution"
-	bottom: "res5b_branch2a"
-	top: "res5b_0"
+	bottom: "conv_4_1"
+	top: "conv_4_2"
 	param {
 		lr_mult: 1
 		decay_mult: 1
@@ -782,9 +709,7 @@ layer {
 	}
 	convolution_param {
 		num_output: 256
-		kernel_size: 3
-		stride: 2
-		pad: 1
+		kernel_size: 1
 		weight_filler {
 			type: "xavier"
 		}
@@ -795,10 +720,10 @@ layer {
 	}
 }
 layer {
-	name: "res5b_0/bn"
+	name: "conv_4_2/bn"
 	type: "BatchNorm"
-	bottom: "res5b_0"
-	top: "res5b_0"
+	bottom: "conv_4_2"
+	top: "conv_4_2"
 	param {
 		lr_mult: 0
 		decay_mult: 0
@@ -813,10 +738,10 @@ layer {
 	}
 }
 layer {
-	name: "res5b_0/scale"
+	name: "conv_4_2/scale"
 	type: "Scale"
-	bottom: "res5b_0"
-	top: "res5b_0"
+	bottom: "conv_4_2"
+	top: "conv_4_2"
 	param {
 		lr_mult: 1.0
 		decay_mult: 0.0
@@ -836,15 +761,122 @@ layer {
 	}
 }
 layer {
-	name: "res5b_0/relu"
+	name: "conv_4_2/relu"
 	type: "PReLU"
-	bottom: "res5b_0"
-	top: "res5b_0"
+	bottom: "conv_4_2"
+	top: "conv_4_2"
 }
+
+####
+layer {
+	name: "conv_4_3"
+	type: "Convolution"
+	bottom: "conv_4_2"
+	top: "conv_4_3"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	convolution_param {
+		num_output: 512
+		kernel_size: 3
+        stride: 2
+        pad: 1
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv_4_3/bn"
+	type: "BatchNorm"
+	bottom: "conv_4_3"
+	top: "conv_4_3"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv_4_3/scale"
+	type: "Scale"
+	bottom: "conv_4_3"
+	top: "conv_4_3"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv_4_3/relu"
+	type: "PReLU"
+	bottom: "conv_4_3"
+	top: "conv_4_3"
+}
+
+
+
+#
+layer {
+	name: "res4b_innerproduct_2"
+	type: "InnerProduct"
+	bottom: "conv_4_1"
+	top: "res4b_innerproduct_2"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	inner_product_param {
+		num_output: 256
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+
+
 layer {
 	name: "res5b_innerproduct"
 	type: "InnerProduct"
-	bottom: "res5b_0"
+	bottom: "conv_4_3"
 	top: "res5b_innerproduct"
 	param {
 		lr_mult: 1
@@ -866,17 +898,12 @@ layer {
 	}
 }
 
-layer {
-	name: "res5b_innerproduct/relu"
-	type: "PReLU"
-	bottom: "res5b_innerproduct"
-	top: "res5b_innerproduct"
-}
+
 
 layer {
 	name: "conv6_gender"
 	type: "InnerProduct"
-	bottom: "res5b_innerproduct"
+	bottom: "res4b_innerproduct_2"
 	top: "conv6_gender"
 	param {
 		lr_mult: 1
@@ -926,7 +953,7 @@ layer {
 layer {
 	name: "conv6_angle"
 	type: "InnerProduct"
-	bottom: "res5b_innerproduct"
+	bottom: "res4b_innerproduct_2"
 	top: "conv6_angle"
 	param {
 		lr_mult: 1
@@ -948,44 +975,48 @@ layer {
 		}
 	}
 }
-
 layer {
-	name: "conv6_gender"
-	type: "Softmax"
-	bottom: "conv6_gender"
-	top: "conv6_gender"
-	softmax_param {
-		axis: 1
+	name: "faceangleloss"
+	type: "EuclideanLoss"
+	bottom: "conv6_angle"
+	bottom: "label_angle"
+	top: "faceangleloss"
+	loss_weight: 1
+	include {
+		phase: TRAIN
+	}
+	propagate_down: true
+	propagate_down: false
+	loss_param {
+		normalization: VALID
 	}
 }
-
-
 layer {
-	name: "multiface_output"
-	type: "Concat"
+	name: "gender_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "conv6_gender"
+	bottom: "label_gender"
+	top: "gender_loss"
+	propagate_down: true
+	propagate_down: false
+	loss_weight: 1
+	include {
+		phase: TRAIN
+	}
+}
+layer {
+	name: "landmark_loss"
+	type: "EuclideanLoss"
 	bottom: "conv6_landmark"
-    bottom: "conv6_angle"
-	bottom: "conv6_gender"
-	top: "multiface_output"
-	concat_param {
-		axis: 1
-	}
+	bottom: "label_landmark"
+	top: "landmark_loss"
+	loss_weight: 1
 	include {
-		phase: TEST
+		phase: TRAIN
 	}
-}
-layer{
-	name: "faceeval_output"
-	type: "FaceAttriEvaluate"
-	bottom: "multiface_output"
-	bottom: "label"
-	top: "faceeval_output"
-	include {
-		phase: TEST
-	}
-	face_evaluate_param{
-		facetype: FACEATTRIBUTE
-		facepoints: 5
-		num_gender: 2
+	propagate_down: true
+	propagate_down: false
+	loss_param {
+		normalization: VALID
 	}
 }
