@@ -48,7 +48,7 @@ void TripletLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       dist_an +=diff_aneg;
     }
     /***********************************************/
-    if (dist_ap - dist_an - margin < 0) {
+    if (dist_ap - dist_an + margin > 0) {
         /*
         ComputeDiff_gpu(a_pointer, p_pointer, a_norm,
             p_norm, inner_ap, diff_ap_.mutable_gpu_data());

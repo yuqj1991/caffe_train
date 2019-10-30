@@ -1,32 +1,41 @@
 name: "GoogleNet"
 layer {
     name: "data"
-    type: "Data"
+    type: "ImageData"
     top: "data"
     top: "label"
+	image_data_param {
+    	new_height: 128
+    	new_width: 64
+    	sample_num: 5
+    	label_num: 45
+    	batch_size: 225
+    	source: 'train.txt'
+    	root_folder: "../../../../../dataset/reId_data/Market-1501_align"
+    }
     transform_param {
-        mirror: true        
+        mirror: true
         mean_value: 127.5
         mean_value: 127.5
         mean_value: 127.5
         scale: 0.0078125
-        resize_param {
-			prob: 1.0
-			resize_mode: WARP
-			height: 128
-			width: 64
-			interp_mode: LINEAR
-			interp_mode: AREA
-			interp_mode: NEAREST
-			interp_mode: CUBIC
-			interp_mode: LANCZOS4
-    	}
+        #resize_param {
+		#	prob: 1.0
+		#	resize_mode: WARP
+		#	height: 128
+		#	width: 64
+		#	interp_mode: LINEAR
+		#	interp_mode: AREA
+		#	interp_mode: NEAREST
+		#	interp_mode: CUBIC
+		#	interp_mode: LANCZOS4
+    	#}
     }
-    data_param {
-        source: "../../../../../dataset/reId_data/Market-1501-v15.09.15/market_lmdb"
-        batch_size: 128
-        backend: LMDB
-    }
+    #data_param {
+    #    #source: "../../../../../dataset/reId_data/Market-1501_align"
+    #    batch_size: 225
+    #    #backend: LMDB
+    #}
 }
 
 layer {
@@ -2098,124 +2107,150 @@ layer {
   }
 }
 
-layer {
-  name: "score"
-  type: "InnerProduct"
-  bottom: "fc5"
-  top: "score"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 1501
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-  name: "Softmax_loss"
-  type: "SoftmaxWithLoss"
-  bottom: "score"
-  bottom: "label"
-  top: "Softmax_loss"
-  loss_weight: 1
-  propagate_down: true
-  propagate_down: false
-}
+#layer {
+#  name: "score"
+#  type: "InnerProduct"
+#  bottom: "fc5"
+#  top: "score"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 1
+#  }
+#  param {
+#    lr_mult: 2
+#    decay_mult: 0
+#  }
+#  inner_product_param {
+#    num_output: 1501
+#    weight_filler {
+#      type: "xavier"
+#    }
+#    bias_filler {
+#      type: "constant"
+#      value: 0
+#    }
+#  }
+#}
+#layer {
+#  name: "Softmax_loss"
+#  type: "SoftmaxWithLoss"
+#  bottom: "score"
+#  bottom: "label"
+#  top: "Softmax_loss"
+#  loss_weight: 1
+#  propagate_down: true
+#  propagate_down: false
+#}
 
-layer {
-	name: "merege_pair"
-	type: "Identity2Verify"
-	bottom: "fc5"
-	bottom: "label"
-	top: "feature1"
-	top: "feature2"
-	top: "sim"
-}
+#layer {
+#	name: "merege_pair"
+#	type: "Identity2Verify"
+#	bottom: "fc5"
+#	bottom: "label"
+#	top: "feature1"
+#	top: "feature2"
+#	top: "sim"
+#}
 
-layer {
-	name: "norm1"
-	type: "SimpleNormalize"
-	bottom: "feature1"
-	top: "normfeature1"
-}
+#layer {
+#	name: "norm1"
+#	type: "SimpleNormalize"
+#	bottom: "feature1"
+#	top: "normfeature1"
+#}
 
-layer {
-	name: "norm2"
-	type: "SimpleNormalize"
-	bottom: "feature2"
-	top: "normfeature2"
-}
+#layer {
+#	name: "norm2"
+#	type: "SimpleNormalize"
+#	bottom: "feature2"
+#	top: "normfeature2"
+#}
 
-layer {
-  name: "loss2"
-  type: "ContrastiveLoss"
-  bottom: "normfeature1"
-  bottom: "normfeature2"
-  bottom: "sim"
-  top: "sim_loss"
-  loss_weight: 0.5
-  contrastive_loss_param {
-    margin: 1
-  }
-}
+#layer {
+#  name: "loss2"
+#  type: "ContrastiveLoss"
+#  bottom: "normfeature1"
+#  bottom: "normfeature2"
+#  bottom: "sim"
+#  top: "sim_loss"
+#  loss_weight: 0.5
+#  contrastive_loss_param {
+#    margin: 1
+#  }
+#}
 
 ############## center loss ###############
-layer {
-  name: "center_loss"
-  type: "CenterLoss"
-  bottom: "fc5"
-  bottom: "label"
-  top: "center_loss"
-  param {
-    lr_mult: 1
-    decay_mult: 2 
-  }
-  center_loss_param {
-    num_output: 1501
-    center_filler {
-      type: "xavier"
-    }
-  }
-  loss_weight: 0.008
-}
+#layer {
+#  name: "center_loss"
+#  type: "CenterLoss"
+#  bottom: "fc5"
+#  bottom: "label"
+#  top: "center_loss"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 2 
+#  }
+#  center_loss_param {
+#    num_output: 1501
+#    center_filler {
+#      type: "xavier"
+#    }
+#  }
+#  loss_weight: 0.008
+#}
 
 
 ##########################################
+#layer {
+#  name: "lmcl_cos_l2_normalize"
+#  type: "CosinL2Normalize"
+#  bottom: "fc5"
+#  top: "lmcl_cos_l2_normalize"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 2 
+#  }
+#  cosin_loss_param {
+#    num_output: 1501
+#    cosin_filler {
+#      type: "xavier"
+#    }
+#  }
+#  propagate_down: true
+#}
+#layer {
+#  name: "cosin_loss"
+#  type: "SoftmaxWithLoss"
+#  bottom: "lmcl_cos_l2_normalize"
+#  bottom: "label"
+#  top: "cosin_loss"
+#  propagate_down: true
+#  propagate_down: false
+#}
+#######################tripletloss##################
 layer {
-  name: "lmcl_cos_l2_normalize"
-  type: "CosinL2Normalize"
-  bottom: "fc5"
-  top: "lmcl_cos_l2_normalize"
-  param {
-    lr_mult: 1
-    decay_mult: 2 
-  }
-  cosin_loss_param {
-    num_output: 1501
-    cosin_filler {
-      type: "xavier"
-    }
-  }
-  propagate_down: true
+	name: "fc5_feature"
+	type: "SimpleNormalize"
+	bottom: "fc5"
+	top: "fc5_feature"
 }
+#add activation layer may increase the feature's expression
 layer {
-  name: "cosin_loss"
-  type: "SoftmaxWithLoss"
-  bottom: "lmcl_cos_l2_normalize"
+  name: "archor_pair"
+  type: "SampleTriplet"
+  bottom: "fc5_feature"
   bottom: "label"
-  top: "cosin_loss"
-  propagate_down: true
+  top: "archor_pair"
+  propagate_down: false
   propagate_down: false
 }
-
+layer {
+  name: "tripletloss"
+  type: "TripletLoss"
+  bottom: "fc5_feature"
+  bottom: "archor_pair"
+  top: "tripletloss"
+  loss_weight: 1
+  propagate_down: true
+  propagate_down: true
+}

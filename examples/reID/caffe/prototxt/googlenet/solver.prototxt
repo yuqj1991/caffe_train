@@ -2,7 +2,7 @@ average_loss: 25
 base_lr: 0.001
 display: 100
 gamma: 0.1
-iter_size: 2
+iter_size: 1
 lr_policy: "multistep"
 stepvalue: 50000
 stepvalue: 100000

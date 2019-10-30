@@ -49,7 +49,7 @@ void TripletLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       inner_matrix_.mutable_cpu_data());
 
   for (int i = 0; i < triplet_num_; ++i) {
-    int a_idx = bottom[1]->cpu_data()[i * 3];
+    int a_idx = bottom[1]->cpu_data()[i * 3 ];
     int p_idx = bottom[1]->cpu_data()[i * 3 + 1];
     int n_idx = bottom[1]->cpu_data()[i * 3 + 2];
     const Dtype *a_pointer = bottom[0]->cpu_data() + a_idx * feature_dim_;
