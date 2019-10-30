@@ -993,7 +993,7 @@ layer {
 	bottom: "conv6_angle"
 	bottom: "label_angle"
 	top: "faceangleloss"
-	loss_weight: 0.05
+	loss_weight: 0.005
 	include {
 		phase: TRAIN
 	}
