@@ -19,7 +19,7 @@ void TripletLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   Dtype eps = this->layer_param_.triplet_loss_param().eps();
   Dtype loss = 0;
   Dtype margin = this->layer_param_.triplet_loss_param().margin();
-  caffe_gpu_gemm(CblasNoTrans, CblasTrans, sample_num_, sample_num_,
+  caffe_gpu_gemm(CblasNoTrans, CblasTrans, batch_size_, batch_size_,
       feature_dim_, Dtype(1), bottom[0]->gpu_data(),
       bottom[0]->gpu_data(), Dtype(0),
       inner_matrix_.mutable_gpu_data());
@@ -32,11 +32,11 @@ void TripletLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const Dtype *p_pointer = bottom[0]->gpu_data() + p_idx * feature_dim_;
     const Dtype *n_pointer = bottom[0]->gpu_data() + n_idx * feature_dim_;
     const Dtype *inner_matrix_data = inner_matrix_.cpu_data();
-    Dtype a_norm = sqrt(inner_matrix_data[a_idx * sample_num_ + a_idx] + eps);
-    Dtype p_norm = sqrt(inner_matrix_data[p_idx * sample_num_ + p_idx] + eps);
-    Dtype n_norm = sqrt(inner_matrix_data[n_idx * sample_num_ + n_idx] + eps);
-    Dtype inner_ap = inner_matrix_data[a_idx * sample_num_ + p_idx];
-    Dtype inner_an = inner_matrix_data[a_idx * sample_num_ + n_idx];
+    Dtype a_norm = sqrt(inner_matrix_data[a_idx * batch_size_ + a_idx] + eps);
+    Dtype p_norm = sqrt(inner_matrix_data[p_idx * batch_size_ + p_idx] + eps);
+    Dtype n_norm = sqrt(inner_matrix_data[n_idx * batch_size_ + n_idx] + eps);
+    Dtype inner_ap = inner_matrix_data[a_idx * batch_size_ + p_idx];
+    Dtype inner_an = inner_matrix_data[a_idx * batch_size_ + n_idx];
     //Dtype dist_ap = inner_ap / (a_norm *p_norm)
     //Dtype dist_an = inner_an / (a_norm *n_norm)
     /*************以下为自己添加的*********************/
@@ -115,7 +115,7 @@ void TripletLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             bottom_diff_.mutable_gpu_data() + (n_idx * feature_dim_));
   }
   Dtype scalar = Dtype(1) / triplet_num_;
-  //Dtype scalar = Dtype(1) / sample_num_;
+  //Dtype scalar = Dtype(1) / batch_size_;
   top[0]->mutable_cpu_data()[0] = loss * scalar;
 }
 
@@ -124,7 +124,7 @@ void TripletLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
   if (propagate_down[0]) {
     Dtype scalar = top[0]->cpu_diff()[0] / triplet_num_;
-    //Dtype scalar = top[0]->cpu_diff()[0] / sample_num_;
+    //Dtype scalar = top[0]->cpu_diff()[0] / batch_size_;
     caffe_gpu_scale(bottom_diff_.count(), scalar, bottom_diff_.gpu_data(),
         bottom[0]->mutable_gpu_diff());
   }
