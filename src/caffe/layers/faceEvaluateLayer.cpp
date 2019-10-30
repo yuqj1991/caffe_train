@@ -164,9 +164,9 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
         correct_precisive_glasses=1;*/
       top_data[ii*9 + 5] = correct_precisive_gender;
       //top_data[ii*9 + 6] = correct_precisive_glasses;
-      correct_precisive_yaw = cos(double((all_prediction_face_angle[ii][0] - all_gt_face_angle[ii][0]) * M_PI));
-      correct_precisive_pitch = cos(double((all_prediction_face_angle[ii][1] - all_gt_face_angle[ii][1]) * M_PI));
-      correct_precisive_roll = cos(double((all_prediction_face_angle[ii][2] - all_gt_face_angle[ii][2]) * M_PI));
+      correct_precisive_yaw = cos(double((all_prediction_face_angle[ii][0] - all_gt_face_angle[ii][0]) /180 * M_PI));
+      correct_precisive_pitch = cos(double((all_prediction_face_angle[ii][1] - all_gt_face_angle[ii][1]) /180  * M_PI));
+      correct_precisive_roll = cos(double((all_prediction_face_angle[ii][2] - all_gt_face_angle[ii][2])  /180 * M_PI));
       top_data[ii* 9 + 6]=float(correct_precisive_yaw);
       top_data[ii* 9 + 7]=float(correct_precisive_pitch);
       top_data[ii* 9 + 8]=float(correct_precisive_roll);
