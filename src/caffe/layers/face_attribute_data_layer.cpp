@@ -220,9 +220,9 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = face.landmark().nose().y();
                 top_label[idx++] = face.landmark().leftmouth().y();
                 top_label[idx++] = face.landmark().rightmouth().y();
-                top_label[idx++] = float(face.faceoritation().yaw());
-                top_label[idx++] = float(face.faceoritation().pitch());
-                top_label[idx++] = float(face.faceoritation().roll());
+                top_label[idx++] = float(face.faceoritation().yaw() / 180);
+                top_label[idx++] = float(face.faceoritation().pitch() / 180);
+                top_label[idx++] = float(face.faceoritation().roll() / 180);
                 top_label[idx++] = face.gender();
                 //top_label[idx++] = face.glass();
                 if(phase_ == TEST){
