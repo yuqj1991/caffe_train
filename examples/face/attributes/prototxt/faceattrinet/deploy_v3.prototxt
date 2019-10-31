@@ -1592,7 +1592,6 @@ layer {
 	bottom: "conv6_landmark"
     bottom: "conv6_angle"
 	bottom: "conv6_gender"
-	bottom: "conv6_glasses"
 	top: "multiface_output"
 	concat_param {
 		axis: 1
