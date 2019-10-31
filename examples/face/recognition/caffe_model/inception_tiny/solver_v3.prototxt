@@ -1,6 +1,6 @@
 # The train/test net protocol buffer definition
 train_net: "face_train_v3.prototxt"
-base_lr: 0.01
+base_lr: 0.001
 momentum: 0.9
 weight_decay: 0.0005
 # The learning rate policy

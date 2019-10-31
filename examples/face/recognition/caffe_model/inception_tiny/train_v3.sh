@@ -5,4 +5,4 @@ if ! test -f face_train_v3.prototxt ;then
         exit 1
 fi
 ../../../../../build/tools/caffe train --solver=solver_v3.prototxt -gpu 2 \
---snapshot=face_recog/tiny_iter_1504.solverstate
+#--snapshot=face_recog/tiny_iter_1504.solverstate
