@@ -1,30 +1,10 @@
 name: "deep_face_attribute"
-layer {
-	name: "data"
-	type: "faceAttributeData"
-	top: "data"
-	top: "label"
-	include {
-		phase: TEST
-	}
-	transform_param {
-		scale: 0.007843
-		mean_value: 127.5
-		mean_value: 127.5
-		mean_value: 127.5
-		resize_param {
-			prob: 1.0
-			resize_mode: WARP
-			height: 96
-			width: 96
-			interp_mode: LINEAR
-		}
-	}
-	data_param {
-		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_testing_umdface_pose_lmdb/"
-		batch_size: 12
-		backend: LMDB
-	}
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 96
+  dim: 96
 }
 layer {
     bottom: "data"
@@ -1373,92 +1353,6 @@ layer {
 }
 
 
-####
-layer {
-	name: "conv6_glasses_fds_1"
-	type: "InnerProduct"
-	bottom: "conv_5_2_1"
-	top: "conv6_glasses_fds_1"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
-		num_output: 96
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv6_glasses_fds_1/relu"
-	type: "ReLU"
-	bottom: "conv6_glasses_fds_1"
-	top: "conv6_glasses_fds_1"
-}
-layer {
-	name: "conv6_glasses_fds_2"
-	type: "InnerProduct"
-	bottom: "conv6_glasses_fds_1"
-	top: "conv6_glasses_fds_2"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
-		num_output: 32
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv6_glasses_fds_2/relu"
-	type: "ReLU"
-	bottom: "conv6_glasses_fds_2"
-	top: "conv6_glasses_fds_2"
-}
-layer {
-	name: "conv6_glasses"
-	type: "InnerProduct"
-	bottom: "conv6_glasses_fds_2"
-	top: "conv6_glasses"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
-		num_output: 2
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-
 ################################
 layer {
 	name: "conv_5_1"
@@ -1693,51 +1587,16 @@ layer {
 	}
 }
 layer {
-	name: "conv6_gender"
-	type: "Softmax"
-	bottom: "conv6_gender"
-	top: "conv6_gender"
-	softmax_param {
-		axis: 1
-	}
-}
-layer {
-	name: "conv6_glasses"
-	type: "Softmax"
-	bottom: "conv6_glasses"
-	top: "conv6_glasses"
-	softmax_param {
-		axis: 1
-	}
-}
-layer {
 	name: "multiface_output"
 	type: "Concat"
 	bottom: "conv6_landmark"
     bottom: "conv6_angle"
 	bottom: "conv6_gender"
-	bottom: "conv6_glasses"
 	top: "multiface_output"
 	concat_param {
 		axis: 1
 	}
 	include {
 		phase: TEST
-	}
-}
-layer{
-	name: "faceeval_output"
-	type: "FaceAttriEvaluate"
-	bottom: "multiface_output"
-	bottom: "label"
-	top: "faceeval_output"
-	include {
-		phase: TEST
-	}
-	face_evaluate_param{
-		facetype: FACEATTRIBUTE
-		facepoints: 5
-		num_gender: 2
-		num_glasses: 2
 	}
 }
