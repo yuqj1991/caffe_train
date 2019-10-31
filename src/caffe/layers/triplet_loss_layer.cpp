@@ -20,7 +20,7 @@ void TripletLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   const vector<Blob<Dtype>*>& top) {
   
   vector<int> loss_shape(1);
-  loss_shape[];
+  loss_shape[0]=1;
   top[0]->Reshape(loss_shape);
 }
 
