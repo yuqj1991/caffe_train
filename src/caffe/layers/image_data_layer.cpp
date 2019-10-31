@@ -79,7 +79,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     lines_id_ = skip;
   }
   // Read an image, and use it to initialize the top blob.
-  cv::Mat cv_img = ReadImageToCVMat(root_folder + lines_[lines_id_].first,
+  cv::Mat cv_img = ReadImageToCVMat(lines_[lines_id_].first,
                                     new_height, new_width, is_color);
   CHECK(cv_img.data) << "Could not load " << lines_[lines_id_].first;
   // Use data_transformer to infer the expected blob shape from a cv_image.
@@ -172,16 +172,14 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     int length = choosedImagefile_.size();
     int temp = std::min(nrof_image_in_class, batch_size - length );
     int nrof_image_from_class = std::min(sample_num_, temp);
-    caffe::rng_t* prefetch_rng =
-                            static_cast<caffe::rng_t*>(prefetch_rng_->generator());
-    shuffle(filelist.begin(), filelist.end(), prefetch_rng);
+    unsigned seed = std::chrono::system_clock::now ().time_since_epoch ().count ();  
+    std::shuffle(filelist.begin(), filelist.end(), std::default_random_engine (seed));
     for(int i = 0; i < nrof_image_from_class; i++){
       choosedImagefile_.push_back(std::make_pair(filelist[i], rand_class_idx));
     }
     labelSet_.push_back(rand_class_idx);
     label.push_back(nrof_image_from_class);
   }
-
   /**************遍历人脸数据集根目录遍历文件夹**********/
 
   // Reshape according to the first image of each batch

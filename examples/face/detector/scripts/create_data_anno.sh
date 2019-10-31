@@ -3,7 +3,8 @@ cd $root_dir/scripts
 
 redo=1
 data_root_dir="../../dataset/facedata"
-dataset_name="wider_face"
+#dataset_name="wider_face"
+dataset_name="wider_face_add_lm_10_10"
 mapfile="../examples/face/detector/labelmap_face.prototxt"
 anno_type="detection"
 db="lmdb"

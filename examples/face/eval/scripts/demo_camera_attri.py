@@ -115,7 +115,7 @@ def detect():
              
              ori_img = frame[y1:y2, x1:x2, :]
              ############face attributes#######################
-             oimg = preprocess(ori_img, (128, 128))
+             oimg = preprocess(ori_img, (96, 96))
              oimg = oimg.astype(np.float32)
              oimg = oimg.transpose((2, 0, 1))
              face_net.blobs['data'].data[...] = oimg
@@ -127,7 +127,7 @@ def detect():
                  cv2.circle(ori_img, point, 3, (0,0,213), -1)
              cv2.rectangle(frame, p1, p2, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "yaw: %f, pitch: %f, roll: %f, %s" % (yaw, pitch, roll, gender)
+             title = "yaw: %f, pitch: %f, roll: %f, %s" % (yaw*180, pitch*180, roll*180, gender)
              print(title)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("face", frame)

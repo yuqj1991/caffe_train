@@ -13,7 +13,7 @@ void SampleTripletLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   /*************************我自己添加的***********************/
   const Dtype *feature_data = bottom[0]->cpu_data();  //feature data
   const Dtype *label_data = bottom[1]->cpu_data(); //label data
-  //int trip_idx = 0;
+  int nrof_images = 0;
   int emb_start_idx = 0;
   int neg_images = 0;
   an_set.clear();
@@ -21,11 +21,11 @@ void SampleTripletLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   neg_set.clear();
   int j = 0;
   for(int i = 0; i < label_num_; i++){
-    int nrof_images = (int)label_data[i];
+    nrof_images = label_data[i];
     neg_images = batch_size_ - nrof_images;
-    for(j = 0; j < nrof_images; j++){
+    for(j = 1; j < nrof_images; j++){
       neg_dist_sqr.clear();
-      int a_idx = i * emb_start_idx + j - 1;
+      int a_idx = emb_start_idx + j - 1;
       /**********计算neg距离****************/
       for(int n = 0; n < batch_size_; n++){
         int min_anchor_idx = emb_start_idx;
@@ -42,11 +42,11 @@ void SampleTripletLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         }
       }
       /***********计算postive距离**********/
-      for(int pair = j; j < nrof_images; pair++ ){
+      for(int pair = j; pair < nrof_images; pair++ ){
           int p_idx = emb_start_idx + pair;
           float pos_dist_sqr =0.f;
           for(int ii = 0; ii < feature_dim_; ii++){
-            float dim = std::pow(feature_data[a_idx] - feature_data[p_idx], 2);
+            float dim = std::pow(feature_data[a_idx*feature_dim_ +ii] - feature_data[p_idx*feature_dim_ +ii], 2);
             pos_dist_sqr += dim;
           }
           vector<int> all_neg;
@@ -69,7 +69,7 @@ void SampleTripletLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   }
   triplet_num_ = neg_set.size();
   top[0]->Reshape(triplet_num_, 3, 1, 1);
-  for(int idx = 0; triplet_num_; idx++){
+  for(int idx = 0; idx<triplet_num_; idx++){
     top_data[idx * 3] = an_set[idx];
     top_data[idx * 3 + 1] = positive_set[idx];
     top_data[idx * 3 + 2] = neg_set[idx];

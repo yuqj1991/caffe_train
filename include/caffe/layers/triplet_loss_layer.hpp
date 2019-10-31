@@ -18,7 +18,8 @@ class TripletLossLayer : public LossLayer<Dtype> {
       const vector<Blob<Dtype>*>& top);
 
   virtual inline const char* type() const { return "TripletLoss"; }
-  virtual inline int ExactNumBottomBlobs() const { return 3; }
+  virtual inline int ExactNumBottomBlobs() const { return 2; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
   void ComputeDiff_cpu(const Dtype *x_1, const Dtype *x_2,
@@ -36,15 +37,12 @@ class TripletLossLayer : public LossLayer<Dtype> {
   virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
   int triplet_num_;
-  int sample_num_;
+  int batch_size_;
   int feature_dim_;
-  Blob<Dtype> diff_an_;
-  Blob<Dtype> diff_ap_;
   Blob<Dtype> diff_na_;
   Blob<Dtype> diff_pa_;
   Blob<Dtype> diff_np_;
   Blob<Dtype> bottom_diff_;
-  Blob<Dtype> inner_matrix_;
 };
 
 }

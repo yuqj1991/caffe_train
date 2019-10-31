@@ -6,12 +6,10 @@ namespace caffe {
 template <typename Dtype>
 void SampleTripletLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   const vector<Blob<Dtype>*>& top) {
-  const Dtype *label_data = bottom[1]->cpu_data(); //label data
   label_num_ = bottom[1]->count();
-  for(int i = 0; i < label_num_; i++)
-    batch_size_ += (int)label_data[i];
+  batch_size_ = bottom[0]->num();
   triplet_num_ = label_num_ ;
-  top[0]->Reshape(triplet_num_, 3, 1, 1);
+  top[0]->Reshape(label_num_, 3, 1, 1);
   feature_dim_ = bottom[0]->count(1);
   inner_matrix_.Reshape(batch_size_, batch_size_, 1, 1);
 }
@@ -39,7 +37,7 @@ void SampleTripletLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     neg_images = batch_size_ - nrof_images;
     for(j = 0; j < nrof_images; j++){
       neg_dist_sqr.clear();
-      int a_idx = i * emb_start_idx + j - 1;
+      int a_idx = emb_start_idx + j - 1;
       /**********计算neg距离****************/
       for(int n = 0; n < batch_size_; n++){
         int min_anchor_idx = emb_start_idx;
@@ -56,11 +54,11 @@ void SampleTripletLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         }
       }
       /***********计算postive距离**********/
-      for(int pair = j; j < nrof_images; pair++ ){
+      for(int pair = j; pair < nrof_images; pair++ ){
           int p_idx = emb_start_idx + pair;
           float pos_dist_sqr =0.f;
           for(int ii = 0; ii < feature_dim_; ii++){
-            float dim = std::pow(feature_data[a_idx] - feature_data[p_idx], 2);
+            float dim = std::pow(feature_data[a_idx*feature_dim_ +ii] - feature_data[p_idx*feature_dim_ +ii], 2);
             pos_dist_sqr += dim;
           }
           vector<int> all_neg;
@@ -83,7 +81,7 @@ void SampleTripletLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   triplet_num_ = neg_set.size();
   top[0]->Reshape(triplet_num_, 3, 1, 1);
-  for(int idx = 0; triplet_num_; idx++){
+  for(int idx = 0; idx<triplet_num_; idx++){
     top_data[idx * 3] = an_set[idx];
     top_data[idx * 3 + 1] = positive_set[idx];
     top_data[idx * 3 + 2] = neg_set[idx];
@@ -132,7 +130,18 @@ void SampleTripletLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   */
 }
+#if 0
+template <typename Dtype>
+void SampleTripletLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down,
+      const vector<Blob<Dtype>*>& bottom) {
+    const Dtype *top_diff = 
+    for(int i = 0; i < batch_size_; i++){
 
+    }
+  
+}
+#endif
 INSTANTIATE_CLASS(SampleTripletLayer);
 REGISTER_LAYER_CLASS(SampleTriplet);
 

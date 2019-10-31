@@ -20,6 +20,8 @@ class SampleTripletLayer : public NeuronLayer<Dtype> {
       const vector<Blob<Dtype>*>& top);
 
   virtual inline const char* type() const { return "SampleTriplet"; }
+  virtual inline int ExactNumBottomBlobs() const { return 2; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
