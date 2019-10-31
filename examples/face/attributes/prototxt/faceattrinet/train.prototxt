@@ -1254,7 +1254,7 @@ layer {
 	bottom: "conv6_angle"
 	bottom: "label_angle"
 	top: "faceangleloss"
-	loss_weight: 1
+	loss_weight: 0.05
 	include {
 		phase: TRAIN
 	}
@@ -1272,7 +1272,7 @@ layer {
 	top: "gender_loss"
 	propagate_down: true
 	propagate_down: false
-	loss_weight: 1
+	loss_weight: 0.5
 	include {
 		phase: TRAIN
 	}
