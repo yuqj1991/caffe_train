@@ -40,13 +40,14 @@ void TripletLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     //Dtype dist_ap = inner_ap / (a_norm *p_norm)
     //Dtype dist_an = inner_an / (a_norm *n_norm)
     /*************以下为自己添加的*********************/
-    Dtype dist_ap, dist_an;
+    float dist_ap, dist_an;
     for(int i = 0; i< feature_dim_; i++){
       float diff_apos = std::pow(float(a_pointer[i])- float(p_pointer[i]), 2);
       float diff_aneg = std::pow(float(a_pointer[i])- float(n_pointer[i]), 2);
       dist_ap += diff_apos;
       dist_an +=diff_aneg;
     }
+    //LOG(INFO)<<"dist_ap: "<<dist_ap<<" dist_an: "<<dist_an;
     /***********************************************/
     if (dist_ap - dist_an + margin > 0) {
         /*
