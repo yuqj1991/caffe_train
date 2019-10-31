@@ -37,15 +37,12 @@ class TripletLossLayer : public LossLayer<Dtype> {
   virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
   int triplet_num_;
-  int sample_num_;
+  int batch_size_;
   int feature_dim_;
-  Blob<Dtype> diff_an_;
-  Blob<Dtype> diff_ap_;
   Blob<Dtype> diff_na_;
   Blob<Dtype> diff_pa_;
   Blob<Dtype> diff_np_;
   Blob<Dtype> bottom_diff_;
-  Blob<Dtype> inner_matrix_;
 };
 
 }

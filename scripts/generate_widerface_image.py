@@ -360,7 +360,7 @@ def generate_annoXml_and_text_from_widerSplit(widerSplit_file, subDir, xml_save_
 				# label text file
 				label_file.writelines(newline)
 				# xml annotation file
-				objects = doc.createElement('objects')
+				objects = doc.createElement('object')
 				annotation.appendChild(objects)
 				object_name = doc.createElement('name')
 				object_name.appendChild(doc.createTextNode('face'))
@@ -374,7 +374,7 @@ def generate_annoXml_and_text_from_widerSplit(widerSplit_file, subDir, xml_save_
 				difficult_node = doc.createElement('difficult')
 				difficult_node.appendChild(doc.createTextNode(str(difficult)))
 				objects.appendChild(difficult_node)
-				boundbox = doc.createElement('boundingbox')  # boundbox
+				boundbox = doc.createElement('bndbox')  # boundbox
 				objects.appendChild(boundbox)
 				xmin = doc.createElement('xmin')
 				xmin.appendChild(doc.createTextNode(x_min))

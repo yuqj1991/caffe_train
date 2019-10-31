@@ -194,7 +194,7 @@ def convertimgset(img_set="train"):
                     bbox = bboxes[i]
                     blur = blurs[i]
                     occlu = occlus[i]
-                    objects = doc.createElement('objects')
+                    objects = doc.createElement('object')
                     annotation.appendChild(objects)
                     object_name = doc.createElement('name')
                     object_name.appendChild(doc.createTextNode('face'))
@@ -215,7 +215,7 @@ def convertimgset(img_set="train"):
                     difficult = doc.createElement('difficult')
                     difficult.appendChild(doc.createTextNode('0'))
                     objects.appendChild(difficult)
-                    bndbox = doc.createElement('boundingbox')
+                    bndbox = doc.createElement('bndbox')
                     objects.appendChild(bndbox)
                     xmin = doc.createElement('xmin')
                     xmin.appendChild(doc.createTextNode(str(bbox[0])))

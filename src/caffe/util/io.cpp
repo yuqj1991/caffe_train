@@ -420,7 +420,7 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
   int instance_id = 0;
   BOOST_FOREACH(ptree::value_type &v1, pt.get_child("annotation")) {
     ptree pt1 = v1.second;
-    if (v1.first == "objects") {
+    if (v1.first == "object") {
       Annotation* anno = NULL;
       bool difficult = false;
       ptree object = v1.second;
@@ -457,7 +457,7 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
           anno->set_instance_id(instance_id++);
         } else if (v2.first == "difficult") {
           difficult = pt2.data() == "1";
-        }else if (v2.first == "boundingbox") {
+        }else if (v2.first == "bndbox") {
           int xmin = pt2.get("xmin", 0);
           int ymin = pt2.get("ymin", 0);
           int xmax = pt2.get("xmax", 0);
