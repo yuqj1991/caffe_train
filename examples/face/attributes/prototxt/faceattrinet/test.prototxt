@@ -656,7 +656,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
         pad: 0
 		weight_filler {

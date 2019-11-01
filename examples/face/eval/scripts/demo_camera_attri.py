@@ -11,10 +11,10 @@ minMargin = 36
 
 def make_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, help='.prototxt file for inference', default = '../../../../net/face_detector.prototxt')
-    parser.add_argument('--weights', type=str, help='.caffemodel file for inference', default = '../../../../net/face_detector.caffemodel')
-    parser.add_argument('--facemodel', type=str, help='.prototxt file for inference face landmarks', default = '../../../../net/face_attributes.prototxt')
-    parser.add_argument('--faceweights', type=str, help='.caffemodel file for inference face landmarks weights', default = '../../../../net/face_attributes.caffemodel')
+    parser.add_argument('--model', type=str, help='.prototxt file for inference', default = '../net/face_detector.prototxt')
+    parser.add_argument('--weights', type=str, help='.caffemodel file for inference', default = '../net/face_detector.caffemodel')
+    parser.add_argument('--facemodel', type=str, help='.prototxt file for inference face landmarks', default = '../net/face_attributes.prototxt')
+    parser.add_argument('--faceweights', type=str, help='.caffemodel file for inference face landmarks weights', default = '../net/face_attributes.caffemodel')
     return parser
 
 parser1 = make_parser()
@@ -115,7 +115,7 @@ def detect():
              
              ori_img = frame[y1:y2, x1:x2, :]
              ############face attributes#######################
-             oimg = preprocess(ori_img, (96, 96))
+             oimg = preprocess(ori_img, (128, 128))
              oimg = oimg.astype(np.float32)
              oimg = oimg.transpose((2, 0, 1))
              face_net.blobs['data'].data[...] = oimg
