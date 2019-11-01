@@ -552,6 +552,10 @@ __global__ void ComputeConfLossKernel(const int nthreads,
       // Compute softmax probability.
       Dtype prob = conf_data[start_idx + label];
       loss = -log(Max(prob, Dtype(FLT_MIN)));
+    } else if (loss_type == MultiBoxLossParameter_ConfLossType_FOCALSOFTMAX) {
+      // Compute softmax probability.
+      Dtype prob = conf_data[start_idx + label];
+      loss = -log(Max(prob, Dtype(FLT_MIN)))*powf(1-prob, 2.0f)*0.25;
     } else if (loss_type == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
       int target = 0;
       for (int c = 0; c < num_classes; ++c) {

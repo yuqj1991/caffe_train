@@ -1418,7 +1418,22 @@ void ComputeConfLoss(const Dtype* conf_data, const int num,
         }
         Dtype prob = std::exp(conf_data[start_idx + label] - maxval) / sum;
         loss = -log(std::max(prob, Dtype(FLT_MIN)));
-      } else if (loss_type == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
+      } else if (loss_type == MultiBoxLossParameter_ConfLossType_FOCALSOFTMAX) {
+        CHECK_GE(label, 0);
+        CHECK_LT(label, num_classes);
+        // Compute softmax probability.
+        // We need to subtract the max to avoid numerical issues.
+        Dtype maxval = -FLT_MAX;
+        for (int c = 0; c < num_classes; ++c) {
+          maxval = std::max<Dtype>(conf_data[start_idx + c], maxval);
+        }
+        Dtype sum = 0.;
+        for (int c = 0; c < num_classes; ++c) {
+          sum += std::exp(conf_data[start_idx + c] - maxval);
+        }
+        Dtype prob = std::exp(conf_data[start_idx + label] - maxval) / sum;
+        loss = -log(std::max(prob, Dtype(FLT_MIN)))*pow(1 - prob, 2.0) * 0.25;
+      }else if (loss_type == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
         int target = 0;
         for (int c = 0; c < num_classes; ++c) {
           if (c == label) {
@@ -1500,6 +1515,21 @@ void ComputeConfLoss(const Dtype* conf_data, const int num,
         }
         Dtype prob = std::exp(conf_data[start_idx + label] - maxval) / sum;
         loss = -log(std::max(prob, Dtype(FLT_MIN)));
+      } else if (loss_type == MultiBoxLossParameter_ConfLossType_FOCALSOFTMAX) {
+        CHECK_GE(label, 0);
+        CHECK_LT(label, num_classes);
+        // Compute softmax probability.
+        // We need to subtract the max to avoid numerical issues.
+        Dtype maxval = conf_data[start_idx];
+        for (int c = 1; c < num_classes; ++c) {
+          maxval = std::max<Dtype>(conf_data[start_idx + c], maxval);
+        }
+        Dtype sum = 0.;
+        for (int c = 0; c < num_classes; ++c) {
+          sum += std::exp(conf_data[start_idx + c] - maxval);
+        }
+        Dtype prob = std::exp(conf_data[start_idx + label] - maxval) / sum;
+        loss = -log(std::max(prob, Dtype(FLT_MIN))) *pow(1 - prob, 2.0)*0.25;
       } else if (loss_type == MultiBoxLossParameter_ConfLossType_LOGISTIC) {
         int target = 0;
         for (int c = 0; c < num_classes; ++c) {
@@ -1593,6 +1623,9 @@ void EncodeConfPrediction(const Dtype* conf_data, const int num,
             case MultiBoxLossParameter_ConfLossType_LOGISTIC:
               conf_gt_data[idx * num_classes + gt_label] = 1;
               break;
+            case MultiBoxLossParameter_ConfLossType_FOCALSOFTMAX:
+              conf_gt_data[idx] = gt_label;
+              break;
             default:
               LOG(FATAL) << "Unknown conf loss type.";
           }
@@ -1621,6 +1654,9 @@ void EncodeConfPrediction(const Dtype* conf_data, const int num,
                   background_label_id < num_classes) {
                 conf_gt_data[count * num_classes + background_label_id] = 1;
               }
+              break;
+            case MultiBoxLossParameter_ConfLossType_FOCALSOFTMAX:
+              conf_gt_data[count] = background_label_id;
               break;
             default:
               LOG(FATAL) << "Unknown conf loss type.";
