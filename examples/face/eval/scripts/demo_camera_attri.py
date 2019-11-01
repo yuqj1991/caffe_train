@@ -127,7 +127,7 @@ def detect():
                  cv2.circle(ori_img, point, 3, (0,0,213), -1)
              cv2.rectangle(frame, p1, p2, (0,255,0))
              p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "yaw: %f, pitch: %f, roll: %f, %s" % (yaw*180, pitch*180, roll*180, gender)
+             title = "yaw: %f, pitch: %f, roll: %f, %s" % (yaw, pitch, roll, gender)
              print(title)
              cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
        cv2.imshow("face", frame)
