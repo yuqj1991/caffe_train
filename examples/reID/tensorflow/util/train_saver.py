@@ -31,14 +31,12 @@ import os
 # 其中，你会给这个图喂（feed）训练数据和一些超参数（比如说learning rate，global step等）。比如我们使用的是已经预训练好的模型，来调优新的数据集
 # 我们通过saver = tf.train.import_meta_graph('my_test_model-1000.meta')和restore恢复了网络图，和参数，权重，偏置，操作op节点，
 # 在这之后，我们可以继续添加新的操作节点，产生新的变量，只训练新的变量，获取到相应的操作节点，tensor，这样可以知道tensor，可以引入新的变量对其进行训练
-
+# we can just train some new variables,just make trainable = True, and make the trained fine weights make them trainable
+# = False
 
 # checkpoint 是什么？
 # checkpoint是一个文本文件，记录了训练过程中在所有中间节点上保存的模型的名称，首行记录的是最后（最近）一次保存的模型名称。
 # checkpoint是检查点文件，文件保存了一个目录下所有的模型文件列表
-
-
-
 
 
 class SaverTensorflow(object):

@@ -6,39 +6,14 @@ import numpy as np
 import tensorflow as tf
 import os
 import re
-
-
-def _add_loss_summaries(total_loss):
-    """Add summaries for losses.
-
-    Generates moving average for all losses and associated summaries for
-    visualizing the performance of the network.
-
-    Args:
-      total_loss: Total loss from loss().
-    Returns:
-      loss_averages_op: op for generating moving averages of losses.
-    """
-    # Compute the moving average of all individual losses and the total loss.
-    loss_averages = tf.train.ExponentialMovingAverage(0.9, name='avg')
-    losses = tf.get_collection('losses')
-    loss_averages_op = loss_averages.apply(losses + [total_loss])
-
-    # Attach a scalar summmary to all individual losses and the total loss; do the
-    # same for the averaged version of the losses.
-    for l in losses + [total_loss]:
-        # Name each loss as '(raw)' and name the moving average version of the loss
-        # as the original loss name.
-        tf.summary.scalar(l.op.name + ' (raw)', l)
-        tf.summary.scalar(l.op.name, loss_averages.average(l))
-
-    return loss_averages_op
+from util import train_summary_log
 
 
 def train(total_loss, global_step, optimizer, learning_rate, moving_average_decay, update_gradient_vars,
           log_histograms=True):
     # Generate moving averages of all losses and associated summaries.
-    loss_averages_op = _add_loss_summaries(total_loss)
+    summary_log = train_summary_log(log_dir="log",loss=total_loss)
+    loss_averages_op = summary_log.add_loss_summaries(collection_name='losses')
 
     # Compute gradients.
     with tf.control_dependencies([loss_averages_op]):
