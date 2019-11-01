@@ -1500,6 +1500,7 @@ message MultiBoxLossParameter {
   enum ConfLossType {
     SOFTMAX = 0;
     LOGISTIC = 1;
+    FOCALSOFTMAX = 2;
   }
   optional ConfLossType conf_loss_type = 2 [default = SOFTMAX];
   // Weight for localization loss.

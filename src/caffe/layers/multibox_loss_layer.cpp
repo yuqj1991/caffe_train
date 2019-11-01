@@ -123,6 +123,26 @@ void MultiBoxSSDLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     conf_pred_.Reshape(conf_shape);
     conf_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
     conf_loss_layer_->SetUp(conf_bottom_vec_, conf_top_vec_);
+  }else if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_FOCALSOFTMAX) {
+    CHECK_GE(background_label_id_, 0)
+        << "background_label_id should be within [0, num_classes) for Softmax.";
+    CHECK_LT(background_label_id_, num_classes_)
+        << "background_label_id should be within [0, num_classes) for Softmax.";
+    LayerParameter layer_param;
+    layer_param.set_name(this->layer_param_.name() + "_focalsoftmax_conf");
+    layer_param.set_type("focalSoftmaxWithLoss");
+    layer_param.add_loss_weight(Dtype(1.));
+    layer_param.mutable_loss_param()->set_normalization(
+        LossParameter_NormalizationMode_NONE);
+    SoftmaxParameter* softmax_param = layer_param.mutable_softmax_param();
+    softmax_param->set_axis(1);
+    // Fake reshape.
+    vector<int> conf_shape(1, 1);
+    conf_gt_.Reshape(conf_shape);
+    conf_shape.push_back(num_classes_);
+    conf_pred_.Reshape(conf_shape);
+    conf_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+    conf_loss_layer_->SetUp(conf_bottom_vec_, conf_top_vec_);
   } else {
     LOG(FATAL) << "Unknown confidence loss type.";
   }
@@ -208,6 +228,11 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
     // Reshape the confidence data.
     vector<int> conf_shape;
     if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
+      conf_shape.push_back(num_conf_);
+      conf_gt_.Reshape(conf_shape);
+      conf_shape.push_back(num_classes_);
+      conf_pred_.Reshape(conf_shape);
+    } else if (conf_loss_type_ == MultiBoxLossParameter_ConfLossType_FOCALSOFTMAX) {
       conf_shape.push_back(num_conf_);
       conf_gt_.Reshape(conf_shape);
       conf_shape.push_back(num_classes_);

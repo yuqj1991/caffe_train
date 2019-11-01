@@ -45,6 +45,25 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   CHECK((new_height == 0 && new_width == 0) ||
       (new_height > 0 && new_width > 0)) << "Current implementation requires "
       "new_height and new_width to be set at the same time.";
+  /**************遍历人脸数据集根目录文件夹**********/
+  struct dirent *faceSetDir;
+  DIR* dir = opendir(root_folder.c_str());
+  if( dir == NULL )
+    LOG(FATAL)<<" is not a directory or not exist!";
+    
+  while ((faceSetDir = readdir(dir)) != NULL) {
+      if(strcmp(faceSetDir->d_name,".")==0 || strcmp(faceSetDir->d_name,"..")==0)    ///current dir OR parrent dir
+        continue;
+      else if(faceSetDir->d_name[0] == '.')
+        continue;
+      else if (faceSetDir->d_type == DT_DIR) {
+        std::string newDirectory = root_folder + string("/") + string(faceSetDir->d_name);
+        fullImageSetDir_.push_back(newDirectory);
+      }
+  }
+  closedir(dir);
+  LOG(INFO)<<"get file directory successfully";
+  /**************遍历人脸数据集根目录文件夹完成*******/
   // Read the file with filenames and labels
   const string& source = this->layer_param_.image_data_param().source();
   LOG(INFO) << "Opening file " << source;
@@ -129,24 +148,8 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   const bool is_color = image_data_param.is_color();
   string root_folder = image_data_param.root_folder();
 
-  /**************遍历人脸数据集根目录文件夹**********/
-  struct dirent *faceSetDir;
-  DIR* dir = opendir(root_folder.c_str());
-  if( dir == NULL )
-    LOG(FATAL)<<" is not a directory or not exist!";
-    
-  while ((faceSetDir = readdir(dir)) != NULL) {
-      if(strcmp(faceSetDir->d_name,".")==0 || strcmp(faceSetDir->d_name,"..")==0)    ///current dir OR parrent dir
-        continue;
-      else if(faceSetDir->d_name[0] == '.')
-        continue;
-      else if (faceSetDir->d_type == DT_DIR) {
-        std::string newDirectory = root_folder + string("/") + string(faceSetDir->d_name);
-        fullImageSetDir_.push_back(newDirectory);
-      }
-  }
-  closedir(dir);
   /**************随机挑选符合要求的人脸图片*************/
+  struct dirent *faceSetDir;
   while (choosedImagefile_.size()<batch_size){
     int rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
     while(std::count(labelSet_.begin(), labelSet_.end(), rand_class_idx)!=0){
@@ -154,7 +157,7 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     std::string subDir = fullImageSetDir_[rand_class_idx];
     std::vector<std::string> filelist;
-    dir = opendir(subDir.c_str());
+    DIR* dir = opendir(subDir.c_str());
     if( dir == NULL )
       LOG(FATAL)<<" is not a directory or not exist!";
     while ((faceSetDir = readdir(dir)) != NULL) {
@@ -180,6 +183,7 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     labelSet_.push_back(rand_class_idx);
     label.push_back(nrof_image_from_class);
   }
+  LOG(INFO)<< "random chosed image file successfully!";
   /**************遍历人脸数据集根目录遍历文件夹**********/
 
   // Reshape according to the first image of each batch
@@ -217,18 +221,6 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     this->transformed_data_.set_cpu_data(prefetch_data + offset);
     this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
     trans_time += timer.MicroSeconds();
-    #if 0 // 前人做的
-    // go to the next iter
-    lines_id_++;
-    if (lines_id_ >= lines_size) {
-      // We have reached the end. Restart from the first.
-      DLOG(INFO) << "Restarting data prefetching from start.";
-      lines_id_ = 0;
-      if (this->layer_param_.image_data_param().shuffle()) {
-        ShuffleImages();
-      }
-    }
-    #endif
   }
   for(int i = 0; i < label_num_; i++){
     prefetch_label[i] = label[i];
