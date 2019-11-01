@@ -76,8 +76,9 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
       }
       DCHECK_GE(label_value, 0);
       DCHECK_LT(label_value, prob_.shape(softmax_axis_));
-      loss -= log(std::max(prob_data[i * dim + label_value * inner_num_ + j],
-                           Dtype(FLT_MIN)))*std::pow((1 -prob_data[i * dim + label_value * inner_num_ + j]),gamma_);
+      Dtype prob_a = prob_data[i * dim + label_value * inner_num_ + j];
+      loss -= log(std::max(prob_a,
+                           Dtype(FLT_MIN)))*std::pow(prob_a,gamma_);
       ++count;
     }
   }
@@ -111,10 +112,10 @@ void focalSoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& 
             bottom_diff[i * dim + c * inner_num_ + j] = 0;
           }
         } else {
-          Dtype diff_element = std::pow((1 - prob_data[i * dim + label_value * inner_num_ + j]), gamma_);
-          Dtype diff_element_mutal =  1 - prob_data[i * dim + label_value * inner_num_ + j] + gamma_ *
-                                       prob_data[i * dim + label_value * inner_num_ + j]*
-                                       log(std::max(prob_data[i * dim + label_value * inner_num_ + j],Dtype(FLT_MIN)));
+          Dtype prob_a = prob_data[i * dim + label_value * inner_num_ + j];
+          Dtype diff_element = std::pow((1 - prob_a), gamma_);
+          Dtype diff_element_mutal =  1 - prob_a - gamma_ *
+                                       prob_a*log(std::max(prob_a,Dtype(FLT_MIN)));
           bottom_diff[i * dim + label_value * inner_num_ + j] = diff_element * diff_element_mutal;
           ++count;
         }
@@ -123,7 +124,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& 
     // Scale gradient
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, outer_num_, inner_num_, count);
-    Dtype loss_weight = alpha_ * top[0]->cpu_diff()[0] / normalizer;
+    Dtype loss_weight = Dtype(-1.0)*alpha_ * top[0]->cpu_diff()[0] / normalizer;
     caffe_scal(prob_.count(), loss_weight, bottom_diff);
   }
 }

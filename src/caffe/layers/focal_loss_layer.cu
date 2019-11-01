@@ -24,7 +24,7 @@ __global__ void SoftmaxLossForwardGPU(const int nthreads,
       Dtype a = 1 - prob_data[n * dim + label_value * spatial_dim + s];
       Dtype b = 0.f;
       b = powf(a, gamma_);
-      loss[index] = -log(max(prob_data[n * dim + label_value * spatial_dim + s],
+      loss[index] = -log(max((1 -a),
                       Dtype(FLT_MIN))) * b;
       counts[index] = 1;
     }
@@ -86,12 +86,11 @@ __global__ void SoftmaxLossBackwardGPU(const int nthreads, const Dtype* top,
       }
       counts[index] = 0;
     } else {
-      Dtype a = 1 - prob_data[n * dim + label_value * spatial_dim + s];
+      Dtype prob_a = prob_data[n * dim + label_value * spatial_dim + s];
       Dtype diff_element = 0.f;
-      diff_element = powf(a, gamma_);
-      Dtype diff_element_mutal =  1 - prob_data[n * dim + label_value * spatial_dim + s] + gamma_ *
-                                    prob_data[n * dim + label_value * spatial_dim + s]*
-                                    log(max(prob_data[n * dim + label_value * spatial_dim + s],Dtype(FLT_MIN)));
+      diff_element = powf(1 - prob_a, gamma_);
+      Dtype diff_element_mutal =  1 - prob_a - gamma_ *
+                                    prob_a*log(max( prob_a,Dtype(FLT_MIN)));
       bottom_diff[n * dim + label_value * spatial_dim + s] = diff_element * diff_element_mutal;
       counts[index] = 1;
     }
@@ -130,7 +129,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& 
     }
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, outer_num_, inner_num_, valid_count);
-    const Dtype loss_weight = alpha_ * top[0]->cpu_diff()[0] / normalizer;
+    const Dtype loss_weight = Dtype(-1.0)*alpha_ * top[0]->cpu_diff()[0] / normalizer;
     caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
   }
 }
