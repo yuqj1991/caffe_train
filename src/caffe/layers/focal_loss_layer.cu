@@ -21,10 +21,10 @@ __global__ void SoftmaxLossForwardGPU(const int nthreads,
       loss[index] = 0;
       counts[index] = 0;
     } else {
-      Dtype a = 1 - prob_data[n * dim + label_value * spatial_dim + s];
+      Dtype prob_a = prob_data[n * dim + label_value * spatial_dim + s];
       Dtype b = 0.f;
-      b = powf(a, gamma_);
-      loss[index] = -log(max((1 -a),
+      b = powf(1- prob_a, gamma_);
+      loss[index] = -log(max(prob_a,
                       Dtype(FLT_MIN))) * b;
       counts[index] = 1;
     }
