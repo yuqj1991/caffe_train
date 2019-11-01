@@ -3,7 +3,7 @@ test_net: "../prototxt/modelfull/face_test_v6.prototxt"
 test_iter: 5000
 test_interval: 5000
 base_lr: 0.001
-display: 1000
+display: 100
 max_iter: 240000
 lr_policy: "multistep"
 gamma: 0.1
