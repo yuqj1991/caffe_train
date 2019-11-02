@@ -13,8 +13,8 @@ layer {
         resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 128
-			width: 128
+			height: 160
+			width: 160
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
@@ -2122,53 +2122,53 @@ layer {
     }
   }
 }
-layer {
-  name: "Softmax_loss"
-  type: "SoftmaxWithLoss"
-  bottom: "score"
-  bottom: "label"
-  top: "Softmax_loss"
-  loss_weight: 1
-  propagate_down: true
-  propagate_down: false
-}
+#layer {
+#  name: "Softmax_loss"
+#  type: "SoftmaxWithLoss"
+#  bottom: "score"
+#  bottom: "label"
+#  top: "Softmax_loss"
+#  loss_weight: 1
+#  propagate_down: true
+#  propagate_down: false
+#}
 
-layer {
-	name: "merege_pair"
-	type: "Identity2Verify"
-	bottom: "fc5"
-	bottom: "label"
-	top: "feature1"
-	top: "feature2"
-	top: "sim"
-}
+#layer {
+#	name: "merege_pair"
+#	type: "Identity2Verify"
+#	bottom: "fc5"
+#	bottom: "label"
+#	top: "feature1"
+#	top: "feature2"
+#	top: "sim"
+#}
 
-layer {
-	name: "norm1"
-	type: "SimpleNormalize"
-	bottom: "feature1"
-	top: "normfeature1"
-}
+#layer {
+#	name: "norm1"
+#	type: "SimpleNormalize"
+#	bottom: "feature1"
+#	top: "normfeature1"
+#}
 
-layer {
-	name: "norm2"
-	type: "SimpleNormalize"
-	bottom: "feature2"
-	top: "normfeature2"
-}
+#layer {
+#	name: "norm2"
+#	type: "SimpleNormalize"
+#	bottom: "feature2"
+#	top: "normfeature2"
+#}
 
-layer {
-  name: "loss2"
-  type: "ContrastiveLoss"
-  bottom: "normfeature1"
-  bottom: "normfeature2"
-  bottom: "sim"
-  top: "sim_loss"
-  loss_weight: 0.5
-  contrastive_loss_param {
-    margin: 1
-  }
-}
+#layer {
+#  name: "loss2"
+#  type: "ContrastiveLoss"
+#  bottom: "normfeature1"
+#  bottom: "normfeature2"
+#  bottom: "sim"
+#  top: "sim_loss"
+#  loss_weight: 0.5
+#  contrastive_loss_param {
+#    margin: 1
+#  }
+#}
 
 ############## center loss ###############
 layer {
