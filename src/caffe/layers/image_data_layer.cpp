@@ -183,7 +183,6 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     labelSet_.push_back(rand_class_idx);
     label.push_back(nrof_image_from_class);
   }
-  LOG(INFO)<< "random chosed image file successfully!";
   /**************遍历人脸数据集根目录遍历文件夹**********/
 
   // Reshape according to the first image of each batch
