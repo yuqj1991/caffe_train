@@ -32,6 +32,8 @@ __global__ void SoftmaxLossForwardGPU(const int nthreads,
 template <typename Dtype>
 void SoftmaxWithLossLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
+  this->Forward_cpu(bottom, top);
+  #if 0
   softmax_layer_->Forward(softmax_bottom_vec_, softmax_top_vec_);
   const Dtype* prob_data = prob_.gpu_data();
   const Dtype* label = bottom[1]->gpu_data();
@@ -60,12 +62,10 @@ void SoftmaxWithLossLayer<Dtype>::Forward_gpu(
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
       normalization_, outer_num_, inner_num_, valid_count);
   top[0]->mutable_cpu_data()[0] = loss / normalizer;
-  #if 0
-  LOG(INFO)<<"LOSS: "<<loss/normalizer;
-  #endif
   if (top.size() == 2) {
     top[1]->ShareData(prob_);
   }
+  #endif
 }
 
 template <typename Dtype>
