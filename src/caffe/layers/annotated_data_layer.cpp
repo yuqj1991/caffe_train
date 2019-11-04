@@ -343,8 +343,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       LOG(FATAL) << "Unknown annotation type.";
     }
   }
-#if 1
-  LOG(INFO)<< "start printf &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& single image: num_bboxes: "<<num_bboxes;
+#if 0
+  LOG(INFO)<< "start printf  single image: num_bboxes: "<<num_bboxes;
   const Dtype* top_label_data = batch->label_.cpu_data();
   for(int ii=0; ii < num_bboxes; ii++)
   {
