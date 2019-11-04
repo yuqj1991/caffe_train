@@ -68,6 +68,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
   int dim = prob_.count() / outer_num_;
   int count = 0;
   Dtype loss = 0;
+  Dtype negloss=0, posloss=0;
   for (int i = 0; i < outer_num_; ++i) {
     for (int j = 0; j < inner_num_; j++) {
       const int label_value = static_cast<int>(label[i * inner_num_ + j]);
@@ -80,7 +81,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
       loss -= log(std::max(prob_a,
                            Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
       #if 1
-      Dtype negloss, posloss;
+      
       if(label_value == 0)
         negloss -= log(std::max(prob_a,
                            Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
