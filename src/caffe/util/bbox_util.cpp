@@ -1625,7 +1625,6 @@ void EncodeConfPrediction(const Dtype* conf_data, const int num,
               break;
             case MultiBoxLossParameter_ConfLossType_FOCALSOFTMAX:
               conf_gt_data[idx] = gt_label;
-              LOG(INFO)<<"gt_label: "<<gt_label;
               break;
             default:
               LOG(FATAL) << "Unknown conf loss type.";

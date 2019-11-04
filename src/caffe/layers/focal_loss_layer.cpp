@@ -93,7 +93,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
       ++count;
     }
   }
-  LOG(INFO)<<"negloss: "<<negloss << " posloss: "<<posloss;
+  LOG(INFO)<<"negloss: "<<negloss << " posloss: "<<posloss<<" total loss: "<<loss;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
       normalization_, outer_num_, inner_num_, count);
   top[0]->mutable_cpu_data()[0] = alpha_*loss / normalizer;
