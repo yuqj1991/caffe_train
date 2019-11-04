@@ -68,7 +68,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
   int dim = prob_.count() / outer_num_;
   int count = 0;
   Dtype loss = 0;
-  Dtype negloss=0, posloss=0;
+  //Dtype negloss=0, posloss=0;
   for (int i = 0; i < outer_num_; ++i) {
     for (int j = 0; j < inner_num_; j++) {
       const int label_value = static_cast<int>(label[i * inner_num_ + j]);
@@ -80,20 +80,18 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
       Dtype prob_a = prob_data[i * dim + label_value * inner_num_ + j];
       loss -= log(std::max(prob_a,
                            Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
-      #if 1
-      
+      #if 0
       if(label_value == 0)
         negloss -= log(std::max(prob_a,
                            Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
       if(label_value == 1)
         posloss -= log(std::max(prob_a,
-                           Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
-      
+                           Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);  
       #endif
       ++count;
     }
   }
-  LOG(INFO)<<"negloss: "<<negloss << " posloss: "<<posloss<<" total loss: "<<loss;
+  //LOG(INFO)<<"negloss: "<<negloss << " posloss: "<<posloss<<" total loss: "<<loss;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
       normalization_, outer_num_, inner_num_, count);
   top[0]->mutable_cpu_data()[0] = alpha_*loss / normalizer;
@@ -115,6 +113,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& 
     const Dtype* label = bottom[1]->cpu_data();
     int dim = prob_.count() / outer_num_;
     int count = 0;
+    Dtype focaldiff = 0;
     for (int i = 0; i < outer_num_; ++i) {
       for (int j = 0; j < inner_num_; ++j) {
         const int label_value = static_cast<int>(label[i * inner_num_ + j]);
@@ -124,10 +123,21 @@ void focalSoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& 
           }
         } else {
           Dtype prob_a = prob_data[i * dim + label_value * inner_num_ + j];
-          Dtype diff_element = std::pow((1 - prob_a), gamma_);
-          Dtype diff_element_mutal =  1 - prob_a - gamma_ *
+          for (int c = 0; c < bottom[0]->shape(softmax_axis_); ++c) {
+            if(c == label_value){
+              Dtype diff_element = std::pow((1 - prob_a), gamma_);
+              Dtype diff_element_mutal =  1 - prob_a - gamma_ *
                                        prob_a*log(std::max(prob_a,Dtype(FLT_MIN)));
-          bottom_diff[i * dim + label_value * inner_num_ + j] = diff_element * diff_element_mutal;
+              focaldiff = diff_element * diff_element_mutal;
+            }else{
+              Dtype pc = prob_data[i * dim + c * inner_num_ + j];
+              Dtype diff_element = std::pow((1 - prob_a), gamma_ -1)*pc;
+              Dtype diff_element_mutal =  1 - prob_a - gamma_ *
+                                       prob_a*log(std::max(prob_a,Dtype(FLT_MIN)));
+              focaldiff = diff_element * diff_element_mutal;
+            }
+            bottom_diff[i * dim + c * inner_num_ + j] = focaldiff;
+          }         
           ++count;
         }
       }
