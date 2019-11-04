@@ -80,13 +80,19 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
       loss -= log(std::max(prob_a,
                            Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
       #if 1
-      Dtype temploss = log(std::max(prob_a,
+      Dtype negloss, posloss;
+      if(label_value == 0)
+        negloss -= log(std::max(prob_a,
                            Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
-      LOG(INFO)<<"label_value: "<<label_value << " prob_a: "<<prob_a<<" loss: "<<temploss;
+      if(label_value == 1)
+        posloss -= log(std::max(prob_a,
+                           Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
+      
       #endif
       ++count;
     }
   }
+  LOG(INFO)<<"negloss: "<<negloss << " posloss: "<<posloss;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
       normalization_, outer_num_, inner_num_, count);
   top[0]->mutable_cpu_data()[0] = alpha_*loss / normalizer;
@@ -105,7 +111,6 @@ void focalSoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& 
   if (propagate_down[0]) {
     Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
     const Dtype* prob_data = prob_.cpu_data();
-    //caffe_copy(prob_.count(), prob_data, bottom_diff);
     const Dtype* label = bottom[1]->cpu_data();
     int dim = prob_.count() / outer_num_;
     int count = 0;
