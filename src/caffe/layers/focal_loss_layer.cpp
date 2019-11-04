@@ -80,7 +80,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
       loss -= log(std::max(prob_a,
                            Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
       #if 1
-      temploss = log(std::max(prob_a,
+      Dtype temploss = log(std::max(prob_a,
                            Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
       LOG(INFO)<<"label_value: "<<label_value << " prob_a: "<<prob_a<<" loss: "<<temploss;
       #endif
