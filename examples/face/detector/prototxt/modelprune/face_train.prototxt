@@ -2669,6 +2669,6 @@ layer {
     neg_overlap: 0.3
     code_type: CENTER_SIZE
     ignore_cross_boundary_bbox: false
-    mining_type: MAX_NEGATIVE
+    mining_type: HARD_EXAMPLE
   }
 }
