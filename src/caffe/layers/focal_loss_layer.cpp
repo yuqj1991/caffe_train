@@ -77,9 +77,13 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
       DCHECK_GE(label_value, 0);
       DCHECK_LT(label_value, prob_.shape(softmax_axis_));
       Dtype prob_a = prob_data[i * dim + label_value * inner_num_ + j];
-      LOG(INFO)<<"label_value: "<<label_value << "prob_a: "<<prob_a;
       loss -= log(std::max(prob_a,
                            Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
+      #if 1
+      temploss = log(std::max(prob_a,
+                           Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
+      LOG(INFO)<<"label_value: "<<label_value << " prob_a: "<<prob_a<<" loss: "<<temploss;
+      #endif
       ++count;
     }
   }
