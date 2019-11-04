@@ -1437,7 +1437,7 @@ layer {
 layer {
 	name: "conv12/dw"
 	type: "Convolution"
-	bottom: "conv11/ReLU"
+	bottom: "conv11"
 	top: "conv12/dw"
 	param {
 		lr_mult: 1.0
