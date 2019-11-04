@@ -1616,7 +1616,6 @@ void EncodeConfPrediction(const Dtype* conf_data, const int num,
             background_label_id + 1 :
             all_gt_bboxes.find(i)->second[match_index[j]].label();
           int idx = do_neg_mining ? count : j;
-          LOG(INFO)<<"&&&&&&&&&&&&&&&&&&&&&&";
           switch (conf_loss_type) {
             case MultiBoxLossParameter_ConfLossType_SOFTMAX:
               conf_gt_data[idx] = gt_label;

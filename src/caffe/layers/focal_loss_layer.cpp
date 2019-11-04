@@ -65,7 +65,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
   softmax_layer_->Forward(softmax_bottom_vec_, softmax_top_vec_);
   const Dtype* prob_data = prob_.cpu_data();
   const Dtype* label = bottom[1]->cpu_data();
-  LOG(INFO)<<"label: "<<label;
+  //LOG(INFO)<<"label: "<<label;
   int dim = prob_.count() / outer_num_;
   int count = 0;
   Dtype loss = 0;
