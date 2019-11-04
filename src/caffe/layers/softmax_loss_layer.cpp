@@ -69,7 +69,7 @@ void SoftmaxWithLossLayer<Dtype>::Forward_cpu(
   for (int i = 0; i < outer_num_; ++i) {
     for (int j = 0; j < inner_num_; j++) {
       const int label_value = static_cast<int>(label[i * inner_num_ + j]);
-      LOG(INFO)<<"label_value: "<<label_value;
+      //LOG(INFO)<<"label_value: "<<label_value;
       if (has_ignore_label_ && label_value == ignore_label_) {
         continue;
       }

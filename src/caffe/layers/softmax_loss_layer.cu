@@ -17,7 +17,7 @@ __global__ void SoftmaxLossForwardGPU(const int nthreads,
     const int n = index / spatial_dim;
     const int s = index % spatial_dim;
     const int label_value = static_cast<int>(label[n * spatial_dim + s]);
-    printf("label_value: %d\n", label_value);
+    //printf("label_value: %d\n", label_value);
     if (has_ignore_label_ && label_value == ignore_label_) {
       loss[index] = 0;
       counts[index] = 0;
@@ -32,8 +32,8 @@ __global__ void SoftmaxLossForwardGPU(const int nthreads,
 template <typename Dtype>
 void SoftmaxWithLossLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-  this->Forward_cpu(bottom, top);
-  #if 0
+  //this->Forward_cpu(bottom, top);
+  #if 1
   softmax_layer_->Forward(softmax_bottom_vec_, softmax_top_vec_);
   const Dtype* prob_data = prob_.gpu_data();
   const Dtype* label = bottom[1]->gpu_data();
