@@ -65,13 +65,13 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
   softmax_layer_->Forward(softmax_bottom_vec_, softmax_top_vec_);
   const Dtype* prob_data = prob_.cpu_data();
   const Dtype* label = bottom[1]->cpu_data();
+  LOG(INFO)<<"label: "<<label;
   int dim = prob_.count() / outer_num_;
   int count = 0;
   Dtype loss = 0;
   for (int i = 0; i < outer_num_; ++i) {
     for (int j = 0; j < inner_num_; j++) {
       const int label_value = static_cast<int>(label[i * inner_num_ + j]);
-      LOG(INFO)<<"label_value: "<<label_value<<" inner_num_: "<<inner_num_;
       if (has_ignore_label_ && label_value == ignore_label_) {
         continue;
       }
