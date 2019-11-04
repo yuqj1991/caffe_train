@@ -743,22 +743,90 @@ layer {
 	operation: SUM
 	}
 }
+
+
+layer {
+	name: "conv9_1"
+	type: "Convolution"
+	bottom: "conv_one_eltwise"
+	top: "conv9_1"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 128
+		bias_term: false
+		kernel_size: 1
+		#pad: 1
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv9_1/bn"
+	type: "BatchNorm"
+	bottom: "conv9_1"
+	top: "conv9_1"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv9_1/scale"
+	type: "Scale"
+	bottom: "conv9_1"
+	top: "conv9_1"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv9_1/ReLU"
+	type: "ReLU"
+	bottom: "conv9_1"
+	top: "conv9_1"
+}
 layer {
 	name: "conv9/dw"
 	type: "Convolution"
-	bottom: "conv_one_eltwise"
+	bottom: "conv9_1"
 	top: "conv9/dw"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		bias_term: false
 		pad: 1
 		kernel_size: 3
 		stride: 2
-		group: 256
+		group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1006,24 +1074,88 @@ layer {
 	}
 }
 
-
+layer {
+	name: "conv11"
+	type: "Convolution"
+	bottom: "conv10_1"
+	top: "conv11"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 128
+		bias_term: false
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv11/bn"
+	type: "BatchNorm"
+	bottom: "conv11"
+	top: "conv11"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv11/scale"
+	type: "Scale"
+	bottom: "conv11"
+	top: "conv11"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv11/ReLU"
+	type: "ReLU"
+	bottom: "conv11"
+	top: "conv11"
+}
 
 layer {
 	name: "conv12/dw"
 	type: "Convolution"
-	bottom: "conv10_1"
+	bottom: "conv11"
 	top: "conv12/dw"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		bias_term: false
 		pad: 1
 		kernel_size: 3
 		stride: 2
-		group: 256
+		group: 128
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -1664,13 +1796,6 @@ layer {
 		}
 	}
 }
-layer {
-	name: "lfpn_2_moudle_cpm_4_3_one_channel/ReLU"
-	type: "ReLU"
-	bottom: "lfpn_2_moudle_cpm_4_3_one_channel"
-	top: "lfpn_2_moudle_cpm_4_3_one_channel"
-}
-
 
 layer{
 	name: "dectction_moudle_one"
@@ -1681,6 +1806,12 @@ layer{
 	eltwise_param {
 		operation: SUM
 	}
+}
+layer {
+	name: "dectction_moudle_one/ReLU"
+	type: "ReLU"
+	bottom: "dectction_moudle_one"
+	top: "dectction_moudle_one"
 }
 #######################################################################
 #                             modeule two                           #
@@ -1813,13 +1944,6 @@ layer {
 		}
 	}
 }
-layer {
-	name: "cpm_moudle_conv13_block3_one_channel/ReLU"
-	type: "ReLU"
-	bottom: "cpm_moudle_conv13_block3_one_channel"
-	top: "cpm_moudle_conv13_block3_one_channel"
-}
-
 
 layer{
 	name: "dectction_moudle_two"
@@ -1830,6 +1954,12 @@ layer{
 	eltwise_param {
 		operation: SUM
 	}
+}
+layer {
+	name: "dectction_moudle_two/ReLU"
+	type: "ReLU"
+	bottom: "dectction_moudle_two"
+	top: "dectction_moudle_two"
 }
 #######################################################################
 #                             modeule three                            #
@@ -1962,12 +2092,7 @@ layer {
 		}
 	}
 }
-layer {
-	name: "cpm_moudle_conv14_2_one_channel/ReLU"
-	type: "ReLU"
-	bottom: "cpm_moudle_conv14_2_one_channel"
-	top: "cpm_moudle_conv14_2_one_channel"
-}
+
 layer{
 	name: "dectction_moudle_three"
 	type: "Eltwise"
@@ -1977,6 +2102,12 @@ layer{
 	eltwise_param {
 		operation: SUM
 	}
+}
+layer {
+	name: "dectction_moudle_three/ReLU"
+	type: "ReLU"
+	bottom: "dectction_moudle_three"
+	top: "dectction_moudle_three"
 }
 #######################################################################
 #                             modeule four                           #
@@ -2109,13 +2240,6 @@ layer {
 		}
 	}
 }
-layer {
-	name: "cpm_moudle_conv16_2_one_channel/ReLU"
-	type: "ReLU"
-	bottom: "cpm_moudle_conv16_2_one_channel"
-	top: "cpm_moudle_conv16_2_one_channel"
-}
-
 layer{
 	name: "dectction_moudle_four"
 	type: "Eltwise"
@@ -2125,6 +2249,12 @@ layer{
 	eltwise_param {
 		operation: SUM
 	}
+}
+layer {
+	name: "dectction_moudle_four/ReLU"
+	type: "ReLU"
+	bottom: "dectction_moudle_four"
+	top: "dectction_moudle_four"
 }
 ############################################################
 #######################priorBox moudle one##################
