@@ -1607,7 +1607,12 @@ layer {
 	operation: SUM
 	}
 }
-
+layer {
+  name: "conv_four_eltwise/relu"
+  type: "PReLU"
+  bottom: "conv_four_eltwise"
+  top: "conv_four_eltwise"
+}
 layer {
   name: "conv_four_eltwise_128"
   type: "Convolution"
@@ -1620,8 +1625,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 3
-    pad: 1
+    kernel_size: 1
+    #pad: 1
     weight_filler {
       type: "msra"
     }
@@ -1940,6 +1945,12 @@ layer {
 	operation: SUM
 	}
 }
+layer {
+  name: "conv_five_eltwise/relu"
+  type: "PReLU"
+  bottom: "conv_five_eltwise"
+  top: "conv_five_eltwise"
+}
 #
 layer {
   name: "conv14_1"
@@ -1953,8 +1964,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 3
-    pad: 1
+    kernel_size: 1
+    #pad: 1
     weight_filler {
       type: "msra"
     }
@@ -2086,8 +2097,8 @@ layer {
   convolution_param {
     num_output: 128
     bias_term: false
-    kernel_size: 3
-    pad: 1
+    kernel_size: 1
+    #pad: 1
     weight_filler {
       type: "msra"
     }
@@ -2409,6 +2420,12 @@ layer{
 	eltwise_param {
 		operation: SUM
 	}
+}
+layer {
+  name: "detector_module_two/relu"
+  type: "PReLU"
+  bottom: "detector_module_two"
+  top: "detector_module_two"
 }
 #
 #############two prior layer############
