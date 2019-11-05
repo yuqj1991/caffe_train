@@ -3875,16 +3875,16 @@ layer {
 ##########################################
 layer {
   name: "lmcl_cos_l2_normalize"
-  type: "CosinL2Normalize"
+  type: "InnerProduct"
   bottom: "fc5"
   top: "lmcl_cos_l2_normalize"
   param {
     lr_mult: 1
     decay_mult: 2 
   }
-  cosin_loss_param {
+  inner_product_param {
     num_output: 8631
-    cosin_filler {
+    weight_filler {
       type: "xavier"
     }
   }
