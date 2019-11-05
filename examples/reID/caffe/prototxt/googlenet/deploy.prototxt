@@ -2079,3 +2079,9 @@ layer {
     }
   }
 }
+layer {
+	name: "featureNormalise"
+	type: "SimpleNormalize"
+	bottom: "fc5"
+	top: "featureNormalise"
+}
