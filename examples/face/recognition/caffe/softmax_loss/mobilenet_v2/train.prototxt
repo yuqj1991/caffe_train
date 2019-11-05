@@ -3888,7 +3888,6 @@ layer {
       type: "xavier"
     }
   }
-  propagate_down: true
 }
 layer {
   name: "cosin_loss"

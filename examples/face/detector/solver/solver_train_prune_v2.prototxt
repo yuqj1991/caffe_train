@@ -18,7 +18,7 @@ average_loss: 10
 stepvalue: 20000
 stepvalue: 80000
 stepvalue: 100000
-iter_size: 8
+iter_size: 2
 #momentum : 0.9
 momentum2 : 0.99
 type: "RMSProp"

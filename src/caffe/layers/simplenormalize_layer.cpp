@@ -48,7 +48,7 @@ void SimpleNormalizeLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   int n = top[0]->num();
   int d = top[0]->count() / n;
   for (int i=0; i<n; ++i) {
-    Dtype a = caffe_cpu_dot(d, top_data+i*d, top_diff+i*d);
+    Dtype a = caffe_cpu_dot(d, top_data + i*d, top_diff+i*d);
     caffe_cpu_scale(d, a, top_data+i*d, bottom_diff+i*d);
     caffe_sub(d, top_diff+i*d, bottom_diff+i*d, bottom_diff+i*d);
     a = caffe_cpu_dot(d, bottom_data+i*d, bottom_data+i*d);
