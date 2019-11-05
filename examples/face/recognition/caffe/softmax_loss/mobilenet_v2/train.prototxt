@@ -24,7 +24,7 @@ layer {
     }
     data_param {
         source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb"
-        batch_size: 128
+        batch_size: 64
         backend: LMDB
     }
 }
