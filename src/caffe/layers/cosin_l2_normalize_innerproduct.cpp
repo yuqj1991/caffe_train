@@ -10,6 +10,7 @@ namespace caffe {
         const vector<Blob<Dtype>*>& top) {
         if (this->layer_param_.propagate_down_size() == 0) {
             this->layer_param_.add_propagate_down(true);
+            this->layer_param_.add_propagate_down(false);
         }
         const int num_output = this->layer_param_.cosin_loss_param().num_output();
         margin_ = this->layer_param_.cosin_loss_param().margin();
@@ -57,6 +58,7 @@ namespace caffe {
         const vector<Blob<Dtype>*>& top) {
         const Dtype* raw_weight = this->blobs_[0]->cpu_data();
         const Dtype* raw_feature = bottom[0]->cpu_data();
+        const Dtype* label_data = bottom[1]->cpu_data();
         Dtype * normalize_weight_data = Normalise_Weight_.mutable_cpu_data();
         Dtype * normalize_feature_data = Normalise_feature_.mutable_cpu_data();
         vector_L2_Normalise(raw_weight, Num_Class_, feature_Dim_, normalize_weight_data);
@@ -67,7 +69,8 @@ namespace caffe {
         caffe_cpu_gemm(CblasNoTrans, CblasTrans, Num_BatchSize_, Num_Class_, feature_Dim_, Dtype(1.0)
                         , feature, weight, Dtype(0.0), wx_cos_value);
         for(int i = 0; i< Num_BatchSize_; i ++){
-            caffe_add_scalar(Num_Class_, (Dtype)margin_, wx_cos_value + i *Num_Class_);
+            const int label_value = static_cast<int>(label_data[i]);
+            caffe_add_scalar(1, (Dtype)margin_, wx_cos_value + i *Num_Class_ + label_value);
             caffe_scal(Num_Class_, (Dtype)scaler_, wx_cos_value + i *Num_Class_);
         }
     }
@@ -109,7 +112,10 @@ namespace caffe {
                 caffe_cpu_scale(feature_Dim_, Dtype(pow(a, -0.5)), weight_diff+i*feature_Dim_, weight_diff+i*feature_Dim_);
             }
         }
-        
+        if (propagate_down[1]) {
+            LOG(FATAL) << this->type()
+                    << " Layer cannot backpropagate to label inputs.";
+        }        
     }
     #ifdef CPU_ONLY
     STUB_GPU(CosinL2NormalizeLayer);
