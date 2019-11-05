@@ -22,12 +22,10 @@ namespace caffe {
             LOG(INFO) << "Skipping parameter initialization";
         } else {
             this->blobs_.resize(1);
-            // Intialize the weight
             vector<int> cosin_shape(2);
             cosin_shape[0] = Num_Class_;
             cosin_shape[1] = feature_Dim_;
             this->blobs_[0].reset(new Blob<Dtype>(cosin_shape));
-            // fill the weights
             shared_ptr<Filler<Dtype> > cosin_filler(GetFiller<Dtype>(
                 this->layer_param_.cosin_loss_param().cosin_filler()));
             cosin_filler->Fill(this->blobs_[0].get());
@@ -35,30 +33,7 @@ namespace caffe {
         this->param_propagate_down_.resize(this->blobs_.size(), true);
         Normalise_Weight_.ReshapeLike(*(this->blobs_[0]));
         Normalise_feature_.ReshapeLike(*(bottom[0]));
-
-        #if 0
-        /******************softmax entropy loss **************************/
-        conf_bottom_vec_.push_back(Normalizer_cosValue_);
-        conf_bottom_vec_.push_back(conf_gt_);
-        vector<int> loss_shape(1, 1);
-        conf_loss_.Reshape(loss_shape);
-        conf_top_vec_.push_back(&conf_loss_);
-        LayerParameter layer_param;
-        layer_param.set_name(this->layer_param_.name() + "_softmax_conf");
-        layer_param.set_type("SoftmaxWithLoss");
-        layer_param.add_loss_weight(Dtype(1.));
-        layer_param.mutable_loss_param()->set_normalization(
-            LossParameter_NormalizationMode_NONE);
-        SoftmaxParameter* softmax_param = layer_param.mutable_softmax_param();
-        softmax_param->set_axis(1);
-        // Fake reshape.
-        vector<int> conf_shape(1, 1);
-        conf_gt_.Reshape(conf_shape);
-        conf_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
-        conf_loss_layer_->SetUp(conf_bottom_vec_, conf_top_vec_);
-        #endif
     }
-
 
     template <typename Dtype>
     void CosinL2NormalizeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
@@ -71,10 +46,12 @@ namespace caffe {
         normail_shape[0] = Num_Class_;
         normail_shape[1] = feature_Dim_;
         Normalise_Weight_.Reshape(normail_shape);
+        /*****************************/
         normail_shape[0] = Num_BatchSize_;
         normail_shape[1] = feature_Dim_;
         Normalise_feature_.Reshape(normail_shape);
     }
+
     template <typename Dtype>
     void CosinL2NormalizeLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         const vector<Blob<Dtype>*>& top) {
@@ -93,18 +70,6 @@ namespace caffe {
             caffe_add_scalar(Num_Class_, (Dtype)margin_, wx_cos_value + i *Num_Class_);
             caffe_scal(Num_Class_, (Dtype)scaler_, wx_cos_value + i *Num_Class_);
         }
-        #if 0
-        vector<int> conf_shape;
-        conf_shape.push_back(Num_BatchSize_);
-        conf_gt_.Reshape(conf_shape);
-        Dtype* conf_gt_data = conf_gt_.mutable_cpu_data();
-        for(int i= 0; i < Num_BatchSize_; i++)
-            conf_gt_data[i] = label[i];
-        conf_loss_layer_->Reshape(conf_bottom_vec_, conf_top_vec_);
-        conf_loss_layer_->Forward(conf_bottom_vec_, conf_top_vec_);
-        top[0]->mutable_cpu_data()[0] = 0;
-        top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0] / Num_BatchSize_;
-        #endif 
     }
 
     template <typename Dtype>
@@ -120,6 +85,7 @@ namespace caffe {
             Dtype *normail_weight_diff = Normalise_Weight_.mutable_cpu_diff();
             Dtype * weight_diff = this->blobs_[0]->mutable_cpu_diff();
             Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+            
             /***********Gradient with respect to normalize weight******/
             caffe_cpu_gemm(CblasTrans, CblasNoTrans, Num_Class_, feature_Dim_, Num_BatchSize_,
                 (Dtype)scaler_, top_diff, normail_feature_data, (Dtype)1., normail_weight_diff);

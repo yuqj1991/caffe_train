@@ -31,11 +31,11 @@ namespace caffe {
                 const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);  //反向传播 GPU 实现
             inline void vector_L2_Normalise(const Dtype * data, int NumBatch, int featureDim, Dtype * distData){
                 Dtype sum_squre;
+                caffe_sqr<Dtype>(NumBatch*featureDim, data, distData);
                 for (size_t i = 0; i < NumBatch; i++)
                 {
-                    caffe_powx(featureDim, data + i * featureDim, Dtype(2.0), distData + i*featureDim);
-                    sum_squre = caffe_cpu_asum(featureDim, distData + i*featureDim) + 0.00000000001;
-                    caffe_cpu_axpby(featureDim, Dtype(1.0/std::sqrt((double)sum_squre)), data + i * featureDim, Dtype(0.0),distData + i * featureDim);
+                    sum_squre = caffe_cpu_asum<Dtype>(featureDim, distData + i*featureDim) + 0.00000000001;
+                    caffe_cpu_scale<Dtype>(featureDim, pow(sum_squre, -0.5), data + i * featureDim, distData + i * featureDim);
                 }
             }
 
