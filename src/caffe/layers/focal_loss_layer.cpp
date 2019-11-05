@@ -79,7 +79,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
       DCHECK_LT(label_value, prob_.shape(softmax_axis_));
       Dtype prob_a = prob_data[i * dim + label_value * inner_num_ + j];
       loss -= log(std::max(prob_a,
-                           Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_);
+                           Dtype(FLT_MIN)))*std::pow(1 -prob_a, gamma_)*alpha_;
       #if 0
       if(label_value == 0)
         negloss -= log(std::max(prob_a,
@@ -94,7 +94,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Forward_cpu(
   //LOG(INFO)<<"negloss: "<<negloss << " posloss: "<<posloss<<" total loss: "<<loss;
   Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
       normalization_, outer_num_, inner_num_, count);
-  top[0]->mutable_cpu_data()[0] = alpha_*loss / normalizer;
+  top[0]->mutable_cpu_data()[0] = loss / normalizer;
   if (top.size() == 2) {
     top[1]->ShareData(prob_);
   }
@@ -126,15 +126,15 @@ void focalSoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& 
           for (int c = 0; c < bottom[0]->shape(softmax_axis_); ++c) {
             if(c == label_value){
               Dtype diff_element = std::pow((1 - prob_a), gamma_);
-              Dtype diff_element_mutal =  1 - prob_a - gamma_ *
-                                       prob_a*log(std::max(prob_a,Dtype(FLT_MIN)));
-              focaldiff = diff_element * diff_element_mutal;
+              Dtype diff_element_mutal = gamma_ *
+                                       prob_a*log(std::max(prob_a,Dtype(FLT_MIN))) + prob_a -1;
+              focaldiff = diff_element * diff_element_mutal*alpha_;
             }else{
               Dtype pc = prob_data[i * dim + c * inner_num_ + j];
               Dtype diff_element = std::pow((1 - prob_a), gamma_ -1)*pc;
               Dtype diff_element_mutal =  1 - prob_a - gamma_ *
                                        prob_a*log(std::max(prob_a,Dtype(FLT_MIN)));
-              focaldiff = diff_element * diff_element_mutal;
+              focaldiff = diff_element * diff_element_mutal*alpha_;
             }
             bottom_diff[i * dim + c * inner_num_ + j] = focaldiff;
           }         
@@ -145,7 +145,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& 
     // Scale gradient
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, outer_num_, inner_num_, count);
-    Dtype loss_weight = Dtype(-1.0)*alpha_ * top[0]->cpu_diff()[0] / normalizer;
+    Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
     caffe_scal(prob_.count(), loss_weight, bottom_diff);
   }
 }
