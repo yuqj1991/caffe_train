@@ -44,7 +44,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_training_umdface_pose_lmdb/"
-		batch_size: 16
+		batch_size: 64
 		backend: LMDB
 	}
 }
