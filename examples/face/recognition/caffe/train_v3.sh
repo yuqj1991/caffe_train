@@ -5,4 +5,4 @@ if ! test -f ./softmax_loss/mobilenet_v2/train.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=./softmax_loss/mobilenet_v2/solver.prototxt -gpu 2 \
---snapshot=./face_recog/tiny_iter_148441.solverstate
+#--snapshot=./face_recog/tiny_iter_148441.solverstate

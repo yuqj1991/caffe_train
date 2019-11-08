@@ -3875,9 +3875,9 @@ layer {
 ##########################################
 layer {
   name: "lmcl_cos_l2_normalize"
-  type: ""InnerProduct
+  type: "InnerProduct"
   bottom: "fc5"
-  bottom: "label"
+  #bottom: "label"
   top: "lmcl_cos_l2_normalize"
   param {
     lr_mult: 1
@@ -3893,11 +3893,11 @@ layer {
   }
 }
 layer {
-  name: "cosin_loss"
+  name: "softmax_loss"
   type: "SoftmaxWithLoss"
   bottom: "lmcl_cos_l2_normalize"
   bottom: "label"
-  top: "cosin_loss"
+  top: "softmax_loss"
   propagate_down: true
   propagate_down: false
 }
