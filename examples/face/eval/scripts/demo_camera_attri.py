@@ -2,6 +2,7 @@ import numpy as np
 import argparse
 import sys,os  
 import cv2
+import time
 caffe_root = '../../../../../caffe_train/'
 sys.path.insert(0, caffe_root + 'python')  
 import caffe  
@@ -90,6 +91,7 @@ def detect():
     cap = cv2.VideoCapture(0)
     while True:
        ret, frame = cap.read()
+       start = time.time()
        #frame=cv2.flip(frame,1)
        h = frame.shape[0]
        w = frame.shape[1]
@@ -100,6 +102,8 @@ def detect():
        net.blobs['data'].data[...] = img
        out = net.forward()
        box, conf, cls = postprocess(frame, out)
+       end = time.time()
+       print("face detect time: %.3f"%(end - start))
        for i in range(len(box)):
           if conf[i]>=0.25:
              p1 = (box[i][0], box[i][1])
@@ -112,7 +116,7 @@ def detect():
              
              p11 = (x1, y1)
              p22 = (x2, y2)
-             
+             start = time.time()
              ori_img = frame[y1:y2, x1:x2, :]
              ############face attributes#######################
              oimg = preprocess(ori_img, (128, 128))
@@ -121,6 +125,8 @@ def detect():
              face_net.blobs['data'].data[...] = oimg
              face_out = face_net.forward()
              boxpoint, faceangle, gender = postprocessface(ori_img, face_out)
+             end = time.time()
+             print("face attributes time: %.3f"%(end - start))
              yaw, pitch, roll = faceangle
              for jj in range(5):
                  point = (boxpoint[jj], boxpoint[jj+5])
