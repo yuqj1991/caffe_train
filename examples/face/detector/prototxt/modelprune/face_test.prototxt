@@ -763,7 +763,12 @@ layer {
 	operation: SUM
 	}
 }
-
+layer {
+  name: "conv_one_eltwise/relu"
+  type: "PReLU"
+  bottom: "conv_one_eltwise"
+  top: "conv_one_eltwise"
+}
 layer {
   name: "conv6/dw"
   type: "Convolution"
@@ -1162,7 +1167,12 @@ layer {
 	operation: SUM
 	}
 }
-
+layer {
+  name: "conv_two_eltwise/relu"
+  type: "PReLU"
+  bottom: "conv_two_eltwise"
+  top: "conv_two_eltwise"
+}
 layer {
   name: "conv_two_eltwise_128"
   type: "Convolution"
@@ -1495,7 +1505,12 @@ layer {
 	operation: SUM
 	}
 }
-
+layer {
+  name: "conv_five_eltwise/relu"
+  type: "PReLU"
+  bottom: "conv_five_eltwise"
+  top: "conv_five_eltwise"
+}
 layer {
   name: "conv14_1"
   type: "Convolution"
@@ -1904,6 +1919,12 @@ layer{
 	eltwise_param {
 		operation: SUM
 	}
+}
+layer {
+  name: "dectction_moudle_one/relu"
+  type: "PReLU"
+  bottom: "dectction_moudle_one"
+  top: "dectction_moudle_one"
 }
 ##########first prior-box layer#########
 layer {
