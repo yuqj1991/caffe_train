@@ -1,4 +1,4 @@
-train_net: "examples/s3fd_mv2/train.prototxt"
+train_net: "../prototxt/s3fd_mv2/train.prototxt"
 base_lr: 0.001
 display: 10
 max_iter: 240000
