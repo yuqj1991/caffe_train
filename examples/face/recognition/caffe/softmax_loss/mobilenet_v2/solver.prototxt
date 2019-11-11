@@ -1,7 +1,7 @@
 # The train/test net protocol buffer definition
 train_net: "./softmax_loss/mobilenet_v2/train.prototxt"
 base_lr: 0.01
-#momentum: 0.9
+momentum: 0.9
 weight_decay: 0.0005
 # The learning rate policy
 lr_policy: "multistep"
@@ -15,10 +15,10 @@ display: 100
 # The maximum number of iterations
 max_iter: 1200000
 # snapshot intermediate results
-snapshot: 5000
+snapshot: 200000
 snapshot_prefix: "face_recog/tiny"
 # solver mode: CPU or GPU
 solver_mode: GPU
 #type: "Adam"
-momentum2: 0.9
-type: "RMSProp"
+#momentum2: 0.9
+#type: "RMSProp"
