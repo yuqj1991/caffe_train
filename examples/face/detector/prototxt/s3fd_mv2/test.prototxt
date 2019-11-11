@@ -1,130 +1,34 @@
-name: "MV2_WIDER_FACE_SFD"
+name: "faceDetctor-Prune"
 layer {
   name: "data"
   type: "AnnotatedData"
   top: "data"
   top: "label"
   include {
-    phase: TRAIN
+    phase: TEST
   }
   transform_param {
-    mirror: true
-    mean_value: 104
-    mean_value: 117
-    mean_value: 123
+    scale: 0.007843
+    mean_value: 103.94
+    mean_value: 116.78
+    mean_value: 123.68
     resize_param {
-      prob: 1
+      prob: 1.0
       resize_mode: WARP
-      height: 640
-      width: 640
+      height: 320
+      width: 320
       interp_mode: LINEAR
-      interp_mode: AREA
-      interp_mode: NEAREST
-      interp_mode: CUBIC
-      interp_mode: LANCZOS4
-    }
-    emit_constraint {
-      emit_type: CENTER
-    }
-    distort_param {
-      brightness_prob: 0.5
-      brightness_delta: 32
-      contrast_prob: 0.5
-      contrast_lower: 0.5
-      contrast_upper: 1.5
-      hue_prob: 0.5
-      hue_delta: 18
-      saturation_prob: 0.5
-      saturation_lower: 0.5
-      saturation_upper: 1.5
-      random_order_prob: 0.0
     }
   }
   data_param {
-    source: "../lmdb/wider_face_wider_train_lmdb/"
-    batch_size: 16
+    source: "../lmdb/wider_face_wider_val_lmdb/"
+    batch_size: 1
     backend: LMDB
   }
   annotated_data_param {
     batch_sampler {
-      sampler {
-        min_scale: 1.0
-        max_scale: 1.0
-        min_aspect_ratio: 1.0
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_object_coverage: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
     }
-    batch_sampler {
-      sampler {
-        min_scale: 0.3
-        max_scale: 1.0
-        min_aspect_ratio: 1.0
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_object_coverage: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.3
-        max_scale: 1.0
-        min_aspect_ratio: 1.0
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_object_coverage: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.3
-        max_scale: 1.0
-        min_aspect_ratio: 1.0
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_object_coverage: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.3
-        max_scale: 1.0
-        min_aspect_ratio: 1.0
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_object_coverage: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    data_anchor_sampler{
-		scale: 16
-		scale: 32
-		scale: 64
-		scale: 128
-		scale: 256
-		scale: 512
-		sample_constraint{
-			min_object_coverage: 1.0
-		}
-		max_sample: 1
-		max_trials: 10
-	}
-	label_map_file: "../labelmap_face.prototxt"
+    label_map_file: "../labelmap_face.prototxt"
   }
 }
 
@@ -4948,40 +4852,45 @@ layer {
     axis: 2
   }
 }
+
 layer {
-  name: "mbox_loss"
-  type: "MultiBoxLoss"
+  name: "detection_out"
+  type: "DetectionOutput"
   bottom: "mbox_loc"
-  bottom: "mbox_conf"
+  bottom: "mbox_conf_flatten"
   bottom: "mbox_priorbox"
-  bottom: "label"
-  top: "mbox_loss"
+  top: "detection_out"
   include {
-    phase: TRAIN
+    phase: TEST
   }
-  propagate_down: true
-  propagate_down: true
-  propagate_down: false
-  propagate_down: false
-  loss_param {
-    normalization: VALID
-  }
-  multibox_loss_param {
-    loc_loss_type: SMOOTH_L1
-    conf_loss_type: SOFTMAX
-    loc_weight: 1.0
+  detection_output_param {
     num_classes: 2
     share_location: true
-    match_type: PER_PREDICTION
-    overlap_threshold: 0.35
-    use_prior_for_matching: true
     background_label_id: 0
-    use_difficult_gt: true
-    neg_pos_ratio: 3.0
-    neg_overlap: 0.35
+    nms_param {
+      nms_threshold: 0.3
+      top_k: 5000
+    }
     code_type: CENTER_SIZE
-    ignore_cross_boundary_bbox: false
-    mining_type: MAX_NEGATIVE
+    keep_top_k: 750
+    confidence_threshold: 0.1
   }
 }
+layer {
+  name: "detection_eval"
+  type: "DetectionEvaluate"
+  bottom: "detection_out"
+  bottom: "label"
+  top: "detection_eval"
+  include {
+    phase: TEST
+  }
+  detection_evaluate_param {
+    num_classes: 2
+    background_label_id: 0
+    overlap_threshold: 0.5
+    evaluate_difficult_gt: false
+  }
+}
+
 
