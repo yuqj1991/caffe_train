@@ -1,4 +1,4 @@
-name: "MV2_WIDER_FACE_SFD_deploy"
+name: "faceDetctor"
 input: "data"
 input_shape {
   dim: 1
@@ -4178,24 +4178,11 @@ layer {
     offset: 0.5
   }
 }
-layer {
-  name: "conv4_3_norm"
-  type: "Normalize"
-  bottom: "conv6_4/bn"
-  top: "conv4_3_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 8
-    }
-    channel_shared: false
-  }
-}
+
 layer {
   name: "conv4_3_norm_mbox_loc"
   type: "Convolution"
-  bottom: "conv4_3_norm"
+  bottom: "conv6_4"
   top: "conv4_3_norm_mbox_loc"
   param {
     lr_mult: 1
@@ -4243,7 +4230,7 @@ layer {
 layer {
   name: "conv4_3_norm_mbox_conf"
   type: "Convolution"
-  bottom: "conv4_3_norm"
+  bottom: "conv6_4"
   top: "conv4_3_norm_mbox_conf"
   param {
     lr_mult: 1
@@ -4291,7 +4278,7 @@ layer {
 layer {
   name: "conv4_3_norm_mbox_priorbox"
   type: "PriorBox"
-  bottom: "conv4_3_norm"
+  bottom: "conv6_4"
   bottom: "data"
   top: "conv4_3_norm_mbox_priorbox"
   prior_box_param {
@@ -4306,23 +4293,9 @@ layer {
   }
 }
 layer {
-  name: "conv5_3_norm"
-  type: "Normalize"
-  bottom: "conv7_1/linear/bn"
-  top: "conv5_3_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 5
-    }
-    channel_shared: false
-  }
-}
-layer {
   name: "conv5_3_norm_mbox_loc"
   type: "Convolution"
-  bottom: "conv5_3_norm"
+  bottom: "conv7_1"
   top: "conv5_3_norm_mbox_loc"
   param {
     lr_mult: 1
@@ -4370,7 +4343,7 @@ layer {
 layer {
   name: "conv5_3_norm_mbox_conf"
   type: "Convolution"
-  bottom: "conv5_3_norm"
+  bottom: "conv7_1"
   top: "conv5_3_norm_mbox_conf"
   param {
     lr_mult: 1
@@ -4418,7 +4391,7 @@ layer {
 layer {
   name: "conv5_3_norm_mbox_priorbox"
   type: "PriorBox"
-  bottom: "conv5_3_norm"
+  bottom: "conv7_1"
   bottom: "data"
   top: "conv5_3_norm_mbox_priorbox"
   prior_box_param {
