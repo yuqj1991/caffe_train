@@ -5714,7 +5714,7 @@ layer {
 	
 		num_classes: 2
 		background_label_id: 0
-		overlap_threshold: 0.5
+		overlap_threshold: 0.45
 		evaluate_difficult_gt: false
 	}
 }
