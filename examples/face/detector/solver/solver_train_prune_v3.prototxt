@@ -1,29 +1,28 @@
-train_net: "../../prototxt/modelfull/face_train_v7.prototxt"
-test_net: "../../prototxt/modelfull/face_test_v7.prototxt"
+train_net: "../../prototxt/modelprune/face_train_v3.prototxt"
+test_net: "../../prototxt/modelprune/face_test_v3.prototxt"
 test_iter: 3083
 test_interval: 5000
 base_lr: 0.001
 display: 100
-max_iter: 400000
+#max_iter: 400000
 lr_policy: "multistep"
 gamma: 0.1
 weight_decay: 0.0005
 snapshot: 5000
-snapshot_prefix: "../../snapshot/face_v7"
+snapshot_prefix: "../snapshot/face_v3"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
 test_initialization: false
+max_iter: 240000
 average_loss: 10
 stepvalue: 50000
 stepvalue: 100000
-stepvalue: 140000
-stepvalue: 180000
-stepvalue: 250000
-stepvalue: 300000
+stepvalue: 200000
 iter_size: 1
-momentum2 : 0.99
-type: "RMSProp"
+momentum: 0.9
+#momentum2 : 0.99
+#type: "RMSProp"
 eval_type: "detection"
 ap_version: "11point"
 
