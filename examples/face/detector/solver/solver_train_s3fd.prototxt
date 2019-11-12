@@ -1,8 +1,8 @@
-train_net: "../prototxt/s3fd_mv2/train.prototxt"
-test_net: "../prototxt/s3fd_mv2/test.prototxt"
+train_net: "../prototxt/s3fd/train.prototxt"
+test_net: "../prototxt/s3fd/test.prototxt"
 test_iter: 5000
 test_interval: 5000
-base_lr: 0.001
+base_lr: 0.01
 display: 100
 max_iter: 240000
 lr_policy: "multistep"
@@ -15,6 +15,7 @@ device_id: 0
 debug_info: false
 momentum: 0.9
 snapshot_after_train: true
+test_initialization: false
 average_loss: 10
 stepvalue: 160000
 stepvalue: 200000
