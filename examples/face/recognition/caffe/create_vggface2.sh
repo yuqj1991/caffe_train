@@ -7,7 +7,7 @@ EXAMPLE=../../../../../dataset/facedata/recognition
 DATA=.
 TOOLS=../../../../build/tools
 
-TRAIN_DATA_ROOT=../../../../../dataset/facedata/recognition/vggface2_align_train/
+TRAIN_DATA_ROOT=../../../../../dataset/facedata/recognition/vggface2_train/
 #VAL_DATA_ROOT=/path/to/imagenet/val/
 
 # Set RESIZE=true to resize the images to 128x128. Leave as false if images have
