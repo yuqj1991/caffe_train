@@ -9,5 +9,5 @@ if ! test -f ../prototxt/test_v3.prototxt ;then
 	echo "please generate your own model prototxt primarily."
         exit 1
 fi
-../../../../build/tools/caffe train --solver=../solver/faceattri_solver_train_v3.prototxt -gpu 1 \
+../../../../build/tools/caffe train --solver=../solver/faceattri_solver_train_v3.prototxt -gpu 0 \
 #--snapshot=../snapshot/faceattri_v2_iter_27715.solverstate
