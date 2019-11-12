@@ -49,17 +49,17 @@ def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
 
     img_crop = img[y0: y1, x0: x1, :]
     if w < h:
-        scale = 160.0 / w
+        scale = 128.0 / w
         h = int(h*scale)
-        if h <160:
-            h = 160
-        w = 160
+        if h <128:
+            h = 128
+        w = 128
     else:
-        scale = 160.0 / h
+        scale = 128.0 / h
         w = int(w*scale)
-        if h <160:
-            h = 160
-        h = 160
+        if h <128:
+            h = 128
+        h = 128
 
     print(w, h)
     img_crop_scale = cv2.resize(img_crop, (w, h), 0, 0, cv2.INTER_CUBIC)

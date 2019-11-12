@@ -3,11 +3,11 @@
 # N.B. set the path to the imagenet train + val data dirs
 set -e
 
-EXAMPLE=../../../../../../dataset/facedata/recognition
+EXAMPLE=../../../../../dataset/facedata/recognition
 DATA=.
-TOOLS=../../../../../build/tools
+TOOLS=../../../../build/tools
 
-TRAIN_DATA_ROOT=../../../../../../dataset/facedata/recognition/lfw_160/
+TRAIN_DATA_ROOT=../../../../../dataset/facedata/recognition/vggface2_align_train/
 #VAL_DATA_ROOT=/path/to/imagenet/val/
 
 # Set RESIZE=true to resize the images to 128x128. Leave as false if images have
@@ -45,7 +45,7 @@ GLOG_logtostderr=1 $TOOLS/convert_imageset \
     --encoded=true \
     $TRAIN_DATA_ROOT \
     $DATA/vggface2_train.txt \
-    $EXAMPLE/lfw_lmdb
+    $EXAMPLE/face_recog_vggface2_lmdb
 
 #echo "Creating val lmdb..."
 

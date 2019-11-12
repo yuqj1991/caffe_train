@@ -41,8 +41,8 @@ layer {
     }
   }
   data_param {
-    source: "data/faces_database/FACE/lmdb/FACE_trainval_lmdb"
-    batch_size: 16
+    source: "../lmdb/wider_face_wider_train_lmdb/"
+    batch_size: 4
     backend: LMDB
   }
   annotated_data_param {
@@ -111,7 +111,20 @@ layer {
       max_sample: 1
       max_trials: 50
     }
-    label_map_file: "data/FACE/labelmap_face.prototxt"
+    data_anchor_sampler{
+		scale: 16
+		scale: 32
+		scale: 64
+		scale: 128
+		scale: 256
+		scale: 512
+		sample_constraint{
+			min_object_coverage: 1.0
+		}
+		max_sample: 1
+		max_trials: 10
+	}
+	label_map_file: "../labelmap_face.prototxt"
   }
 }
 
@@ -3712,7 +3725,7 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 256
+    group: 128
     weight_filler {
       type: "msra"
     }
@@ -3876,7 +3889,7 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 256
+    group: 128
     weight_filler {
       type: "msra"
     }
@@ -4040,7 +4053,7 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 256
+    group: 64
     weight_filler {
       type: "msra"
     }
@@ -4138,23 +4151,9 @@ layer {
 ###################Feature Map###############################
 
 layer {
-  name: "conv3_3_norm"
-  type: "Normalize"
-  bottom: "block_5_2"
-  top: "conv3_3_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 10
-    }
-    channel_shared: false
-  }
-}
-layer {
   name: "conv3_3_norm_mbox_loc"
   type: "Convolution"
-  bottom: "conv3_3_norm"
+  bottom: "block_5_2"
   top: "conv3_3_norm_mbox_loc"
   param {
     lr_mult: 1
@@ -4202,7 +4201,7 @@ layer {
 layer {
   name: "conv3_3_norm_mbox_conf"
   type: "Convolution"
-  bottom: "conv3_3_norm"
+  bottom: "block_5_2"
   top: "conv3_3_norm_mbox_conf"
   param {
     lr_mult: 1
@@ -4286,7 +4285,7 @@ layer {
 layer {
   name: "conv3_3_norm_mbox_priorbox"
   type: "PriorBox"
-  bottom: "conv3_3_norm"
+  bottom: "block_5_2"
   bottom: "data"
   top: "conv3_3_norm_mbox_priorbox"
   prior_box_param {
@@ -4300,24 +4299,11 @@ layer {
     offset: 0.5
   }
 }
-layer {
-  name: "conv4_3_norm"
-  type: "Normalize"
-  bottom: "conv6_4/bn"
-  top: "conv4_3_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 8
-    }
-    channel_shared: false
-  }
-}
+
 layer {
   name: "conv4_3_norm_mbox_loc"
   type: "Convolution"
-  bottom: "conv4_3_norm"
+  bottom: "conv6_4"
   top: "conv4_3_norm_mbox_loc"
   param {
     lr_mult: 1
@@ -4365,7 +4351,7 @@ layer {
 layer {
   name: "conv4_3_norm_mbox_conf"
   type: "Convolution"
-  bottom: "conv4_3_norm"
+  bottom: "conv6_4"
   top: "conv4_3_norm_mbox_conf"
   param {
     lr_mult: 1
@@ -4413,7 +4399,7 @@ layer {
 layer {
   name: "conv4_3_norm_mbox_priorbox"
   type: "PriorBox"
-  bottom: "conv4_3_norm"
+  bottom: "conv6_4"
   bottom: "data"
   top: "conv4_3_norm_mbox_priorbox"
   prior_box_param {
@@ -4428,23 +4414,9 @@ layer {
   }
 }
 layer {
-  name: "conv5_3_norm"
-  type: "Normalize"
-  bottom: "conv7_1/linear/bn"
-  top: "conv5_3_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 5
-    }
-    channel_shared: false
-  }
-}
-layer {
   name: "conv5_3_norm_mbox_loc"
   type: "Convolution"
-  bottom: "conv5_3_norm"
+  bottom: "conv7_1"
   top: "conv5_3_norm_mbox_loc"
   param {
     lr_mult: 1
@@ -4492,7 +4464,7 @@ layer {
 layer {
   name: "conv5_3_norm_mbox_conf"
   type: "Convolution"
-  bottom: "conv5_3_norm"
+  bottom: "conv7_1"
   top: "conv5_3_norm_mbox_conf"
   param {
     lr_mult: 1
@@ -4540,7 +4512,7 @@ layer {
 layer {
   name: "conv5_3_norm_mbox_priorbox"
   type: "PriorBox"
-  bottom: "conv5_3_norm"
+  bottom: "conv7_1"
   bottom: "data"
   top: "conv5_3_norm_mbox_priorbox"
   prior_box_param {
@@ -4937,7 +4909,7 @@ layer {
 }
 layer {
   name: "mbox_loss"
-  type: "MultiBoxLoss"
+  type: "MultiBoxSSDLoss"
   bottom: "mbox_loc"
   bottom: "mbox_conf"
   bottom: "mbox_priorbox"
