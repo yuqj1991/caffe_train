@@ -1,5 +1,5 @@
-train_net: "../prototxt/modelprune/face_train_v2.prototxt"
-test_net: "../prototxt/modelprune/face_test_v2.prototxt"
+train_net: "../prototxt/model/face_train_v2.prototxt"
+test_net: "../prototxt/model/face_test_v2.prototxt"
 test_iter: 5000
 test_interval: 5000
 base_lr: 0.01
