@@ -16,8 +16,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 96
-			width: 96
+			height: 128
+			width: 128
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
@@ -67,8 +67,8 @@ layer {
     type: "Convolution"
     convolution_param {
         num_output: 64
-        kernel_size: 7
-        pad: 3
+        kernel_size: 3
+        pad: 1
         stride: 2
         weight_filler {
             type: "msra"
@@ -834,173 +834,14 @@ layer {
     }
 }
 
-layer {
-    bottom: "res4a"
-    bottom: "res4b_branch2b"
-    top: "res4b"
-    name: "res4b"
-    type: "Eltwise"
-    eltwise_param {
-        operation: SUM
-    }
-}
 
 layer {
-    bottom: "res4b"
-    top: "res4b"
-    name: "res4b_relu"
-    type: "ReLU"
-}
-
-layer {
-    bottom: "res4b"
-    top: "res5a_branch1"
-    name: "res5a_branch1"
-    type: "Convolution"
-    convolution_param {
-        num_output: 512
-        kernel_size: 1
-        pad: 0
-        stride: 2
-        weight_filler {
-            type: "msra"
-        }
-        bias_term: false
-
-    }
-}
-
-layer {
-    bottom: "res5a_branch1"
-    top: "res5a_branch1"
-    name: "bn5a_branch1"
-    type: "BatchNorm"
-    batch_norm_param {
-      moving_average_fraction: 0.9 
-    }
-    
-}
-
-layer {
-    bottom: "res5a_branch1"
-    top: "res5a_branch1"
-    name: "scale5a_branch1"
-    type: "Scale"
-    scale_param {
-        bias_term: true
-    }
-}
-
-layer {
-    bottom: "res4b"
-    top: "res5a_branch2a"
-    name: "res5a_branch2a"
-    type: "Convolution"
-    convolution_param {
-        num_output: 512
-        kernel_size: 3
-        pad: 1
-        stride: 2
-        weight_filler {
-            type: "msra"
-        }
-        bias_term: false
-
-    }
-}
-
-layer {
-    bottom: "res5a_branch2a"
-    top: "res5a_branch2a"
-    name: "bn5a_branch2a"
-    type: "BatchNorm"
-    batch_norm_param {
-      moving_average_fraction: 0.9 
-    }
-    
-}
-
-layer {
-    bottom: "res5a_branch2a"
-    top: "res5a_branch2a"
-    name: "scale5a_branch2a"
-    type: "Scale"
-    scale_param {
-        bias_term: true
-    }
-}
-
-layer {
-    bottom: "res5a_branch2a"
-    top: "res5a_branch2a"
-    name: "res5a_branch2a_relu"
-    type: "ReLU"
-}
-
-layer {
-    bottom: "res5a_branch2a"
-    top: "res5a_branch2b"
-    name: "res5a_branch2b"
-    type: "Convolution"
-    convolution_param {
-        num_output: 512
-        kernel_size: 3
-        pad: 1
-        stride: 1
-        weight_filler {
-            type: "msra"
-        }
-        bias_term: false
-
-    }
-}
-
-layer {
-    bottom: "res5a_branch2b"
-    top: "res5a_branch2b"
-    name: "bn5a_branch2b"
-    type: "BatchNorm"
-    batch_norm_param {
-      moving_average_fraction: 0.9 
-    }
-    
-}
-
-layer {
-    bottom: "res5a_branch2b"
-    top: "res5a_branch2b"
-    name: "scale5a_branch2b"
-    type: "Scale"
-    scale_param {
-        bias_term: true
-    }
-}
-
-layer {
-    bottom: "res5a_branch1"
-    bottom: "res5a_branch2b"
-    top: "res5a"
-    name: "res5a"
-    type: "Eltwise"
-    eltwise_param {
-        operation: SUM
-    }
-}
-
-layer {
-    bottom: "res5a"
-    top: "res5a"
-    name: "res5a_relu"
-    type: "ReLU"
-}
-
-layer {
-    bottom: "res5a"
+    bottom: "conv_5_2_1"
     top: "res5b_branch2a"
     name: "res5b_branch2a"
     type: "Convolution"
     convolution_param {
-        num_output: 512
+        num_output: 256
         kernel_size: 3
         pad: 1
         stride: 1
@@ -1046,7 +887,7 @@ layer {
     name: "res5b_branch2b"
     type: "Convolution"
     convolution_param {
-        num_output: 512
+        num_output: 256
         kernel_size: 3
         pad: 1
         stride: 1
@@ -1080,7 +921,7 @@ layer {
 }
 
 layer {
-    bottom: "res5a"
+    bottom: "conv_5_2_1"
     bottom: "res5b_branch2b"
     top: "res5b"
     name: "res5b"
@@ -1174,7 +1015,7 @@ layer {
 layer {
 	name: "conv_5_2"
 	type: "Convolution"
-	bottom: "res4b"
+	bottom: "res4b_branch2b"
 	top: "conv_5_2"
 	param {
 		lr_mult: 1
@@ -1408,158 +1249,11 @@ layer {
 
 
 ################################
-layer {
-	name: "conv_5_1"
-	type: "Convolution"
-	bottom: "res4b"
-	top: "conv_5_1"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 256
-		kernel_size: 3
-		stride: 2
-		pad: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv_5_1/bn"
-	type: "BatchNorm"
-	bottom: "conv_5_1"
-	top: "conv_5_1"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv_5_1/scale"
-	type: "Scale"
-	bottom: "conv_5_1"
-	top: "conv_5_1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv_5_1/relu"
-	type: "ReLU"
-	bottom: "conv_5_1"
-	top: "conv_5_1"
-}
-layer {
-	name: "conv_5_1_1"
-	type: "Convolution"
-	bottom: "conv_5_1"
-	top: "conv_5_1_1"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 256
-		kernel_size: 3
-		stride: 1
-		pad: 0
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv_5_1_1/bn"
-	type: "BatchNorm"
-	bottom: "conv_5_1_1"
-	top: "conv_5_1_1"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv_5_1_1/scale"
-	type: "Scale"
-	bottom: "conv_5_1_1"
-	top: "conv_5_1_1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv_5_1_1/relu"
-	type: "ReLU"
-	bottom: "conv_5_1_1"
-	top: "conv_5_1_1"
-}
+
 layer {
 	name: "conv6_landmark_fds_1"
 	type: "InnerProduct"
-	bottom: "conv_5_1_1"
+	bottom: "conv_5_2_1"
 	top: "conv6_landmark_fds_1"
 	param {
 		lr_mult: 1
@@ -1570,7 +1264,7 @@ layer {
 		decay_mult: 0
 	}
 	inner_product_param {
-		num_output: 64
+		num_output: 256
 		weight_filler {
 			type: "xavier"
 		}
@@ -1600,7 +1294,7 @@ layer {
 		decay_mult: 0
 	}
 	inner_product_param {
-		num_output: 16
+		num_output: 64
 		weight_filler {
 			type: "xavier"
 		}

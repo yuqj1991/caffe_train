@@ -4151,23 +4151,9 @@ layer {
 ###################Feature Map###############################
 
 layer {
-  name: "conv3_3_norm"
-  type: "Normalize"
-  bottom: "block_5_2"
-  top: "conv3_3_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 10
-    }
-    channel_shared: false
-  }
-}
-layer {
   name: "conv3_3_norm_mbox_loc"
   type: "Convolution"
-  bottom: "conv3_3_norm"
+  bottom: "block_5_2"
   top: "conv3_3_norm_mbox_loc"
   param {
     lr_mult: 1
@@ -4215,7 +4201,7 @@ layer {
 layer {
   name: "conv3_3_norm_mbox_conf"
   type: "Convolution"
-  bottom: "conv3_3_norm"
+  bottom: "block_5_2"
   top: "conv3_3_norm_mbox_conf"
   param {
     lr_mult: 1
@@ -4299,7 +4285,7 @@ layer {
 layer {
   name: "conv3_3_norm_mbox_priorbox"
   type: "PriorBox"
-  bottom: "conv3_3_norm"
+  bottom: "block_5_2"
   bottom: "data"
   top: "conv3_3_norm_mbox_priorbox"
   prior_box_param {
