@@ -1,5 +1,5 @@
 # The train/test net protocol buffer definition
-train_net: "./softmax_loss/my_design/train.prototxt"
+train_net: "./prototxt/my_design/train.prototxt"
 base_lr: 0.01
 momentum: 0.9
 weight_decay: 0.0005

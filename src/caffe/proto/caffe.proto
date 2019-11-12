@@ -659,6 +659,9 @@ message LayerParameter {
   optional CenterLossParameter center_loss_param = 249;
   optional RankParameter rank_param = 43;
   optional cosinLossParameter cosin_loss_param = 250;
+  optional CosinAddmParameter cosin_add_m_param = 179;
+  
+  optional CombinedMarginParameter combined_margin_param = 156;
 }
 
 message TripletLossParameter {
@@ -1299,6 +1302,18 @@ message DummyDataParameter {
   repeated uint32 channels = 3;
   repeated uint32 height = 4;
   repeated uint32 width = 5;
+}
+
+message CosinAddmParameter {
+  optional float m = 1 [default = 0.5];
+  optional bool transform_test = 2 [default = false];
+}
+
+message CombinedMarginParameter {
+  optional float m1 = 1 [default = 4];
+  optional float m2 = 2 [default = 0.5];
+  optional float m3 = 3 [default = 0.35];
+  optional bool transform_test = 4 [default = false];
 }
 
 message EltwiseParameter {

@@ -15,5 +15,5 @@ momentum: 0.9
 snapshot: 10000
 snapshot_prefix: "./face_recog/face_inception_googlenet"
 
-train_net: "./softmax_loss/google/train.prototxt"
+train_net: "./prototxt/google/train.prototxt"
 weight_decay: 0.0005
