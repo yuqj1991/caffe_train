@@ -1204,7 +1204,7 @@ layer {
 layer {
 	name: "conv6_landmark_fds"
 	type: "InnerProduct"
-	bottom: "conv_4_3_2"
+	bottom: "conv_4_3_3"
 	top: "conv6_landmark_fds"
 	param {
 		lr_mult: 1
@@ -1216,7 +1216,7 @@ layer {
 	}
 	inner_product_param {
 		#kernel_size: 1
-		num_output: 32
+		num_output: 128
 		weight_filler {
 			type: "xavier"
 		}
@@ -1271,7 +1271,7 @@ layer {
 	}
 	inner_product_param {
 		#kernel_size: 1
-		num_output: 32
+		num_output: 128
 		weight_filler {
 			type: "xavier"
 		}
