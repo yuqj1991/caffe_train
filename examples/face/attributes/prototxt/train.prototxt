@@ -1137,7 +1137,27 @@ layer {
 		}
 	}
 }
-
+#######################################
+#layer {
+#  name: "conv6_gender"
+#  type: "CosinL2Normalize"
+#  bottom: "conv6_gender_fds"
+#   bottom: "label_gender"
+# top: "conv6_gender"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 2 
+#  }
+#  cosin_loss_param {
+#	num_output: 2
+#	 margin: -0.35
+#	 scale: 30
+#    cosin_filler {
+#      type: "xavier"
+#    }
+#  }
+#}
+#######################################
 layer {
 	name: "conv6_landmark_fds"
 	type: "InnerProduct"

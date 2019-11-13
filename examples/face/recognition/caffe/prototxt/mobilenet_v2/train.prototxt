@@ -3885,7 +3885,7 @@ layer {
   }
    inner_product_param{
     #margin: -0.35
-    #scale: 64
+    #scale: 32
     num_output: 8631
     weight_filler {
       type: "xavier"
