@@ -662,6 +662,17 @@ message LayerParameter {
   optional CosinAddmParameter cosin_add_m_param = 179;
   
   optional CombinedMarginParameter combined_margin_param = 156;
+  optional metricDistanceParameter metric_param = 300;
+}
+
+message metricDistanceParameter{
+  enum MetricType {
+    COSDISTANCE = 0;
+    EUCILDISTANCE = 1;
+  }
+  optional MetricType metric = 2[default = COSDISTANCE];
+  optional float cos_threshold = 3[default = 0.65];
+  optional float eucil_threshold = 4[default = 1.2];
 }
 
 message TripletLossParameter {

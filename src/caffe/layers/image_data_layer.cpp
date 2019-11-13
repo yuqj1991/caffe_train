@@ -64,44 +64,28 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   closedir(dir);
   LOG(INFO)<<"get file directory successfully";
   /**************遍历人脸数据集根目录文件夹完成*******/
-  // Read the file with filenames and labels
-  const string& source = this->layer_param_.image_data_param().source();
-  LOG(INFO) << "Opening file " << source;
-  std::ifstream infile(source.c_str());
-  string line;
-  size_t pos;
-  int label;
-  while (std::getline(infile, line)) {
-    pos = line.find_last_of(' ');
-    label = atoi(line.substr(pos + 1).c_str());
-    lines_.push_back(std::make_pair(line.substr(0, pos), label));
-  }
-
-  CHECK(!lines_.empty()) << "File is empty";
-
-  if (this->layer_param_.image_data_param().shuffle()) {
-    // randomly shuffle data
-    LOG(INFO) << "Shuffling data";
-    const unsigned int prefetch_rng_seed = caffe_rng_rand();
-    prefetch_rng_.reset(new Caffe::RNG(prefetch_rng_seed));
-    ShuffleImages();
-  }
-  LOG(INFO) << "A total of " << lines_.size() << " images.";
 
   lines_id_ = 0;
-  // Check if we would need to randomly skip a few data points
-  if (this->layer_param_.image_data_param().rand_skip()) {
-    unsigned int skip = caffe_rng_rand() %
-        this->layer_param_.image_data_param().rand_skip();
-    LOG(INFO) << "Skipping first " << skip << " data points.";
-    CHECK_GT(lines_.size(), skip) << "Not enough points to skip";
-    lines_id_ = skip;
+    /**************获取第一个图像*************/
+  std::string subDir = fullImageSetDir_[0];
+  std::string imgfile;
+  dir = opendir(subDir.c_str());
+  if( dir == NULL )
+    LOG(FATAL)<<" is not a directory or not exist!";
+  while ((faceSetDir = readdir(dir)) != NULL) {
+    if(strcmp(faceSetDir->d_name,".")==0 || strcmp(faceSetDir->d_name,"..")==0)
+      continue;
+    else if(faceSetDir->d_name[0] == '.')
+      continue;
+    else if (faceSetDir->d_type == DT_REG) {
+      imgfile = subDir + string("/") + string(faceSetDir->d_name);
+      break;
+    }
   }
-  // Read an image, and use it to initialize the top blob.
-  cv::Mat cv_img = ReadImageToCVMat(lines_[lines_id_].first,
+  closedir(dir);
+  cv::Mat cv_img = ReadImageToCVMat(imgfile,
                                     new_height, new_width, is_color);
-  CHECK(cv_img.data) << "Could not load " << lines_[lines_id_].first;
-  // Use data_transformer to infer the expected blob shape from a cv_image.
+  CHECK(cv_img.data) << "Could not load " << imgfile;
   vector<int> top_shape = this->data_transformer_->InferBlobShape(cv_img);
   this->transformed_data_.Reshape(top_shape);
   // Reshape prefetch_data and top[0] according to the batch_size.
@@ -124,12 +108,6 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   }
 }
 
-template <typename Dtype>
-void ImageDataLayer<Dtype>::ShuffleImages() {
-  caffe::rng_t* prefetch_rng =
-      static_cast<caffe::rng_t*>(prefetch_rng_->generator());
-  shuffle(lines_.begin(), lines_.end(), prefetch_rng);
-}
 
 // This function is called on prefetch thread
 template <typename Dtype>
