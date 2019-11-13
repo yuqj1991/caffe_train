@@ -108,7 +108,6 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
 	crop_bbox->set_ymin(Dtype(h_off) / datum_height);
 	crop_bbox->set_xmax(Dtype(w_off + width) / datum_width);
 	crop_bbox->set_ymax(Dtype(h_off + height) / datum_height);
-
 	Dtype datum_element;
 	int top_index, data_index;
 	for (int c = 0; c < datum_channels; ++c) {

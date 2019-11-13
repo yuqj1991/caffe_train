@@ -3,11 +3,15 @@ import os
 import sys
 import cv2
 import numpy as np
-
-root_dir = "../../../../../dataset/facedata/recognition"
-image_dir = "/train"
-list_file = "/bb_landmark/loose_bb_train.csv"
-output_dir = "/vggface2_align_train"
+root_dir = "../../../../../dataset/facedata/recognition/vggface"
+if 0:
+    image_dir = "/vggface2_train"
+    list_file = "/bb_landmark/loose_bb_train.csv"
+    output_dir = "/vggface2_align_train"
+else:
+    image_dir = "/vggface2_test"
+    list_file = "/bb_landmark/loose_bb_test.csv"
+    output_dir = "/vggface2_align_test"
 
 
 def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
@@ -51,14 +55,10 @@ def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
     if w < h:
         scale = 128.0 / w
         h = int(h*scale)
-        if h <128:
-            h = 128
         w = 128
     else:
         scale = 128.0 / h
         w = int(w*scale)
-        if h <128:
-            h = 128
         h = 128
 
     print(w, h)
@@ -87,7 +87,6 @@ reader = csv.reader(csv_fd)
 for idx, item in enumerate(reader):
     if idx == 0:
         continue
-    # print(item[1], item[2], item[3], item[4])
     crop_face(root_dir + image_dir, item[0], root_dir + output_dir, int(item[1]), int(item[2]), int(item[3]), int(item[4]))
 
 csv_fd.close()

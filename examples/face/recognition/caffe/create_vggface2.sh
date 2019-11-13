@@ -8,7 +8,13 @@ DATA=.
 TOOLS=../../../../build/tools
 
 TRAIN_DATA_ROOT=../../../../../dataset/facedata/recognition/vggface/vggface2_align_train/
-#VAL_DATA_ROOT=/path/to/imagenet/val/
+TEST_DATA_ROOT=../../../../../dataset/facedata/recognition/vggface/vggface2_align_test/
+
+LABEL_TRAIN_FILE=vggface2_train.txt
+LABEL_TEST_FILE=vggface2_test.txt
+
+TRAIN_LMDB=face_recog_vggface2_lmdb_train
+TEST_LMDB=face_recog_vggface2_lmdb_test
 
 # Set RESIZE=true to resize the images to 128x128. Leave as false if images have
 # already been resized using another tool.
@@ -41,20 +47,22 @@ GLOG_logtostderr=1 $TOOLS/convert_imageset \
     --resize_height=$RESIZE_HEIGHT \
     --resize_width=$RESIZE_WIDTH \
     --shuffle \
-    --encode_type=png \
+    --encode_type=jpg \
     --encoded=true \
     $TRAIN_DATA_ROOT \
-    $DATA/vggface2_train.txt \
-    $EXAMPLE/face_recog_vggface2_lmdb
+    $DATA/$LABEL_TRAIN_FILE \
+    $EXAMPLE/$TRAIN_LMDB
 
-#echo "Creating val lmdb..."
+echo "Creating val lmdb..."
 
-#GLOG_logtostderr=1 $TOOLS/convert_imageset \
-#    --resize_height=$RESIZE_HEIGHT \
-#    --resize_width=$RESIZE_WIDTH \
-#    --shuffle \
-#    $VAL_DATA_ROOT \
-#    $DATA/val.txt \
-#    $EXAMPLE/ilsvrc12_val_lmdb
+GLOG_logtostderr=1 $TOOLS/convert_imageset \
+    --resize_height=$RESIZE_HEIGHT \
+    --resize_width=$RESIZE_WIDTH \
+    --shuffle \
+    --encode_type=jpg \
+    --encoded=true \
+    $TEST_DATA_ROOT \
+    $DATA/$LABEL_TEST_FILE \
+    $EXAMPLE/$TEST_LMDB
 
 echo "Done."

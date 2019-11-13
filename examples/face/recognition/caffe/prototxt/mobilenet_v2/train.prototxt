@@ -1,16 +1,16 @@
 name: "deepFace"
 layer {
-    name: "data"
-    type: "Data"
-    top: "data"
-    top: "label"
-    transform_param {
-        mirror: true        
-        mean_value: 127.5
-        mean_value: 127.5
-        mean_value: 127.5
-        scale: 0.0078125
-        resize_param {
+	name: "data"
+	type: "Data"
+	top: "data"
+	top: "label"
+	transform_param {
+		mirror: true
+		mean_value: 127.5
+		mean_value: 127.5
+		mean_value: 127.5
+		scale: 0.0078125
+		resize_param {
 			prob: 1.0
 			resize_mode: WARP
 			height: 128
@@ -20,13 +20,42 @@ layer {
 			interp_mode: NEAREST
 			interp_mode: CUBIC
 			interp_mode: LANCZOS4
-    	}
-    }
-    data_param {
-        source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb"
-        batch_size: 64
-        backend: LMDB
-    }
+		}
+	}
+	data_param {
+		#source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
+		source: "/media/resideo/DATA/dataset/face_recog_vggface2_lmdb_train"
+		batch_size: 64
+		backend: LMDB
+	}
+}
+
+layer {
+	name: "data"
+	type: "Data"
+	top: "data"
+	top: "label"
+	transform_param {
+		scale: 0.007843
+		mean_value: 103.94
+		mean_value: 116.78
+		mean_value: 123.68
+		resize_param {
+			prob: 1.0
+			resize_mode: WARP
+			height: 128
+			width: 128
+			interp_mode: LINEAR
+		}
+	}
+	data_param {
+		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_test"
+		batch_size: 64
+		backend: LMDB
+	}
+	include {
+		phase: TEST
+	}
 }
 layer {
   name: "Conv"

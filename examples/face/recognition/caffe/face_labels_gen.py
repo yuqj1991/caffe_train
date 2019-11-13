@@ -16,6 +16,10 @@ def shuffle_file(filename):
 	f.writelines(lines)
 	f.close()
 
+if 0:
+    label = "vggface2_train.txt"
+else:
+    label = "vggface2_test.txt"
 
 def generate_labels(img_dir):
 
@@ -39,7 +43,7 @@ if __name__ == '__main__':
     img_dir = sys.argv[1]
     labels_str = generate_labels(img_dir)
 
-    with open("vggface2_train.txt", "w") as labels_file:
+    with open(label, "w") as labels_file:
         labels_file.writelines(labels_str)
-    shuffle_file("vggface2_train.txt")
+    shuffle_file(label)
 

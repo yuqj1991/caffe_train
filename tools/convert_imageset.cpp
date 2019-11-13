@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
     }
     // sequential
     string key_str = caffe::format_int(line_id, 8) + "_" + lines[line_id].first;
-	std::cout<<" channels: "<<datum.channels() <<" height: "<< datum.height() << " width: " <<datum.width()<<std::endl;
+	  std::cout<<lines[line_id].first <<" label: "<<datum.label()<<" channels: "<<datum.channels() <<" height: "<< datum.height() << " width: " <<datum.width()<<std::endl;
     // Put in db
     string out;
     CHECK(datum.SerializeToString(&out));
