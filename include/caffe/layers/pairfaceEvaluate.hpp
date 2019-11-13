@@ -18,7 +18,7 @@ class pairfaceEvaluateLayer : public Layer<Dtype> {
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top); 
-  virtual inline int ExactNumBottomBlobs() const { return 3; }
+  virtual inline int ExactNumBottomBlobs() const { return 2; }
   virtual inline const char* type() const { return "pairfaceEvaluate"; }
 
   virtual inline int ExactNumTopBlobs() const { return 1; }

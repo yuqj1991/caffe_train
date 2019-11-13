@@ -15,9 +15,6 @@ void pairfaceEvaluateLayer<Dtype>::LayerSetUp(
   CHECK_EQ(bottom[0]->width(), 1);
   CHECK_EQ(bottom[1]->height(), 1);
   CHECK_EQ(bottom[1]->width(), 1);
-  CHECK_EQ(bottom[2]->channels(), 1);
-  CHECK_EQ(bottom[2]->height(), 1);
-  CHECK_EQ(bottom[2]->width(), 1);
   diff_.Reshape(bottom[0]->num(), bottom[0]->channels(), 1, 1);
   diff_sq_.Reshape(bottom[0]->num(), bottom[0]->channels(), 1, 1);
   dist_left_.Reshape(bottom[0]->num(), bottom[0]->channels(), 1, 1);

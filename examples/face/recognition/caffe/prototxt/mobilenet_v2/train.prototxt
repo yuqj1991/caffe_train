@@ -3982,3 +3982,61 @@ layer{
   bottom:"label"
   top: "softmax_loss"
 }
+
+#####################test############################
+layer {
+	name: "merege_pair"
+	type: "Identity2Verify"
+	bottom: "fc5"
+	bottom: "label"
+	top: "feature1"
+	top: "feature2"
+	top: "sim"
+	include {
+		phase: TEST
+	}
+}
+
+layer {
+	name: "norm1"
+	type: "SimpleNormalize"
+	bottom: "feature1"
+	top: "normfeature1"
+	include {
+		phase: TEST
+	}
+}
+
+layer {
+	name: "norm2"
+	type: "SimpleNormalize"
+	bottom: "feature2"
+	top: "normfeature2"
+	include {
+		phase: TEST
+	}
+}
+layer {
+	name: "faceEvalate"
+	type: "pairfaceEvaluate"
+	bottom: "normfeature1"
+	bottom: "normfeature2"
+	top: "faceEvalate_label"
+	metric_param {
+		metric: COSDISTANCE
+		cos_threshold: 0.65
+	}
+	include {
+		phase: TEST
+	}
+}
+layer {
+	name: "accuracy"
+	type: "Accuracy"
+	bottom: "faceEvalate_label"
+	bottom: "sim"
+	top: "accuracy"
+	include {
+		phase: TEST
+	}
+}
