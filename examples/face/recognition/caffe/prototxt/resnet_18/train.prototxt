@@ -880,7 +880,7 @@ layer {
   }
   cosin_loss_param {
     margin: -0.35
-    scale: 30
+    scale: 64
     num_output: 8631
     cosin_filler {
       type: "xavier"
