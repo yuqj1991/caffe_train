@@ -1,5 +1,5 @@
 net: "./prototxt/resnet_18/train.prototxt"
-base_lr: 0.1
+base_lr: 0.01
 lr_policy: "multistep"
 gamma: 0.1
 

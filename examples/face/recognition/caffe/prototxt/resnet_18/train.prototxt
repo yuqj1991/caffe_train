@@ -812,38 +812,6 @@ layer {
   }
 }
 layer {
-  name: "classifier"
-  type: "InnerProduct"
-  bottom: "fc5"
-  top: "classifier"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 8631
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-  name: "loss"
-  type: "SoftmaxWithLoss"
-  bottom: "classifier"
-  bottom: "label"
-  top: "loss"
-}
-
-layer {
 	name: "merege_pair"
 	type: "Identity2Verify"
 	bottom: "fc5"
@@ -868,12 +836,12 @@ layer {
 }
 
 layer {
-  name: "loss2"
+  name: "contraiv_loss"
   type: "ContrastiveLoss"
   bottom: "normfeature1"
   bottom: "normfeature2"
   bottom: "sim"
-  top: "sim_loss"
+  top: "contraiv_loss"
   loss_weight: 0.3
   contrastive_loss_param {
     margin: 1

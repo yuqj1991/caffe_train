@@ -1,6 +1,6 @@
 # The train/test net protocol buffer definition
 train_net: "./prototxt/mobilenet_v2/train.prototxt"
-base_lr: 0.1
+base_lr: 0.01
 momentum: 0.9
 weight_decay: 0.0005
 # The learning rate policy
