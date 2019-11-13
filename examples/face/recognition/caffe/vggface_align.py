@@ -7,7 +7,7 @@ import numpy as np
 root_dir = "../../../../../dataset/facedata/recognition"
 image_dir = "/train"
 list_file = "/bb_landmark/loose_bb_train.csv"
-output_dir = "/vggface2_train"
+output_dir = "/vggface2_align_train"
 
 
 def crop_face(img_dir, img_path, img_dir_out, x0, y0, w, h):
