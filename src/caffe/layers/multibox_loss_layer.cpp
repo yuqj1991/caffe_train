@@ -171,6 +171,22 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
   const Dtype* prior_data = bottom[2]->cpu_data();
   const Dtype* gt_data = bottom[3]->cpu_data();
 
+  #if 1
+  vector<int> Sigmoid_shape(2);
+  Sigmoid_shape[0] = 1;
+  Sigmoid_shape[1] = num_priors_ * num_ * 2;
+  loc_Sigmoid_.Reshape(Sigmoid_shape);
+  Dtype * mutable_Sigmoid_data = loc_Sigmoid_.mutable_cpu_data();
+  for (int i = 0; i < num_; ++i) {
+    for(int j = 0; j< num_priors_; ++j){
+      int start_idx_loc_data = i * num_priors_* 4 + j * 4;
+      int start_idx_Sigmoid_data = i * num_priors_* 2 + j * 2;
+      mutable_Sigmoid_data[start_idx_Sigmoid_data + 0] = Dtype(1 / std::exp(loc_data[start_idx_loc_data + 0]));
+      mutable_Sigmoid_data[start_idx_Sigmoid_data + 1] = Dtype(1 / std::exp(loc_data[start_idx_loc_data + 1]));
+    }
+  }
+  #endif
+
   // Retrieve all ground truth.
   map<int, vector<NormalizedBBox> > all_gt_bboxes;
   GetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
@@ -327,6 +343,7 @@ void MultiBoxSSDLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
       // Copy gradient back to bottom[0].
       const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
+      const Dtype * Sigmoid_data = loc_Sigmoid_.cpu_data();
       int count = 0;
       for (int i = 0; i < num_; ++i) {
         for (map<int, vector<int> >::iterator it =
@@ -340,8 +357,14 @@ void MultiBoxSSDLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             }
             // Copy the diff to the right place.
             int start_idx = loc_classes_ * 4 * j + label * 4;
-            caffe_copy<Dtype>(4, loc_pred_diff + count * 4,
-                              loc_bottom_diff + start_idx);
+            #if 1
+            int Sig_idx = loc_classes_ * 2 * j + label * 2;
+            Dtype temp_diff_x = loc_pred_diff[count *4 + 0] * Sigmoid_data[Sig_idx + 0]*(1 - Sigmoid_data[Sig_idx + 0]);
+            Dtype temp_diff_y = loc_pred_diff[count *4 + 1] * Sigmoid_data[Sig_idx + 1]*(1 - Sigmoid_data[Sig_idx + 1]);
+            caffe_copy<Dtype>(1, &temp_diff_x, loc_bottom_diff + start_idx + 0);
+            caffe_copy<Dtype>(1, &temp_diff_y, loc_bottom_diff + start_idx + 1);
+            #endif
+            caffe_copy<Dtype>(2, loc_pred_diff + count * 4 + 2, loc_bottom_diff + start_idx + 2);
             ++count;
           }
         }

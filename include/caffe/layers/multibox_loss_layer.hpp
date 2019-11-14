@@ -60,6 +60,7 @@ class MultiBoxSSDLossLayer : public LossLayer<Dtype> {
   Blob<Dtype> loc_gt_;
   // localization loss.
   Blob<Dtype> loc_loss_;
+  Blob<Dtype> loc_Sigmoid_;
 
   // The internal confidence loss layer.
   shared_ptr<Layer<Dtype> > conf_loss_layer_;
