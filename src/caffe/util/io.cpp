@@ -28,6 +28,13 @@
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/io.hpp"
 
+
+#ifndef O_BINARY
+
+ #define O_BINARY 0 
+
+ #endif
+
 const int kProtoReadBytesLimit = INT_MAX;  // Max size of 2 GB minus 1 byte.
 
 namespace caffe {
