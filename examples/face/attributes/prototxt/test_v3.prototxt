@@ -1301,10 +1301,10 @@ layer {
 	}
 }
 layer {
-    name: "conv6_landmark"
+    name: "conv6_landmark_s"
 	type: "Sigmoid"
 	bottom: "conv6_landmark"
-	top: "conv6_landmark"
+	top: "conv6_landmark_s"
 }
 layer {
 	name: "conv6_gender"
@@ -1319,7 +1319,7 @@ layer {
 layer {
 	name: "multiface_output"
 	type: "Concat"
-	bottom: "conv6_landmark"
+	bottom: "conv6_landmark_s"
     bottom: "conv6_angle"
 	bottom: "conv6_gender"
 	top: "multiface_output"

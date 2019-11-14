@@ -1214,10 +1214,10 @@ layer {
 	}
 }
 layer {
-    name: "conv6_landmark"
+    name: "conv6_landmark_s"
 	type: "Sigmoid"
 	bottom: "conv6_landmark"
-	top: "conv6_landmark"
+	top: "conv6_landmark_s"
 }
 layer {
 	name: "conv6_angle_fds"
@@ -1307,7 +1307,7 @@ layer {
 layer {
 	name: "landmark_loss"
 	type: "SmoothL1Loss"
-	bottom: "conv6_landmark"
+	bottom: "conv6_landmark_s"
 	bottom: "label_landmark"
 	top: "landmark_loss"
 	loss_weight: 1
