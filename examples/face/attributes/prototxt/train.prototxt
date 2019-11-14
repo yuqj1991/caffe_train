@@ -1214,6 +1214,12 @@ layer {
 	}
 }
 layer {
+    name: "conv6_landmark"
+	type: "Sigmoid"
+	bottom: "conv6_landmark"
+	top: "conv6_landmark"
+}
+layer {
 	name: "conv6_angle_fds"
 	type: "InnerProduct"
 	bottom: "conv_4_1_3"
@@ -1271,7 +1277,7 @@ layer {
 }
 layer {
 	name: "faceangleloss"
-	type: "EuclideanLoss"
+	type: "SmoothL1Loss"
 	bottom: "conv6_angle"
 	bottom: "label_angle"
 	top: "faceangleloss"
@@ -1300,7 +1306,7 @@ layer {
 }
 layer {
 	name: "landmark_loss"
-	type: "EuclideanLoss"
+	type: "SmoothL1Loss"
 	bottom: "conv6_landmark"
 	bottom: "label_landmark"
 	top: "landmark_loss"

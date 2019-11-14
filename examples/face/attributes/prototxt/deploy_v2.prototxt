@@ -1407,6 +1407,12 @@ layer {
 	}
 }
 layer {
+    name: "conv6_landmark"
+	type: "Sigmoid"
+	bottom: "conv6_landmark"
+	top: "conv6_landmark"
+}
+layer {
 	name: "conv6_angle_fds"
 	type: "InnerProduct"
 	bottom: "conv_5_1"
