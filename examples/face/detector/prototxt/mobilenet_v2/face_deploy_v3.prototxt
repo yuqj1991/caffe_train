@@ -3964,6 +3964,213 @@ layer {
   bottom: "layer_19_2_3"
   top: "layer_19_2_3"
 }
+layer {
+  name: "layer_19_1_4"
+  type: "Convolution"
+  bottom: "layer_19_2_3"
+  top: "layer_19_1_4"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 128
+    bias_term: false
+    kernel_size: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "layer_19_1_4/bn"
+  type: "BatchNorm"
+  bottom: "layer_19_1_4"
+  top: "layer_19_1_4"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  batch_norm_param {
+    eps: 0.001
+  }
+}
+layer {
+  name: "layer_19_1_4/scale"
+  type: "Scale"
+  bottom: "layer_19_1_4"
+  top: "layer_19_1_4"
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  scale_param {
+    filler {
+      value: 1
+    }
+    bias_term: true
+    bias_filler {
+      value: 0
+    }
+  }
+}
+layer {
+  name: "layer_19_1_4/relu"
+  type: "ReLU"
+  bottom: "layer_19_1_4"
+  top: "layer_19_1_4"
+}
+layer {
+  name: "layer_19_2_4/depthwise"
+  type: "Convolution"
+  bottom: "layer_19_1_4"
+  top: "layer_19_2_4/depthwise"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 128
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 128
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "layer_19_2_4/depthwise/bn"
+  type: "BatchNorm"
+  bottom: "layer_19_2_4/depthwise"
+  top: "layer_19_2_4/depthwise"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  batch_norm_param {
+    eps: 0.001
+  }
+}
+layer {
+  name: "layer_19_2_4/depthwise/scale"
+  type: "Scale"
+  bottom: "layer_19_2_4/depthwise"
+  top: "layer_19_2_4/depthwise"
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  scale_param {
+    filler {
+      value: 1
+    }
+    bias_term: true
+    bias_filler {
+      value: 0
+    }
+  }
+}
+layer {
+  name: "layer_19_2_4/depthwise/relu"
+  type: "ReLU"
+  bottom: "layer_19_2_4/depthwise"
+  top: "layer_19_2_4/depthwise"
+}
+layer {
+  name: "layer_19_2_4"
+  type: "Convolution"
+  bottom: "layer_19_2_4/depthwise"
+  top: "layer_19_2_4"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    num_output: 256
+    bias_term: false
+    kernel_size: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "layer_19_2_4/bn"
+  type: "BatchNorm"
+  bottom: "layer_19_2_4"
+  top: "layer_19_2_4"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  batch_norm_param {
+    eps: 0.001
+  }
+}
+layer {
+  name: "layer_19_2_4/scale"
+  type: "Scale"
+  bottom: "layer_19_2_4"
+  top: "layer_19_2_4"
+  param {
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  scale_param {
+    filler {
+      value: 1
+    }
+    bias_term: true
+    bias_filler {
+      value: 0
+    }
+  }
+}
+layer {
+  name: "layer_19_2_4/relu"
+  type: "ReLU"
+  bottom: "layer_19_2_4"
+  top: "layer_19_2_4"
+}
 
 #######################################################################
 #                             modeule one                             #
@@ -3972,17 +4179,17 @@ layer {
 layer{
 	name: "lfpn_1_moudle_cpm_3_3"
 	type: "Convolution"
-	bottom: "conv_3/expand"
+	bottom: "conv_6/expand"
 	top: "lfpn_1_moudle_cpm_3_3"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 144
+		num_output: 192
 		bias_term: false
 		kernel_size: 3
-		group: 144
+		group: 192
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -4045,7 +4252,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 144
+		num_output: 192
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -4118,17 +4325,17 @@ layer {
 layer{
 	name: "lfpn_2_moudle_cpm_4_3"
 	type: "Convolution"
-	bottom: "conv_6/expand"
+	bottom: "conv_13/expand"
 	top: "lfpn_2_moudle_cpm_4_3"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 192
+		num_output: 576
 		bias_term: false
 		kernel_size: 3
-		group: 192
+		group: 576
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -4191,7 +4398,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 192
+		num_output: 576
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -4264,17 +4471,17 @@ layer {
 layer{
 	name: "cpm_moudle_conv13_block3"
 	type: "Convolution"
-	bottom: "conv_13/expand"
+	bottom: "Conv_1"
 	top: "cpm_moudle_conv13_block3"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 576
+		num_output: 1280
 		bias_term: false
 		kernel_size: 3
-		group: 576
+		group: 1280
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -4337,7 +4544,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 576
+		num_output: 1280
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -4412,7 +4619,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv14_2"
 	type: "Convolution"
-	bottom: "Conv_1"
+	bottom: "layer_19_2_2"
 	top: "cpm_moudle_conv14_2"
 	param {
 		lr_mult: 1
@@ -4423,10 +4630,10 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 1280
+		num_output: 256
 		kernel_size: 3
 		pad: 1
-		group: 1280
+		group: 256
 		weight_filler {
 			type: "msra"
 		}
@@ -4497,7 +4704,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 1280
+		num_output: 256
 		kernel_size: 1
 		stride: 1
 		weight_filler {
@@ -4572,7 +4779,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv16_2"
 	type: "Convolution"
-	bottom: "layer_19_2_2"
+	bottom: "layer_19_2_3"
 	top: "cpm_moudle_conv16_2"
 	param {
 		lr_mult: 1
@@ -4733,7 +4940,7 @@ layer {
 layer{
 	name: "cpm_moudle_conv17_2"
 	type: "Convolution"
-	bottom: "layer_19_2_3"
+	bottom: "layer_19_2_4"
 	top: "cpm_moudle_conv17_2"
 	param {
 		lr_mult: 1
