@@ -185,6 +185,7 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
       mutable_Sigmoid_data[start_idx_Sigmoid_data + 1] = Dtype(1 / std::exp(loc_data[start_idx_loc_data + 1]));
     }
   }
+  const Dtype * Sigmoid_data = loc_Sigmoid_.cpu_data();
   #endif
 
   // Retrieve all ground truth.
@@ -343,7 +344,6 @@ void MultiBoxSSDLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
       // Copy gradient back to bottom[0].
       const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
-      const Dtype * Sigmoid_data = loc_Sigmoid_.cpu_data();
       int count = 0;
       for (int i = 0; i < num_; ++i) {
         for (map<int, vector<int> >::iterator it =
