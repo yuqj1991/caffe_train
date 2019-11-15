@@ -18,6 +18,7 @@ stepvalue: 1002000
 display: 100
 # The maximum number of iterations
 max_iter: 1200000
+average_loss: 10
 snapshot_after_train: true
 test_initialization: false
 # snapshot intermediate results
