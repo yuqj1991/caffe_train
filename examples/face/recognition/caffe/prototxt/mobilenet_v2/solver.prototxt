@@ -4,7 +4,7 @@ net: "./prototxt/mobilenet_v2/train.prototxt"
 test_iter: 1000
 test_interval: 10000
 
-base_lr: 0.1
+base_lr: 0.01
 momentum: 0.9
 weight_decay: 0.0005
 # The learning rate policy
