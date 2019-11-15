@@ -23,10 +23,13 @@ layer {
 		}
 	}
 	data_param {
-		#source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
-		source: "/media/resideo/DATA/dataset/face_recog_vggface2_lmdb_train"
-		batch_size: 64
+		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
+		#source: "/media/resideo/DATA/dataset/face_recog_vggface2_lmdb_train"
+		batch_size: 32
 		backend: LMDB
+	}
+	include {
+		phase: TRAIN
 	}
 }
 
@@ -50,7 +53,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_test"
-		batch_size: 64
+		batch_size: 32
 		backend: LMDB
 	}
 	include {
