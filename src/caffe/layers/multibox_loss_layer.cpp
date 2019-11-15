@@ -171,7 +171,7 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
   const Dtype* prior_data = bottom[2]->cpu_data();
   const Dtype* gt_data = bottom[3]->cpu_data();
 
-  #if 1
+  #if 0
   vector<int> Sigmoid_shape(2);
   Sigmoid_shape[0] = 1;
   Sigmoid_shape[1] = num_priors_ * num_ * 2;
@@ -357,14 +357,14 @@ void MultiBoxSSDLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             }
             // Copy the diff to the right place.
             int start_idx = loc_classes_ * 4 * j + label * 4;
-            #if 1
+            #if 0
             int Sig_idx = loc_classes_ * 2 * j + label * 2;
             Dtype temp_diff_x = loc_pred_diff[count *4 + 0] * Sigmoid_data[Sig_idx + 0]*(1 - Sigmoid_data[Sig_idx + 0]);
             Dtype temp_diff_y = loc_pred_diff[count *4 + 1] * Sigmoid_data[Sig_idx + 1]*(1 - Sigmoid_data[Sig_idx + 1]);
             caffe_copy<Dtype>(1, &temp_diff_x, loc_bottom_diff + start_idx + 0);
             caffe_copy<Dtype>(1, &temp_diff_y, loc_bottom_diff + start_idx + 1);
             #endif
-            caffe_copy<Dtype>(2, loc_pred_diff + count * 4 + 2, loc_bottom_diff + start_idx + 2);
+            caffe_copy<Dtype>(4, loc_pred_diff + count * 4, loc_bottom_diff + start_idx);
             ++count;
           }
         }
