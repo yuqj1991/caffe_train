@@ -135,7 +135,7 @@ __global__ void DecodeBBoxesKernel(const int nthreads,
         decode_bbox_height = exp(ymax) * prior_height;
       } else {
         // variance is encoded in bbox, we need to scale the offset accordingly.
-        #if 0
+        #if 1
         decode_bbox_center_x =
           prior_data[vi] * xmin * prior_width + prior_center_x;
         decode_bbox_center_y =

@@ -399,7 +399,7 @@ void EncodeBBox(
       encode_bbox->set_ymax(log(bbox_height / prior_height));
     } else {
       // Encode variance in bbox.
-      #if 0
+      #if 1
       encode_bbox->set_xmin(
           (bbox_center_x - prior_center_x) / prior_width / prior_variance[0]);
       encode_bbox->set_ymin(
@@ -486,7 +486,7 @@ void DecodeBBox(
       decode_bbox_height = exp(bbox.ymax()) * prior_height;
     } else {
       // variance is encoded in bbox, we need to scale the offset accordingly.
-      #if 0
+      #if 1
       decode_bbox_center_x =
           prior_variance[0] * bbox.xmin() * prior_width + prior_center_x;
       decode_bbox_center_y =
@@ -1158,12 +1158,15 @@ void GetLocPredictions(const Dtype* loc_data, const int num,
         if (label_bbox.find(label) == label_bbox.end()) {
           label_bbox[label].resize(num_preds_per_class);
         }
-        #if 1
+        #if 0
         Dtype px = Dtype(1 / (1 + std::exp(loc_data[start_idx + c * 4])));
         Dtype py = Dtype(1 / (1 + std::exp(loc_data[start_idx + c * 4 + 1])));
-        #endif
         label_bbox[label][p].set_xmin(px);
         label_bbox[label][p].set_ymin(py);
+        #else
+        label_bbox[label][p].set_xmin(loc_data[start_idx + c * 4]);
+        label_bbox[label][p].set_ymin(loc_data[start_idx + c * 4 + 1]);
+        #endif
         label_bbox[label][p].set_xmax(loc_data[start_idx + c * 4 + 2]);
         label_bbox[label][p].set_ymax(loc_data[start_idx + c * 4 + 3]);
       }

@@ -2,14 +2,14 @@ import numpy as np
 import argparse
 import sys,os  
 import cv2
-caffe_root = '../../../../caffe_train/'
+caffe_root = '../../../../../caffe_train/'
 sys.path.insert(0, caffe_root + 'python')  
 import caffe  
 
 def make_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, required=True, help='.prototxt file for inference')
-    parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
+    parser.add_argument('--model', type=str, help='.prototxt file for inference', default = '../net/face_detector.prototxt')
+    parser.add_argument('--weights', type=str, help='.caffemodel file for inference', default = '../net/face_detector.caffemodel')
     parser.add_argument('--input', type = int, help='net input', default = 320)
     parser.add_argument('--sameAvg', type = int, help='net input', default = 0)
     return parser
