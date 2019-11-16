@@ -43,7 +43,7 @@ layer {
 	}
 	data_param {
 		source: "../lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 8
+		batch_size: 5
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -151,6 +151,7 @@ layer {
 			max_sample: 1
 			max_trials: 10
 		}
+		sampleprob: 1.0
 		label_map_file: "../labelmap_face.prototxt"
 	}
 }
@@ -1492,87 +1493,23 @@ layer {
 		operation: SUM
 	}
 }
-layer {
-	name: "conv11"
-	type: "Convolution"
-	bottom: "conv11_1_block2"
-	top: "conv11"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv11/bn"
-	type: "BatchNorm"
-	bottom: "conv11"
-	top: "conv11"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv11/scale"
-	type: "Scale"
-	bottom: "conv11"
-	top: "conv11"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv11/ReLU"
-	type: "ReLU"
-	bottom: "conv11"
-	top: "conv11"
-}
+
 layer {
 	name: "conv12/dw"
 	type: "Convolution"
-	bottom: "conv11"
+	bottom: "conv11_1_block2"
 	top: "conv12/dw"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 512
 		bias_term: false
 		pad: 1
 		kernel_size: 3
 		stride: 2
-		group: 128
+		group: 512
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -2092,7 +2029,140 @@ layer {
 	bottom: "conv15_2"
 	top: "conv15_2"
 }
-
+#
+layer {
+  name: "conv16_1"
+  type: "Convolution"
+  bottom: "conv15_2"
+  top: "conv16_1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 128
+    bias_term: false
+    kernel_size: 1
+    #pad: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv16_1/bn"
+  type: "BatchNorm"
+  bottom: "conv16_1"
+  top: "conv16_1"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+}
+layer {
+  name: "conv16_1/scale"
+  type: "Scale"
+  bottom: "conv16_1"
+  top: "conv16_1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1
+    }
+    bias_term: true
+    bias_filler {
+      value: 0
+    }
+  }
+}
+layer {
+  name: "conv16_1/relu"
+  type: "PReLU"
+  bottom: "conv16_1"
+  top: "conv16_1"
+}
+layer {
+  name: "conv16_2"
+  type: "Convolution"
+  bottom: "conv16_1"
+  top: "conv16_2"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 256
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv16_2/bn"
+  type: "BatchNorm"
+  bottom: "conv16_2"
+  top: "conv16_2"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+}
+layer {
+  name: "conv16_2/scale"
+  type: "Scale"
+  bottom: "conv16_2"
+  top: "conv16_2"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1
+    }
+    bias_term: true
+    bias_filler {
+      value: 0
+    }
+  }
+}
+layer {
+  name: "conv16_2/relu"
+  type: "PReLU"
+  bottom: "conv16_2"
+  top: "conv16_2"
+}
 #
 #######################################################################
 #                             modeule two                             #
@@ -2696,7 +2766,7 @@ layer {
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
 		min_size: 16.0
-        min_size: 32.0
+		min_size: 10.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2704,7 +2774,6 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		#step: 16
 	}
 }
 
@@ -2813,7 +2882,7 @@ layer {
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
 		min_size: 48
-		min_size: 64
+		min_size: 32
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2821,7 +2890,6 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		#step: 32
 	}
 }
 
@@ -2931,7 +2999,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
-		min_size: 128
+		min_size: 64
 		min_size: 96
 		flip: true
 		clip: false
@@ -2940,7 +3008,6 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		#step: 64
 	}
 }
 
@@ -3048,7 +3115,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 256.0
+		min_size: 128.0
 		min_size: 192.0
 		flip: true
 		clip: false
@@ -3057,7 +3124,6 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		#step: 128
 	}
 }
 
@@ -3164,7 +3230,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
-		min_size: 512.0
+		min_size: 256.0
 		min_size: 384.0
 		flip: true
 		clip: false
@@ -3173,7 +3239,6 @@ layer {
 		variance: 0.2
 		variance: 0.2
 		offset: 0.5
-		#step: 256
 	}
 }
 
@@ -3270,6 +3335,117 @@ layer {
 		axis: 1
 	}
 }
+
+#############seven prior layer############
+layer {
+  name: "conv_mbox_loc_module_seven"
+  type: "Convolution"
+  bottom: "conv16_2"
+  top: "conv_mbox_loc_module_seven"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 4
+    kernel_size: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "conv_mbox_loc_module_seven_perm"
+  type: "Permute"
+  bottom: "conv_mbox_loc_module_seven"
+  top: "conv_mbox_loc_module_seven_perm"
+  permute_param {
+    order: 0
+    order: 2
+    order: 3
+    order: 1
+  }
+}
+layer {
+  name: "conv_mbox_loc_module_seven_flat"
+  type: "Flatten"
+  bottom: "conv_mbox_loc_module_seven_perm"
+  top: "conv_mbox_loc_module_seven_flat"
+  flatten_param {
+    axis: 1
+  }
+}
+layer {
+  name: "conv_mbox_loc_module_seven_conf"
+  type: "Convolution"
+  bottom: "conv16_2"
+  top: "conv_mbox_loc_module_seven_conf"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 2
+    kernel_size: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "conv_mbox_loc_module_seven_conf_perm"
+  type: "Permute"
+  bottom: "conv_mbox_loc_module_seven_conf"
+  top: "conv_mbox_loc_module_seven_conf_perm"
+  permute_param {
+    order: 0
+    order: 2
+    order: 3
+    order: 1
+  }
+}
+layer {
+  name: "conv_mbox_loc_module_seven_conf_flat"
+  type: "Flatten"
+  bottom: "conv_mbox_loc_module_seven_conf_perm"
+  top: "conv_mbox_loc_module_seven_conf_flat"
+  flatten_param {
+    axis: 1
+  }
+}
+layer {
+  name: "conv_mbox_priorbox_seven"
+  type: "PriorBox"
+  bottom: "conv16_2"
+  bottom: "data"
+  top: "conv_mbox_priorbox_seven"
+  prior_box_param {
+    min_size: 512.0
+    flip: true
+    clip: false
+    variance: 0.10000000149011612
+    variance: 0.10000000149011612
+    variance: 0.20000000298023224
+    variance: 0.20000000298023224
+    offset: 0.5
+  }
+}
 ################################################
 layer {
 	name: "mbox_priorbox"
@@ -3279,6 +3455,7 @@ layer {
 	bottom: "dectction_moudle_four_priorbox"
 	bottom: "dectction_moudle_five_priorbox"
 	bottom: "dectction_moudle_six_priorbox"
+	bottom: "conv_mbox_priorbox_seven"
 	top: "mbox_priorbox"
 	concat_param {
 		axis: 2
@@ -3293,6 +3470,7 @@ layer {
 	bottom: "dectction_moudle_four_loc_flat"
 	bottom: "dectction_moudle_five_loc_flat"
 	bottom: "dectction_moudle_six_loc_flat"
+	bottom: "conv_mbox_loc_module_seven_flat"
 	top: "mbox_loc"
 	concat_param {
 		axis: 1
@@ -3308,6 +3486,7 @@ layer {
 	bottom: "dectction_moudle_four_conf_concat_flat"
 	bottom: "dectction_moudle_five_conf_concat_flat"
 	bottom: "dectction_moudle_six_conf_concat_flat"
+	bottom: "conv_mbox_loc_module_seven_conf_flat"
 	top: "mbox_conf"
 	concat_param {
 		axis: 1
