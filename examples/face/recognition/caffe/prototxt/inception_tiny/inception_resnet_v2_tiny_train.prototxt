@@ -5886,7 +5886,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 128
+    num_output: 512
     weight_filler {
       type: "xavier"
     }
@@ -5928,7 +5928,7 @@ layer {
 #  bottom: "label"
 #  top: "loss"
 #}
-########################################
+##############contravie loss##########################
 layer {
 	name: "merege_pair"
 	type: "Identity2Verify"
@@ -5985,7 +5985,7 @@ layer {
   loss_weight: 0.008
 }
 
-##########################################
+###############cosface loss#############
 layer {
   name: "lmcl_cos_l2_normalize"
   type: "CosinL2Normalize"

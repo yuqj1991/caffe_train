@@ -26,7 +26,7 @@ layer {
     	}
     }
 	data_param {
-		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb"
+		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
         batch_size: 128
         backend: LMDB
 	}
@@ -1565,74 +1565,79 @@ layer {
     }
   }
 }
-layer {
-  name: "classifier"
-  type: "InnerProduct"
-  bottom: "fc5"
-  top: "classifier"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 8631
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-  name: "loss"
-  type: "SoftmaxWithLoss"
-  bottom: "classifier"
-  bottom: "label"
-  top: "loss"
-}
+############## softmax loss ###############
+#layer {
+#  name: "score"
+#  type: "InnerProduct"
+#  bottom: "fc5"
+#  top: "score"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 1
+#  }
+#  param {
+#    lr_mult: 2
+#    decay_mult: 0
+#  }
+#  inner_product_param {
+#    num_output: 8631
+#    weight_filler {
+#      type: "xavier"
+#    }
+#    bias_filler {
+#      type: "constant"
+#      value: 0
+#    }
+#  }
+#}
+#layer {
+#  name: "Softmax_loss"
+#  type: "SoftmaxWithLoss"
+#  bottom: "score"
+#  bottom: "label"
+#  top: "Softmax_loss"
+#  loss_weight: 1
+#  propagate_down: true
+#  propagate_down: false
+#}
 
-layer {
-	name: "merege_pair"
-	type: "Identity2Verify"
-	bottom: "fc5"
-	bottom: "label"
-	top: "feature1"
-	top: "feature2"
-	top: "sim"
-}
+##############contravie loss##########################
+#layer {
+#	name: "merege_pair"
+#	type: "Identity2Verify"
+#	bottom: "fc5"
+#	bottom: "label"
+#	top: "feature1"
+#	top: "feature2"
+#	top: "sim"
+#}
 
-layer {
-	name: "norm1"
-	type: "SimpleNormalize"
-	bottom: "feature1"
-	top: "normfeature1"
-}
+#layer {
+#	name: "norm1"
+#	type: "SimpleNormalize"
+#	bottom: "feature1"
+#	top: "normfeature1"
+#}
 
-layer {
-	name: "norm2"
-	type: "SimpleNormalize"
-	bottom: "feature2"
-	top: "normfeature2"
-}
+#layer {
+#	name: "norm2"
+#	type: "SimpleNormalize"
+#	bottom: "feature2"
+#	top: "normfeature2"
+#}
 
-layer {
-  name: "loss2"
-  type: "ContrastiveLoss"
-  bottom: "normfeature1"
-  bottom: "normfeature2"
-  bottom: "sim"
-  top: "sim_loss"
-  loss_weight: 0.3
-  contrastive_loss_param {
-    margin: 1
-  }
-}
+#layer {
+#  name: "loss2"
+#  type: "ContrastiveLoss"
+#  bottom: "normfeature1"
+#  bottom: "normfeature2"
+#  bottom: "sim"
+#  top: "sim_loss"
+#  loss_weight: 0.3
+#  contrastive_loss_param {
+#    margin: 1
+#  }
+#}
 ############## center loss ###############
 layer {
   name: "center_loss"
@@ -1653,23 +1658,27 @@ layer {
   loss_weight: 0.008
 }
 
-##########################################
+#############cosface loss###############
 layer {
   name: "lmcl_cos_l2_normalize"
   type: "CosinL2Normalize"
   bottom: "fc5"
+  bottom: "label"
   top: "lmcl_cos_l2_normalize"
   param {
     lr_mult: 1
     decay_mult: 2 
   }
   cosin_loss_param {
+    margin: -0.35
+    scale: 64
     num_output: 8631
     cosin_filler {
       type: "xavier"
     }
   }
   propagate_down: true
+  propagate_down: false
 }
 layer {
   name: "cosin_loss"
@@ -1680,3 +1689,4 @@ layer {
   propagate_down: true
   propagate_down: false
 }
+
