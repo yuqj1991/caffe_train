@@ -12,7 +12,7 @@ max_iter: 1200000
 
 momentum: 0.9
 snapshot: 10000
-snapshot_prefix: "./face_recog/face_inception_googlenet"
+snapshot_prefix: "./snapshot/face_inception_googlenet"
 
 train_net: "./prototxt/google/train.prototxt"
 weight_decay: 0.0005

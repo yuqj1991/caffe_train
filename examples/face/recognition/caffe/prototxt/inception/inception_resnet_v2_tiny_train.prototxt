@@ -22,8 +22,8 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb"
-		batch_size: 128
+		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
+		batch_size: 48
 		backend: LMDB
 	}
 }
@@ -5886,7 +5886,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 512
+    num_output: 128
     weight_filler {
       type: "xavier"
     }

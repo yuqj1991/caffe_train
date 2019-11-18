@@ -16,7 +16,7 @@ display: 100
 max_iter: 1002000
 # snapshot intermediate results
 snapshot: 5000
-snapshot_prefix: "face_recog/facenet_inception_resnet_v2_tiny"
+snapshot_prefix: "snapshot/facenet_inception_resnet_v2_tiny"
 # solver mode: CPU or GPU
 solver_mode: GPU
 type: "SGD"

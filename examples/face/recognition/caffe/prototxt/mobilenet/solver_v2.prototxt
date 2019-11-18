@@ -23,7 +23,7 @@ snapshot_after_train: true
 #test_initialization: false
 # snapshot intermediate results
 snapshot: 200000
-snapshot_prefix: "face_recog/mobilenet_v2"
+snapshot_prefix: "snapshot/mobilenet_v2"
 # solver mode: CPU or GPU
 solver_mode: GPU
 #type: "Adam"

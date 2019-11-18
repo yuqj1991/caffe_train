@@ -27,7 +27,7 @@ layer {
     }
 	data_param {
 		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
-        batch_size: 64
+        batch_size: 48
         backend: LMDB
 	}
 }
@@ -45,7 +45,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 16
+		num_output: 32
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -119,7 +119,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 32
+		num_output: 64
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -188,7 +188,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 32
+		num_output: 64
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -273,7 +273,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 64
+		num_output: 128
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -344,7 +344,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 64
+		num_output: 128
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -430,7 +430,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		stride: 2
 		pad: 1
@@ -501,7 +501,7 @@ layer {
 	decay_mult: 1
 	}
 	convolution_param {
-		num_output: 128
+		num_output: 256
 		kernel_size: 3
 		stride: 1
 		pad: 1
@@ -2894,7 +2894,7 @@ layer {
 	convolution_param {
 		num_output: 512
 		pad: 0
-		kernel_size: 1
+		kernel_size: 3
 		stride: 1
 		weight_filler {
 			type: "xavier"
@@ -3042,24 +3042,24 @@ layer {
 #	}
 #}
 ############## center loss ###############
-layer {
-	name: "center_loss"
-	type: "CenterLoss"
-	bottom: "fc5"
-	bottom: "label"
-	top: "center_loss"
-	param {
-		lr_mult: 1
-		decay_mult: 2 
-	}
-	center_loss_param {
-		num_output: 8631
-		center_filler {
-			type: "xavier"
-		}
-	}
-	loss_weight: 0.8
-}
+#layer {
+#	name: "center_loss"
+#	type: "CenterLoss"
+#	bottom: "fc5"
+#	bottom: "label"
+#	top: "center_loss"
+#	param {
+#		lr_mult: 1
+#		decay_mult: 2 
+#	}
+#	center_loss_param {
+#		num_output: 8631
+#		center_filler {
+#			type: "xavier"
+#		}
+#	}
+#	loss_weight: 0.8
+#}
 
 #############cosface loss###############
 layer {
