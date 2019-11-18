@@ -133,6 +133,7 @@ annotated_data_param {
 			max_sample: 1
 			max_trials: 10
 		}
+        sampleprob: 1.0
 		label_map_file: "../labelmap_face.prototxt"
 	}
 }
