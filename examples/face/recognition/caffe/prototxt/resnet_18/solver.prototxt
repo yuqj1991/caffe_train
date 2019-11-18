@@ -3,10 +3,10 @@ base_lr: 0.01
 lr_policy: "multistep"
 gamma: 0.1
 
-stepvalue: 16000
-stepvalue: 24000
-stepvalue: 28000
-max_iter: 30000
+stepvalue: 100000
+stepvalue: 500000
+stepvalue: 800000
+max_iter: 1000000
 iter_size: 1
 
 display: 100
