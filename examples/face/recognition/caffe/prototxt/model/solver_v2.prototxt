@@ -1,22 +1,22 @@
 # The train/test net protocol buffer definition
-train_net: "./prototxt/inception/inception_resnet_v2_tiny_train.prototxt"
-base_lr: 0.1
+train_net: "./prototxt/model/train_v2.prototxt"
+base_lr: 0.01
 momentum: 0.9
 weight_decay: 0.0005
 # The learning rate policy
 lr_policy: "multistep"
 gamma: 0.1
-stepvalue: 100000
-stepvalue: 6004000
-stepvalue: 8002000
-
+stepvalue: 200000
+stepvalue: 602000
+stepvalue: 1002000
+average_loss: 10
 # Display every 100 iterations
 display: 100
 # The maximum number of iterations
-max_iter: 1002000
+max_iter: 1200000
 # snapshot intermediate results
 snapshot: 5000
-snapshot_prefix: "face_recog/facenet_inception_resnet_v2_tiny"
+snapshot_prefix: "face_recog/model_v2"
 # solver mode: CPU or GPU
 solver_mode: GPU
 type: "SGD"

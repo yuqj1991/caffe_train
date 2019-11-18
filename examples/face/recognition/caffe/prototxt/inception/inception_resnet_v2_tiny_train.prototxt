@@ -1,15 +1,15 @@
 layer {
-    name: "data"
-    type: "Data"
-    top: "data"
-    top: "label"
-    transform_param {
-        mirror: true
-        mean_value: 127.5
-        mean_value: 127.5
-        mean_value: 127.5
-        scale: 0.0078125
-        resize_param {
+	name: "data"
+	type: "Data"
+	top: "data"
+	top: "label"
+	transform_param {
+		mirror: true
+		mean_value: 127.5
+		mean_value: 127.5
+		mean_value: 127.5
+		scale: 0.0078125
+		resize_param {
 			prob: 1.0
 			resize_mode: WARP
 			height: 128
@@ -19,13 +19,13 @@ layer {
 			interp_mode: NEAREST
 			interp_mode: CUBIC
 			interp_mode: LANCZOS4
-    	}
-    }
-    data_param {
-        source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb"
-        batch_size: 128
-        backend: LMDB
-    }
+		}
+	}
+	data_param {
+		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb"
+		batch_size: 128
+		backend: LMDB
+	}
 }
 layer {
   name: "conv1_3x3_s2"
@@ -5954,63 +5954,63 @@ layer {
 }
 
 layer {
-  name: "loss2"
-  type: "ContrastiveLoss"
-  bottom: "normfeature1"
-  bottom: "normfeature2"
-  bottom: "sim"
-  top: "sim_loss"
-  loss_weight: 0.3
-  contrastive_loss_param {
-    margin: 1
-  }
+	name: "loss2"
+	type: "ContrastiveLoss"
+	bottom: "normfeature1"
+	bottom: "normfeature2"
+	bottom: "sim"
+	top: "sim_loss"
+	loss_weight: 0.3
+	contrastive_loss_param {
+		margin: 1
+	}
 }
 ############## center loss ###############
 layer {
-  name: "center_loss"
-  type: "CenterLoss"
-  bottom: "fc5"
-  bottom: "label"
-  top: "center_loss"
-  param {
-    lr_mult: 1
-    decay_mult: 2 
-  }
-  center_loss_param {
-    num_output: 8631
-    center_filler {
-      type: "xavier"
-    }
-  }
-  loss_weight: 0.008
+	name: "center_loss"
+	type: "CenterLoss"
+	bottom: "fc5"
+	bottom: "label"
+	top: "center_loss"
+	param {
+		lr_mult: 1
+		decay_mult: 2 
+	}
+	center_loss_param {
+		num_output: 8631
+		center_filler {
+			type: "xavier"
+		}
+	}
+	loss_weight: 0.8
 }
 
 ###############cosface loss#############
 layer {
-  name: "lmcl_cos_l2_normalize"
-  type: "CosinL2Normalize"
-  bottom: "fc5"
-  bottom: "label"
-  top: "lmcl_cos_l2_normalize"
-  param {
-    lr_mult: 1
-    decay_mult: 2 
-  }
-  cosin_loss_param {
-    margin: -0.35
-    scale: 64
-    num_output: 8631
-    cosin_filler {
-      type: "xavier"
-    }
-  }
+	name: "lmcl_cos_l2_normalize"
+	type: "CosinL2Normalize"
+	bottom: "fc5"
+	bottom: "label"
+	top: "lmcl_cos_l2_normalize"
+	param {
+		lr_mult: 1
+		decay_mult: 2 
+	}
+	cosin_loss_param {
+		margin: -0.35
+		scale: 64
+		num_output: 8631
+		cosin_filler {
+			type: "xavier"
+		}
+	}
 }
 layer {
-  name: "cosin_loss"
-  type: "SoftmaxWithLoss"
-  bottom: "lmcl_cos_l2_normalize"
-  bottom: "label"
-  top: "cosin_loss"
-  propagate_down: true
-  propagate_down: false
+	name: "cosin_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "lmcl_cos_l2_normalize"
+	bottom: "label"
+	top: "cosin_loss"
+	propagate_down: true
+	propagate_down: false
 }
