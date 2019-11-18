@@ -1,5 +1,5 @@
 # The train/test net protocol buffer definition
-net: "./prototxt/mobilenet_v2/train.prototxt"
+net: "./prototxt/mobilenet/train_v2.prototxt"
 
 #test_iter: 1000
 #test_interval: 10000
@@ -23,7 +23,7 @@ snapshot_after_train: true
 #test_initialization: false
 # snapshot intermediate results
 snapshot: 200000
-snapshot_prefix: "face_recog/tiny"
+snapshot_prefix: "face_recog/mobilenet_v2"
 # solver mode: CPU or GPU
 solver_mode: GPU
 #type: "Adam"
