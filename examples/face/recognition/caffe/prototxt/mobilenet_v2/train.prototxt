@@ -24,8 +24,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
-		#source: "/media/resideo/DATA/dataset/face_recog_vggface2_lmdb_train"
-		batch_size: 32
+		batch_size: 64
 		backend: LMDB
 	}
 	include {
@@ -53,7 +52,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_test"
-		batch_size: 32
+		batch_size: 1
 		backend: LMDB
 	}
 	include {
@@ -3893,7 +3892,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 256
+    num_output: 512
     weight_filler {
       type: "xavier"
     }
