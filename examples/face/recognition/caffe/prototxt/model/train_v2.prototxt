@@ -27,7 +27,7 @@ layer {
     }
 	data_param {
 		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
-        batch_size: 128
+        batch_size: 64
         backend: LMDB
 	}
 }
@@ -2879,20 +2879,75 @@ layer {
   top: "reduction_b_concat"
 }
 layer {
-  name: "pool_3x3_s1"
-  type: "Pooling"
-  bottom: "reduction_b_concat"
-  top: "pool_3x3_s1"
-  pooling_param {
-    pool: AVE
-    global_pooling: true
-  }
+	name: "conv6_1x1"
+	type: "Convolution"
+	bottom: "reduction_b_concat"
+	top: "conv6_1x1"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	convolution_param {
+		num_output: 512
+		pad: 0
+		kernel_size: 1
+		stride: 1
+		weight_filler {
+			type: "xavier"
+			std: 0.01
+		}
+		bias_filler {
+			type: "constant"
+			value: 0.2
+		}
+	}
+}
+layer {
+	name: "conv6_1x1_bn"
+	type: "BatchNorm"
+	bottom: "conv6_1x1"
+	top: "conv6_1x1"
+	param {
+		lr_mult: 0.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+		decay_mult: 0.0
+	}
+	batch_norm_param {
+		use_global_stats: true
+		moving_average_fraction: 0.95
+	}
+}
+layer {
+	name: "conv6_1x1_scale"
+	type: "Scale"
+	bottom: "conv6_1x1"
+	top: "conv6_1x1"
+	scale_param {
+	bias_term: true
+	}
+}
+layer {
+  name: "conv6_1x1_relu"
+  type: "ReLU"
+  bottom: "conv6_1x1"
+  top: "conv6_1x1"
 }
 ##########################################################
 layer {
 	name: "fc5"
 	type: "InnerProduct"
-	bottom: "pool_3x3_s1"
+	bottom: "conv6_1x1"
 	top: "fc5"
 	param {
 		lr_mult: 1
@@ -2903,7 +2958,7 @@ layer {
 		decay_mult: 0
 	}
 	inner_product_param {
-		num_output: 512
+		num_output: 256
 		weight_filler {
 			type: "xavier"
 		}
@@ -2975,16 +3030,16 @@ layer {
 #}
 
 #layer {
-#  name: "loss2"
-#  type: "ContrastiveLoss"
-#  bottom: "normfeature1"
-#  bottom: "normfeature2"
-#  bottom: "sim"
-#  top: "sim_loss"
-#  loss_weight: 0.3
-#  contrastive_loss_param {
-#    margin: 1
-#  }
+#	name: "loss2"
+#	type: "ContrastiveLoss"
+#	bottom: "normfeature1"
+#	bottom: "normfeature2"
+#	bottom: "sim"
+#	top: "sim_loss"
+#	loss_weight: 0.3
+#	contrastive_loss_param {
+#		margin: 1
+#	}
 #}
 ############## center loss ###############
 layer {
@@ -3003,7 +3058,7 @@ layer {
 			type: "xavier"
 		}
 	}
-	loss_weight: 0.008
+	loss_weight: 0.8
 }
 
 #############cosface loss###############
