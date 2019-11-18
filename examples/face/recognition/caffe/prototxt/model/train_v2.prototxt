@@ -1,4 +1,4 @@
-name: "deep_face_attribute"
+name: "faceRecognition"
 layer {
 	name: "data"
 	type: "Data"
@@ -7,13 +7,13 @@ layer {
 	include {
 		phase: TRAIN
 	}
-    transform_param {
-        mirror: true        
-        mean_value: 127.5
-        mean_value: 127.5
-        mean_value: 127.5
-        scale: 0.0078125
-        resize_param {
+	transform_param {
+		mirror: true
+		mean_value: 127.5
+		mean_value: 127.5
+		mean_value: 127.5
+		scale: 0.0078125
+		resize_param {
 			prob: 1.0
 			resize_mode: WARP
 			height: 128
