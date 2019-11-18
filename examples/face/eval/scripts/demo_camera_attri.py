@@ -111,7 +111,7 @@ def detect():
              
              x1 = max_(0, box[i][0] - minMargin/2)
              x2 = min_(box[i][2]+minMargin/2, w)
-             y1 = max_(0, box[i][1] - maxMargin/2)
+             y1 = max_(0, box[i][1] - minMargin/2)
              y2 = min_(box[i][3]+minMargin/2, h)
              
              p11 = (x1, y1)
