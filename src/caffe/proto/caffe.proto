@@ -663,6 +663,120 @@ message LayerParameter {
   
   optional CombinedMarginParameter combined_margin_param = 156;
   optional metricDistanceParameter metric_param = 300;
+  
+  optional CTCDecoderParameter ctc_decoder_param = 301;
+  optional CTCLossParameter ctc_loss_param = 302;
+  
+  optional ReverseParameter reverse_param = 303;
+  optional ReverseTimeParameter reverse_time_param = 304;
+  
+  optional InterpParameter interp_param = 305;
+
+  optional ContinuationIndicatorParameter continuation_indicator_param = 306;
+
+  optional LabelsequenceAccuracyParameter labelsequence_accuracy_param = 307;
+  
+  optional TransposeParameter transpose_param=8266710;
+  optional LSTMParameter lstm_param = 8266711;
+}
+
+message ContinuationIndicatorParameter {
+    optional uint32 time_step = 1 [default = 0];
+    optional uint32 batch_size = 2 [default = 0];
+}
+
+message LabelsequenceAccuracyParameter {
+  optional int32 blank_label = 1 [default = 0];
+}
+
+// Message that stores parameters used by LSTMParameter
+message LSTMParameter {
+  optional uint32 num_output = 1; // The number of outputs for the layer
+  optional float clipping_threshold = 2 [default = 0.0];
+  optional FillerParameter weight_filler = 3; // The filler for weight
+  optional FillerParameter bias_filler = 4; // The filler for the bias
+  optional uint32 batch_size = 5 [default = 1];
+}
+
+
+message TransposeParameter {
+  // For example, if you want to transpose NxCxHxW into WxNxHxC, 
+  // the parameter should be the following:
+  // transpose_param { dim: 3 dim: 0 dim: 2 dim: 1 }
+  // ie, if the i-th dim has value n, then the i-th axis of top is equal to the n-th axis of bottom.
+  repeated int32 dim=1;
+}
+
+message CTCDecoderParameter {
+  // The index of the blank index in the labels. A negative (default)
+  // value will use the last index
+  optional int32 blank_index = 1 [default = 0];
+
+  // Collapse the repeated labels during the ctc calculation
+  // e.g. collapse [0bbb11bb11bb0b2] to [01102] instead of [0111102],
+  // where b means blank label.
+  // The default behaviour is to merge repeated labels.
+  // Note: blank labels will be removed in any case.
+  optional bool ctc_merge_repeated = 2 [default = true];
+}
+
+message CTCLossParameter {
+  // Adds delayed output to the CTC loss calculation (untested!)
+  optional int32 output_delay = 1 [default = 0];
+
+  // The index of the blank index in the labels. A negative (default)
+  // value will use the last index
+  optional int32 blank_index = 2 [default = 0];
+
+  // Collapse repeating labels of the target sequence before calculating
+  // the loss and the gradients (e.g. collapse [01102] to [0102])
+  // The default behaviour is to keep repeated labels. Elsewise the
+  // network will not learn to predict repetitions.
+  optional bool preprocess_collapse_repeated = 3 [default = false];
+
+  // Collapse the repeated labels during the ctc calculation
+  // e.g collapse [0bbb11bb11bb0b2] to [01102] instead of [0111102],
+  // where b means blank label.
+  // The default behaviour is to merge repeated labels.
+  // Note: blank labels will be removed in any case.
+  optional bool ctc_merge_repeated = 4 [default = true];
+
+  /// This parameter is for test cases only!
+  /// The time for which to calculate the loss (see Graves Eq. (7.27) )
+  /// Note that the result must be the same for each 0 <= t < T
+  /// Therefore you can chose an arbitrary value, default 0
+  optional int32 loss_calculation_t = 5 [default = 0];
+}
+
+message ReverseParameter {
+  // axis controls the data axis which shall be inverted.
+  // The layout of the content will not be inverted
+  //
+  // The default axis is 0 that means:
+  //   data_previous[n] == data_afterwards[N - n -1]
+  // where N is the shape of axis(n)
+  //
+  // Usually this layer will be used with recurrent layers to invert the
+  // time axis which is axis 0
+  // This layer will therefore swap the order in time but not the
+  // order of the actual data.
+  optional int32 axis = 1 [default = 0];
+}
+
+message ReverseTimeParameter {
+  // if true the rest of the sequence will not be reversed but copied
+  // if false no more operation will be performed for the reset.
+  //   this can lead to random numbers in the blob.
+  optional bool copy_remaining = 1 [default = false];
+}
+
+message InterpParameter {
+  optional int32 height = 1 [default = 0]; // Height of output
+  optional int32 width = 2 [default = 0]; // Width of output
+  optional int32 zoom_factor = 3 [default = 1]; // zoom factor
+  optional int32 shrink_factor = 4 [default = 1]; // shrink factor
+  optional int32 pad_beg = 5 [default = 0]; // padding at begin of input
+  optional int32 pad_end = 6 [default = 0]; // padding at end of input
 }
 
 message metricDistanceParameter{

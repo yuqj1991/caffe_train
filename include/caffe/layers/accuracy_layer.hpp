@@ -68,6 +68,8 @@ class AccuracyLayer : public Layer<Dtype> {
    */
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
 
 
   /// @brief Not implemented -- AccuracyLayer cannot be used as a loss.
@@ -77,6 +79,8 @@ class AccuracyLayer : public Layer<Dtype> {
       if (propagate_down[i]) { NOT_IMPLEMENTED; }
     }
   }
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
   int label_axis_, outer_num_, inner_num_;
 
@@ -88,6 +92,55 @@ class AccuracyLayer : public Layer<Dtype> {
   int ignore_label_;
   /// Keeps counts of the number of samples per class.
   Blob<Dtype> nums_buffer_;
+};
+
+
+/* MultiLabelAccuracyLayer
+  Note: It is also a loss layer! Does not implement backwards step.
+  Computes the accuracy and cross entropy loss with respect to b.
+*/
+template <typename Dtype>
+class MultiLabelAccuracyLayer : public Layer<Dtype> {
+ public:
+  explicit MultiLabelAccuracyLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+	  const vector<Blob<Dtype>*>& top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+	  const vector<Blob<Dtype>*>& top);
+
+  virtual inline const char* type() const {
+    return "MultiLabelAccuracy";
+  }
+  virtual inline int ExactNumBottomBlobs() const { return 2; }
+
+  // If there are two top blobs, then the second blob will contain
+  // accuracies per class.
+  virtual inline int MinTopBlobs() const { return 1; }
+  virtual inline int MaxTopBlobs() const { return 2; }
+
+ protected:
+	 virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+		 const vector<Blob<Dtype>*>& top);
+	 /// @brief Not implemented -- AccuracyLayer cannot be used as a loss.
+	 virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+		 const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
+		 for (int i = 0; i < propagate_down.size(); ++i) {
+			 if (propagate_down[i]) { NOT_IMPLEMENTED; }
+		 }
+	 }
+
+  int label_axis_, outer_num_, inner_num_, label_num_;
+
+  int top_k_;
+
+  /// Whether to ignore instances with a certain label.
+  bool has_ignore_label_;
+  /// The label indicating that an instance should be ignored.
+  int ignore_label_;
+  /// Keeps counts of the number of samples per class.
+  Blob<Dtype> nums_buffer_;
+
 };
 
 }  // namespace caffe
