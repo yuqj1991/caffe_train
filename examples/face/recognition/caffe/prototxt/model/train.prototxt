@@ -1,36 +1,60 @@
 name: "faceRecognition"
+#layer {
+#	name: "data"
+#	type: "Data"
+#	top: "data"
+#	top: "label"
+#	include {
+#		phase: TRAIN
+#	}
+#    transform_param {
+#        mirror: true        
+#        mean_value: 127.5
+#        mean_value: 127.5
+#        mean_value: 127.5
+#        scale: 0.0078125
+#        resize_param {
+#			prob: 1.0
+#			resize_mode: WARP
+#			height: 128
+#			width: 128
+#			interp_mode: LINEAR
+#			interp_mode: AREA
+#			interp_mode: NEAREST
+#			interp_mode: CUBIC
+#			interp_mode: LANCZOS4
+#    	}
+#    }
+#	data_param {
+#		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
+#        batch_size: 128
+#        backend: LMDB
+#	}
+#}
+
 layer {
 	name: "data"
-	type: "Data"
+	type: "ImageData"
 	top: "data"
 	top: "label"
-	include {
-		phase: TRAIN
+	image_data_param {
+		new_height: 128
+		new_width: 128
+		sample_num: 5
+		label_num: 45
+		batch_size: 225
+		source: 'train.txt'
+		root_folder: "../../../../../dataset/facedata/recognition"
 	}
-    transform_param {
-        mirror: true        
-        mean_value: 127.5
-        mean_value: 127.5
-        mean_value: 127.5
-        scale: 0.0078125
-        resize_param {
-			prob: 1.0
-			resize_mode: WARP
-			height: 128
-			width: 128
-			interp_mode: LINEAR
-			interp_mode: AREA
-			interp_mode: NEAREST
-			interp_mode: CUBIC
-			interp_mode: LANCZOS4
-    	}
-    }
-	data_param {
-		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
-        batch_size: 128
-        backend: LMDB
+	transform_param {
+		mirror: true
+		mean_value: 127.5
+		mean_value: 127.5
+		mean_value: 127.5
+		scale: 0.0078125
 	}
 }
+
 layer {
     bottom: "data"
     top: "conv1"
@@ -1659,34 +1683,62 @@ layer {
 }
 
 #############cosface loss###############
+#layer {
+#  name: "lmcl_cos_l2_normalize"
+#  type: "CosinL2Normalize"
+#  bottom: "fc5"
+#  bottom: "label"
+#  top: "lmcl_cos_l2_normalize"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 2 
+#  }
+#  cosin_loss_param {
+#    margin: -0.35
+#    scale: 64
+#    num_output: 8631
+#    cosin_filler {
+#      type: "xavier"
+#    }
+#  }
+#  propagate_down: true
+#  propagate_down: false
+#}
+#layer {
+#  name: "cosin_loss"
+#  type: "SoftmaxWithLoss"
+#  bottom: "lmcl_cos_l2_normalize"
+#  bottom: "label"
+#  top: "cosin_loss"
+#  propagate_down: true
+#  propagate_down: false
+#}
+
+#######################tripletloss##################
 layer {
-  name: "lmcl_cos_l2_normalize"
-  type: "CosinL2Normalize"
-  bottom: "fc5"
-  bottom: "label"
-  top: "lmcl_cos_l2_normalize"
-  param {
-    lr_mult: 1
-    decay_mult: 2 
-  }
-  cosin_loss_param {
-    margin: -0.35
-    scale: 64
-    num_output: 8631
-    cosin_filler {
-      type: "xavier"
-    }
-  }
-  propagate_down: true
-  propagate_down: false
+	name: "fc5_feature"
+	type: "SimpleNormalize"
+	bottom: "fc5"
+	top: "fc5_feature"
+}
+#add activation layer may increase the feature's expression
+layer {
+	name: "archor_pair"
+	type: "SampleTriplet"
+	bottom: "fc5_feature"
+	bottom: "label"
+	top: "archor_pair"
+	propagate_down: false
+	propagate_down: false
 }
 layer {
-  name: "cosin_loss"
-  type: "SoftmaxWithLoss"
-  bottom: "lmcl_cos_l2_normalize"
-  bottom: "label"
-  top: "cosin_loss"
-  propagate_down: true
-  propagate_down: false
+	name: "tripletloss"
+	type: "TripletLoss"
+	bottom: "fc5_feature"
+	bottom: "archor_pair"
+	top: "tripletloss"
+	loss_weight: 1
+	propagate_down: true
+	propagate_down: true
 }
 
