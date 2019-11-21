@@ -46,6 +46,22 @@ void caffe_cpu_gemv<double>(const CBLAS_TRANSPOSE TransA, const int M,
 }
 
 template <>
+void caffe_bound<float>(const int N, const float* a, const float min,
+	const float max, float* y) {
+	for (int i = 0; i < N; ++i) {
+		y[i] = std::min(std::max(a[i], min), max);
+	}
+}
+
+template <>
+void caffe_bound<double>(const int N, const double* a, const double min,
+	const double max, double* y) {
+	for (int i = 0; i < N; ++i) {
+		y[i] = std::min(std::max(a[i], min), max);
+	}
+}
+
+template <>
 void caffe_axpy<float>(const int N, const float alpha, const float* X,
     float* Y) { cblas_saxpy(N, alpha, X, 1, Y, 1); }
 

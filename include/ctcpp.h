@@ -66,7 +66,7 @@ ctcStatus_t compute_ctc_loss_cpu(const Dtype* const activations,
                              void *workspace,
                              ctcOptions options);
 
-template<typename Dtype>
+/*template<typename Dtype>
 ctcStatus_t compute_ctc_loss_gpu(const Dtype* const activations,
 	Dtype* gradients,
 	const int* const flat_labels,
@@ -76,7 +76,7 @@ ctcStatus_t compute_ctc_loss_gpu(const Dtype* const activations,
 	int minibatch,
 	Dtype *costs,
 	void *workspace,
-	ctcOptions options);
+	ctcOptions options);*/
 
 
 /** For a given set of labels and minibatch size return the required workspace

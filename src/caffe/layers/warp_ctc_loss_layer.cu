@@ -77,7 +77,7 @@ void WarpCTCLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     size_t workspace_alloc_bytes_;
 
     ctcOptions options;
-    options.loc = CTC_GPU;
+    options.loc = CTC_CPU;
     options.blank_label = blank_index_;
     options.stream = stream;
 
@@ -93,7 +93,7 @@ void WarpCTCLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       workspace_.reset(new SyncedMemory(workspace_alloc_bytes_));
     }
 
-    status = compute_ctc_loss(activations,
+    status = compute_ctc_loss_cpu(activations,
                               gradients,
                               flat_labels_.data(),
                               label_lengths_.data(),

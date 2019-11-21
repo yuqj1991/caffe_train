@@ -561,7 +561,7 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
   CHECK_NOTNULL(test_nets_[test_net_id].get())->
       ShareTrainedLayersWith(net_.get());
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
-  Dtype lefteye =0.0, righteye = 0.0, nose = 0.0, leftmouth = 0.0, rightmouth = 0.0, gender_precision =0.0, glasses_presion=0.0;
+  Dtype lefteye =0.0, righteye = 0.0, nose = 0.0, leftmouth = 0.0, rightmouth = 0.0, gender_precision =0.0;
   Dtype pitch_precision =0.0, yaw_presion=0.0, roll_presicon=0.0;
   int batch_size =0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
@@ -608,7 +608,6 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
              << " leftmouth: "<< leftmouth/total_images
              << " rightmouth: "<< rightmouth/total_images
              <<" gender accuracy: "<<gender_precision/total_images
-             //<<" glasses accuracy: "<<glasses_presion/total_images
              <<" yaw accuracy: "<< yaw_presion/total_images
              <<" pitch accuracy: "<< pitch_precision/total_images
              <<" roll accuracy: "<< roll_presicon/total_images;        

@@ -145,7 +145,7 @@ void WarpCTCLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       workspace_.reset(new SyncedMemory(workspace_alloc_bytes_ * sizeof(char)));
     }
 
-    status = compute_ctc_loss(activations,
+    status = compute_ctc_loss_cpu(activations,
                               gradients,
                               flat_labels_.data(),
                               label_lengths_.data(),

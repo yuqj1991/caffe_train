@@ -86,8 +86,14 @@ void ReshapeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   top[0]->Reshape(top_shape);
   CHECK_EQ(top[0]->count(), bottom[0]->count())
       << "output count must match input count";
+  #if 0
+  const vector<int> topShape = top[0]->shape();
+  for(unsigned i = 0 ;i < topShape.size(); i++)
+    LOG(INFO)<<"top shape: "<< topShape[i];
+  #endif
   top[0]->ShareData(*bottom[0]);
   top[0]->ShareDiff(*bottom[0]);
+  //LOG(FATAL)<<"end";
 }
 
 INSTANTIATE_CLASS(ReshapeLayer);

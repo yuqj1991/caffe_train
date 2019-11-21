@@ -18,10 +18,14 @@ ads = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q'
 
 def make_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, required=True, help='.prototxt file for inference')
-    parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
-    parser.add_argument('--ccpdmodel', type=str, required=True, help='.prototxt file for inference')
-    parser.add_argument('--ccpdweights', type=str, required=True, help='.caffemodel file for inference')
+    parser.add_argument('--ssd_model_def', default= '{}examples/licensePlate/net/SSD_300x300/deploy.prototxt'.format(caffe_root))
+    parser.add_argument('--ssd_image_resize', default=300, type=int)
+    parser.add_argument('--ssd_model_weights', default= '{}examples/licensePlate/net/SSD_300x300/lpr_detection.caffemodel'.format(caffe_root))
+    parser.add_argument('--recog_model_def', default='{}examples/licensePlate/net/LPR/deploy.prototxt'.format(caffe_root))
+    parser.add_argument('--recog_image_width', default=128, type=int)
+    parser.add_argument('--recog_image_height', default=32, type=int)
+    parser.add_argument('--recog_model_weights', default='{}examples/licensePlate/net/LPR/lpr_recognition.caffemodel'.format(caffe_root))
+
     return parser
 parser1 = make_parser()
 args = parser1.parse_args()

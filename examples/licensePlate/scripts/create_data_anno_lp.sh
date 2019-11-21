@@ -4,7 +4,7 @@ cd $root_dir/scripts
 redo=1
 data_root_dir="../../dataset/car_person_data/car_license"
 dataset_name="ccpd_dataset"
-mapfile="../examples/deep_liceneseplate/scripts/labelmap_lp.prototxt"
+mapfile="../examples/deep_liceneseplate/scripts/labelmap.prototxt"
 anno_type="Rec_ccpd"
 label_type="txt"
 db="lmdb"
