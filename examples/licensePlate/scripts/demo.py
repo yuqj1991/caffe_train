@@ -12,8 +12,8 @@ sys.path.insert(0, caffe_root + 'python')
 
 import caffe
 
-from ssd_detect_ccpd import main, CaffeDetection      #detection caffe
-from recog_eval import CaffeRecog                     #recognition caffe
+from others.ssd_detect_ccpd import main, CaffeDetection      #detection caffe
+from others.recog_eval import CaffeRecog                     #recognition caffe
 import argparse
 import cv2
 import time
