@@ -10,4 +10,4 @@ if ! test -f ../prototxt/s3fd/test.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=../prototxt/s3fd/solver_train_s3fd.prototxt -gpu 0 \
-#--snapshot=../snapshot/face_s3fd_mv2.solverstate
+--snapshot=../snapshot/face_s3fd_mv2_iter_140671.solverstate

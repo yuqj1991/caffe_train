@@ -4,7 +4,7 @@ cd $root_dir/scripts
 redo=1
 data_root_dir="../../dataset/car_person_data/car_license"
 dataset_name="ccpd_dataset"
-mapfile="../examples/liceneseplate/scripts/labelmap.prototxt"
+mapfile="../examples/licensePlate/scripts/labelmap.prototxt"
 anno_type="detection"
 label_type="txt"
 db="lmdb"
@@ -20,5 +20,5 @@ then
 fi
 for subset in training testing
 do
-  python create_annoset.py --anno-type=$anno_type --label-map-file=$mapfile --label-type=$label_type --min-dim=$min_dim --max-dim=$max_dim --resize-width=$width --resize-height=$height --check-label $extra_cmd $data_root_dir ../examples/liceneseplate/scripts/$subset.txt $data_root_dir/$dataset_name/$db/$dataset_name"_"$subset"_"$db $data_root_dir/$dataset_name
+  python create_annoset.py --anno-type=$anno_type --label-map-file=$mapfile --label-type=$label_type --min-dim=$min_dim --max-dim=$max_dim --resize-width=$width --resize-height=$height --check-label $extra_cmd $data_root_dir ../examples/licensePlate/scripts/$subset.txt $data_root_dir/$dataset_name/$db/$dataset_name"_"$subset"_"$db $data_root_dir/$dataset_name
 done

@@ -2187,7 +2187,7 @@ layer {
       type: "xavier"
     }
   }
-  loss_weight: 0.008
+  loss_weight: 0.8
 }
 
 
