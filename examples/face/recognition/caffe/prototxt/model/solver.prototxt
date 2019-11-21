@@ -1,14 +1,15 @@
 # The train/test net protocol buffer definition
 train_net: "./prototxt/model/train.prototxt"
-base_lr: 0.01
+base_lr: 0.001
 momentum: 0.9
 weight_decay: 0.0005
 # The learning rate policy
 lr_policy: "multistep"
 gamma: 0.1
 stepvalue: 200000
+stepvalue: 402000
 stepvalue: 602000
-stepvalue: 1002000
+stepvalue: 802000
 average_loss: 10
 # Display every 100 iterations
 display: 100
