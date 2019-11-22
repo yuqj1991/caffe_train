@@ -2871,7 +2871,7 @@ layer {
 layer {
 	name: "dectction_moudle_six_priorbox"
 	type: "PriorBox"
-	bottom: "cpm_moudle_conv17_2"
+	bottom: "conv16_2"
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
@@ -2889,7 +2889,7 @@ layer {
 layer {
 	name: "dectction_moudle_six_loc"
 	type: "Convolution"
-	bottom: "cpm_moudle_conv17_2"
+	bottom: "conv16_2"
 	top: "dectction_moudle_six_loc"
 	param {
 		lr_mult: 1
@@ -2936,7 +2936,7 @@ layer {
 layer {
 	name: "dectction_moudle_six_conf"
 	type: "Convolution"
-	bottom: "cpm_moudle_conv17_2"
+	bottom: "conv16_2"
 	top: "dectction_moudle_six_conf"
 	param {
 		lr_mult: 1
