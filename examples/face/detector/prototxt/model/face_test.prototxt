@@ -41,7 +41,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 32
+    num_output: 64
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -107,12 +107,12 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 32
+    num_output: 64
     bias_term: false
     pad: 1
     kernel_size: 3
     stride: 2
-    group: 32
+    group: 64
     weight_filler {
       type: "msra"
     }
@@ -176,7 +176,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 128
     bias_term: false
     kernel_size: 1
     weight_filler {
@@ -241,11 +241,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 128
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 64
+    group: 128
     stride: 2
     weight_filler {
       type: "msra"
@@ -310,7 +310,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 256
     bias_term: false
     kernel_size: 1
     weight_filler {
@@ -375,11 +375,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 128
+    group: 256
     weight_filler {
       type: "msra"
     }
@@ -443,7 +443,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 256
     bias_term: false
     kernel_size: 1
     weight_filler {
@@ -508,11 +508,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 128
+    group: 256
     stride: 2
     weight_filler {
       type: "msra"
@@ -577,7 +577,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 512
     bias_term: false
     kernel_size: 1
     weight_filler {
@@ -636,11 +636,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 512
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 256
+    group: 512
     weight_filler {
       type: "msra"
     }
@@ -704,7 +704,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 512
     bias_term: false
     kernel_size: 1
     weight_filler {
@@ -779,11 +779,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 512
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 256
+    group: 512
     stride: 2
     weight_filler {
       type: "msra"
@@ -848,7 +848,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 1024
     bias_term: false
     kernel_size: 1
     weight_filler {
@@ -907,11 +907,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 1024
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 256
+    group: 1024
     weight_filler {
       type: "msra"
     }
@@ -975,7 +975,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 512
     bias_term: false
     kernel_size: 1
     weight_filler {
@@ -1040,11 +1040,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 512
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 256
+    group: 512
     weight_filler {
       type: "msra"
     }
@@ -1108,7 +1108,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 1024
     bias_term: false
     kernel_size: 1
     weight_filler {
@@ -1184,11 +1184,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 256
+    num_output: 1024
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 256
+    group: 1024
     stride: 2
     weight_filler {
       type: "msra"
@@ -1727,10 +1727,10 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		bias_term: false
 		kernel_size: 3
-		#group: 128
+		#group: 512
 		pad: 1
 		weight_filler {
 			type: "msra"
