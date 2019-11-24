@@ -2977,7 +2977,7 @@ layer {
 layer {
 	name: "dectction_moudle_four_priorbox"
 	type: "PriorBox"
-	bottom: "cpm_moudle_conv16_2"
+	bottom: "dectction_moudle_four"
 	bottom: "data"
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
@@ -2995,7 +2995,7 @@ layer {
 layer {
 	name: "dectction_moudle_four_loc"
 	type: "Convolution"
-	bottom: "cpm_moudle_conv16_2"
+	bottom: "dectction_moudle_four"
 	top: "dectction_moudle_four_loc"
 	param {
 		lr_mult: 1
@@ -3042,7 +3042,7 @@ layer {
 layer {
 	name: "dectction_moudle_four_conf"
 	type: "Convolution"
-	bottom: "cpm_moudle_conv16_2"
+	bottom: "dectction_moudle_four"
 	top: "dectction_moudle_four_conf"
 	param {
 		lr_mult: 1
@@ -3091,12 +3091,11 @@ layer {
 layer {
 	name: "dectction_moudle_five_priorbox"
 	type: "PriorBox"
-	bottom: "cpm_moudle_conv17_2"
+	bottom: "dectction_moudle_five"
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
 		min_size: 256.0
-		min_size: 384.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3110,7 +3109,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_loc"
 	type: "Convolution"
-	bottom: "cpm_moudle_conv17_2"
+	bottom: "dectction_moudle_five"
 	top: "dectction_moudle_five_loc"
 	param {
 		lr_mult: 1
@@ -3157,7 +3156,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_conf"
 	type: "Convolution"
-	bottom: "cpm_moudle_conv17_2"
+	bottom: "dectction_moudle_five"
 	top: "dectction_moudle_five_conf"
 	param {
 		lr_mult: 1
@@ -3207,7 +3206,7 @@ layer {
 layer {
   name: "conv_mbox_loc_module_six"
   type: "Convolution"
-  bottom: "conv16_2"
+  bottom: "conv15_2"
   top: "conv_mbox_loc_module_six"
   param {
     lr_mult: 1.0
@@ -3253,7 +3252,7 @@ layer {
 layer {
   name: "conv_mbox_loc_module_six_conf"
   type: "Convolution"
-  bottom: "conv16_2"
+  bottom: "conv15_2"
   top: "conv_mbox_loc_module_six_conf"
   param {
     lr_mult: 1.0
@@ -3299,7 +3298,7 @@ layer {
 layer {
   name: "conv_mbox_priorbox_six"
   type: "PriorBox"
-  bottom: "conv16_2"
+  bottom: "conv15_2"
   bottom: "data"
   top: "conv_mbox_priorbox_six"
   prior_box_param {
