@@ -45,6 +45,7 @@ layer {
 		num_output: 64
 		bias_term: false
 		kernel_size: 3
+		stride: 2
 		pad: 1
 		weight_filler {
 			type: "msra"
