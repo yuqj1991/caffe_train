@@ -79,12 +79,6 @@ protected:
 			const vector<bool>& propagate_down,
 			const vector<Blob<Dtype>*>& bottom);
 
-	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-			const vector<Blob<Dtype>*>& top);
-
-	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-			const vector<bool>& propagate_down,
-			const vector<Blob<Dtype>*>& bottom);
 
 	void ExtractInputData(const Blob<Dtype>* seq_ind_blob,
 			const Blob<Dtype>* labels_blob, vector<int>* flat_labels,
