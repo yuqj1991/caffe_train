@@ -10,5 +10,6 @@ if ! test -f ../prototxt/model/face_test.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=../solver/solver_train_prune.prototxt -gpu 0 \
-#--snapshot=../snapshot/face_iter_137864.solverstate
+--weights ../snapshot/face_iter_80000.caffemodel
+#--snapshot=../snapshot/face_iter_100000.solverstate
 
