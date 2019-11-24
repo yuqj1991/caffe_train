@@ -324,6 +324,9 @@ endif
 ifeq ($(USE_OPENCV), 1)
 	COMMON_FLAGS += -DUSE_OPENCV
 endif
+ifeq ($(USE_WARP_CTC), 1)
+	COMMON_FLAGS += -DUSE_WARP_CTC
+endif
 ifeq ($(USE_LEVELDB), 1)
 	COMMON_FLAGS += -DUSE_LEVELDB
 endif
