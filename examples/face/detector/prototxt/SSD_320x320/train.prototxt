@@ -173,7 +173,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		stride: 2
+		stride: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -2789,7 +2789,7 @@ layer {
 layer {
 	name: "conv11_mbox_loc"
 	type: "Convolution"
-	bottom: "conv11"
+	bottom: "conv11_1_block2"
 	top: "conv11_mbox_loc"
 	param {
 		lr_mult: 1.0
@@ -2835,7 +2835,7 @@ layer {
 layer {
 	name: "conv11_mbox_conf"
 	type: "Convolution"
-	bottom: "conv11"
+	bottom: "conv11_1_block2"
 	top: "conv11_mbox_conf"
 	param {
 		lr_mult: 1.0
@@ -2881,7 +2881,7 @@ layer {
 layer {
 	name: "conv11_mbox_priorbox"
 	type: "PriorBox"
-	bottom: "conv11"
+	bottom: "conv11_1_block2"
 	bottom: "data"
 	top: "conv11_mbox_priorbox"
 	prior_box_param {
@@ -2899,7 +2899,7 @@ layer {
 layer {
 	name: "conv13_mbox_loc"
 	type: "Convolution"
-	bottom: "conv13"
+	bottom: "conv13_block3"
 	top: "conv13_mbox_loc"
 	param {
 		lr_mult: 1.0
@@ -2945,7 +2945,7 @@ layer {
 layer {
 	name: "conv13_mbox_conf"
 	type: "Convolution"
-	bottom: "conv13"
+	bottom: "conv13_block3"
 	top: "conv13_mbox_conf"
 	param {
 		lr_mult: 1.0
@@ -2992,7 +2992,7 @@ layer {
 layer {
 	name: "conv13_mbox_priorbox"
 	type: "PriorBox"
-	bottom: "conv13"
+	bottom: "conv13_block3"
 	bottom: "data"
 	top: "conv13_mbox_priorbox"
 	prior_box_param {
