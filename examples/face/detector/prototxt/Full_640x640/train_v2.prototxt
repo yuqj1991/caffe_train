@@ -43,7 +43,7 @@ layer {
 	}
 	data_param {
 		source: "../lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 10
+		batch_size: 3
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -169,7 +169,7 @@ layer {
 		num_output: 64
 		bias_term: false
 		kernel_size: 3
-		stride: 2
+		stride: 1
 		pad: 1
 		weight_filler {
 			type: "msra"
