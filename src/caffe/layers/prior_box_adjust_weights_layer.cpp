@@ -415,6 +415,6 @@ void PriorBoxWeightsLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 }
 
 INSTANTIATE_CLASS(PriorBoxWeightsLayer);
-REGISTER_LAYER_CLASS(PriorBox);
+REGISTER_LAYER_CLASS(PriorBoxWeights);
 
 }  // namespace caffe
