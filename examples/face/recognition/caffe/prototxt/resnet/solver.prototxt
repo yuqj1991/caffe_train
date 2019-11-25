@@ -12,7 +12,7 @@ iter_size: 1
 display: 100
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 1000
+snapshot: 100000
 snapshot_prefix: "snapshot/resnet"
 
 solver_mode: GPU

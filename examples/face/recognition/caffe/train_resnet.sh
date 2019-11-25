@@ -5,4 +5,5 @@ if ! test -f ./prototxt/resnet/train.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=./prototxt/resnet/solver.prototxt -gpu 0 \
-#--snapshot=./face_recog/tiny_iter_148441.solverstate
+--snapshot=./snapshot/resnet_iter_7479.solverstate
+#--weights ./snapshot/resnet_deploy.caffemodel

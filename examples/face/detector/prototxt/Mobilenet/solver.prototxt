@@ -1,0 +1,28 @@
+train_net: "../prototxt/Mobilenet/train.prototxt"
+test_net: "../prototxt/Mobilenet/test.prototxt"
+test_iter: 3083
+test_interval: 5000
+base_lr: 0.01
+display: 100
+#max_iter: 400000
+lr_policy: "multistep"
+gamma: 0.1
+weight_decay: 0.0005
+snapshot: 5000
+snapshot_prefix: "../snapshot/face_mobilenet_"
+solver_mode: GPU
+debug_info: false
+snapshot_after_train: true
+test_initialization: false
+max_iter: 240000
+average_loss: 10
+stepvalue: 50000
+stepvalue: 100000
+stepvalue: 200000
+iter_size: 1
+momentum: 0.9
+#momentum2 : 0.99
+#type: "RMSProp"
+eval_type: "detection"
+ap_version: "11point"
+
