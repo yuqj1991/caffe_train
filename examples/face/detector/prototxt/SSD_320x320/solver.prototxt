@@ -1,5 +1,5 @@
-train_net: "../prototxt/SSD_300x300/train.prototxt"
-test_net: "../prototxt/SSD_300x300/test.prototxt"
+train_net: "../prototxt/SSD_320x320/train.prototxt"
+test_net: "../prototxt/SSD_320x320/test.prototxt"
 test_iter: 3226
 test_interval: 5000
 base_lr: 0.001
