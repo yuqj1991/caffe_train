@@ -4,7 +4,7 @@ cd $root_dir/scripts
 redo=1
 data_root_dir="../../dataset/facedata"
 dataset_name="umdface"
-mapfile="../examples/face/attributes/labelmap_face.prototxt"
+mapfile="../examples/face/attributes/labelmap.prototxt"
 anno_type="faceattributes"
 label_type="txt"
 db="lmdb"
