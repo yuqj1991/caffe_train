@@ -15,7 +15,7 @@ def parser():
     parser = argparse.ArgumentParser('face Evaluate Module!',
                             description='You can use this file to evaluate face model capbilitaty!')
     parser.add_argument('--db', dest='db_name', help='Path to the image',
-                        default='wider_val', type=str)
+                        default='wider_test', type=str)
     parser.add_argument('--gpu', dest='gpu_id', help='The GPU ide to be used',
                         default=0, type=int)
     parser.add_argument('--prototxt', dest='prototxt', help='face caffe test prototxt',
@@ -31,7 +31,7 @@ def parser():
 
 
 def preprocess(src):
-    img = cv2.resize(src, (320,320))
+    img = cv2.resize(src, (640,640))
     img = img - [103.94, 116.78, 123.68] # 127.5
     img = img * 0.007843
     return img
