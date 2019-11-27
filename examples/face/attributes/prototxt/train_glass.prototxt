@@ -1314,7 +1314,7 @@ layer {
 	}
 }
 layer {
-	name: "faceangleloss"
+	name: "Angle_loss"
 	type: "SmoothL1Loss"
 	bottom: "conv6_angle"
 	bottom: "label_angle"

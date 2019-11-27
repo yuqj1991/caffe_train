@@ -1,5 +1,5 @@
-train_net: "../prototxt/train.prototxt"
-test_net: "../prototxt/test.prototxt"
+train_net: "../prototxt/train_glass.prototxt"
+test_net: "../prototxt/test_glass.prototxt"
 test_iter: 1000
 test_interval: 10000
 base_lr: 0.01
@@ -10,7 +10,7 @@ gamma: 0.1
 weight_decay: 0.004
 #momentum: 0.9
 snapshot: 200000
-snapshot_prefix: "../snapshot/faceattri"
+snapshot_prefix: "../snapshot/face_glass"
 solver_mode: GPU
 average_loss: 10
 snapshot_after_train: true
