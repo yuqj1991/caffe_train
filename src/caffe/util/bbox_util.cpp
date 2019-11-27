@@ -399,14 +399,14 @@ void EncodeBBox(
       encode_bbox->set_ymax(log(bbox_height / prior_height));
     } else {
       // Encode variance in bbox.
-      #if 1
+      #ifdef USE_ORIGIN_PREDICTION
+      encode_bbox->set_xmin(bbox_center_x);
+      encode_bbox->set_ymin(bbox_center_y);
+      #else
       encode_bbox->set_xmin(
           (bbox_center_x - prior_center_x) / prior_width / prior_variance[0]);
       encode_bbox->set_ymin(
           (bbox_center_y - prior_center_y) / prior_height / prior_variance[1]);
-      #else
-      encode_bbox->set_xmin(bbox_center_x);
-      encode_bbox->set_ymin(bbox_center_y);
       #endif
       encode_bbox->set_xmax(
           log(bbox_width / prior_width) / prior_variance[2]);
@@ -486,14 +486,14 @@ void DecodeBBox(
       decode_bbox_height = exp(bbox.ymax()) * prior_height;
     } else {
       // variance is encoded in bbox, we need to scale the offset accordingly.
-      #if 1
+      #ifdef USE_ORIGIN_PREDICTION
+      decode_bbox_center_x = bbox.xmin();
+      decode_bbox_center_y = bbox.ymin();
+      #else
       decode_bbox_center_x =
           prior_variance[0] * bbox.xmin() * prior_width + prior_center_x;
       decode_bbox_center_y =
           prior_variance[1] * bbox.ymin() * prior_height + prior_center_y;
-      #else
-      decode_bbox_center_x = bbox.xmin();
-      decode_bbox_center_y = bbox.ymin();
       #endif
       decode_bbox_width =
           exp(prior_variance[2] * bbox.xmax()) * prior_width;
@@ -1158,15 +1158,8 @@ void GetLocPredictions(const Dtype* loc_data, const int num,
         if (label_bbox.find(label) == label_bbox.end()) {
           label_bbox[label].resize(num_preds_per_class);
         }
-        #if 0
-        Dtype px = Dtype(1 / (1 + std::exp(loc_data[start_idx + c * 4])));
-        Dtype py = Dtype(1 / (1 + std::exp(loc_data[start_idx + c * 4 + 1])));
-        label_bbox[label][p].set_xmin(px);
-        label_bbox[label][p].set_ymin(py);
-        #else
         label_bbox[label][p].set_xmin(loc_data[start_idx + c * 4]);
         label_bbox[label][p].set_ymin(loc_data[start_idx + c * 4 + 1]);
-        #endif
         label_bbox[label][p].set_xmax(loc_data[start_idx + c * 4 + 2]);
         label_bbox[label][p].set_ymax(loc_data[start_idx + c * 4 + 3]);
       }

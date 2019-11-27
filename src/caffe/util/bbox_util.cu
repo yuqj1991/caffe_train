@@ -8,7 +8,6 @@
 
 #include "caffe/common.hpp"
 #include "caffe/util/bbox_util.hpp"
-
 namespace caffe {
 
 template <typename Dtype>
@@ -135,14 +134,14 @@ __global__ void DecodeBBoxesKernel(const int nthreads,
         decode_bbox_height = exp(ymax) * prior_height;
       } else {
         // variance is encoded in bbox, we need to scale the offset accordingly.
-        #if 1
+        #ifdef USE_ORIGIN_PREDICTION
+        decode_bbox_center_x = xmin;
+        decode_bbox_center_y = ymin;
+        #else
         decode_bbox_center_x =
           prior_data[vi] * xmin * prior_width + prior_center_x;
         decode_bbox_center_y =
           prior_data[vi + 1] * ymin * prior_height + prior_center_y;
-        #else
-        decode_bbox_center_x = xmin;
-        decode_bbox_center_y = ymin;
         #endif
         decode_bbox_width =
           exp(prior_data[vi + 2] * xmax) * prior_width;
