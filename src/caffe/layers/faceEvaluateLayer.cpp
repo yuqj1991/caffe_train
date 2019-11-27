@@ -85,7 +85,7 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
       for(int jj = 0; jj< 5; jj++){
         double pow_x = pow(batchImgShape[ii][0]*(all_prediction_face_points[ii][jj]-all_gt_face_points[ii][jj]), 2);
         double pow_y = pow(batchImgShape[ii][1]*(all_prediction_face_points[ii][jj + 5]-all_gt_face_points[ii][jj + 5]), 2);
-        top_data[ii*9 + jj] = std::sqrt(pow_x + pow_y) / Dis_diag;
+        top_data[ii*10 + jj] = std::sqrt(pow_x + pow_y) / Dis_diag;
       }
       int gender_index=0; 
       int glasses_index=0; 
@@ -104,14 +104,14 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
         correct_precisive_gender=1;
       if(all_gt_face_attributes[ii][1]==glasses_index)
         correct_precisive_glasses=1;
-      top_data[ii*9 + 5] = correct_precisive_gender;
-      top_data[ii*9 + 6] = correct_precisive_glasses;
+      top_data[ii*10 + 5] = correct_precisive_gender;
+      top_data[ii*10 + 6] = correct_precisive_glasses;
       correct_precisive_yaw = cos(double((all_prediction_face_angle[ii][0] / 180 - all_gt_face_angle[ii][0] / 180)* M_PI));
       correct_precisive_pitch = cos(double((all_prediction_face_angle[ii][1] / 180 - all_gt_face_angle[ii][1] / 180)* M_PI));
       correct_precisive_roll = cos(double((all_prediction_face_angle[ii][2] / 180 - all_gt_face_angle[ii][2] / 180)  * M_PI));
-      top_data[ii* 9 + 7]=float(correct_precisive_yaw);
-      top_data[ii* 9 + 8]=float(correct_precisive_pitch);
-      top_data[ii* 9 + 9]=float(correct_precisive_roll);
+      top_data[ii* 10 + 7]=float(correct_precisive_yaw);
+      top_data[ii* 10 + 8]=float(correct_precisive_pitch);
+      top_data[ii* 10 + 9]=float(correct_precisive_roll);
     }
   }
 }
