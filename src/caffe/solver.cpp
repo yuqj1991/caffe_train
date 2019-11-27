@@ -562,6 +562,7 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
       ShareTrainedLayersWith(net_.get());
   const shared_ptr<Net<Dtype> >& test_net = test_nets_[test_net_id];
   Dtype lefteye =0.0, righteye = 0.0, nose = 0.0, leftmouth = 0.0, rightmouth = 0.0, gender_precision =0.0;
+  Dtype glasses_presion =0.0;
   Dtype pitch_precision =0.0, yaw_presion=0.0, roll_presicon=0.0;
   int batch_size =0;
   for (int i = 0; i < param_.test_iter(test_net_id); ++i) {
@@ -585,18 +586,18 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
       const Dtype* result_vec = result[j]->cpu_data();
       batch_size = result[j]->height();
       for(int ii = 0; ii<batch_size; ii++){
-        lefteye += result_vec[ii*9 + 0];
-        righteye += result_vec[ii*9 + 1];
-        nose += result_vec[ii*9 + 2];
-        leftmouth += result_vec[ii*9 + 3];
-        rightmouth += result_vec[ii*9 + 4];
-        if (result_vec[ii*9 + 5]==1)
+        lefteye += result_vec[ii*10 + 0];
+        righteye += result_vec[ii*10 + 1];
+        nose += result_vec[ii*10 + 2];
+        leftmouth += result_vec[ii*10 + 3];
+        rightmouth += result_vec[ii*10 + 4];
+        if (result_vec[ii*10 + 5]==1)
           gender_precision++;
-        /*if (result_vec[ii*10 + 6]==1)
-          glasses_presion++;*/
-        yaw_presion += result_vec[ii*9 + 6];
-        pitch_precision += result_vec[ii*9 + 7];
-        roll_presicon += result_vec[ii*9 + 8];
+        if (result_vec[ii*10 + 6]==1)
+          glasses_presion++;
+        yaw_presion += result_vec[ii*10 + 7];
+        pitch_precision += result_vec[ii*10 + 8];
+        roll_presicon += result_vec[ii*10 + 9];
       } 
     }    
   }
@@ -608,6 +609,7 @@ void Solver<Dtype>::TestRecoFaceAttri(const int test_net_id) {
              << " leftmouth: "<< leftmouth/total_images
              << " rightmouth: "<< rightmouth/total_images
              <<" gender accuracy: "<<gender_precision/total_images
+             <<" glass accuracy: "<<glasses_presion/total_images
              <<" yaw accuracy: "<< yaw_presion/total_images
              <<" pitch accuracy: "<< pitch_precision/total_images
              <<" roll accuracy: "<< roll_presicon/total_images;        
