@@ -53,6 +53,30 @@ layer {
 }
 
 layer {
+  name: "label_slice"
+  type: "Slice"
+  bottom: "label"
+  top: "label_province"
+  top: "label_alpha"
+  top: "label_number_one"
+  top: "label_number_two"
+  top: "label_number_three"
+  top: "label_number_four"
+  top: "label_number_five"
+  slice_param {
+    slice_point: 1
+    slice_point: 2
+    slice_point: 3
+    slice_point: 4
+    slice_point: 5
+    slice_point: 6
+    axis: 1
+  }
+  include {
+       phase: TRAIN
+  }
+}
+layer {
 	bottom: "data"
 	top: "conv1"
 	name: "conv1"
@@ -71,7 +95,7 @@ layer {
 	name: "bn_conv1"
 	type: "BatchNorm"
 	batch_norm_param {
-		use_global_stats: false
+	use_global_stats: false
 	}
 }
 
@@ -124,7 +148,7 @@ layer {
 	name: "bn2a_branch1"
 	type: "BatchNorm"
 	batch_norm_param {
-		use_global_stats: false
+	use_global_stats: false
 	}
 }
 
@@ -2375,7 +2399,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 34
+        num_output: 31
         weight_filler {
             type: "xavier"
         }
@@ -2425,7 +2449,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 25
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -2475,7 +2499,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -2525,7 +2549,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -2575,7 +2599,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -2624,7 +2648,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -2673,7 +2697,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -2684,39 +2708,98 @@ layer {
     }
 }
 layer {
-	name: "Muti_ccpd_loss"
-	type: "MulticcpdLoss"
+	name: "province_loss"
+	type: "SoftmaxWithLoss"
 	bottom: "lp_chinese_2"
-	bottom: "lp_eng_2"
-	bottom: "lp_let1_2"
-	bottom: "lp_let2_2"
-	bottom: "lp_let3_2"
-	bottom: "lp_let4_2"
-	bottom: "lp_let5_2"
-	bottom: "label"
-	top: "Muti_ccpd_loss"
+	bottom: "label_province"
+	top: "province_loss"
+	propagate_down: true
+	propagate_down: false
+	loss_weight: 0.5
 	include {
 		phase: TRAIN
 	}
-	propagate_down: true
-	propagate_down: true
-	propagate_down: true
-	propagate_down: true
-	propagate_down: true
-	propagate_down: true
+}
+layer {
+	name: "alpha_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "lp_eng_2"
+	bottom: "label_alpha"
+	top: "alpha_loss"
 	propagate_down: true
 	propagate_down: false
-	loss_param {
-		normalization: VALID
+	loss_weight: 0.5
+	include {
+		phase: TRAIN
 	}
-	multibox_loss_param {
-		chineselp_loss_type: SOFTMAX
-		englishlp_loss_type: SOFTMAX
-		letter_lp_loss_type: SOFTMAX
-		loc_weight: 1.0
-		num_chinese: 34
-		num_english: 25
-		num_letter: 35
+}
+layer {
+	name: "lp_let1_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "lp_let1_2"
+	bottom: "label_number_one"
+	top: "lp_let1_loss"
+	propagate_down: true
+	propagate_down: false
+	loss_weight: 0.5
+	include {
+		phase: TRAIN
+	}
+}
+
+layer {
+	name: "lp_let2_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "lp_let2_2"
+	bottom: "label_number_two"
+	top: "lp_let2_loss"
+	propagate_down: true
+	propagate_down: false
+	loss_weight: 0.5
+	include {
+		phase: TRAIN
+	}
+}
+
+layer {
+	name: "lp_let3_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "lp_let3_2"
+	bottom: "label_number_three"
+	top: "lp_let3_loss"
+	propagate_down: true
+	propagate_down: false
+	loss_weight: 0.5
+	include {
+		phase: TRAIN
+	}
+}
+
+layer {
+	name: "lp_let4_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "lp_let4_2"
+	bottom: "label_number_four"
+	top: "lp_let4_loss"
+	propagate_down: true
+	propagate_down: false
+	loss_weight: 0.5
+	include {
+		phase: TRAIN
+	}
+}
+
+layer {
+	name: "lp_let5_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "lp_let5_2"
+	bottom: "label_number_five"
+	top: "lp_let5_loss"
+	propagate_down: true
+	propagate_down: false
+	loss_weight: 0.5
+	include {
+		phase: TRAIN
 	}
 }
 
