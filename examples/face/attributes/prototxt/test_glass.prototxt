@@ -1256,6 +1256,16 @@ layer {
 	}
 }
 
+layer {
+	name: "conv6_glass"
+	type: "Softmax"
+	bottom: "conv6_glass"
+	top: "conv6_glass"
+	softmax_param {
+		axis: 1
+	}
+}
+
 
 layer {
 	name: "multiface_output"

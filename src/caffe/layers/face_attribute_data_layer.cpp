@@ -66,10 +66,10 @@ void faceAttributeDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& b
             // sure there is at least one bbox.
             label_shape[0] = batch_size;
                 if(phase_ == TRAIN){
-                    label_shape[1] = 14;
+                    label_shape[1] = 15;
                 }
                 else{
-                    label_shape[1] = 16;
+                    label_shape[1] = 17;
                 }
             
             } else {
@@ -242,7 +242,7 @@ void faceAttributeDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 LOG(INFO)<<top_label[idx+0] << " " <<top_label[idx+1] << " " << top_label[idx+2] << " " << top_label[idx+3] << " " << top_label[idx+4] << 
                 " " << top_label[idx+5] << " " << top_label[idx+6] << " " << top_label[idx+7] << " " << top_label[idx+8] << 
                 " " << top_label[idx+9] << " " <<top_label[idx+10] << " " << top_label[idx+11] << " " << top_label[idx+12] <<
-                " " << top_label[idx+13];
+                " " << top_label[idx+13] << " " <<top_label[idx+14];
             }
         }
     }

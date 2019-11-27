@@ -44,7 +44,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/umdface/lmdb/umdface_training_umdface_pose_lmdb/"
-		batch_size: 64
+		batch_size: 128
 		backend: LMDB
 	}
 }
@@ -91,7 +91,7 @@ layer {
   }
   include {
 		phase: TRAIN
-	}
+  }
 }
 layer {
 	name: "conv_0"
