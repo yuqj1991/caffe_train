@@ -1295,5 +1295,6 @@ layer{
 		facetype: FACEATTRIBUTE
 		facepoints: 5
 		num_gender: 2
+		num_glasses: 2
 	}
 }

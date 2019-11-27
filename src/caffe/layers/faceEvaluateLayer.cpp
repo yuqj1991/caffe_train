@@ -12,7 +12,7 @@ void FaceAttriEvaluateLayer<Dtype>::LayerSetUp(
       const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   const FaceEvaluateParameter& face_paramer = this->layer_param_.face_evaluate_param();
   num_gender_ = face_paramer.num_gender();
-  //num_glasses_ = face_paramer.num_glasses();
+  num_glasses_ = face_paramer.num_glasses();
   num_facepoints_ = face_paramer.facepoints();
   CHECK(face_paramer.has_facetype())
       << "Must provide facetype.";
@@ -51,16 +51,16 @@ void FaceAttriEvaluateLayer<Dtype>::Forward_cpu(
     for(int ii = 0; ii<batch_size; ii++){
       /**********ground truth************/
       for(int jj =0; jj<10; jj++){
-        all_gt_face_points[ii].push_back(gt_data[ii*16+jj]);
+        all_gt_face_points[ii].push_back(gt_data[ii*17+jj]);
       }
       for(int jj =10; jj<13; jj++){
-        all_gt_face_angle[ii].push_back(gt_data[ii*16+jj]);
+        all_gt_face_angle[ii].push_back(gt_data[ii*17+jj]);
       }
       for(int jj =13; jj<15; jj++){
-        all_gt_face_attributes[ii].push_back(gt_data[ii*16+jj]);
+        all_gt_face_attributes[ii].push_back(gt_data[ii*17+jj]);
       }
       for(int jj =15; jj<17; jj++){
-        batchImgShape[ii].push_back(gt_data[ii*16+jj]);
+        batchImgShape[ii].push_back(gt_data[ii*17+jj]);
       }
       /**********prediction************/
       for(int jj =0; jj< 5*2; jj++){
