@@ -18,9 +18,8 @@ def create_image_lists():
     k = 0
     # 获取当前目录下所有的子目录,这里x 是一个三元组(root,dirs,files)，第一个元素表示ROOT_DATA当前目录，
     # 第二个元素表示当前目录下的所有子目录,第三个元素表示当前目录下的所有的文件
-    sub_dirs = [x[0] for x in os.listdir(ROOT_DATA)]
     while len(matched_result) < repeatedTimes * crossTimes:
-        for sub_dir in sub_dirs[1:]:
+        for sub_dir in os.listdir(ROOT_DATA):
             print(sub_dir)
             # 获取当前目录下所有的有效图片文件
             extensions = 'jpg'
@@ -54,9 +53,9 @@ def create_image_lists():
 def create_pairs():
     unmatched_result = set()       # 不同类的匹配对
     k = 0
-    sub_dirs = [x[0] for x in os.listdir(ROOT_DATA)]
     # sub_dirs[0]表示当前文件夹本身的地址，不予考虑，只考虑他的子目录
-    for sub_dir in sub_dirs[1:]:
+    sub_dirs = os.listdir(ROOT_DATA)
+    for sub_dir in sub_dirs:
         # 获取当前目录下所有的有效图片文件
         extensions = ['jpg']
         file_list = []
@@ -99,8 +98,8 @@ result_same, k1 = create_image_lists()
 print(len(result_same))
 # print(result)
 
-result_unssame, k2 = create_pairs()
-print(len(result_un))
+result_unsame, k2 = create_pairs()
+print(len(result_unsame))
 # print(result_un)
 
 file = open(pairs_path, 'w')
