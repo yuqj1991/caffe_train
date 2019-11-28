@@ -3,11 +3,11 @@
 # N.B. set the path to the imagenet train + val data dirs
 set -e
 
-EXAMPLE=../../../../../dataset/reId_data/Market-1501-v15.09.15
+EXAMPLE=../../../../../dataset/reId_data/combineData
 DATA=.
 TOOLS=../../../../build/tools
 
-TRAIN_DATA_ROOT=../../../../../dataset/reId_data/Market-1501-v15.09.15/gt_bbox
+TRAIN_DATA_ROOT=../../../../../dataset/reId_data/combineData/train
 #VAL_DATA_ROOT=/path/to/imagenet/val/
 
 # Set RESIZE=true to resize the images to 128x128. Leave as false if images have
@@ -44,8 +44,8 @@ GLOG_logtostderr=1 $TOOLS/convert_imageset \
     --encode_type=jpg \
     --encoded=true \
     $TRAIN_DATA_ROOT \
-    $DATA/train_market.txt \
-    $EXAMPLE/market_lmdb
+    $DATA/train.txt \
+    $EXAMPLE/combine_lmdb
 
 #echo "Creating val lmdb..."
 

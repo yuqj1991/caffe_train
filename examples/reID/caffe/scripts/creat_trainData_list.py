@@ -4,42 +4,40 @@ import os
 import random
 
 ROOT_DIR = '../../../../../dataset/reId_data/'
-reID_DataSet = ['cuhk03_release', 'Market-1501-v15.09.15']
 
-subMarket_1501_Dir = ['gt_bbox', 'bounding_box_test']
-subCUHK_03_Dir = ['labeled/train', 'labeled/val']
-
-label = ['train_market.txt', 'train_cuhk_03.txt']
+combineDataDir = 'combineData'
+train_val_set = ['train', 'val']
+labelIndex = 0
 
 
-def getMark_1501_label(subDir, setfile):
+def shuffle_file(filename):
+	f = open(filename, 'r+')
+	lines = f.readlines()
+	random.shuffle(lines)
+	f.seek(0)
+	f.truncate()
+	f.writelines(lines)
+	f.close()
+
+
+def getCombineLabel(subDir,setfile):
 	setfile_ = open(setfile, 'w')
-	for img_file in os.listdir(subDir):
-		label = img_file.split('_')[0]
-		print(label)
-		label_int = int(label) -1
-		imgFilePath = subDir + '/' + img_file.split('.jpg')[0]
-		absfullPath = os.path.abspath(imgFilePath)
-		content = absfullPath + ' ' + str(label_int) + '\n'
-		setfile_.write(content)
+	for sublabelDir in os.listdir(subDir):
+		print(sublabelDir)
+		for img_file in os.listdir(subDir + '/' + sublabelDir):
+			print(img_file)
+			global labelIndex
+			imgFilePath = subDir + '/' +sublabelDir + '/' + img_file.split('.jpg')[0]
+			absfullPath = os.path.abspath(imgFilePath)
+			content = absfullPath + ' ' + str(labelIndex) + '\n'
+			setfile_.write(content)
+		labelIndex += 1
 	setfile_.close()
 
-
-def getCUHK_03_label(subDir, setfile):
-	setfile_ = open(setfile, 'w')
-	for img_file in os.listdir(subDir):
-		label = img_file.split('_')[0]
-		label_int = int(label) -1
-		imgFilePath = subDir + '/' + img_file.split('.jpg')[0]
-		absfullPath = os.path.abspath(imgFilePath)
-		content = absfullPath +' ' + str(label_int) + '\n'
-		setfile_.write(content)
-	setfile_.close()
-	
-	
 
 def main():
-	getMark_1501_label(ROOT_DIR + 'Market-1501-v15.09.15/' + subMarket_1501_Dir[0], label[0])
+	getCombineLabel(ROOT_DIR + combineDataDir + '/' + train_val_set[0], train_val_set[0]+'.txt')
+	shuffle_file(train_val_set[0]+'.txt')
 
 if __name__ == "__main__":
 	main()

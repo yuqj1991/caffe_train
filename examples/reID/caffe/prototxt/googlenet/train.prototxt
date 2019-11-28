@@ -1,41 +1,70 @@
 name: "GoogleNet"
+####################triplet##############################################
+#layer {
+#	name: "data"
+#	type: "ImageData"
+#	top: "data"
+#	top: "label"
+#	image_data_param {
+#		new_height: 128
+#		new_width: 64
+#		sample_num: 5
+#		label_num: 45
+#		batch_size: 225
+#		source: 'train.txt'
+#		root_folder: "../../../../../dataset/reId_data/combineData/train"
+#	}
+#	transform_param {
+#		mirror: true
+#		mean_value: 127.5
+#		mean_value: 127.5
+#		mean_value: 127.5
+#		scale: 0.0078125
+#		resize_param {
+#			prob: 1.0
+#			resize_mode: WARP
+#			height: 128
+#			width: 64
+#			interp_mode: LINEAR
+#			interp_mode: AREA
+#			interp_mode: NEAREST
+#			interp_mode: CUBIC
+#			interp_mode: LANCZOS4
+#		}
+#	}
+#}
+##########################common data layer######################################
 layer {
-    name: "data"
-    type: "ImageData"
-    top: "data"
-    top: "label"
-	image_data_param {
-    	new_height: 128
-    	new_width: 64
-    	sample_num: 5
-    	label_num: 45
-    	batch_size: 225
-    	source: 'train.txt'
-    	root_folder: "../../../../../dataset/reId_data/Market-1501_align"
-    }
+	name: "data"
+	type: "Data"
+	top: "data"
+	top: "label"
+	include {
+		phase: TRAIN
+	}
     transform_param {
         mirror: true
         mean_value: 127.5
         mean_value: 127.5
         mean_value: 127.5
         scale: 0.0078125
-        #resize_param {
-		#	prob: 1.0
-		#	resize_mode: WARP
-		#	height: 128
-		#	width: 64
-		#	interp_mode: LINEAR
-		#	interp_mode: AREA
-		#	interp_mode: NEAREST
-		#	interp_mode: CUBIC
-		#	interp_mode: LANCZOS4
-    	#}
+        resize_param {
+			prob: 1.0
+			resize_mode: WARP
+			height: 128
+			width: 128
+			interp_mode: LINEAR
+			interp_mode: AREA
+			interp_mode: NEAREST
+			interp_mode: CUBIC
+			interp_mode: LANCZOS4
+    	}
     }
-    #data_param {
-    #    #source: "../../../../../dataset/reId_data/Market-1501_align"
-    #    batch_size: 225
-    #    #backend: LMDB
-    #}
+	data_param {
+		source: "../../../../../dataset/reId_data/combineData/combine_lmdb"
+        batch_size: 128
+        backend: LMDB
+	}
 }
 
 layer {
