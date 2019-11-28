@@ -5,8 +5,17 @@ import os
 import cv2
 import argparse
 
-import caffe
+import logging
+
+try:
+    caffe_root = '../../../../../../caffe_train/'
+    sys.path.insert(0, caffe_root + 'python')
+    import caffe
+except ImportError:
+    logging.fatal("Cannot find caffe!")
 import time
+
+inputSize = (160, 160)
 
 def l2_normalize(vector):
     output = vector/np.sqrt(max(np.sum(vector**2), 1e-12))
@@ -44,14 +53,14 @@ def image_pair_build(image_path, pair_path):
         for line in lines:
             path1, path2 = line.strip('\n').split(" ")
             image_pair_path += (os.path.join(image_path, path1), os.path.join(image_path, path2))
+            print((os.path.join(image_path, path1), os.path.join(image_path, path2)))
 
-    print(image_pair_path)
     return image_pair_path
 
-# '''
+
 def preprocess(img):
 
-    preprocessed_image = cv2.resize(img, (128, 128))
+    preprocessed_image = cv2.resize(img, inputSize)
     preprocessed_image = np.transpose(preprocessed_image, (2,0,1))
     preprocessed_image = preprocessed_image.astype("float")
     preprocessed_image = preprocessed_image - 127.5
@@ -59,18 +68,6 @@ def preprocess(img):
 
     return preprocessed_image
 
-# '''
-
-'''
-def preprocess(img):
-
-    preprocessed_image = cv2.resize(img, (160, 160))
-    preprocessed_image = preprocessed_image.astype("float")
-    preprocessed_image -= np.array([104,117,123])
-    preprocessed_image = np.transpose(preprocessed_image, (2,0,1))
-    
-    return preprocessed_image
-'''
 
 def face_similarity_result(similarity_list, similairty_file):
 
@@ -102,8 +99,10 @@ def main(args):
     image_paths = image_pair_build(args.image_dir, args.pair_file)
 
     total_pair = len(image_paths)//2
+    print("total_pair: ", total_pair)
     similarity_list = []
     for idx in range(total_pair):
+        print("image_left: %s, image_right: %s"%(image_paths[2*idx], image_paths[2*idx+1]))
         image_left = preprocess(cv2.imread(image_paths[2*idx]))
         image_right = preprocess(cv2.imread(image_paths[2*idx + 1]))
 	
@@ -112,16 +111,13 @@ def main(args):
         images = np.concatenate((image_left, image_right))
 
         facenet.blobs['data'].data[...] = images
-        embeddings = facenet.forward()['fc5']
-        # embeddings = facenet.forward()['pool4_logits_flat']
-	
-        # print(embeddings)
+        embeddings = facenet.forward()['flatten']
         embedding_left = embeddings[0]
         embedding_right = embeddings[1]
         # print(embedding_left)
         # print(embedding_right)
         # exit()
-	
+
         '''
         facenet.blobs['data'].data[...] = image_left
         embedding_left = facenet.forward()['fc5']
@@ -132,15 +128,10 @@ def main(args):
         embedding_left = np.squeeze(embedding_left)
         embedding_right = np.squeeze(embedding_right)
         # print(embedding_left)
-	    '''
+        '''
 
         norm_left = l2_normalize(embedding_left)
         norm_right = l2_normalize(embedding_right)
-        # print(np.shape(norm_left))
-        # print(np.shape(norm_right))
-        # print(norm_left)
-        # print(norm_right)
-        # exit()
 
         cosine = cos(norm_left, norm_right)
         if cosine < 0.0:

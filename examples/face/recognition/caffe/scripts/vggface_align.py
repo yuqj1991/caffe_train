@@ -3,7 +3,7 @@ import os
 import sys
 import cv2
 import numpy as np
-root_dir = "../../../../../dataset/facedata/recognition/vggface"
+root_dir = "../../../../../../dataset/facedata/recognition/vggface"
 if 0:
     image_dir = "/vggface2_train"
     list_file = "/bb_landmark/loose_bb_train.csv"
