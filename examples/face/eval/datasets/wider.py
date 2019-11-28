@@ -10,6 +10,7 @@ from datasets.imdb import imdb
 
 DATA_DIR = "../../../../dataset"
 
+TEST_DATA_DIR = DATA_DIR + '/facedata/wider_face'
 
 class wider(imdb):
     def __init__(self, split, wider_path=None):
@@ -76,6 +77,7 @@ class wider(imdb):
     def gt_roidb(self):
         roidb = []
         for fp in self._image_paths:
+            print("fp:", fp)
             if self._test_flag:
                 roidb.append({'image_size': Image.open(os.path.join(self._imgs_path, fp)).size,
                               'file_path': os.path.join(self._imgs_path, fp)})
