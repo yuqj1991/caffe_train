@@ -6,10 +6,10 @@ from xml.dom.minidom import Document
 
 import cv2
 
-rootdir = "../../dataset/facedata/wider_face"
+rootdir = "../../../dataset/facedata/wider_face"
 if not os.path.exists(rootdir):
     os.makedirs(rootdir)
-retinaface_gt_file_path = "../../dataset/facedata/retinaface_labels/"
+retinaface_gt_file_path = "../../../dataset/facedata/retinaface_labels/"
 convet2yoloformat = False
 convert2vocformat = True
 resized_dim = (48, 48)
@@ -17,7 +17,7 @@ resized_dim = (48, 48)
 minsize2select = 10  # min face size
 usepadding = True
 
-datasetprefix = "../../dataset/facedata/wider_face/JPEGImages"  #
+datasetprefix = "../../../dataset/facedata/wider_face/JPEGImages"
 
 
 def convertimgset(img_set="train"):

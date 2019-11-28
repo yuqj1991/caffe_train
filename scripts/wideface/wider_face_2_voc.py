@@ -14,7 +14,7 @@ minsize2select = 32
 cropsize2select = 60
 usepadding = True
 
-datasetprefix = "../../dataset/facedata/wider_face"  #
+datasetprefix = "../../../dataset/facedata/wider_face"  #
 use_blur_occlu_attri = False #True #
 
 def convertimgset(img_set="train"):
