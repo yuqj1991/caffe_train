@@ -9,14 +9,15 @@ gamma: 0.1
 stepvalue: 100000
 stepvalue: 6004000
 stepvalue: 8002000
+stepvalue: 13002000
 
 # Display every 100 iterations
 display: 100
 # The maximum number of iterations
-max_iter: 1002000
+max_iter: 1802000
 # snapshot intermediate results
 snapshot: 5000
-snapshot_prefix: "snapshot/facenet_inception_resnet_v2_tiny"
+snapshot_prefix: "snapshot/inception_tiny"
 # solver mode: CPU or GPU
 solver_mode: GPU
 type: "SGD"

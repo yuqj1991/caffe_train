@@ -56,6 +56,15 @@ class ReidBatch {
   Blob<Dtype> data_, label_;
   Blob<Dtype> datap_, labelp_;
 };
+
+
+template <typename Dtype>
+class pairBatch {
+ public:
+  Blob<Dtype> data_, label_, labelSample_;
+};
+
+
 template <typename Dtype>
 class BasePrefetchingDataLayer :
     public BaseDataLayer<Dtype>, public InternalThread {
@@ -113,6 +122,42 @@ class ReidPrefetchingDataLayer :
 
   Blob<Dtype> transformed_data_;
 };
+
+/**
+ * @brief Provides data to the Net from image files.
+ *
+ * TODO(dox): thorough documentation for Forward and proto params.
+ */
+template <typename Dtype>
+class ImageDataPrefetchingDataLayer : 
+    public BaseDataLayer<Dtype>, public InternalThread {
+ public:
+  explicit ImageDataPrefetchingDataLayer(const LayerParameter& param);
+  // LayerSetUp: implements common data layer setup functionality, and calls
+  // DataLayerSetUp to do special data layer setup for individual layer types.
+  // This method may not be overridden.
+  void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  // Prefetches batches (asynchronously if to GPU memory)
+  static const int PREFETCH_COUNT = 3;
+
+ protected:
+  virtual void InternalThreadEntry();
+  virtual void load_batch(pairBatch<Dtype>* batch) = 0;
+
+  pairBatch<Dtype> prefetch_[PREFETCH_COUNT];
+
+  BlockingQueue<pairBatch<Dtype>*> prefetch_free_;
+  BlockingQueue<pairBatch<Dtype>*> prefetch_full_;
+
+  Blob<Dtype> transformed_data_;
+};
+
 
 }  // namespace caffe
 

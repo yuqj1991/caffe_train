@@ -1,4 +1,4 @@
-name: "GoogleNet"
+name: "GoogleNet-face"
 layer {
   name: "data"
   type: "Input"
@@ -8,7 +8,7 @@ layer {
       dim: 1
       dim: 3
       dim: 128
-      dim: 64
+      dim: 128
     }
   }
 }

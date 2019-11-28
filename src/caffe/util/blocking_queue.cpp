@@ -88,6 +88,8 @@ size_t BlockingQueue<T>::size() const {
 
 template class BlockingQueue<Batch<float>*>;
 template class BlockingQueue<Batch<double>*>;
+template class BlockingQueue<pairBatch<float>*>;
+template class BlockingQueue<pairBatch<double>*>;
 template class BlockingQueue<ReidBatch<float>*>;
 template class BlockingQueue<ReidBatch<double>*>;
 template class BlockingQueue<Datum*>;

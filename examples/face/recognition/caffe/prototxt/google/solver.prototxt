@@ -7,12 +7,12 @@ lr_policy: "multistep"
 stepvalue: 100000
 stepvalue: 400000
 stepvalue: 602000
-stepvalue: 1002000
-max_iter: 1200000
+stepvalue: 1202000
+max_iter: 1800000
 
 momentum: 0.9
 snapshot: 10000
-snapshot_prefix: "./snapshot/face_inception_googlenet"
+snapshot_prefix: "./snapshot/googlenet"
 
 train_net: "./prototxt/google/train.prototxt"
 weight_decay: 0.0005

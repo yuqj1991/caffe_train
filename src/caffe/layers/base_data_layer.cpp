@@ -237,13 +237,124 @@ void ReidPrefetchingDataLayer<Dtype>::Forward_cpu(
   DLOG(INFO) << "ReidPrefetchingDataLayer : Forward_cpu Done";
 }
 
+
+template <typename Dtype>
+ImageDataPrefetchingDataLayer<Dtype>::ImageDataPrefetchingDataLayer(
+    const LayerParameter& param)
+    : BaseDataLayer<Dtype>(param),
+      prefetch_free_(), prefetch_full_() {
+  for (int i = 0; i < PREFETCH_COUNT; ++i) {
+    prefetch_free_.push(&prefetch_[i]);
+  }
+}
+
+template <typename Dtype>
+void ImageDataPrefetchingDataLayer<Dtype>::LayerSetUp(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
+  DLOG(INFO) << "ImageDataPrefetchingDataLayer : LayerSetUp";
+  BaseDataLayer<Dtype>::LayerSetUp(bottom, top);
+  // Before starting the prefetch thread, we make cpu_data and gpu_data
+  // calls so that the prefetch thread does not accidentally make simultaneous
+  // cudaMalloc calls when the main thread is running. In some GPUs this
+  // seems to cause failures if we do not so.
+  CHECK(top.size() == 3) << "number of top blobs can only be 3";
+  if (top.size() == 3) this->output_labels_ = true;
+  else                 this->output_labels_ = false;
+
+  for (int i = 0; i < PREFETCH_COUNT; ++i) {
+    prefetch_[i].data_.mutable_cpu_data();
+    if (this->output_labels_) {
+      prefetch_[i].label_.mutable_cpu_data();
+      prefetch_[i].labelSample_.mutable_cpu_data();
+    }
+  }
+#ifndef CPU_ONLY
+  if (Caffe::mode() == Caffe::GPU) {
+    for (int i = 0; i < PREFETCH_COUNT; ++i) {
+      prefetch_[i].data_.mutable_gpu_data();
+      if (this->output_labels_) {
+        prefetch_[i].label_.mutable_gpu_data();
+        prefetch_[i].labelSample_.mutable_gpu_data();
+      }
+    }
+  }
+#endif
+  DLOG(INFO) << "Initializing prefetch";
+  this->data_transformer_->InitRand();
+  StartInternalThread();
+  DLOG(INFO) << "Prefetch initialized.";
+}
+
+template <typename Dtype>
+void ImageDataPrefetchingDataLayer<Dtype>::InternalThreadEntry() {
+#ifndef CPU_ONLY
+  cudaStream_t stream;
+  if (Caffe::mode() == Caffe::GPU) {
+    CUDA_CHECK(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
+  }
+#endif
+
+  try {
+    while (!must_stop()) {
+      pairBatch<Dtype>* batch = prefetch_free_.pop();
+      load_batch(batch);
+#ifndef CPU_ONLY
+      if (Caffe::mode() == Caffe::GPU) {
+        batch->data_.data().get()->async_gpu_push(stream);
+        if (this->output_labels_) {
+          batch->label_.data().get()->async_gpu_push(stream);
+          batch->labelSample_.data().get()->async_gpu_push(stream);
+        }
+        CUDA_CHECK(cudaStreamSynchronize(stream));
+      }
+#endif
+      prefetch_full_.push(batch);
+    }
+  } catch (boost::thread_interrupted&) {
+    // Interrupted exception is expected on shutdown
+  }
+#ifndef CPU_ONLY
+  if (Caffe::mode() == Caffe::GPU) {
+    CUDA_CHECK(cudaStreamDestroy(stream));
+  }
+#endif
+}
+
+template <typename Dtype>
+void ImageDataPrefetchingDataLayer<Dtype>::Forward_cpu(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
+
+  pairBatch<Dtype>* batch = prefetch_full_.pop("Data layer prefetch queue empty");
+  // Reshape to loaded data.
+  top[0]->ReshapeLike(batch->data_);
+  // Copy the data
+  caffe_copy(batch->data_.count(), batch->data_.cpu_data(),
+             top[0]->mutable_cpu_data());
+  DLOG(INFO) << "Prefetch copied";
+  if (this->output_labels_) {
+    // Reshape to loaded labels.
+    top[1]->ReshapeLike(batch->label_);
+    top[2]->ReshapeLike(batch->labelSample_);
+    // Copy the labels.
+    caffe_copy(batch->label_.count(), batch->label_.cpu_data(), top[1]->mutable_cpu_data());
+    caffe_copy(batch->labelSample_.count(), batch->labelSample_.cpu_data(), top[2]->mutable_cpu_data());
+  }
+  prefetch_free_.push(batch);
+}
+
+
+
+
+
 #ifdef CPU_ONLY
 STUB_GPU_FORWARD(BasePrefetchingDataLayer, Forward);
 STUB_GPU_FORWARD(ReidPrefetchingDataLayer, Forward);
+STUB_GPU_FORWARD(ImageDataPrefetchingDataLayer, Forward);
 #endif
 
 INSTANTIATE_CLASS(BaseDataLayer);
 INSTANTIATE_CLASS(BasePrefetchingDataLayer);
 INSTANTIATE_CLASS(ReidPrefetchingDataLayer);
+INSTANTIATE_CLASS(ImageDataPrefetchingDataLayer);
 
 }  // namespace caffe

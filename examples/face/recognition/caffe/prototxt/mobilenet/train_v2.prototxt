@@ -1,9 +1,19 @@
-name: "deepFace"
+name: "mobilenet-face"
 layer {
 	name: "data"
-	type: "Data"
+	type: "ImageData"
 	top: "data"
 	top: "label"
+	top: "labelIndex"
+	image_data_param {
+		new_height: 128
+		new_width: 128
+		sample_num: 5
+		label_num: 24
+		batch_size: 120
+		root_folder: "../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
+		source: "./scripts/labelmap.txt"
+	}
 	transform_param {
 		mirror: true
 		mean_value: 127.5
@@ -21,14 +31,6 @@ layer {
 			interp_mode: CUBIC
 			interp_mode: LANCZOS4
 		}
-	}
-	data_param {
-		source: "../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
-		batch_size: 64
-		backend: LMDB
-	}
-	include {
-		phase: TRAIN
 	}
 }
 
@@ -3881,7 +3883,6 @@ layer {
 #  name: "lmcl_cos_l2_normalize"
 #  type: "InnerProduct"
 #  bottom: "fc5"
-#  #bottom: "label"
 #  top: "lmcl_cos_l2_normalize"
 #  param {
 #    lr_mult: 1
@@ -3898,7 +3899,7 @@ layer {
 #  name: "softmax_loss"
 #  type: "SoftmaxWithLoss"
 #  bottom: "lmcl_cos_l2_normalize"
-#  bottom: "label"
+#  bottom: "labelIndex"
 #  top: "softmax_loss"
 #  propagate_down: true
 #  propagate_down: false
@@ -3909,7 +3910,7 @@ layer {
   name: "center_loss"
   type: "CenterLoss"
   bottom: "fc5"
-  bottom: "label"
+  bottom: "labelIndex"
   top: "center_loss"
   param {
     lr_mult: 1
@@ -3928,7 +3929,7 @@ layer {
   name: "lmcl_cos_l2_normalize"
   type: "CosinL2Normalize"
   bottom: "fc5"
-  bottom: "label"
+  bottom: "labelIndex"
   top: "lmcl_cos_l2_normalize"
   param {
     lr_mult: 1
@@ -3947,7 +3948,7 @@ layer {
   name: "cosin_loss"
   type: "SoftmaxWithLoss"
   bottom: "lmcl_cos_l2_normalize"
-  bottom: "label"
+  bottom: "labelIndex"
   top: "cosin_loss"
   propagate_down: true
   propagate_down: false
@@ -3957,7 +3958,7 @@ layer {
 #  name: "cosin_add_m"
 #  type: "CosinAddm"
 #  bottom: "fc5"
-#  bottom: "label"
+#  bottom: "labelIndex"
 #  top: "fc6_margin"
 #  cosin_add_m_param {
 #    m: 0.5
@@ -3984,22 +3985,19 @@ layer {
 #  name: "softmax_loss"
 #  type: "SoftmaxWithLoss"
 #  bottom: "fc6_margin_scale"
-#  bottom:"label"
+#  bottom:"labelIndex"
 #  top: "softmax_loss"
 #}
 
-#####################test############################
+##############contravie loss##########################
 layer {
 	name: "merege_pair"
 	type: "Identity2Verify"
 	bottom: "fc5"
-	bottom: "label"
+	bottom: "labelIndex"
 	top: "feature1"
 	top: "feature2"
 	top: "sim"
-	include {
-		phase: TEST
-	}
 }
 
 layer {
@@ -4007,9 +4005,6 @@ layer {
 	type: "SimpleNormalize"
 	bottom: "feature1"
 	top: "normfeature1"
-	include {
-		phase: TEST
-	}
 }
 
 layer {
@@ -4017,31 +4012,44 @@ layer {
 	type: "SimpleNormalize"
 	bottom: "feature2"
 	top: "normfeature2"
-	include {
-		phase: TEST
-	}
 }
+
 layer {
-	name: "faceEvalate"
-	type: "pairfaceEvaluate"
+	name: "sim_loss"
+	type: "ContrastiveLoss"
 	bottom: "normfeature1"
 	bottom: "normfeature2"
-	top: "faceEvalate_label"
-	metric_param {
-		metric: COSDISTANCE
-		cos_threshold: 0.65
-	}
-	include {
-		phase: TEST
+	bottom: "sim"
+	top: "sim_loss"
+	loss_weight: 0.3
+	contrastive_loss_param {
+		margin: 1
 	}
 }
+
+#######################tripletloss##################
 layer {
-	name: "accuracy"
-	type: "Accuracy"
-	bottom: "faceEvalate_label"
-	bottom: "sim"
-	top: "accuracy"
-	include {
-		phase: TEST
-	}
+	name: "fc5_feature"
+	type: "SimpleNormalize"
+	bottom: "fc5"
+	top: "fc5_feature"
+}
+layer {
+	name: "archor_pair"
+	type: "SampleTriplet"
+	bottom: "fc5_feature"
+	bottom: "label"
+	top: "archor_pair"
+	propagate_down: false
+	propagate_down: false
+}
+layer {
+	name: "tripletloss"
+	type: "TripletLoss"
+	bottom: "fc5_feature"
+	bottom: "archor_pair"
+	top: "tripletloss"
+	loss_weight: 1
+	propagate_down: true
+	propagate_down: true
 }

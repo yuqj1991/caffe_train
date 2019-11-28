@@ -46,6 +46,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       (new_height > 0 && new_width > 0)) << "Current implementation requires "
       "new_height and new_width to be set at the same time.";
   /**************遍历人脸数据集根目录文件夹**********/
+  #if 0
   struct dirent *faceSetDir;
   DIR* dir = opendir(root_folder.c_str());
   if( dir == NULL )
@@ -62,14 +63,29 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       }
   }
   closedir(dir);
+  #endif
+
+  const string &sourceMap = this->layer_param_.image_data_param().source();
+  LOG(INFO) << "Opening labelmap file: "<< sourceMap;
+  std::ifstream infile(sourceMap.c_str());
+  string line;
+  size_t pos;
+  int label;
+  while(std::getline(infile, line)){
+    pos = line.find_last_of(' ');
+    label = atoi(line.substr(pos+1).c_str());
+    std::string newDirectory = root_folder + string("/") + line.substr(0, pos);
+    fullImageSetDir_.push_back(std::make_pair(newDirectory, label));
+  }
   LOG(INFO)<<"get file directory successfully";
   /**************遍历人脸数据集根目录文件夹完成*******/
 
   lines_id_ = 0;
     /**************获取第一个图像*************/
-  std::string subDir = fullImageSetDir_[0];
+  std::string subDir = fullImageSetDir_[0].first;
   std::string imgfile;
-  dir = opendir(subDir.c_str());
+  struct dirent *faceSetDir;
+  DIR* dir = opendir(subDir.c_str());
   if( dir == NULL )
     LOG(FATAL)<<" is not a directory or not exist!";
   while ((faceSetDir = readdir(dir)) != NULL) {
@@ -106,12 +122,18 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
     this->prefetch_[i].label_.Reshape(label_shape);
   }
+  // sample_label_
+  vector<int> label_shape_sample(1, batch_size);
+  top[2]->Reshape(label_shape_sample);
+  for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
+    this->prefetch_[i].labelSample_.Reshape(label_shape_sample);
+  }
 }
 
 
 // This function is called on prefetch thread
 template <typename Dtype>
-void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
+void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
   CPUTimer batch_timer;
   batch_timer.Start();
   double read_time = 0;
@@ -133,7 +155,7 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     while(std::count(labelSet_.begin(), labelSet_.end(), rand_class_idx)!=0){
       rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
     }
-    std::string subDir = fullImageSetDir_[rand_class_idx];
+    std::string subDir = fullImageSetDir_[rand_class_idx].first;
     std::vector<std::string> filelist;
     DIR* dir = opendir(subDir.c_str());
     if( dir == NULL )
@@ -156,7 +178,7 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     unsigned seed = std::chrono::system_clock::now ().time_since_epoch ().count ();  
     std::shuffle(filelist.begin(), filelist.end(), std::default_random_engine (seed));
     for(int i = 0; i < nrof_image_from_class; i++){
-      choosedImagefile_.push_back(std::make_pair(filelist[i], rand_class_idx));
+      choosedImagefile_.push_back(std::make_pair(filelist[i], fullImageSetDir_[rand_class_idx].second));
     }
     labelSet_.push_back(rand_class_idx);
     label.push_back(nrof_image_from_class);
@@ -181,6 +203,7 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
   Dtype* prefetch_data = batch->data_.mutable_cpu_data();
   Dtype* prefetch_label = batch->label_.mutable_cpu_data();
+  Dtype* labelSample = batch->labelSample_.mutable_cpu_data();
   
 
   // datum scales
@@ -198,6 +221,8 @@ void ImageDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     this->transformed_data_.set_cpu_data(prefetch_data + offset);
     this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
     trans_time += timer.MicroSeconds();
+    labelSample[item_id] = choosedImagefile_[item_id].second;
+    //LOG(INFO)<< choosedImagefile_[item_id].second <<", "<<choosedImagefile_[item_id].first;
   }
   for(int i = 0; i < label_num_; i++){
     prefetch_label[i] = label[i];

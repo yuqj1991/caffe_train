@@ -1,3 +1,4 @@
+# -*- coding:UTF-8 -*-
 from os import listdir
 from os.path import isfile, join
 import argparse

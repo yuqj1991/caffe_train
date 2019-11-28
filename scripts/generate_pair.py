@@ -1,3 +1,4 @@
+# -*- coding:UTF-8 -*-
 import glob
 import os.path
 import numpy as np
@@ -5,9 +6,9 @@ import os
 
 # 图片数据文件夹
 # 类似的作出lfw_gt_pairs.txt 来测试算法性能，repeatedTimes = 300; crossTimes = 10(默认情况下)
-ROOT_DATA = '../../dataset/reid_data/combineData/val'
+ROOT_DATA = '../../dataset/reId_data/combineData/val'
 
-pairs_path = ""
+pairs_path = "pairs.txt"
 repeatedTimes = 300
 crossTimes = 10
 
@@ -17,9 +18,10 @@ def create_image_lists():
     k = 0
     # 获取当前目录下所有的子目录,这里x 是一个三元组(root,dirs,files)，第一个元素表示ROOT_DATA当前目录，
     # 第二个元素表示当前目录下的所有子目录,第三个元素表示当前目录下的所有的文件
-    sub_dirs = [x[0] for x in os.walk(ROOT_DATA)]
+    sub_dirs = [x[0] for x in os.listdir(ROOT_DATA)]
     while len(matched_result) < repeatedTimes * crossTimes:
         for sub_dir in sub_dirs[1:]:
+            print(sub_dir)
             # 获取当前目录下所有的有效图片文件
             extensions = 'jpg'
             # 把图片存放在file_list列表里
@@ -52,7 +54,7 @@ def create_image_lists():
 def create_pairs():
     unmatched_result = set()       # 不同类的匹配对
     k = 0
-    sub_dirs = [x[0] for x in os.walk(ROOT_DATA)]
+    sub_dirs = [x[0] for x in os.listdir(ROOT_DATA)]
     # sub_dirs[0]表示当前文件夹本身的地址，不予考虑，只考虑他的子目录
     for sub_dir in sub_dirs[1:]:
         # 获取当前目录下所有的有效图片文件
