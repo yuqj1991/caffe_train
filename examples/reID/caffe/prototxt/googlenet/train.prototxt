@@ -11,7 +11,7 @@ layer {
 		sample_num: 5
 		label_num: 45
 		batch_size: 225
-		root_folder: root_folder: "../../../../../dataset/reId_data/combineData/train"
+		root_folder: "../../../../dataset/reId_data/combineData/train"
 		source: "./scripts/labelmap.txt"
 	}
 	transform_param {
@@ -24,7 +24,7 @@ layer {
 			prob: 1.0
 			resize_mode: WARP
 			height: 128
-			width: 128
+			width: 64
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
@@ -2114,7 +2114,7 @@ layer {
 #    decay_mult: 2 
 #  }
 #   inner_product_param{
-#    num_output: 2240
+#    num_output: 2946
 #    weight_filler {
 #      type: "xavier"
 #    }
@@ -2142,7 +2142,7 @@ layer {
     decay_mult: 2 
   }
   center_loss_param {
-    num_output: 2240
+    num_output: 2946
     center_filler {
       type: "xavier"
     }
@@ -2164,7 +2164,7 @@ layer {
   cosin_loss_param {
     margin: -0.35
     scale: 64
-    num_output: 2240
+    num_output: 2946
     cosin_filler {
       type: "xavier"
     }

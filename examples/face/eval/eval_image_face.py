@@ -98,8 +98,9 @@ def test_net(net, imdb, thresh=0.05, output_path=None):
     if run_inference:
         for i in xrange(len(imdb)):
             im_path =imdb.image_path_at(i)
+            print('im_path: ', im_path)
             dets[1][i], detect_time = detect(net, im_path, thresh, timers=timers)
-            print('\r{:d}/{:d} detect-time: {:.3f}s, misc-time:{:.3f}s'.format(i + 1, len(imdb), timers['detect'].average_time,timers['misc'].average_time), end='')
+            print('\r{:d}/{:d} detect-time: {:.3f}s, misc-time:{:.3f}s\n'.format(i + 1, len(imdb), timers['detect'].average_time,timers['misc'].average_time), end='')
         print('\n', end='')
 
     # Evaluate the detections

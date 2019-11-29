@@ -54,7 +54,7 @@ def main():
 		getCombineLabel(ROOT_DIR + combineDataDir + '/' + train_val_set[0], train_val_set[0]+'.txt')
 		shuffle_file(train_val_set[0]+'.txt')
 	else:
-		labels_str = generat_labelmap(img_dir)
+		labels_str = generat_labelmap(ROOT_DIR + combineDataDir + '/' + train_val_set[0])
 		with open(vgglabmap_train, "w") as labels_file:
 			labels_file.writelines(labels_str)
 		shuffle_file(vgglabmap_train)

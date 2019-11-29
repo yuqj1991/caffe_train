@@ -7,12 +7,12 @@ ROOT_DIR = '../../../../../dataset/reId_data/'
 train_val_set = ['train', 'val']
 subMarket_1501_Dir = ['gt_bbox', 'bounding_box_test']
 subCUHK_03_Dir = ['labeled/train', 'labeled/val']
-#subDukeMTMC-reID_Dir = ['', '']
+subDukeMTMC_reID_Dir = ['bounding_box_train', 'bounding_box_test']
 
 
-reID_DataSet = ['Market-1501-v15.09.15', 'cuhk03_release']
-subDataSetList = [subMarket_1501_Dir, subCUHK_03_Dir]
-DirPrefixlist = ['market_1501', 'cuhk03']
+reID_DataSet = ['Market-1501-v15.09.15', 'cuhk03_release', 'DukeMTMC-reID']
+subDataSetList = [subMarket_1501_Dir, subCUHK_03_Dir, subDukeMTMC_reID_Dir]
+DirPrefixlist = ['market_1501', 'cuhk03', 'DukeMTMC']
 combineDataDir = 'combineData'
 
 
