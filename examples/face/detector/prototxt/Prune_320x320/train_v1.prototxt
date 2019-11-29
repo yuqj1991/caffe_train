@@ -9,7 +9,7 @@ layer {
   }
   transform_param {
     scale: 0.007843
-    mirror: true
+    mirror: false
     mean_value: 103.94
     mean_value: 116.78
     mean_value: 123.68
@@ -43,7 +43,7 @@ layer {
   }
   data_param {
     source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-    batch_size: 4
+    batch_size: 3
     backend: LMDB
   }
 	annotated_data_param {
