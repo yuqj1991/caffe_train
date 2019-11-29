@@ -43,7 +43,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 12
+		batch_size: 6
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -276,7 +276,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		#group: 256
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -328,7 +328,7 @@ layer {
 		pad: 1
 		kernel_size: 3
 		#stride: 1
-		#group: 256
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -374,7 +374,7 @@ layer {
 		kernel_size: 3
 		pad: 1
 		stride: 2
-		#group: 256
+		group: 256
 		weight_filler {
 			type: "msra"
 		}
@@ -419,7 +419,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		#group: 256
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -471,7 +471,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		#group: 256
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -529,7 +529,7 @@ layer {
 		pad: 1
 		kernel_size: 3
 		stride: 2
-		#group: 256
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -574,7 +574,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		#group: 256
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -625,7 +625,7 @@ layer {
 		bias_term: false
 		pad: 1
 		kernel_size: 3
-		#group: 256
+		group: 256
 		#engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -653,7 +653,7 @@ layer {
 		bias_term: false
 		#pad: 1
 		kernel_size: 1
-		#group: 256
+		group: 256
 		#engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -686,7 +686,7 @@ layer {
 		pad: 1
 		kernel_size: 3
 		stride: 2
-		#group: 256
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -732,7 +732,7 @@ layer {
 		bias_term: false
 		kernel_size: 3
 		pad:1
-		#group: 256
+		group: 256
 		engine: CAFFE
 		weight_filler {
 			type: "msra"
@@ -938,7 +938,7 @@ layer{
 		num_output: 256
 		bias_term: false
 		kernel_size: 3
-		#group: 256
+		group: 256
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -1044,7 +1044,7 @@ layer{
 		num_output: 256
 		bias_term: false
 		kernel_size: 3
-		#group: 256
+		group: 256
 		pad: 1
 		weight_filler {
 			type: "msra"
@@ -1152,7 +1152,7 @@ layer{
 		bias_term: false
 		kernel_size: 3
 		pad: 1
-		#group: 256
+		group: 256
 		weight_filler {
 			type: "msra"
 		}
@@ -1258,7 +1258,7 @@ layer{
 		num_output: 256
 		kernel_size: 3
 		pad: 1
-		#group: 256
+		group: 256
 		weight_filler {
 			type: "msra"
 		}
@@ -1330,7 +1330,7 @@ layer{
 		num_output: 256
 		kernel_size: 3
 		#pad: 1
-        #group: 256
+        group: 256
 		weight_filler {
 			type: "msra"
 		}
