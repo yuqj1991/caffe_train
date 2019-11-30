@@ -1621,7 +1621,7 @@ layer {
 layer {
 	name: "conv15_1"
 	type: "Convolution"
-	bottom: "conv15_2"
+	bottom: "conv14_2"
 	top: "conv15_1"
 	param {
 		lr_mult: 1.0
@@ -1745,6 +1745,12 @@ layer {
 		}
 	}
 }
+layer {
+	name: "conv15_2/relu"
+	type: "PReLU"
+	bottom: "conv15_2"
+	top: "conv15_2"
+}
 #######################################################################
 #                             modeule one                             #
 #######################################################################
@@ -1811,7 +1817,7 @@ layer {
 	}
 }
 layer {
-	name: "modeule_one/ReLU"
+	name: "modeule_one/relu"
 	type: "PReLU"
 	bottom: "modeule_one"
 	top: "modeule_one"
@@ -1958,7 +1964,7 @@ layer {
 	}
 }
 layer {
-	name: "modeule_two/ReLU"
+	name: "modeule_two/relu"
 	type: "PReLU"
 	bottom: "modeule_two"
 	top: "modeule_two"
@@ -2035,7 +2041,7 @@ layer{
 	}
 }
 layer {
-	name: "dectction_moudle_two/ReLU"
+	name: "dectction_moudle_two/relu"
 	type: "PReLU"
 	bottom: "dectction_moudle_two"
 	top: "dectction_moudle_two"
@@ -2106,7 +2112,7 @@ layer {
 	}
 }
 layer {
-	name: "modeule_three/ReLU"
+	name: "modeule_three/relu"
 	type: "PReLU"
 	bottom: "modeule_three"
 	top: "modeule_three"
@@ -2183,7 +2189,7 @@ layer{
 	}
 }
 layer {
-	name: "dectction_moudle_three/ReLU"
+	name: "dectction_moudle_three/relu"
 	type: "PReLU"
 	bottom: "dectction_moudle_three"
 	top: "dectction_moudle_three"
@@ -2254,7 +2260,7 @@ layer {
 	}
 }
 layer {
-	name: "modeule_four/ReLU"
+	name: "modeule_four/relu"
 	type: "PReLU"
 	bottom: "modeule_four"
 	top: "modeule_four"
@@ -2330,7 +2336,7 @@ layer{
 	}
 }
 layer {
-	name: "dectction_moudle_four/ReLU"
+	name: "dectction_moudle_four/relu"
 	type: "PReLU"
 	bottom: "dectction_moudle_four"
 	top: "dectction_moudle_four"
