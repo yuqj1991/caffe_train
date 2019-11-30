@@ -15,8 +15,10 @@ snapshot_after_train: true
 test_initialization: false
 max_iter: 240000
 average_loss: 10
-stepvalue: 50000
+stepvalue: 30000
+stepvalue: 60000
 stepvalue: 100000
+stepvalue: 150000
 stepvalue: 200000
 iter_size: 1
 momentum: 0.9
