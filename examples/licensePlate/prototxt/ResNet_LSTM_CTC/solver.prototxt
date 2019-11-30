@@ -3,7 +3,7 @@ test_net: "../prototxt/ResNet_LSTM_CTC/lp_rec_test.prototxt"
 test_iter: 1500
 test_interval: 5000
 base_lr: 0.001
-display: 1000
+display: 100
 max_iter: 1600000
 lr_policy: "multistep"
 gamma: 0.5

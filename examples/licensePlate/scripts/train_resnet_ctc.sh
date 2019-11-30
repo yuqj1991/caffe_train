@@ -10,4 +10,4 @@ if ! test -f ../prototxt/ResNet_LSTM_CTC/lp_rec_test.prototxt ;then
         exit 1
 fi
 ../../../build/tools/caffe train --solver=../prototxt/ResNet_LSTM_CTC/solver.prototxt -gpu 0 \
-#--snapshot=../snapshot/deepccpd_rec_v1_iter_44952.solverstate
+--weights ../snapshot/resnet_lstm_ctc_iter_432543.caffemodel

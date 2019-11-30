@@ -35,40 +35,6 @@ layer {
 }
 
 layer {
-	name: "data"
-	type: "ImageData"
-	top: "data"
-	top: "label"
-	image_data_param {
-		new_height: 128
-		new_width: 128
-		sample_num: 5
-		label_num: 45
-		batch_size: 225
-		source: 'train.txt'
-		root_folder: "../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
-	}
-	transform_param {
-		mirror: true
-		mean_value: 127.5
-		mean_value: 127.5
-		mean_value: 127.5
-		scale: 0.0078125
-		resize_param {
-			prob: 1.0
-			resize_mode: WARP
-			height: 128
-			width: 128
-			interp_mode: LINEAR
-			interp_mode: AREA
-			interp_mode: NEAREST
-			interp_mode: CUBIC
-			interp_mode: LANCZOS4
-		}
-	}
-}
-
-layer {
     bottom: "data"
     top: "conv1"
     name: "conv1"

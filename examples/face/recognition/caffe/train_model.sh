@@ -5,5 +5,5 @@ if ! test -f ./prototxt/model/train.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=./prototxt/model/solver.prototxt -gpu 2 \
---weights ./snapshot/faceRecognition.caffemodel
-#--snapshot=./face_recog/tiny_iter_148441.solverstate
+#--snapshot=./snapshot/model_iter_400000.solverstate
+#--weights ./snapshot/faceRecognition.caffemodel\
