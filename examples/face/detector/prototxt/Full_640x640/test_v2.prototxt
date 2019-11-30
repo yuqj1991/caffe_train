@@ -94,7 +94,7 @@ layer {
 }
 layer {
 	name: "conv1/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv1"
 	top: "conv1"
 }
@@ -162,7 +162,7 @@ layer {
 }
 layer {
 	name: "conv2/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv2"
 	top: "conv2"
 }
@@ -230,7 +230,7 @@ layer {
 }
 #layer {
 #	name: "conv3/relu"
-#	type: "ReLU"
+#	type: "PReLU"
 #	bottom: "conv3"
 #	top: "conv3"
 #}
@@ -298,7 +298,7 @@ layer {
 }
 layer {
 	name: "conv4/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv4"
 	top: "conv4"
 }
@@ -364,7 +364,7 @@ layer {
 }
 #layer {
 #	name: "conv5/relu"
-#	type: "ReLU"
+#	type: "PReLU"
 #	bottom: "conv5"
 #	top: "conv5"
 #}
@@ -441,7 +441,7 @@ layer {
 }
 layer {
 	name: "conv6/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv6"
 	top: "conv6"
 }
@@ -508,7 +508,7 @@ layer {
 }
 #layer {
 #	name: "conv7/relu"
-#	type: "ReLU"
+#	type: "PReLU"
 #	bottom: "conv7"
 #	top: "conv7"
 #}
@@ -585,7 +585,7 @@ layer {
 }
 #layer {
 #	name: "conv8/relu"
-#	type: "ReLU"
+#	type: "PReLU"
 #	bottom: "conv8"
 #	top: "conv8"
 #}
@@ -654,7 +654,7 @@ layer {
 }
 layer {
 	name: "conv8_1/dw/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv8_1/dw"
 	top: "conv8_1/dw"
 }
@@ -781,7 +781,7 @@ layer {
 }
 layer {
 	name: "conv8_2/dw/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv8_2/dw"
 	top: "conv8_2/dw"
 }
@@ -846,7 +846,7 @@ layer {
 }
 layer {
 	name: "conv8_2/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv8_2"
 	top: "conv8_2"
 }
@@ -914,7 +914,7 @@ layer {
 }
 layer {
 	name: "conv8_3/dw/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv8_3/dw"
 	top: "conv8_3/dw"
 }
@@ -1053,7 +1053,7 @@ layer {
 }
 layer {
 	name: "conv9/dw/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv9/dw"
 	top: "conv9/dw"
 }
@@ -1118,7 +1118,7 @@ layer {
 }
 layer {
 	name: "conv9/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv9"
 	top: "conv9"
 }
@@ -1187,7 +1187,7 @@ layer {
 }
 layer {
 	name: "conv10_1/dw/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv10_1/dw"
 	top: "conv10_1/dw"
 }
@@ -1318,7 +1318,7 @@ layer {
 }
 layer {
 	name: "conv12/dw/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv12/dw"
 	top: "conv12/dw"
 }
@@ -1383,7 +1383,7 @@ layer {
 }
 layer {
 	name: "conv12/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv12"
 	top: "conv12"
 }
@@ -1451,7 +1451,7 @@ layer {
 }
 layer {
 	name: "conv13/dw/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv13/dw"
 	top: "conv13/dw"
 }
@@ -1578,7 +1578,7 @@ layer {
 }
 layer {
 	name: "conv14_1/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv14_1"
 	top: "conv14_1"
 }
@@ -1705,7 +1705,7 @@ layer {
 }
 layer {
 	name: "conv15_1/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "conv15_1"
 	top: "conv15_1"
 }
@@ -1837,7 +1837,7 @@ layer {
 }
 layer {
 	name: "modeule_one/ReLU"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "modeule_one"
 	top: "modeule_one"
 }
@@ -1913,7 +1913,7 @@ layer{
 }
 layer {
 	name: "dectction_moudle_one/relu"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "dectction_moudle_one"
 	top: "dectction_moudle_one"
 }
@@ -1984,7 +1984,7 @@ layer {
 }
 layer {
 	name: "modeule_two/ReLU"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "modeule_two"
 	top: "modeule_two"
 }
@@ -2061,7 +2061,7 @@ layer{
 }
 layer {
 	name: "dectction_moudle_two/ReLU"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "dectction_moudle_two"
 	top: "dectction_moudle_two"
 }
@@ -2132,7 +2132,7 @@ layer {
 }
 layer {
 	name: "modeule_three/ReLU"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "modeule_three"
 	top: "modeule_three"
 }
@@ -2209,7 +2209,7 @@ layer{
 }
 layer {
 	name: "dectction_moudle_three/ReLU"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "dectction_moudle_three"
 	top: "dectction_moudle_three"
 }
@@ -2280,7 +2280,7 @@ layer {
 }
 layer {
 	name: "modeule_four/ReLU"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "modeule_four"
 	top: "modeule_four"
 }
@@ -2356,7 +2356,7 @@ layer{
 }
 layer {
 	name: "dectction_moudle_four/ReLU"
-	type: "ReLU"
+	type: "PReLU"
 	bottom: "dectction_moudle_four"
 	top: "dectction_moudle_four"
 }
