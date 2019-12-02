@@ -3226,7 +3226,7 @@ layer {
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
 		min_size: 256.0
-		min_size: 300.0
+		min_size: 384.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3341,7 +3341,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
-		min_size: 384.0
+		min_size: 600.0
 		min_size: 512.0
 		flip: true
 		clip: false
