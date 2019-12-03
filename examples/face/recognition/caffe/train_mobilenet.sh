@@ -5,4 +5,4 @@ if ! test -f ./prototxt/mobilenet/train.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=./prototxt/mobilenet/solver.prototxt -gpu 0 \
-#--snapshot=./face_recog/tiny_iter_148441.solverstate
+--snapshot=./snapshot/mobilenet_iter_36220.solverstate
