@@ -8,9 +8,9 @@ layer {
 	image_data_param {
 		new_height: 128
 		new_width: 128
-		sample_num: 5
-		label_num: 32
-		batch_size: 160
+		sample_num: 2
+		label_num: 64
+		batch_size: 128
 		root_folder: "../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
 		source: "./scripts/labelmap.txt"
 	}
