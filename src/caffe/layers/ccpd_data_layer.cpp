@@ -64,7 +64,7 @@ void ccpdDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom, co
             // and another point is each image only have one person face, so we store the lable 
             // in a specific formate. In specific:
             label_shape[0] = batch_size;
-            label_shape[1] = 8;
+            label_shape[1] = 7;
             } else {
                 LOG(FATAL) << "Unknown annotation type.";
             }
