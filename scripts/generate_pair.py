@@ -8,8 +8,8 @@ import os
 # 类似的作出lfw_gt_pairs.txt 来测试算法性能，repeatedTimes = 300; crossTimes = 10(默认情况下)
 ROOT_DATA = '../../dataset/reId_data/combineData/val'
 
-pairs_path = "pairs.txt"
-repeatedTimes = 300
+pairs_path = "../examples/reID/caffe/eval/reid_pairs.txt"
+repeatedTimes = 2000
 crossTimes = 10
 
 
@@ -21,6 +21,8 @@ def create_image_lists():
     while len(matched_result) < repeatedTimes * crossTimes:
         for sub_dir in os.listdir(ROOT_DATA):
             print(sub_dir)
+            if sub_dir == 'market_1501_-1':
+                continue
             # 获取当前目录下所有的有效图片文件
             extensions = 'jpg'
             # 把图片存放在file_list列表里
@@ -56,6 +58,8 @@ def create_pairs():
     # sub_dirs[0]表示当前文件夹本身的地址，不予考虑，只考虑他的子目录
     sub_dirs = os.listdir(ROOT_DATA)
     for sub_dir in sub_dirs:
+        if sub_dir == 'market_1501_-1':
+            continue
         # 获取当前目录下所有的有效图片文件
         extensions = ['jpg']
         file_list = []

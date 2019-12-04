@@ -15,7 +15,7 @@ except ImportError:
     logging.fatal("Cannot find caffe!")
 import time
 
-inputSize = (160, 160)
+inputSize = (64, 128)
 
 def l2_normalize(vector):
     output = vector/np.sqrt(max(np.sum(vector**2), 1e-12))
@@ -111,7 +111,7 @@ def main(args):
         images = np.concatenate((image_left, image_right))
 
         facenet.blobs['data'].data[...] = images
-        embeddings = facenet.forward()['flatten']
+        embeddings = facenet.forward()['fc5']
         embedding_left = embeddings[0]
         embedding_right = embeddings[1]
         # print(embedding_left)

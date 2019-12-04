@@ -48,13 +48,13 @@ def save2ContraviepathLabelfile(list, labelpath, gtPath):
     gtlines =[]
     for i in range(len(list)):
         if len(list[i]) == 3:
-            labelline = list[i][0] + "/" + list[i][0] + "_" + list[i][1] + ".png" \
-                              + ' ' + list[i][0] + "/" + list[i][0] + "_" + list[i][2] + ".png" + "\n"
+            labelline = list[i][0] + "/" + list[i][1] \
+                              + ' ' + list[i][0] + "/" + list[i][2] + "\n"
             labellines.append(labelline)
             gtlines.append('1' + ' ' + labelline)
         elif len(list[i]) == 4:
-            labelline = list[i][0] + "/" +list[i][0] + "_" + list[i][1] + ".png" \
-                              + ' ' + list[i][2] + "/" +list[i][2] + "_" + list[i][3] + ".png" + "\n"
+            labelline = list[i][0] + "/" + list[i][1] \
+                              + ' ' + list[i][2] + "/" + list[i][3] + "\n"
             labellines.append(labelline)
             gtlines.append('0' + ' ' + labelline)
     file.writelines(labellines)
