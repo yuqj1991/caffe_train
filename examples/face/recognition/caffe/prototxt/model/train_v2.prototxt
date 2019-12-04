@@ -10,7 +10,7 @@ layer {
 		new_width: 128
 		sample_num: 5
 		label_num: 32
-		batch_size: 180
+		batch_size: 160
 		root_folder: "../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
 		source: "./scripts/labelmap.txt"
 	}
