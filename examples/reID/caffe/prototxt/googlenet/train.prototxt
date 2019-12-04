@@ -9,8 +9,8 @@ layer {
 		new_height: 128
 		new_width: 64
 		sample_num: 5
-		label_num: 45
-		batch_size: 225
+		label_num: 72
+		batch_size: 360
 		root_folder: "../../../../dataset/reId_data/combineData/train"
 		source: "./scripts/labelmap.txt"
 	}
@@ -35,31 +35,31 @@ layer {
 }
 
 layer {
-  name: "conv1/7x7_s2"
-  type: "Convolution"
-  bottom: "data"
-  top: "conv1/7x7_s2"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 64
-    pad: 3
-    kernel_size: 7
-    stride: 2
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.2
-    }
-  }
+	name: "conv1/7x7_s2"
+	type: "Convolution"
+	bottom: "data"
+	top: "conv1/7x7_s2"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+		stride: 2
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0.2
+		}
+	}
 }
 layer {
   name: "conv1/relu_7x7"
