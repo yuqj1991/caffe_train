@@ -152,10 +152,11 @@ def generate_random_val_list(lengthTrainSet, lengthTestSet):
 def main():
 	trainsetfilepath = root_dir + '/' + set_dir + '/training_lp.txt'
 	testsetfilepath= root_dir + '/' + set_dir + '/testing_lp.txt'
-
-	for imgdir in os.listdir(root_dir + '/' + image_dir):
-		fullimgdirpath = root_dir + '/' + image_dir +'/'+imgdir
-		generate_setfile(fullimgdirpath, trainsetfilepath)
+	
+	if 0:
+		for imgdir in os.listdir(root_dir + '/' + image_dir):
+			fullimgdirpath = root_dir + '/' + image_dir +'/'+imgdir
+			generate_setfile(fullimgdirpath, trainsetfilepath)
 
 	val_list = generate_random_val_list(lengthTrain, lengthTest)
 	
