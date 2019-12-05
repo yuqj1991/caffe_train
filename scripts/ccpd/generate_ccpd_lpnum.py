@@ -159,13 +159,13 @@ def main():
 	val_list = generate_random_val_list(lengthTrain, lengthTest)
 	
 	train, val = split_setfile(trainsetfilepath, val_list)
-	
+	print("$$$$$$$$$$$write to file$$$$$$$$$$$$$$$$$$$$$$$")
 	with open(trainsetfilepath, "w") as train_file_:
 		train_file_.truncate()
-		train_file_.write(train)
+		train_file_.write(str(train))
 		train_file_.close()
 	with open(testsetfilepath, "w") as test_file_:
-		test_file_.write(val)
+		test_file_.write(str(val))
 		test_file_.close()
 
 if __name__ == '__main__':
