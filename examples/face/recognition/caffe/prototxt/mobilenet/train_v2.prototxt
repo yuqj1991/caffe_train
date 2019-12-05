@@ -11,8 +11,8 @@ layer {
 		sample_num: 5
 		label_num: 36
 		batch_size: 180
-		root_folder: "../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
-		source: "./scripts/labelmap.txt"
+		root_folder: "../../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
+		source: "../scripts/labelmap.txt"
 	}
 	transform_param {
 		mirror: true

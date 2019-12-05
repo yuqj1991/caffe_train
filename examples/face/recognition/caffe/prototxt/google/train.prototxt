@@ -2102,117 +2102,99 @@ layer {
   }
 }
 ################softmax loss##########################
+layer {
+	name: "lmcl_cos_l2_normalize"
+	type: "InnerProduct"
+	bottom: "fc5"
+	top: "lmcl_cos_l2_normalize"
+	param {
+		lr_mult: 1
+		decay_mult: 2 
+	}
+	inner_product_param{
+		num_output: 8631
+		weight_filler {
+		type: "xavier"
+		}
+	}
+}
+##############cosinface loss#############
 #layer {
-#  name: "lmcl_cos_l2_normalize"
-#  type: "InnerProduct"
-#  bottom: "fc5"
-#  top: "lmcl_cos_l2_normalize"
-#  param {
-#    lr_mult: 1
-#    decay_mult: 2 
-#  }
-#   inner_product_param{
-#    num_output: 8631
-#    weight_filler {
-#      type: "xavier"
-#    }
-#  }
+#	name: "lmcl_cos_l2_normalize"
+#	type: "CosinL2Normalize"
+#	bottom: "fc5"
+#	bottom: "labelIndex"
+#	top: "lmcl_cos_l2_normalize"
+#	param {
+#		lr_mult: 1
+#		decay_mult: 2 
+#	}
+#	cosin_loss_param {
+#		margin: -0.35
+#		scale: 64
+#		num_output: 8631
+#		cosin_filler {
+#			type: "xavier"
+#		}
+#	}
 #}
+################arcface-loss#############
 #layer {
-#  name: "softmax_loss"
-#  type: "SoftmaxWithLoss"
-#  bottom: "lmcl_cos_l2_normalize"
-#  bottom: "labelIndex"
-#  top: "softmax_loss"
-#  propagate_down: true
-#  propagate_down: false
+#	name: "cosin_add_m"
+#	type: "CosinAddm"
+#	bottom: "fc5"
+#	bottom: "labelIndex"
+#	top: "fc6_margin"
+#	cosin_add_m_param {
+#		m: 0.5
+#	}
+#} 
+#layer {
+#	name: "lmcl_cos_l2_normalize"
+#	type: "Scale"
+#	bottom: "fc6_margin"
+#	top: "lmcl_cos_l2_normalize"
+#	param {
+#		lr_mult: 0
+#		decay_mult: 0
+#	}
+#	scale_param {
+#		filler{
+#			type: "constant"
+#			value: 64
+#		}
+#	}
 #}
+layer {
+	name: "softmax_loss"
+	type: "SoftmaxWithLoss"
+	bottom: "lmcl_cos_l2_normalize"
+	bottom: "labelIndex"
+	top: "softmax_loss"
+	propagate_down: true
+	propagate_down: false
+}
 
 ############## center loss ###############
 layer {
-  name: "center_loss"
-  type: "CenterLoss"
-  bottom: "fc5"
-  bottom: "labelIndex"
-  top: "center_loss"
-  param {
-    lr_mult: 1
-    decay_mult: 2 
-  }
-  center_loss_param {
-    num_output: 8631
-    center_filler {
-      type: "xavier"
-    }
-  }
-  loss_weight: 0.8
+	name: "center_loss"
+	type: "CenterLoss"
+	bottom: "fc5"
+	bottom: "labelIndex"
+	top: "center_loss"
+	param {
+		lr_mult: 1
+		decay_mult: 2 
+	}
+	center_loss_param {
+		num_output: 8631
+		center_filler {
+			type: "xavier"
+		}
+	}
+	loss_weight: 0.8
 }
-##############cosinface loss#############
-layer {
-  name: "lmcl_cos_l2_normalize"
-  type: "CosinL2Normalize"
-  bottom: "fc5"
-  bottom: "labelIndex"
-  top: "lmcl_cos_l2_normalize"
-  param {
-    lr_mult: 1
-    decay_mult: 2 
-  }
-  cosin_loss_param {
-    margin: -0.35
-    scale: 64
-    num_output: 8631
-    cosin_filler {
-      type: "xavier"
-    }
-  }
-}
-layer {
-  name: "cosin_loss"
-  type: "SoftmaxWithLoss"
-  bottom: "lmcl_cos_l2_normalize"
-  bottom: "labelIndex"
-  top: "cosin_loss"
-  propagate_down: true
-  propagate_down: false
-}
-################arcface-loss##########################
-#layer {
-#  name: "cosin_add_m"
-#  type: "CosinAddm"
-#  bottom: "fc5"
-#  bottom: "labelIndex"
-#  top: "fc6_margin"
-#  cosin_add_m_param {
-#    m: 0.5
-#  }
-#} 
-#layer {
-#  name: "fc6_margin_scale"
-#  type: "Scale"
-#  bottom: "fc6_margin"
-#  top: "fc6_margin_scale"
-#  param {
-#    lr_mult: 0
-#    decay_mult: 0
-#  }
-#  scale_param {
-#    filler{
-#      type: "constant"
-#      value: 64
-#    }
-#  }
-#}
- 
-#layer{
-#  name: "softmax_loss"
-#  type: "SoftmaxWithLoss"
-#  bottom: "fc6_margin_scale"
-#  bottom:"labelIndex"
-#  top: "softmax_loss"
-#}
-
-##############contravie loss##########################
+##############contravie loss###############
 layer {
 	name: "merege_pair"
 	type: "Identity2Verify"
@@ -2250,7 +2232,7 @@ layer {
 	}
 }
 
-#######################tripletloss##################
+#######################tripletloss############
 layer {
 	name: "fc5_feature"
 	type: "SimpleNormalize"
