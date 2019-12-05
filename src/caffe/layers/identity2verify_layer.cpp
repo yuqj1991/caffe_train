@@ -28,6 +28,11 @@ void Identity2VerifyLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void Identity2VerifyLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+    #if 0
+    const Dtype* label = bottom[1]->cpu_data();
+    for(unsigned i = 0; i < bottom[1]->num(); i++)
+      LOG(INFO) << " label index " << i << ", " << label[i] << ", ";
+    #endif
     const int feature_size = bottom[0]->count(1);
     for (int n = 0; n < bottom[0]->num(); ++ n) {
         caffe_copy(

@@ -134,6 +134,9 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
 // This function is called on prefetch thread
 template <typename Dtype>
 void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
+  choosedImagefile_.clear();
+  labelIdxSet_.clear();
+  label.clear();
   CPUTimer batch_timer;
   batch_timer.Start();
   double read_time = 0;
@@ -150,9 +153,9 @@ void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
 
   /**************随机挑选符合要求的人脸图片*************/
   struct dirent *faceSetDir;
-  while (choosedImagefile_.size()<batch_size){
+  while (choosedImagefile_.size() < batch_size){
     int rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
-    while(std::count(labelSet_.begin(), labelSet_.end(), rand_class_idx)!=0){
+    while(std::count(labelIdxSet_.begin(), labelIdxSet_.end(), rand_class_idx)!=0){
       rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
     }
     std::string subDir = fullImageSetDir_[rand_class_idx].first;
@@ -180,7 +183,7 @@ void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
     for(int i = 0; i < nrof_image_from_class; i++){
       choosedImagefile_.push_back(std::make_pair(filelist[i], fullImageSetDir_[rand_class_idx].second));
     }
-    labelSet_.push_back(rand_class_idx);
+    labelIdxSet_.push_back(rand_class_idx);
     label.push_back(nrof_image_from_class);
   }
   /**************遍历人脸数据集根目录遍历文件夹**********/
@@ -197,7 +200,7 @@ void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
   top_shape[0] = batch_size;
   batch->data_.Reshape(top_shape);
 
-  label_num_ = labelSet_.size();
+  label_num_ = labelIdxSet_.size();
   vector<int> label_shape(1, label_num_);
   batch->label_.Reshape(label_shape);
 
@@ -210,7 +213,6 @@ void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     // get a blob
     timer.Start();
-    //CHECK_GT(lines_size, lines_id_);
     cv::Mat cv_img = ReadImageToCVMat(choosedImagefile_[item_id].first,
         new_height, new_width, is_color);
     CHECK(cv_img.data) << "Could not load " << choosedImagefile_[item_id].first;

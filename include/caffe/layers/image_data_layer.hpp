@@ -41,7 +41,7 @@ class ImageDataLayer : public ImageDataPrefetchingDataLayer<Dtype> {
   std::vector< std::pair<std::string, int> > choosedImagefile_;
   int sample_num_;
   int label_num_;
-  std::vector< int > labelSet_;
+  std::vector< int > labelIdxSet_;
   std::vector< int > label;
 };
 
