@@ -12,7 +12,7 @@ max_iter: 1800000
 
 momentum: 0.9
 snapshot: 10000
-snapshot_prefix: "./snapshot/googlenet"
+snapshot_prefix: "../snapshot/googlenet"
 
-train_net: "./prototxt/google/train.prototxt"
+train_net: "../prototxt/google/train.prototxt"
 weight_decay: 0.0005

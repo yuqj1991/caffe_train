@@ -24,7 +24,7 @@ Test
 ---
 >>(1)LFW数据集测评：  
 >>利用face_similarity.py脚本生成LFW人脸对的余弦相似度得分。  
->>python face_similarity.py   --image_dir --image_dir ../../../../../../dataset/facedata/lfw/lfw_align_160/  --pair_file face_list_lfw.txt  --result_file  facenet_vggface2_inception_resnet_v2_lfw.txt  --network deploy.prototxt  --weights deploy.caffemodel  
+>>python face_similarity.py   --image_dir ../../../../../../dataset/facedata/lfw/lfw_align_160/  --pair_file face_list_lfw.txt  --result_file  facenet_vggface2_inception_resnet_v2_lfw.txt  --network deploy.prototxt  --weights deploy.caffemodel  
 
 >>(2)LFW性能分析：  
 >>利用roc_curve.py脚本生成结果。  

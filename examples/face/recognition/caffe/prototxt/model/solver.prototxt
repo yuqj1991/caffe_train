@@ -1,5 +1,5 @@
 # The train/test net protocol buffer definition
-train_net: "./prototxt/model/train.prototxt"
+train_net: "../prototxt/model/train.prototxt"
 base_lr: 0.001
 momentum: 0.9
 weight_decay: 0.0005
@@ -17,7 +17,7 @@ display: 100
 max_iter: 1200000
 # snapshot intermediate results
 snapshot: 200000
-snapshot_prefix: "snapshot/model"
+snapshot_prefix: "../snapshot/model"
 # solver mode: CPU or GPU
 solver_mode: GPU
 type: "SGD"

@@ -1,5 +1,5 @@
 # The train/test net protocol buffer definition
-net: "./prototxt/mobilenet/train.prototxt"
+net: "../prototxt/mobilenet/train.prototxt"
 
 base_lr: 0.01
 momentum: 0.9
@@ -19,7 +19,7 @@ average_loss: 10
 snapshot_after_train: true
 # snapshot intermediate results
 snapshot: 200000
-snapshot_prefix: "snapshot/mobilenet"
+snapshot_prefix: "../snapshot/mobilenet"
 # solver mode: CPU or GPU
 solver_mode: GPU
 #type: "Adam"
