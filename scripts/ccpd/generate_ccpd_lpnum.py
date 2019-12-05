@@ -141,7 +141,7 @@ def generate_random_val_list(lengthTrainSet, lengthTestSet):
 	test_length = 0
 	test_list = []
 	while test_length <= lengthTestSet:
-		random_number = random.randint(0, lengthTrainSet)
+		random_number = random.randint(0, lengthTrainSet - 1)
 		if random_number not in test_list:
 			test_list.append(random_number)
 			test_length = len(test_list) + 1
