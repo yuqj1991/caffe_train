@@ -18,7 +18,7 @@ set_dir = "ImageSets/Main"
 image_dir = "JPEGImages"
 label_dir = "label"
 lengthTest = 50000
-lengthTrain = 280001
+lengthTrain = 0
 provNum, alphaNum, adNum = 34, 25, 35
 provinces = ["皖", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "苏", "浙", "京", "闽", "赣", "鲁", "豫", "鄂", "湘", "粤", "桂", "琼", "川", "贵", "云", "藏", "陕", "甘", "青", "宁", "新", "警", "学", "O"]
 alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'O']
@@ -47,7 +47,7 @@ def convertIndex2label(licenseNum):
 	return fist + "_" + second + "_" + third + "_" + forth + "_" + fifth + "_" + sixth + "_" + seventh
 
 
-def generate_label(imagefilepath, savefilepath):
+def generate_label(imagefilepath, labelfilepath):
 	print(imagefilepath)
 	img = cv2.imread(imagefilepath)
 	img_h = img.shape[0]
@@ -71,12 +71,12 @@ def generate_label(imagefilepath, savefilepath):
 	vertices_4_y = exactbndBox[3].split("&")[1]
 	licenseNum = labelInfo[4].split('_')
 	labelContent =" ".join(b for b in licenseNum)
-	label_file_ = open(savefilepath, "w")
-	label_file_.write(labelContent)
-	label_file_.close()
+	with open(labelfilepath, "w") as label_file_:
+		label_file_.write(labelContent)
+		label_file_.close()
 
 
-def generate_anothor_label(imagefilepath, savefilepath):
+def generate_anothor_label(imagefilepath, labelfilepath, dirprefix):
 	print(imagefilepath)
 	img = cv2.imread(imagefilepath)
 	img_h = img.shape[0]
@@ -88,7 +88,7 @@ def generate_anothor_label(imagefilepath, savefilepath):
 	right_bottom_x = labelbndBox[1].split("&")[0]
 	right_bottom_y = labelbndBox[1].split("&")[1]
 	cropped = img[(int(left_upBox_y) - 22):(int(right_bottom_y)+22), (int(left_upBox_x) -22):(int(right_bottom_x) + 22), :]
-	cv2.imwrite(ccpd_anno_img_dir+"/"+"crop_"+str(imagefilepath.split("/")[-1]), cropped)
+	cv2.imwrite(ccpd_anno_img_dir+'/crop_' + dirprefix + str(imagefilepath.split("/")[-1]), cropped)
 	exactbndBox = labelInfo[3].split('_')
 	vertices_1_x = exactbndBox[0].split("&")[0]
 	vertices_1_y = exactbndBox[0].split("&")[1]
@@ -105,22 +105,22 @@ def generate_anothor_label(imagefilepath, savefilepath):
 	numberString = convertIndex2label(license)
 	numbers = get_label(numberString)
 	labelContent =" ".join(str(b) for b in numbers)
-	label_file_ = open(savefilepath, "w")
-	label_file_.write(labelContent)
-	label_file_.close()
+	with open(labelfilepath, "w") as label_file_:
+		label_file_.write(labelContent)
+		label_file_.close()
 
 
-def generate_setfile(imagefiledir, setfile):
+def generate_setfile(imagefiledir, setfile, dirprefix):
 	setfile_ = open(setfile, "a+")
 	global lengthTrain
 	for imagefilepath in os.listdir(imagefiledir):
 		imgpath = imagefiledir +'/'+imagefilepath
 		absimgfilepath = os.path.abspath(imgpath)
-		annopath = ccpd_anno_img_dir+"/"+"crop_"+str(absimgfilepath.split("/")[-1])
-		setfile_.write(os.path.abspath(annopath) + '\n')
-		savefilepath = root_dir+'/'+label_dir +'/crop_'+ absimgfilepath.split('/')[-1].split('.jpg')[0]
-		#generate_label(absimgfilepath, savefilepath)
-		generate_anothor_label(absimgfilepath, savefilepath)
+		annopath = os.path.abspath(ccpd_anno_img_dir)+'/crop_' + dirprefix + str(absimgfilepath.split("/")[-1])
+		setfile_.write(annopath + '\n')
+		labelfilepath = root_dir + '/' + label_dir + '/crop_' + dirprefix + absimgfilepath.split('/')[-1].split('.jpg')[0]
+		#generate_label(absimgfilepath, labelfilepath)
+		generate_anothor_label(absimgfilepath, labelfilepath, dirprefix)
 		lengthTrain += 1
 
 
@@ -154,10 +154,10 @@ def main():
 	trainsetfilepath = root_dir + '/' + set_dir + '/training_lp.txt'
 	testsetfilepath= root_dir + '/' + set_dir + '/testing_lp.txt'
 	
-	if 0:
+	if 1:
 		for imgdir in os.listdir(root_dir + '/' + image_dir):
-			fullimgdirpath = root_dir + '/' + image_dir +'/'+imgdir
-			generate_setfile(fullimgdirpath, trainsetfilepath)
+			fullimgdir = root_dir + '/' + image_dir +'/'+imgdir
+			generate_setfile(fullimgdir, trainsetfilepath, imgdir)
 
 	val_list = generate_random_val_list(lengthTrain, lengthTest)
 	

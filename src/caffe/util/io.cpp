@@ -726,7 +726,7 @@ bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
     anno->set_letternum_3(lpnum_5);
     anno->set_letternum_4(lpnum_6);
     anno->set_letternum_5(lpnum_7);
-    #if 1
+    #if 0
     LOG(INFO)<<"chi: "<<anno->chichracter()<< " eng: "<<anno->engchracter()<<" let1: "<<anno->letternum_1()
               << " let2: "<<anno->letternum_2()<<" let3: "<<anno->letternum_3()<<" let4: "<<anno->letternum_4()
               <<" let5: "<<anno->letternum_5();
