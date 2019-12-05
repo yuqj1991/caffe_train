@@ -158,7 +158,7 @@ def main():
 		for imgdir in os.listdir(root_dir + '/' + image_dir):
 			fullimgdir = root_dir + '/' + image_dir +'/'+imgdir
 			generate_setfile(fullimgdir, trainsetfilepath, imgdir)
-
+	print("lengthTrain: ", lengthTrain)
 	val_list = generate_random_val_list(lengthTrain, lengthTest)
 	
 	train, val = split_setfile(trainsetfilepath, val_list)
