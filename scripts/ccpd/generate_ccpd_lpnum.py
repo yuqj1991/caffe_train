@@ -155,6 +155,9 @@ def main():
 	testsetfilepath= root_dir + '/' + set_dir + '/testing_lp.txt'
 	
 	if 1:
+		with open(trainsetfilepath, "w") as set_truncate_file_:
+			set_truncate_file_.truncate()
+			set_truncate_file_.close()
 		for imgdir in os.listdir(root_dir + '/' + image_dir):
 			fullimgdir = root_dir + '/' + image_dir +'/'+imgdir
 			generate_setfile(fullimgdir, trainsetfilepath, imgdir)
