@@ -2399,7 +2399,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 31
+        num_output: 65
         weight_filler {
             type: "xavier"
         }
@@ -2449,7 +2449,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 34
+        num_output: 65
         weight_filler {
             type: "xavier"
         }
@@ -2499,7 +2499,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 34
+        num_output: 65
         weight_filler {
             type: "xavier"
         }
@@ -2549,7 +2549,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 34
+        num_output: 65
         weight_filler {
             type: "xavier"
         }
@@ -2599,7 +2599,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 34
+        num_output: 65
         weight_filler {
             type: "xavier"
         }
@@ -2648,7 +2648,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 34
+        num_output: 65
         weight_filler {
             type: "xavier"
         }
@@ -2697,7 +2697,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 34
+        num_output: 65
         weight_filler {
             type: "xavier"
         }
