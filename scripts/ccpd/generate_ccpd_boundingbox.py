@@ -14,7 +14,7 @@ root_dir = "../../../dataset/car_person_data/car_license/ccpd_dataset"
 set_dir = "ImageSets/Main"
 image_dir = "JPEGImages"
 label_dir = "label"
-lengthTestset = 50000
+lengthTest = 50000
 lengthTrain = 280001
 provNum, alphaNum, adNum = 34, 25, 35
 provinces = ["皖", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "苏", "浙", "京", "闽", "赣", "鲁", "豫", "鄂", "湘", "粤", "桂",
@@ -64,7 +64,7 @@ def generate_label(imagefilepath, savefilepath, classflydataFile):
 	classfly_file.close()
 
 
-def generate_train_setfile(imagefiledir, setfile):
+def generate_setfile(imagefiledir, setfile):
 	setfile_ = open(setfile, "a+")
 	classfy_ = open(classflyFile, "w")
 	classfy_.truncate()
@@ -77,51 +77,58 @@ def generate_train_setfile(imagefiledir, setfile):
 		savefilepath = root_dir+'/'+label_dir +'/'+ absimgfilepath.split('/')[-1].split('.jpg')[0]
 		generate_label(absimgfilepath, savefilepath, classflyFile)
 		lengthTrain += 1
-	
-	
-def split_train_setfile(trainSetfilepath, testSetfilepath, testline, count, setfile):
-	lines = []
-	with open(trainSetfilepath, 'r+w') as trainfile:
-		for index, line in enumerate(trainfile):
-			with open(testSetfilepath, 'a+') as testfile:
-				assert testline <= count
-				if index== testline:
-					testfile.write(line)
-				else:
-					lines.append(line)
-			testfile.close()
-		trainfile.close()
-	file_ = open(setfile, 'r+w')
-	file_.seek(0)
-	file_.truncate()
-	for linecontent in lines:
-		file_.write(linecontent)
-	file_.close()
-	
-	
-def generate_random_test_indexlist(lengthTrainset, lengthTestset):
-	test_length = 1
-	test_list = []
-	while test_length<=lengthTestset:
-		random_number = random.randint(1, lengthTrainset - 1)
-		if random_number not in test_list:
-			test_list.append(random_number)
-			test_length = len(test_list)+1
-	return test_list
 
 
-trainsetfilepath = root_dir + '/' + set_dir + '/training.txt'
-trainsetfilecopypath = root_dir + '/' + set_dir + '/training_copy.txt'
-testsetfilepath = root_dir + '/' + set_dir + '/testing.txt'
+def split_setfile(trainSetfilepath, valList):
+	valSetContent = []
+	trainSetContent = []
+	with open(trainSetfilepath, 'r') as setfile_:
+		setContent = setfile_.readlines()
+		print("setContent  length: ", len(setContent))
+		for index in valList:
+			valSetContent.append(setContent[index])
+			setContent[index] = "a\n"
+		for content in setContent:
+			if content != "a\n":
+				trainSetContent.append(content)
+	return trainSetContent, valSetContent
 
-for imgdir in os.listdir(root_dir + '/' + image_dir):
-	fullimgdirpath = root_dir + '/' + image_dir +'/'+imgdir
-	generate_train_setfile(fullimgdirpath, trainsetfilepath)
-shutil.copyfile(trainsetfilepath, trainsetfilecopypath)
 
-test_list = generate_random_test_indexlist(lengthTrain, lengthTestset)
-numlines =0
-for index in test_list:
-	split_train_setfile(trainsetfilecopypath, testsetfilepath, index, lengthTrain,trainsetfilepath)
-	numlines += 1
+def generate_random_val_list(lengthTrainSet, lengthTestSet):
+	val_length = 0
+	val_list = []
+	while val_length <= lengthTestSet:
+		random_number = random.randint(0, lengthTrainSet - 1)
+		if random_number not in val_list:
+			val_list.append(random_number)
+			val_length = len(val_list) + 1
+	return val_list
+
+
+def main():
+	trainsetfilepath = root_dir + '/' + set_dir + '/training.txt'
+	testsetfilepath = root_dir + '/' + set_dir + '/testing.txt'
+
+	for imgdir in os.listdir(root_dir + '/' + image_dir):
+		fullimgdirpath = root_dir + '/' + image_dir +'/'+imgdir
+		generate_setfile(fullimgdirpath, trainsetfilepath)
+
+	val_list = generate_random_val_list(lengthTrain, lengthTest)
+	train, val = split_setfile(trainsetfilepath, val_list)
+	print("$$$$$$$$$$$write to file$$$$$$$$$$$$$$$$$$$$$$$")
+	print("train set : ", len(train))
+	print("val set : ", len(val))
+	with open(trainsetfilepath, "w") as train_file_:
+		train_file_.truncate()
+		for line in train:
+			train_file_.writelines(line)
+		train_file_.close()
+	with open(testsetfilepath, "w") as test_file_:
+		for line in val:
+			test_file_.writelines(line)
+		test_file_.close()
+
+
+if __name__ == "__main__":
+	main()
 

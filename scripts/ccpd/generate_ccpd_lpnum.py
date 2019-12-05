@@ -129,24 +129,25 @@ def split_setfile(trainSetfilepath, valList):
 	trainSetContent = []
 	with open(trainSetfilepath, 'r') as setfile_:
 		setContent = setfile_.readlines()
+		print("setContent  length: ", len(setContent))
 		for index in valList:
 			valSetContent.append(setContent[index])
 			setContent[index] = "a\n"
-		for content in trainSetContent:
+		for content in setContent:
 			if content != "a\n":
 				trainSetContent.append(content)
 	return trainSetContent, valSetContent
 
 
 def generate_random_val_list(lengthTrainSet, lengthTestSet):
-	test_length = 0
-	test_list = []
-	while test_length <= lengthTestSet:
+	val_length = 0
+	val_list = []
+	while val_length <= lengthTestSet:
 		random_number = random.randint(0, lengthTrainSet - 1)
-		if random_number not in test_list:
-			test_list.append(random_number)
-			test_length = len(test_list) + 1
-	return test_list
+		if random_number not in val_list:
+			val_list.append(random_number)
+			val_length = len(val_list) + 1
+	return val_list
 
 
 def main():
@@ -162,12 +163,16 @@ def main():
 	
 	train, val = split_setfile(trainsetfilepath, val_list)
 	print("$$$$$$$$$$$write to file$$$$$$$$$$$$$$$$$$$$$$$")
+	print("train set : ", len(train))
+	print("val set : ", len(val))
 	with open(trainsetfilepath, "w") as train_file_:
 		train_file_.truncate()
-		train_file_.write(str(train))
+		for line in train:
+			train_file_.writelines(line)
 		train_file_.close()
 	with open(testsetfilepath, "w") as test_file_:
-		test_file_.write(str(val))
+		for line in val:
+			test_file_.writelines(line)
 		test_file_.close()
 
 if __name__ == '__main__':
