@@ -15,7 +15,7 @@ set_dir = "ImageSets/Main"
 image_dir = "JPEGImages"
 label_dir = "label"
 lengthTest = 50000
-lengthTrain = 280001
+lengthTrain = 0
 provNum, alphaNum, adNum = 34, 25, 35
 provinces = ["皖", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "苏", "浙", "京", "闽", "赣", "鲁", "豫", "鄂", "湘", "粤", "桂",
              "琼", "川", "贵", "云", "藏", "陕", "甘", "青", "宁", "新", "警", "学", "O"]
@@ -28,7 +28,7 @@ classflyFile = "./ccpd_classfly_distance_data.txt"
 collectBoxData = True
 
 
-def generate_label(imagefilepath, savefilepath, classflydataFile):
+def generate_label(imagefilepath, labelfilepath, classflydataFile):
 	print(imagefilepath)
 	classfly_file = open(classflydataFile, 'a+')
 	img = cv2.imread(imagefilepath)
@@ -58,13 +58,13 @@ def generate_label(imagefilepath, savefilepath, classflydataFile):
 	vertices_4_y = exactbndBox[3].split("&")[1]
 	licenseNum = labelInfo[4].split('_')
 	labelContent = " ".join(a for ii in range(2) for a in labelbndBox[ii].split("&"))
-	label_file_ = open(savefilepath, "w")
+	label_file_ = open(labelfilepath, "w")
 	label_file_.write(labelContent)
 	label_file_.close()
 	classfly_file.close()
 
 
-def generate_setfile(imagefiledir, setfile):
+def generate_setfile(imagefiledir, setfile, dirprefix):
 	setfile_ = open(setfile, "a+")
 	classfy_ = open(classflyFile, "w")
 	classfy_.truncate()
@@ -74,8 +74,8 @@ def generate_setfile(imagefiledir, setfile):
 		imgpath = imagefiledir +'/'+imagefilepath
 		absimgfilepath = os.path.abspath(imgpath)
 		setfile_.write(absimgfilepath+'\n')
-		savefilepath = root_dir+'/'+label_dir +'/'+ absimgfilepath.split('/')[-1].split('.jpg')[0]
-		generate_label(absimgfilepath, savefilepath, classflyFile)
+		labelfilepath = root_dir+'/'+label_dir +'/'+ absimgfilepath.split('/')[-1].split('.jpg')[0]
+		generate_label(absimgfilepath, labelfilepath, classflyFile)
 		lengthTrain += 1
 
 
