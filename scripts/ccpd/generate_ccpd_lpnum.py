@@ -128,12 +128,13 @@ def split_setfile(trainSetfilepath, valList):
 	valSetContent = []
 	trainSetContent = []
 	with open(trainSetfilepath, 'r') as setfile_:
-		trainSetContent = setfile_.readlines()
+		setContent = setfile_.readlines()
 		for index in valList:
-			valSetContent.append(trainSetContent[index])
-			#trainSetContent[index] = "a\n"
-		for index in valList:
-			del trainSetContent[index]
+			valSetContent.append(setContent[index])
+			setContent[index] = "a\n"
+		for content in trainSetContent:
+			if content != "a\n":
+				trainSetContent.append(content)
 	return trainSetContent, valSetContent
 
 
