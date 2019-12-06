@@ -1,19 +1,45 @@
 name: "GoogleNet-face"
-layer {
+#layer {
+#	name: "data"
+#	type: "ImageData"
+#	top: "data"
+#	top: "label"
+#	top: "labelIndex"
+#	image_data_param {
+#		new_height: 128
+#		new_width: 128
+#		sample_num: 5
+#		label_num: 96
+#		batch_size: 480
+#		root_folder: "../../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
+#		source: "../scripts/labelmap.txt"
+#	}
+#	transform_param {
+#		mirror: true
+#		mean_value: 127.5
+#		mean_value: 127.5
+#		mean_value: 127.5
+#		scale: 0.0078125
+#		resize_param {
+#			prob: 1.0
+#			resize_mode: WARP
+#			height: 128
+#			width: 128
+#			interp_mode: LINEAR
+#			interp_mode: AREA
+#			interp_mode: NEAREST
+#			interp_mode: CUBIC
+#			interp_mode: LANCZOS4
+#		}
+#	}
+#}
+
+
+layer{
 	name: "data"
-	type: "ImageData"
+	type: "Data"
 	top: "data"
-	top: "label"
 	top: "labelIndex"
-	image_data_param {
-		new_height: 128
-		new_width: 128
-		sample_num: 5
-		label_num: 96
-		batch_size: 480
-		root_folder: "../../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
-		source: "../scripts/labelmap.txt"
-	}
 	transform_param {
 		mirror: true
 		mean_value: 127.5
@@ -32,7 +58,13 @@ layer {
 			interp_mode: LANCZOS4
 		}
 	}
+	data_param: {
+		source: "../../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
+		batch_size: 480
+		backend: LMDB
+	}
 }
+
 
 layer {
   name: "conv1/7x7_s2"
@@ -2194,67 +2226,30 @@ layer {
 	}
 	loss_weight: 0.8
 }
-##############contravie loss###############
-layer {
-	name: "merege_pair"
-	type: "Identity2Verify"
-	bottom: "fc5"
-	bottom: "labelIndex"
-	top: "feature1"
-	top: "feature2"
-	top: "sim"
-}
-
-layer {
-	name: "norm1"
-	type: "SimpleNormalize"
-	bottom: "feature1"
-	top: "normfeature1"
-}
-
-layer {
-	name: "norm2"
-	type: "SimpleNormalize"
-	bottom: "feature2"
-	top: "normfeature2"
-}
-
-layer {
-	name: "sim_loss"
-	type: "ContrastiveLoss"
-	bottom: "normfeature1"
-	bottom: "normfeature2"
-	bottom: "sim"
-	top: "sim_loss"
-	loss_weight: 0.3
-	contrastive_loss_param {
-		margin: 1
-	}
-}
 
 #######################tripletloss############
-layer {
-	name: "fc5_feature"
-	type: "SimpleNormalize"
-	bottom: "fc5"
-	top: "fc5_feature"
-}
-layer {
-	name: "archor_pair"
-	type: "SampleTriplet"
-	bottom: "fc5_feature"
-	bottom: "label"
-	top: "archor_pair"
-	propagate_down: false
-	propagate_down: false
-}
-layer {
-	name: "tripletloss"
-	type: "TripletLoss"
-	bottom: "fc5_feature"
-	bottom: "archor_pair"
-	top: "tripletloss"
-	loss_weight: 1
-	propagate_down: true
-	propagate_down: false
-}
+#layer {
+#	name: "fc5_feature"
+#	type: "SimpleNormalize"
+#	bottom: "fc5"
+#	top: "fc5_feature"
+#}
+#layer {
+#	name: "archor_pair"
+#	type: "SampleTriplet"
+#	bottom: "fc5_feature"
+#	bottom: "label"
+#	top: "archor_pair"
+#	propagate_down: false
+#	propagate_down: false
+#}
+#layer {
+#	name: "tripletloss"
+#	type: "TripletLoss"
+#	bottom: "fc5_feature"
+#	bottom: "archor_pair"
+#	top: "tripletloss"
+#	loss_weight: 1
+#	propagate_down: true
+#	propagate_down: false
+#}
