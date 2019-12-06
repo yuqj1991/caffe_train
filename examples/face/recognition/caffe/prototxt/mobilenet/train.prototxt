@@ -1,19 +1,44 @@
 name: "mobilenet-face"
-layer {
+#layer {
+#	name: "data"
+#	type: "ImageData"
+#	top: "data"
+#	top: "label"
+#	top: "labelIndex"
+#	image_data_param {
+#		new_height: 128
+#		new_width: 128
+#		sample_num: 5
+#		label_num: 24
+#		batch_size: 120
+#		root_folder: "../../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
+#		source: "../scripts/labelmap.txt"
+#	}
+#	transform_param {
+#		mirror: true
+#		mean_value: 127.5
+#		mean_value: 127.5
+#		mean_value: 127.5
+#		scale: 0.0078125
+#		resize_param {
+#			prob: 1.0
+#			resize_mode: WARP
+#			height: 128
+#			width: 128
+#			interp_mode: LINEAR
+#			interp_mode: AREA
+#			interp_mode: NEAREST
+#			interp_mode: CUBIC
+#			interp_mode: LANCZOS4
+#		}
+#	}
+#}
+
+layer{
 	name: "data"
-	type: "ImageData"
+	type: "Data"
 	top: "data"
-	top: "label"
 	top: "labelIndex"
-	image_data_param {
-		new_height: 128
-		new_width: 128
-		sample_num: 5
-		label_num: 24
-		batch_size: 120
-		root_folder: "../../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
-		source: "../scripts/labelmap.txt"
-	}
 	transform_param {
 		mirror: true
 		mean_value: 127.5
@@ -31,6 +56,11 @@ layer {
 			interp_mode: CUBIC
 			interp_mode: LANCZOS4
 		}
+	}
+	data_param: {
+		source: "../../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
+		batch_size: 96
+		backend: LMDB
 	}
 }
 
@@ -1967,28 +1997,28 @@ layer {
   top: "conv14_2"
 }
 layer {
-  name: "fc5"
-  type: "InnerProduct"
-  bottom: "conv14_2"
-  top: "fc5"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 512
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
+	name: "fc5"
+	type: "InnerProduct"
+	bottom: "conv14_2"
+	top: "fc5"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	inner_product_param {
+		num_output: 512
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0
+		}
+	}
 }
 ################softmax loss##########################
 layer {
@@ -2122,28 +2152,28 @@ layer {
 }
 
 #######################tripletloss############
-layer {
-	name: "fc5_feature"
-	type: "SimpleNormalize"
-	bottom: "fc5"
-	top: "fc5_feature"
-}
-layer {
-	name: "archor_pair"
-	type: "SampleTriplet"
-	bottom: "fc5_feature"
-	bottom: "label"
-	top: "archor_pair"
-	propagate_down: false
-	propagate_down: false
-}
-layer {
-	name: "tripletloss"
-	type: "TripletLoss"
-	bottom: "fc5_feature"
-	bottom: "archor_pair"
-	top: "tripletloss"
-	loss_weight: 1
-	propagate_down: true
-	propagate_down: true
-}
+#layer {
+#	name: "fc5_feature"
+#	type: "SimpleNormalize"
+#	bottom: "fc5"
+#	top: "fc5_feature"
+#}
+#layer {
+#	name: "archor_pair"
+#	type: "SampleTriplet"
+#	bottom: "fc5_feature"
+#	bottom: "label"
+#	top: "archor_pair"
+#	propagate_down: false
+#	propagate_down: false
+#}
+#layer {
+#	name: "tripletloss"
+#	type: "TripletLoss"
+#	bottom: "fc5_feature"
+#	bottom: "archor_pair"
+#	top: "tripletloss"
+#	loss_weight: 1
+#	propagate_down: true
+#	propagate_down: true
+#}
