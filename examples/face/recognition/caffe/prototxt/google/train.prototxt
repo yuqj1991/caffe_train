@@ -9,8 +9,8 @@ layer {
 		new_height: 128
 		new_width: 128
 		sample_num: 5
-		label_num: 24
-		batch_size: 120
+		label_num: 96
+		batch_size: 480
 		root_folder: "../../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
 		source: "../scripts/labelmap.txt"
 	}
@@ -49,8 +49,8 @@ layer {
   }
   convolution_param {
     num_output: 64
-    pad: 3
-    kernel_size: 7
+    pad: 1
+    kernel_size: 3
     stride: 2
     weight_filler {
       type: "xavier"
@@ -2114,7 +2114,7 @@ layer {
 	inner_product_param{
 		num_output: 8631
 		weight_filler {
-		type: "xavier"
+			type: "xavier"
 		}
 	}
 }
