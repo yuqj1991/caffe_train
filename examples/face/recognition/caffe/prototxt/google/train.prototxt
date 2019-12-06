@@ -1,5 +1,5 @@
 name: "GoogleNet-face"
-#layer {
+layer {
 	name: "data"
 	type: "ImageData"
 	top: "data"
