@@ -15,7 +15,7 @@ except ImportError:
     logging.fatal("Cannot find caffe!")
 import time
 
-inputSize = (128, 128)
+
 
 def l2_normalize(vector):
     output = vector/np.sqrt(max(np.sum(vector**2), 1e-12))
@@ -58,7 +58,7 @@ def image_pair_build(image_path, pair_path):
     return image_pair_path
 
 
-def preprocess(img):
+def preprocess(img, inputSize):
 
     preprocessed_image = cv2.resize(img, inputSize)
     preprocessed_image = np.transpose(preprocessed_image, (2,0,1))
@@ -97,6 +97,7 @@ def main(args):
 
     facenet = caffenet_load(args.network, args.weights, "GPU")
     image_paths = image_pair_build(args.image_dir, args.pair_file)
+    inputSize = (args.width, args.height)
 
     total_pair = len(image_paths)//2
     print("total_pair: ", total_pair)
@@ -149,6 +150,8 @@ def parse_arguments(argv):
     parser.add_argument('--result_file', type=str, help='Result of face recognition')
     parser.add_argument('--network', type=str, help='Network file of face recognition')
     parser.add_argument('--weights', type=str, help='Weights file of face recognition')
+    parser.add_argument('--height', type=int, help='input size height')
+    parser.add_argument('--weight', type=int, help='input size')
 
     return parser.parse_args(argv)
 

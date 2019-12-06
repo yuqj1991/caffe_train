@@ -627,7 +627,7 @@ message LayerParameter {
   optional MemoryDataParameter memory_data_param = 119;
   optional MultiBoxLossParameter multibox_loss_param = 201;
   optional MVNParameter mvn_param = 120;
-  optional NormalizeParameter norm_param = 206;
+  optional NormalizeParameter normalize_param = 206;
   optional ParameterParameter parameter_param = 145;
   optional PermuteParameter permute_param = 202;
   optional PoolingParameter pooling_param = 121;
@@ -678,6 +678,7 @@ message LayerParameter {
   
   optional TransposeParameter transpose_param=8266710;
   optional LSTMParameter lstm_param = 8266711;
+  optional LabelSpecificAddParameter label_specific_add_param = 8000;
 }
 
 message ContinuationIndicatorParameter {
@@ -1582,6 +1583,7 @@ message InnerProductParameter {
   // of the weight matrix. The weight matrix itself is not going to be transposed
   // but rather the transfer flag of operations will be toggled accordingly.
   optional bool transpose = 6 [default = false];
+  optional bool normalize = 7 [default = false];
 }
 
 message InputParameter {
@@ -1771,15 +1773,10 @@ message MVNParameter {
   optional float eps = 3 [default = 1e-9];
 }
 
-// Message that stores parameters used by NormalizeLayer
 message NormalizeParameter {
-  optional bool across_spatial = 1 [default = true];
-  // Initial value of scale. Default is 1.0 for all
-  optional FillerParameter scale_filler = 2;
-  // Whether or not scale parameters are shared across channels.
-  optional bool channel_shared = 3 [default = true];
-  // Epsilon for not dividing by zero while normalizing variance
-  optional float eps = 4 [default = 1e-10];
+  optional string normalize_type = 1 [default = "L2"];
+  optional bool fix_gradient = 2 [default = false];
+  optional bool bp_norm = 3 [default = false];
 }
 
 message ParameterParameter {
@@ -2091,6 +2088,8 @@ message ScaleParameter {
   // may be more efficient).  Initialized with bias_filler (defaults to 0).
   optional bool bias_term = 4 [default = false];
   optional FillerParameter bias_filler = 5;
+  optional float min_value = 6;
+  optional float max_value = 7;
 }
 
 message SigmoidParameter {
@@ -2414,4 +2413,15 @@ message PReLUParameter {
   optional FillerParameter filler = 1;
   // Whether or not slope paramters are shared across channels.
   optional bool channel_shared = 2 [default = false];
+}
+
+message LabelSpecificAddParameter {
+  optional float bias = 1 [default = 0.0];
+  optional bool transform_test = 2 [default = false];
+  optional float bias_base = 3 [default = 0.0];
+  optional float bias_gamma = 4 [default = 0.0];
+  optional float bias_power = 5 [default = 1.0];
+  optional float bias_min = 6 [default =0.0];
+  optional float bias_max = 7 [default =0.0];
+  optional uint32 iteration = 8 [default = 0];
 }
