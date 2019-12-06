@@ -2198,28 +2198,28 @@ layer {
 #}
 
 #######################tripletloss############
-#layer {
-#	name: "fc5_feature"
-#	type: "SimpleNormalize"
-#	bottom: "fc5"
-#	top: "fc5_feature"
-#}
-#layer {
-#	name: "archor_pair"
-#	type: "SampleTriplet"
-#	bottom: "fc5_feature"
-#	bottom: "label"
-#	top: "archor_pair"
-#	propagate_down: false
-#	propagate_down: false
-#}
-#layer {
-#	name: "tripletloss"
-#	type: "TripletLoss"
-#	bottom: "fc5_feature"
-#	bottom: "archor_pair"
-#	top: "tripletloss"
-#	loss_weight: 1
-#	propagate_down: true
-#	propagate_down: false
-#}
+layer {
+	name: "fc5_feature"
+	type: "SimpleNormalize"
+	bottom: "fc5"
+	top: "fc5_feature"
+}
+layer {
+	name: "archor_pair"
+	type: "SampleTriplet"
+	bottom: "fc5_feature"
+	bottom: "label"
+	top: "archor_pair"
+	propagate_down: false
+	propagate_down: false
+}
+layer {
+	name: "tripletloss"
+	type: "TripletLoss"
+	bottom: "fc5_feature"
+	bottom: "archor_pair"
+	top: "tripletloss"
+	loss_weight: 1
+	propagate_down: true
+	propagate_down: false
+}
