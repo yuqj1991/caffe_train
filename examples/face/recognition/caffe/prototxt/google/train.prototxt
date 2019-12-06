@@ -2208,24 +2208,24 @@ layer {
 }
 
 ############## center loss ###############
-layer {
-	name: "center_loss"
-	type: "CenterLoss"
-	bottom: "fc5"
-	bottom: "labelIndex"
-	top: "center_loss"
-	param {
-		lr_mult: 1
-		decay_mult: 2 
-	}
-	center_loss_param {
-		num_output: 8631
-		center_filler {
-			type: "xavier"
-		}
-	}
-	loss_weight: 0.8
-}
+#layer {
+#	name: "center_loss"
+#	type: "CenterLoss"
+#	bottom: "fc5"
+#	bottom: "labelIndex"
+#	top: "center_loss"
+#	param {
+#		lr_mult: 1
+#		decay_mult: 2 
+#	}
+#	center_loss_param {
+#		num_output: 8631
+#		center_filler {
+#			type: "xavier"
+#		}
+#	}
+#	loss_weight: 0.8
+#}
 
 #######################tripletloss############
 #layer {
