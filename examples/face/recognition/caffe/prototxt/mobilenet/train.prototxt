@@ -2084,7 +2084,6 @@ layer {
 #		}
 #	}
 #}
-
 ############## AM label speciled ##########
 layer {
 	name: "norm1"
