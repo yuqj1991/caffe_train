@@ -2020,44 +2020,44 @@ layer {
 		}
 	}
 }
-################softmax loss##########################
-layer {
-	name: "lmcl_cos_l2_normalize"
-	type: "InnerProduct"
-	bottom: "fc5"
-	top: "lmcl_cos_l2_normalize"
-	param {
-		lr_mult: 1
-		decay_mult: 2 
-	}
-	inner_product_param{
-		num_output: 8631
-		weight_filler {
-		type: "xavier"
-		}
-	}
-}
-##############cosinface loss#############
+################ normal #####################
 #layer {
 #	name: "lmcl_cos_l2_normalize"
-#	type: "CosinL2Normalize"
+#	type: "InnerProduct"
 #	bottom: "fc5"
-#	bottom: "labelIndex"
 #	top: "lmcl_cos_l2_normalize"
 #	param {
 #		lr_mult: 1
 #		decay_mult: 2 
 #	}
-#	cosin_loss_param {
-#		margin: -0.35
-#		scale: 64
+#	inner_product_param{
 #		num_output: 8631
-#		cosin_filler {
+#		weight_filler {
 #			type: "xavier"
 #		}
 #	}
 #}
-################arcface-loss#############
+##############cosinface ##################
+layer {
+	name: "lmcl_cos_l2_normalize"
+	type: "CosinL2Normalize"
+	bottom: "fc5"
+	bottom: "labelIndex"
+	top: "lmcl_cos_l2_normalize"
+	param {
+		lr_mult: 1
+		decay_mult: 2 
+	}
+	cosin_loss_param {
+		margin: -0.35
+		scale: 64
+		num_output: 8631
+		cosin_filler {
+			type: "xavier"
+		}
+	}
+}
+################arcface-#################
 #layer {
 #	name: "cosin_add_m"
 #	type: "CosinAddm"
@@ -2084,6 +2084,7 @@ layer {
 #		}
 #	}
 #}
+############## softmax loss ###############
 layer {
 	name: "softmax_loss"
 	type: "SoftmaxWithLoss"
@@ -2113,43 +2114,6 @@ layer {
 	}
 	loss_weight: 0.8
 }
-##############contravie loss###############
-layer {
-	name: "merege_pair"
-	type: "Identity2Verify"
-	bottom: "fc5"
-	bottom: "labelIndex"
-	top: "feature1"
-	top: "feature2"
-	top: "sim"
-}
-
-layer {
-	name: "norm1"
-	type: "SimpleNormalize"
-	bottom: "feature1"
-	top: "normfeature1"
-}
-
-layer {
-	name: "norm2"
-	type: "SimpleNormalize"
-	bottom: "feature2"
-	top: "normfeature2"
-}
-
-layer {
-	name: "sim_loss"
-	type: "ContrastiveLoss"
-	bottom: "normfeature1"
-	bottom: "normfeature2"
-	bottom: "sim"
-	top: "sim_loss"
-	loss_weight: 0.3
-	contrastive_loss_param {
-		margin: 1
-	}
-}
 
 #######################tripletloss############
 #layer {
@@ -2175,5 +2139,5 @@ layer {
 #	top: "tripletloss"
 #	loss_weight: 1
 #	propagate_down: true
-#	propagate_down: true
+#	propagate_down: false
 #}

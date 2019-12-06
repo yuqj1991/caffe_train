@@ -76,8 +76,9 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     label = atoi(line.substr(pos+1).c_str());
     std::string newDirectory = root_folder + string("/") + line.substr(0, pos);
     fullImageSetDir_.push_back(std::make_pair(newDirectory, label));
+    //LOG(INFO)<< "directory: " << newDirectory << ", label: " << label;
   }
-  LOG(INFO)<<"get file directory successfully";
+  LOG(INFO)<<" fullImageSetDir_ size: " << fullImageSetDir_.size() << "get file directory successfully";
   /**************遍历人脸数据集根目录文件夹完成*******/
 
   lines_id_ = 0;
@@ -87,7 +88,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   struct dirent *faceSetDir;
   DIR* dir = opendir(subDir.c_str());
   if( dir == NULL )
-    LOG(FATAL)<<" is not a directory or not exist!";
+    LOG(FATAL) << subDir << " is not a directory or not exist!";
   while ((faceSetDir = readdir(dir)) != NULL) {
     if(strcmp(faceSetDir->d_name,".")==0 || strcmp(faceSetDir->d_name,"..")==0)
       continue;
@@ -153,13 +154,14 @@ void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
 
   /**************随机挑选符合要求的人脸图片*************/
   struct dirent *faceSetDir;
+  std::vector<std::string> filelist;
   while (choosedImagefile_.size() < batch_size){
     int rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
     while(std::count(labelIdxSet_.begin(), labelIdxSet_.end(), rand_class_idx)!=0){
       rand_class_idx = caffe_rng_rand() % fullImageSetDir_.size();
     }
     std::string subDir = fullImageSetDir_[rand_class_idx].first;
-    std::vector<std::string> filelist;
+    filelist.clear();
     DIR* dir = opendir(subDir.c_str());
     if( dir == NULL )
       LOG(FATAL)<<" is not a directory or not exist!";
@@ -224,7 +226,7 @@ void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
     this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
     trans_time += timer.MicroSeconds();
     labelSample[item_id] = choosedImagefile_[item_id].second;
-    //LOG(INFO)<< choosedImagefile_[item_id].second <<", "<<choosedImagefile_[item_id].first;
+    //LOG(INFO) << "labelidx: " << choosedImagefile_[item_id].second <<", file: " << choosedImagefile_[item_id].first;
   }
   for(int i = 0; i < label_num_; i++){
     prefetch_label[i] = label[i];
