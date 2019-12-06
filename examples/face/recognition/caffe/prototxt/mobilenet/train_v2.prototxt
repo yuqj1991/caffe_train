@@ -9,8 +9,8 @@ layer {
 		new_height: 128
 		new_width: 128
 		sample_num: 5
-		label_num: 96
-		batch_size: 480
+		label_num: 64
+		batch_size: 320
 		root_folder: "../../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
 		source: "../scripts/labelmap.txt"
 	}
