@@ -79,18 +79,6 @@ void TripletLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     // backward p
     caffe_sub(
       feature_dim_,
-      n_pointer,  // n
-      a_pointer,  // a
-      diff_na_.mutable_cpu_data());  // n_i - a_i;
-    caffe_cpu_axpby(
-      feature_dim_,
-      Dtype(2.0),
-      diff_na_.mutable_cpu_data(),
-      Dtype(0.0),
-      bottom_diff_.mutable_cpu_data() + (p_idx * feature_dim_)); 
-    // backward n
-    caffe_sub(
-      feature_dim_,
       p_pointer,  // p
       a_pointer,  // a
       diff_pa_.mutable_cpu_data());  // p_i - a_i;
@@ -98,6 +86,18 @@ void TripletLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       feature_dim_,
       Dtype(2.0),
       diff_pa_.mutable_cpu_data(),
+      Dtype(0.0),
+      bottom_diff_.mutable_cpu_data() + (p_idx * feature_dim_)); 
+    // backward n
+    caffe_sub(
+      feature_dim_,
+      a_pointer,  // a
+      p_pointer,  // n
+      diff_na_.mutable_cpu_data());  // a_i - n_i;
+    caffe_cpu_axpby(
+      feature_dim_,
+      Dtype(2.0),
+      diff_na_.mutable_cpu_data(),
       Dtype(0.0),
       bottom_diff_.mutable_cpu_data() + (n_idx * feature_dim_)); 
     /*********************以上是我自己做的**********************/
