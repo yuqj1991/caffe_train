@@ -1629,15 +1629,21 @@ layer {
 }
 
 layer {
-	name: "acc"
+	name: "result"
 	type: "CTCGreedyDecoder"
 	bottom: "fc1x"
-	bottom: "label"
-	top: "acc"
-	include {
-    phase: TEST
-  	}
-  	ctc_decoder_param {
+	top: "result"
+	ctc_decoder_param {
 	    blank_index: -1
+	}
+}
+layer{
+	name: "ccpdeval_output"
+	type: "LpEvaluate"
+	bottom: "result"
+	bottom: "label"
+	top: "ccpdeval_output"
+	include {
+		phase: TEST
 	}
 }
