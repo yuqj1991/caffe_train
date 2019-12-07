@@ -1083,7 +1083,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 34
+        num_output: 33
         weight_filler {
             type: "xavier"
         }
@@ -1133,7 +1133,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 25
+        num_output: 24
         weight_filler {
             type: "xavier"
         }
@@ -1183,7 +1183,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -1233,7 +1233,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -1283,7 +1283,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -1332,7 +1332,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -1381,7 +1381,7 @@ layer {
         decay_mult: 1
     }
     inner_product_param {
-        num_output: 35
+        num_output: 34
         weight_filler {
             type: "xavier"
         }
@@ -1469,8 +1469,8 @@ layer {
 		phase: TEST
 	}
 	lp_det_param {
-		num_chinese: 34
-		num_english: 25
-		num_letter: 35
+		num_chinese: 33
+		num_english: 24
+		num_letter: 34
 	}
 }
