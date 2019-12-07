@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../dataset/car_person_data/car_license/ccpd_dataset/lmdb/ccpd_dataset_training_lp_lmdb/"
-		batch_size: 64
+		batch_size: 128
 		backend: LMDB
 	}
 }
@@ -58,7 +58,7 @@ layer {
 	top: "indicator"
 	continuation_indicator_param {
 		time_step:  16
-		batch_size: 64
+		batch_size: 128
 	}
 }
 layer {
