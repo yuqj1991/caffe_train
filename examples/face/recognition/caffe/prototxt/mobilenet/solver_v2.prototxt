@@ -2,13 +2,15 @@
 net: "../prototxt/mobilenet/train_v2.prototxt"
 
 
-base_lr: 0.01
+base_lr: 0.1
 momentum: 0.9
 weight_decay: 0.0005
 # The learning rate policy
 lr_policy: "multistep"
 gamma: 0.1
-stepvalue: 200000
+stepvalue: 20000
+stepvalue: 42000
+stepvalue: 242000
 stepvalue: 602000
 stepvalue: 1302000
 
