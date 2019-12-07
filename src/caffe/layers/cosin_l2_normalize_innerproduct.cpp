@@ -82,12 +82,12 @@ namespace caffe {
 
             const Dtype *normail_feature_data = Normalise_feature_.cpu_data();
             const Dtype *normail_weight_data = Normalise_Weight_.cpu_data();
-            const Dtype* bottom_data = bottom[0]->cpu_data();
-            const Dtype* top_diff = top[0]->cpu_diff();
+            const Dtype *bottom_data = bottom[0]->cpu_data();
+            const Dtype *top_diff = top[0]->cpu_diff();
             Dtype *normail_feature_diff = Normalise_feature_.mutable_cpu_diff();
             Dtype *normail_weight_diff = Normalise_Weight_.mutable_cpu_diff();
-            Dtype * weight_diff = this->blobs_[0]->mutable_cpu_diff();
-            Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+            Dtype *weight_diff = this->blobs_[0]->mutable_cpu_diff();
+            Dtype *bottom_diff = bottom[0]->mutable_cpu_diff();
             
             /***********Gradient with respect to normalize weight******/
             caffe_cpu_gemm(CblasTrans, CblasNoTrans, Num_Class_, feature_Dim_, Num_BatchSize_,
