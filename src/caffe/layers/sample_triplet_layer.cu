@@ -7,11 +7,11 @@ void SampleTripletLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
 
   alpha_ = this->layer_param_.sample_triplet_param().alpha();
-  Dtype *top_data = top[0]->mutable_cpu_data();
+  Dtype *top_data = top[0]->mutable_gpu_data();
 
   /*************************我自己添加的***********************/
-  const Dtype *feature_data = bottom[0]->cpu_data();  //feature data
-  const Dtype *label_data = bottom[1]->cpu_data(); //label data
+  const Dtype *feature_data = bottom[0]->gpu_data();  //feature data
+  const Dtype *label_data = bottom[1]->gpu_data(); //label data
   int nrof_images = 0;
   int emb_start_idx = 0;
   int neg_images = 0;
@@ -67,6 +67,7 @@ void SampleTripletLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     emb_start_idx += nrof_images;
   }
   triplet_num_ = neg_set.size();
+  printf("triplet_num: %d\n", triplet_num_);
   top[0]->Reshape(triplet_num_, 3, 1, 1);
   for(int idx = 0; idx<triplet_num_; idx++){
     top_data[idx * 3] = an_set[idx];
