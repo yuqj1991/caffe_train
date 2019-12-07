@@ -30,7 +30,7 @@ namespace caffe {
             virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
                 const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);  //反向传播 GPU 实现
             inline void vector_L2_Normalise(const Dtype * data, int NumBatch, int featureDim, Dtype * distData){
-                Dtype sum_squre;
+                Dtype sum_squre = Dtype(0);
                 caffe_sqr<Dtype>(NumBatch*featureDim, data, distData);
                 for (size_t i = 0; i < NumBatch; i++)
                 {
