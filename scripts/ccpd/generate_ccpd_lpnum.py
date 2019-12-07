@@ -19,10 +19,10 @@ image_dir = "JPEGImages"
 label_dir = "label"
 lengthTest = 50000
 lengthTrain = 0
-provNum, alphaNum, adNum = 34, 25, 35
-provinces = ["皖", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "苏", "浙", "京", "闽", "赣", "鲁", "豫", "鄂", "湘", "粤", "桂", "琼", "川", "贵", "云", "藏", "陕", "甘", "青", "宁", "新", "警", "学", "O"]
-alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'O']
-ads = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'O']
+provNum, alphaNum, adNum = 33, 24, 34
+provinces = ["皖", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "苏", "浙", "京", "闽", "赣", "鲁", "豫", "鄂", "湘", "粤", "桂", "琼", "川", "贵", "云", "藏", "陕", "甘", "青", "宁", "新", "警", "学"]
+alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+ads = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 
 index = {"京": 0, "沪": 1, "津": 2, "渝": 3, "冀": 4, "晋": 5, "蒙": 6, "辽": 7, "吉": 8, "黑": 9, "苏": 10, "浙": 11, "皖": 12, "闽": 13, "赣": 14, "鲁": 15, "豫": 16, "鄂": 17, "湘": 18, "粤": 19, "桂": 20, "琼": 21, "川": 22, "贵": 23, "云": 24, "藏": 25, "陕": 26, "甘": 27, "青": 28, "宁": 29, "新": 30, "0": 31, "1": 32, "2": 33, "3": 34, "4": 35, "5": 36, "6": 37, "7": 38, "8": 39, "9": 40, "A": 41, "B": 42, "C": 43, "D": 44, "E": 45, "F": 46, "G": 47, "H": 48, "J": 49, "K": 50, "L": 51, "M": 52, "N": 53, "P": 54, "Q": 55, "R": 56, "S": 57, "T": 58, "U": 59, "V": 60, "W": 61, "X": 62, "Y": 63, "Z": 64}
@@ -47,7 +47,7 @@ def convertIndex2label(licenseNum):
 	return fist + "_" + second + "_" + third + "_" + forth + "_" + fifth + "_" + sixth + "_" + seventh
 
 
-def generate_label(imagefilepath, labelfilepath):
+def generate_label(imagefilepath, labelfilepath, dirprefix):
 	print(imagefilepath)
 	img = cv2.imread(imagefilepath)
 	img_h = img.shape[0]
@@ -59,7 +59,7 @@ def generate_label(imagefilepath, labelfilepath):
 	right_bottom_x = labelbndBox[1].split("&")[0]
 	right_bottom_y = labelbndBox[1].split("&")[1]
 	cropped = img[(int(left_upBox_y) - 22):(int(right_bottom_y)+22), (int(left_upBox_x) -22):(int(right_bottom_x) + 22), :]
-	cv2.imwrite(ccpd_anno_img_dir+"/"+"crop_"+str(imagefilepath.split("/")[-1]), cropped)
+	cv2.imwrite(ccpd_anno_img_dir + "/" + "crop_" + dirprefix + '_' + str(imagefilepath.split("/")[-1]), cropped)
 	exactbndBox = labelInfo[3].split('_')
 	vertices_1_x = exactbndBox[0].split("&")[0]
 	vertices_1_y = exactbndBox[0].split("&")[1]
@@ -88,7 +88,7 @@ def generate_anothor_label(imagefilepath, labelfilepath, dirprefix):
 	right_bottom_x = labelbndBox[1].split("&")[0]
 	right_bottom_y = labelbndBox[1].split("&")[1]
 	cropped = img[(int(left_upBox_y) - 22):(int(right_bottom_y)+22), (int(left_upBox_x) -22):(int(right_bottom_x) + 22), :]
-	cv2.imwrite(ccpd_anno_img_dir+'/crop_' + dirprefix + str(imagefilepath.split("/")[-1]), cropped)
+	cv2.imwrite(ccpd_anno_img_dir+'/crop_' + dirprefix + '_' + str(imagefilepath.split("/")[-1]), cropped)
 	exactbndBox = labelInfo[3].split('_')
 	vertices_1_x = exactbndBox[0].split("&")[0]
 	vertices_1_y = exactbndBox[0].split("&")[1]
@@ -116,11 +116,11 @@ def generate_setfile(imagefiledir, setfile, dirprefix):
 	for imagefilepath in os.listdir(imagefiledir):
 		imgpath = imagefiledir +'/'+imagefilepath
 		absimgfilepath = os.path.abspath(imgpath)
-		annopath = os.path.abspath(ccpd_anno_img_dir)+'/crop_' + dirprefix + str(absimgfilepath.split("/")[-1])
+		annopath = os.path.abspath(ccpd_anno_img_dir)+'/crop_' + dirprefix + '_' + str(absimgfilepath.split("/")[-1])
 		setfile_.write(annopath + '\n')
-		labelfilepath = root_dir + '/' + label_dir + '/crop_' + dirprefix + absimgfilepath.split('/')[-1].split('.jpg')[0]
-		#generate_label(absimgfilepath, labelfilepath)
-		generate_anothor_label(absimgfilepath, labelfilepath, dirprefix)
+		labelfilepath = root_dir + '/' + label_dir + '/crop_' + dirprefix +  '_' + absimgfilepath.split('/')[-1].split('.jpg')[0]
+		generate_label(absimgfilepath, labelfilepath, dirprefix)
+		#generate_anothor_label(absimgfilepath, labelfilepath, dirprefix)
 		lengthTrain += 1
 
 
