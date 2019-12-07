@@ -529,6 +529,8 @@ void DataTransformer<Dtype>::TransformAnnoCcpd(
 		transformed_annoface_all->set_letternum_3(anno_datum.lpnumber().letternum_3());
 		transformed_annoface_all->set_letternum_4(anno_datum.lpnumber().letternum_4());
 		transformed_annoface_all->set_letternum_5(anno_datum.lpnumber().letternum_5());
+	}else{
+		LOG(FATAL) << " unsurropted ccpd licensePlate number type！";
 	}
 }
 

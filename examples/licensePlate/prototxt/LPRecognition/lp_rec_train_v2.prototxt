@@ -53,28 +53,28 @@ layer {
 }
 
 layer {
-  name: "label_slice"
-  type: "Slice"
-  bottom: "label"
-  top: "label_province"
-  top: "label_alpha"
-  top: "label_number_one"
-  top: "label_number_two"
-  top: "label_number_three"
-  top: "label_number_four"
-  top: "label_number_five"
-  slice_param {
-    slice_point: 1
-    slice_point: 2
-    slice_point: 3
-    slice_point: 4
-    slice_point: 5
-    slice_point: 6
-    axis: 1
-  }
-  include {
-       phase: TRAIN
-  }
+	name: "label_slice"
+	type: "Slice"
+	bottom: "label"
+	top: "label_province"
+	top: "label_alpha"
+	top: "label_number_one"
+	top: "label_number_two"
+	top: "label_number_three"
+	top: "label_number_four"
+	top: "label_number_five"
+	slice_param {
+		slice_point: 1
+		slice_point: 2
+		slice_point: 3
+		slice_point: 4
+		slice_point: 5
+		slice_point: 6
+		axis: 1
+	}
+	include {
+		phase: TRAIN
+	}
 }
 layer {
 	bottom: "data"

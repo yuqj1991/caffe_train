@@ -731,7 +731,9 @@ bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
               << " let2: "<<anno->letternum_2()<<" let3: "<<anno->letternum_3()<<" let4: "<<anno->letternum_4()
               <<" let5: "<<anno->letternum_5();
     #endif
+    sstr.clear();
   }
+  infile.close();
   return true;
 }
 

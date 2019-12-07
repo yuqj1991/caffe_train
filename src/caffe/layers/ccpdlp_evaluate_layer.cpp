@@ -38,8 +38,8 @@ void LpEvaluateLayer<Dtype>::Forward_cpu(
   /**#####################################################**/
   int correct_precisive = 0;
   for(int ii = 0; ii<batch_size; ii++){
-    const int pre_index = ii*7;
-    const int gt_index = ii*7;
+    const int pre_index = ii * 7;
+    const int gt_index = ii * 7;
     const Dtype* cur_det_data = det_data + pre_index;
     const Dtype* cur_gt_data = gt_data + gt_index;
     if(cur_det_data[0]==cur_gt_data[0]&&cur_det_data[1]==cur_gt_data[1]&&
@@ -47,14 +47,7 @@ void LpEvaluateLayer<Dtype>::Forward_cpu(
       cur_det_data[4]==cur_gt_data[4]&&cur_det_data[5]==cur_gt_data[5]&&
       cur_det_data[6]==cur_gt_data[6])
       correct_precisive=1;
-    top_data[ii] = correct_precisive;
-    #if 0
-    for(int jj=0; jj<9; jj++){
-      LOG(INFO)<<"#####"<<all_face_prediction_attributes[ii][jj];
-    }
-    LOG(INFO)<<"gender_index: "<<gender_index<<" glasses_index: "<<glasses_index<<" headpose_index: "<<headpose_index;
-    LOG(INFO)<<"=====gt_gender_index: "<<all_gt_face_attributes[ii][0]<<" gt glassesindex: "<<all_gt_face_attributes[ii][1]<<" gt headpose index: "<<all_gt_face_attributes[ii][2];
-    #endif
+      top_data[ii] = correct_precisive;
   }
 }
 
