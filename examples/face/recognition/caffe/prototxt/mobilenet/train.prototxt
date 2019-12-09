@@ -1991,7 +1991,7 @@ layer {
 		}
 	}
 }
-################ normal #####################
+################fc layer#################
 #layer {
 #	name: "lmcl_cos_l2_normalize"
 #	type: "InnerProduct"
@@ -2004,11 +2004,11 @@ layer {
 #	inner_product_param{
 #		num_output: 8631
 #		weight_filler {
-#			type: "xavier"
+#		type: "xavier"
 #		}
 #	}
 #}
-##############cosinface ##################
+##############cosinface #################
 layer {
 	name: "lmcl_cos_l2_normalize"
 	type: "CosinL2Normalize"
@@ -2021,7 +2021,7 @@ layer {
 	}
 	cosin_loss_param {
 		margin: -0.35
-		scale: 30
+		scale: 64
 		num_output: 8631
 		cosin_filler {
 			type: "xavier"
@@ -2055,8 +2055,7 @@ layer {
 #		}
 #	}
 #}
-
-############## softmax loss ###############
+################softmax loss#############
 layer {
 	name: "softmax_loss"
 	type: "SoftmaxWithLoss"
@@ -2067,27 +2066,7 @@ layer {
 	propagate_down: false
 }
 
-############## center loss ###############
-#layer {
-#	name: "center_loss"
-#	type: "CenterLoss"
-#	bottom: "fc5"
-#	bottom: "labelIndex"
-#	top: "center_loss"
-#	param {
-#		lr_mult: 1
-#		decay_mult: 2 
-#	}
-#	center_loss_param {
-#		num_output: 8631
-#		center_filler {
-#			type: "xavier"
-#		}
-#	}
-#	loss_weight: 0.8
-#}
-
-#######################tripletloss############
+############## triplet loss #############
 layer {
 	name: "fc5_feature"
 	type: "SimpleNormalize"
@@ -2113,3 +2092,22 @@ layer {
 	propagate_down: true
 	propagate_down: false
 }
+############## center loss ##############
+#layer {
+#	name: "center_loss"
+#	type: "CenterLoss"
+#	bottom: "fc5"
+#	bottom: "labelIndex"
+#	top: "center_loss"
+#	param {
+#		lr_mult: 1
+#		decay_mult: 2 
+#	}
+#	center_loss_param {
+#		num_output: 8631
+#		center_filler {
+#			type: "xavier"
+#		}
+#	}
+#	loss_weight: 0.8
+#}

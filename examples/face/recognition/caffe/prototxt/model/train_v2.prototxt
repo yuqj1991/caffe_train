@@ -2945,7 +2945,6 @@ layer {
   bottom: "conv6_1x1"
   top: "conv6_1x1"
 }
-##########################################################
 layer {
 	name: "fc5"
 	type: "InnerProduct"
@@ -2970,7 +2969,7 @@ layer {
 		}
 	}
 }
-################softmax loss##########################
+################fc layer#################
 layer {
 	name: "lmcl_cos_l2_normalize"
 	type: "InnerProduct"
@@ -2987,7 +2986,7 @@ layer {
 		}
 	}
 }
-##############cosinface loss#############
+##############cosinface #################
 #layer {
 #	name: "lmcl_cos_l2_normalize"
 #	type: "CosinL2Normalize"
@@ -3007,7 +3006,7 @@ layer {
 #		}
 #	}
 #}
-################arcface-loss#############
+################arcface-#################
 #layer {
 #	name: "cosin_add_m"
 #	type: "CosinAddm"
@@ -3034,6 +3033,7 @@ layer {
 #		}
 #	}
 #}
+################softmax loss#############
 layer {
 	name: "softmax_loss"
 	type: "SoftmaxWithLoss"
@@ -3044,64 +3044,7 @@ layer {
 	propagate_down: false
 }
 
-############## center loss ###############
-layer {
-	name: "center_loss"
-	type: "CenterLoss"
-	bottom: "fc5"
-	bottom: "labelIndex"
-	top: "center_loss"
-	param {
-		lr_mult: 1
-		decay_mult: 2 
-	}
-	center_loss_param {
-		num_output: 8631
-		center_filler {
-			type: "xavier"
-		}
-	}
-	loss_weight: 0.8
-}
-##############contravie loss###############
-layer {
-	name: "merege_pair"
-	type: "Identity2Verify"
-	bottom: "fc5"
-	bottom: "labelIndex"
-	top: "feature1"
-	top: "feature2"
-	top: "sim"
-}
-
-layer {
-	name: "norm1"
-	type: "SimpleNormalize"
-	bottom: "feature1"
-	top: "normfeature1"
-}
-
-layer {
-	name: "norm2"
-	type: "SimpleNormalize"
-	bottom: "feature2"
-	top: "normfeature2"
-}
-
-layer {
-	name: "sim_loss"
-	type: "ContrastiveLoss"
-	bottom: "normfeature1"
-	bottom: "normfeature2"
-	bottom: "sim"
-	top: "sim_loss"
-	loss_weight: 0.3
-	contrastive_loss_param {
-		margin: 1
-	}
-}
-
-#######################tripletloss############
+############## triplet loss #############
 layer {
 	name: "fc5_feature"
 	type: "SimpleNormalize"
@@ -3125,5 +3068,24 @@ layer {
 	top: "tripletloss"
 	loss_weight: 1
 	propagate_down: true
-	propagate_down: true
+	propagate_down: false
 }
+############## center loss ##############
+#layer {
+#	name: "center_loss"
+#	type: "CenterLoss"
+#	bottom: "fc5"
+#	bottom: "labelIndex"
+#	top: "center_loss"
+#	param {
+#		lr_mult: 1
+#		decay_mult: 2 
+#	}
+#	center_loss_param {
+#		num_output: 8631
+#		center_filler {
+#			type: "xavier"
+#		}
+#	}
+#	loss_weight: 0.8
+#}
