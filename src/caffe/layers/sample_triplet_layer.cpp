@@ -24,7 +24,6 @@ void SampleTripletLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   /*************************我自己添加的***********************/
   const Dtype *feature_data = bottom[0]->cpu_data();  //feature data
   const Dtype *label_data = bottom[1]->cpu_data(); //label data
-  //int trip_idx = 0;
   int emb_start_idx = 0;
   int neg_images = 0;
   an_set.clear();
@@ -34,7 +33,7 @@ void SampleTripletLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   for(int i = 0; i < label_num_; i++){
     int nrof_images = (int)label_data[i];
     neg_images = batch_size_ - nrof_images;
-    for(j = 0; j < nrof_images; j++){
+    for(j = 1; j < nrof_images; j++){
       neg_dist_sqr.clear();
       int a_idx = emb_start_idx + j - 1;
       /**********计算neg距离****************/
