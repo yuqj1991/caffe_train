@@ -1,44 +1,19 @@
 name: "mobilenet-face"
-#layer {
-#	name: "data"
-#	type: "ImageData"
-#	top: "data"
-#	top: "label"
-#	top: "labelIndex"
-#	image_data_param {
-#		new_height: 128
-#		new_width: 128
-#		sample_num: 5
-#		label_num: 24
-#		batch_size: 120
-#		root_folder: "../../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
-#		source: "../scripts/labelmap.txt"
-#	}
-#	transform_param {
-#		mirror: true
-#		mean_value: 127.5
-#		mean_value: 127.5
-#		mean_value: 127.5
-#		scale: 0.0078125
-#		resize_param {
-#			prob: 1.0
-#			resize_mode: WARP
-#			height: 128
-#			width: 128
-#			interp_mode: LINEAR
-#			interp_mode: AREA
-#			interp_mode: NEAREST
-#			interp_mode: CUBIC
-#			interp_mode: LANCZOS4
-#		}
-#	}
-#}
-
-layer{
+layer {
 	name: "data"
-	type: "Data"
+	type: "ImageData"
 	top: "data"
+	top: "label"
 	top: "labelIndex"
+	image_data_param {
+		new_height: 128
+		new_width: 128
+		sample_num: 5
+		label_num: 18
+		batch_size: 90
+		root_folder: "../../../../../../dataset/facedata/recognition/vggface/vggface2_align_train"
+		source: "../scripts/labelmap.txt"
+	}
 	transform_param {
 		mirror: true
 		mean_value: 127.5
@@ -57,12 +32,8 @@ layer{
 			interp_mode: LANCZOS4
 		}
 	}
-	data_param: {
-		source: "../../../../../../dataset/facedata/recognition/face_recog_vggface2_lmdb_train"
-		batch_size: 96
-		backend: LMDB
-	}
 }
+
 
 layer {
   name: "conv0"
@@ -2038,25 +2009,25 @@ layer {
 #	}
 #}
 ##############cosinface ##################
-#layer {
-#	name: "lmcl_cos_l2_normalize"
-#	type: "CosinL2Normalize"
-#	bottom: "fc5"
-#	bottom: "labelIndex"
-#	top: "lmcl_cos_l2_normalize"
-#	param {
-#		lr_mult: 1
-#		decay_mult: 2 
-#	}
-#	cosin_loss_param {
-#		margin: -0.35
-#		scale: 64
-#		num_output: 8631
-#		cosin_filler {
-#			type: "xavier"
-#		}
-#	}
-#}
+layer {
+	name: "lmcl_cos_l2_normalize"
+	type: "CosinL2Normalize"
+	bottom: "fc5"
+	bottom: "labelIndex"
+	top: "lmcl_cos_l2_normalize"
+	param {
+		lr_mult: 1
+		decay_mult: 2 
+	}
+	cosin_loss_param {
+		margin: -0.35
+		scale: 30
+		num_output: 8631
+		cosin_filler {
+			type: "xavier"
+		}
+	}
+}
 ################arcface-#################
 #layer {
 #	name: "cosin_add_m"
@@ -2084,61 +2055,7 @@ layer {
 #		}
 #	}
 #}
-############## AM label speciled ##########
-layer {
-	name: "norm1"
-	type: "Normalize"
-	bottom: "fc5"
-	top: "norm1"
-}
 
-layer {
-	name: "fc6"
-	type: "InnerProduct"
-	bottom: "norm1"
-	top: "fc6"
-	param {
-		lr_mult: 1
-		decay_mult:10
-	}
-	inner_product_param{
-		num_output: 8631
-		normalize: true
-		weight_filler {
-			type: "xavier"
-		}
-		bias_term: false
-	}
-}
-
-layer{
-	name: "label_specific_margin"
-	type: "LabelSpecificAdd"
-	bottom: "fc6"
-	bottom: "labelIndex"
-	top: "fc6_margin"
-	label_specific_add_param {
-		bias: -0.3
-	}
-}
-
-layer{
-	name: "lmcl_cos_l2_normalize"
-	type: "Scale"
-	bottom: "fc6_margin"
-	top: "lmcl_cos_l2_normalize"
-	param {
-		lr_mult: 0
-		decay_mult:0
-	}
-	scale_param{
-		min_value: 30
-		filler{
-			type:"constant"
-			value:30
-		}
-	}
-}
 ############## softmax loss ###############
 layer {
 	name: "softmax_loss"
@@ -2171,28 +2088,28 @@ layer {
 #}
 
 #######################tripletloss############
-#layer {
-#	name: "fc5_feature"
-#	type: "SimpleNormalize"
-#	bottom: "fc5"
-#	top: "fc5_feature"
-#}
-#layer {
-#	name: "archor_pair"
-#	type: "SampleTriplet"
-#	bottom: "fc5_feature"
-#	bottom: "label"
-#	top: "archor_pair"
-#	propagate_down: false
-#	propagate_down: false
-#}
-#layer {
-#	name: "tripletloss"
-#	type: "TripletLoss"
-#	bottom: "fc5_feature"
-#	bottom: "archor_pair"
-#	top: "tripletloss"
-#	loss_weight: 1
-#	propagate_down: true
-#	propagate_down: false
-#}
+layer {
+	name: "fc5_feature"
+	type: "SimpleNormalize"
+	bottom: "fc5"
+	top: "fc5_feature"
+}
+layer {
+	name: "archor_pair"
+	type: "SampleTriplet"
+	bottom: "fc5_feature"
+	bottom: "label"
+	top: "archor_pair"
+	propagate_down: false
+	propagate_down: false
+}
+layer {
+	name: "tripletloss"
+	type: "TripletLoss"
+	bottom: "fc5_feature"
+	bottom: "archor_pair"
+	top: "tripletloss"
+	loss_weight: 1
+	propagate_down: true
+	propagate_down: false
+}
