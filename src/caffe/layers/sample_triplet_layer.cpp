@@ -79,7 +79,6 @@ void SampleTripletLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     emb_start_idx += nrof_images;
   }
   triplet_num_ = neg_set.size();
-  LOG(INFO) << "triplet_num_: " << triplet_num_;
   top[0]->Reshape(triplet_num_, 3, 1, 1);
   for(int idx = 0; idx<triplet_num_; idx++){
     top_data[idx * 3] = an_set[idx];
