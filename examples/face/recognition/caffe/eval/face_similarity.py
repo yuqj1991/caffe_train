@@ -104,8 +104,8 @@ def main(args):
     similarity_list = []
     for idx in range(total_pair):
         print("image_left: %s, image_right: %s"%(image_paths[2*idx], image_paths[2*idx+1]))
-        image_left = preprocess(cv2.imread(image_paths[2*idx]))
-        image_right = preprocess(cv2.imread(image_paths[2*idx + 1]))
+        image_left = preprocess(cv2.imread(image_paths[2*idx]), inputSize)
+        image_right = preprocess(cv2.imread(image_paths[2*idx + 1]), inputSize)
 	
         image_left = image_left[np.newaxis, :]
         image_right = image_right[np.newaxis, :]
@@ -151,7 +151,7 @@ def parse_arguments(argv):
     parser.add_argument('--network', type=str, help='Network file of face recognition')
     parser.add_argument('--weights', type=str, help='Weights file of face recognition')
     parser.add_argument('--height', type=int, help='input size height')
-    parser.add_argument('--weight', type=int, help='input size')
+    parser.add_argument('--width', type=int, help='input size')
 
     return parser.parse_args(argv)
 
