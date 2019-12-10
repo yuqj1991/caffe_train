@@ -15,7 +15,7 @@ except ImportError:
     logging.fatal("Cannot find caffe!")
 import time
 
-inputSize = (64, 128)
+
 
 def l2_normalize(vector):
     output = vector/np.sqrt(max(np.sum(vector**2), 1e-12))
@@ -58,9 +58,9 @@ def image_pair_build(image_path, pair_path):
     return image_pair_path
 
 
-def preprocess(img):
+def preprocess(img, input):
 
-    preprocessed_image = cv2.resize(img, inputSize)
+    preprocessed_image = cv2.resize(img, input)
     preprocessed_image = np.transpose(preprocessed_image, (2,0,1))
     preprocessed_image = preprocessed_image.astype("float")
     preprocessed_image = preprocessed_image - 127.5
@@ -95,40 +95,28 @@ def main(args):
         print("{} does not exist".format(args.weights))
         exit()
 
-    facenet = caffenet_load(args.network, args.weights, "GPU")
+    reidnet = caffenet_load(args.network, args.weights, "GPU")
     image_paths = image_pair_build(args.image_dir, args.pair_file)
+    inputSize = (reidnet.blobs['data'].data.shape[3], reidnet.blobs['data'].data.shape[2])
 
     total_pair = len(image_paths)//2
     print("total_pair: ", total_pair)
     similarity_list = []
     for idx in range(total_pair):
         print("image_left: %s, image_right: %s"%(image_paths[2*idx], image_paths[2*idx+1]))
-        image_left = preprocess(cv2.imread(image_paths[2*idx]))
-        image_right = preprocess(cv2.imread(image_paths[2*idx + 1]))
+        image_left = preprocess(cv2.imread(image_paths[2*idx]), inputSize)
+        image_right = preprocess(cv2.imread(image_paths[2*idx + 1]), inputSize)
 	
         image_left = image_left[np.newaxis, :]
         image_right = image_right[np.newaxis, :]
         images = np.concatenate((image_left, image_right))
 
-        facenet.blobs['data'].data[...] = images
-        embeddings = facenet.forward()['fc5']
+        reidnet.blobs['data'].data[...] = images
+        embeddings = reidnet.forward()['fc5']
         embedding_left = embeddings[0]
         embedding_right = embeddings[1]
-        # print(embedding_left)
-        # print(embedding_right)
-        # exit()
 
-        '''
-        facenet.blobs['data'].data[...] = image_left
-        embedding_left = facenet.forward()['fc5']
-        facenet.blobs['data'].data[...] = image_right
-        embedding_right = facenet.forward()['fc5']
 
-        # print(np.shape(embedding_left))
-        embedding_left = np.squeeze(embedding_left)
-        embedding_right = np.squeeze(embedding_right)
-        # print(embedding_left)
-        '''
 
         norm_left = l2_normalize(embedding_left)
         norm_right = l2_normalize(embedding_right)

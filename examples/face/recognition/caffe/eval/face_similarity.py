@@ -97,7 +97,8 @@ def main(args):
 
     facenet = caffenet_load(args.network, args.weights, "GPU")
     image_paths = image_pair_build(args.image_dir, args.pair_file)
-    inputSize = (args.width, args.height)
+    inputShape = facenet.blobs['data'].data.shape
+    inputSize = (inputShape[3], inputShape[2])
 
     total_pair = len(image_paths)//2
     print("total_pair: ", total_pair)
@@ -119,17 +120,6 @@ def main(args):
         # print(embedding_right)
         # exit()
 
-        '''
-        facenet.blobs['data'].data[...] = image_left
-        embedding_left = facenet.forward()['fc5']
-        facenet.blobs['data'].data[...] = image_right
-        embedding_right = facenet.forward()['fc5']
-
-        # print(np.shape(embedding_left))
-        embedding_left = np.squeeze(embedding_left)
-        embedding_right = np.squeeze(embedding_right)
-        # print(embedding_left)
-        '''
 
         norm_left = l2_normalize(embedding_left)
         norm_right = l2_normalize(embedding_right)
@@ -150,8 +140,6 @@ def parse_arguments(argv):
     parser.add_argument('--result_file', type=str, help='Result of face recognition')
     parser.add_argument('--network', type=str, help='Network file of face recognition')
     parser.add_argument('--weights', type=str, help='Weights file of face recognition')
-    parser.add_argument('--height', type=int, help='input size height')
-    parser.add_argument('--width', type=int, help='input size')
 
     return parser.parse_args(argv)
 
