@@ -10,8 +10,6 @@ def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, help='.prototxt file for inference', default ='../net/face_detector.prototxt')
     parser.add_argument('--weights', type=str, help='.caffemodel file for inference', default ='../net/face_detector.caffemodel')
-    parser.add_argument('--input', type = int, help='net input', default = 640)
-    parser.add_argument('--sameAvg', type = int, help='net input', default = 0)
     return parser
 parser1 = make_parser()
 args = parser1.parse_args()
@@ -19,11 +17,6 @@ net_file= args.model
 caffe_model= args.weights
 test_dir = "../images"
 
-inputsize = args.input
-mean_value = [127.5, 127.5, 127.5]
-if not args.sameAvg:
-    mean_value = [103.94, 116.78, 123.68]
-    inputsize = args.input
 
 if not os.path.exists(caffe_model):
     print(caffe_model + " does not exist")
@@ -33,10 +26,11 @@ if not os.path.exists(net_file):
     exit()
 caffe.set_mode_gpu();
 caffe.set_device(0);
-net = caffe.Net(net_file,caffe_model,caffe.TEST)  
+net = caffe.Net(net_file,caffe_model,caffe.TEST)
+inputSize = (net.blobs['data'].data.shape[3], net.blobs['data'].data.shape[2])
+mean_value = [103.94, 116.78, 123.68]
 
-CLASSES = ('background',
-           'face')
+CLASSES = ('background', 'face')
 
 
 def preprocess(src, inputsize, mean_value):
@@ -56,7 +50,7 @@ def postprocess(img, out):
 
 def detect(imgfile):
     origimg = cv2.imread(imgfile)
-    img = preprocess(origimg, inputsize, mean_value)
+    img = preprocess(origimg, inputSize, mean_value)
     
     img = img.astype(np.float32)
     img = img.transpose((2, 0, 1))

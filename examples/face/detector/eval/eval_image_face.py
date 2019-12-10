@@ -30,9 +30,9 @@ def parser():
     return parser.parse_args()
 
 
-def preprocess(src):
-    img = cv2.resize(src, (640,640))
-    img = img - [103.94, 116.78, 123.68] # 127.5
+def preprocess(src, input):
+    img = cv2.resize(src, input)
+    img = img - [103.94, 116.78, 123.68]
     img = img * 0.007843
     return img
 
@@ -63,7 +63,9 @@ def detect(net, im_path, thresh=0.05, timers=None):
     sys.stdout.flush()
     timers['detect'].tic()
 
-    img = preprocess(im)
+    inputSize = (net.blobs['data'].data.shape[3], net.blobs['data'].data.shape[2])
+
+    img = preprocess(im, inputSize)
     img = img.astype(np.float32)
     img = img.transpose((2, 0, 1))
     net.blobs['data'].data[...] = img

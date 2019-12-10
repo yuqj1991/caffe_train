@@ -55,7 +55,7 @@ def min_(m,n):
 
 def preprocessdet(src, size):
     img = cv2.resize(src, size)
-    img = img - [103.94, 116.78, 123.68] # 127.5
+    img = img - [103.94, 116.78, 123.68]
     img = img * 0.007843
     return img
 
@@ -96,7 +96,8 @@ def detect():
        #frame=cv2.flip(frame,1)
        h = frame.shape[0]
        w = frame.shape[1]
-       img = preprocessdet(frame, (320, 320))
+       inputSize = (net.blobs['data'].data.shape[3], net.blobs['data'].data.shape[2])
+       img = preprocessdet(frame, inputSize)
        img = img.astype(np.float32)
        img = img.transpose((2, 0, 1))
 
@@ -120,6 +121,7 @@ def detect():
              start = time.time()
              ori_img = frame[y1:y2, x1:x2, :]
              ############face attributes#######################
+             size = (face_net.blobs['data'].data.shape[3], face_net.blobs['data'].data.shape[2])
              attri_img = preprocess(ori_img, (128, 128))
              attri_img = attri_img.astype(np.float32)
              attri_img = attri_img.transpose((2, 0, 1))
