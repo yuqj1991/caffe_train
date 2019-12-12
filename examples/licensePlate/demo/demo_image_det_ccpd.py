@@ -16,6 +16,13 @@ alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P
 ads = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
        'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'O']
 
+
+chars = ["京", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "苏", "浙", "皖", "闽", "赣", "鲁", "豫", "鄂", "湘", "粤", "桂",
+             "琼", "川", "贵", "云", "藏", "陕", "甘", "青", "宁", "新", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A",
+             "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+             "Y", "Z"
+             ]
+
 def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--ssd_model_def', default= '{}examples/licensePlate/net/SSD_300x300/deploy.prototxt'.format(caffe_root))
@@ -29,10 +36,10 @@ def make_parser():
     return parser
 parser1 = make_parser()
 args = parser1.parse_args()
-net_file= args.model
-caffe_model= args.weights
-ccpd_file= args.ccpdmodel
-ccpd_model= args.ccpdweights
+net_file= args.ssd_model_def
+caffe_model= args.ssd_model_weights
+ccpd_file= args.recog_model_def
+ccpd_model= args.recog_model_weights
 test_dir = "../images"
 
 if not os.path.exists(caffe_model):
@@ -60,6 +67,17 @@ def min_(m,n):
 	if m > n:
 		return n
 	return m
+
+
+def net_result_to_string(res):
+	str = ''
+	for x in res[0]:
+		index = int(x[0][0])
+		#print('idx:', index)
+		if index != -1:
+			str += chars[index]
+	return str
+
 
 
 font = ImageFont.truetype('NotoSansCJK-Black.ttc', 20)
@@ -114,9 +132,11 @@ def detect(imgfile):
            ccpdimg = ccpdimg.astype(np.float32)
            ccpdimg = ccpdimg.transpose((2, 0, 1))
            ccpd_net.blobs['data'].data[...] = ccpdimg
-           ccpd_out = ccpd_net.forward()
-           ccpdbox = ccpd_out['ccpd_output'][0,0,:,0:7]
-           ccpdstring = provinces[int(ccpdbox[0][0])] + alphabets[int(ccpdbox[0][1])] + ads[int(ccpdbox[0][2])] + ads[int(ccpdbox[0][3])] + ads[int(ccpdbox[0][4])]+ ads[int(ccpdbox[0][5])] + ads[int(ccpdbox[0][6])] 
+           #ccpd_out = ccpd_net.forward()
+           #ccpdbox = ccpd_out['result'][0,0,:,0:7]
+           #ccpdstring = provinces[int(ccpdbox[0][0])] + alphabets[int(ccpdbox[0][1])] + ads[int(ccpdbox[0][2])] + ads[int(ccpdbox[0][3])] + ads[int(ccpdbox[0][4])]+ ads[int(ccpdbox[0][5])] + ads[int(ccpdbox[0][6])] 
+           result = ccpd_net.forward()['result']
+           ccpdstring = net_result_to_string(result)
            print(ccpdstring)
            cv2.rectangle(origimg, p1, p2, (0,255,0))
            p3 = (max(p1[0], 15), max(p1[1], 15))
