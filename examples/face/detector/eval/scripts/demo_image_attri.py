@@ -41,6 +41,8 @@ gender_content = ('male', 'female')
 glasses_content = ('wearing glasses', 'not wearing glasses')
 
 
+test_dir = "../images"
+
 def max_(m,n):
 	if m > n:
 		return m
@@ -88,61 +90,63 @@ def post_faceattributes(img, out):
     return facepoints.astype(np.int32), faceangle, gender_content[gender_index], glasses_content[glass_index]
 
 
-def detect():
-    cap = cv2.VideoCapture(0)
-    while True:
-       ret, frame = cap.read()
-       start = time.time()
-       #frame=cv2.flip(frame,1)
-       h = frame.shape[0]
-       w = frame.shape[1]
-       inputSize = (net.blobs['data'].data.shape[3], net.blobs['data'].data.shape[2])
-       img = preprocessdet(frame, inputSize)
-       img = img.astype(np.float32)
-       img = img.transpose((2, 0, 1))
+def detect(imgfile):
+   frame = cv2.imread(imgfile)
+   start = time.time()
+   #frame=cv2.flip(frame,1)
+   h = frame.shape[0]
+   w = frame.shape[1]
+   inputSize = (net.blobs['data'].data.shape[3], net.blobs['data'].data.shape[2])
+   img = preprocessdet(frame, inputSize)
+   img = img.astype(np.float32)
+   img = img.transpose((2, 0, 1))
 
-       net.blobs['data'].data[...] = img
-       out = net.forward()
-       box, conf, cls = post_facedet(frame, out)
-       end = time.time()
-       print("face detect time: %.3f"%(end - start))
-       for i in range(len(box)):
-          if conf[i]>=0.25:
-             p1 = (box[i][0], box[i][1])
-             p2 = (box[i][2], box[i][3])
-             
-             x1 = max_(0, box[i][0] - minMargin/2)
-             x2 = min_(box[i][2] + minMargin/2, w)
-             y1 = max_(0, box[i][1] - minMargin/2)
-             y2 = min_(box[i][3] + minMargin/2, h)
-             
-             p11 = (x1, y1)
-             p22 = (x2, y2)
-             start = time.time()
-             ori_img = frame[y1:y2, x1:x2, :]
-             ############face attributes#######################
-             size = (face_net.blobs['data'].data.shape[3], face_net.blobs['data'].data.shape[2])
-             attri_img = preprocess(ori_img, size)
-             attri_img = attri_img.astype(np.float32)
-             attri_img = attri_img.transpose((2, 0, 1))
-             face_net.blobs['data'].data[...] = attri_img
-             face_out = face_net.forward()
-             boxpoint, faceangle, gender, glass = post_faceattributes(ori_img, face_out)
-             end = time.time()
-             print("face attributes time: %.3f"%(end - start))
-             yaw, pitch, roll = faceangle
-             for jj in range(5):
-                 point = (boxpoint[jj], boxpoint[jj+5])
-                 cv2.circle(ori_img, point, 3, (0,0,213), -1)
-             cv2.rectangle(frame, p1, p2, (0,255,0))
-             p3 = (max(p1[0], 15), max(p1[1], 15))
-             title = "yaw: %f, pitch: %f, roll: %f, %s" % (yaw, pitch, roll, gender)
-             print(title)
-             cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
-       cv2.imshow("face", frame)
-       k = cv2.waitKey(30) & 0xff
-       if k == 27 : 
-          return False
+   net.blobs['data'].data[...] = img
+   out = net.forward()
+   box, conf, cls = post_facedet(frame, out)
+   end = time.time()
+   print("face detect time: %.3f"%(end - start))
+   for i in range(len(box)):
+      if conf[i]>=0.25:
+         p1 = (box[i][0], box[i][1])
+         p2 = (box[i][2], box[i][3])
+         
+         x1 = max_(0, box[i][0] - minMargin/2)
+         x2 = min_(box[i][2] + minMargin/2, w)
+         y1 = max_(0, box[i][1] - minMargin/2)
+         y2 = min_(box[i][3] + minMargin/2, h)
+         
+         p11 = (x1, y1)
+         p22 = (x2, y2)
+         start = time.time()
+         ori_img = frame[y1:y2, x1:x2, :]
+         ############face attributes#######################
+         size = (face_net.blobs['data'].data.shape[3], face_net.blobs['data'].data.shape[2])
+         attri_img = preprocess(ori_img, size)
+         attri_img = attri_img.astype(np.float32)
+         attri_img = attri_img.transpose((2, 0, 1))
+         face_net.blobs['data'].data[...] = attri_img
+         face_out = face_net.forward()
+         boxpoint, faceangle, gender, glass = post_faceattributes(ori_img, face_out)
+         end = time.time()
+         print("face attributes time: %.3f"%(end - start))
+         yaw, pitch, roll = faceangle
+         for jj in range(5):
+             point = (boxpoint[jj], boxpoint[jj+5])
+             cv2.circle(ori_img, point, 3, (0,0,213), -1)
+         cv2.rectangle(frame, p1, p2, (0,255,0))
+         p3 = (max(p1[0], 15), max(p1[1], 15))
+         title = " %s,  %s" % (gender, glass)
+         print(title)
+         cv2.putText(frame, title, p3, cv2.FONT_ITALIC, 0.5, (0, 255, 0), 1)
+   name = test_dir + '/' + imgfile.split("/")[-1].split('.jpg')[0] + '_crop.jpg'
+   cv2.imwrite(name, frame)
+   cv2.imshow("face", frame)
+   k = cv2.waitKey(30) & 0xff
+   if k == 27 : 
+      return False
 
 if __name__=="__main__":
-    detect()
+    for f in os.listdir(test_dir):
+        if detect(test_dir + "/" + f) == False:
+           break

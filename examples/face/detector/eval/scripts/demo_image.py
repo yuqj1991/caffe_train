@@ -68,7 +68,7 @@ def detect(imgfile):
            p3 = (max(p1[0], 15), max(p1[1], 15))
            title = "%s:%.2f" % (CLASSES[int(cls[i])], conf[i])
            cv2.putText(origimg, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
-    name = imgfile.split("/")[-1].split('.jpg')[0] + '_crop.jpg'
+    name = test_dir + '/' + imgfile.split("/")[-1].split('.jpg')[0] + '_crop.jpg'
     cv2.imwrite(name, origimg)
     cv2.imshow("facedetector", origimg)
  
