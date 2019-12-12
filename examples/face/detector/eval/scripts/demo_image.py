@@ -2,7 +2,7 @@ import numpy as np
 import argparse
 import sys,os  
 import cv2
-caffe_root = '../../../../../caffe_train/'
+caffe_root = '../../../../../../caffe_train/'
 sys.path.insert(0, caffe_root + 'python')  
 import caffe  
 
@@ -34,7 +34,7 @@ CLASSES = ('background', 'face')
 
 
 def preprocess(src, inputsize, mean_value):
-    img = cv2.resize(src, (inputsize,inputsize))
+    img = cv2.resize(src, inputsize)
     img = img -mean_value
     img = img * 0.007843
     return img
@@ -68,6 +68,8 @@ def detect(imgfile):
            p3 = (max(p1[0], 15), max(p1[1], 15))
            title = "%s:%.2f" % (CLASSES[int(cls[i])], conf[i])
            cv2.putText(origimg, title, p3, cv2.FONT_ITALIC, 0.6, (0, 255, 0), 1)
+    name = imgfile.split("/")[-1].split('.jpg')[0] + '_crop.jpg'
+    cv2.imwrite(name, origimg)
     cv2.imshow("facedetector", origimg)
  
     k = cv2.waitKey(0) & 0xff
