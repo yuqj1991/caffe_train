@@ -1,7 +1,7 @@
 from __future__ import print_function
 import argparse
 import sys
-caffe_root = '../../../../caffe_train/'
+caffe_root = '../../../../../caffe_train/'
 sys.path.insert(0, caffe_root + 'python') 
 import caffe
 import numpy as np
@@ -15,7 +15,7 @@ def parser():
     parser = argparse.ArgumentParser('face Evaluate Module!',
                             description='You can use this file to evaluate face model capbilitaty!')
     parser.add_argument('--db', dest='db_name', help='Path to the image',
-                        default='wider_test', type=str)
+                        default='wider_val', type=str)
     parser.add_argument('--gpu', dest='gpu_id', help='The GPU ide to be used',
                         default=0, type=int)
     parser.add_argument('--prototxt', dest='prototxt', help='face caffe test prototxt',

@@ -8,7 +8,7 @@ import scipy.sparse
 from PIL import Image
 from datasets.imdb import imdb
 
-DATA_DIR = "../../../../dataset"
+DATA_DIR = "../../../../../dataset"
 
 TEST_DATA_DIR = DATA_DIR + '/facedata/wider_face'
 
