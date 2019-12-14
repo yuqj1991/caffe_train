@@ -1177,10 +1177,24 @@ layer {
 	}
 	}
 }
+
+layer {
+	name: "permuted_cpu"
+	type: "Permute"
+	bottom: "fc1x"
+	top: "permuted_cpu"
+	permute_param {
+		order: 1
+		order: 0
+		order: 2
+	}
+}
+
+
 layer {
 	name: "result"
 	type: "CTCGreedyDecoder"
-	bottom: "fc1x"
+	bottom: "permuted_cpu"
 	top: "result"
 	ctc_decoder_param {
 	    blank_index: -1
