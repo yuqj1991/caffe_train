@@ -15,8 +15,6 @@ debug_info: false
 snapshot_after_train: true
 test_initialization: false
 average_loss: 10
-stepvalue: 120000
-stepvalue: 180000
 stepvalue: 300000
 stepvalue: 800000
 stepvalue: 1200000

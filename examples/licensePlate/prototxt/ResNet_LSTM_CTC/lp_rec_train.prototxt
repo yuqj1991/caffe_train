@@ -1627,76 +1627,10 @@ layer {
   }
 }
 
-####second concate of lstm
-
-layer {
-  name: "lstm-reverse_second"
-  type: "Reverse"
-  bottom: "merge_lstm_rlstmx"
-  top: "rlstm_input_2"
-  reverse_param {
-    axis: 0
-  }
-}
-layer {
-    name: "lstm2x_2"
-    type: "LSTM"
-    bottom: "rlstm_input_2"
-    bottom: "indicator"
-    top: "lstm2x_2"
-    recurrent_param {
-        num_output: 100
-        weight_filler {
-          type: "xavier"
-        }
-        bias_filler {
-          type: "constant"
-          value: 0
-        }
-    }
-}
-layer {
-  name: "lstm-reverse2_2"
-  type: "Reverse"
-  bottom: "lstm2x_2"
-  top: "rlstmx_2"
-  reverse_param {
-    axis: 0
-  }
-}
-
-layer {
-    name: "lstm1x_2"
-    type: "LSTM"
-    bottom: "merge_lstm_rlstmx"
-    bottom: "indicator"
-    top: "lstm1x_2"
-    recurrent_param {
-        num_output: 100
-        weight_filler {
-          type: "xavier"
-        }
-        bias_filler {
-          type: "constant"
-          value: 0
-        }
-    }
-}
-layer {
-  name: "merge_lstm_rlstmx_2"
-  type: "Concat"
-  bottom: "lstm1x_2"
-  bottom: "rlstmx_2"
-  top: "merge_lstm_rlstmx_2"
-  concat_param {
-    axis: 2
-  }
-}
-
 layer {
 	name: "fc1x"
 	type: "InnerProduct"
-	bottom: "merge_lstm_rlstmx_2"
+	bottom: "merge_lstm_rlstmx"
 	top: "fc1x"
 	param {
 		lr_mult: 1
