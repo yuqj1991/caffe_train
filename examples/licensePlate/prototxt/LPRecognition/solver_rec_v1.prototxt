@@ -23,6 +23,6 @@ stepvalue: 300000
 stepvalue: 800000
 stepvalue: 1200000
 iter_size: 1
-momentum2 : 0.99
-type: "RMSProp"
+#momentum2 : 0.99
+#type: "RMSProp"
 eval_type: "Rec_ccpd"
