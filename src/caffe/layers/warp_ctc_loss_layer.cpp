@@ -10,6 +10,15 @@ using namespace CTC;
 namespace caffe {
 
 template <typename Dtype>
+WarpCTCLossLayer<Dtype>::WarpCTCLossLayer(const LayerParameter& param)
+     : LossLayer<Dtype>(param),
+       T_(0),
+       N_(0),
+       C_(0) {
+  blank_index_ = param.ctc_loss_param().blank_index();
+}
+
+template <typename Dtype>
 WarpCTCLossLayer<Dtype>::~WarpCTCLossLayer() {
 }
 

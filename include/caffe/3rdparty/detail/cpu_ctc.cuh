@@ -5,7 +5,7 @@
 #include <limits>
 #include <algorithm>
 #include <numeric>
-
+#define CTC_DISABLE_OMP   // added by xmf
 #if !defined(CTC_DISABLE_OMP) && !defined(APPLE)
 #include <omp.h>
 #endif
@@ -163,7 +163,7 @@ template<typename ProbT>
 void
 CpuCTC<ProbT>::softmax(const ProbT* const activations, ProbT* probs,
                        const int* const input_lengths) {
-#pragma omp parallel for
+//#pragma omp parallel for
     for (int mb = 0; mb < minibatch_; ++mb) {
         for(int c = 0; c < input_lengths[mb]; ++c) {
             int col_offset = (mb + minibatch_ * c) * alphabet_size_;
@@ -303,7 +303,7 @@ ProbT CpuCTC<ProbT>::compute_betas_and_grad(ProbT* grad, const ProbT* const prob
     for (int i = 0; i < alphabet_size_; ++i) {
         int idx3 = (T - 1) * alphabet_size_ * minibatch_ + i;
 
-        if (/*output[i] == 0.0 || */output[i] == ctc_helper::neg_inf<ProbT>() ||
+        if (output[i] == 0.0 || output[i] == ctc_helper::neg_inf<ProbT>() ||
             probs[idx3] == 0.0) {
             grad[idx3] = probs[idx3];
         } else {
@@ -353,7 +353,7 @@ ProbT CpuCTC<ProbT>::compute_betas_and_grad(ProbT* grad, const ProbT* const prob
         // wrt to each one at this time step
         for (int i = 0; i < alphabet_size_; ++i) {
 
-            if (/*output[i] == 0.0 || */output[i] == ctc_helper::neg_inf<ProbT>() ||
+            if (output[i] == 0.0 || output[i] == ctc_helper::neg_inf<ProbT>() ||
                 probs[idx3] == 0.0) {
                 grad[idx3] = probs[idx3];
             } else {
@@ -415,7 +415,7 @@ CpuCTC<ProbT>::cost_and_grad(const ProbT* const activations,
 
     softmax(activations, probs, input_lengths);
 
-#pragma omp parallel for
+//#pragma omp parallel for
     for (int mb = 0; mb < minibatch_; ++mb) {
         const int T = input_lengths[mb]; // Length of utterance (time)
         const int L = label_lengths[mb]; // Number of labels in transcription
@@ -473,7 +473,7 @@ ctcStatus_t CpuCTC<ProbT>::score_forward(const ProbT* const activations,
 
     softmax(activations, probs, input_lengths);
 
-#pragma omp parallel for
+//#pragma omp parallel for
     for (int mb = 0; mb < minibatch_; ++mb) {
         const int T = input_lengths[mb]; // Length of utterance (time)
         const int L = label_lengths[mb]; // Number of labels in transcription

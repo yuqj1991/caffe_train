@@ -1,22 +1,59 @@
-/** \file ctcpp.h
- * Contains a simple CPP interface to call fast CPU and GPU based computation
+/** \file ctc.h
+ * Contains a simple C interface to call fast CPU and GPU based computation
  * of the CTC loss.
  */
 
 #pragma once
 
-#include "ctc.h"
+#ifdef __cplusplus
+#include <cstddef>
+extern "C" {
+#endif
 
-namespace CTC {
+//forward declare of CUDA typedef to avoid needing to pull in CUDA headers
+typedef struct CUstream_st* CUstream;
+
+typedef enum {
+    CTC_STATUS_SUCCESS = 0,
+    CTC_STATUS_MEMOPS_FAILED = 1,
+    CTC_STATUS_INVALID_VALUE = 2,
+    CTC_STATUS_EXECUTION_FAILED = 3,
+    CTC_STATUS_UNKNOWN_ERROR = 4
+} ctcStatus_t;
 
 /** Returns a single integer which specifies the API version of the warpctc library */
 int get_warpctc_version();
 
 /** Returns a string containing a description of status that was passed in
-*  \param[in] status identifies which string should be returned
-*  \return C style string containing the text description
-*  */
+ *  \param[in] status identifies which string should be returned
+ *  \return C style string containing the text description
+ *  */
 const char* ctcGetStatusString(ctcStatus_t status);
+
+typedef enum {
+    CTC_CPU = 0,
+    CTC_GPU = 1
+} ctcComputeLocation;
+
+/** Structure used for options to the CTC compution.  Applications
+ *  should zero out the array using memset and sizeof(struct
+ *  ctcOptions) in C or default initialization (e.g. 'ctcOptions
+ *  options{};' or 'auto options = ctcOptions{}') in C++ to ensure
+ *  forward compatibility with added options. */
+struct ctcOptions {
+    /// indicates where the ctc calculation should take place {CTC_CPU | CTC_GPU}
+    ctcComputeLocation loc;
+    union {
+        /// used when loc == CTC_CPU, the maximum number of threads that can be used
+        unsigned int num_threads;
+
+        /// used when loc == CTC_GPU, which stream the kernels should be launched in
+        CUstream stream;
+    };
+
+    /// the label value/index that the CTC calculation should use as the blank label
+    int blank_label;
+};
 
 /** Compute the connectionist temporal classification loss between a sequence
  *  of probabilities and a ground truth labeling.  Optionally compute the
@@ -54,31 +91,39 @@ const char* ctcGetStatusString(ctcStatus_t status);
  *  \return Status information
  *
  * */
-template<typename Dtype>
-ctcStatus_t compute_ctc_loss_cpu(const Dtype* const activations,
-                             Dtype* gradients,
+ctcStatus_t compute_ctc_loss(const float* const activations,
+                             float* gradients,
                              const int* const flat_labels,
                              const int* const label_lengths,
                              const int* const input_lengths,
                              int alphabet_size,
                              int minibatch,
-                             Dtype *costs,
+                             float *costs,
+                             void *workspace,
+                             ctcOptions options);
+ctcStatus_t compute_ctc_loss_cpu(const float* const activations,
+                             float* gradients,
+                             const int* const flat_labels,
+                             const int* const label_lengths,
+                             const int* const input_lengths,
+                             int alphabet_size,
+                             int minibatch,
+                             float *costs,
                              void *workspace,
                              ctcOptions options);
 
-template<typename Dtype>
-ctcStatus_t compute_ctc_loss_gpu(const Dtype* const activations,
-	Dtype* gradients,
-	const int* const flat_labels,
-	const int* const label_lengths,
-	const int* const input_lengths,
-	int alphabet_size,
-	int minibatch,
-	Dtype *costs,
-	void *workspace,
-	ctcOptions options);
-
-
+#ifndef CPU_ONLY
+ctcStatus_t compute_ctc_loss_gpu(const float* const activations,
+                             float* gradients,
+                             const int* const flat_labels,
+                             const int* const label_lengths,
+                             const int* const input_lengths,
+                             int alphabet_size,
+                             int minibatch,
+                             float *costs,
+                             void *workspace,
+                             ctcOptions options);
+#endif
 /** For a given set of labels and minibatch size return the required workspace
  *  size.  This will need to be allocated in the same memory space as your
  *  probabilities.
@@ -96,13 +141,12 @@ ctcStatus_t compute_ctc_loss_gpu(const Dtype* const activations,
  *
  *  \return Status information
  **/
-template<typename Dtype>
 ctcStatus_t get_workspace_size(const int* const label_lengths,
                                const int* const input_lengths,
                                int alphabet_size, int minibatch,
                                ctcOptions info,
                                size_t* size_bytes);
 
-
-
-} // namespace ctc
+#ifdef __cplusplus
+}
+#endif

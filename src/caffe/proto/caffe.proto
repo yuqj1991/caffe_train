@@ -557,6 +557,7 @@ message LayerParameter {
   // Each layer assigns a default value, usually of either 0 or 1,
   // to each top blob.
   repeated float loss_weight = 5;
+  optional bool use_ctc_loss = 225[default = false];
 
   // Specifies training parameters (multipliers on global learning constants,
   // and the name and other settings used for weight sharing).
@@ -666,6 +667,7 @@ message LayerParameter {
   
   optional CTCDecoderParameter ctc_decoder_param = 301;
   optional CTCLossParameter ctc_loss_param = 302;
+  optional CtcLossParameter warpctc_loss_param = 309;
   
   optional ReverseParameter reverse_param = 303;
   optional ReverseTimeParameter reverse_time_param = 304;
@@ -679,6 +681,12 @@ message LayerParameter {
   optional TransposeParameter transpose_param=8266710;
   optional LSTMParameter lstm_param = 8266711;
   optional LabelSpecificAddParameter label_specific_add_param = 8000;
+}
+
+message CtcLossParameter {
+    optional uint32 alphabet_size = 1 [default = 0];
+    optional uint32 time_step = 3 [default = 0];
+    optional int32 blank_label = 4 [default = 0];
 }
 
 message ContinuationIndicatorParameter {
