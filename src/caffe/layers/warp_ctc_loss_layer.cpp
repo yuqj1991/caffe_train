@@ -100,11 +100,10 @@ void WarpCTCLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 			label_lengths_[n] = curlen;
 			input_lengths_[n] = T_;
 		}
-	}
-    else if (bottom.size() == 3) {
+	}else if (bottom.size() == 3) {
       ExtractInputData(bottom[1], bottom[2],
           &flat_labels_, &label_lengths_, &input_lengths_);
-    } else if (bottom.size() == 4) {
+  } else if (bottom.size() == 4) {
       const Blob<Dtype>* seq_len_blob = bottom[1];
       const Blob<Dtype>* lab_len_blob = bottom[2];
       const Blob<Dtype>* label_seq_blob = bottom[3];

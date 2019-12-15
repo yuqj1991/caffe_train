@@ -163,7 +163,7 @@ template<typename ProbT>
 void
 CpuCTC<ProbT>::softmax(const ProbT* const activations, ProbT* probs,
                        const int* const input_lengths) {
-#pragma omp parallel for
+//#pragma omp parallel for
     for (int mb = 0; mb < minibatch_; ++mb) {
         for(int c = 0; c < input_lengths[mb]; ++c) {
             int col_offset = (mb + minibatch_ * c) * alphabet_size_;
@@ -415,7 +415,7 @@ CpuCTC<ProbT>::cost_and_grad(const ProbT* const activations,
 
     softmax(activations, probs, input_lengths);
 
-#pragma omp parallel for
+//#pragma omp parallel for
     for (int mb = 0; mb < minibatch_; ++mb) {
         const int T = input_lengths[mb]; // Length of utterance (time)
         const int L = label_lengths[mb]; // Number of labels in transcription
@@ -473,7 +473,7 @@ ctcStatus_t CpuCTC<ProbT>::score_forward(const ProbT* const activations,
 
     softmax(activations, probs, input_lengths);
 
-#pragma omp parallel for
+//#pragma omp parallel for
     for (int mb = 0; mb < minibatch_; ++mb) {
         const int T = input_lengths[mb]; // Length of utterance (time)
         const int L = label_lengths[mb]; // Number of labels in transcription
