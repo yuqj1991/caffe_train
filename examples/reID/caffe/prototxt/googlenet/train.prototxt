@@ -9,8 +9,8 @@ layer {
 		new_height: 128
 		new_width: 64
 		sample_num: 5
-		label_num: 128
-		batch_size: 640
+		label_num: 48
+		batch_size: 240
 		root_folder: "../../../../dataset/reId_data/combineData/train"
 		source: "./scripts/labelmap.txt"
 	}
@@ -2158,21 +2158,21 @@ layer {
 }
 
 ############## center loss ###############
-layer {
-	name: "center_loss"
-	type: "CenterLoss"
-	bottom: "fc5"
-	bottom: "labelIndex"
-	top: "center_loss"
-	param {
-		lr_mult: 1
-		decay_mult: 2 
-	}
-	center_loss_param {
-		num_output: 2946
-		center_filler {
-			type: "xavier"
-		}
-	}
-	loss_weight: 0.8
-}
+#layer {
+#	name: "center_loss"
+#	type: "CenterLoss"
+#	bottom: "fc5"
+#	bottom: "labelIndex"
+#	top: "center_loss"
+#	param {
+#		lr_mult: 1
+#		decay_mult: 2 
+#	}
+#	center_loss_param {
+#		num_output: 2946
+#		center_filler {
+#			type: "xavier"
+#		}
+#	}
+#	loss_weight: 0.8
+#}
