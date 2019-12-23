@@ -3507,7 +3507,7 @@ layer {
 layer {
 	name: "dectction_moudle_six_loc"
 	type: "Convolution"
-	bottom: "conv16_2"
+	bottom: "conv15_2"
 	top: "dectction_moudle_six_loc"
 	param {
 		lr_mult: 1
@@ -3554,7 +3554,7 @@ layer {
 layer {
 	name: "dectction_moudle_six_conf"
 	type: "Convolution"
-	bottom: "conv16_2"
+	bottom: "conv15_2"
 	top: "dectction_moudle_six_conf"
 	param {
 		lr_mult: 1
