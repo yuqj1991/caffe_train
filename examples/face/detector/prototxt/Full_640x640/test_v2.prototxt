@@ -2851,9 +2851,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_one_priorbox"
 	prior_box_param {
-		min_size: 10
 		min_size: 16
-		min_size: 24
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2878,7 +2876,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 12
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2925,7 +2923,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 6
+		num_output: 2
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -2969,7 +2967,6 @@ layer {
 	top: "dectction_moudle_two_priorbox"
 	prior_box_param {
 		min_size: 32
-		min_size: 48
 		flip: true
 		clip: false
 		variance: 0.1
@@ -2995,7 +2992,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3042,7 +3039,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 2
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3086,7 +3083,6 @@ layer {
 	top: "dectction_moudle_three_priorbox"
 	prior_box_param {
 		min_size: 64
-		min_size: 96
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3112,7 +3108,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3159,7 +3155,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 2
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3203,7 +3199,6 @@ layer {
 	top: "dectction_moudle_four_priorbox"
 	prior_box_param {
 		min_size: 128
-		min_size: 192
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3229,7 +3224,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3276,7 +3271,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 2
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3320,7 +3315,6 @@ layer {
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
 		min_size: 256.0
-		min_size: 384.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3335,7 +3329,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_loc"
 	type: "Convolution"
-	bottom: "conv14_2"
+	bottom: "conv15_2"
 	top: "dectction_moudle_five_loc"
 	param {
 		lr_mult: 1
@@ -3346,7 +3340,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3393,7 +3387,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 2
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3435,7 +3429,6 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_six_priorbox"
 	prior_box_param {
-		min_size: 600.0
 		min_size: 512.0
 		flip: true
 		clip: false
@@ -3461,7 +3454,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3508,7 +3501,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 2
 		kernel_size: 1
 		weight_filler {
 			type: "msra"

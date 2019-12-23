@@ -278,7 +278,7 @@ void PriorBoxWeightsLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
                  */
               }
             }
-          }
+          } 
           //rest of priors
           for (int r = 0; r < aspect_ratios_.size(); ++r) {
             float ar = aspect_ratios_[r];
