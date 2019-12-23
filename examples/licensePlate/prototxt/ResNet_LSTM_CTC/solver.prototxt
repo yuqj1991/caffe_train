@@ -8,13 +8,14 @@ max_iter: 1600000
 lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.0001
-snapshot: 200000
+snapshot: 5000
 snapshot_prefix: "../snapshot/resnet_lstm_ctc"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
 test_initialization: false
 average_loss: 10
+stepvalue: 1000
 stepvalue: 300000
 stepvalue: 800000
 stepvalue: 1200000

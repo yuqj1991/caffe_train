@@ -119,8 +119,8 @@ def generate_setfile(imagefiledir, setfile, dirprefix):
 		annopath = os.path.abspath(ccpd_anno_img_dir)+'/crop_' + dirprefix + '_' + str(absimgfilepath.split("/")[-1])
 		setfile_.write(annopath + '\n')
 		labelfilepath = root_dir + '/' + label_dir + '/crop_' + dirprefix +  '_' + absimgfilepath.split('/')[-1].split('.jpg')[0]
-		generate_label(absimgfilepath, labelfilepath, dirprefix)
-		#generate_anothor_label(absimgfilepath, labelfilepath, dirprefix)
+		#generate_label(absimgfilepath, labelfilepath, dirprefix)
+		generate_anothor_label(absimgfilepath, labelfilepath, dirprefix)
 		lengthTrain += 1
 
 
