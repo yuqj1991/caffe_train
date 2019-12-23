@@ -2036,7 +2036,7 @@ layer {
 	name: "conv15_1"
 	type: "Convolution"
 	bottom: "conv14_2"
-	top: "conv16_1"
+	top: "conv15_1"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
@@ -2070,10 +2070,10 @@ layer {
 	}
 }
 layer {
-	name: "conv16_1/scale"
+	name: "conv15_1/scale"
 	type: "Scale"
-	bottom: "conv16_1"
-	top: "conv16_1"
+	bottom: "conv15_1"
+	top: "conv15_1"
 	param {
 		lr_mult: 1.0
 		decay_mult: 0.0
