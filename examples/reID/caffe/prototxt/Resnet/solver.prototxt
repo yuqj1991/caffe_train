@@ -1,0 +1,18 @@
+average_loss: 10
+base_lr: 0.001
+display: 100
+gamma: 0.1
+iter_size: 1
+lr_policy: "multistep"
+stepvalue: 100000
+stepvalue: 400000
+stepvalue: 602000
+stepvalue: 1302000
+max_iter: 1800000
+
+momentum: 0.9
+snapshot: 10000
+snapshot_prefix: "./snapshot/reid"
+
+train_net: "./prototxt/googlenet/train.prototxt"
+weight_decay: 0.0005
