@@ -1392,6 +1392,7 @@ void DataTransformer<Dtype>::ExpandImage(const cv::Mat& img,
 	cv::Rect bbox_roi(w_off, h_off, img_width, img_height);
 	img.copyTo((*expand_img)(bbox_roi));
 }
+
 template <typename Dtype>
 vector<cv::Point2f> DataTransformer<Dtype>::getRotatePoint(int row, 
 											const vector<cv::Point2f> Points, 

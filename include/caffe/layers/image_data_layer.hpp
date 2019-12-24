@@ -35,6 +35,8 @@ class ImageDataLayer : public ImageDataPrefetchingDataLayer<Dtype> {
  protected:
   shared_ptr<Caffe::RNG> prefetch_rng_;
   virtual void load_batch(pairBatch<Dtype>* batch);
+  virtual void get_random_erasing_box(float sl, float sh, float min_rate, 
+                                float max_rate, cv::Mat img, float *mean_value);
 
   int lines_id_;
   std::vector< std::pair<std::string, int> > fullImageSetDir_;
@@ -43,6 +45,12 @@ class ImageDataLayer : public ImageDataPrefetchingDataLayer<Dtype> {
   int label_num_;
   std::vector< int > labelIdxSet_;
   std::vector< int > label;
+  float problity_;
+  float max_aspect_ratio_;
+  float min_aspect_ratio_;
+  float scale_lower_;
+  float scale_higher_;
+  float mean_value[3];
 };
 
 

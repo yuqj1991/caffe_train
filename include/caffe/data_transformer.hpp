@@ -175,8 +175,6 @@ class DataTransformer {
       LicensePlate* transformed_annoface_all);
 
 
-
-
   /**
    * @brief Expand the datum.
    */

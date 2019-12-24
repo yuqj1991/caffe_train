@@ -32,6 +32,53 @@ ImageDataLayer<Dtype>::~ImageDataLayer<Dtype>() {
 }
 
 template <typename Dtype>
+void ImageDataLayer<Dtype>::get_random_erasing_box(float sl, float sh, float min_rate, 
+                                float max_rate, cv::Mat img, float *mean_value){
+  CHECK_GE(sh, sl);
+  CHECK_GT(sl, 0.);
+  CHECK_LE(sh, 1.);
+
+  CHECK_GE(max_rate, min_rate);
+  CHECK_GT(min_rate, 0.);
+  CHECK_LT(max_rate, 1);
+
+  float scale;
+  caffe_rng_uniform(1, sl, sh, &scale);
+
+  // Get random aspect ratio.
+
+  int height = img.rows;
+  int width = img.cols;
+
+  float aspect_ratio;
+  caffe_rng_uniform(1, min_rate, max_rate, &aspect_ratio);
+
+  aspect_ratio = std::max<float>(aspect_ratio, std::pow(scale, 2.));
+  aspect_ratio = std::min<float>(aspect_ratio, 1 / std::pow(scale, 2.));
+
+  float bbox_width = scale * sqrt(aspect_ratio);
+  float bbox_height = scale / sqrt(aspect_ratio);
+
+  // Figure out top left coordinates.
+  float w_off, h_off;
+  caffe_rng_uniform(1, 0.f, 1 - bbox_width, &w_off);
+  caffe_rng_uniform(1, 0.f, 1 - bbox_height, &h_off);
+
+  int xmin = int(w_off*width);
+  int ymin = int(h_off*height);
+  int xmax = int(bbox_width*width) + int(w_off*width);
+  int ymax = int(bbox_height*height) + int(h_off*height);
+  for(int row = ymin; row < ymax; row++){
+    uchar* pdata= img.ptr<uchar>(row);
+    for(int col = xmin; col < xmax;col++){
+      pdata[col*3 + 0] = mean_value[0];
+      pdata[col*3 + 1] = mean_value[1];
+      pdata[col*3 + 2] = mean_value[2];
+    }
+  }
+}
+
+template <typename Dtype>
 void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   const int new_height = this->layer_param_.image_data_param().new_height();
@@ -41,6 +88,17 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   label_num_= this->layer_param_.image_data_param().label_num();
   string root_folder = this->layer_param_.image_data_param().root_folder();
   CHECK_EQ(label_num_*sample_num_, this->layer_param_.image_data_param().batch_size());
+
+  problity_ = this->layer_param_.image_data_param().probability();
+  max_aspect_ratio_ = this->layer_param_.image_data_param().max_aspect_ratio();
+  min_aspect_ratio_ = this->layer_param_.image_data_param().min_aspect_ratio();
+  scale_lower_ = this->layer_param_.image_data_param().lower();
+  scale_higher_ = this->layer_param_.image_data_param().higher();
+
+  for(int ii = 0; ii < this->layer_param_.transform_param().mean_value().size(); ii++){
+    mean_value[ii] = this->layer_param_.transform_param().mean_value(ii);
+  }
+
 
   CHECK((new_height == 0 && new_width == 0) ||
       (new_height > 0 && new_width > 0)) << "Current implementation requires "
@@ -213,18 +271,32 @@ void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
 
   // datum scales
   for (int item_id = 0; item_id < batch_size; ++item_id) {
+    float sampleProb = 0.0f;
+    caffe_rng_uniform(1, 0.0f, 1.0f, &sampleProb);
     // get a blob
     timer.Start();
     cv::Mat cv_img = ReadImageToCVMat(choosedImagefile_[item_id].first,
         new_height, new_width, is_color);
     CHECK(cv_img.data) << "Could not load " << choosedImagefile_[item_id].first;
-    read_time += timer.MicroSeconds();
-    timer.Start();
-    // Apply transformations (mirror, crop...) to the image
-    int offset = batch->data_.offset(item_id);
-    this->transformed_data_.set_cpu_data(prefetch_data + offset);
-    this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
-    trans_time += timer.MicroSeconds();
+    if(sampleProb > problity_){
+      read_time += timer.MicroSeconds();
+      timer.Start();
+      // Apply transformations (mirror, crop...) to the image
+      get_random_erasing_box(scale_lower_, scale_higher_, min_aspect_ratio_, 
+                                max_aspect_ratio_, cv_img, mean_value);
+      int offset = batch->data_.offset(item_id);
+      this->transformed_data_.set_cpu_data(prefetch_data + offset);
+      this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
+      trans_time += timer.MicroSeconds();
+    }else{
+      read_time += timer.MicroSeconds();
+      timer.Start();
+      // Apply transformations (mirror, crop...) to the image
+      int offset = batch->data_.offset(item_id);
+      this->transformed_data_.set_cpu_data(prefetch_data + offset);
+      this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
+      trans_time += timer.MicroSeconds();
+    }
     labelSample[item_id] = choosedImagefile_[item_id].second;
     //LOG(INFO) << "labelidx: " << choosedImagefile_[item_id].second <<", file: " << choosedImagefile_[item_id].first;
   }
