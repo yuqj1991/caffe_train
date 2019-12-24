@@ -30,14 +30,6 @@ void EltwiseLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void EltwiseLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-  #if 0
-  vector<int >shape0 = bottom[0]->shape();
-  vector<int >shape1 = bottom[1]->shape();
-  CHECK(shape0.size()==shape1.size());
-  for(int ii=0; ii<shape0.size(); ii++){
-    LOG(INFO)<<"&&&&&&&&&&shape0: "<<shape0[ii]<<" shape1: "<<shape1[ii];
-  }
-  #endif
   for (int i = 1; i < bottom.size(); ++i) {
     CHECK(bottom[i]->shape() == bottom[0]->shape());
   }

@@ -45,6 +45,12 @@ inline const char* cudnnGetErrorString(cudnnStatus_t status) {
     case CUDNN_STATUS_RUNTIME_PREREQUISITE_MISSING:
       return "CUDNN_STATUS_RUNTIME_PREREQUISITE_MISSING";
 #endif
+#if CUDNN_VERSION_MIN(7, 0, 0)
+    case CUDNN_STATUS_RUNTIME_IN_PROGRESS:
+      return "CUDNN_STATUS_RUNTIME_IN_PROGRESS";
+    case CUDNN_STATUS_RUNTIME_FP_OVERFLOW:
+      return "CUDNN_STATUS_RUNTIME_FP_OVERFLOW";
+#endif
   }
   return "Unknown cudnn status";
 }
@@ -95,7 +101,7 @@ template <typename Dtype>
 inline void createFilterDesc(cudnnFilterDescriptor_t* desc,
     int n, int c, int h, int w) {
   CUDNN_CHECK(cudnnCreateFilterDescriptor(desc));
-#if CUDNN_VERSION_MIN(5, 0, 0)
+#if CUDNN_VERSION_MIN(6, 0, 0)
   CUDNN_CHECK(cudnnSetFilter4dDescriptor(*desc, dataType<Dtype>::type,
       CUDNN_TENSOR_NCHW, n, c, h, w));
 #else
@@ -138,7 +144,7 @@ inline void createPoolingDesc(cudnnPoolingDescriptor_t* pool_desc,
     LOG(FATAL) << "Unknown pooling method.";
   }
   CUDNN_CHECK(cudnnCreatePoolingDescriptor(pool_desc));
-#if CUDNN_VERSION_MIN(5, 0, 0)
+#if CUDNN_VERSION_MIN(6, 0, 0)
   CUDNN_CHECK(cudnnSetPooling2dDescriptor(*pool_desc, *mode,
         CUDNN_PROPAGATE_NAN, h, w, pad_h, pad_w, stride_h, stride_w));
 #else

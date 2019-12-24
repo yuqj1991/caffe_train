@@ -24,16 +24,17 @@ chars = ["京", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "
              ]
 
 def make_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--ssd_model_def', default= '{}examples/licensePlate/net/SSD_300x300/deploy.prototxt'.format(caffe_root))
-    parser.add_argument('--ssd_image_resize', default=300, type=int)
-    parser.add_argument('--ssd_model_weights', default= '{}examples/licensePlate/net/SSD_300x300/lpr_detection.caffemodel'.format(caffe_root))
-    parser.add_argument('--recog_model_def', default='{}examples/licensePlate/net/LPR/deploy.prototxt'.format(caffe_root))
-    parser.add_argument('--recog_image_width', default=128, type=int)
-    parser.add_argument('--recog_image_height', default=32, type=int)
-    parser.add_argument('--recog_model_weights', default='{}examples/licensePlate/net/LPR/lpr_recognition.caffemodel'.format(caffe_root))
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--ssd_model_def', default= '{}examples/licensePlate/net/SSD_300X300/deploy.prototxt'.format(caffe_root))
+	parser.add_argument('--ssd_image_resize', default=300, type=int)
+	parser.add_argument('--ssd_model_weights', default= '{}examples/licensePlate/net/SSD_300X300/lpr_detection.caffemodel'.format(caffe_root))
+	parser.add_argument('--recog_model_def', default='{}examples/licensePlate/net/LPR/deploy.prototxt'.format(caffe_root))
+	parser.add_argument('--recog_image_width', default=128, type=int)
+	parser.add_argument('--recog_image_height', default=32, type=int)
+	parser.add_argument('--recog_model_weights', default='{}examples/licensePlate/net/LPR/lpr_recognition.caffemodel'.format(caffe_root))
+	return parser
 
-    return parser
+
 parser1 = make_parser()
 args = parser1.parse_args()
 net_file= args.ssd_model_def
@@ -51,7 +52,13 @@ if not os.path.exists(net_file):
 caffe.set_mode_gpu();
 caffe.set_device(0);
 net = caffe.Net(net_file,caffe_model,caffe.TEST)  
-ccpd_net = caffe.Net(ccpd_file,ccpd_model,caffe.TEST)  
+ccpd_net = caffe.Net(ccpd_file,ccpd_model,caffe.TEST)
+
+inputShape = net.blobs['data'].data.shape
+det_inputSize = (inputShape[3], inputShape[2])
+
+inputShape = ccpd_net.blobs['data'].data.shape
+rec_inputSize = (inputShape[3], inputShape[2])
 
 CLASSES = ('background',
            'liceneseplate')
@@ -83,18 +90,12 @@ def net_result_to_string(res):
 font = ImageFont.truetype('NotoSansCJK-Black.ttc', 20)
 fillColor = (255,0,0)
 
-def preprocess(src):
-    img = cv2.resize(src, (300,300))
+def preprocess(src, imgSize):
+    img = cv2.resize(src, imgSize)
     img = img - 127.5
     img = img * 0.007843
     return img
 
-
-def preprocessccpd(src):
-    img = cv2.resize(src, (128, 64))
-    img = img - 127.5
-    img = img * 0.007843
-    return img
 
 def postprocess(img, out):   
     h = img.shape[0]
@@ -109,7 +110,7 @@ def detect(imgfile):
     origimg = cv2.imread(imgfile)
     h = origimg.shape[0]
     w = origimg.shape[1]
-    img = preprocess(origimg)
+    img = preprocess(origimg, det_inputSize)
     
     img = img.astype(np.float32)
     img = img.transpose((2, 0, 1))
@@ -128,7 +129,7 @@ def detect(imgfile):
            y1 = max_(0, box[i][1])
            y2 = min_(box[i][3], h)
            ori_img = origimg[y1:y2, x1:x2, :]
-           ccpdimg = preprocessccpd(ori_img)
+           ccpdimg = preprocess(ori_img, rec_inputSize)
            ccpdimg = ccpdimg.astype(np.float32)
            ccpdimg = ccpdimg.transpose((2, 0, 1))
            ccpd_net.blobs['data'].data[...] = ccpdimg
