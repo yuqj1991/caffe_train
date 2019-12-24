@@ -2027,10 +2027,10 @@ layer {
 
 
 layer {
-	name: "conv15_2"
+	name: "conv14_3"
 	type: "Convolution"
 	bottom: "conv14_2"
-	top: "conv15_2"
+	top: "conv14_3"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
@@ -2047,10 +2047,10 @@ layer {
 	}
 }
 layer {
-	name: "conv15_2/bn"
+	name: "conv14_3/bn"
 	type: "BatchNorm"
-	bottom: "conv15_2"
-	top: "conv15_2"
+	bottom: "conv14_3"
+	top: "conv14_3"
 	param {
 		lr_mult: 0
 		decay_mult: 0
@@ -2065,10 +2065,10 @@ layer {
 	}
 }
 layer {
-	name: "conv15_2/scale"
+	name: "conv14_3/scale"
 	type: "Scale"
-	bottom: "conv15_2"
-	top: "conv15_2"
+	bottom: "conv14_3"
+	top: "conv14_3"
 	param {
 		lr_mult: 1.0
 		decay_mult: 0.0
@@ -2088,10 +2088,10 @@ layer {
 	}
 }
 layer {
-	name: "conv15_2/relu"
+	name: "conv14_3/relu"
 	type: "PReLU"
-	bottom: "conv15_2"
-	top: "conv15_2"
+	bottom: "conv14_3"
+	top: "conv14_3"
 }
 
 #######################################################################
@@ -3158,7 +3158,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_priorbox"
 	type: "PriorBox"
-	bottom: "conv15_2"
+	bottom: "conv14_3"
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
@@ -3178,7 +3178,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_loc"
 	type: "Convolution"
-	bottom: "conv14_2"
+	bottom: "conv14_3"
 	top: "dectction_moudle_five_loc"
 	param {
 		lr_mult: 1
@@ -3225,7 +3225,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_conf"
 	type: "Convolution"
-	bottom: "conv15_2"
+	bottom: "conv14_3"
 	top: "dectction_moudle_five_conf"
 	param {
 		lr_mult: 1
