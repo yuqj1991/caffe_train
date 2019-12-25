@@ -71,7 +71,7 @@ void ImageDataLayer<Dtype>::get_random_erasing_box(float sl, float sh, float min
   int ymax = int(bbox_height*height) + int(h_off*height);
   for(int row = ymin; row < ymax; row++){
     uchar* pdata= img.ptr<uchar>(row);
-    for(int col = xmin; col < xmax;col++){
+    for(int col = xmin; col < xmax; col++){
       pdata[col*3 + 0] = mean_value[0];
       pdata[col*3 + 1] = mean_value[1];
       pdata[col*3 + 2] = mean_value[2];
@@ -274,33 +274,23 @@ void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     float sampleProb = 0.0f;
     caffe_rng_uniform(1, 0.0f, 1.0f, &sampleProb);
-    LOG(INFO)<<"sampleProb: "<<sampleProb;
     // get a blob
     timer.Start();
     cv::Mat cv_img = ReadImageToCVMat(choosedImagefile_[item_id].first,
         new_height, new_width, is_color);
     CHECK(cv_img.data) << "Could not load " << choosedImagefile_[item_id].first;
-    if(sampleProb > problity_){
-      read_time += timer.MicroSeconds();
-      timer.Start();
+    read_time += timer.MicroSeconds();
+    timer.Start();
+    if(sampleProb > problity_){ 
       // Apply transformations (mirror, crop...) to the image
       get_random_erasing_box(scale_lower_, scale_higher_, min_aspect_ratio_, 
                                 max_aspect_ratio_, cv_img, mean_value);
-      int offset = batch->data_.offset(item_id);
-      this->transformed_data_.set_cpu_data(prefetch_data + offset);
-      this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
-      trans_time += timer.MicroSeconds();
-    }else{
-      read_time += timer.MicroSeconds();
-      timer.Start();
-      // Apply transformations (mirror, crop...) to the image
-      int offset = batch->data_.offset(item_id);
-      this->transformed_data_.set_cpu_data(prefetch_data + offset);
-      this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
-      trans_time += timer.MicroSeconds();
     }
+    int offset = batch->data_.offset(item_id);
+    this->transformed_data_.set_cpu_data(prefetch_data + offset);
+    this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
+    trans_time += timer.MicroSeconds();
     labelSample[item_id] = choosedImagefile_[item_id].second;
-    //LOG(INFO) << "labelidx: " << choosedImagefile_[item_id].second <<", file: " << choosedImagefile_[item_id].first;
   }
   for(int i = 0; i < label_num_; i++){
     prefetch_label[i] = label[i];

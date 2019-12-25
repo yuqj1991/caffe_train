@@ -14,10 +14,10 @@ layer {
 		root_folder: "../../../../dataset/reId_data/combineData/train"
 		source: "./scripts/labelmap.txt"
 		probability: 0.5
-		min_aspect_ratio: 0.3;
-		max_aspect_ratio: 0.7;
-		lower: 0.2;
-		higher: 1.0;
+		min_aspect_ratio: 0.3
+		max_aspect_ratio: 0.7
+		lower: 0.2
+		higher: 0.9
 	}
 	transform_param {
 		mirror: true
