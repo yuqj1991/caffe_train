@@ -13,7 +13,7 @@ layer {
 		batch_size: 240
 		root_folder: "../../../../dataset/reId_data/combineData/train"
 		source: "./scripts/labelmap.txt"
-		probability: 0.5
+		probability: 1
 		min_aspect_ratio: 0.3
 		max_aspect_ratio: 0.7
 		lower: 0.2
