@@ -1,5 +1,5 @@
 average_loss: 10
-base_lr: 0.001
+base_lr: 0.01
 display: 100
 gamma: 0.1
 iter_size: 1
@@ -12,7 +12,7 @@ max_iter: 1800000
 
 momentum: 0.9
 snapshot: 10000
-snapshot_prefix: "./snapshot/reid"
+snapshot_prefix: "./snapshot/Resnet-reid"
 
-train_net: "./prototxt/googlenet/train.prototxt"
+train_net: "./prototxt/Resnet/train.prototxt"
 weight_decay: 0.0005

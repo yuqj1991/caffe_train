@@ -68,6 +68,7 @@ void ImageDataLayer<Dtype>::get_random_erasing_box(float sl, float sh, float min
   int ymin = int(h_off*height);
   int xmax = int(bbox_width*width) + int(w_off*width);
   int ymax = int(bbox_height*height) + int(h_off*height);
+  LOG(INFO)<<"xmin: "<<xmin<<", xmax: "<<xmax<<", ymin: "<<ymin<<", ymax: "<<ymax;
   for(int row = ymin; row < ymax; row++){
     uchar* pdata= img.ptr<uchar>(row);
     for(int col = xmin; col < xmax;col++){

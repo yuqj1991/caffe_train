@@ -14,5 +14,5 @@ momentum: 0.9
 snapshot: 10000
 snapshot_prefix: "./snapshot/reid"
 
-train_net: "./prototxt/googlenet/train.prototxt"
+train_net: "./prototxt/Googlenet/train.prototxt"
 weight_decay: 0.0005

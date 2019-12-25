@@ -1,5 +1,4 @@
 name: "ResNet"
-
 input: "data"
 input_dim: 1
 input_dim: 3
@@ -752,237 +751,235 @@ layer {
     top: "res4b"
     name: "res4b"
     type: "Eltwise"
-    }
+}
 
 layer {
   bottom: "res4b"
     top: "res4b"
     name: "res4b_relu"
     type: "ReLU"
-    }
-
+}
 layer {
-  name: "pool5_ave"
-  type: "Pooling"
-  bottom: "res4b"
-  top: "pool5_ave"
-  pooling_param {
-    pool: AVE
-    kernel_w: 1
-	kernel_h: 4
-    stride_w: 1
-	stride_h: 1
-  }
+	name: "res4b_slice"
+	type: "Slice"
+	bottom: "res4b"
+	top: "party_body_one"
+	top: "party_body_two"
+	top: "party_body_three"
+	slice_param {
+		slice_point: 16
+		slice_point: 32
+		axis: 2
+	}
+}
+############branch_one#############
+layer {
+	name: "branch_one_gap"
+	type: "Pooling"
+	bottom: "res4b"
+	top: "branch_one_gap"
+	pooling_param {
+		pool: AVE
+		global_pooling: true
+	}
+}
+layer {
+	name: "branch_one_gmp"
+	type: "Pooling"
+	bottom: "res4b"
+	top: "branch_one_gmp"
+	pooling_param {
+		pool: MAX
+		global_pooling: true
+	}
 }
 
 layer {
-  name: "pool5_ave_transpose"
-  top: "pool5_ave_transpose"
-  bottom: "pool5_ave"
-  type: "Transpose"
-  transpose_param {
-    dim: 3
-    dim: 2
-    dim: 0
-    dim: 1
-  }
+	bottom: "branch_one_gap"
+	bottom: "branch_one_gmp"
+	top: "branch_one"
+	name: "branch_one"
+	type: "Eltwise"
 }
 
+############branch_two#############
 layer {
-  name: "blstm_input"
-  type: "Reshape"
-  bottom: "pool5_ave_transpose"
-  top: "blstm_input"
-  reshape_param {
-    shape { dim: -1 }
-    axis: 1
-    num_axes: 2
-  }
-}
-
-#===================blstm layer 1============================
-#======lstm1===================
-layer {
-  name: "lstm1"
-  type: "Lstm"
-  bottom: "blstm_input"
-  top: "lstm1"
-  lstm_param {
-    num_output: 100
-    weight_filler {
-      type: "gaussian"
-      std: 0.1
-    }
-    bias_filler {
-      type: "constant"
-    }
-  }
-}
-
-# =====lstm1_reverse===================
-layer {
-  name: "lstm1-reverse1"
-  type: "Reverse"
-  bottom: "blstm_input"
-  top: "rlstm1_input"
-  reverse_param {
-    axis: 0
-  }
-}
-layer {
-  name: "rlstm1"
-  type: "Lstm"
-  bottom: "rlstm1_input"
-  top: "rlstm1-output"
-  lstm_param {
-    num_output: 100
-	weight_filler {
-      type: "gaussian"
-      std: 0.1
-    }
-    bias_filler {
-      type: "constant"
-    }
-   }
-}
-layer {
-  name: "lstm1-reverse2"
-  type: "Reverse"
-  bottom: "rlstm1-output"
-  top: "rlstm1"
-  reverse_param {
-    axis: 0
-  }
-}
-
-
-# merge lstm1 and rlstm1
-layer {
-  name: "blstm1"
-  type: "Concat"
-  bottom: "lstm1"
-  bottom: "rlstm1"
-  top: "blstm1"
-  concat_param {
-    axis: 2
-  }
-}
-
-
- 
-
-#===================blstm layer 2============================
-#======lstm2===================
-layer {
-  name: "lstm2"
-  type: "Lstm"
-  bottom: "blstm1"
-  top: "lstm2"
-  lstm_param {
-    num_output: 100
-    weight_filler {
-      type: "gaussian"
-      std: 0.1
-    }
-    bias_filler {
-      type: "constant"
-    }
-  }
-}
-
-# =====lstm2_reverse===================
-layer {
-  name: "lstm2-reverse1"
-  type: "Reverse"
-  bottom: "blstm1"
-  top: "rlstm2_input"
-  reverse_param {
-    axis: 0
-  }
-}
-
-layer {
-  name: "rlstm2"
-  type: "Lstm"
-  bottom: "rlstm2_input"
-  top: "rlstm2-output"
-  lstm_param {
-    num_output: 100
-	weight_filler {
-      type: "gaussian"
-      std: 0.1
-    }
-    bias_filler {
-      type: "constant"
-    }
-   }
-}
-layer {
-  name: "lstm2-reverse2"
-  type: "Reverse"
-  bottom: "rlstm2-output"
-  top: "rlstm2"
-  reverse_param {
-    axis: 0
-  }
-}
-
-# merge lstm2 and rlstm2
-layer {
-	name: "blstm2"
+	name: "stage_two_one"
 	type: "Concat"
-	bottom: "lstm2"
-	bottom: "rlstm2"
-	top: "blstm2"
+	bottom: "party_body_one"
+	bottom: "party_body_two"
+	top: "stage_two_one"
 	concat_param {
 		axis: 2
 	}
 }
+layer {
+	name: "branch_two_gap"
+	type: "Pooling"
+	bottom: "stage_two_one"
+	top: "branch_two_gap"
+	pooling_param {
+		pool: AVE
+		global_pooling: true
+	}
+}
+layer {
+	name: "branch_two_gmp"
+	type: "Pooling"
+	bottom: "stage_two_one"
+	top: "branch_two_gmp"
+	pooling_param {
+		pool: MAX
+		global_pooling: true
+	}
+}
 
 layer {
-	name: "blstm_sum"
+	bottom: "branch_two_gap"
+	bottom: "branch_two_gmp"
+	top: "branch_two"
+	name: "branch_two"
 	type: "Eltwise"
-	bottom: "blstm1"
-	bottom: "blstm2"
-	top: "blstm_sum"
-	eltwise_param{
-		operation: SUM
-	}
 }
 
- 
-
-
+############branch_three#############
 layer {
-	name: "fc1x"
-	type: "InnerProduct"
-	bottom: "blstm_sum"
-	top: "fc1x"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	inner_product_param {
+	name: "stage_two_two"
+	type: "Concat"
+	bottom: "party_body_two"
+	bottom: "party_body_three"
+	top: "stage_two_two"
+	concat_param {
 		axis: 2
-		num_output: 66
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0
-		}
+	}
+}
+layer {
+	name: "branch_three_gap"
+	type: "Pooling"
+	bottom: "stage_two_two"
+	top: "branch_three_gap"
+	pooling_param {
+		pool: AVE
+		global_pooling: true
+	}
+}
+layer {
+	name: "branch_three_gmp"
+	type: "Pooling"
+	bottom: "stage_two_two"
+	top: "branch_three_gmp"
+	pooling_param {
+		pool: MAX
+		global_pooling: true
 	}
 }
 
+layer {
+	bottom: "branch_three_gap"
+	bottom: "branch_three_gmp"
+	top: "branch_three"
+	name: "branch_three"
+	type: "Eltwise"
+}
+
+############branch_four#############
+layer {
+	name: "branch_four_gap"
+	type: "Pooling"
+	bottom: "party_body_one"
+	top: "branch_four_gap"
+	pooling_param {
+		pool: AVE
+		global_pooling: true
+	}
+}
+layer {
+	name: "branch_four_gmp"
+	type: "Pooling"
+	bottom: "party_body_one"
+	top: "branch_four_gmp"
+	pooling_param {
+		pool: MAX
+		global_pooling: true
+	}
+}
 
 layer {
-	name: "result"
-	type: "CTCGreedyDecoder"
-	bottom: "fc1x"
-	top: "result"
+	bottom: "branch_four_gap"
+	bottom: "branch_four_gmp"
+	top: "branch_four"
+	name: "branch_four"
+	type: "Eltwise"
+}
+
+############branch_five#############
+layer {
+	name: "branch_five_gap"
+	type: "Pooling"
+	bottom: "party_body_two"
+	top: "branch_five_gap"
+	pooling_param {
+		pool: AVE
+		global_pooling: true
+	}
+}
+layer {
+	name: "branch_five_gmp"
+	type: "Pooling"
+	bottom: "party_body_two"
+	top: "branch_five_gmp"
+	pooling_param {
+		pool: MAX
+		global_pooling: true
+	}
+}
+
+layer {
+	bottom: "branch_five_gap"
+	bottom: "branch_five_gmp"
+	top: "branch_five"
+	name: "branch_five"
+	type: "Eltwise"
+}
+
+############branch_six#############
+layer {
+	name: "branch_six_gap"
+	type: "Pooling"
+	bottom: "party_body_three"
+	top: "branch_six_gap"
+	pooling_param {
+		pool: AVE
+		global_pooling: true
+	}
+}
+layer {
+	name: "branch_six_gmp"
+	type: "Pooling"
+	bottom: "party_body_three"
+	top: "branch_six_gmp"
+	pooling_param {
+		pool: MAX
+		global_pooling: true
+	}
+}
+
+layer {
+	bottom: "branch_six_gap"
+	bottom: "branch_six_gmp"
+	top: "branch_six"
+	name: "branch_six"
+	type: "Eltwise"
+}
+
+layer {
+	name: "fc5"
+	type: "Concat"
+	bottom: "branch_one"
+	bottom: "branch_two"
+	bottom: "branch_three"
+	bottom: "branch_four"
+	bottom: "branch_five"
+	bottom: "branch_six"
+	top: "fc5"
 }
