@@ -42,6 +42,9 @@ void ImageDataLayer<Dtype>::get_random_erasing_box(float sl, float sh, float min
   CHECK_GT(min_rate, 0.);
   CHECK_LT(max_rate, 1);
 
+  LOG(INFO)<<"sl: "<<sl<<", sh: "<<sh<<", min_rate: "<<min_rate<<", max_rate: "<<max_rate
+            <<", mean_value: "<<mean_value[0]<<", "<<mean_value[1]<<", "<<mean_value[2];
+
   float scale;
   caffe_rng_uniform(1, sl, sh, &scale);
 
