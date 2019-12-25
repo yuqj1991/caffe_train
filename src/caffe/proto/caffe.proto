@@ -1568,11 +1568,11 @@ message ImageDataParameter {
   optional uint32 pair_size = 13 [default = 1];
   optional uint32 label_num = 14;
   optional uint32 sample_num = 15;
-  optional float probability = 16;
-  optional float min_aspect_ratio = 17;
-  optional float max_aspect_ratio = 20;
-  optional float lower = 18;
-  optional float higher = 19;
+  optional float probability = 16 [default = 1.0];
+  optional float min_aspect_ratio = 17 [default = 1.0];
+  optional float max_aspect_ratio = 20 [default = 1.0];
+  optional float lower = 18 [default = 1.0];
+  optional float higher = 19 [default = 1.0];
 }
 
 message InfogainLossParameter {

@@ -42,8 +42,6 @@ void ImageDataLayer<Dtype>::get_random_erasing_box(float sl, float sh, float min
   CHECK_GT(min_rate, 0.);
   CHECK_LT(max_rate, 1);
 
-  LOG(INFO)<<"sl: "<<sl<<", sh: "<<sh<<", min_rate: "<<min_rate<<", max_rate: "<<max_rate
-            <<", mean_value: "<<mean_value[0]<<", "<<mean_value[1]<<", "<<mean_value[2];
 
   float scale;
   caffe_rng_uniform(1, sl, sh, &scale);
@@ -71,7 +69,6 @@ void ImageDataLayer<Dtype>::get_random_erasing_box(float sl, float sh, float min
   int ymin = int(h_off*height);
   int xmax = int(bbox_width*width) + int(w_off*width);
   int ymax = int(bbox_height*height) + int(h_off*height);
-  LOG(INFO)<<"xmin: "<<xmin<<", xmax: "<<xmax<<", ymin: "<<ymin<<", ymax: "<<ymax;
   for(int row = ymin; row < ymax; row++){
     uchar* pdata= img.ptr<uchar>(row);
     for(int col = xmin; col < xmax;col++){
@@ -277,6 +274,7 @@ void ImageDataLayer<Dtype>::load_batch(pairBatch<Dtype>* batch) {
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     float sampleProb = 0.0f;
     caffe_rng_uniform(1, 0.0f, 1.0f, &sampleProb);
+    LOG(INFO)<<"sampleProb: "<<sampleProb;
     // get a blob
     timer.Start();
     cv::Mat cv_img = ReadImageToCVMat(choosedImagefile_[item_id].first,
