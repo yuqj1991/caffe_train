@@ -1654,18 +1654,6 @@ layer {
 }
 
 
-#layer {
-#	name: "ctcloss"
-#	type: "WarpCTCLoss"
-#	bottom: "fc1x"
-#	bottom: "label"
-#	top: "ctcloss"
-#	loss_weight:1
-#	ctc_loss_param{
-#		blank_index: -1
-#	}
-#}
-
 layer {
 	name: "ctc_loss"
 	type: "CtcLoss"
@@ -1675,7 +1663,7 @@ layer {
 	loss_weight: 1.0
 	use_ctc_loss: true
 	warpctc_loss_param {
-		blank_label: -1
+		blank_label: 65
 		alphabet_size: 66
 		time_step: 16
 	}

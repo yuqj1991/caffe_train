@@ -49,9 +49,7 @@ void WarpCTCLossLayer<Dtype>::LayerSetUp(
     CHECK_EQ(N_, seq_len_blob->count());
     CHECK_EQ(N_, lab_len_blob->count());
     CHECK_EQ(N_, label_seq_blob->channels());
-  }
-  else if (bottom.size() == 2)//input seq + labels
-  {
+  }else if (bottom.size() == 2){//input seq + labels
 	  const Blob<Dtype>* label_seq = bottom[1];
 	  CHECK_EQ(N_, label_seq->num());
   }

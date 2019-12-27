@@ -974,9 +974,6 @@ layer {
   }
 }
 
-
- 
-
 #===================blstm layer 2============================
 #======lstm2===================
 layer {
@@ -1056,8 +1053,6 @@ layer {
 	}
 }
 
- 
-
 
 layer {
 	name: "fc1x"
@@ -1093,14 +1088,33 @@ layer {
 	bottom: "label"
 	top: "ctcloss"
 	loss_weight:1
+	ctc_loss_param {
+		blank_index: 65
+	}
+	include {
+		phase: TRAIN
+	}
 }
 
 layer {
-	name: "acc"
+	name: "result"
 	type: "CTCGreedyDecoder"
 	bottom: "fc1x"
+	top: "result"
+	ctc_decoder_param {
+		blank_index: 65
+	}
+	include {
+		phase: TEST
+	}
+}
+
+layer{
+	name: "ccpdeval_output"
+	type: "LpEvaluate"
+	bottom: "result"
 	bottom: "label"
-	top: "acc"
+	top: "ccpdeval_output"
 	include {
 		phase: TEST
 	}
