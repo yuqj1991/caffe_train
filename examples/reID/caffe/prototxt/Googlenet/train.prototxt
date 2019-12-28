@@ -6,11 +6,11 @@ layer {
 	top: "label"
 	top: "labelIndex"
 	image_data_param {
-		new_height: 128
-		new_width: 64
+		new_height: 384
+		new_width: 128
 		sample_num: 5
-		label_num: 48
-		batch_size: 240
+		label_num: 24
+		batch_size: 120
 		root_folder: "../../../../dataset/reId_data/combineData/train"
 		source: "./scripts/labelmap.txt"
 		probability: 0.5
