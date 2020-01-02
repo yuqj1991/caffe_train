@@ -10,4 +10,4 @@ if ! test -f ../prototxt/test_glass.prototxt ;then
         exit 1
 fi
 ../../../../build/tools/caffe train --solver=../solver/solver_glass.prototxt -gpu 0 \
-#--snapshot=../snapshot/faceattri_iter_69754.solverstate
+--snapshot=../snapshot/face_glass_iter_377459.solverstate
