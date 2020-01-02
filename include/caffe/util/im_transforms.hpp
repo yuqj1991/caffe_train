@@ -20,10 +20,6 @@ void UpdateBBoxByResizePolicy(const ResizeParameter& param,
                               const int old_width, const int old_height,
                               NormalizedBBox* bbox);
 
-void UpdateBBoxByResizePolicy(ResizeParameter& param,
-                              const int old_width, const int old_height,
-                              NormalizedBBox* bbox);
-
 void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
                               const int old_width, const int old_height,
                               AnnoFaceLandmarks* lface) ;

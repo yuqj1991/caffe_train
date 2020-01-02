@@ -175,7 +175,6 @@ void CuDNNConvolutionLayer<Dtype>::Reshape(
 #endif
 
     // choose forward and backward algorithms + workspace(s)
-    
     CUDNN_CHECK(cudnnGetConvolutionForwardAlgorithm(handle_[0],
       bottom_descs_[i],
       filter_desc_,

@@ -96,65 +96,6 @@ void UpdateBBoxByResizePolicy(const ResizeParameter& param,
   bbox->set_ymax(y_max / new_height);
 }
 
-void UpdateBBoxByResizePolicy(ResizeParameter& param,
-                              const int old_width, const int old_height,
-                              NormalizedBBox* bbox) {
-  float new_height = param.height();
-  float new_width = param.width();
-  float orig_aspect = static_cast<float>(old_width) / old_height;
-  float new_aspect = new_width / new_height;
-
-  float x_min = bbox->xmin() * old_width;
-  float y_min = bbox->ymin() * old_height;
-  float x_max = bbox->xmax() * old_width;
-  float y_max = bbox->ymax() * old_height;
-  float padding;
-  switch (param.resize_mode()) {
-    case ResizeParameter_Resize_mode_WARP:
-      x_min = std::max(0.f, x_min * new_width / old_width);
-      x_max = std::min(new_width, x_max * new_width / old_width);
-      y_min = std::max(0.f, y_min * new_height / old_height);
-      y_max = std::min(new_height, y_max * new_height / old_height);
-      break;
-    case ResizeParameter_Resize_mode_FIT_LARGE_SIZE_AND_PAD:
-      if (orig_aspect > new_aspect) {
-        padding = (new_height - new_width / orig_aspect) / 2;
-        x_min = std::max(0.f, x_min * new_width / old_width);
-        x_max = std::min(new_width, x_max * new_width / old_width);
-        y_min = y_min * (new_height - 2 * padding) / old_height;
-        y_min = padding + std::max(0.f, y_min);
-        y_max = y_max * (new_height - 2 * padding) / old_height;
-        y_max = padding + std::min(new_height, y_max);
-      } else {
-        padding = (new_width - orig_aspect * new_height) / 2;
-        x_min = x_min * (new_width - 2 * padding) / old_width;
-        x_min = padding + std::max(0.f, x_min);
-        x_max = x_max * (new_width - 2 * padding) / old_width;
-        x_max = padding + std::min(new_width, x_max);
-        y_min = std::max(0.f, y_min * new_height / old_height);
-        y_max = std::min(new_height, y_max * new_height / old_height);
-      }
-      break;
-    case ResizeParameter_Resize_mode_FIT_SMALL_SIZE:
-      if (orig_aspect < new_aspect) {
-        new_height = new_width / orig_aspect;
-      } else {
-        new_width = orig_aspect * new_height;
-      }
-      x_min = std::max(0.f, x_min * new_width / old_width);
-      x_max = std::min(new_width, x_max * new_width / old_width);
-      y_min = std::max(0.f, y_min * new_height / old_height);
-      y_max = std::min(new_height, y_max * new_height / old_height);
-      break;
-    default:
-      LOG(FATAL) << "Unknown resize mode.";
-  }
-  bbox->set_xmin(x_min / new_width);
-  bbox->set_ymin(y_min / new_height);
-  bbox->set_xmax(x_max / new_width);
-  bbox->set_ymax(y_max / new_height);
-}
-
 void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
                               const int old_width, const int old_height,
                               AnnoFaceLandmarks* lface){

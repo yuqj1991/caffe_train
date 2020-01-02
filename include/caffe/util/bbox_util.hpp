@@ -191,7 +191,7 @@ void MineHardExamples(const Blob<Dtype>& conf_blob,
     vector<vector<int> >* all_neg_indices);
 
 // Retrieve bounding box ground truth from gt_data.
-//    gt_data: 1 x 1 x num_gt x 9 blob.
+//    gt_data: 1 x 1 x num_gt x 7 blob.
 //    num_gt: the number of ground truth.
 //    background_label_id: the label for background class which is used to do
 //      santity check so that no ground truth contains it.
