@@ -667,7 +667,7 @@ message LayerParameter {
   
   optional CTCDecoderParameter ctc_decoder_param = 301;
   optional CTCLossParameter ctc_loss_param = 302;
-  optional CtcLossParameter warpctc_loss_param = 309;
+  optional WarpCtcLossParameter warpctc_loss_param = 309;
   
   optional ReverseParameter reverse_param = 303;
   optional ReverseTimeParameter reverse_time_param = 304;
@@ -683,7 +683,7 @@ message LayerParameter {
   optional LabelSpecificAddParameter label_specific_add_param = 8000;
 }
 
-message CtcLossParameter {
+message WarpCtcLossParameter {
     optional uint32 alphabet_size = 1 [default = 0];
     optional uint32 time_step = 3 [default = 0];
     optional int32 blank_label = 4 [default = 0];

@@ -6,7 +6,7 @@ template <typename Dtype>
 void CtcLossLayer<Dtype>::LayerSetUp(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::LayerSetUp(bottom, top);
-  CtcLossParameter param = this->layer_param_.warpctc_loss_param();
+  WarpCtcLossParameter param = this->layer_param_.warpctc_loss_param();
   blank_label_ = param.blank_label();
   alphabet_size_ = param.alphabet_size();
   CHECK_GT(alphabet_size_, 0) << "The size of alphabeta should be greater than 0.";
