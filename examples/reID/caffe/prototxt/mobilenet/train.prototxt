@@ -9,8 +9,8 @@ layer {
 		new_height: 384
 		new_width: 128
 		sample_num: 5
-		label_num: 24
-		batch_size: 120
+		label_num: 12
+		batch_size: 60
 		root_folder: "../../../../dataset/reId_data/combineData/train"
 		source: "./scripts/labelmap.txt"
 		probability: 0.5
