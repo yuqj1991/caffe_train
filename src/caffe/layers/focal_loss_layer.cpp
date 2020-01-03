@@ -34,7 +34,7 @@ void focalSoftmaxWithLossLayer<Dtype>::LayerSetUp(
     normalization_ = this->layer_param_.loss_param().normalization();
   }
   alpha_ = 0.75;
-  gamma_ = 4.0f;
+  gamma_ = 2.0f;
 }
 
 template <typename Dtype>
@@ -127,7 +127,7 @@ void focalSoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& 
               focaldiff = diff_element * diff_element_mutal*alpha_;
             }
             bottom_diff[i * dim + c * inner_num_ + j] = focaldiff;
-          }         
+          }        
           ++count;
         }
       }
