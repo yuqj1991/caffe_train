@@ -57,7 +57,6 @@ cv::Mat AspectKeepingResizeBySmall(const cv::Mat& in_img,
 void constantNoise(const int n, const vector<uchar>& val, cv::Mat* image);
 
 cv::Mat ApplyResize(const cv::Mat& in_img, const ResizeParameter& param);
-cv::Mat ApplyResizeNew(cv::Mat& in_img, ResizeParameter& param);
 
 cv::Mat ApplyNoise(const cv::Mat& in_img, const NoiseParameter& param);
 

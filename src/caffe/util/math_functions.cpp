@@ -9,6 +9,15 @@
 
 namespace caffe {
 
+template <>
+void caffe_cpu_logistic_activate(float *x, const int n)
+{
+	int i;
+	for (i = 0; i < n; ++i) {
+		x[i] = logistic_activate(x[i]);
+	}
+}
+
 template<>
 void caffe_cpu_gemm<float>(const CBLAS_TRANSPOSE TransA,
     const CBLAS_TRANSPOSE TransB, const int M, const int N, const int K,
@@ -211,6 +220,16 @@ void caffe_sqr<float>(const int n, const float* a, float* y) {
 template <>
 void caffe_sqr<double>(const int n, const double* a, double* y) {
   vdSqr(n, a, y);
+}
+
+template <>
+void caffe_sqrt<float>(const int n, const float* a, float* y) {
+  vsSqrt(n, a, y);
+}
+
+template <>
+void caffe_sqrt<double>(const int n, const double* a, double* y) {
+  vdSqrt(n, a, y);
 }
 
 template <>

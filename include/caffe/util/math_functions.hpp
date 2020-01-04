@@ -12,6 +12,15 @@
 
 namespace caffe {
 
+static inline float logistic_activate(float x) { return 1. / (1. + exp(-x)); }
+static inline float logistic_gradient(float x) { return (1 - x)*x; }
+
+template <typename Dtype>
+void caffe_cpu_logistic_activate(Dtype *x, const int n);
+
+template <typename Dtype>
+void caffe_gpu_logistic_activate(const int N, const Dtype* a, Dtype* y);
+
 // Caffe gemm provides a simpler interface to the gemm functions, with the
 // limitation that the data has to be contiguous in memory.
 template <typename Dtype>
@@ -51,6 +60,9 @@ void caffe_scal(const int N, const Dtype alpha, Dtype *X);
 
 template <typename Dtype>
 void caffe_sqr(const int N, const Dtype* a, Dtype* y);
+
+template <typename Dtype>
+void caffe_sqrt(const int N, const Dtype* a, Dtype* y);
 
 template <typename Dtype>
 void caffe_add(const int N, const Dtype* a, const Dtype* b, Dtype* y);
@@ -185,6 +197,11 @@ void caffe_gpu_add_scalar(const int N, const Dtype alpha, Dtype *X);
 template <typename Dtype>
 void caffe_gpu_scal(const int N, const Dtype alpha, Dtype *X);
 
+#ifndef CPU_ONLY
+template <typename Dtype>
+void caffe_gpu_scal(const int N, const Dtype alpha, Dtype* X, cudaStream_t str);
+#endif
+
 template <typename Dtype>
 void caffe_gpu_add(const int N, const Dtype* a, const Dtype* b, Dtype* y);
 
@@ -208,6 +225,9 @@ void caffe_gpu_log(const int n, const Dtype* a, Dtype* y);
 
 template <typename Dtype>
 void caffe_gpu_powx(const int n, const Dtype* a, const Dtype b, Dtype* y);
+
+template <typename Dtype>
+void caffe_gpu_sqrt(const int n, const Dtype* a, Dtype* y);
 
 // caffe_gpu_rng_uniform with two arguments generates integers in the range
 // [0, UINT_MAX].

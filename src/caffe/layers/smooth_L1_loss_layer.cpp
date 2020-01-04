@@ -3,7 +3,7 @@
 // copyright (c) 2015 Microsoft
 // Licensed under The MIT License [see fast-rcnn/LICENSE for details]
 // Written by Ross Girshick
-// Modified by yuqianjin
+// Modified by Wei Liu
 // ------------------------------------------------------------------
 
 #include <vector>
@@ -103,6 +103,6 @@ STUB_GPU(SmoothL1LossLayer);
 #endif
 
 INSTANTIATE_CLASS(SmoothL1LossLayer);
-REGISTER_LAYER_CLASS(SmoothL1Loss);
+//REGISTER_LAYER_CLASS(SmoothL1Loss);
 
 }  // namespace caffe
