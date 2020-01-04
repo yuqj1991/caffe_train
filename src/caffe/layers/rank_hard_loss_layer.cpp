@@ -48,7 +48,7 @@ void RankHardLossLayer<Dtype>::set_mask(const vector<Blob<Dtype>*>& bottom)
 	const Dtype* label = bottom[1]->cpu_data();
 	int count = bottom[0]->count();
 	int num = bottom[0]->num();
-	int dim = bottom[0]->count() / bottom[0]->num();
+	int dim = count / num;
 	Dtype* dis_data = dis_.mutable_cpu_data();
 	Dtype* mask_data = mask_.mutable_cpu_data();
 
@@ -142,18 +142,18 @@ template <typename Dtype>
 void RankHardLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
 
-	const Dtype* bottom_data = bottom[0]->cpu_data();
-	const Dtype* label = bottom[1]->cpu_data();
-	int count = bottom[0]->count();
+	//const Dtype* bottom_data = bottom[0]->cpu_data();
+	//const Dtype* label = bottom[1]->cpu_data();
+	//int count = bottom[0]->count();
 	int num = bottom[0]->num();
-	int dim = bottom[0]->count() / bottom[0]->num();
+	//int dim = bottom[0]->count() / bottom[0]->num();
 
 
 	RankParameter rank_param = this->layer_param_.rank_param();
 	int neg_num = rank_param.neg_num();      // 4
 	int pair_size = rank_param.pair_size();  // 5
-	float hard_ratio = rank_param.hard_ratio();
-	float rand_ratio = rank_param.rand_ratio();
+	//float hard_ratio = rank_param.hard_ratio();
+	//float rand_ratio = rank_param.rand_ratio();
 	float margin = rank_param.margin();
 	Dtype* dis_data = dis_.mutable_cpu_data();
 	Dtype* mask_data = mask_.mutable_cpu_data();
@@ -183,7 +183,7 @@ void RankHardLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 
 
 	const Dtype* bottom_data = bottom[0]->cpu_data();
-	const Dtype* label = bottom[1]->cpu_data();
+	//const Dtype* label = bottom[1]->cpu_data();
 	Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
 	int count = bottom[0]->count();
 	int num = bottom[0]->num();
@@ -193,8 +193,8 @@ void RankHardLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 	RankParameter rank_param = this->layer_param_.rank_param();
 	int neg_num = rank_param.neg_num();
 	int pair_size = rank_param.pair_size();
-	float hard_ratio = rank_param.hard_ratio();
-	float rand_ratio = rank_param.rand_ratio();
+	//float hard_ratio = rank_param.hard_ratio();
+	//float rand_ratio = rank_param.rand_ratio();
 	float margin = rank_param.margin();
 
 	Dtype* dis_data = dis_.mutable_cpu_data();

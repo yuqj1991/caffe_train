@@ -10,4 +10,4 @@ if ! test -f ../prototxt/SSD_300x300/lp_det_test.prototxt ;then
         exit 1
 fi
 ../../../build/tools/caffe train --solver=../prototxt/SSD_300x300/solver_det.prototxt -gpu 0 \
-#--snapshot=../snapshot/deepccpd_res_v1_iter_370000.solverstate
+#--snapshot=../snapshot/det_iter_110000.solverstate
