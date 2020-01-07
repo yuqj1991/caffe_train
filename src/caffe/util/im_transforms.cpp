@@ -96,6 +96,12 @@ void UpdateBBoxByResizePolicy(const ResizeParameter& param,
   bbox->set_ymax(y_max / new_height);
 }
 
+void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
+                              const int old_width, const int old_height,
+                              AnnoFaceLandmarks* lface){
+  //
+}
+
 void InferNewSize(const ResizeParameter& resize_param,
                   const int old_width, const int old_height,
                   int* new_width, int* new_height) {
