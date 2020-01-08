@@ -681,6 +681,7 @@ message LayerParameter {
   optional PowerParameter power_param = 122;
   optional PReLUParameter prelu_param = 131;
   optional PriorBoxParameter prior_box_param = 203;
+  optional ReceptiveFieldBoxParameter receptive_box_param = 315;
   optional PythonParameter python_param = 130;
   optional RecurrentParameter recurrent_param = 146;
   optional ReductionParameter reduction_param = 136;
@@ -1975,6 +1976,27 @@ message PriorBoxParameter {
   repeated float default_size = 17;
   repeated float default_ratio = 18;
   repeated anchorBox anchor = 19;
+}
+
+message ReceptiveFieldBoxParameter {
+  // Encode/decode type.
+  enum CodeType {
+    CORNER = 1;
+    CENTER_SIZE = 2;
+    CORNER_SIZE = 3;
+  }
+  optional float receptive_field_center_start = 1;
+  optional uint32 receptive_field_stride = 2;
+  optional uint32 receptive_field_size = 3;
+  // By default, we calculate img_height, img_width, step_x, step_y based on
+  // bottom[0] (feat) and bottom[1] (img). Unless these values are explicitely
+  // provided.
+  // Explicitly provide the img_size.
+  optional uint32 img_size = 7;
+  // Either img_size or img_h/img_w should be specified; not both.
+  optional uint32 img_h = 8;
+  optional uint32 img_w = 9;
+
 }
 
 message anchorBox{

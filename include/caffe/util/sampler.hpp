@@ -20,7 +20,8 @@ bool SatisfySampleConstraint(const NormalizedBBox& sampled_bbox,
 
 // Sample a NormalizedBBox given the specifictions.
 void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox);
-void SampleBBox_Square(const AnnotatedDatum& anno_datum, const Sampler& sampler, NormalizedBBox* sampled_bbox);
+void SampleBBox_Square(const AnnotatedDatum& anno_datum, const Sampler& sampler, 
+                                NormalizedBBox* sampled_bbox);
 
 // Generate samples from NormalizedBBox using the BatchSampler.
 void GenerateSamples(const NormalizedBBox& source_bbox,

@@ -4,7 +4,7 @@
 
 #include <string>
 #include <vector>
-#include "caffe/data_transformer.hpp"
+#include "caffe/lffd_data_transformer.hpp"
 #include "caffe/util/bbox_util.hpp"
 #include "caffe/util/im_transforms.hpp"
 #include "caffe/util/io.hpp"
@@ -14,7 +14,7 @@
 namespace caffe {
 
 template<typename Dtype>
-DataTransformer<Dtype>::DataTransformer(const TransformationParameter& param,
+LffdDataTransformer<Dtype>::LffdDataTransformer(const TransformationParameter& param,
 		Phase phase)
 		: param_(param), phase_(phase) {
 	// check if we want to use mean_file
@@ -47,7 +47,7 @@ DataTransformer<Dtype>::DataTransformer(const TransformationParameter& param,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const Datum& datum,
+void LffdDataTransformer<Dtype>::Transform(const Datum& datum,
 																			 Dtype* transformed_data,
 																			 NormalizedBBox* crop_bbox,
 																			 bool* do_mirror) {
@@ -142,7 +142,7 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const Datum& datum,
+void LffdDataTransformer<Dtype>::Transform(const Datum& datum,
 																			 Dtype* transformed_data) {
 	NormalizedBBox crop_bbox;
 	bool do_mirror;
@@ -150,7 +150,7 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const Datum& datum,
+void LffdDataTransformer<Dtype>::Transform(const Datum& datum,
 																			 Blob<Dtype>* transformed_blob,
 																			 NormalizedBBox* crop_bbox,
 																			 bool* do_mirror) {
@@ -206,14 +206,14 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const Datum& datum, Blob<Dtype>* transformed_blob) {
+void LffdDataTransformer<Dtype>::Transform(const Datum& datum, Blob<Dtype>* transformed_blob) {
 	NormalizedBBox crop_bbox;
 	bool do_mirror;
 	Transform(datum, transformed_blob, &crop_bbox, &do_mirror);
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const vector<Datum> & datum_vector, Blob<Dtype>* transformed_blob) {
+void LffdDataTransformer<Dtype>::Transform(const vector<Datum> & datum_vector, Blob<Dtype>* transformed_blob) {
 	const int datum_num = datum_vector.size();
 	const int num = transformed_blob->num();
 	const int channels = transformed_blob->channels();
@@ -232,7 +232,7 @@ void DataTransformer<Dtype>::Transform(const vector<Datum> & datum_vector, Blob<
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(
+void LffdDataTransformer<Dtype>::Transform(
 		const AnnotatedDatum& anno_datum, Blob<Dtype>* transformed_blob,
 		RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all,
 		bool* do_mirror) {
@@ -248,7 +248,7 @@ void DataTransformer<Dtype>::Transform(
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(
+void LffdDataTransformer<Dtype>::Transform(
 		const AnnotatedDatum& anno_datum, Blob<Dtype>* transformed_blob,
 		RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all) {
 	bool do_mirror;
@@ -257,7 +257,7 @@ void DataTransformer<Dtype>::Transform(
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(
+void LffdDataTransformer<Dtype>::Transform(
 		const AnnotatedDatum& anno_datum, Blob<Dtype>* transformed_blob,
 		vector<AnnotationGroup>* transformed_anno_vec, bool* do_mirror) {
 	RepeatedPtrField<AnnotationGroup> transformed_anno_group_all;
@@ -269,7 +269,7 @@ void DataTransformer<Dtype>::Transform(
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(
+void LffdDataTransformer<Dtype>::Transform(
 		const AnnotatedDatum& anno_datum, Blob<Dtype>* transformed_blob,
 		vector<AnnotationGroup>* transformed_anno_vec) {
 	bool do_mirror;
@@ -277,7 +277,7 @@ void DataTransformer<Dtype>::Transform(
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::TransformAnnotation(
+void LffdDataTransformer<Dtype>::TransformAnnotation(
 		const AnnotatedDatum& anno_datum, const bool do_resize,
 		const NormalizedBBox& crop_bbox, const bool do_mirror,
 		RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all) {
@@ -337,138 +337,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const AnnoFaceAttributeDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 AnnoFaceAttribute* transformed_annoface_all,
-                 bool* do_mirror){
-	// Transform datum.
-	const Datum& datum = anno_datum.datum();
-	NormalizedBBox crop_bbox;
-	Transform(datum, transformed_blob, &crop_bbox, do_mirror);
-
-	// Transform annotation.
-	const bool do_resize = true;
-	const bool do_expand = false;
-	TransformAnnoFaceAttribute(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
-											transformed_annoface_all);
-}
-
-template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const AnnoFaceAttributeDatum& anno_datum, 
-				Blob<Dtype>* transformed_blob,
-				AnnoFaceAttribute* transformed_anno_vec){
-	bool do_mirror;
-	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
-}
-
-// transfer label face pose depender expand
-template<typename Dtype>
-void DataTransformer<Dtype>::TransformAnnoFaceAttribute(
-		const AnnoFaceAttributeDatum& anno_datum,const bool do_resize,
-		const NormalizedBBox& crop_bbox, const bool do_mirror, const bool do_expand,
-		AnnoFaceAttribute* transformed_annoface_all){
-	const int img_height = anno_datum.datum().height();
-	const int img_width = anno_datum.datum().width();
-	AnnoFaceAttribute src_annoface = anno_datum.faceattri();
-	AnnoFaceLandmarks src_facemark = src_annoface.landmark();
-	AnnoFaceLandmarks project_facemark;
-	if(anno_datum.type() == AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE){
-		if(do_resize && param_.has_resize_param()){
-			CHECK_GT(img_height, 0);
-			CHECK_GT(img_width, 0);
-			UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
-											img_width, img_height,
-											&src_facemark);
-		}
-		project_facemark.CopyFrom(src_facemark);
-		point lefteye = src_facemark.lefteye();
-		point righteye = src_facemark.righteye();
-		point nose = src_facemark.nose();
-		point leftmouth = src_facemark.leftmouth();
-		point rightmouth = src_facemark.rightmouth();
-		if(do_mirror){
-			project_facemark.mutable_lefteye()->set_x(1-lefteye.x());
-			project_facemark.mutable_righteye()->set_x(1-righteye.x());
-			project_facemark.mutable_nose()->set_x(1-nose.x());
-			project_facemark.mutable_leftmouth()->set_x(1-leftmouth.x());
-			project_facemark.mutable_rightmouth()->set_x(1-rightmouth.x());
-			transformed_annoface_all->mutable_faceoritation()->set_yaw(-src_annoface.faceoritation().yaw());
-			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
-			transformed_annoface_all->mutable_faceoritation()->set_roll(-src_annoface.faceoritation().roll());
-		}else{
-			transformed_annoface_all->mutable_faceoritation()->set_yaw(src_annoface.faceoritation().yaw());
-			transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
-			transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
-		}
-		if(do_expand){
-			float src_width = crop_bbox.xmax() - crop_bbox.xmin();
-			float src_height = crop_bbox.ymax() - crop_bbox.ymin();
-			project_facemark.mutable_lefteye()->set_x((lefteye.x()-crop_bbox.xmin())/src_width);
-			project_facemark.mutable_lefteye()->set_y((lefteye.y()-crop_bbox.ymin())/src_height);
-			project_facemark.mutable_righteye()->set_x((righteye.x()-crop_bbox.xmin())/src_width);
-			project_facemark.mutable_righteye()->set_y((righteye.y()-crop_bbox.ymin())/src_height);
-			project_facemark.mutable_nose()->set_x((nose.x()-crop_bbox.xmin())/src_width);
-			project_facemark.mutable_nose()->set_y((nose.y()-crop_bbox.ymin())/src_height);
-			project_facemark.mutable_leftmouth()->set_x((leftmouth.x()-crop_bbox.xmin())/src_width);
-			project_facemark.mutable_leftmouth()->set_y((leftmouth.y()-crop_bbox.ymin())/src_height);
-			project_facemark.mutable_rightmouth()->set_x((rightmouth.x()-crop_bbox.xmin())/src_width);
-			project_facemark.mutable_rightmouth()->set_y((rightmouth.y()-crop_bbox.ymin())/src_height);
-		}
-		transformed_annoface_all->mutable_landmark()->CopyFrom(project_facemark);
-		transformed_annoface_all->set_gender(src_annoface.gender());
-		transformed_annoface_all->set_glass(src_annoface.glass());
-	}
-}
-
-
-template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const AnnotatedCCpdDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 LicensePlate* transformed_annoface_all,
-                 bool* do_mirror){
-	// Transform datum.
-	const Datum& datum = anno_datum.datum();
-	NormalizedBBox crop_bbox;
-	Transform(datum, transformed_blob, &crop_bbox, do_mirror);
-
-	// Transform annotation.
-	const bool do_resize = true;
-	const bool do_expand = false;
-	TransformAnnoCcpd(anno_datum, do_resize, crop_bbox, *do_mirror, do_expand, 
-											transformed_annoface_all);
-}
-
-template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const AnnotatedCCpdDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 LicensePlate* transformed_anno_vec){
-	bool do_mirror;
-	Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
-}
-
-template<typename Dtype>
-void DataTransformer<Dtype>::TransformAnnoCcpd(
-		const AnnotatedCCpdDatum& anno_datum, const bool do_resize,
-      const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      LicensePlate* transformed_annoface_all){
-	if(anno_datum.type() == AnnotatedCCpdDatum_AnnotationType_CCPD){
-		transformed_annoface_all->set_chichracter(anno_datum.lpnumber().chichracter());
-		transformed_annoface_all->set_engchracter(anno_datum.lpnumber().engchracter());
-		transformed_annoface_all->set_letternum_1(anno_datum.lpnumber().letternum_1());
-		transformed_annoface_all->set_letternum_2(anno_datum.lpnumber().letternum_2());
-		transformed_annoface_all->set_letternum_3(anno_datum.lpnumber().letternum_3());
-		transformed_annoface_all->set_letternum_4(anno_datum.lpnumber().letternum_4());
-		transformed_annoface_all->set_letternum_5(anno_datum.lpnumber().letternum_5());
-	}else{
-		LOG(FATAL) << " unsurropted ccpd licensePlate number type！";
-	}
-}
-
-
-
-
-template<typename Dtype>
-void DataTransformer<Dtype>::CropImage(const Datum& datum,
+void LffdDataTransformer<Dtype>::CropImage(const Datum& datum,
 																			 const NormalizedBBox& bbox,
 																			 Datum* crop_datum) {
 	// If datum is encoded, decode and crop the cv::image.
@@ -537,7 +406,7 @@ void DataTransformer<Dtype>::CropImage(const Datum& datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
+void LffdDataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
 																			 const NormalizedBBox& bbox,
 																			 AnnotatedDatum* cropped_anno_datum) {
 	// Crop the datum.
@@ -554,7 +423,7 @@ void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::ExpandImage(const Datum& datum,
+void LffdDataTransformer<Dtype>::ExpandImage(const Datum& datum,
 																				 const float expand_ratio,
 																				 NormalizedBBox* expand_bbox,
 																				 Datum* expand_datum) {
@@ -628,7 +497,7 @@ void DataTransformer<Dtype>::ExpandImage(const Datum& datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::ExpandImage(const AnnotatedDatum& anno_datum,
+void LffdDataTransformer<Dtype>::ExpandImage(const AnnotatedDatum& anno_datum,
 																				 AnnotatedDatum* expanded_anno_datum) {
 	if (!param_.has_expand_param()) {
 		expanded_anno_datum->CopyFrom(anno_datum);
@@ -662,84 +531,8 @@ void DataTransformer<Dtype>::ExpandImage(const AnnotatedDatum& anno_datum,
 											expanded_anno_datum->mutable_annotation_group());
 }
 
-
 template<typename Dtype>
-void DataTransformer<Dtype>::ExpandImage(const AnnoFaceAttributeDatum& anno_datum,
-																				 AnnoFaceAttributeDatum* expanded_anno_datum) {
-	if (!param_.has_expand_param()) {
-		expanded_anno_datum->CopyFrom(anno_datum);
-		return;
-	}
-	const ExpansionParameter& expand_param = param_.expand_param();
-	const float expand_prob = expand_param.prob();
-	float prob;
-	caffe_rng_uniform(1, 0.f, 1.f, &prob);
-	if (prob > expand_prob) {
-		expanded_anno_datum->CopyFrom(anno_datum);
-		return;
-	}
-	const float max_expand_ratio = expand_param.max_expand_ratio();
-	if (fabs(max_expand_ratio - 1.) < 1e-2) {
-		expanded_anno_datum->CopyFrom(anno_datum);
-		return;
-	}
-	float expand_ratio;
-	caffe_rng_uniform(1, 1.f, max_expand_ratio, &expand_ratio);
-	// Expand the datum.
-	NormalizedBBox expand_bbox;
-	ExpandImage(anno_datum.datum(), expand_ratio, &expand_bbox,
-							expanded_anno_datum->mutable_datum());
-	expanded_anno_datum->set_type(anno_datum.type());
-
-	// Transform the annotation according to crop_bbox.
-	const bool do_resize = false;
-	const bool do_mirror = false;
-	const bool do_expand = true;
-	TransformAnnoFaceAttribute(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
-											expanded_anno_datum->mutable_faceattri());
-}
-
-
-template<typename Dtype>
-void DataTransformer<Dtype>::ExpandImage(const AnnotatedCCpdDatum& anno_datum,
-																				 AnnotatedCCpdDatum* expanded_anno_datum) {
-	if (!param_.has_expand_param()) {
-		expanded_anno_datum->CopyFrom(anno_datum);
-		return;
-	}
-	const ExpansionParameter& expand_param = param_.expand_param();
-	const float expand_prob = expand_param.prob();
-	float prob;
-	caffe_rng_uniform(1, 0.f, 1.f, &prob);
-	if (prob > expand_prob) {
-		expanded_anno_datum->CopyFrom(anno_datum);
-		return;
-	}
-	const float max_expand_ratio = expand_param.max_expand_ratio();
-	if (fabs(max_expand_ratio - 1.) < 1e-2) {
-		expanded_anno_datum->CopyFrom(anno_datum);
-		return;
-	}
-	float expand_ratio;
-	caffe_rng_uniform(1, 1.f, max_expand_ratio, &expand_ratio);
-	// Expand the datum.
-	NormalizedBBox expand_bbox;
-	ExpandImage(anno_datum.datum(), expand_ratio, &expand_bbox,
-							expanded_anno_datum->mutable_datum());
-	expanded_anno_datum->set_type(anno_datum.type());
-
-	// Transform the annotation according to crop_bbox.
-	const bool do_resize = false;
-	const bool do_mirror = false;
-	const bool do_expand = true;
-	TransformAnnoCcpd(anno_datum, do_resize, expand_bbox, do_mirror, do_expand, 
-											expanded_anno_datum->mutable_lpnumber());
-}
-
-
-
-template<typename Dtype>
-void DataTransformer<Dtype>::DistortImage(const Datum& datum,
+void LffdDataTransformer<Dtype>::DistortImage(const Datum& datum,
 																					Datum* distort_datum) {
 	if (!param_.has_distort_param()) {
 		distort_datum->CopyFrom(datum);
@@ -773,7 +566,7 @@ void DataTransformer<Dtype>::DistortImage(const Datum& datum,
 
 #ifdef USE_OPENCV
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const vector<cv::Mat> & mat_vector,
+void LffdDataTransformer<Dtype>::Transform(const vector<cv::Mat> & mat_vector,
 																			 Blob<Dtype>* transformed_blob) {
 	const int mat_num = mat_vector.size();
 	const int num = transformed_blob->num();
@@ -793,7 +586,7 @@ void DataTransformer<Dtype>::Transform(const vector<cv::Mat> & mat_vector,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
+void LffdDataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
 																			 Blob<Dtype>* transformed_blob,
 																			 NormalizedBBox* crop_bbox,
 																			 bool* do_mirror) {
@@ -920,7 +713,7 @@ void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::TransformInv(const Dtype* data, cv::Mat* cv_img,
+void LffdDataTransformer<Dtype>::TransformInv(const Dtype* data, cv::Mat* cv_img,
 																					const int height, const int width,
 																					const int channels) {
 	const Dtype scale = param_.scale();
@@ -974,7 +767,7 @@ void DataTransformer<Dtype>::TransformInv(const Dtype* data, cv::Mat* cv_img,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::TransformInv(const Blob<Dtype>* blob,
+void LffdDataTransformer<Dtype>::TransformInv(const Blob<Dtype>* blob,
 																					vector<cv::Mat>* cv_imgs) {
 	const int channels = blob->channels();
 	const int height = blob->height();
@@ -992,7 +785,7 @@ void DataTransformer<Dtype>::TransformInv(const Blob<Dtype>* blob,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
+void LffdDataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
 																			 Blob<Dtype>* transformed_blob) {
 	NormalizedBBox crop_bbox;
 	bool do_mirror;
@@ -1000,7 +793,7 @@ void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
 }
 
 template <typename Dtype>
-void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
+void LffdDataTransformer<Dtype>::CropImage(const cv::Mat& img,
 																			 const NormalizedBBox& bbox,
 																			 cv::Mat* crop_img) {
 	const int img_height = img.rows;
@@ -1023,7 +816,7 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 }
 
 template <typename Dtype>
-void DataTransformer<Dtype>::ExpandImage(const cv::Mat& img,
+void LffdDataTransformer<Dtype>::ExpandImage(const cv::Mat& img,
 																				 const float expand_ratio,
 																				 NormalizedBBox* expand_bbox,
 																				 cv::Mat* expand_img) {
@@ -1086,68 +879,10 @@ void DataTransformer<Dtype>::ExpandImage(const cv::Mat& img,
 	cv::Rect bbox_roi(w_off, h_off, img_width, img_height);
 	img.copyTo((*expand_img)(bbox_roi));
 }
-
-template <typename Dtype>
-vector<cv::Point2f> DataTransformer<Dtype>::getRotatePoint(int row, 
-											const vector<cv::Point2f> Points, 
-											const cv::Point2f rotate_center, 
-											const double angle) {
-    vector<cv::Point2f> dstPoints;
-    float x1 = 0, y1 = 0;
-    for (size_t i = 0; i < Points.size(); i++){
-        x1 = Points.at(i).x;
-        y1 = row - Points.at(i).y;
-        float x2 = rotate_center.x;
-        float y2 = row - rotate_center.y;
-        float x = (x1 - x2)*cos(M_PI / 180.0 * angle) - (y1 - y2)*sin(M_PI / 180.0 * angle) + x2;
-        float y = (x1 - x2)*sin(M_PI / 180.0 * angle) + (y1 - y2)*cos(M_PI / 180.0 * angle) + y2;
-        y = row - y;
-        dstPoints.push_back(cv::Point2f(x, y));
-    }
-    return dstPoints;
-}
-template <typename Dtype>
-void DataTransformer<Dtype>::CropRotateImg(const int cols, const int rows, cv::Mat& dst , 
-								const double angle, const vector<cv::Point2f> Points , 
-								vector<cv::Point2f>* dstPoints){
-    float radian = (float) (angle /180.0 * M_PI);
-    //计算图像旋转之后包含图像的最大的矩形
-    float sinVal = fabs(sin(radian));
-    float cosVal = fabs(cos(radian));
-    cv::Size targetSize( (int)(cols * cosVal +rows * sinVal),
-                     (int)(cols * sinVal + rows * cosVal) );
-    //剪掉多余边框
-
-    float x = (dst.cols - targetSize.width) / 2;
-    float y = (dst.rows - targetSize.height) / 2;
-    cv::Rect rect(x, y, targetSize.width, targetSize.height);
-    dst = cv::Mat(dst,rect);
-    for(int i=0; i<Points.size(); i++){
-        float point_x =  Points.at(i).x - x;
-        float point_y = Points.at(i).y - y;
-        dstPoints->push_back(cv::Point2i(point_x, point_y));
-    }
-}
-template <typename Dtype>
-cv::Mat DataTransformer<Dtype>::RotateImage(const cv::Mat& img, const int rotate_angle
-														) {
-	cv::Mat rotate_img;
-    int maxBorder =(int) (std::max(img.cols, img.rows)* 1.414 ); //即为sqrt(2)*max
-    int dx = (maxBorder - img.cols)/2;
-    int dy = (maxBorder - img.rows)/2;
-    cv::copyMakeBorder(img, rotate_img, dy, dy, dx, dx, cv::BORDER_CONSTANT);
-
-    //旋转
-    cv::Point2f center( (float)(rotate_img.cols/2) , (float) (rotate_img.rows/2));
-    cv::Mat affine_matrix = cv::getRotationMatrix2D( center, rotate_angle, 1.0 );//求得旋转矩阵
-    cv::warpAffine(rotate_img, rotate_img, affine_matrix, rotate_img.size());
-	return rotate_img;
-}
-
 #endif  // USE_OPENCV
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(Blob<Dtype>* input_blob,
+void LffdDataTransformer<Dtype>::Transform(Blob<Dtype>* input_blob,
 																			 Blob<Dtype>* transformed_blob) {
 	const int crop_size = param_.crop_size();
 	const int input_num = input_blob->num();
@@ -1261,7 +996,7 @@ void DataTransformer<Dtype>::Transform(Blob<Dtype>* input_blob,
 }
 
 template<typename Dtype>
-vector<int> DataTransformer<Dtype>::InferBlobShape(const Datum& datum) {
+vector<int> LffdDataTransformer<Dtype>::InferBlobShape(const Datum& datum) {
 	if (datum.encoded()) {
 #ifdef USE_OPENCV
 		CHECK(!(param_.force_color() && param_.force_gray()))
@@ -1310,7 +1045,7 @@ vector<int> DataTransformer<Dtype>::InferBlobShape(const Datum& datum) {
 }
 
 template<typename Dtype>
-vector<int> DataTransformer<Dtype>::InferBlobShape(
+vector<int> LffdDataTransformer<Dtype>::InferBlobShape(
 		const vector<Datum> & datum_vector) {
 	const int num = datum_vector.size();
 	CHECK_GT(num, 0) << "There is no datum to in the vector";
@@ -1323,7 +1058,7 @@ vector<int> DataTransformer<Dtype>::InferBlobShape(
 
 #ifdef USE_OPENCV
 template<typename Dtype>
-vector<int> DataTransformer<Dtype>::InferBlobShape(const cv::Mat& cv_img) {
+vector<int> LffdDataTransformer<Dtype>::InferBlobShape(const cv::Mat& cv_img) {
 	const int crop_size = param_.crop_size();
 	int crop_h = param_.crop_h();
 	int crop_w = param_.crop_w();
@@ -1353,7 +1088,7 @@ vector<int> DataTransformer<Dtype>::InferBlobShape(const cv::Mat& cv_img) {
 }
 
 template<typename Dtype>
-vector<int> DataTransformer<Dtype>::InferBlobShape(
+vector<int> LffdDataTransformer<Dtype>::InferBlobShape(
 		const vector<cv::Mat> & mat_vector) {
 	const int num = mat_vector.size();
 	CHECK_GT(num, 0) << "There is no cv_img to in the vector";
@@ -1366,7 +1101,7 @@ vector<int> DataTransformer<Dtype>::InferBlobShape(
 #endif  // USE_OPENCV
 
 template <typename Dtype>
-void DataTransformer<Dtype>::InitRand() {
+void LffdDataTransformer<Dtype>::InitRand() {
 	const bool needs_rand = param_.mirror() ||
 			(phase_ == TRAIN && param_.crop_size());
 	if (needs_rand) {
@@ -1378,7 +1113,7 @@ void DataTransformer<Dtype>::InitRand() {
 }
 
 template <typename Dtype>
-int DataTransformer<Dtype>::Rand(int n) {
+int LffdDataTransformer<Dtype>::Rand(int n) {
 	CHECK(rng_);
 	CHECK_GT(n, 0);
 	caffe::rng_t* rng =
@@ -1386,6 +1121,6 @@ int DataTransformer<Dtype>::Rand(int n) {
 	return ((*rng)() % n);
 }
 
-INSTANTIATE_CLASS(DataTransformer);
+INSTANTIATE_CLASS(LffdDataTransformer);
 
 }  // namespace caffe

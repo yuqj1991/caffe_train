@@ -154,9 +154,6 @@ void SampleBBox_Square(const AnnotatedDatum& anno_datum, const Sampler& sampler,
   sampled_bbox->set_ymin(h_off);
   sampled_bbox->set_xmax(w_off + bbox_width);
   sampled_bbox->set_ymax(h_off + bbox_height);
-
-  // printf("sampled_bbox:\n");
-  // printf("%0.6f, %0.6f, %0.6f, %0.6f\n", sampled_bbox->xmin(), sampled_bbox->ymin(), sampled_bbox->xmax(), sampled_bbox->ymax());
 }
 
 

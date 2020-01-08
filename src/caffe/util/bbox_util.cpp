@@ -439,7 +439,7 @@ void EncodeBBox(
           (bbox.ymax() - prior_bbox.ymax()) / prior_height / prior_variance[3]);
     }
   } else {
-    LOG(FATAL) << "Unknown LocLossType.";
+    LOG(FATAL) << "Unknown encode type.";
   }
 }
 

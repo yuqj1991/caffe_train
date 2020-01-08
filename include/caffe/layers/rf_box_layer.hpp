@@ -18,11 +18,11 @@ namespace caffe {
  * NOTE: does not implement Backwards operation.
  */
 template <typename Dtype>
-class PriorBoxWeightsLayer : public Layer<Dtype> {
+class ReceptiveFieldBoxLayer : public Layer<Dtype> {
  public:
   /**
-   * @param param provides PriorBoxParameter prior_box_param,
-   *     with PriorBoxWeightsLayer options:
+   * @param param provides ReceptiveFieldBoxParameter prior_box_param,
+   *     with ReceptiveFieldBoxLayer options:
    *   - min_size (\b minimum box size in pixels. can be multiple. required!).
    *   - max_size (\b maximum box size in pixels. can be ignored or same as the
    *   # of min_size.).
@@ -30,20 +30,20 @@ class PriorBoxWeightsLayer : public Layer<Dtype> {
    *   - flip (\b optional bool, default true).
    *     if set, flip the aspect ratio.
    */
-  explicit PriorBoxWeightsLayer(const LayerParameter& param)
+  explicit ReceptiveFieldBoxLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "PriorBoxWeights"; }
+  virtual inline const char* type() const { return "ReceptiveFieldBox"; }
   virtual inline int ExactBottomBlobs() const { return 2; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
   /**
-   * @brief Generates prior boxes for a layer with specified parameters.
+   * @brief Generates prior boxes (receptive field boxes) for a layer with specified parameters.
    *
    * @param bottom input Blob vector (at least 2)
    *   -# @f$ (N \times C \times H_i \times W_i) @f$
@@ -62,27 +62,13 @@ class PriorBoxWeightsLayer : public Layer<Dtype> {
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
     return;
   }
-  
-  vector<float> default_size_;
-  vector<float> dafault_ratios_;
-  vector<float> min_sizes_;
-  vector<float> max_sizes_;
-  vector<float> fixed_sizes_;
-  vector<float> densitys_;
-  vector<float> aspect_ratios_;
-  vector<float> fixed_ratios_;
-  bool flip_;
+  float receptive_field_center_start_;
+  uint32_t receptive_field_stride_;
+  uint32_t receptive_field_size_;
   int num_priors_;
-  bool clip_;
-  vector<float> variance_;
 
   int img_w_;
   int img_h_;
-  float step_w_;
-  float step_h_;
-
-  float offset_;
-  vector<anchorBox> anchor_;
 };
 
 }  // namespace caffe

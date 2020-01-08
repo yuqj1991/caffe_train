@@ -1,5 +1,5 @@
-#ifndef CAFFE_DATA_TRANSFORMER_HPP
-#define CAFFE_DATA_TRANSFORMER_HPP
+#ifndef CAFFE_DATA_TRANSFORMER_HPP_LFFD_
+#define CAFFE_DATA_TRANSFORMER_HPP_LFFD_
 
 #include <vector>
 
@@ -20,10 +20,10 @@ namespace caffe {
  * scaling, mirroring, substracting the image mean...
  */
 template <typename Dtype>
-class DataTransformer {
+class LffdDataTransformer {
  public:
-  explicit DataTransformer(const TransformationParameter& param, Phase phase);
-  virtual ~DataTransformer() {}
+  explicit LffdDataTransformer(const TransformationParameter& param, Phase phase);
+  virtual ~LffdDataTransformer() {}
 
   /**
    * @brief Initialize the Random number generations if needed by the
@@ -82,7 +82,12 @@ class DataTransformer {
   void Transform(const AnnotatedDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,
                  vector<AnnotationGroup>* transformed_anno_vec);
-  
+/*
+  void RotateImage(const AnnoFaceDatum& anno_datum,
+												AnnoFaceDatum* Rotate_datum);
+
+*/
+
   /**
    * @brief Transform the annotation according to the transformation applied
    * to the datum.
@@ -115,37 +120,6 @@ class DataTransformer {
   void CropImage(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
                  AnnotatedDatum* cropped_anno_datum);
 
-
-  void Transform(const AnnoFaceAttributeDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 AnnoFaceAttribute* transformed_annoface_all,
-                 bool* do_mirror);
-  void Transform(const AnnoFaceAttributeDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 AnnoFaceAttribute* transformed_anno_vec);
-  
-
-  void Transform(const AnnotatedCCpdDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 LicensePlate* transformed_annoface_all,
-                 bool* do_mirror);
-  void Transform(const AnnotatedCCpdDatum& anno_datum,
-                 Blob<Dtype>* transformed_blob,
-                 LicensePlate* transformed_anno_vec);
-
-
-  void TransformAnnoFaceAttribute(
-      const AnnoFaceAttributeDatum& anno_datum, const bool do_resize,
-      const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      AnnoFaceAttribute* transformed_annoface_all);
-
-
-  void TransformAnnoCcpd(
-      const AnnotatedCCpdDatum& anno_datum, const bool do_resize,
-      const NormalizedBBox& crop_bbox, const bool do_mirror,  const bool do_expand,
-      LicensePlate* transformed_annoface_all);
-
-
   /**
    * @brief Expand the datum.
    */
@@ -158,11 +132,6 @@ class DataTransformer {
   void ExpandImage(const AnnotatedDatum& anno_datum,
                    AnnotatedDatum* expanded_anno_datum);
 
-
-  void ExpandImage(const AnnoFaceAttributeDatum& anno_datum,
-                    AnnoFaceAttributeDatum* expanded_anno_datum);
-  void ExpandImage(const AnnotatedCCpdDatum& anno_datum,
-                    AnnotatedCCpdDatum* expanded_anno_datum);
   /**
    * @brief Apply distortion to the datum.
    */
@@ -211,20 +180,6 @@ class DataTransformer {
   void TransformInv(const Blob<Dtype>* blob, vector<cv::Mat>* cv_imgs);
   void TransformInv(const Dtype* data, cv::Mat* cv_img, const int height,
                     const int width, const int channels);
-  vector<cv::Point2f> getRotatePoint(int row, 
-                    const vector<cv::Point2f> Points, 
-                    const cv::Point2f rotate_center, 
-                    const double angle);
-  void CropRotateImg(const int cols, const int rows, cv::Mat& dst , 
-                const double angle, const vector<cv::Point2f> Points , 
-                vector<cv::Point2f>* dstPoints);
-  cv::Mat RotateImage(const cv::Mat& img, const int rotate_angle
-                            );
-  void RotateImage(const Datum& datum,
-                            const double rotate_angle,
-                            Datum* Rotate_datum, 
-                            const vector<cv::Point2f> Points,
-                            vector<cv::Point2f>* dstPoints);
 #endif  // USE_OPENCV
 
   /**
