@@ -841,15 +841,16 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
             }
           }
         
-          int top_n = 6;
+          //int top_n = 6;
           // sort overlap
           for (int i = 0; i < tiny_gt_num; i++) {
             vector<pair<int, float> > tiny_gt_v = tiny_overlaps[i];
             sort(tiny_gt_v.begin(), tiny_gt_v.end(), overlap_cmp);
             // printf("for tiny gt NO.%d ---- idx =  %d, total tiny gt num = %d\n", tiny_gt_indices[i], i, tiny_gt_num);
-            int k = 0;    
+            //int k = 0;    
             for (vector<pair<int, float> > ::iterator it=tiny_gt_v.begin(); it != tiny_gt_v.end(); it++) {
-              if (k++ < top_n) {
+              //if (k++ < top_n) {
+              if(it->second > 0.25){
                 if ((*match_indices)[it->first] == -1) {
                     (*match_indices)[it->first] = tiny_gt_indices[i];
                     (*match_overlaps)[it->first] = it->second;
@@ -861,7 +862,39 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
         }
       }
       if(use_center_locate_match){
+        // Get most overlaped for the rest prediction bboxes.
+        for (map<int, map<int, float> >::iterator it = overlaps.begin();
+            it != overlaps.end(); ++it) {
+          int i = it->first;
+          if ((*match_indices)[i] != -1) {
+            // The prediction already has matched ground truth or is ignored.
+            continue;
+          }
+          float pred_center_x = float((pred_bboxes[i].xmin() + pred_bboxes[i].xmax()) /2);
+          float pred_center_y = float((pred_bboxes[i].ymin() + pred_bboxes[i].ymax()) /2);
+          int center_match_gt_idx = -1;
+          float center_match_overlap = -1;
+          for (int j = 0; j < num_gt; ++j) {
+            bool x_inside_gt_box = false, y_inside_gt_box = false;
+            if( pred_center_x >= gt_bboxes[j].xmin() && pred_center_x <= gt_bboxes[j].xmax() ){
+              x_inside_gt_box = true;
+            }
+            if( pred_center_y >= gt_bboxes[j].ymin() && pred_center_y <= gt_bboxes[j].ymax() ){
+              y_inside_gt_box = true;
+            }
+            if(y_inside_gt_box && x_inside_gt_box){
+              center_match_gt_idx = j;
+              center_match_overlap = it->second[j];
+            }
+          }
 
+          if (center_match_gt_idx != -1) {
+            // Found a matched ground truth.
+            CHECK_EQ((*match_indices)[i], -1);
+            (*match_indices)[i] = gt_indices[center_match_gt_idx];
+            (*match_overlaps)[i] = center_match_overlap;
+          }
+        }
       }
     }
       break;
@@ -899,6 +932,7 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
   const bool ignore_cross_boundary_bbox =
       multibox_loss_param.ignore_cross_boundary_bbox();
   const bool use_tiny_box_to_match = multibox_loss_param.use_tiny_box_match();
+  const bool use_center_to_match = multibox_loss_param.use_center_locate_match();
   // Find the matches.
   int num = all_loc_preds.size();
   for (int i = 0; i < num; ++i) {
@@ -928,7 +962,7 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
                      all_loc_preds[i].find(label)->second, &loc_bboxes);
         MatchBBox(gt_bboxes, loc_bboxes, label, match_type,
                   overlap_threshold, ignore_cross_boundary_bbox,
-                  &match_indices[label], &match_overlaps[label], use_tiny_box_to_match);
+                  &match_indices[label], &match_overlaps[label], use_tiny_box_to_match, use_center_to_match);
       }
     } else {
       // Use prior bboxes to match against all ground truth.
@@ -937,7 +971,7 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
       const int label = -1;
       MatchBBox(gt_bboxes, prior_bboxes, label, match_type, overlap_threshold,
                 ignore_cross_boundary_bbox, &temp_match_indices,
-                &temp_match_overlaps, use_tiny_box_to_match);
+                &temp_match_overlaps, use_tiny_box_to_match, use_center_to_match);
       if (share_location) {
         match_indices[label] = temp_match_indices;
         match_overlaps[label] = temp_match_overlaps;
