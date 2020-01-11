@@ -116,22 +116,18 @@ message EmitConstraint {
   optional float emit_overlap = 2;
 }
 
-
-
 // data_anchor_sampler of bbox with provided constriants
 message DataAnchorSampler {
 	// Use original image as the source for sampling.
 	optional bool use_original_image = 1 [default = true];
 	// anchor scale
-	repeated int32 scale = 2;
+  repeated int32 scale = 2;
+  repeated int32 stride = 6; //[scale stride from orign image like 4, 8, 16, 32]
 	optional SampleConstraint sample_constraint = 3;
 	optional uint32 max_sample = 4;
 	// Maximum number of trials for sampling to avoid infinite loop.
 	optional uint32 max_trials = 5 [default = 100];
-
 }
-
-
 
 message LicensePlate {
 	optional int32 chichracter = 1;
@@ -1786,6 +1782,8 @@ message MultiBoxLossParameter {
   optional NonMaximumSuppressionParameter nms_param = 21;
   optional int32 sample_size = 22 [default = 64];
   optional bool use_prior_for_nms = 23 [default = false];
+  optional bool use_tiny_box_match = 25 [default = false];
+  optional bool use_center_locate_match = 27 [default = false];
   optional uint32 num_chinese = 28;
   optional ConfLossType chineselp_loss_type = 29;
   optional uint32 num_english = 30;
@@ -1937,6 +1935,7 @@ message PriorBoxParameter {
     CORNER = 1;
     CENTER_SIZE = 2;
     CORNER_SIZE = 3;
+    CENTER_GRID = 4;
   }
   // Minimum box size (in pixels). Required!
   repeated float min_size = 1;

@@ -61,6 +61,15 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                 int resized_height, int resized_width,
                                 vector<NormalizedBBox>* sampled_bboxes);
 
+// lffd Generate samples by using data_samples
+// lffd
+
+void GenerateLffdSample(const AnnotatedDatum& anno_datum, 
+                                const DataAnchorSampler& data_anchor_sampler,
+                                vector<NormalizedBBox>& object_bboxes,
+                                int resized_height, int resized_width,
+                                NormalizedBBox* samplerbox, float *new_scale );
+
 }  // namespace caffe
 
 #endif  // CAFFE_UTIL_SAMPLER_H_

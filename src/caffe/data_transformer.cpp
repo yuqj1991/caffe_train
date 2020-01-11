@@ -473,7 +473,7 @@ void DataTransformer<Dtype>::CropImage(const Datum& datum,
 																			 Datum* crop_datum) {
 	// If datum is encoded, decode and crop the cv::image.
 	if (datum.encoded()) {
-#ifdef USE_OPENCV
+	#ifdef USE_OPENCV
 		CHECK(!(param_.force_color() && param_.force_gray()))
 				<< "cannot set both force_color and force_gray";
 		cv::Mat cv_img;
@@ -484,15 +484,17 @@ void DataTransformer<Dtype>::CropImage(const Datum& datum,
 			cv_img = DecodeDatumToCVMatNative(datum);
 		}
 		// Crop the image.
-		cv::Mat crop_img;
+		int crop_width = int(datum.width() * (bbox.xmax() - bbox.xmin()));
+		int crop_height = int(datum.height() * (bbox.ymax() - bbox.ymin()));
+		cv::Mat crop_img(cv::Size(crop_height, crop_width), CV_8UC3, cv::Scalar(0));
 		CropImage(cv_img, bbox, &crop_img);
 		// Save the image into datum.
 		EncodeCVMatToDatum(crop_img, "jpg", crop_datum);
 		crop_datum->set_label(datum.label());
 		return;
-#else
+	#else
 		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
-#endif  // USE_OPENCV
+	#endif  // USE_OPENCV
 	} else {
 		if (param_.force_color() || param_.force_gray()) {
 			LOG(ERROR) << "force_color and force_gray only for encoded datum";
@@ -549,7 +551,80 @@ void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
 	const bool do_mirror = false;
 	NormalizedBBox crop_bbox;
 	ClipBBox(bbox, &crop_bbox);
-	TransformAnnotation(anno_datum, do_resize, crop_bbox, do_mirror,
+	TransformAnnotation(anno_datum, do_resize, bbox, do_mirror,
+										cropped_anno_datum->mutable_annotation_group());
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::CropImage_anchor_Sampling(const AnnotatedDatum& anno_datum,
+														const NormalizedBBox& bbox,
+														AnnotatedDatum* cropped_anno_datum) {
+	// Crop the datum.
+	CropImage(anno_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
+	cropped_anno_datum->set_type(anno_datum.type());
+	
+	// Transform the annotation according to crop_bbox.
+	const bool do_resize = false;
+	const bool do_mirror = false;
+	TransformAnnotation(anno_datum, do_resize, bbox, do_mirror,
+										cropped_anno_datum->mutable_annotation_group());
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::CropImage_Lffd_Sampling(const AnnotatedDatum& anno_datum,
+														const NormalizedBBox& bbox,
+														AnnotatedDatum* cropped_anno_datum, const float new_resized_scale) {
+	AnnotatedDatum new_Resized_datum;
+	new_Resized_datum.CopyFrom(anno_datum);
+	//resize origin datum and labels
+	if (new_Resized_datum.datum().encoded()) {
+	#ifdef USE_OPENCV
+		CHECK(!(param_.force_color() && param_.force_gray()))
+				<< "cannot set both force_color and force_gray";
+		cv::Mat cv_img;
+		if (param_.force_color() || param_.force_gray()) {
+			// If force_color then decode in color otherwise decode in gray.
+			cv_img = DecodeDatumToCVMat(new_Resized_datum.datum(), param_.force_color());
+		} else {
+			cv_img = DecodeDatumToCVMatNative(new_Resized_datum.datum());
+		}
+		// new resized image shape
+		int new_resized_width = int(new_Resized_datum.datum().width() * new_resized_scale);
+		int new_resized_height = int(new_Resized_datum.datum().height() * new_resized_scale);
+		cv::Mat resized_img;
+		cv::resize(cv_img, resized_img, cv::Size(new_resized_width, new_resized_height), 0, 0);
+
+		// Save the image into datum.
+		EncodeCVMatToDatum(resized_img, "jpg", new_Resized_datum.mutable_datum());
+	#else
+		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
+	#endif  // USE_OPENCV
+	} else {
+		if (param_.force_color() || param_.force_gray()) {
+			LOG(ERROR) << "force_color and force_gray only for encoded datum";
+		}
+	}
+	for (int g = 0; g < new_Resized_datum.annotation_group_size(); ++g) {
+		AnnotationGroup* anno_group = new_Resized_datum.mutable_annotation_group(g);
+		// Go through each Annotation.
+		for (int a = 0; a < anno_group->annotation_size(); ++a) {
+			Annotation* anno = anno_group->mutable_annotation(a);
+			NormalizedBBox* bbox = anno->mutable_bbox();
+			bbox->set_xmin(bbox->xmin() * new_resized_scale);
+			bbox->set_xmax(bbox->xmax() * new_resized_scale);
+			bbox->set_ymin(bbox->ymin() * new_resized_scale);
+			bbox->set_ymax(bbox->ymax() * new_resized_scale);	
+		}
+	}
+	
+	// Crop the datum.
+	CropImage(new_Resized_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
+	cropped_anno_datum->set_type(anno_datum.type());
+	
+	// Transform the annotation according to crop_bbox.
+	const bool do_resize = false;
+	const bool do_mirror = false;
+	TransformAnnotation(new_Resized_datum, do_resize, bbox, do_mirror,
 										cropped_anno_datum->mutable_annotation_group());
 }
 
@@ -1006,20 +1081,33 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	const int img_height = img.rows;
 	const int img_width = img.cols;
 
-	// Get the bbox dimension.
-	NormalizedBBox clipped_bbox;
-	ClipBBox(bbox, &clipped_bbox);
+	// Get the crossed_bbox dimension.
+	NormalizedBBox crossed_bbox;
+	ClipBBox(bbox, &crossed_bbox);
 	NormalizedBBox scaled_bbox;
-	ScaleBBox(clipped_bbox, img_height, img_width, &scaled_bbox);
+	ScaleBBox(crossed_bbox, img_height, img_width, &scaled_bbox);
+
+	NormalizedBBox roi_bbox;
+	roi_bbox.set_xmin( bbox.xmin() >= 0 ? 0 : std::fabs(bbox.xmin()));
+	roi_bbox.set_ymin( bbox.ymin() >= 0 ? 0 : std::fabs(bbox.ymin()));
+	roi_bbox.set_xmax( roi_bbox.xmin() + (crossed_bbox.xmax() - crossed_bbox.xmin()));
+	roi_bbox.set_ymax( roi_bbox.ymin() + (crossed_bbox.ymax()- crossed_bbox.ymin()));
 
 	// Crop the image using bbox.
 	int w_off = static_cast<int>(scaled_bbox.xmin());
 	int h_off = static_cast<int>(scaled_bbox.ymin());
 	int width = static_cast<int>(scaled_bbox.xmax() - scaled_bbox.xmin());
 	int height = static_cast<int>(scaled_bbox.ymax() - scaled_bbox.ymin());
-	cv::Rect bbox_roi(w_off, h_off, width, height);
-
-	img(bbox_roi).copyTo(*crop_img);
+	cv::Rect bbox_roi_cross(w_off, h_off, width, height);
+	
+	int roi_w_off = static_cast<int>(roi_bbox.xmin() * img_width);
+	int roi_h_off = static_cast<int>(roi_bbox.ymin() * img_height);
+	int roi_width = static_cast<int>((roi_bbox.xmax() - roi_bbox.xmin()) * img_width);
+	int roi_height = static_cast<int>((roi_bbox.ymax() - roi_bbox.ymin()) * img_height);
+	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, roi_width, roi_height);
+	cv::Mat cross_img = (*crop_img)(bbox_roi_crop);
+	
+	img(bbox_roi_cross).copyTo(cross_img);
 }
 
 template <typename Dtype>

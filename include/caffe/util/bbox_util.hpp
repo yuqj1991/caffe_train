@@ -144,7 +144,8 @@ void MatchBBox(const vector<NormalizedBBox>& gt,
     const vector<NormalizedBBox>& pred_bboxes, const int label,
     const MatchType match_type, const float overlap_threshold,
     const bool ignore_cross_boundary_bbox,
-    vector<int>* match_indices, vector<float>* match_overlaps);
+    vector<int>* match_indices, vector<float>* match_overlaps, 
+    const bool use_tiny_box_match, const bool use_center_locate_match);
 
 // Find matches between prediction bboxes and ground truth bboxes.
 //    all_loc_preds: stores the location prediction, where each item contains

@@ -115,6 +115,11 @@ class DataTransformer {
   void CropImage(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
                  AnnotatedDatum* cropped_anno_datum);
 
+  void CropImage_anchor_Sampling(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
+                 AnnotatedDatum* cropped_anno_datum);
+
+  void CropImage_Lffd_Sampling(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
+                 AnnotatedDatum* cropped_anno_datum, const float new_resized_scale);
 
   void Transform(const AnnoFaceAttributeDatum& anno_datum,
                  Blob<Dtype>* transformed_blob,

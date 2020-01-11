@@ -399,15 +399,10 @@ void EncodeBBox(
       encode_bbox->set_ymax(log(bbox_height / prior_height));
     } else {
       // Encode variance in bbox.
-      #ifdef USE_ORIGIN_PREDICTION
-      encode_bbox->set_xmin(bbox_center_x);
-      encode_bbox->set_ymin(bbox_center_y);
-      #else
       encode_bbox->set_xmin(
           (bbox_center_x - prior_center_x) / prior_width / prior_variance[0]);
       encode_bbox->set_ymin(
           (bbox_center_y - prior_center_y) / prior_height / prior_variance[1]);
-      #endif
       encode_bbox->set_xmax(
           log(bbox_width / prior_width) / prior_variance[2]);
       encode_bbox->set_ymax(
@@ -437,6 +432,33 @@ void EncodeBBox(
           (bbox.xmax() - prior_bbox.xmax()) / prior_width / prior_variance[2]);
       encode_bbox->set_ymax(
           (bbox.ymax() - prior_bbox.ymax()) / prior_height / prior_variance[3]);
+    }
+  }else if (code_type == PriorBoxParameter_CodeType_CENTER_GRID) {
+    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+    CHECK_GT(prior_width, 0);
+    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+    CHECK_GT(prior_height, 0);
+    float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
+    float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
+
+    float bbox_width = bbox.xmax() - bbox.xmin();
+    CHECK_GT(bbox_width, 0);
+    float bbox_height = bbox.ymax() - bbox.ymin();
+    CHECK_GT(bbox_height, 0);
+    float bbox_center_x = (bbox.xmin() + bbox.xmax()) / 2.;
+    float bbox_center_y = (bbox.ymin() + bbox.ymax()) / 2.;
+    if (encode_variance_in_target) {
+      encode_bbox->set_xmin((bbox_center_x - prior_center_x) / prior_width);
+      encode_bbox->set_ymin((bbox_center_y - prior_center_y) / prior_height);
+      encode_bbox->set_xmax(log(bbox_width / prior_width));
+      encode_bbox->set_ymax(log(bbox_height / prior_height));
+    } else {
+      encode_bbox->set_xmin((bbox_center_x / prior_width) / prior_variance[0]);
+      encode_bbox->set_ymin((bbox_center_y/ prior_width) / prior_variance[1]);
+      encode_bbox->set_xmax(
+          log(bbox_width / prior_width) / prior_variance[2]);
+      encode_bbox->set_ymax(
+          log(bbox_height / prior_height) / prior_variance[3]);
     }
   } else {
     LOG(FATAL) << "Unknown encode type.";
@@ -486,15 +508,43 @@ void DecodeBBox(
       decode_bbox_height = exp(bbox.ymax()) * prior_height;
     } else {
       // variance is encoded in bbox, we need to scale the offset accordingly.
-      #ifdef USE_ORIGIN_PREDICTION
-      decode_bbox_center_x = bbox.xmin();
-      decode_bbox_center_y = bbox.ymin();
-      #else
       decode_bbox_center_x =
           prior_variance[0] * bbox.xmin() * prior_width + prior_center_x;
       decode_bbox_center_y =
           prior_variance[1] * bbox.ymin() * prior_height + prior_center_y;
-      #endif
+      decode_bbox_width =
+          exp(prior_variance[2] * bbox.xmax()) * prior_width;
+      decode_bbox_height =
+          exp(prior_variance[3] * bbox.ymax()) * prior_height;
+    }
+
+    decode_bbox->set_xmin(decode_bbox_center_x - decode_bbox_width / 2.);
+    decode_bbox->set_ymin(decode_bbox_center_y - decode_bbox_height / 2.);
+    decode_bbox->set_xmax(decode_bbox_center_x + decode_bbox_width / 2.);
+    decode_bbox->set_ymax(decode_bbox_center_y + decode_bbox_height / 2.);
+  } else if (code_type == PriorBoxParameter_CodeType_CENTER_GRID) {
+    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+    CHECK_GT(prior_width, 0);
+    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+    CHECK_GT(prior_height, 0);
+    float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
+    float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
+
+    float decode_bbox_center_x, decode_bbox_center_y;
+    float decode_bbox_width, decode_bbox_height;
+    if (variance_encoded_in_target) {
+      // variance is encoded in target, we simply need to retore the offset
+      // predictions.
+      decode_bbox_center_x = bbox.xmin() * prior_width + prior_center_x;
+      decode_bbox_center_y = bbox.ymin() * prior_height + prior_center_y;
+      decode_bbox_width = exp(bbox.xmax()) * prior_width;
+      decode_bbox_height = exp(bbox.ymax()) * prior_height;
+    } else {
+      // variance is encoded in bbox, we need to scale the offset accordingly.
+      decode_bbox_center_x =
+          prior_variance[0] * bbox.xmin() * prior_width ;
+      decode_bbox_center_y =
+          prior_variance[1] * bbox.ymin() * prior_height;
       decode_bbox_width =
           exp(prior_variance[2] * bbox.xmax()) * prior_width;
       decode_bbox_height =
@@ -601,7 +651,8 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
     const vector<NormalizedBBox>& pred_bboxes, const int label,
     const MatchType match_type, const float overlap_threshold,
     const bool ignore_cross_boundary_bbox,
-    vector<int>* match_indices, vector<float>* match_overlaps) {
+    vector<int>* match_indices, vector<float>* match_overlaps, const bool use_tiny_box_match,
+    const bool use_center_locate_match) {
   int num_pred = pred_bboxes.size();
   match_indices->clear();
   match_indices->resize(num_pred, -1);
@@ -693,10 +744,10 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
   }
 
   switch (match_type) {
-    case MultiBoxLossParameter_MatchType_BIPARTITE:
+    case MultiBoxLossParameter_MatchType_BIPARTITE:  // 为每一个guoundtruth box 寻找到最大交叠的预测框
       // Already done.
       break;
-    case MultiBoxLossParameter_MatchType_PER_PREDICTION:
+    case MultiBoxLossParameter_MatchType_PER_PREDICTION: // 为剩余的预测框寻找次级的ground truth box
     {
       // Get most overlaped for the rest prediction bboxes.
       for (map<int, map<int, float> >::iterator it = overlaps.begin();
@@ -730,86 +781,88 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
           gt_boxnum[max_gt_idx]++;
         }
       }
-      
-      /*
-      for (int i = 0; i < gt_indices.size(); i++) {
-        int gt_box_cnt = 0;
-        for (int j = 0; j < num_pred; j++) {
-          if ((*match_indices)[j] == gt_indices[i]) {
-            gt_box_cnt++;
+      if(use_tiny_box_match){
+        #if 0
+        for (int i = 0; i < gt_indices.size(); i++) {
+          int gt_box_cnt = 0;
+          for (int j = 0; j < num_pred; j++) {
+            if ((*match_indices)[j] == gt_indices[i]) {
+              gt_box_cnt++;
+            }
           }
+          printf("gt No.%d has %d bboxes, %d\n", i, gt_box_cnt, gt_boxnum[i]);
         }
-        printf("gt No.%d has %d bboxes, %d\n", i, gt_box_cnt, gt_boxnum[i]);
-      }
-      */
-      int tiny_gt_num = 0;
-      vector<int> tiny_gt_indices;
-      for (int i = 0; i < gt_indices.size(); i++) {
-          if (gt_boxnum[i] < 6) {
-            tiny_gt_indices.push_back(i);
-          }
-      }
+        #endif
+        int tiny_gt_num = 0;
+        vector<int> tiny_gt_indices;
+        for (int i = 0; i < gt_indices.size(); i++) {
+            if (gt_boxnum[i] < 6) {
+              tiny_gt_indices.push_back(i);
+            }
+        }
 
-      // printf("___total gt = %ld, tiny gt = %ld\n", gt_indices.size(), tiny_gt_indices.size());
-      
-      tiny_gt_num = tiny_gt_indices.size();
+        // printf("___total gt = %ld, tiny gt = %ld\n", gt_indices.size(), tiny_gt_indices.size());
+        
+        tiny_gt_num = tiny_gt_indices.size();
 
-      if (tiny_gt_num > 0) {
-        vector< vector< pair<int, float> > > tiny_overlaps(tiny_gt_num);
-        // find tiny overlaps     
-        for (map<int, map<int, float> >::iterator it = overlaps.begin();
-             it != overlaps.end(); ++it) {
-          int i = it->first;
-          if ((*match_indices)[i] != -1) {
-            // The prediction already has matched ground truth or is ignored.
-            continue;
-          }
-          int max_gt_idx = -1;
-          float max_overlap = -1;
-          for (int j = 0; j < tiny_gt_num; ++j) {
-            if (it->second.find(tiny_gt_indices[j]) == it->second.end()) {
-              // No overlap between the i-th prediction and j-th ground truth.
+        if (tiny_gt_num > 0) {
+          vector< vector< pair<int, float> > > tiny_overlaps(tiny_gt_num);
+          // find tiny overlaps     
+          for (map<int, map<int, float> >::iterator it = overlaps.begin();
+              it != overlaps.end(); ++it) {
+            int i = it->first;
+            if ((*match_indices)[i] != -1) {
+              // The prediction already has matched ground truth or is ignored.
               continue;
             }
-            // Find the maximum overlapped pair.
-            float overlap = it->second[tiny_gt_indices[j]];
-            if (overlap >= 0.1 && overlap > max_overlap) {
-              // If the prediction has not been matched to any ground truth,
-              // and the overlap is larger than maximum overlap, update.
-              max_gt_idx = j;
-              max_overlap = overlap;
+            int max_gt_idx = -1;
+            float max_overlap = -1;
+            for (int j = 0; j < tiny_gt_num; ++j) {
+              if (it->second.find(tiny_gt_indices[j]) == it->second.end()) {
+                // No overlap between the i-th prediction and j-th ground truth.
+                continue;
+              }
+              // Find the maximum overlapped pair.
+              float overlap = it->second[tiny_gt_indices[j]];
+              if (overlap >= 0.1 && overlap > max_overlap) {
+                // If the prediction has not been matched to any ground truth,
+                // and the overlap is larger than maximum overlap, update.
+                max_gt_idx = j;
+                max_overlap = overlap;
+              }
+            }
+            if (max_gt_idx != -1) {
+              // Found a matched ground truth.
+              CHECK_EQ((*match_indices)[i], -1);
+              //(*match_indices)[i] = gt_indices[max_gt_idx];
+              //(*match_overlaps)[i] = max_overlap;
+              //gt_boxnum[max_gt_idx]++;
+              tiny_overlaps[max_gt_idx].push_back(pair<int, float>(i, max_overlap));
             }
           }
-          if (max_gt_idx != -1) {
-            // Found a matched ground truth.
-            CHECK_EQ((*match_indices)[i], -1);
-            //(*match_indices)[i] = gt_indices[max_gt_idx];
-            //(*match_overlaps)[i] = max_overlap;
-            //gt_boxnum[max_gt_idx]++;
-            tiny_overlaps[max_gt_idx].push_back(pair<int, float>(i, max_overlap));
-          }
-        }
-      
-        int top_n = 6;
-        // sort overlap
-        for (int i = 0; i < tiny_gt_num; i++) {
+        
+          int top_n = 6;
+          // sort overlap
+          for (int i = 0; i < tiny_gt_num; i++) {
             vector<pair<int, float> > tiny_gt_v = tiny_overlaps[i];
             sort(tiny_gt_v.begin(), tiny_gt_v.end(), overlap_cmp);
             // printf("for tiny gt NO.%d ---- idx =  %d, total tiny gt num = %d\n", tiny_gt_indices[i], i, tiny_gt_num);
             int k = 0;    
             for (vector<pair<int, float> > ::iterator it=tiny_gt_v.begin(); it != tiny_gt_v.end(); it++) {
-                if (k++ < top_n) {
-                    if ((*match_indices)[it->first] == -1) {
-                        (*match_indices)[it->first] = tiny_gt_indices[i];
-                        (*match_overlaps)[it->first] = it->second;
-                        // printf("%d, idx=%d, overlap=%f\n", k, it->first, it->second);
-                    }
-                }        
+              if (k++ < top_n) {
+                if ((*match_indices)[it->first] == -1) {
+                    (*match_indices)[it->first] = tiny_gt_indices[i];
+                    (*match_overlaps)[it->first] = it->second;
+                    // printf("%d, idx=%d, overlap=%f\n", k, it->first, it->second);
+                }
+              }        
             }
-            // printf("@@@@@@@@@@@@@@@@@@\n");
+          }
         }
       }
-      // printf("_______________________________________\n");
+      if(use_center_locate_match){
+
+      }
     }
       break;
     default:
@@ -845,6 +898,7 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
       multibox_loss_param.encode_variance_in_target();
   const bool ignore_cross_boundary_bbox =
       multibox_loss_param.ignore_cross_boundary_bbox();
+  const bool use_tiny_box_to_match = multibox_loss_param.use_tiny_box_match();
   // Find the matches.
   int num = all_loc_preds.size();
   for (int i = 0; i < num; ++i) {
@@ -874,7 +928,7 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
                      all_loc_preds[i].find(label)->second, &loc_bboxes);
         MatchBBox(gt_bboxes, loc_bboxes, label, match_type,
                   overlap_threshold, ignore_cross_boundary_bbox,
-                  &match_indices[label], &match_overlaps[label]);
+                  &match_indices[label], &match_overlaps[label], use_tiny_box_to_match);
       }
     } else {
       // Use prior bboxes to match against all ground truth.
@@ -883,7 +937,7 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
       const int label = -1;
       MatchBBox(gt_bboxes, prior_bboxes, label, match_type, overlap_threshold,
                 ignore_cross_boundary_bbox, &temp_match_indices,
-                &temp_match_overlaps);
+                &temp_match_overlaps, use_tiny_box_to_match);
       if (share_location) {
         match_indices[label] = temp_match_indices;
         match_overlaps[label] = temp_match_overlaps;
@@ -1788,8 +1842,6 @@ template void EncodeConfPrediction(const double* conf_data, const int num,
       const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
       double* conf_pred_data, double* conf_gt_data);
 
-
-/************~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~************/
 template <typename Dtype>
 void GetPriorBBoxes(const Dtype* prior_data, const int num_priors,
       vector<NormalizedBBox>* prior_bboxes,
