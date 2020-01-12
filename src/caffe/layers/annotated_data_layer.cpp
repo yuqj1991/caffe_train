@@ -155,22 +155,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     read_time += timer.MicroSeconds();
     float sampleProb = 0.0f;
     caffe_rng_uniform(1, 0.0f, 1.0f, &sampleProb);
-#if 0
-    int size_group = anno_datum.annotation_group_size();
-    LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
-    for(int ii=0; ii< size_group; ii++)
-    {
-      const AnnotationGroup& anno_group = anno_datum.annotation_group(ii);
-      int anno_size = anno_group.annotation_size();
-      for(int jj=0; jj<anno_size; jj++)
-      {
-        const Annotation& anno = anno_group.annotation(jj);
-        const NormalizedBBox& bbox = anno.bbox();
-        LOG(INFO)<<"xmin: "<<bbox.xmin()<<" ymin: "<<bbox.ymin()<<" xmax: "<<bbox.xmax()<<" ymax: "<<bbox.ymax();
-      }
-    }
-    LOG(INFO)<<" END READ RAW ANNODATUM+++++++++++++++++++++++++++++++++++++++++++++++++++";
-#endif 
     timer.Start();
     AnnotatedDatum distort_datum;
     AnnotatedDatum* expand_datum = NULL;
