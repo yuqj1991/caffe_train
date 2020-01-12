@@ -3492,7 +3492,7 @@ layer {
 		use_center_locate_match: true
 		background_label_id: 0
 		use_difficult_gt: true
-		neg_pos_ratio: 10.0
+		neg_pos_ratio: 5.0
 		neg_overlap: 0.1
 		code_type: CENTER_GRID
 		ignore_cross_boundary_bbox: false
