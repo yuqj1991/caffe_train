@@ -66,17 +66,17 @@ namespace caffe {
 	template <typename Dtype>
 	void delta_region_class_v3(Dtype* input_data, Dtype* &diff, int index, int class_label, int classes, float scale, Dtype* avg_cat, int stride)
 	{
-		if (diff[index]) {
+		if (diff[index]) { //one class
 			diff[index + stride*class_label] = 1 - input_data[index + stride*class_label];
 			*avg_cat += input_data[index + stride*class_label];
 			return;
 		}
-		for (int n = 0; n < classes; ++n) {
+		for (int n = 0; n < classes; ++n) { // multi-class
 			diff[index + n*stride] = (-1.0) * scale * (((n == class_label) ? 1 : 0) - input_data[index + n*stride]);
-			//std::cout<<diff[index+n]<<",";
+			//LOG(INFO)<<diff[index+n]<<",";
 			if (n == class_label) {
 				*avg_cat += input_data[index + n*stride];
-				//std::cout<<"avg_cat:"<<input_data[index+n]<<std::endl; 
+				//LOG(INFO)<<"avg_cat:"<<input_data[index+n]<<std::endl; 
 			}
 		}
 	}
@@ -118,7 +118,7 @@ namespace caffe {
 		Yolov3Parameter param = this->layer_param_.yolov3_param();
 		iter_ = 0;
 		num_class_ = param.num_class(); //20
-		num_ = param.num(); //5
+		num_ = param.num(); //3
 		side_ = bottom[0]->width();
 		anchors_scale_ = param.anchors_scale();
 		object_scale_ = param.object_scale(); //5.0
@@ -140,7 +140,7 @@ namespace caffe {
 		int tmp_input_count = side_ * side_ * num_ * (4 + num_class_ + 1); //13*13*5*(20+4+1) label: isobj, class_label, coordinates
 		int tmp_label_count = 300 * num_;
 		CHECK_EQ(input_count, tmp_input_count);
-		//CHECK_EQ(label_count, tmp_label_count);
+		CHECK_EQ(label_count, tmp_label_count);
 	}
 	typedef struct {
 		float x, y, w, h;
@@ -199,7 +199,6 @@ namespace caffe {
 					float best_iou = 0;
 					int best_class = -1;
 					vector<Dtype> best_truth;
-#ifdef CPU_ONLY
 					for (int c = 0; c < len; ++c) {
 						int index2 = c*stride + index;
 						//LOG(INFO)<<index2;
@@ -210,7 +209,6 @@ namespace caffe {
 							swap_data[index2] = logistic_activate(input_data[index2 + 0]);
 						}
 					}
-#endif
 					//LOG(INFO) << index + 5;
 					int y2 = s / side_;
 					int x2 = s % side_;
@@ -271,8 +269,8 @@ namespace caffe {
 				float best_iou = 0;
 				int best_index = 0;
 				int best_n = -1;
-				int best_n_second = -1;
-				int best_iou_second = 0;
+				//int best_n_second = -1;
+				//int best_iou_second = 0;
 				int i = truth[0] * side_;
 				int j = truth[1] * side_;
 				int pos = j * side_ + i;
@@ -300,10 +298,7 @@ namespace caffe {
 						best_iou = iou;
 					}
 				}
-				//LOG(INFO) << best_n;
 				int mask_n = int_index(mask_, best_n, num_);
-				
-				//LOG(INFO) << mask_n;
 				
 				if (mask_n >= 0) {
 					float iou;
@@ -343,9 +338,7 @@ namespace caffe {
 		top[0]->mutable_cpu_data()[0] = loss / bottom[0]->num();
 		//LOG(INFO) << "avg_noobj: " << avg_anyobj / (side_ * side_ * num_ * bottom[0]->num());	
 		iter_++;
-		//LOG(INFO) << "iter: " << iter <<" loss: " << loss;
-		if (!(iter_ % 10))
-		{
+		if (!(iter_ % 10)){
 			if(time_count_>0 ) {
 				LOG(INFO) << "avg_noobj: " << score_.avg_anyobj / 10. << " avg_obj: " << score_.avg_obj / time_count_ <<
 					" avg_iou: " << score_.avg_iou / time_count_ << " avg_cat: " << score_.avg_cat / time_count_ << " recall: " << score_.recall / time_count_ << " recall75: " << score_.recall75 / time_count_<< " count: " << class_count_/time_count_;
@@ -354,8 +347,7 @@ namespace caffe {
 				class_count_ = 0;
 				time_count_ = 0;
 			}
-		}
-		else {
+		}else {
 			score_.avg_anyobj += avg_anyobj / (side_*side_*num_*bottom[0]->num());
 			if (count > 0) {
 				score_.avg_obj += avg_obj / count;
@@ -389,10 +381,10 @@ namespace caffe {
 						for (int n = 0; n < num_; n++) {
 							int index = n*len*stride + s + b*bottom[0]->count(1);
 							//LOG(INFO)<<index;
-							vector<Dtype> pred;
-							float best_iou = 0;
-							int best_class = -1;
-							vector<Dtype> best_truth;
+							//vector<Dtype> pred;
+							//float best_iou = 0;
+							//int best_class = -1;
+							//vector<Dtype> best_truth;
 							for (int c = 0; c < len; ++c) {
 								int index2 = c*stride + index;
 								//LOG(INFO)<<index2;
@@ -415,8 +407,6 @@ namespace caffe {
 			}
 			const Dtype sign(1.);
 			const Dtype alpha = sign * top[0]->cpu_diff()[0] / bottom[0]->num();
-			//const Dtype alpha(1.0);
-			//LOG(INFO) << "alpha:" << alpha;
 
 			caffe_cpu_axpby(
 				bottom[0]->count(),
@@ -432,6 +422,6 @@ namespace caffe {
 #endif
 
 	INSTANTIATE_CLASS(Yolov3Layer);
-	//REGISTER_LAYER_CLASS(Yolov3);
+	REGISTER_LAYER_CLASS(Yolov3);
 
 }  // namespace caffe

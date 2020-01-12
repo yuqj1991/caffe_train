@@ -38,7 +38,7 @@ layer {
 }
 layer {
   name: "conv1/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv0"
   top: "conv1/dw"
   param {
@@ -91,7 +91,7 @@ layer {
 }
 layer {
   name: "conv2/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv1"
   top: "conv2/dw"
   param {
@@ -145,7 +145,7 @@ layer {
 }
 layer {
   name: "conv3/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv2"
   top: "conv3/dw"
   param {
@@ -198,7 +198,7 @@ layer {
 }
 layer {
   name: "conv4/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv3"
   top: "conv4/dw"
   param {
@@ -252,7 +252,7 @@ layer {
 }
 layer {
   name: "conv5/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv4"
   top: "conv5/dw"
   param {
@@ -304,7 +304,7 @@ layer {
 }
 layer {
   name: "conv6/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv5"
   top: "conv6/dw"
   param {
@@ -356,7 +356,7 @@ layer {
 }
 layer {
   name: "conv7/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv6"
   top: "conv7/dw"
   param {
@@ -407,7 +407,7 @@ layer {
 }
 layer {
   name: "conv8/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv7"
   top: "conv8/dw"
   param {
@@ -458,7 +458,7 @@ layer {
 }
 layer {
   name: "conv9/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv8"
   top: "conv9/dw"
   param {
@@ -509,7 +509,7 @@ layer {
 }
 layer {
   name: "conv10/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv9"
   top: "conv10/dw"
   param {
@@ -560,7 +560,7 @@ layer {
 }
 layer {
   name: "conv11/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv10"
   top: "conv11/dw"
   param {
@@ -611,7 +611,7 @@ layer {
 }
 layer {
   name: "conv12/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv11"
   top: "conv12/dw"
   param {
@@ -663,7 +663,7 @@ layer {
 }
 layer {
   name: "conv13/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv12"
   top: "conv13/dw"
   param {
@@ -716,7 +716,7 @@ layer {
 
 layer {
   name: "conv16/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv13"
   top: "conv16/dw"
   param {
@@ -782,7 +782,7 @@ layer {
 }
 layer {
   name: "conv17/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv11"
   top: "conv17/dw"
   param {
@@ -841,7 +841,7 @@ layer {
 }
 layer {
   name: "conv18/dw"
-  type: "DepthwiseConvolution"
+  type: "Convolution"
   bottom: "conv17/sum"
   top: "conv18/dw"
   param {
