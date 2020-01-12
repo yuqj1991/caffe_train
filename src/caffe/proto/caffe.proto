@@ -1161,8 +1161,10 @@ message AnnotatedDataParameter {
   // If provided, it will replace the AnnotationType stored in each
   // AnnotatedDatum.
   optional AnnotatedDatum.AnnotationType anno_type = 3;
-  repeated DataAnchorSampler data_anchor_sampler =4;
-  optional float sampleprob = 5[default=0.5];
+  repeated DataAnchorSampler data_anchor_sampler =6;
+  optional float sampleprob = 7[default=0.5];
+  optional int32 yolo_data_type = 4 [default = 0];
+  optional float yolo_data_jitter = 5 [default = 0.3];
 }
 
 message ArgMaxParameter {

@@ -1,7 +1,7 @@
 name: "MobileNet-YOLO"
 layer {
   name: "data"
-  type: "AnnotatedData"
+  type: "YoloAnnotatedData"
   top: "data"
   top: "label"
   include {
