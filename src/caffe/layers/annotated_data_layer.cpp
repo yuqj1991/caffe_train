@@ -155,6 +155,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     read_time += timer.MicroSeconds();
     float sampleProb = 0.0f;
     caffe_rng_uniform(1, 0.0f, 1.0f, &sampleProb);
+    LOG(INFO)<<"sampleProb: "<<sampleProb;
 #if 0
     int size_group = anno_datum.annotation_group_size();
     LOG(INFO)<<" START READ RAW ANNODATUM=================================================";
