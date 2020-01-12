@@ -347,10 +347,10 @@ void YoloDetectionOutputLayer<Dtype>::Forward_cpu(
 }
 
 #ifdef CPU_ONLY
-//STUB_GPU_FORWARD(DetectionOutputLayer, Forward);
+STUB_GPU_FORWARD(YoloDetectionOutputLayer, Forward);
 #endif
 
 INSTANTIATE_CLASS(YoloDetectionOutputLayer);
-//REGISTER_LAYER_CLASS(YoloDetectionOutput);
+REGISTER_LAYER_CLASS(YoloDetectionOutput);
 
 }  // namespace caffe

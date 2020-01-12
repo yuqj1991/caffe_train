@@ -1,10 +1,3 @@
-/*
-* @Author: Eric612
-* @Date:   2018-08-20 
-* @https://github.com/eric612/Caffe-YOLOv2-Windows
-* @https://github.com/eric612/MobileNet-YOLO
-* Avisonic
-*/
 #include <algorithm>
 #include <fstream>  // NOLINT(readability/streams)
 #include <map>
@@ -366,10 +359,10 @@ void Yolov3DetectionOutputLayer<Dtype>::Forward_cpu(
 }
 
 #ifdef CPU_ONLY
-//STUB_GPU_FORWARD(DetectionOutputLayer, Forward);
+STUB_GPU_FORWARD(Yolov3DetectionOutputLayer, Forward);
 #endif
 
 INSTANTIATE_CLASS(Yolov3DetectionOutputLayer);
-//REGISTER_LAYER_CLASS(Yolov3DetectionOutput);
+REGISTER_LAYER_CLASS(Yolov3DetectionOutput);
 
 }  // namespace caffe

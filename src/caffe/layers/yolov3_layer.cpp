@@ -1,10 +1,4 @@
-/*
-* @Author: Eric612
-* @Date:   2018-08-20 
-* @https://github.com/eric612/Caffe-YOLOv2-Windows
-* @https://github.com/eric612/MobileNet-YOLO
-* Avisonic
-*/
+
 #include <algorithm>
 #include <cfloat>
 #include <vector>
