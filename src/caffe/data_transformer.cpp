@@ -486,7 +486,8 @@ void DataTransformer<Dtype>::CropImage(const Datum& datum,
 		// Crop the image.
 		int crop_width = int(datum.width() * (bbox.xmax() - bbox.xmin()));
 		int crop_height = int(datum.height() * (bbox.ymax() - bbox.ymin()));
-		cv::Mat crop_img(cv::Size(crop_height, crop_width), CV_8UC3, cv::Scalar(0));
+		cv::Mat crop_img(cv::Size(crop_width, crop_height), CV_8UC3, cv::Scalar(0));
+		//LOG(INFO)<<"crop_height: "<<crop_height<<", crop_width: "<<crop_width;
 		CropImage(cv_img, bbox, &crop_img);
 		// Save the image into datum.
 		EncodeCVMatToDatum(crop_img, "jpg", crop_datum);
@@ -1104,9 +1105,9 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	int roi_h_off = static_cast<int>(roi_bbox.ymin() * img_height);
 	int roi_width = static_cast<int>((roi_bbox.xmax() - roi_bbox.xmin()) * img_width);
 	int roi_height = static_cast<int>((roi_bbox.ymax() - roi_bbox.ymin()) * img_height);
+	//LOG(INFO)<<"img_height: "<<img_height<<",img_width: "<<img_width<<", "<<roi_h_off<<", "<<roi_w_off <<", "<<roi_height<< " , "<<roi_width;
 	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, roi_width, roi_height);
 	cv::Mat cross_img = (*crop_img)(bbox_roi_crop);
-	
 	img(bbox_roi_cross).copyTo(cross_img);
 }
 
