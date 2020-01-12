@@ -146,7 +146,7 @@ layer {
 			scale: 256
 			scale: 512
 			sample_constraint{
-				min_object_coverage: 0.5
+				min_object_coverage: 0.2
 			}
 			max_sample: 1
 			max_trials: 10
@@ -3676,7 +3676,7 @@ layer {
 		use_center_locate_match: true
 		background_label_id: 0
 		use_difficult_gt: true
-		neg_pos_ratio: 5.0
+		neg_pos_ratio: 3.0
 		neg_overlap: 0.15
 		code_type: CENTER_GRID
 		ignore_cross_boundary_bbox: false
