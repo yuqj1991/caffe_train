@@ -42,7 +42,7 @@ layer {
 		}
 	}
 	data_param {
-		source: "../../../../../dataset/facedata/wider_face_32/lmdb/wider_face_wider_train_lmdb/"
+		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
 		batch_size: 5
 		backend: LMDB
 	}
@@ -3673,11 +3673,12 @@ layer {
 		match_type: PER_PREDICTION
 		overlap_threshold: 0.35
 		use_prior_for_matching: true
+		use_center_locate_match: true
 		background_label_id: 0
 		use_difficult_gt: true
 		neg_pos_ratio: 5.0
-		neg_overlap: 0.25
-		code_type: CENTER_SIZE
+		neg_overlap: 0.15
+		code_type: CENTER_GRID
 		ignore_cross_boundary_bbox: false
 		mining_type: MAX_NEGATIVE
 	}

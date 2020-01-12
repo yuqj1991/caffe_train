@@ -3569,7 +3569,7 @@ layer {
 			nms_threshold: 0.55
 			top_k: 200
 		}
-		code_type: CENTER_SIZE
+		code_type: CENTER_GRID
 		keep_top_k: 100
 		confidence_threshold: 0.25
 	}
