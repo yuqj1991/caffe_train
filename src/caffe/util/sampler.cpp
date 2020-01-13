@@ -293,14 +293,12 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   for(int j = 0; j < anchorScale.size() -1; ++j){
     if(bbox_aera >= std::pow(anchorScale[j], 2) && bbox_aera < std::pow(anchorScale[j+1], 2))
     {
-      if(std::fabs(bbox_aera - std::pow(anchorScale[j], 2)) <= std::fabs(bbox_aera - std::pow(anchorScale[j + 1], 2))){
-        bbox_locate_range_idx = j;
-      }else{
-        bbox_locate_range_idx = j + 1;
-      }
+      bbox_locate_range_idx = j;
       break;
     }
   }
+  if(bbox_aera > std::pow(anchorScale[anchorScale.size() - 2], 2))
+    bbox_locate_range_idx = anchorScale.size() - 2;
   if(bbox_locate_range_idx==0){
     anchor_choose_index = 0;
   }else{
@@ -312,10 +310,12 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     float max_resize_val = COMPAREMIN((float)anchorScale[anchor_choose_index] * 2,
                                                   2*std::sqrt(bbox_aera)) ;
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
+    LOG(INFO)<<"min_resize_val: "<<min_resize_val<<", max_resize_val: "<<max_resize_val<<", scaleChoose: "<<scaleChoose;
   }else{
     float min_resize_val = anchorScale[anchor_choose_index] / 2;
     float max_resize_val = (float)anchorScale[anchor_choose_index] * 2;
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
+    LOG(INFO)<<"min_resize_val: "<<min_resize_val<<", max_resize_val: "<<max_resize_val<<", scaleChoose: "<<scaleChoose;
   }
   float sample_box_size = (float)bbox_width * resized_width / scaleChoose;
 
