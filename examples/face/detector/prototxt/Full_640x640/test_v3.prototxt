@@ -1645,7 +1645,7 @@ layer {
 layer {
 	name: "conv15_1"
 	type: "Convolution"
-	bottom: "conv15_2"
+	bottom: "conv14_2"
 	top: "conv15_1"
 	param {
 		lr_mult: 1.0
