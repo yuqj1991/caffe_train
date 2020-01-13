@@ -337,8 +337,9 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   int height_offset_ = std::floor(height_offset_org);
   float w_off = (float) width_offset_ / img_width;
   float h_off = (float) height_offset_ / img_height;
-  LOG(INFO)<<"min_resize_val: "<<min_resize_val<<", max_resize_val: "<<max_resize_val<<", scaleChoose: "<<scaleChoose
-            <<", sample_box_size: "<<sample_box_size<<"w_off: "<<w_off<<", h_off: "<<h_off;
+  LOG(INFO)<<"min_resize_val: "<<min_resize_val<<", max_resize_val: "<<max_resize_val
+           <<", scaleChoose: "<<scaleChoose<<", bbox_width/scaleChoose: "<<bbox_width / scaleChoose
+           <<", sample_box_size: "<<sample_box_size<<", w_off: "<<w_off<<", h_off: "<<h_off;
   samplerbox->set_xmin(w_off);
   samplerbox->set_ymin(h_off);
   samplerbox->set_xmax(w_off + float(sample_box_size/img_width));
