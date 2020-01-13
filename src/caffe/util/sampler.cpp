@@ -330,6 +330,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
       caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_box_size, &height_offset_org);
     }
   }else{
+    sample_box_size = std::max(img_width, img_height);
     caffe_rng_uniform(1, img_height-sample_box_size, 0.0f, &height_offset_org);
     caffe_rng_uniform(1, img_width-sample_box_size, 0.0f, &width_offset_org);
   }
