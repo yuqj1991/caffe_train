@@ -317,8 +317,6 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
   }
   float sample_box_size = (float)bbox_width * resized_width / scaleChoose;
-  LOG(INFO)<<"min_resize_val: "<<min_resize_val<<", max_resize_val: "<<max_resize_val<<", scaleChoose: "<<scaleChoose
-            <<", sample_box_size: "<<sample_box_size;
   float width_offset_org = 0.0f, height_offset_org = 0.0f;
   if(sample_box_size < std::max(img_width, img_height)){
     if(bbox_width <= sample_box_size){
@@ -339,7 +337,8 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   int height_offset_ = std::floor(height_offset_org);
   float w_off = (float) width_offset_ / img_width;
   float h_off = (float) height_offset_ / img_height;
-  LOG(INFO)"w_off: "<<w_off<<", h_off: "<<h_off;
+  LOG(INFO)<<"min_resize_val: "<<min_resize_val<<", max_resize_val: "<<max_resize_val<<", scaleChoose: "<<scaleChoose
+            <<", sample_box_size: "<<sample_box_size<<"w_off: "<<w_off<<", h_off: "<<h_off;
   samplerbox->set_xmin(w_off);
   samplerbox->set_ymin(h_off);
   samplerbox->set_xmax(w_off + float(sample_box_size/img_width));
