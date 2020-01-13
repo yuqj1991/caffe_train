@@ -445,20 +445,18 @@ void EncodeBBox(
     CHECK_GT(bbox_width, 0);
     float bbox_height = bbox.ymax() - bbox.ymin();
     CHECK_GT(bbox_height, 0);
-    float bbox_center_x = (bbox.xmin() + bbox.xmax()) / 2.;
-    float bbox_center_y = (bbox.ymin() + bbox.ymax()) / 2.;
     if (encode_variance_in_target) {
-      encode_bbox->set_xmin((bbox_center_x - prior_center_x) / prior_width);
-      encode_bbox->set_ymin((bbox_center_y - prior_center_y) / prior_height);
-      encode_bbox->set_xmax(log(bbox_width / prior_width));
-      encode_bbox->set_ymax(log(bbox_height / prior_height));
+      encode_bbox->set_xmin((bbox.xmin() - prior_center_x) / prior_width);
+      encode_bbox->set_ymin((bbox.ymin() - prior_center_y) / prior_height);
+      encode_bbox->set_xmax((bbox.xmax() - prior_center_x) / prior_width);
+      encode_bbox->set_ymax((bbox.ymax() - prior_center_y) / prior_height);
     } else {
-      encode_bbox->set_xmin((bbox_center_x / prior_width) / prior_variance[0]);
-      encode_bbox->set_ymin((bbox_center_y/ prior_width) / prior_variance[1]);
+      encode_bbox->set_xmin(((bbox.xmin() - prior_center_x) / prior_width) / prior_variance[0]);
+      encode_bbox->set_ymin(((bbox.ymin() - prior_center_y) / prior_height) / prior_variance[1]);
       encode_bbox->set_xmax(
-          log(bbox_width / prior_width) / prior_variance[2]);
+          ((bbox.xmax() - prior_center_x) / prior_width) / prior_variance[2]);
       encode_bbox->set_ymax(
-          log(bbox_height / prior_height) / prior_variance[3]);
+          ((bbox.ymax() - prior_center_y) / prior_height) / prior_variance[3]);
     }
   } else {
     LOG(FATAL) << "Unknown encode type.";
@@ -530,31 +528,31 @@ void DecodeBBox(
     float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
     float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
 
-    float decode_bbox_center_x, decode_bbox_center_y;
-    float decode_bbox_width, decode_bbox_height;
+    float decode_bbox_xmin, decode_bbox_ymin;
+    float decode_bbox_xmax, decode_bbox_ymax;
     if (variance_encoded_in_target) {
       // variance is encoded in target, we simply need to retore the offset
       // predictions.
-      decode_bbox_center_x = bbox.xmin() * prior_width + prior_center_x;
-      decode_bbox_center_y = bbox.ymin() * prior_height + prior_center_y;
-      decode_bbox_width = exp(bbox.xmax()) * prior_width;
-      decode_bbox_height = exp(bbox.ymax()) * prior_height;
+      decode_bbox_xmin = bbox.xmin() * prior_width + prior_center_x;
+      decode_bbox_ymin = bbox.ymin() * prior_height + prior_center_y;
+      decode_bbox_xmax = bbox.xmax() * prior_width + prior_center_x;
+      decode_bbox_ymax = bbox.ymax() * prior_height + prior_center_y;
     } else {
       // variance is encoded in bbox, we need to scale the offset accordingly.
-      decode_bbox_center_x =
-          prior_variance[0] * bbox.xmin() * prior_width ;
-      decode_bbox_center_y =
-          prior_variance[1] * bbox.ymin() * prior_height;
-      decode_bbox_width =
-          exp(prior_variance[2] * bbox.xmax()) * prior_width;
-      decode_bbox_height =
-          exp(prior_variance[3] * bbox.ymax()) * prior_height;
+      decode_bbox_xmin =
+          prior_variance[0] * bbox.xmin() * prior_width + prior_center_x ;
+      decode_bbox_ymin =
+          prior_variance[1] * bbox.ymin() * prior_height + prior_center_y ;
+      decode_bbox_xmax =
+          prior_variance[2] * bbox.xmax() * prior_width + prior_center_x ;
+      decode_bbox_ymax =
+          prior_variance[3] * bbox.ymax() * prior_height + prior_center_y;
     }
 
-    decode_bbox->set_xmin(decode_bbox_center_x - decode_bbox_width / 2.);
-    decode_bbox->set_ymin(decode_bbox_center_y - decode_bbox_height / 2.);
-    decode_bbox->set_xmax(decode_bbox_center_x + decode_bbox_width / 2.);
-    decode_bbox->set_ymax(decode_bbox_center_y + decode_bbox_height / 2.);
+    decode_bbox->set_xmin(decode_bbox_xmin);
+    decode_bbox->set_ymin(decode_bbox_ymin);
+    decode_bbox->set_xmax(decode_bbox_xmax);
+    decode_bbox->set_ymax(decode_bbox_ymax);
   } else if (code_type == PriorBoxParameter_CodeType_CORNER_SIZE) {
     float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
     CHECK_GT(prior_width, 0);
