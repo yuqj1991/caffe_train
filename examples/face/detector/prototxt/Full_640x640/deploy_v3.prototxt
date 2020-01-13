@@ -2918,7 +2918,121 @@ layer {
 		axis: 1
 	}
 }
+############################################################
+#######################priorBox moudle six ################
+############################################################
+layer {
+	name: "dectction_moudle_six_priorbox"
+	type: "PriorBox"
+	bottom: "conv15_2"
+	bottom: "data"
+	top: "dectction_moudle_six_priorbox"
+	prior_box_param {
+		min_size: 600.0
+		min_size: 512.0
+		flip: true
+		clip: false
+		variance: 0.1
+		variance: 0.1
+		variance: 0.2
+		variance: 0.2
+		offset: 0.5
+		#step: 64
+	}
+}
+layer {
+	name: "dectction_moudle_six_loc"
+	type: "Convolution"
+	bottom: "conv15_2"
+	top: "dectction_moudle_six_loc"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	convolution_param {
+		num_output: 8
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0.0
+		}
+	}
+}
+layer {
+	name: "dectction_moudle_six_loc_perm"
+	type: "Permute"
+	bottom: "dectction_moudle_six_loc"
+	top: "dectction_moudle_six_loc_perm"
+	permute_param {
+		order: 0
+		order: 2
+		order: 3
+		order: 1
+	}
+}
+layer {
+	name: "dectction_moudle_six_loc_flat"
+	type: "Flatten"
+	bottom: "dectction_moudle_six_loc_perm"
+	top: "dectction_moudle_six_loc_flat"
+	flatten_param {
+		axis: 1
+	}
+}
 
+layer {
+	name: "dectction_moudle_six_conf"
+	type: "Convolution"
+	bottom: "conv15_2"
+	top: "dectction_moudle_six_conf"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	param {
+		lr_mult: 2
+		decay_mult: 0
+	}
+	convolution_param {
+		num_output: 4
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
+		bias_filler {
+			type: "constant"
+			value: 0.0
+		}
+	}
+}
+layer {
+	name: "dectction_moudle_six_conf_concat_perm"
+	type: "Permute"
+	bottom: "dectction_moudle_six_conf"
+	top: "dectction_moudle_six_conf_concat_perm"
+	permute_param {
+		order: 0
+		order: 2
+		order: 3
+		order: 1
+	}
+}
+layer {
+	name: "dectction_moudle_six_conf_concat_flat"
+	type: "Flatten"
+	bottom: "dectction_moudle_six_conf_concat_perm"
+	top: "dectction_moudle_six_conf_concat_flat"
+	flatten_param {
+		axis: 1
+	}
+}
 ################################################
 layer {
 	name: "mbox_priorbox"
@@ -2928,6 +3042,7 @@ layer {
 	bottom: "dectction_moudle_three_priorbox"
 	bottom: "dectction_moudle_four_priorbox"
 	bottom: "dectction_moudle_five_priorbox"
+	bottom: "dectction_moudle_six_priorbox"
 	top: "mbox_priorbox"
 	concat_param {
 		axis: 2
@@ -2942,6 +3057,7 @@ layer {
 	bottom: "dectction_moudle_three_loc_flat"
 	bottom: "dectction_moudle_four_loc_flat"
 	bottom: "dectction_moudle_five_loc_flat"
+	bottom: "dectction_moudle_six_loc_flat"
 	top: "mbox_loc"
 	concat_param {
 		axis: 1
@@ -2957,6 +3073,7 @@ layer {
 	bottom: "dectction_moudle_three_conf_concat_flat"
 	bottom: "dectction_moudle_four_conf_concat_flat"
 	bottom: "dectction_moudle_five_conf_concat_flat"
+	bottom: "dectction_moudle_six_conf_concat_flat"
 	top: "mbox_conf"
 	concat_param {
 		axis: 1
