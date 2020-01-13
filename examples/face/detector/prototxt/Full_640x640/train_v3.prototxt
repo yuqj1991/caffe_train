@@ -43,7 +43,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 8
+		batch_size: 4
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -1748,6 +1748,133 @@ layer {
 	type: "Scale"
 	bottom: "conv14_2"
 	top: "conv14_2"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv15_1"
+	type: "Convolution"
+	bottom: "conv15_2"
+	top: "conv15_1"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 128
+		bias_term: false
+		kernel_size: 1
+		#pad: 1
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv15_1/bn"
+	type: "BatchNorm"
+	bottom: "conv15_1"
+	top: "conv15_1"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv15_1/scale"
+	type: "Scale"
+	bottom: "conv15_1"
+	top: "conv15_1"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv15_1/relu"
+	type: "PReLU"
+	bottom: "conv15_1"
+	top: "conv15_1"
+}
+layer {
+	name: "conv15_2"
+	type: "Convolution"
+	bottom: "conv15_1"
+	top: "conv15_2"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	convolution_param {
+		num_output: 256
+		bias_term: false
+		pad: 1
+		kernel_size: 3
+		stride: 2
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv15_2/bn"
+	type: "BatchNorm"
+	bottom: "conv15_2"
+	top: "conv15_2"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv15_2/scale"
+	type: "Scale"
+	bottom: "conv15_2"
+	top: "conv15_2"
 	param {
 		lr_mult: 1.0
 		decay_mult: 0.0
