@@ -1,5 +1,5 @@
-train_net: "../prototxt/Prune_320x320/train_v3.prototxt"
-test_net: "../prototxt/Prune_320x320/test_v3.prototxt"
+train_net: "../prototxt/Full_640x640/train_v3.prototxt"
+test_net: "../prototxt/Full_640x640/test_v3.prototxt"
 test_iter: 5000
 test_interval: 5000
 base_lr: 0.01
