@@ -1,4 +1,3 @@
-
 #include <algorithm>
 #include <cfloat>
 #include <vector>
@@ -22,9 +21,6 @@
 
 
 namespace caffe {
-	
-
-
 	template <typename Dtype>
 	Dtype overlap(Dtype x1, Dtype w1, Dtype x2, Dtype w2)
 	{

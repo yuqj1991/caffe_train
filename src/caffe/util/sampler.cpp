@@ -9,6 +9,24 @@
 
 namespace caffe {
 
+void GenerateJitterSamples(float jitter, vector<NormalizedBBox>* sampled_bboxes)
+{
+	float img_w,img_h,off_x,off_y;
+
+	caffe_rng_uniform(1, 1.0f - jitter, 1.0f, &img_w);
+	caffe_rng_uniform(1, 1.0f - jitter, 1.0f, &img_h);
+	caffe_rng_uniform(1, 0.0f, 1.0f - img_w, &off_x);
+	caffe_rng_uniform(1, 0.0f, 1.0f - img_h, &off_y);
+
+	NormalizedBBox sampled_bbox;
+	sampled_bbox.set_xmin(off_x);
+	sampled_bbox.set_ymin(off_y);
+	sampled_bbox.set_xmax(off_x + img_w);
+	sampled_bbox.set_ymax(off_y + img_h);
+	sampled_bboxes->push_back(sampled_bbox);
+
+}
+
 void GroupObjectBBoxes(const AnnotatedDatum& anno_datum,
                        vector<NormalizedBBox>* object_bboxes) {
   object_bboxes->clear();
