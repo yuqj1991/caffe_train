@@ -290,6 +290,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   int bbox_locate_range_idx = 0, anchor_choose_index = 0, rng_random_index = 0; 
   float bbox_aera = bbox_height * bbox_width;
   float scaleChoose = 0.0f; 
+  float min_resize_val = 0.f, max_resize_val = 0.f;
   for(int j = 0; j < anchorScale.size() -1; ++j){
     if(bbox_aera >= std::pow(anchorScale[j], 2) && bbox_aera < std::pow(anchorScale[j+1], 2))
     {
@@ -306,19 +307,18 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     anchor_choose_index = rng_random_index % (bbox_locate_range_idx + 1);
   }
   if(anchor_choose_index == bbox_locate_range_idx){
-    float min_resize_val = anchorScale[anchor_choose_index] / 2;
-    float max_resize_val = COMPAREMIN((float)anchorScale[anchor_choose_index] * 2,
+    min_resize_val = anchorScale[anchor_choose_index] / 2;
+    max_resize_val = COMPAREMIN((float)anchorScale[anchor_choose_index] * 2,
                                                   2*std::sqrt(bbox_aera)) ;
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
-    LOG(INFO)<<"min_resize_val: "<<min_resize_val<<", max_resize_val: "<<max_resize_val<<", scaleChoose: "<<scaleChoose;
   }else{
-    float min_resize_val = anchorScale[anchor_choose_index] / 2;
-    float max_resize_val = (float)anchorScale[anchor_choose_index] * 2;
+    min_resize_val = anchorScale[anchor_choose_index] / 2;
+    max_resize_val = (float)anchorScale[anchor_choose_index] * 2;
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
-    LOG(INFO)<<"min_resize_val: "<<min_resize_val<<", max_resize_val: "<<max_resize_val<<", scaleChoose: "<<scaleChoose;
   }
   float sample_box_size = (float)bbox_width * resized_width / scaleChoose;
-
+  LOG(INFO)<<"min_resize_val: "<<min_resize_val<<", max_resize_val: "<<max_resize_val<<", scaleChoose: "<<scaleChoose
+            <<", sample_box_size: "<<sample_box_size;
   float width_offset_org = 0.0f, height_offset_org = 0.0f;
   if(sample_box_size < std::max(img_width, img_height)){
     if(bbox_width <= sample_box_size){
@@ -339,7 +339,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   int height_offset_ = std::floor(height_offset_org);
   float w_off = (float) width_offset_ / img_width;
   float h_off = (float) height_offset_ / img_height;
-  LOG(INFO)<<"sample_box_size: "<<sample_box_size<<", w_off: "<<w_off<<", h_off: "<<h_off;
+  LOG(INFO)"w_off: "<<w_off<<", h_off: "<<h_off;
   samplerbox->set_xmin(w_off);
   samplerbox->set_ymin(h_off);
   samplerbox->set_xmax(w_off + float(sample_box_size/img_width));
