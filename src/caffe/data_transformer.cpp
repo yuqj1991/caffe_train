@@ -1088,24 +1088,36 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	NormalizedBBox scaled_bbox;
 	ScaleBBox(crossed_bbox, img_height, img_width, &scaled_bbox);
 
-	NormalizedBBox roi_bbox;
-	roi_bbox.set_xmin( bbox.xmin() >= 0 ? 0 : std::fabs(bbox.xmin()));
-	roi_bbox.set_ymin( bbox.ymin() >= 0 ? 0 : std::fabs(bbox.ymin()));
-	roi_bbox.set_xmax( roi_bbox.xmin() + (crossed_bbox.xmax() - crossed_bbox.xmin()));
-	roi_bbox.set_ymax( roi_bbox.ymin() + (crossed_bbox.ymax()- crossed_bbox.ymin()));
-
-	// Crop the image using bbox.
 	int w_off = static_cast<int>(scaled_bbox.xmin());
 	int h_off = static_cast<int>(scaled_bbox.ymin());
 	int width = static_cast<int>(scaled_bbox.xmax() - scaled_bbox.xmin());
 	int height = static_cast<int>(scaled_bbox.ymax() - scaled_bbox.ymin());
 	cv::Rect bbox_roi_cross(w_off, h_off, width, height);
+	CHECK_GE(w_off, 0);
+	CHECK_GE(width, 0);
+	CHECK_LE(w_off + width, img_width);
+	CHECK_GE(h_off, 0);
+	CHECK_GE(height, 0);
+	CHECK_LE(h_off + height, img_height);
+
+	// if crop box out boundary image
+	// Crop the image overlapped by using bbox.
+	NormalizedBBox roi_bbox;
+	roi_bbox.set_xmin( bbox.xmin() >= 0 ? 0 : std::fabs(bbox.xmin()));
+	roi_bbox.set_ymin( bbox.ymin() >= 0 ? 0 : std::fabs(bbox.ymin()));
+	roi_bbox.set_xmax( roi_bbox.xmin() + (crossed_bbox.xmax() - crossed_bbox.xmin()));
+	roi_bbox.set_ymax( roi_bbox.ymin() + (crossed_bbox.ymax()- crossed_bbox.ymin()));
 	
 	int roi_w_off = static_cast<int>(roi_bbox.xmin() * img_width);
 	int roi_h_off = static_cast<int>(roi_bbox.ymin() * img_height);
 	int roi_width = static_cast<int>((roi_bbox.xmax() - roi_bbox.xmin()) * img_width);
 	int roi_height = static_cast<int>((roi_bbox.ymax() - roi_bbox.ymin()) * img_height);
-	//LOG(INFO)<<"img_height: "<<img_height<<",img_width: "<<img_width<<", "<<roi_h_off<<", "<<roi_w_off <<", "<<roi_height<< " , "<<roi_width;
+	CHECK_GE(roi_w_off, 0);
+	CHECK_GE(roi_width, 0);
+	CHECK_LE(roi_w_off + roi_width, img_width);
+	CHECK_GE(roi_h_off, 0);
+	CHECK_GE(roi_height, 0);
+	CHECK_LE(roi_h_off + roi_height, img_height);
 	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, roi_width, roi_height);
 	cv::Mat cross_img = (*crop_img)(bbox_roi_crop);
 	img(bbox_roi_cross).copyTo(cross_img);
