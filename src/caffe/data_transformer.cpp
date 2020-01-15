@@ -484,10 +484,7 @@ void DataTransformer<Dtype>::CropImage(const Datum& datum,
 			cv_img = DecodeDatumToCVMatNative(datum);
 		}
 		// Crop the image.
-		int crop_width = int(datum.width() * (bbox.xmax() - bbox.xmin()));
-		int crop_height = int(datum.height() * (bbox.ymax() - bbox.ymin()));
-		cv::Mat crop_img(cv::Size(crop_width, crop_height), CV_8UC3, cv::Scalar(0));
-		//LOG(INFO)<<"crop_height: "<<crop_height<<", crop_width: "<<crop_width;
+		cv::Mat crop_img;
 		CropImage(cv_img, bbox, &crop_img);
 		// Save the image into datum.
 		EncodeCVMatToDatum(crop_img, "jpg", crop_datum);
@@ -1081,6 +1078,8 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 																			 cv::Mat* crop_img) {
 	const int img_height = img.rows;
 	const int img_width = img.cols;
+	int crop_width = int(img_width * (bbox.xmax() - bbox.xmin()));
+	int crop_height = int(img_height * (bbox.ymax() - bbox.ymin()));
 
 	// Get the crossed_bbox dimension.
 	NormalizedBBox crossed_bbox;
@@ -1119,8 +1118,9 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	CHECK_GE(roi_height, 0);
 	CHECK_LE(roi_h_off + roi_height, (*crop_img).rows);
 	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, roi_width, roi_height);
-	cv::Mat cross_img = (*crop_img)(bbox_roi_crop);
-	img(bbox_roi_cross).copyTo(cross_img);
+	crop_img->create(crop_width, crop_height, img.type());
+	crop_img->setTo(cv::Scalar(0));
+	img(bbox_roi_cross).copyTo((*crop_img)(bbox_roi_crop));
 }
 
 template <typename Dtype>
