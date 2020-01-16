@@ -722,6 +722,8 @@ message LayerParameter {
   optional ContinuationIndicatorParameter continuation_indicator_param = 306;
 
   optional LabelsequenceAccuracyParameter labelsequence_accuracy_param = 307;
+
+  optional CenterObjectParameter center_object_loss_param = 308;
   
   optional TransposeParameter transpose_param=8266710;
   optional LSTMParameter lstm_param = 8266711;
@@ -2217,6 +2219,57 @@ message SigmoidParameter {
     CUDNN = 2;
   }
   optional Engine engine = 1 [default = DEFAULT];
+}
+
+message CenterObjectParameter {
+  optional uint32 num_class = 1[default = 1];
+  optional bool share_location = 2 [default = true];
+  enum LocLossType {
+    L2 = 0;
+    SMOOTH_L1 = 1;
+  }
+  optional LocLossType loc_loss_type = 22 [default = SMOOTH_L1];
+  // Confidence loss type.
+  enum ConfLossType {
+    FOCALSIGMOID = 2;
+  }
+  optional ConfLossType conf_loss_type = 4 [default = FOCALSIGMOID];
+  // Weight for localization loss.
+  optional float loc_weight = 3 [default = 1.0];
+  // Number of classes to be predicted. Required!
+
+  // Matching method during training.
+  enum MatchType {
+    BIPARTITE = 0;
+    PER_PREDICTION = 1;
+  }
+  optional uint32 down_ratio = 5 [default = 4];
+  optional MatchType match_type = 6 [default = PER_PREDICTION];
+  // If match_type is PER_PREDICTION, use overlap_threshold to
+  // determine the extra matching bboxes.
+  optional float overlap_threshold = 7 [default = 0.5];  
+  // If true, perform negative mining.
+  // DEPRECATED: use mining_type instead.
+  optional bool do_neg_mining = 11;
+  // The negative/positive ratio.
+  optional float neg_pos_ratio = 12 [default = 3.0];
+  // The negative overlap upperbound for the unmatched predictions.
+  optional float neg_overlap = 13 [default = 0.5];
+  // Type of coding method for bbox.
+  optional PriorBoxParameter.CodeType code_type = 14 [default = CORNER];
+  // If true, encode the variance of prior box in the loc loss target instead of
+  // in bbox.
+  optional bool encode_variance_in_target = 16 [default = false];
+  // If true, map all object classes to agnostic class. It is useful for learning
+  // objectness detector.
+  optional bool map_object_to_agnostic = 17 [default = false];
+  // If true, ignore cross boundary bbox during matching.
+  // Cross boundary bbox is a bbox who is outside of the image region.
+  optional bool ignore_cross_boundary_bbox = 18 [default = false];
+  // If true, only backpropagate on corners which are inside of the image
+  // region when encode_type is CORNER or CORNER_SIZE.
+  optional bool bp_inside = 19 [default = false];
+
 }
 
 message SliceParameter {

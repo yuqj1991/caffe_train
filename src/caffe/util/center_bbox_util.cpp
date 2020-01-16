@@ -10,6 +10,7 @@
 
 #include "boost/iterator/counting_iterator.hpp"
 
+#include "caffe/util/bbox_util.hpp"
 #include "caffe/util/center_bbox_util.hpp"
 
 namespace caffe {
@@ -39,12 +40,182 @@ Dtype gaussian_radius(const Dtype heatmap_width, const Dtype heatmap_height, con
 template float gaussian_radius(const float heatmap_width, const float heatmap_height, const float min_overlap);
 template double gaussian_radius(const double heatmap_width, const double heatmap_height, const double min_overlap);
 
+template <typename Dtype>
+void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int output_width, 
+                                const int output_height, bool share_location, 
+                                Dtype* pred_data, const int num_channels,
+                                Dtype* gt_data, std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
+  std::map<int, vector<NormalizedBBox> > ::iterator iter;
+  int count = 0;
+  for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    int batch_id = iter->first;
+    vector<NormalizedBBox> gt_bboxes = iter->second;
+    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+      const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+      const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+      const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+      const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+      Dtype center_x = (xmin + xmax) / 2;
+      Dtype center_y = (ymin + ymax) / 2;
+      int inter_center_x = static_cast<int> (center_x);
+      int inter_center_y = static_cast<int> (center_y);
+      Dtype diff_x = center_x - inter_center_x;
+      Dtype diff_y = center_x - inter_center_y;
+      Dtype width = gt_bboxes[ii].xmax() - gt_bboxes[ii].xmin();
+      Dtype height = gt_bboxes[ii].ymax() - gt_bboxes[ii].ymin();
+      int dimScale = output_height * output_width;
+      int x_loc_index = batch_id * num_channels * dimScale 
+                                + inter_center_y * output_width + inter_center_x;
+      int y_loc_index = batch_id * num_channels * dimScale 
+                                + dimScale
+                                + inter_center_y * output_width + inter_center_x;
+      int width_loc_index = batch_id * num_channels * dimScale
+                                + 2 * dimScale
+                                + inter_center_y * output_width + inter_center_x;
+      int height_loc_index = batch_id * num_channels * dimScale 
+                                + 3 * dimScale
+                                + inter_center_y * output_width + inter_center_x;
+      gt_data[count * 4 + 0] = diff_x;
+      gt_data[count * 4 + 1] = diff_y;
+      gt_data[count * 4 + 2] = width;
+      gt_data[count * 4 + 3] = height;
+      pred_data[count * 4 + 0] = loc_data[x_loc_index];
+      pred_data[count * 4 + 1] = loc_data[y_loc_index];
+      pred_data[count * 4 + 2] = loc_data[width_loc_index];
+      pred_data[count * 4 + 3] = loc_data[height_loc_index];
+      count++;
+    }
+  }
+}
+template void EncodeCenteGroundTruthAndPredictions(const float* loc_data, const int output_width, 
+                                const int output_height, bool share_location, 
+                                float* pred_data, const int num_channels,
+                                float* gt_data, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+template void EncodeCenteGroundTruthAndPredictions(const double* loc_data, const int output_width, 
+                                const int output_height, bool share_location, 
+                                double* pred_data, const int num_channels,
+                                double* gt_data, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);                              
+
+template <typename Dtype>
+void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
+                                const int output_height, 
+                                bool share_location, Dtype* bottom_diff, const int num_channels,
+                                std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
+  std::map<int, vector<NormalizedBBox> > ::iterator iter;
+  int count = 0;
+  for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    int batch_id = iter->first;
+    vector<NormalizedBBox> gt_bboxes = iter->second;
+    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+      const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+      const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+      const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+      const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+      Dtype center_x = (xmin + xmax) / 2;
+      Dtype center_y = (ymin + ymax) / 2;
+      int inter_center_x = static_cast<int> (center_x);
+      int inter_center_y = static_cast<int> (center_y);
+      int dimScale = output_height * output_width;
+      int x_loc_index = batch_id * num_channels * dimScale 
+                                + inter_center_y * output_width + inter_center_x;
+      int y_loc_index = batch_id * num_channels * dimScale 
+                                + dimScale
+                                + inter_center_y * output_width + inter_center_x;
+      int width_loc_index = batch_id * num_channels * dimScale 
+                                + 2 * dimScale
+                                + inter_center_y * output_width + inter_center_x;
+      int height_loc_index = batch_id * num_channels * dimScale
+                                + 3 * dimScale
+                                + inter_center_y * output_width + inter_center_x;
+      bottom_diff[x_loc_index] = pre_diff[count * 4 + 0];
+      bottom_diff[y_loc_index] = pre_diff[count * 4 + 1];
+      bottom_diff[width_loc_index] = pre_diff[count * 4 + 2];
+      bottom_diff[height_loc_index] = pre_diff[count * 4 + 3];
+      count++;
+    }
+  }
+}
+template void CopyDiffToBottom(const float* pre_diff, const int output_width, 
+                                const int output_height, 
+                                bool share_location, float* bottom_diff, const int num_channels,
+                                std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+template void CopyDiffToBottom(const double* pre_diff, const int output_width, 
+                                const int output_height, 
+                                bool share_location, double* bottom_diff, const int num_channels,
+                                std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+
+template <typename Dtype>
+void _nms_heatmap(const Dtype* conf_data, Dtype* keep_max_data, const int output_height
+                  , const int output_width, const int channels, const int num_batch){
+    int dim = num_batch * channels * output_height * output_width;
+    for(int ii = 0; ii < dim; ii++){
+      keep_max_data[ii] = (keep_max_data[ii] == conf_data[ii]) ? keep_max_data[ii] : Dtype(0.);
+    }
+}
+template void _nms_heatmap(const float* conf_data, float* keep_max_data, const int output_height
+                  , const int output_width, const int channels, const int num_batch);
+template void _nms_heatmap(const double* conf_data, double* keep_max_data, const int output_height
+                  , const int output_width, const int channels, const int num_batch);
+
+template <typename Dtype>
+void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
+                  , const int output_width, const int classes, const int num_batch
+                  , std::map<int, std::vector<CenterNetInfo> > results
+                  , const int loc_channels){
+  for(int i = 0; i < num_batch; i++){
+    int dim = classes * output_width * output_height;
+    std::vector<CenterNetInfo> batch_result;
+    batch_result.clear();
+    for(int c = 0 ; c < classes; c++){
+      int dimScale = output_width * output_height;
+      for(int h = 0; h < output_height; h++){
+        for(int w = 0; w < output_width; w++){
+          int index = i * dim + c * dimScale + h * output_width + w;
+          if(keep_max_data[index] != 0){
+            int x_loc_index = i * loc_channels * dimScale + h * output_width + w;
+            int y_loc_index = i * loc_channels * dimScale + dimScale + h * output_width + w;
+            int width_loc_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
+            int height_loc_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
+            float center_x = w + loc_data[x_loc_index];
+            float center_y = h + loc_data[y_loc_index];
+            float width = loc_data[width_loc_index] * output_width;
+            float height = loc_data[height_loc_index] * output_height;
+            CenterNetInfo temp_result = {
+              .class_id = c,
+              .score = keep_max_data[index],
+              .xmin = float((center_x - float(width / 2)) / output_width),
+              .ymin = float((center_y - float(height / 2)) / output_height),
+              .xmax = float((center_x + float(width / 2)) / output_width),
+              .ymax = float((center_y + float(height / 2)) / output_height)
+            };
+            batch_result.push_back(temp_result);
+          } 
+        }
+      }
+    }
+    if(batch_result.size() > 0){
+      if(results.find(i) == results.end()){
+        results.insert(std::make_pair(i, batch_result));
+      }else{
+        // 
+      }
+    }
+  }
+}
+template  void get_topK(const float* keep_max_data, const float* loc_data, const int output_height
+                  , const int output_width, const int classes, const int num_batch
+                  , std::map<int, std::vector<CenterNetInfo> > results
+                  , const int loc_channels);
+template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
+                  , const int output_width, const int classes, const int num_batch
+                  , std::map<int, std::vector<CenterNetInfo> > results
+                  , const int loc_channels);
 
 #ifdef USE_OPENCV
 
 cv::Mat gaussian2D(const int height, const int width, const float sigma){
   int half_width = (width - 1) / 2;
-  int half_height = (height - 1) /2 ; 
+  int half_height = (height - 1) / 2;
   cv::Mat heatmap(cv::Size(width, height), CV_32FC1, cv::Scalar(0));
   for(int i = 0; i < heatmap.rows; i++){
     float *data = heatmap.ptr<float>(i);
@@ -59,7 +230,7 @@ cv::Mat gaussian2D(const int height, const int width, const float sigma){
   return heatmap;
 }
 
-void draw_umich_gaussian(cv::Mat heatmap, float center_x, float center_y, float radius, int k = 1){
+void draw_umich_gaussian(cv::Mat heatmap, int center_x, int center_y, float radius, int k = 1){
   float diameter = 2 * radius + 1;
   cv::Mat gaussian = gaussian2D(int(diameter), int(diameter), float(diameter / 6));
   int height = heatmap.rows, width = heatmap.cols;
@@ -79,8 +250,52 @@ void draw_umich_gaussian(cv::Mat heatmap, float center_x, float center_y, float 
   }
 }
 
+template <typename Dtype>
+void transferCVMatToBlobData(cv::Mat heatmap, Dtype* buffer_heat){
+  int width = heatmap.cols;
+  int height = heatmap.rows;
+  for(int row = 0; row < height; row++){
+    float* data = heatmap.ptr<float>(row);
+    for(int col = 0; col < width; col++){
+      buffer_heat[row*width + col] = buffer_heat[row*width + col] > data[col] ? 
+                                              buffer_heat[row*width + col] : data[col];
+    }
+  }
+}
+template void transferCVMatToBlobData(cv::Mat heatmap, float* buffer_heat);
+template void transferCVMatToBlobData(cv::Mat heatmap, double* buffer_heat);
 
 
+template <typename Dtype>
+void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, Dtype* gt_heatmap, 
+                              const int num_classes_, const int output_width, const int output_height){
+  std::map<int, vector<NormalizedBBox> > ::iterator iter;
+  for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    int batch_id = iter->first;
+    vector<NormalizedBBox> gt_bboxes = iter->second;
+    cv::Mat heatmap(cv::Size(output_width, output_height), CV_32FC1, cv::Scalar(0));
+    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+      const int class_id = gt_bboxes[ii].label();
+      Dtype *classid_heap = gt_heatmap + (batch_id * num_classes_ + class_id) * output_width * output_height;
+      const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+      const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+      const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+      const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+      const Dtype width = Dtype((xmax - xmin));
+      const Dtype height = Dtype((ymax - ymin));
+      Dtype radius = gaussian_radius(width, height, 0.7);
+      radius = std::max(0, int(radius));
+      int center_x = int( (xmin + xmax) / 2 );
+      int center_y = int( (ymin + ymax) / 2 );
+      draw_umich_gaussian( heatmap, center_x, center_y, radius );
+      transferCVMatToBlobData(heatmap, classid_heap);
+    }
+  }
+}
+template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, float* gt_heatmap, 
+                              const int num_classes_, const int output_width, const int output_height);
+template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, double* gt_heatmap, 
+                              const int num_classes_, const int output_width, const int output_height);
 #endif  // USE_OPENCV
 
 }  // namespace caffe

@@ -464,7 +464,73 @@ void DataTransformer<Dtype>::TransformAnnoCcpd(
 	}
 }
 
+template<typename Dtype>
+void DataTransformer<Dtype>::CropImageAnchor(const Datum& datum, const NormalizedBBox& bbox,
+												Datum* crop_datum) {
+	// If datum is encoded, decode and crop the cv::image.
+	if (datum.encoded()) {
+	#ifdef USE_OPENCV
+		CHECK(!(param_.force_color() && param_.force_gray()))
+				<< "cannot set both force_color and force_gray";
+		cv::Mat cv_img;
+		if (param_.force_color() || param_.force_gray()) {
+			// If force_color then decode in color otherwise decode in gray.
+			cv_img = DecodeDatumToCVMat(datum, param_.force_color());
+		} else {
+			cv_img = DecodeDatumToCVMatNative(datum);
+		}
+		// Crop the image.
+		cv::Mat crop_img;
+		CropImageData_Anchor(cv_img, bbox, &crop_img);
+		// Save the image into datum.
+		EncodeCVMatToDatum(crop_img, "jpg", crop_datum);
+		crop_datum->set_label(datum.label());
+		return;
+	#else
+		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
+	#endif  // USE_OPENCV
+	} else {
+		if (param_.force_color() || param_.force_gray()) {
+			LOG(ERROR) << "force_color and force_gray only for encoded datum";
+		}
+	}
 
+	const int datum_channels = datum.channels();
+	const int datum_height = datum.height();
+	const int datum_width = datum.width();
+
+	// Get the bbox dimension.
+	NormalizedBBox clipped_bbox;
+	ClipBBox(bbox, &clipped_bbox);
+	NormalizedBBox scaled_bbox;
+	ScaleBBox(clipped_bbox, datum_height, datum_width, &scaled_bbox);
+	const int w_off = static_cast<int>(scaled_bbox.xmin());
+	const int h_off = static_cast<int>(scaled_bbox.ymin());
+	const int width = static_cast<int>(scaled_bbox.xmax() - scaled_bbox.xmin());
+	const int height = static_cast<int>(scaled_bbox.ymax() - scaled_bbox.ymin());
+
+	// Crop the image using bbox.
+	crop_datum->set_channels(datum_channels);
+	crop_datum->set_height(height);
+	crop_datum->set_width(width);
+	crop_datum->set_label(datum.label());
+	crop_datum->clear_data();
+	crop_datum->clear_float_data();
+	crop_datum->set_encoded(false);
+	const int crop_datum_size = datum_channels * height * width;
+	const std::string& datum_buffer = datum.data();
+	std::string buffer(crop_datum_size, ' ');
+	for (int h = h_off; h < h_off + height; ++h) {
+		for (int w = w_off; w < w_off + width; ++w) {
+			for (int c = 0; c < datum_channels; ++c) {
+				int datum_index = (c * datum_height + h) * datum_width + w;
+				int crop_datum_index = (c * height + h - h_off) * width + w - w_off;
+				buffer[crop_datum_index] = datum_buffer[datum_index];
+			}
+		}
+	}
+	crop_datum->set_data(buffer);
+}
 
 
 template<typename Dtype>
@@ -558,14 +624,14 @@ void DataTransformer<Dtype>::CropImage_anchor_Sampling(const AnnotatedDatum& ann
 														const NormalizedBBox& bbox,
 														AnnotatedDatum* cropped_anno_datum) {
 	// Crop the datum.
-	CropImage(anno_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
+	CropImageAnchor(anno_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
 	cropped_anno_datum->set_type(anno_datum.type());
 	
 	// Transform the annotation according to crop_bbox.
 	const bool do_resize = false;
 	const bool do_mirror = false;
-	NormalizedBBox crop_bbox;
-	ClipBBox(bbox, &crop_bbox);
+	//NormalizedBBox crop_bbox;
+	//ClipBBox(bbox, &crop_bbox);
 	TransformAnnotation(anno_datum, do_resize, bbox, do_mirror,
 										cropped_anno_datum->mutable_annotation_group());
 }
@@ -1076,8 +1142,7 @@ void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
 
 template <typename Dtype>
 void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
-																			 const NormalizedBBox& bbox,
-																			 cv::Mat* crop_img) {
+									const NormalizedBBox& bbox, cv::Mat* crop_img) {
 	const int img_height = img.rows;
 	const int img_width = img.cols;
 	
@@ -1101,7 +1166,7 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 
 	img(bbox_roi_cross).copyTo(*crop_img);
 
-	#if 0
+	#if 1
 	int crop_width = static_cast<int>(img_width * (bbox.xmax() - bbox.xmin()));
 	int crop_height = static_cast<int>(img_height * (bbox.ymax() - bbox.ymin()));
 	crop_img->create(crop_height, crop_width, img.type());

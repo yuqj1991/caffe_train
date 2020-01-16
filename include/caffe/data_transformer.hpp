@@ -108,6 +108,8 @@ class DataTransformer {
    */
   void CropImage(const Datum& datum, const NormalizedBBox& bbox,
                  Datum* crop_datum);
+  void CropImageAnchor(const Datum& datum, const NormalizedBBox& bbox,
+												Datum* crop_datum);
 
   /**
    * @brief Crops the datum and AnnotationGroup according to bbox.
