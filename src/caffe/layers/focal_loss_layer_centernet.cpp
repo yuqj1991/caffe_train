@@ -12,7 +12,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::LayerSetUp(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::LayerSetUp(bottom, top);
   LayerParameter sigmoid_param(this->layer_param_);
-  sigmoid_param.set_type("sigmoid");
+  sigmoid_param.set_type("Sigmoid");
   sigmoid_layer_ = LayerRegistry<Dtype>::CreateLayer(sigmoid_param);
   sigmoid_bottom_vec_.clear();
   sigmoid_bottom_vec_.push_back(bottom[0]);
