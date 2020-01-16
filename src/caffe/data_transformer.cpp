@@ -1121,7 +1121,8 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	CHECK_GE(roi_height, 0);
 	CHECK_LE(roi_h_off + roi_height, crop_height);
 	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, roi_width, roi_height);
-	img(bbox_roi_cross).copyTo((*crop_img)(bbox_roi_crop));
+	cv::Mat temp_roi = img(bbox_roi_cross);
+	temp_roi.copyTo((*crop_img)(bbox_roi_crop));
 }
 
 template <typename Dtype>
