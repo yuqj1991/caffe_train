@@ -1080,7 +1080,7 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	const int img_width = img.cols;
 	int crop_width = int(img_width * (bbox.xmax() - bbox.xmin()));
 	int crop_height = int(img_height * (bbox.ymax() - bbox.ymin()));
-	crop_img->create(crop_width, crop_height, img.type());
+	crop_img->create(crop_height, crop_width, img.type());
 	crop_img->setTo(cv::Scalar(0));
 
 	// Get the crossed_bbox dimension.
