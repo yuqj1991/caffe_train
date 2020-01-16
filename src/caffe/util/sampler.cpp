@@ -346,8 +346,8 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   #endif
   samplerbox->set_xmin(w_off);
   samplerbox->set_ymin(h_off);
-  samplerbox->set_xmax(w_off + float((1+sample_box_size)/img_width));
-  samplerbox->set_ymax(h_off + float((1+sample_box_size)/img_height));
+  samplerbox->set_xmax(w_off + float((sample_box_size)/img_width));
+  samplerbox->set_ymax(h_off + float((sample_box_size)/img_height));
   
 }// func GenerateDataAnchorSamples
 
