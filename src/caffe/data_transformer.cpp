@@ -1161,10 +1161,10 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	cv::Rect bbox_roi_cross(w_off, h_off, width, height);
 	CHECK_GE(w_off, 0);
 	CHECK_GE(width, 0);
-	CHECK_LT(w_off + width, img_width);
+	CHECK_LE(w_off + width, img_width);
 	CHECK_GE(h_off, 0);
 	CHECK_GE(height, 0);
-	CHECK_LT(h_off + height, img_height);
+	CHECK_LE(h_off + height, img_height);
 	int crop_width = static_cast<int>(img_width * (bbox.xmax() - bbox.xmin()));
 	int crop_height = static_cast<int>(img_height * (bbox.ymax() - bbox.ymin()));
 	crop_img->create(crop_height, crop_width, CV_8UC3);
@@ -1183,9 +1183,9 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	int roi_h_off = static_cast<int>(roi_bbox.ymin() * img_height) -1;
 	roi_h_off = roi_h_off >= 0 ? roi_h_off : 0;
 	CHECK_GE(roi_w_off, 0);
-	CHECK_LT(roi_w_off + width, crop_width);
+	CHECK_LE(roi_w_off + width, crop_width);
 	CHECK_GE(roi_h_off, 0);
-	CHECK_LT(roi_h_off + height, crop_height);
+	CHECK_LE(roi_h_off + height, crop_height);
 	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, width, height);
 	img(bbox_roi_cross).copyTo((*crop_img)(bbox_roi_crop));
 	#if 0
