@@ -29,7 +29,7 @@ typedef struct _CenterNetInfo{
 }CenterNetInfo;
 
 template<typename Dtype>
-Dtype gaussian_radius(const int heatmap_width, const int heatmap_height, const Dtype min_overlap);
+Dtype gaussian_radius(const Dtype heatmap_width, const Dtype heatmap_height, const Dtype min_overlap);
 template <typename Dtype>
 void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int output_width, 
                                 const int output_height, 
