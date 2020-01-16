@@ -150,7 +150,7 @@ layer {
 			max_sample: 1
 			max_trials: 10
 		}
-		sampleprob: 0.5
+		sampleprob: 1.0
 		label_map_file: "../labelmap.prototxt"
 	}
 }
