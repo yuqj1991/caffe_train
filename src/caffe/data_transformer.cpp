@@ -1075,7 +1075,7 @@ void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
 }
 
 template <typename Dtype>
-void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
+void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 																			 const NormalizedBBox& bbox,
 																			 cv::Mat* crop_img) {
 	const int img_height = img.rows;
@@ -1104,7 +1104,6 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	#if 0
 	int crop_width = static_cast<int>(img_width * (bbox.xmax() - bbox.xmin()));
 	int crop_height = static_cast<int>(img_height * (bbox.ymax() - bbox.ymin()));
-
 	crop_img->create(crop_height, crop_width, img.type());
 	crop_img->setTo(cv::Scalar(0));
 
@@ -1129,6 +1128,29 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, roi_width, roi_height);
 	img(bbox_roi_cross).copyTo((*crop_img)(bbox_roi_crop));
 	#endif
+}
+
+template <typename Dtype>
+void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
+																			 const NormalizedBBox& bbox,
+																			 cv::Mat* crop_img) {
+	const int img_height = img.rows;
+	const int img_width = img.cols;
+
+	// Get the bbox dimension.
+	NormalizedBBox clipped_bbox;
+	ClipBBox(bbox, &clipped_bbox);
+	NormalizedBBox scaled_bbox;
+	ScaleBBox(clipped_bbox, img_height, img_width, &scaled_bbox);
+
+	// Crop the image using bbox.
+	int w_off = static_cast<int>(scaled_bbox.xmin());
+	int h_off = static_cast<int>(scaled_bbox.ymin());
+	int width = static_cast<int>(scaled_bbox.xmax() - scaled_bbox.xmin());
+	int height = static_cast<int>(scaled_bbox.ymax() - scaled_bbox.ymin());
+	cv::Rect bbox_roi(w_off, h_off, width, height);
+
+	img(bbox_roi).copyTo(*crop_img);
 }
 
 template <typename Dtype>

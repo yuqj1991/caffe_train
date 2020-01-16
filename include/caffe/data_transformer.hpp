@@ -206,6 +206,8 @@ class DataTransformer {
    */
   void CropImage(const cv::Mat& img, const NormalizedBBox& bbox,
                  cv::Mat* crop_img);
+  void CropImageData_Anchor(const cv::Mat& img, const NormalizedBBox& bbox,
+																			 cv::Mat* crop_img);
 
   /**
    * @brief Expand img to include mean value as background.
