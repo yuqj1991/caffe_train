@@ -1156,8 +1156,8 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	w_off = w_off >= 0 ? w_off : 0;
 	int h_off = static_cast<int>(scaled_bbox.ymin()) - 1;
 	h_off = h_off >= 0 ? h_off : 0;
-	int width = static_cast<int>(scaled_bbox.xmax() - scaled_bbox.xmin()) - 1;
-	int height = static_cast<int>(scaled_bbox.ymax() - scaled_bbox.ymin()) - 1;
+	int width = static_cast<int>(scaled_bbox.xmax() - scaled_bbox.xmin());
+	int height = static_cast<int>(scaled_bbox.ymax() - scaled_bbox.ymin());
 	cv::Rect bbox_roi_cross(w_off, h_off, width, height);
 	CHECK_GE(w_off, 0);
 	CHECK_GE(width, 0);
