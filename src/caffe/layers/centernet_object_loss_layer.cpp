@@ -78,7 +78,7 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   if (conf_loss_type_ == CenterObjectParameter_ConfLossType_FOCALSIGMOID) {
     LayerParameter layer_param;
     layer_param.set_name(this->layer_param_.name() + "_sigmoid_conf");
-    layer_param.set_type("CenterNetfocalsigmoidWithLoss");
+    layer_param.set_type("CenterNetfocalSigmoidWithLoss");
     layer_param.add_loss_weight(Dtype(1.));
     layer_param.mutable_loss_param()->set_normalization(
         LossParameter_NormalizationMode_NONE);
