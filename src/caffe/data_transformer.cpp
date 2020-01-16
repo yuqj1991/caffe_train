@@ -564,6 +564,8 @@ void DataTransformer<Dtype>::CropImage_anchor_Sampling(const AnnotatedDatum& ann
 	// Transform the annotation according to crop_bbox.
 	const bool do_resize = false;
 	const bool do_mirror = false;
+	NormalizedBBox crop_bbox;
+	ClipBBox(bbox, &crop_bbox);
 	TransformAnnotation(anno_datum, do_resize, bbox, do_mirror,
 										cropped_anno_datum->mutable_annotation_group());
 }
