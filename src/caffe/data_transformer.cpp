@@ -1164,8 +1164,6 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	CHECK_GE(height, 0);
 	CHECK_LE(h_off + height, img_height);
 
-	img(bbox_roi_cross).copyTo(*crop_img);
-
 	#if 1
 	int crop_width = static_cast<int>(img_width * (bbox.xmax() - bbox.xmin()));
 	int crop_height = static_cast<int>(img_height * (bbox.ymax() - bbox.ymin()));
