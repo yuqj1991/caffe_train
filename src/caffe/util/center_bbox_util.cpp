@@ -283,7 +283,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
       const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
       const Dtype width = Dtype((xmax - xmin));
       const Dtype height = Dtype((ymax - ymin));
-      Dtype radius = gaussian_radius(width, height, 0.7);
+      Dtype radius = gaussian_radius(width, height, Dtype(0.7));
       radius = std::max(0, int(radius));
       int center_x = int( (xmin + xmax) / 2 );
       int center_y = int( (ymin + ymax) / 2 );
