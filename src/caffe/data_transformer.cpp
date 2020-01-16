@@ -484,11 +484,14 @@ void DataTransformer<Dtype>::CropImage(const Datum& datum,
 			cv_img = DecodeDatumToCVMatNative(datum);
 		}
 		// Crop the image.
-		cv::Mat crop_img;
+		int crop_width = int(datum.width() * (bbox.xmax() - bbox.xmin()));
+		int crop_height = int(datum.height() * (bbox.ymax() - bbox.ymin()));
+		cv::Mat crop_img(crop_height, crop_width, cv_img.type());
 		CropImage(cv_img, bbox, &crop_img);
 		// Save the image into datum.
 		EncodeCVMatToDatum(crop_img, "jpg", crop_datum);
 		crop_datum->set_label(datum.label());
+		crop_img.release();
 		return;
 	#else
 		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
@@ -1078,11 +1081,9 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 																			 cv::Mat* crop_img) {
 	const int img_height = img.rows;
 	const int img_width = img.cols;
-	int crop_width = int(img_width * (bbox.xmax() - bbox.xmin()));
-	int crop_height = int(img_height * (bbox.ymax() - bbox.ymin()));
-	crop_img->create(crop_height, crop_width, img.type());
-	crop_img->setTo(cv::Scalar(0));
-
+	int crop_width = crop_img->cols;
+	int crop_height = crop_img->rows;
+	
 	// Get the crossed_bbox dimension.
 	NormalizedBBox crossed_bbox;
 	ClipBBox(bbox, &crossed_bbox);
