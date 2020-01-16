@@ -35,7 +35,7 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-    sigmoid_layer_->Forward(sigmoid_bottom_vec_, sigmoid_top_vec_);
+    /*sigmoid_layer_->Forward(sigmoid_bottom_vec_, sigmoid_top_vec_);
     const Dtype* prob_data = prob_.gpu_data();
     const Dtype* label = bottom[1]->gpu_data();
     const int nthreads = prob_.count();
@@ -55,7 +55,8 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     top[0]->mutable_cpu_data()[0] = loss / valid_count;
     if (top.size() == 2) {
       top[1]->ShareData(prob_);
-    }
+    }*/
+    this->Forward_cpu(bottom,top);
 }
 
 template <typename Dtype>
@@ -87,7 +88,7 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-  if (propagate_down[1]) {
+  /*if (propagate_down[1]) {
     LOG(FATAL) << this->type()
                 << " Layer cannot backpropagate to label inputs.";
   }
@@ -108,7 +109,8 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
     caffe_gpu_asum(nthreads, counts, &valid_count);
     const Dtype loss_weight = top[0]->cpu_diff()[0] / valid_count;
     caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
-  }
+  }*/
+  this->Backward_cpu(top, propagate_down, bottom);
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(CenterNetfocalSigmoidWithLossLayer);

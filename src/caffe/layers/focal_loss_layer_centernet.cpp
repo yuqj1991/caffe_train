@@ -27,6 +27,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::LayerSetUp(
 
   alpha_ = 2.0f;
   gamma_ = 4.0f;
+  iterations_ = 0;
 }
 
 template <typename Dtype>
@@ -59,9 +60,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
   Dtype negitive_loss = Dtype(0.), positive_loss = Dtype(0.);
 
   int dim = num_class_ * height_ * width_;
-  int dimScale = height_ * width_;
-
-  LOG(INFO)<<"batch_: "<<batch_<<", num_class: "<<num_class_<<", height: "<<height_<<", width: "<<width_;
+  int dimScale = height_ * width_; 
 
   for(int b = 0; b < batch_; ++b){
     for(int c = 0; c < num_class_; ++c) {
@@ -83,10 +82,16 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
     }
   }
   top[0]->mutable_cpu_data()[0] = (loss)/ count;
-  LOG(INFO)<<"loss: "<<loss<<", count: "<<count<<", total_loss: "<<top[0]->mutable_cpu_data()[0];
+  #if 1
+  if(iterations_%1000 == 0){
+    LOG(INFO)<<"batch_: "<<batch_<<", num_class: "<<num_class_<<", height: "<<height_<<", width: "<<width_;
+    LOG(INFO)<<"loss: "<<loss<<", count: "<<count<<", total_loss: "<<top[0]->mutable_cpu_data()[0];
+  }
+  #endif
   if (top.size() == 2) {
     top[1]->ShareData(prob_);
   }
+  iterations_++;
 }
 
 template <typename Dtype>
