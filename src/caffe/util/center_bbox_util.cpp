@@ -77,8 +77,8 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int outpu
                                 + inter_center_y * output_width + inter_center_x;
       gt_data[count * 4 + 0] = diff_x;
       gt_data[count * 4 + 1] = diff_y;
-      gt_data[count * 4 + 2] = width;
-      gt_data[count * 4 + 3] = height;
+      gt_data[count * 4 + 2] = Dtype(width / output_width);
+      gt_data[count * 4 + 3] = Dtype(height / output_height);
       pred_data[count * 4 + 0] = loc_data[x_loc_index];
       pred_data[count * 4 + 1] = loc_data[y_loc_index];
       pred_data[count * 4 + 2] = loc_data[width_loc_index];
@@ -259,6 +259,10 @@ void transferCVMatToBlobData(cv::Mat heatmap, Dtype* buffer_heat){
     for(int col = 0; col < width; col++){
       buffer_heat[row*width + col] = buffer_heat[row*width + col] > data[col] ? 
                                               buffer_heat[row*width + col] : data[col];
+      #if 0
+      if(buffer_heat[row*width + col]!=0)
+        LOG(INFO)<<"gt heatmap: "<< buffer_heat[row*width + col];
+      #endif
     }
   }
 }
@@ -276,14 +280,15 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
     cv::Mat heatmap(cv::Size(output_width, output_height), CV_32FC1, cv::Scalar(0));
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
       const int class_id = gt_bboxes[ii].label();
-      Dtype *classid_heap = gt_heatmap + (batch_id * num_classes_ + class_id) * output_width * output_height;
+      //LOG(INFO)<<"batch_id: "<<batch_id<<", class_id: "<<class_id;
+      Dtype *classid_heap = gt_heatmap + (batch_id * num_classes_ + (class_id - 1)) * output_width * output_height;
       const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
       const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
       const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
       const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
       const Dtype width = Dtype((xmax - xmin));
       const Dtype height = Dtype((ymax - ymin));
-      Dtype radius = gaussian_radius(width, height, Dtype(0.7));
+      Dtype radius = gaussian_radius(width, height, Dtype(0.5));
       radius = std::max(0, int(radius));
       int center_x = int( (xmin + xmax) / 2 );
       int center_y = int( (ymin + ymax) / 2 );

@@ -186,6 +186,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     LOG(INFO)<<"loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
             <<"; conf loss: "<< conf_loss_.cpu_data()[0] / normalizer
             <<"; num_groundtruth: "<<num_groundtruth;
+    LOG(INFO)<<"num_classes: "<<num_classes_<<", output_width: "<<output_width<<", output_height: "<<output_height;
   }
   iterations_++;
   #endif

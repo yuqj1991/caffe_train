@@ -17,8 +17,6 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
     const int fh = index % height;
     const int fc = (index / width / height) % channels;
     const int fn = index / width / height / channels;
-    //int dim = channels * width * height;
-    //int dimScale = width * height;
     const Dtype* label_slice = label + (fn * channels + fc) * height * width;
     const Dtype* prob_slice = prob_data + (fn * channels + fc) * height * width;
     const Dtype label_a = label_slice[fh * width + fw];
@@ -41,25 +39,19 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     const Dtype* prob_data = prob_.gpu_data();
     const Dtype* label = bottom[1]->gpu_data();
     const int nthreads = prob_.count();
-    // Since this memory is not used for anything until it is overwritten
-    // on the backward pass, we use it here to avoid having to allocate new GPU
-    // memory to accumulate intermediate results in the kernel.
+    batch_ = bottom[0]->num();
+    num_class_ = bottom[0]->channels();
+    width_ = bottom[0]->width();
+    height_ = bottom[0]->height();
     Dtype* loss_data = bottom[0]->mutable_gpu_diff();
-    // Similarly, this memory is never used elsewhere, and thus we can use it
-    // to avoid having to allocate additional GPU memory.
     Dtype* counts = prob_.mutable_gpu_diff();
-    // NOLINT_NEXT_LINE(whitespace/operators)
     focalSigmoidLossForwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
         CAFFE_CUDA_NUM_THREADS>>>(nthreads, prob_data, label, loss_data,
         batch_, num_class_, height_, width_, counts, gamma_, alpha_);
     Dtype loss;
     caffe_gpu_asum(nthreads, loss_data, &loss);
-    Dtype valid_count = -1;
-    // Only launch another CUDA kernel if we actually need the count of valid
-    // outputs.
-    if (normalization_ == LossParameter_NormalizationMode_VALID) {
-      caffe_gpu_asum(nthreads, counts, &valid_count);
-    }
+    Dtype valid_count;
+    caffe_gpu_asum(nthreads, counts, &valid_count);
     top[0]->mutable_cpu_data()[0] = loss / valid_count;
     if (top.size() == 2) {
       top[1]->ShareData(prob_);
@@ -105,14 +97,15 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
     const Dtype* label = bottom[1]->gpu_data();
     const int nthreads = bottom[0]->count();
     Dtype* counts = prob_.mutable_gpu_diff();
+    batch_ = bottom[0]->num();
+    num_class_ = bottom[0]->channels();
+    width_ = bottom[0]->width();
+    height_ = bottom[0]->height();
     focalSigmoidLossBackwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
         CAFFE_CUDA_NUM_THREADS>>>(nthreads, label, prob_data, bottom_diff,
           batch_, num_class_, height_, width_, counts, gamma_, alpha_);
-
-    Dtype valid_count = -1;
-    if (normalization_ == LossParameter_NormalizationMode_VALID ) {
-      caffe_gpu_asum(nthreads, counts, &valid_count);
-    }
+    Dtype valid_count;
+    caffe_gpu_asum(nthreads, counts, &valid_count);
     const Dtype loss_weight = top[0]->cpu_diff()[0] / valid_count;
     caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
   }
