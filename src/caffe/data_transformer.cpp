@@ -1099,7 +1099,7 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	CHECK_GE(height, 0);
 	CHECK_LE(h_off + height, img_height);
 
-	img.copyTo(*crop_img);
+	img(bbox_roi_cross).copyTo(*crop_img);
 
 	#if 0
 	int crop_width = static_cast<int>(img_width * (bbox.xmax() - bbox.xmin()));
@@ -1127,8 +1127,7 @@ void DataTransformer<Dtype>::CropImage(const cv::Mat& img,
 	CHECK_GE(roi_height, 0);
 	CHECK_LE(roi_h_off + roi_height, crop_height);
 	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, roi_width, roi_height);
-	cv::Mat temp_roi = img(bbox_roi_cross);
-	temp_roi.copyTo((*crop_img)(bbox_roi_crop));
+	img(bbox_roi_cross).copyTo((*crop_img)(bbox_roi_crop));
 	#endif
 }
 
