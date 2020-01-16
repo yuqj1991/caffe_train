@@ -258,7 +258,7 @@ void YoloDetectionOutputLayer<Dtype>::Forward_cpu(
 	}
 	if (bottom.size() > 1) {
 		//LOG(INFO) << "detect two scaler layer";
-		const int num = bottom[1]->num();
+		//const int num = bottom[1]->num();
 		side_ = bottom[1]->width();
 		Blob<Dtype> swap2;
 		swap2.Reshape(bottom[1]->num(), bottom[1]->height()*bottom[1]->width(), num_box_, bottom[1]->channels() / num_box_);

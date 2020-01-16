@@ -178,11 +178,11 @@ namespace caffe {
 		}
 
 
-		int input_count = bottom[0]->count(1); //h*w*n*(classes+coords+1) = 13*13*5*(20+4+1)
-		int label_count = bottom[1]->count(1); //30*5-
+		//int input_count = bottom[0]->count(1); //h*w*n*(classes+coords+1) = 13*13*5*(20+4+1)
+		//int label_count = bottom[1]->count(1); //30*5-
 											   // outputs: classes, iou, coordinates
-		int tmp_input_count = side_ * side_ * num_ * (coords_ + num_class_ + 1); //13*13*5*(20+4+1) label: isobj, class_label, coordinates
-		int tmp_label_count = 30 * num_;
+		//int tmp_input_count = side_ * side_ * num_ * (coords_ + num_class_ + 1); //13*13*5*(20+4+1) label: isobj, class_label, coordinates
+		//int tmp_label_count = 30 * num_;
 		//CHECK_EQ(input_count, tmp_input_count);
 		//CHECK_EQ(label_count, tmp_label_count);
 	}

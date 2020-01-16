@@ -226,7 +226,7 @@ void Yolov3DetectionOutputLayer<Dtype>::Forward_cpu(
 	const int num = bottom[0]->num();
 	
 	int len = 4 + num_class_ + 1;
-	int stride = side_*side_;
+	//int stride = side_*side_;
 
 
 	
