@@ -777,7 +777,7 @@ layer {
 layer {
 	name: "detection_out"
 	type: "CenternetDetectionOutput"
-	bottom: "conf_heatmap_64_1x1"
+	bottom: "conf_heatmap_64_1x1_sigmoid"
 	bottom: "conf_heatmap_64_1x1_pool"
 	bottom: "prediction_concate_output"
 	top: "detection_out"
