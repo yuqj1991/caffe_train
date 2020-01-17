@@ -57,8 +57,6 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
   
   int count = 0;
   Dtype loss = Dtype(0.);
-  Dtype negitive_loss = Dtype(0.), positive_loss = Dtype(0.);
-
   int dim = num_class_ * height_ * width_;
   int dimScale = height_ * width_; 
 
@@ -116,17 +114,13 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<D
             Dtype prob_a = prob_data[index];
             Dtype label_a = label[index];
             if(int(label_a) == 1){
-              bottom_diff[index] = std::pow(1 - prob_a, alpha_) * (alpha_ * log(std::max(prob_a, Dtype(FLT_MIN))) * prob_a - 
-                        (1 - prob_a));
+              bottom_diff[index] = std::pow(1 - prob_a, alpha_) * (alpha_ * prob_a *log(std::max(prob_a, Dtype(FLT_MIN))) - (1 - prob_a));
               count++;
             }else if(label_a < Dtype(1))
-              bottom_diff[index] = std::pow(1 - prob_a, gamma_) * std::pow(prob_a, alpha_) *( - alpha_ * (1 - prob_a) * log(std::max(1 - prob_a, Dtype(FLT_MIN)))
-                                  + prob_a);
+              bottom_diff[index] = std::pow(1 - label_a, gamma_) * std::pow(prob_a, alpha_) * 
+                                                ( prob_a - alpha_ * (1 - prob_a) * log(std::max(1 - prob_a, Dtype(FLT_MIN))));
           }
         }
-        //prob_data += prob_.offset(0, 1);
-        //label += bottom[1]->offset(0, 1);
-        //bottom_diff += bottom[0]->offset(0, 1);
       }
     }
     Dtype loss_weight = top[0]->cpu_diff()[0] / count;
