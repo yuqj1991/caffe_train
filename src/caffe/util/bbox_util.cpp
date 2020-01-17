@@ -433,7 +433,7 @@ void EncodeBBox(
       encode_bbox->set_ymax(
           (bbox.ymax() - prior_bbox.ymax()) / prior_height / prior_variance[3]);
     }
-  }else if (code_type == PriorBoxParameter_CodeType_CENTER_GRID) {
+  }else if (code_type == PriorBoxParameter_CodeType_CORNER_GRID) {
     float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
     CHECK_GT(prior_width, 0);
     float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
@@ -522,7 +522,7 @@ void DecodeBBox(
     decode_bbox->set_ymin(decode_bbox_center_y - decode_bbox_height / 2.);
     decode_bbox->set_xmax(decode_bbox_center_x + decode_bbox_width / 2.);
     decode_bbox->set_ymax(decode_bbox_center_y + decode_bbox_height / 2.);
-  } else if (code_type == PriorBoxParameter_CodeType_CENTER_GRID) {
+  } else if (code_type == PriorBoxParameter_CodeType_CORNER_GRID) {
     float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
     CHECK_GT(prior_width, 0);
     float prior_height = prior_bbox.ymax() - prior_bbox.ymin();

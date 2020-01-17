@@ -157,7 +157,7 @@ __global__ void DecodeBBoxesKernel(const int nthreads,
           bbox_data[index] = decode_bbox_center_y + decode_bbox_height / 2.;
           break;
       }
-    } else if (code_type == PriorBoxParameter_CodeType_CENTER_GRID) {
+    } else if (code_type == PriorBoxParameter_CodeType_CORNER_GRID) {
       const Dtype p_xmin = prior_data[pi];
       const Dtype p_ymin = prior_data[pi + 1];
       const Dtype p_xmax = prior_data[pi + 2];

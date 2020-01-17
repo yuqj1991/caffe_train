@@ -1939,7 +1939,7 @@ message PriorBoxParameter {
     CORNER = 1;
     CENTER_SIZE = 2;
     CORNER_SIZE = 3;
-    CENTER_GRID = 4;
+    CORNER_GRID = 4;
   }
   // Minimum box size (in pixels). Required!
   repeated float min_size = 1;

@@ -3678,7 +3678,7 @@ layer {
 		use_difficult_gt: true
 		neg_pos_ratio: 3.0
 		neg_overlap: 0.15
-		code_type: CENTER_GRID
+		code_type: CORNER_GRID
 		ignore_cross_boundary_bbox: false
 		mining_type: MAX_NEGATIVE
 	}
