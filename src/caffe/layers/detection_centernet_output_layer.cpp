@@ -107,6 +107,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
         top_data[count * 7 + 4] = result_temp[i].ymin;
         top_data[count * 7 + 5] = result_temp[i].xmax;
         top_data[count * 7 + 6] = result_temp[i].ymax;
+        ++count;
       }
     }else{
       LOG(INFO) << "image id "<<i<< " Couldn't find any detections";
