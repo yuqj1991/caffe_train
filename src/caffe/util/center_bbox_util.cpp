@@ -60,7 +60,7 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int outpu
       int inter_center_x = static_cast<int> (center_x);
       int inter_center_y = static_cast<int> (center_y);
       Dtype diff_x = center_x - inter_center_x;
-      Dtype diff_y = center_x - inter_center_y;
+      Dtype diff_y = center_y - inter_center_y;
       Dtype width = gt_bboxes[ii].xmax() - gt_bboxes[ii].xmin();
       Dtype height = gt_bboxes[ii].ymax() - gt_bboxes[ii].ymin();
       int dimScale = output_height * output_width;
@@ -77,13 +77,16 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int outpu
                                 + inter_center_y * output_width + inter_center_x;
       gt_data[count * 4 + 0] = diff_x;
       gt_data[count * 4 + 1] = diff_y;
-      gt_data[count * 4 + 2] = Dtype(width / output_width);
-      gt_data[count * 4 + 3] = Dtype(height / output_height);
+      gt_data[count * 4 + 2] = Dtype(width);
+      gt_data[count * 4 + 3] = Dtype(height );
       pred_data[count * 4 + 0] = loc_data[x_loc_index];
       pred_data[count * 4 + 1] = loc_data[y_loc_index];
       pred_data[count * 4 + 2] = loc_data[width_loc_index];
       pred_data[count * 4 + 3] = loc_data[height_loc_index];
       count++;
+      #if 0
+      LOG(INFO)<<"diff_x: "<<diff_x<<", diff_y: "<<diff_y<<", width: "<<width  <<", height: "<<height;
+      #endif
     }
   }
 }
