@@ -448,17 +448,17 @@ void EncodeBBox(
     float bbox_center_x = (bbox.xmin() + bbox.xmax()) / 2.;
     float bbox_center_y = (bbox.ymin() + bbox.ymax()) / 2.;
     if (encode_variance_in_target) {
-      encode_bbox->set_xmin(log((bbox.xmin() - prior_bbox.xmin()) / prior_width));
-      encode_bbox->set_ymin(log((bbox.ymin() - prior_bbox.ymin()) / prior_height));
-      encode_bbox->set_xmax(log((bbox.xmax() - prior_bbox.xmax()) / prior_width));
-      encode_bbox->set_ymax(log((bbox.ymax() - prior_bbox.ymax()) / prior_height));
+      encode_bbox->set_xmin(((bbox.xmin() - prior_bbox.xmin()) / prior_width));
+      encode_bbox->set_ymin(((bbox.ymin() - prior_bbox.ymin()) / prior_height));
+      encode_bbox->set_xmax(((bbox.xmax() - prior_bbox.xmax()) / prior_width));
+      encode_bbox->set_ymax(((bbox.ymax() - prior_bbox.ymax()) / prior_height));
     } else {
-      encode_bbox->set_xmin(log(((bbox.xmin() - prior_bbox.xmin()) / prior_width)) / prior_variance[0]);
-      encode_bbox->set_ymin(log(((bbox.ymin() - prior_bbox.ymin()) / prior_height)) / prior_variance[1]);
+      encode_bbox->set_xmin((((bbox.xmin() - prior_bbox.xmin()) / prior_width)) / prior_variance[0]);
+      encode_bbox->set_ymin((((bbox.ymin() - prior_bbox.ymin()) / prior_height)) / prior_variance[1]);
       encode_bbox->set_xmax(
-          log(((bbox.xmax() - prior_bbox.xmax()) / prior_width)) / prior_variance[2]);
+          (((bbox.xmax() - prior_bbox.xmax()) / prior_width)) / prior_variance[2]);
       encode_bbox->set_ymax(
-          log(((bbox.ymax() - prior_bbox.ymax()) / prior_height)) / prior_variance[3]);
+          (((bbox.ymax() - prior_bbox.ymax()) / prior_height)) / prior_variance[3]);
     }
   } else {
     LOG(FATAL) << "Unknown encode type.";
@@ -535,20 +535,20 @@ void DecodeBBox(
     if (variance_encoded_in_target) {
       // variance is encoded in target, we simply need to retore the offset
       // predictions.
-      decode_bbox_xmin = exp(bbox.xmin()) * prior_width + prior_bbox.xmin();
-      decode_bbox_ymin = exp(bbox.ymin()) * prior_height + prior_bbox.ymin();
-      decode_bbox_xmax = exp(bbox.xmax()) * prior_width + prior_bbox.xmax();
-      decode_bbox_ymax = exp(bbox.ymax()) * prior_height + prior_bbox.ymax();
+      decode_bbox_xmin = (bbox.xmin()) * prior_width + prior_bbox.xmin();
+      decode_bbox_ymin = (bbox.ymin()) * prior_height + prior_bbox.ymin();
+      decode_bbox_xmax = (bbox.xmax()) * prior_width + prior_bbox.xmax();
+      decode_bbox_ymax = (bbox.ymax()) * prior_height + prior_bbox.ymax();
     } else {
       // variance is encoded in bbox, we need to scale the offset accordingly.
       decode_bbox_xmin =
-          exp(prior_variance[0] * bbox.xmin()) * prior_width + prior_bbox.xmin() ;
+          (prior_variance[0] * bbox.xmin()) * prior_width + prior_bbox.xmin() ;
       decode_bbox_ymin =
-          exp(prior_variance[1] * bbox.ymin()) * prior_height + prior_bbox.ymin() ;
+          (prior_variance[1] * bbox.ymin()) * prior_height + prior_bbox.ymin() ;
       decode_bbox_xmax =
-         exp(prior_variance[2] * bbox.xmax()) * prior_width + prior_bbox.xmax() ;
+         (prior_variance[2] * bbox.xmax()) * prior_width + prior_bbox.xmax() ;
       decode_bbox_ymax =
-          exp(prior_variance[3] * bbox.ymax()) * prior_height + prior_bbox.ymax();
+          (prior_variance[3] * bbox.ymax()) * prior_height + prior_bbox.ymax();
     }
 
     decode_bbox->set_xmin(decode_bbox_xmin);
