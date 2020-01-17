@@ -1143,9 +1143,41 @@ void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
 template <typename Dtype>
 void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 									const NormalizedBBox& bbox, cv::Mat* crop_img) {
-	const int img_height = img.rows;
-	const int img_width = img.cols;
-	
+	int img_height = img.rows;
+	int img_width = img.cols;
+	#if 1
+	float xmin = bbox.xmin() * img_width;
+	float ymin = bbox.ymin() * img_height;
+	float xmax = bbox.xmax() * img_width;
+	float ymax = bbox.ymax() * img_height;
+
+	float w_off = xmin, h_off = ymin, width = xmax - xmin, height = ymax - ymin;
+	float cross_xmin = std::max(0.f, w_off);
+	float cross_ymin = std::max(0.f, h_off); 
+	float cross_xmax = std::min(w_off + width - 1, float(img_width));
+	float cross_ymax = std::min(h_off + height - 1, float(img_height));
+	int cross_width = static_cast<int>(cross_xmax - cross_xmin);
+	int	cross_height = static_cast<int>(cross_ymax - cross_ymin);
+
+	float roi_xmin = w_off >= 0 ? 0 : std::fabs(w_off);
+	float roi_ymin = h_off >= 0 ? 0 : std::fabs(h_off);
+	int roi_width = cross_width;
+	int roi_height = cross_height;
+
+	int roi_x1 = static_cast<int>(roi_xmin);
+	int roi_y1 = static_cast<int>(roi_ymin);
+
+	int cross_x1 = static_cast<int>(cross_xmin);
+	int cross_y1 = static_cast<int>(cross_ymin);
+	crop_img->create(int(height), int(width), CV_8UC3);
+	crop_img->setTo(cv::Scalar(0));
+
+	cv::Rect bbox_cross(cross_x1, cross_y1, cross_width, cross_height);
+	cv::Rect bbox_roi(roi_x1, roi_y1, roi_width, roi_height);
+	img(bbox_cross).copyTo((*crop_img)(bbox_roi));
+
+
+	#else
 	// Get the crossed_bbox dimension.
 	NormalizedBBox crossed_bbox;
 	ClipBBox(bbox, &crossed_bbox);
@@ -1194,6 +1226,7 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 
 	LOG(INFO)<<"crop_width: "<<crop_width<<", crop_height: "<<crop_height
 				<<", roi_w_off: "<<roi_w_off<<", roi_h_off: "<<roi_h_off;
+	#endif
 	#endif
 }
 
