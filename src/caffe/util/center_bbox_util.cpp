@@ -13,6 +13,11 @@
 #include "caffe/util/bbox_util.hpp"
 #include "caffe/util/center_bbox_util.hpp"
 
+int count_gt = 0;
+int count_one = 0;
+int count_zero = 0;
+int count_no_zero = 0;
+
 namespace caffe {
 template<typename Dtype>
 Dtype gaussian_radius(const Dtype heatmap_width, const Dtype heatmap_height, const Dtype min_overlap){
@@ -21,19 +26,19 @@ Dtype gaussian_radius(const Dtype heatmap_width, const Dtype heatmap_height, con
   Dtype b1  = (heatmap_width + heatmap_height);
   Dtype c1  = heatmap_width * heatmap_height * (1 - min_overlap) / (1 + min_overlap);
   Dtype sq1 = std::sqrt(b1 * b1 - 4 * a1 * c1);
-  Dtype r1  = (b1 + sq1) / 2;
+  Dtype r1  = Dtype(b1 + sq1) / 2;
 
   Dtype a2  = Dtype(4.0);
   Dtype b2  = 2 * (heatmap_height + heatmap_width);
   Dtype c2  = (1 - min_overlap) * heatmap_width * heatmap_height;
   Dtype sq2 = std::sqrt(b2 * b2 - 4 * a2 * c2);
-  Dtype r2  = (b2 + sq2) / 2;
+  Dtype r2  = Dtype(b2 + sq2) / 2;
 
   Dtype a3  = Dtype(4 * min_overlap);
   Dtype b3  = -2 * min_overlap * (heatmap_height + heatmap_width);
   Dtype c3  = (min_overlap - 1) * heatmap_width * heatmap_height;
   Dtype sq3 = std::sqrt(b3 * b3 - 4 * a3 * c3);
-  Dtype r3  = (b3 + sq3) / 2;
+  Dtype r3  = Dtype(b3 + sq3) / 2;
   return std::min(std::min(r1, r2), r3);
 }
 
@@ -209,10 +214,10 @@ template  void get_topK(const float* keep_max_data, const float* loc_data, const
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo> > results
                   , const int loc_channels);
-template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
+/*template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo> > results
-                  , const int loc_channels);
+                  , const int loc_channels);*/
 
 #ifdef USE_OPENCV
 
@@ -239,7 +244,7 @@ void draw_umich_gaussian(cv::Mat heatmap, int center_x, int center_y, float radi
   int height = heatmap.rows, width = heatmap.cols;
   int left = std::min(int(center_x), int(radius)), right = std::min(int(width - center_x), int(radius) + 1);
   int top = std::min(int(center_y), int(radius)), bottom = std::min(int(height - center_y), int(radius) + 1);
-  if(left + right > 0 && top + bottom > 0){
+  if((left + right) > 0 && (top + bottom) > 0){
     cv::Mat masked_heatmap = heatmap(cv::Rect(int(center_x) -left, int(center_y) -top, (right + left), (bottom + top)));
     cv::Mat masked_gaussian = gaussian(cv::Rect(int(radius) - left, int(radius) - top, (right + left), (bottom + top)));
     for(int row = 0; row < (top + bottom); row++){
@@ -251,6 +256,16 @@ void draw_umich_gaussian(cv::Mat heatmap, int center_x, int center_y, float radi
       }
     }
   }
+  #if 0
+  LOG(INFO)<<"left + right: "<<left + right<<",top + bottom: "<<top + bottom; 
+  for(int row = 0; row < height; row++){
+    float *masked_heatmap_data = heatmap.ptr<float>(row);
+    for(int col = 0; col < width; col++){
+      if(masked_heatmap_data[col] == 1.f)
+        LOG(INFO)<<"heatmap center_x: "<< col << ", heatmap center_y; "<< row;
+    }
+  }
+  #endif
 }
 
 template <typename Dtype>
@@ -262,10 +277,6 @@ void transferCVMatToBlobData(cv::Mat heatmap, Dtype* buffer_heat){
     for(int col = 0; col < width; col++){
       buffer_heat[row*width + col] = buffer_heat[row*width + col] > data[col] ? 
                                               buffer_heat[row*width + col] : data[col];
-      #if 0
-      if(buffer_heat[row*width + col]!=0)
-        LOG(INFO)<<"gt heatmap: "<< buffer_heat[row*width + col];
-      #endif
     }
   }
 }
@@ -277,28 +288,71 @@ template <typename Dtype>
 void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, Dtype* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height){
   std::map<int, vector<NormalizedBBox> > ::iterator iter;
+  count_gt = 0;
+  count_zero = 0;
+  count_no_zero = 0;
+  count_one = 0;
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
-    cv::Mat heatmap(cv::Size(output_width, output_height), CV_32FC1, cv::Scalar(0));
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+      cv::Mat heatmap(cv::Size(output_width, output_height), CV_32FC1, cv::Scalar(0));
       const int class_id = gt_bboxes[ii].label();
-      //LOG(INFO)<<"batch_id: "<<batch_id<<", class_id: "<<class_id;
       Dtype *classid_heap = gt_heatmap + (batch_id * num_classes_ + (class_id - 1)) * output_width * output_height;
       const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
       const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
       const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
       const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
-      const Dtype width = Dtype((xmax - xmin));
-      const Dtype height = Dtype((ymax - ymin));
-      Dtype radius = gaussian_radius(width, height, Dtype(0.5));
+      const Dtype width = Dtype(xmax - xmin);
+      const Dtype height = Dtype(ymax - ymin);
+      Dtype radius = gaussian_radius(width, height, Dtype(0.7));
       radius = std::max(0, int(radius));
       int center_x = int( (xmin + xmax) / 2 );
       int center_y = int( (ymin + ymax) / 2 );
+      #if 0
+      LOG(INFO)<<"batch_id: "<<batch_id<<", class_id: "
+                <<class_id<<", radius: "<<radius<<", center_x: "
+                <<center_x<<", center_y: "<<center_y<<", output_height: "
+                <<output_height<<", output_width: "<<output_width
+                <<", bbox_width: "<<width<<", bbox_height: "<<height;
+      #endif
       draw_umich_gaussian( heatmap, center_x, center_y, radius );
       transferCVMatToBlobData(heatmap, classid_heap);
+      count_gt++;
     }
   }
+  #if 0
+  for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    int batch_id = iter->first;
+    vector<NormalizedBBox> gt_bboxes = iter->second;
+    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+      const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+      const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+      const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+      const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+      int center_x = int( (xmin + xmax) / 2 );
+      int center_y = int( (ymin + ymax) / 2 );
+      LOG(INFO)<<"gt_bboxes center_x: "<< center_x << ", gt_bboxes center_y; "<< center_y;
+    }
+    for(int c = 0; c < num_classes_; c++){
+      for(int h = 0 ; h < output_height; h++){
+        for(int w = 0; w < output_width; w++){
+          int index = batch_id * num_classes_ * output_height * output_width + c * output_height * output_width + h * output_width + w;  
+          if(gt_heatmap[index] == 0.f)
+            count_zero++;
+          if(gt_heatmap[index] != 0.f)
+            count_no_zero++;
+          if(gt_heatmap[index] == 1.f){
+            count_one++;
+            LOG(INFO)<<"heatmap center_x: "<< w << ", heatmap center_y; "<< h << ", value: "<<gt_heatmap[index];
+          }
+        }
+      }
+    }
+  }
+  LOG(INFO)<<"count_no_zero: "<<count_no_zero<<", count_zero: "<<count_zero;
+  CHECK_EQ(count_one, count_gt);
+  #endif
 }
 template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, float* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);

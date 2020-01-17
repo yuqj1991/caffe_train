@@ -19,8 +19,9 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
     const int fh = index % height;
     const int fc = (index / width / height) % channels;
     const int fn = index / width / height / channels;
-    const Dtype* label_slice = label + (fn * channels + fc) * height * width;
-    const Dtype* prob_slice = prob_data + (fn * channels + fc) * height * width;
+    const int dim = (fn * channels + fc) * height * width;
+    const Dtype* label_slice = label + dim;
+    const Dtype* prob_slice = prob_data + dim;
     const Dtype label_a = label_slice[fh * width + fw];
     const Dtype prob_a = prob_slice[fh * width + fw];
     if( label_a == Dtype(1)){
@@ -58,7 +59,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     if (top.size() == 2) {
       top[1]->ShareData(prob_);
     }
-    //this->Forward_cpu(bottom,top);
+    this->Forward_cpu(bottom,top);
     #if 1
     if(count_iter % 1000 == 0)
       printf("\033[1m\033[45;33m batch_: %d, num_class_: %d, width: %d, height: %d, valid_count: %f, loss: %f, final_loss: %f \33[0m\n", 
@@ -77,16 +78,18 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
     const int fh = index % height;
     const int fc = (index / width / height) % channels;
     const int fn = index / width / height / channels;
-    const Dtype* label_slice = label + (fn * channels + fc) * height * width;
-    const Dtype* prob_slice = prob_data + (fn * channels + fc) * height * width;
+    const int dim = (fn * channels + fc) * height * width;
+    const Dtype* label_slice = label + dim;
+    const Dtype* prob_slice = prob_data + dim;
+    Dtype* diff_a = bottom_diff + dim;
     const Dtype label_a = label_slice[fh * width + fw];
     const Dtype prob_a = prob_slice[fh * width + fw];
     if(label_a == Dtype(1)){
-      bottom_diff[fh * width + fw] = powf(1 - prob_a, alpha) * 
+      diff_a[fh * width + fw] = powf(1 - prob_a, alpha) * 
                                         (alpha * prob_a * log(max(prob_a, Dtype(FLT_MIN))) - (1 - prob_a));
       counts[index] = 1;
     }else if(label_a < Dtype(1)){
-      bottom_diff[fh * width + fw] = powf(1 - label_a, gamma) * powf(prob_a, alpha) * 
+      diff_a[fh * width + fw] = powf(1 - label_a, gamma) * powf(prob_a, alpha) * 
                                         ( prob_a - alpha* (1 - prob_a) * log(max(1 - prob_a, Dtype(FLT_MIN))));
       counts[index] = 0;
     }
