@@ -1152,9 +1152,9 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	NormalizedBBox scaled_bbox;
 	ScaleBBox(crossed_bbox, img_height, img_width, &scaled_bbox);
 
-	int w_off = static_cast<int>(scaled_bbox.xmin()) - 1;
+	int w_off = static_cast<int>(scaled_bbox.xmin());
 	w_off = w_off >= 0 ? w_off : 0;
-	int h_off = static_cast<int>(scaled_bbox.ymin()) - 1;
+	int h_off = static_cast<int>(scaled_bbox.ymin());
 	h_off = h_off >= 0 ? h_off : 0;
 	int width = static_cast<int>(scaled_bbox.xmax() - scaled_bbox.xmin());
 	int height = static_cast<int>(scaled_bbox.ymax() - scaled_bbox.ymin());
@@ -1178,9 +1178,9 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	roi_bbox.set_xmax( roi_bbox.xmin() + (crossed_bbox.xmax() - crossed_bbox.xmin()));
 	roi_bbox.set_ymax( roi_bbox.ymin() + (crossed_bbox.ymax()- crossed_bbox.ymin()));
 	
-	int roi_w_off = static_cast<int>(roi_bbox.xmin() * img_width) -1;
+	int roi_w_off = static_cast<int>(roi_bbox.xmin() * img_width);
 	roi_w_off = roi_w_off >= 0 ? roi_w_off : 0;
-	int roi_h_off = static_cast<int>(roi_bbox.ymin() * img_height) -1;
+	int roi_h_off = static_cast<int>(roi_bbox.ymin() * img_height);
 	roi_h_off = roi_h_off >= 0 ? roi_h_off : 0;
 	CHECK_GE(roi_w_off, 0);
 	CHECK_LE(roi_w_off + width, crop_width);
