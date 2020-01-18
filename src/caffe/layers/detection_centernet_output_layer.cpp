@@ -73,7 +73,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
       iter->second.resize(keep_top_k_);
       num_kept += keep_top_k_;
     }else{
-      num_det += num_det;
+      num_kept += num_det;
     }
   }
   vector<int> top_shape(2, 1);

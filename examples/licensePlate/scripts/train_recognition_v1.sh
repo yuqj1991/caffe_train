@@ -10,4 +10,4 @@ if ! test -f ../prototxt/LPRecognition/lp_rec_test_v1.prototxt ;then
         exit 1
 fi
 ../../../build/tools/caffe train --solver=../prototxt/LPRecognition/solver_rec_v1.prototxt -gpu 0 \
-#--snapshot=../snapshot/deepccpd_rec_v1_iter_44952.solverstate
+--snapshot=../snapshot/rec_v1_iter_190000.solverstate
