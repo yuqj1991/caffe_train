@@ -12,7 +12,7 @@ snapshot_prefix: "../snapshot/face"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
-test_initialization: true
+test_initialization: false
 max_iter: 240000
 average_loss: 10
 stepvalue: 50000
