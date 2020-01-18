@@ -883,7 +883,8 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
               y_inside_gt_box = true;
             }
             if(y_inside_gt_box && x_inside_gt_box){
-              if(BBoxCoverage(gt_bboxes[j], pred_bboxes[i]) > 0.55){
+              if(BBoxCoverage(gt_bboxes[j], pred_bboxes[i]) > 0.55 
+                                  && BBoxCoverage(pred_bboxes[i], gt_bboxes[j]) > 0.55){
                 center_match_gt_idx = j;
                 center_match_overlap = it->second[j];
               }
