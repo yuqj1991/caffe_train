@@ -58,9 +58,10 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
   const int output_width = bottom[0]->width();
   const int classes = bottom[0]->channels();
   Dtype* keep_max_data = bottom[1]->mutable_cpu_data();
+   num_ =  bottom[0]->num();
   _nms_heatmap(conf_data, keep_max_data, output_height, output_width, classes, num_);
   const Dtype* keep_data = bottom[1]->cpu_data();
-  get_topK(keep_data, loc_data, output_height, output_width, classes, num_, results_, 4);
+  get_topK(keep_data, loc_data, output_height, output_width, classes, num_, &results_, 4);
 
   int num_kept = 0;
 
@@ -81,7 +82,6 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
   top_shape.push_back(7);
   Dtype* top_data;
   if (num_kept == 0) {
-    LOG(INFO) << "Couldn't find any detections";
     top_shape[2] = num_;
     top[0]->Reshape(top_shape);
     top_data = top[0]->mutable_cpu_data();
@@ -109,8 +109,6 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
         top_data[count * 7 + 6] = result_temp[i].ymax;
         ++count;
       }
-    }else{
-      LOG(INFO) << "image id "<<i<< " Couldn't find any detections";
     }
   }
   results_.clear();

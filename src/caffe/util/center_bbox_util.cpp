@@ -168,7 +168,7 @@ template void _nms_heatmap(const double* conf_data, double* keep_max_data, const
 template <typename Dtype>
 void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
-                  , std::map<int, std::vector<CenterNetInfo> > results
+                  , std::map<int, std::vector<CenterNetInfo> >* results
                   , const int loc_channels){
   for(int i = 0; i < num_batch; i++){
     int dim = classes * output_width * output_height;
@@ -202,8 +202,9 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
       }
     }
     if(batch_result.size() > 0){
-      if(results.find(i) == results.end()){
-        results.insert(std::make_pair(i, batch_result));
+      if(results->find(i) == results->end()){
+        results->insert(std::make_pair(i, batch_result));
+       // LOG(INFO)<<"num_batch: "<<num_batch<<",  batch det result size: "<< batch_result.size()<<", map size: "<<results->size();
       }else{
         // 
       }
@@ -212,7 +213,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
 }
 template  void get_topK(const float* keep_max_data, const float* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
-                  , std::map<int, std::vector<CenterNetInfo> > results
+                  , std::map<int, std::vector<CenterNetInfo> >* results
                   , const int loc_channels);
 /*template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
