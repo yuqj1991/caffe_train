@@ -229,7 +229,7 @@ cv::Mat gaussian2D(const int height, const int width, const float sigma){
     int x = i - half_width;
     for(int j = 0; j < heatmap.cols; j++){
       int y = j - half_height;
-      data[j] = std::exp(-(x*x + y*y)/ (2* sigma * sigma));
+      data[j] = std::exp(float(-(x*x + y*y) / (2* sigma * sigma)));
       if(data[j] < 0)
         data[j] = 0;
     }
@@ -324,15 +324,15 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
-    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+    /*for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
       const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
       const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
       const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
       const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
       int center_x = int( (xmin + xmax) / 2 );
       int center_y = int( (ymin + ymax) / 2 );
-      //LOG(INFO)<<"gt_bboxes center_x: "<< center_x << ", gt_bboxes center_y; "<< center_y;
-    }
+      LOG(INFO)<<"gt_bboxes center_x: "<< center_x << ", gt_bboxes center_y; "<< center_y;
+    }*/
     for(int c = 0; c < num_classes_; c++){
       for(int h = 0 ; h < output_height; h++){
         for(int w = 0; w < output_width; w++){
@@ -350,7 +350,8 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
     }
   }
   //LOG(INFO)<<"count_no_zero: "<<count_no_zero<<", count_zero: "<<count_zero;
-  CHECK_EQ(count_one, count_gt);
+  if(std::abs(count_one - count_gt) > 1)
+    LOG(FATAL) << "count_one is not equal to count_gt: " << count_one <<", "<<count_gt;
   #endif
 }
 template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, float* gt_heatmap, 
