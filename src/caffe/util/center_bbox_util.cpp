@@ -204,9 +204,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
     if(batch_result.size() > 0){
       if(results->find(i) == results->end()){
         results->insert(std::make_pair(i, batch_result));
-       // LOG(INFO)<<"num_batch: "<<num_batch<<",  batch det result size: "<< batch_result.size()<<", map size: "<<results->size();
       }else{
-        // 
       }
     }
   }
@@ -215,10 +213,10 @@ template  void get_topK(const float* keep_max_data, const float* loc_data, const
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo> >* results
                   , const int loc_channels);
-/*template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
+template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
-                  , std::map<int, std::vector<CenterNetInfo> > results
-                  , const int loc_channels);*/
+                  , std::map<int, std::vector<CenterNetInfo> >* results
+                  , const int loc_channels);
 
 #ifdef USE_OPENCV
 

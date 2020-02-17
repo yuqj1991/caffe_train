@@ -136,6 +136,7 @@ if __name__ == '__main__':
         #     print("####{}_{}".format(score, idx))
 
         gt_list.append(float(gt))
+        score = score.split("[[")[1].split("]]")[0]
         score_list.append(float(score))
 
 
