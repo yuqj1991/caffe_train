@@ -224,11 +224,13 @@ cv::Mat gaussian2D(const int height, const int width, const float sigma){
   int half_width = (width - 1) / 2;
   int half_height = (height - 1) / 2;
   cv::Mat heatmap(cv::Size(width, height), CV_32FC1, cv::Scalar(0));
-  for(int i = 0; i < heatmap.rows; i++){
+  CHECK_EQ(height, heatmap.rows);
+  CHECK_EQ(width, heatmap.cols);
+  for(int i = 0; i < height; i++){
     float *data = heatmap.ptr<float>(i);
-    int x = i - half_width;
-    for(int j = 0; j < heatmap.cols; j++){
-      int y = j - half_height;
+    int x = i - half_height;
+    for(int j = 0; j < width; j++){
+      int y = j - half_width;
       data[j] = std::exp(float(-(x*x + y*y) / (2* sigma * sigma)));
       if(data[j] < 0)
         data[j] = 0;
