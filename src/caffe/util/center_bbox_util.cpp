@@ -58,8 +58,8 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int outpu
       const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
       const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
       const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
-      Dtype center_x = (xmin + xmax) / 2;
-      Dtype center_y = (ymin + ymax) / 2;
+      Dtype center_x = Dtype((xmin + xmax) / 2);
+      Dtype center_y = Dtype((ymin + ymax) / 2);
       int inter_center_x = static_cast<int> (center_x);
       int inter_center_y = static_cast<int> (center_y);
       Dtype diff_x = center_x - inter_center_x;
@@ -117,8 +117,8 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
       const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
       const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
       const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
-      Dtype center_x = (xmin + xmax) / 2;
-      Dtype center_y = (ymin + ymax) / 2;
+      Dtype center_x = Dtype((xmin + xmax) / 2);
+      Dtype center_y = Dtype((ymin + ymax) / 2);
       int inter_center_x = static_cast<int> (center_x);
       int inter_center_y = static_cast<int> (center_y);
       int dimScale = output_height * output_width;
