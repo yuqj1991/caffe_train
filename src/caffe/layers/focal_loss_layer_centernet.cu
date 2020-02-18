@@ -6,7 +6,6 @@
 #include "caffe/util/math_functions.hpp"
 
 int count_iter = 0;
-
 namespace caffe {
 
 template <typename Dtype>
@@ -72,7 +71,6 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
           const Dtype* label, const Dtype* prob_data, Dtype* bottom_diff, 
           const int batch, const int channels, const int height,
           const int width, Dtype* counts, float gamma, float alpha) {
-  Dtype diff_sum = Dtype(0);
   CUDA_KERNEL_LOOP(index, nthreads) {
     const int fw = index / width;
     const int fh = index % height;
@@ -93,11 +91,7 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
                                         ( prob_a - alpha* (1 - prob_a) * log(max(1 - prob_a, Dtype(FLT_MIN))));
       counts[index] = 0;
     }
-    diff_sum += diff_a[fh * width + fw];
   }
-  #if 1
-    printf("\033[1m\033[45;33m cuda diff_sumarize_a: %f  \33[0m\n", diff_sum);
-  #endif
 }
 
 template <typename Dtype>
@@ -117,9 +111,14 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
     num_class_ = bottom[0]->channels();
     width_ = bottom[0]->width();
     height_ = bottom[0]->height();
+    Dtype diff_sum;
     focalSigmoidLossBackwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
         CAFFE_CUDA_NUM_THREADS>>>(nthreads, label, prob_data, bottom_diff,
           batch_, num_class_, height_, width_, counts, gamma_, alpha_);
+    #if 1
+      caffe_gpu_asum(nthreads, bottom_diff, &diff_sum);
+      printf("\033[1m\033[45;33m cuda diff_sumarize_a: %f  \33[0m\n", diff_sum);
+    #endif
     Dtype valid_count;
     caffe_gpu_asum(nthreads, counts, &valid_count);
     const Dtype loss_weight = top[0]->cpu_diff()[0] / valid_count;
