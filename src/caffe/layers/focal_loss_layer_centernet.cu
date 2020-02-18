@@ -79,15 +79,14 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
     const int dim = (fn * channels + fc) * height * width;
     const Dtype* label_slice = label + dim;
     const Dtype* prob_slice = prob_data + dim;
-    Dtype* diff_a = bottom_diff + dim;
     const Dtype label_a = label_slice[fh * width + fw];
     const Dtype prob_a = prob_slice[fh * width + fw];
     if(label_a == Dtype(1)){
-      diff_a[fh * width + fw] = powf(1 - prob_a, alpha) * 
+      bottom_diff[index] = powf(1 - prob_a, alpha) * 
                                         (alpha * prob_a * log(max(prob_a, Dtype(FLT_MIN))) - (1 - prob_a));
       counts[index] = 1;
     }else if(label_a < Dtype(1)){
-      diff_a[fh * width + fw] = powf(1 - label_a, gamma) * powf(prob_a, alpha) * 
+      bottom_diff[index] = powf(1 - label_a, gamma) * powf(prob_a, alpha) * 
                                         ( prob_a - alpha* (1 - prob_a) * log(max(1 - prob_a, Dtype(FLT_MIN))));
       counts[index] = 0;
     }
