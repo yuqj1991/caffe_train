@@ -125,7 +125,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<D
         }
       }
     }
-    LOG(INFO)<<"CPP DIFF: "<<diff_sum_a;
+    //LOG(INFO)<<"CPP DIFF: "<<diff_sum_a;
     Dtype loss_weight = top[0]->cpu_diff()[0] / count;
     caffe_scal(prob_.count(), loss_weight, bottom_diff);
   }

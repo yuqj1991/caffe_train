@@ -100,7 +100,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
     LOG(FATAL) << this->type()
                 << " Layer cannot backpropagate to label inputs.";
   }
-  if (propagate_down[0]) {
+  /*if (propagate_down[0]) {
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
     const Dtype* prob_data = prob_.gpu_data();
     const Dtype* label = bottom[1]->gpu_data();
@@ -122,7 +122,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
     caffe_gpu_asum(nthreads, counts, &valid_count);
     const Dtype loss_weight = top[0]->cpu_diff()[0] / valid_count;
     caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
-  }
+  }*/
   this->Backward_cpu(top, propagate_down, bottom);
   
 }
