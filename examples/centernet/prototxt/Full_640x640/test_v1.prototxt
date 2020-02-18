@@ -767,15 +767,9 @@ layer {
 	}
 }
 layer {
-    name: "loc_offset_conv_1x1_sigmoid"
-	type: "Sigmoid"
-	bottom: "loc_offset_conv_1x1"
-	top: "loc_offset_conv_1x1_sigmoid"
-}
-layer {
   name: "prediction_concate_output"
   type: "Concat"
-  bottom: "loc_offset_conv_1x1_sigmoid"
+  bottom: "loc_offset_conv_1x1"
   bottom: "conv_object_size_1x1"
   top: "prediction_concate_output"
 }

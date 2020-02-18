@@ -138,20 +138,6 @@ layer {
 			max_sample: 1
 			max_trials: 50
 		}
-		data_anchor_sampler{
-			scale: 16
-			scale: 32
-			scale: 64
-			scale: 128
-			scale: 256
-			scale: 512
-			sample_constraint{
-				min_object_coverage: 0.2
-			}
-			max_sample: 1
-			max_trials: 10
-		}
-		sampleprob: 0.5
 		label_map_file: "../labelmap.prototxt"
 	}
 }
@@ -890,16 +876,11 @@ layer {
 		}
 	}
 }
-layer {
-    name: "loc_offset_conv_1x1_sigmoid"
-	type: "Sigmoid"
-	bottom: "loc_offset_conv_1x1"
-	top: "loc_offset_conv_1x1_sigmoid"
-}
+
 layer {
   name: "prediction_concate_output"
   type: "Concat"
-  bottom: "loc_offset_conv_1x1_sigmoid"
+  bottom: "loc_offset_conv_1x1"
   bottom: "conv_object_size_1x1"
   top: "prediction_concate_output"
 }
