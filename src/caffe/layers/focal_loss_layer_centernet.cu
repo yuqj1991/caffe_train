@@ -94,7 +94,6 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
       counts[index] = 0;
     }
     diff_sum += diff_a[fh * width + fw];
-    printf("\033[1m\033[45;33m cuda diff_sum_a: %f  \33[0m\n", diff_a[fh * width + fw]);
   }
   #if 1
     printf("\033[1m\033[45;33m cuda diff_sum_a: %f  \33[0m\n", diff_sum);
@@ -126,7 +125,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
     const Dtype loss_weight = top[0]->cpu_diff()[0] / valid_count;
     caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
   }
-  //this->Backward_cpu(top, propagate_down, bottom);
+  this->Backward_cpu(top, propagate_down, bottom);
   
 }
 
