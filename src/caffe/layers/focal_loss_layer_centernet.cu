@@ -59,7 +59,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     if (top.size() == 2) {
       top[1]->ShareData(prob_);
     }
-    this->Forward_cpu(bottom,top);
+    //this->Forward_cpu(bottom,top);
     #if 1
     if(count_iter % 1000 == 0)
       printf("\033[1m\033[45;33m batch_: %d, num_class_: %d, width: %d, height: %d, valid_count: %f, loss: %f, final_loss: %f \33[0m\n", 
