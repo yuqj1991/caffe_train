@@ -96,7 +96,7 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
     diff_sum += diff_a[fh * width + fw];
   }
   #if 1
-    printf("\033[1m\033[45;33m cuda diff_sum_a: %f  \33[0m\n", diff_sum);
+    printf("\033[1m\033[45;33m cuda diff_sumarize_a: %f  \33[0m\n", diff_sum);
   #endif
 }
 
