@@ -82,7 +82,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
   top[0]->mutable_cpu_data()[0] = (loss)/ count;
   #if 1
   if(iterations_%1000 == 0){
-    LOG(INFO)<<"batch_: "<<batch_<<", num_class: "<<num_class_<<", height: "<<height_<<", width: "<<width_
+    LOG(INFO)<<"forward batch_: "<<batch_<<", num_class: "<<num_class_<<", height: "<<height_<<", width: "<<width_
     <<", loss: "<<loss<<", count: "<<count<<", classes total_loss: "<<top[0]->mutable_cpu_data()[0];
   }
   #endif
@@ -125,9 +125,14 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<D
         }
       }
     }
-    //LOG(INFO)<<"CPP DIFF: "<<diff_sum_a / count << ", count: "<<count;
     Dtype loss_weight = top[0]->cpu_diff()[0] / count;
     caffe_scal(prob_.count(), loss_weight, bottom_diff);
+    #if 1
+  if(iterations_%1000 == 0){
+    LOG(INFO)<<"backward batch_: "<<batch_<<", num_class: "<<num_class_<<", height: "<<height_<<", width: "<<width_
+              <<", diff_sum_a: "<<diff_sum_a / count<<", count: "<<count;
+  }
+  #endif
   }
 }
 
