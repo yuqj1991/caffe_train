@@ -128,7 +128,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<D
     Dtype loss_weight = top[0]->cpu_diff()[0] / count;
     caffe_scal(prob_.count(), loss_weight, bottom_diff);
     #if 1
-  if(iterations_%1000 == 0){
+  if(iterations_%1000 == 1){
     LOG(INFO)<<"backward batch_: "<<batch_<<", num_class: "<<num_class_<<", height: "<<height_<<", width: "<<width_
               <<", diff_sum_a: "<<diff_sum_a / count<<", count: "<<count;
   }
