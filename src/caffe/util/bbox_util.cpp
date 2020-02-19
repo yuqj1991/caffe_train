@@ -448,13 +448,13 @@ void EncodeBBox(
     float bbox_center_x = (bbox.xmin() + bbox.xmax()) / 2.;
     float bbox_center_y = (bbox.ymin() + bbox.ymax()) / 2.;
     if (encode_variance_in_target) {
-      encode_bbox->set_xmin(exp(-(bbox_center_x - prior_center_x) / prior_width));
-      encode_bbox->set_ymin(exp(-(bbox_center_y - prior_center_y) / prior_height));
+      encode_bbox->set_xmin(exp(-(bbox_center_x - prior_center_x) / prior_width) - 1);
+      encode_bbox->set_ymin(exp(-(bbox_center_y - prior_center_y) / prior_height) - 1);
       encode_bbox->set_xmax(log(bbox_width / prior_width));
       encode_bbox->set_ymax(log(bbox_height / prior_height));
     } else {
-      encode_bbox->set_xmin(exp(-(bbox_center_x - prior_center_x) / prior_width) / prior_variance[0]);
-      encode_bbox->set_ymin(exp(-(bbox_center_y - prior_center_y) / prior_height) / prior_variance[1]);
+      encode_bbox->set_xmin((exp(-(bbox_center_x - prior_center_x) / prior_width) - 1) / prior_variance[0]);
+      encode_bbox->set_ymin((exp(-(bbox_center_y - prior_center_y) / prior_height) - 1) / prior_variance[1]);
       encode_bbox->set_xmax(
           log(bbox_width / prior_width) / prior_variance[2]);
       encode_bbox->set_ymax(
@@ -535,16 +535,16 @@ void DecodeBBox(
     if (variance_encoded_in_target) {
       // variance is encoded in target, we simply need to retore the offset
       // predictions.
-      decode_bbox_center_x = -log(bbox.xmin()) * prior_width + prior_center_x;
-      decode_bbox_center_y = -log(bbox.ymin()) * prior_height + prior_center_y;
+      decode_bbox_center_x = -log(bbox.xmin() + 1) * prior_width + prior_center_x;
+      decode_bbox_center_y = -log(bbox.ymin() + 1) * prior_height + prior_center_y;
       decode_bbox_width = exp(bbox.xmax()) * prior_width;
       decode_bbox_height = exp(bbox.ymax()) * prior_height;
     } else {
       // variance is encoded in bbox, we need to scale the offset accordingly.
       decode_bbox_center_x =
-          -log(prior_variance[0] * bbox.xmin()) * prior_width + prior_center_x;
+          -log(prior_variance[0] * (bbox.xmin() + 1)) * prior_width + prior_center_x;
       decode_bbox_center_y =
-          -log(prior_variance[1] * bbox.ymin()) * prior_height + prior_center_y;
+          -log(prior_variance[1] * (bbox.ymin() + 1)) * prior_height + prior_center_y;
       decode_bbox_width =
           exp(prior_variance[2] * bbox.xmax()) * prior_width;
       decode_bbox_height =
