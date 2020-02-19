@@ -21,7 +21,7 @@ stepvalue: 200000
 iter_size: 3
 #momentum: 0.9
 momentum2 : 0.99
-type: "Adam"
+type: "RMSProp"
 eval_type: "detection"
 ap_version: "11point"
 
