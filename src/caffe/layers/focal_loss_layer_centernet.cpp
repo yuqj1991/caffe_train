@@ -117,7 +117,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<D
             if(label_a == Dtype(1.0)){
               bottom_diff[index] = std::pow(1 - prob_a, alpha_) * (alpha_ * prob_a *log(std::max(prob_a, Dtype(FLT_MIN))) - (1 - prob_a));
               count++;
-            }else if(label_a < Dtype(1))
+            }else if(label_a < Dtype(1.0))
               bottom_diff[index] = std::pow(1 - label_a, gamma_) * std::pow(prob_a, alpha_) * 
                                                 ( prob_a - alpha_ * (1 - prob_a) * log(std::max(1 - prob_a, Dtype(FLT_MIN))));
             diff_sum_a += bottom_diff[index];
@@ -125,7 +125,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<D
         }
       }
     }
-    //LOG(INFO)<<"CPP DIFF: "<<diff_sum_a;
+    //LOG(INFO)<<"CPP DIFF: "<<diff_sum_a / count << ", count: "<<count;
     Dtype loss_weight = top[0]->cpu_diff()[0] / count;
     caffe_scal(prob_.count(), loss_weight, bottom_diff);
   }

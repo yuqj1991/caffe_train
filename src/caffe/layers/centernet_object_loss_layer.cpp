@@ -166,12 +166,12 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_gt_, num_gt_);
     top[0]->mutable_cpu_data()[0] +=
-        loc_weight_ * loc_loss_.cpu_data()[0] / normalizer;
+        loc_weight_ * loc_loss_.cpu_data()[0];/* normalizer;*/
   }
   if (this->layer_param_.propagate_down(1)) {
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_gt_, num_gt_);
-    top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0] / normalizer;
+    top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0];/* normalizer;*/
   }
   #if 1 
   if(iterations_ % 1000 == 0){
@@ -183,8 +183,8 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
       num_groundtruth += gt_boxes.size();
     }
     CHECK_EQ(num_gt_, num_groundtruth);
-    LOG(INFO)<<"loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
-            <<", conf loss: "<< conf_loss_.cpu_data()[0] / normalizer
+    LOG(INFO)<<"loc loss: "<<loc_loss_.cpu_data()[0]
+            <<", conf loss: "<< conf_loss_.cpu_data()[0]
             <<", num_groundtruth: "<<num_groundtruth
             <<", num_classes: "<<num_classes_<<", output_width: "<<output_width<<", output_height: "<<output_height;
   }
@@ -216,10 +216,10 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       loc_loss_layer_->Backward(loc_top_vec_, loc_propagate_down,
                                 loc_bottom_vec_);
       // Scale gradient.
-      Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+      /*Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
           normalization_, num_, num_gt_, num_gt_);
       Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
-      caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
+      caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());*/
       // Copy gradient back to bottom[0].
       const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
       CopyDiffToBottom(loc_pred_diff, output_width, output_height, 
@@ -240,11 +240,11 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       conf_loss_layer_->Backward(conf_top_vec_, conf_propagate_down,
                                  conf_bottom_vec_);
       // Scale gradient.
-      Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+      /*Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
           normalization_, num_, num_gt_, num_gt_);
       Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
       caffe_scal(conf_pred_.count(), loss_weight,
-                 conf_pred_.mutable_cpu_diff());
+                 conf_pred_.mutable_cpu_diff());*/
       // Copy gradient back to bottom[1].
       bottom[1]->ShareDiff(conf_pred_);
     }

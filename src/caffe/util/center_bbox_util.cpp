@@ -177,7 +177,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
       for(int h = 0; h < output_height; h++){
         for(int w = 0; w < output_width; w++){
           int index = i * dim + c * dimScale + h * output_width + w;
-          if(keep_max_data[index] != 0){
+          if(keep_max_data[index] > 0 && keep_max_data[index] < 1){
             int x_loc_index = i * loc_channels * dimScale + h * output_width + w;
             int y_loc_index = i * loc_channels * dimScale + dimScale + h * output_width + w;
             int width_loc_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
