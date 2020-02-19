@@ -177,16 +177,16 @@ __global__ void DecodeBBoxesKernel(const int nthreads,
       if (variance_encoded_in_target) {
         // variance is encoded in target, we simply need to retore the offset
         // predictions.
-        decode_bbox_center_x = -log(xmin) * prior_width + prior_center_x;
-        decode_bbox_center_y = -log(ymin) * prior_height + prior_center_y;
+        decode_bbox_center_x = -log(xmin + 1) * prior_width + prior_center_x;
+        decode_bbox_center_y = -log(ymin + 1) * prior_height + prior_center_y;
         decode_bbox_width = exp(xmax) * prior_width;
         decode_bbox_height = exp(ymax) * prior_height;
       } else {
         // variance is encoded in bbox, we need to scale the offset accordingly.
         decode_bbox_center_x =
-        -log(prior_data[vi] * xmin) * prior_width + prior_center_x;
+        -log(prior_data[vi] * (xmin + 1)) * prior_width + prior_center_x;
         decode_bbox_center_y =
-        -log(prior_data[vi + 1] * ymin) * prior_height + prior_center_y;
+        -log(prior_data[vi + 1] * (ymin + 1)) * prior_height + prior_center_y;
         decode_bbox_width =
           exp(prior_data[vi + 2] * xmax) * prior_width;
         decode_bbox_height =
