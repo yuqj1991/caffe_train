@@ -15,11 +15,92 @@ layer {
     mean_value: 127.5
     mean_value: 127.5
 
-	resize_param {
+	resize_param_yolo {
       prob: 0.1
       resize_mode: WARP
       height: 608
       width: 608
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: LANCZOS4
+    }
+    resize_param_yolo {
+      prob: 0.1
+      resize_mode: WARP
+      height: 416
+      width: 416
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: LANCZOS4
+    }
+	resize_param_yolo {
+      prob: 0.1
+      resize_mode: WARP
+      height: 320
+      width: 320
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: LANCZOS4
+    }
+	resize_param_yolo {
+      prob: 0.1
+      resize_mode: WARP
+      height: 352
+      width: 352
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: LANCZOS4
+    }
+	resize_param_yolo {
+      prob: 0.1
+      resize_mode: WARP
+      height: 384
+      width: 384
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: LANCZOS4
+    }
+	resize_param_yolo {
+      prob: 0.1
+      resize_mode: WARP
+      height: 448
+      width: 448
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: LANCZOS4
+    }
+	resize_param_yolo {
+      prob: 0.1
+      resize_mode: WARP
+      height: 480
+      width: 480
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: LANCZOS4
+    }
+	resize_param_yolo {
+      prob: 0.1
+      resize_mode: WARP
+      height: 512
+      width: 512
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: LANCZOS4
+    }
+	resize_param_yolo {
+      prob: 0.1
+      resize_mode: WARP
+      height: 544
+      width: 544
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: LANCZOS4
+    }
+	resize_param_yolo {
+      prob: 0.1
+      resize_mode: WARP
+      height: 576
+      width: 576
       interp_mode: LINEAR
       interp_mode: AREA
       interp_mode: LANCZOS4
@@ -48,14 +129,14 @@ layer {
     }
   }
   data_param {
-    source: "examples/VOC0712/VOC0712_trainval_lmdb"
-    batch_size: 6
-    backend: LMDB
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
+	batch_size: 4
+	backend: LMDB
   }
   annotated_data_param {
 	yolo_data_type : 1
 	yolo_data_jitter : 0.3
-    label_map_file:  "data/VOC0712/labelmap_voc.prototxt"
+    label_map_file:  "../labelmap_voc.prototxt"
   }
 }
 
@@ -2346,7 +2427,7 @@ layer {
   loss_weight: 1
   yolov3_param {
     side: 13
-    num_class: 20
+    num_class: 1
     num: 3  
     object_scale: 5.0
     noobject_scale: 1.0
