@@ -104,6 +104,13 @@ class MultiBoxSSDLossLayer : public LossLayer<Dtype> {
   vector<map<int, vector<int> > > all_match_indices_;
   vector<vector<int> > all_neg_indices_;
 
+  vector<int> bbox_small_list_;
+  vector<int> bbox_large_list_;
+  vector<int> receptive_filed_list_;
+  int num_output_scales_;
+  int net_input_height_;
+  int net_input_width_;
+
   int iterations_;
 
   // How to normalize the loss.

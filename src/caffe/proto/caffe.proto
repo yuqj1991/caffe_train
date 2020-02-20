@@ -1794,6 +1794,13 @@ message MultiBoxLossParameter {
   optional ConfLossType englishlp_loss_type = 31;
   optional uint32 num_letter = 32;
   optional ConfLossType letter_lp_loss_type = 33;
+
+  repeated uint32 bbox_small_list = 34;
+  repeated uint32 bbox_large_list = 35;
+  repeated uint32 receptive_field_list = 36;
+  optional uint32 num_output_scales = 37;
+  optional uint32 net_input_height = 38;
+  optional uint32 net_input_width = 39;
 }
 
 // Message that store parameters used by MultiBoxLossLayer

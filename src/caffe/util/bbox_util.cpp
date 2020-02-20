@@ -649,10 +649,12 @@ bool overlap_cmp(const pair<int,float> &p1,const pair<int,float> &p2)
 
 void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
     const vector<NormalizedBBox>& pred_bboxes, const int label,
-    const MatchType match_type, const float overlap_threshold,
+    const MatchType match_type, consmatcht float overlap_threshold,
     const bool ignore_cross_boundary_bbox,
     vector<int>* match_indices, vector<float>* match_overlaps, const bool use_tiny_box_match,
-    const bool use_center_locate_match) {
+    const bool use_center_locate_match,
+    vector<int> bbox_small_list, vector<int> bbox_large_list,
+    vector<int> receptive_filed_list, int input_height, int input_width) {
   int num_pred = pred_bboxes.size();
   match_indices->clear();
   match_indices->resize(num_pred, -1);
@@ -915,7 +917,7 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
       const vector<vector<float> >& prior_variances,
       const MultiBoxLossParameter& multibox_loss_param,
       vector<map<int, vector<float> > >* all_match_overlaps,
-      vector<map<int, vector<int> > >* all_match_indices) {
+      vector<map<int, vector<int> > >* all_match_indices, ) {
   // all_match_overlaps->clear();
   // all_match_indices->clear();
   // Get parameters.
