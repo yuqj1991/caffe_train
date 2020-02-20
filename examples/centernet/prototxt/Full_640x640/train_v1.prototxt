@@ -394,10 +394,10 @@ layer {
 #######################################################################
 #################context moudle####################
 layer{
-	name: "conf_heatmap_64"
+	name: "conf_heatmap"
 	type: "Convolution"
 	bottom: "conv5"
-	top: "conf_heatmap_64"
+	top: "conf_heatmap"
 	param {
 		lr_mult: 1
 		decay_mult: 1
@@ -414,10 +414,10 @@ layer{
 	}
 }
 layer {
-	name: "conf_heatmap_64/bn"
+	name: "conf_heatmap/bn"
 	type: "BatchNorm"
-	bottom: "conf_heatmap_64"
-	top: "conf_heatmap_64"
+	bottom: "conf_heatmap"
+	top: "conf_heatmap"
 	param {
 		lr_mult: 0
 		decay_mult: 0
@@ -432,10 +432,10 @@ layer {
 	}
 }
 layer {
-	name: "conf_heatmap_64/scale"
+	name: "conf_heatmap/scale"
 	type: "Scale"
-	bottom: "conf_heatmap_64"
-	top: "conf_heatmap_64"
+	bottom: "conf_heatmap"
+	top: "conf_heatmap"
 	param {
 		lr_mult: 1.0
 		decay_mult: 0.0
@@ -455,16 +455,16 @@ layer {
 	}
 }
 layer {
-	name: "conf_heatmap_64/ReLU"
+	name: "conf_heatmap/ReLU"
 	type: "ReLU"
-	bottom: "conf_heatmap_64"
-	top: "conf_heatmap_64"
+	bottom: "conf_heatmap"
+	top: "conf_heatmap"
 }
 layer{
-	name: "conf_heatmap_64_1x1"
+	name: "conf_heatmap_1x1"
 	type: "Convolution"
-	bottom: "conf_heatmap_64"
-	top: "conf_heatmap_64_1x1"
+	bottom: "conf_heatmap"
+	top: "conf_heatmap_1x1"
 	param {
 		lr_mult: 1
 		decay_mult: 1
@@ -479,47 +479,6 @@ layer{
 		bias_term: false
 	}
 }
-layer {
-	name: "conf_heatmap_64_1x1/bn"
-	type: "BatchNorm"
-	bottom: "conf_heatmap_64_1x1"
-	top: "conf_heatmap_64_1x1"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conf_heatmap_64_1x1/scale"
-	type: "Scale"
-	bottom: "conf_heatmap_64_1x1"
-	top: "conf_heatmap_64_1x1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
 
 
 #######################################################################
@@ -527,10 +486,10 @@ layer {
 #######################################################################
 #################context moudle####################
 layer{
-	name: "loc_offset_conv"
+	name: "conv_loc"
 	type: "Convolution"
 	bottom: "conv5"
-	top: "loc_offset_conv"
+	top: "conv_loc"
 	param {
 		lr_mult: 1
 		decay_mult: 1
@@ -547,10 +506,10 @@ layer{
 	}
 }
 layer {
-	name: "loc_offset_conv/bn"
+	name: "conv_loc/bn"
 	type: "BatchNorm"
-	bottom: "loc_offset_conv"
-	top: "loc_offset_conv"
+	bottom: "conv_loc"
+	top: "conv_loc"
 	param {
 		lr_mult: 0
 		decay_mult: 0
@@ -565,10 +524,10 @@ layer {
 	}
 }
 layer {
-	name: "loc_offset_conv/scale"
+	name: "conv_loc/scale"
 	type: "Scale"
-	bottom: "loc_offset_conv"
-	top: "loc_offset_conv"
+	bottom: "conv_loc"
+	top: "conv_loc"
 	param {
 		lr_mult: 1.0
 		decay_mult: 0.0
@@ -588,22 +547,22 @@ layer {
 	}
 }
 layer {
-	name: "loc_offset_conv/ReLU"
+	name: "conv_loc/ReLU"
 	type: "ReLU"
-	bottom: "loc_offset_conv"
-	top: "loc_offset_conv"
+	bottom: "conv_loc"
+	top: "conv_loc"
 }
 layer{
-	name: "loc_offset_conv_1x1"
+	name: "conv_loc_1x1"
 	type: "Convolution"
-	bottom: "loc_offset_conv"
-	top: "loc_offset_conv_1x1"
+	bottom: "conv_loc"
+	top: "conv_loc_1x1"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 2
+		num_output: 4
 		kernel_size: 1
 		#pad: 1
 		weight_filler {
@@ -611,187 +570,6 @@ layer{
 		}
 		bias_term: false
 	}
-}
-layer {
-	name: "loc_offset_conv_1x1/bn"
-	type: "BatchNorm"
-	bottom: "loc_offset_conv_1x1"
-	top: "loc_offset_conv_1x1"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "loc_offset_conv_1x1/scale"
-	type: "Scale"
-	bottom: "loc_offset_conv_1x1"
-	top: "loc_offset_conv_1x1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
- 
-#######################################################################
-#                             modeule three                            #
-#######################################################################
-#################context moudle####################
-layer{
-	name: "conv_object_size"
-	type: "Convolution"
-	bottom: "conv5"
-	top: "conv_object_size"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 128
-		bias_term: false
-		kernel_size: 3
-		pad: 1
-		group: 128
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-layer {
-	name: "conv_object_size/bn"
-	type: "BatchNorm"
-	bottom: "conv_object_size"
-	top: "conv_object_size"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv_object_size/scale"
-	type: "Scale"
-	bottom: "conv_object_size"
-	top: "conv_object_size"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-layer {
-	name: "conv_object_size/ReLU"
-	type: "ReLU"
-	bottom: "conv_object_size"
-	top: "conv_object_size"
-}
-layer{
-	name: "conv_object_size_1x1"
-	type: "Convolution"
-	bottom: "conv_object_size"
-	top: "conv_object_size_1x1"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 2
-		kernel_size: 1
-		#pad: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_term: false
-	}
-}
-layer {
-	name: "conv_object_size_1x1/bn"
-	type: "BatchNorm"
-	bottom: "conv_object_size_1x1"
-	top: "conv_object_size_1x1"
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-	param {
-		lr_mult: 0
-		decay_mult: 0
-	}
-}
-layer {
-	name: "conv_object_size_1x1/scale"
-	type: "Scale"
-	bottom: "conv_object_size_1x1"
-	top: "conv_object_size_1x1"
-	param {
-		lr_mult: 1.0
-		decay_mult: 0.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0.0
-	}
-	scale_param {
-		filler {
-			value: 1
-		}
-		bias_term: true
-		bias_filler {
-			value: 0
-		}
-	}
-}
-
-layer {
-  name: "prediction_concate_output"
-  type: "Concat"
-  bottom: "loc_offset_conv_1x1"
-  bottom: "conv_object_size_1x1"
-  top: "prediction_concate_output"
 }
 
 
@@ -799,7 +577,7 @@ layer {
 	name: "centernet_loss"
 	type: "CenterObjectLoss"
 	bottom: "prediction_concate_output"
-	bottom: "conf_heatmap_64_1x1"
+	bottom: "conf_heatmap_1x1"
 	bottom: "label"
 	top: "centernet_loss"
 	include {
