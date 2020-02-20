@@ -576,7 +576,7 @@ layer{
 layer {
 	name: "centernet_loss"
 	type: "CenterObjectLoss"
-	bottom: "prediction_concate_output"
+	bottom: "conv_loc_1x1"
 	bottom: "conf_heatmap_1x1"
 	bottom: "label"
 	top: "centernet_loss"
