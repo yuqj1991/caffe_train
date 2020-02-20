@@ -177,33 +177,29 @@ __global__ void DecodeBBoxesKernel(const int nthreads,
       if (variance_encoded_in_target) {
         // variance is encoded in target, we simply need to retore the offset
         // predictions.
-        decode_bbox_center_x = -log(xmin + 1) * prior_width + prior_center_x;
-        decode_bbox_center_y = -log(ymin + 1) * prior_height + prior_center_y;
-        decode_bbox_width = exp(xmax) * prior_width;
-        decode_bbox_height = exp(ymax) * prior_height;
+        decode_bbox_center_x = -xmin * prior_width + prior_center_x;
+        decode_bbox_center_y = -ymin * prior_height + prior_center_y;
+        decode_bbox_width = -xmax * prior_width + prior_center_x;
+        decode_bbox_height = -ymax * prior_height + prior_center_y;
       } else {
         // variance is encoded in bbox, we need to scale the offset accordingly.
-        decode_bbox_center_x =
-        -log(prior_data[vi] * (xmin + 1)) * prior_width + prior_center_x;
-        decode_bbox_center_y =
-        -log(prior_data[vi + 1] * (ymin + 1)) * prior_height + prior_center_y;
-        decode_bbox_width =
-          exp(prior_data[vi + 2] * xmax) * prior_width;
-        decode_bbox_height =
-          exp(prior_data[vi + 3] * ymax) * prior_height;
+        decode_bbox_center_x = -prior_data[vi] * xmin * prior_width + prior_center_x;
+        decode_bbox_center_y = -prior_data[vi + 1] * ymin * prior_height + prior_center_y;
+        decode_bbox_width = -prior_data[vi + 2] * xmax * prior_width + prior_center_x;
+        decode_bbox_height = -prior_data[vi + 3] * ymax * prior_height + prior_center_y;
       }
       switch (i) {
         case 0:
-          bbox_data[index] = decode_bbox_center_x - decode_bbox_width / 2.;
+          bbox_data[index] = decode_bbox_center_x;
           break;
         case 1:
-          bbox_data[index] = decode_bbox_center_y - decode_bbox_height / 2.;
+          bbox_data[index] = decode_bbox_center_y;
           break;
         case 2:
-          bbox_data[index] = decode_bbox_center_x + decode_bbox_width / 2.;
+          bbox_data[index] = decode_bbox_width;
           break;
         case 3:
-          bbox_data[index] = decode_bbox_center_y + decode_bbox_height / 2.;
+          bbox_data[index] = decode_bbox_height;
           break;
       }
     } else if (code_type == PriorBoxParameter_CodeType_CORNER_SIZE) {

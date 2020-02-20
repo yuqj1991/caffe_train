@@ -40,23 +40,6 @@ void MultiBoxSSDLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
              mining_type_ != MultiBoxLossParameter_MiningType_NONE);
   }
 
-  if(multibox_loss_param.has_num_output_scales()){
-    num_output_scales_ = multibox_loss_param.num_output_scales();
-    CHECK_EQ(num_output_scales_, multibox_loss_param.bbox_small_list_size());
-    CHECK_EQ(num_output_scales_, multibox_loss_param.bbox_large_list_size());
-    CHECK_EQ(num_output_scales_, multibox_loss_param.receptive_field_list_size());
-    bbox_small_list_.clear();
-    bbox_large_list_.clear();
-    receptive_filed_list_.clear();
-    for(unsigned i = 0; i < num_output_scales_; i++){
-      bbox_small_list_.push_back(multibox_loss_param.bbox_small_list[i]);
-      bbox_large_list_.push_back(multibox_loss_param.bbox_large_list[i]);
-      receptive_filed_list_.push_back(multibox_loss_param.receptive_field_list[i]);
-    }
-    net_input_height_ = multibox_loss_param.net_input_height();
-    net_input_width_ = multibox_loss_param.net_input_width();
-  }
-
   do_neg_mining_ = mining_type_ != MultiBoxLossParameter_MiningType_NONE;
 
   if (!this->layer_param_.loss_param().has_normalization() &&

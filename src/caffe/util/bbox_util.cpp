@@ -448,17 +448,17 @@ void EncodeBBox(
     float bbox_center_x = (bbox.xmin() + bbox.xmax()) / 2.;
     float bbox_center_y = (bbox.ymin() + bbox.ymax()) / 2.;
     if (encode_variance_in_target) {
-      encode_bbox->set_xmin(exp(-(bbox_center_x - prior_center_x) / prior_width) - 1);
-      encode_bbox->set_ymin(exp(-(bbox_center_y - prior_center_y) / prior_height) - 1);
-      encode_bbox->set_xmax(log(bbox_width / prior_width));
-      encode_bbox->set_ymax(log(bbox_height / prior_height));
+      encode_bbox->set_xmin((prior_center_x - bbox.xmin()) / prior_width);
+      encode_bbox->set_ymin((prior_center_y - bbox.ymin()) / prior_height);
+      encode_bbox->set_xmax((prior_center_x - bbox.xmax()) / prior_width);
+      encode_bbox->set_ymax((prior_center_y - bbox.ymax()) / prior_height);
     } else {
-      encode_bbox->set_xmin((exp(-(bbox_center_x - prior_center_x) / prior_width) - 1) / prior_variance[0]);
-      encode_bbox->set_ymin((exp(-(bbox_center_y - prior_center_y) / prior_height) - 1) / prior_variance[1]);
+      encode_bbox->set_xmin((prior_center_x - bbox.xmin()) / prior_width / prior_variance[0]);
+      encode_bbox->set_ymin((bbox_center_y -bbox.ymin()) / prior_height / prior_variance[1]);
       encode_bbox->set_xmax(
-          log(bbox_width / prior_width) / prior_variance[2]);
+          (prior_center_x - bbox.xmax()) / prior_width / prior_variance[2]);
       encode_bbox->set_ymax(
-          log(bbox_height / prior_height) / prior_variance[3]);
+          (prior_center_y - bbox.ymax()) / prior_height / prior_variance[3]);
     }
   } else {
     LOG(FATAL) << "Unknown encode type.";
@@ -535,26 +535,22 @@ void DecodeBBox(
     if (variance_encoded_in_target) {
       // variance is encoded in target, we simply need to retore the offset
       // predictions.
-      decode_bbox_center_x = -log(bbox.xmin() + 1) * prior_width + prior_center_x;
-      decode_bbox_center_y = -log(bbox.ymin() + 1) * prior_height + prior_center_y;
-      decode_bbox_width = exp(bbox.xmax()) * prior_width;
-      decode_bbox_height = exp(bbox.ymax()) * prior_height;
+      decode_bbox_center_x = prior_center_x - bbox.xmin() * prior_width;
+      decode_bbox_center_y = prior_center_y - bbox.ymin() * prior_height;
+      decode_bbox_width = prior_center_x - bbox.xmax() * prior_width;
+      decode_bbox_height = prior_center_y - bbox.ymax() * prior_height;
     } else {
       // variance is encoded in bbox, we need to scale the offset accordingly.
-      decode_bbox_center_x =
-          -log(prior_variance[0] * (bbox.xmin() + 1)) * prior_width + prior_center_x;
-      decode_bbox_center_y =
-          -log(prior_variance[1] * (bbox.ymin() + 1)) * prior_height + prior_center_y;
-      decode_bbox_width =
-          exp(prior_variance[2] * bbox.xmax()) * prior_width;
-      decode_bbox_height =
-          exp(prior_variance[3] * bbox.ymax()) * prior_height;
+      decode_bbox_center_x = prior_center_x - bbox.xmin() * prior_width * prior_variance[0];
+      decode_bbox_center_y = prior_center_y - bbox.ymin() * prior_height * prior_variance[1];
+      decode_bbox_width = prior_center_x - bbox.xmax() * prior_width * prior_variance[2];
+      decode_bbox_height = prior_center_y - bbox.ymax() * prior_height * prior_variance[3];
     }
 
-    decode_bbox->set_xmin(decode_bbox_center_x - decode_bbox_width / 2.);
-    decode_bbox->set_ymin(decode_bbox_center_y - decode_bbox_height / 2.);
-    decode_bbox->set_xmax(decode_bbox_center_x + decode_bbox_width / 2.);
-    decode_bbox->set_ymax(decode_bbox_center_y + decode_bbox_height / 2.);
+    decode_bbox->set_xmin(decode_bbox_center_x);
+    decode_bbox->set_ymin(decode_bbox_center_y);
+    decode_bbox->set_xmax(decode_bbox_width);
+    decode_bbox->set_ymax(decode_bbox_height);
   } else if (code_type == PriorBoxParameter_CodeType_CORNER_SIZE) {
     float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
     CHECK_GT(prior_width, 0);
@@ -649,7 +645,7 @@ bool overlap_cmp(const pair<int,float> &p1,const pair<int,float> &p2)
 
 void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
     const vector<NormalizedBBox>& pred_bboxes, const int label,
-    const MatchType match_type, consmatcht float overlap_threshold,
+    const MatchType match_type, const float overlap_threshold,
     const bool ignore_cross_boundary_bbox,
     vector<int>* match_indices, vector<float>* match_overlaps, const bool use_tiny_box_match,
     const bool use_center_locate_match,
@@ -878,10 +874,24 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
           float center_match_overlap = -1;
           for (int j = 0; j < num_gt; ++j) {
             bool x_inside_gt_box = false, y_inside_gt_box = false;
-            if( pred_center_x >= gt_bboxes[j].xmin() && pred_center_x <= gt_bboxes[j].xmax() ){
+            int receptive_filed_ = int ((pred_bboxes[i].xmax() - pred_bboxes[i].xmin()) * input_width);
+            int gt_bbox_size_width = int((gt_bboxes[j].xmax() - gt_bboxes[j].xmin()) * input_width);
+            int gt_bbox_size_height = int((gt_bboxes[j].ymax() - gt_bboxes[j].ymin()) * input_height);
+            int large_side = std::max(gt_bbox_size_height, gt_bbox_size_width);
+            int num_scale_id = 0;
+            for(unsigned n = 0 ; n < bbox_small_list.size(); n++){
+              if(large_side >= bbox_small_list[n] && large_side <= bbox_large_list[n]){
+                num_scale_id = n;
+                break;
+              }
+            }
+            if( pred_center_x >= gt_bboxes[j].xmin() && 
+                          pred_center_x <= gt_bboxes[j].xmax() && 
+                          receptive_filed_ == receptive_filed_list[num_scale_id] ){
               x_inside_gt_box = true;
             }
-            if( pred_center_y >= gt_bboxes[j].ymin() && pred_center_y <= gt_bboxes[j].ymax() ){
+            if( pred_center_y >= gt_bboxes[j].ymin() && pred_center_y <= gt_bboxes[j].ymax() &&
+                  receptive_filed_ == receptive_filed_list[num_scale_id]  ){
               y_inside_gt_box = true;
             }
             if(y_inside_gt_box && x_inside_gt_box){
@@ -917,7 +927,7 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
       const vector<vector<float> >& prior_variances,
       const MultiBoxLossParameter& multibox_loss_param,
       vector<map<int, vector<float> > >* all_match_overlaps,
-      vector<map<int, vector<int> > >* all_match_indices, ) {
+      vector<map<int, vector<int> > >* all_match_indices) {
   // all_match_overlaps->clear();
   // all_match_indices->clear();
   // Get parameters.
@@ -938,6 +948,30 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
       multibox_loss_param.ignore_cross_boundary_bbox();
   const bool use_tiny_box_to_match = multibox_loss_param.use_tiny_box_match();
   const bool use_center_to_match = multibox_loss_param.use_center_locate_match();
+
+  vector<int> bbox_small_list_;
+  vector<int> bbox_large_list_;
+  vector<int> receptive_filed_list_;
+  int num_output_scales_ = 0;
+  int net_input_height_ = 0;
+  int net_input_width_ = 0;
+
+  if(multibox_loss_param.has_num_output_scales()){
+    num_output_scales_ = multibox_loss_param.num_output_scales();
+    CHECK_EQ(num_output_scales_, multibox_loss_param.bbox_small_list_size());
+    CHECK_EQ(num_output_scales_, multibox_loss_param.bbox_large_list_size());
+    CHECK_EQ(num_output_scales_, multibox_loss_param.receptive_field_list_size());
+    bbox_small_list_.clear();
+    bbox_large_list_.clear();
+    receptive_filed_list_.clear();
+    for(unsigned i = 0; i < num_output_scales_; i++){
+      bbox_small_list_.push_back(multibox_loss_param.bbox_small_list(i));
+      bbox_large_list_.push_back(multibox_loss_param.bbox_large_list(i));
+      receptive_filed_list_.push_back(multibox_loss_param.receptive_field_list(i));
+    }
+    net_input_height_ = multibox_loss_param.net_input_height();
+    net_input_width_ = multibox_loss_param.net_input_width();
+  }
   // Find the matches.
   int num = all_loc_preds.size();
   for (int i = 0; i < num; ++i) {
@@ -967,7 +1001,9 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
                      all_loc_preds[i].find(label)->second, &loc_bboxes);
         MatchBBox(gt_bboxes, loc_bboxes, label, match_type,
                   overlap_threshold, ignore_cross_boundary_bbox,
-                  &match_indices[label], &match_overlaps[label], use_tiny_box_to_match, use_center_to_match);
+                  &match_indices[label], &match_overlaps[label], use_tiny_box_to_match, use_center_to_match,
+                  bbox_small_list_, bbox_large_list_, receptive_filed_list_, net_input_height_,
+                  net_input_width_ );
       }
     } else {
       // Use prior bboxes to match against all ground truth.
@@ -976,7 +1012,9 @@ void FindMatches(const vector<LabelBBox>& all_loc_preds,
       const int label = -1;
       MatchBBox(gt_bboxes, prior_bboxes, label, match_type, overlap_threshold,
                 ignore_cross_boundary_bbox, &temp_match_indices,
-                &temp_match_overlaps, use_tiny_box_to_match, use_center_to_match);
+                &temp_match_overlaps, use_tiny_box_to_match, use_center_to_match, 
+                bbox_small_list_, bbox_large_list_, receptive_filed_list_, net_input_height_,
+                net_input_width_ );
       if (share_location) {
         match_indices[label] = temp_match_indices;
         match_overlaps[label] = temp_match_overlaps;
