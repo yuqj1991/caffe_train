@@ -1492,6 +1492,55 @@ void DataTransformer<Dtype>::Transform(Blob<Dtype>* input_blob,
 }
 
 template<typename Dtype>
+vector<int> DataTransformer<Dtype>::InferBlobShape_yolo(const Datum& datum,int policy_num) {
+  if (datum.encoded()) {
+#ifdef USE_OPENCV
+    CHECK(!(param_.force_color() && param_.force_gray()))
+        << "cannot set both force_color and force_gray";
+    cv::Mat cv_img;
+    if (param_.force_color() || param_.force_gray()) {
+    // If force_color then decode in color otherwise decode in gray.
+      cv_img = DecodeDatumToCVMat(datum, param_.force_color());
+    } else {
+      cv_img = DecodeDatumToCVMatNative(datum);
+    }
+    // InferBlobShape using the cv::image.
+    return InferBlobShape_yolo(cv_img, policy_num);
+#else
+    LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
+#endif  // USE_OPENCV
+  }
+
+  const int crop_size = param_.crop_size();
+  int crop_h = param_.crop_h();
+  int crop_w = param_.crop_w();
+  if (crop_size) {
+    crop_h = crop_size;
+    crop_w = crop_size;
+  }
+  const int datum_channels = datum.channels();
+  int datum_height = datum.height();
+  int datum_width = datum.width();
+
+  // Check dimensions.
+  CHECK_GT(datum_channels, 0);
+  if (param_.resize_param_yolo_size()) {
+    InferNewSize(param_.resize_param_yolo(policy_num), datum_width, datum_height,
+                 &datum_width, &datum_height);
+  }
+  CHECK_GE(datum_height, crop_h);
+  CHECK_GE(datum_width, crop_w);
+
+  // Build BlobShape.
+  vector<int> shape(4);
+  shape[0] = 1;
+  shape[1] = datum_channels;
+  shape[2] = (crop_h)? crop_h: datum_height;
+  shape[3] = (crop_w)? crop_w: datum_width;
+  return shape;
+}
+
+template<typename Dtype>
 vector<int> DataTransformer<Dtype>::InferBlobShape(const Datum& datum) {
 	if (datum.encoded()) {
 #ifdef USE_OPENCV
@@ -1584,6 +1633,37 @@ vector<int> DataTransformer<Dtype>::InferBlobShape(const cv::Mat& cv_img) {
 }
 
 template<typename Dtype>
+vector<int> DataTransformer<Dtype>::InferBlobShape_yolo(const cv::Mat& cv_img, int policy_num) {
+  const int crop_size = param_.crop_size();
+  int crop_h = param_.crop_h();
+  int crop_w = param_.crop_w();
+  if (crop_size) {
+    crop_h = crop_size;
+    crop_w = crop_size;
+  }
+  const int img_channels = cv_img.channels();
+  int img_height = cv_img.rows;
+  int img_width = cv_img.cols;
+  // Check dimensions.
+  CHECK_GT(img_channels, 0);
+  //LOG(INFO) << policy_num;
+  if (param_.resize_param_yolo_size()) {
+    InferNewSize(param_.resize_param_yolo(policy_num), img_width, img_height,
+                 &img_width, &img_height);
+  }
+  CHECK_GE(img_height, crop_h);
+  CHECK_GE(img_width, crop_w);
+
+  // Build BlobShape.
+  vector<int> shape(4);
+  shape[0] = 1;
+  shape[1] = img_channels;
+  shape[2] = (crop_h)? crop_h: img_height;
+  shape[3] = (crop_w)? crop_w: img_width;
+  return shape;
+}
+
+template<typename Dtype>
 vector<int> DataTransformer<Dtype>::InferBlobShape(
 		const vector<cv::Mat> & mat_vector) {
 	const int num = mat_vector.size();
@@ -1616,6 +1696,312 @@ int DataTransformer<Dtype>::Rand(int n) {
 			static_cast<caffe::rng_t*>(rng_->generator());
 	return ((*rng)() % n);
 }
+
+
+
+// yolo resize mode transferom
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform_yolo(const Datum& datum,
+                                       Blob<Dtype>* transformed_blob,
+                                       NormalizedBBox* crop_bbox,
+                                       bool* do_mirror, int policy_num) {
+	//LOG(INFO) << policy_num;
+  // If datum is encoded, decoded and transform the cv::image.
+  if (datum.encoded()) {
+#ifdef USE_OPENCV
+    CHECK(!(param_.force_color() && param_.force_gray()))
+        << "cannot set both force_color and force_gray";
+    cv::Mat cv_img;
+    if (param_.force_color() || param_.force_gray()) {
+    // If force_color then decode in color otherwise decode in gray.
+      cv_img = DecodeDatumToCVMat(datum, param_.force_color());
+    } else {
+      cv_img = DecodeDatumToCVMatNative(datum);
+    }
+    // Transform the cv::image into blob.
+    return Transform_yolo(cv_img, transformed_blob, crop_bbox, do_mirror, policy_num);
+#else
+    LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
+#endif  // USE_OPENCV
+  } else {
+    if (param_.force_color() || param_.force_gray()) {
+      LOG(ERROR) << "force_color and force_gray only for encoded datum";
+    }
+  }
+  //LOG(INFO) << "test";
+  const int crop_size = param_.crop_size();
+  const int datum_channels = datum.channels();
+  const int datum_height = datum.height();
+  const int datum_width = datum.width();
+
+  // Check dimensions.
+  const int channels = transformed_blob->channels();
+  const int height = transformed_blob->height();
+  const int width = transformed_blob->width();
+  const int num = transformed_blob->num();
+
+  CHECK_EQ(channels, datum_channels);
+  CHECK_LE(height, datum_height);
+  CHECK_LE(width, datum_width);
+  CHECK_GE(num, 1);
+
+  if (crop_size) {
+    CHECK_EQ(crop_size, height);
+    CHECK_EQ(crop_size, width);
+  } else {
+    CHECK_EQ(datum_height, height);
+    CHECK_EQ(datum_width, width);
+  }
+
+  Dtype* transformed_data = transformed_blob->mutable_cpu_data();
+  Transform(datum, transformed_data, crop_bbox, do_mirror);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform_yolo(
+    const AnnotatedDatum& anno_datum, Blob<Dtype>* transformed_blob,
+    RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all,
+    bool* do_mirror, int policy_num) {
+  // Transform datum.
+  const Datum& datum = anno_datum.datum();
+  NormalizedBBox crop_bbox;
+
+  Transform_yolo(datum, transformed_blob, &crop_bbox, do_mirror, policy_num);
+
+  // Transform annotation.
+  const bool do_resize = true;
+  TransformAnnotation_yolo(anno_datum, do_resize, crop_bbox, *do_mirror,
+                      transformed_anno_group_all, policy_num);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform_yolo(
+    const AnnotatedDatum& anno_datum, Blob<Dtype>* transformed_blob,
+    RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all, int policy_num) {
+  bool do_mirror;
+  
+  Transform_yolo(anno_datum, transformed_blob, transformed_anno_group_all,
+            &do_mirror, policy_num);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform_yolo(
+    const AnnotatedDatum& anno_datum, Blob<Dtype>* transformed_blob,
+    vector<AnnotationGroup>* transformed_anno_vec, bool* do_mirror, int policy_num) {
+  //LOG(INFO) << policy_num;
+  RepeatedPtrField<AnnotationGroup> transformed_anno_group_all;
+  Transform_yolo(anno_datum, transformed_blob, &transformed_anno_group_all,
+            do_mirror, policy_num);
+  for (int g = 0; g < transformed_anno_group_all.size(); ++g) {
+    transformed_anno_vec->push_back(transformed_anno_group_all.Get(g));
+  }
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform_yolo(
+    const AnnotatedDatum& anno_datum, Blob<Dtype>* transformed_blob,
+    vector<AnnotationGroup>* transformed_anno_vec,int policy_num) {
+  bool do_mirror;
+  //LOG(INFO) << policy_num;
+  Transform_yolo(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror, policy_num);
+}
+
+template<typename Dtype>
+void DataTransformer<Dtype>::TransformAnnotation_yolo(
+    const AnnotatedDatum& anno_datum, const bool do_resize,
+    const NormalizedBBox& crop_bbox, const bool do_mirror,
+    RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all, int policy_num) {
+  const int img_height = anno_datum.datum().height();
+  const int img_width = anno_datum.datum().width();
+  const int num_resize_policies = param_.resize_param_yolo_size();
+  //LOG(INFO) << policy_num;
+  //LOG(INFO) << img_width << "," << img_height;
+  if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
+    // Go through each AnnotationGroup.
+    for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
+      const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
+      AnnotationGroup transformed_anno_group;
+      // Go through each Annotation.
+      bool has_valid_annotation = false;
+      for (int a = 0; a < anno_group.annotation_size(); ++a) {
+        const Annotation& anno = anno_group.annotation(a);
+        const NormalizedBBox& bbox = anno.bbox();
+        // Adjust bounding box annotation.
+        NormalizedBBox resize_bbox = bbox;
+        if (do_resize && param_.resize_param_yolo_size()) {
+          CHECK_GT(img_height, 0);
+          CHECK_GT(img_width, 0);
+          UpdateBBoxByResizePolicy(param_.resize_param_yolo(policy_num), img_width, img_height,
+                                   &resize_bbox);
+        }
+        if (param_.has_emit_constraint() &&
+            !MeetEmitConstraint(crop_bbox, resize_bbox,
+                                param_.emit_constraint())) {
+          continue;
+        }
+        NormalizedBBox proj_bbox;
+        if (ProjectBBox(crop_bbox, resize_bbox, &proj_bbox)) {
+          has_valid_annotation = true;
+          Annotation* transformed_anno =
+              transformed_anno_group.add_annotation();
+          transformed_anno->set_instance_id(anno.instance_id());
+          NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
+          transformed_bbox->CopyFrom(proj_bbox);
+          if (do_mirror) {
+            Dtype temp = transformed_bbox->xmin();
+            transformed_bbox->set_xmin(1 - transformed_bbox->xmax());
+            transformed_bbox->set_xmax(1 - temp);
+          }
+          if (do_resize && param_.resize_param_yolo_size()) {
+            ExtrapolateBBox(param_.resize_param_yolo(policy_num), img_height, img_width,
+                crop_bbox, transformed_bbox);
+          }
+        }
+		//LOG(INFO) << num_resize_policies;
+      }
+      // Save for output.
+      if (has_valid_annotation) {
+        transformed_anno_group.set_group_label(anno_group.group_label());
+        transformed_anno_group_all->Add()->CopyFrom(transformed_anno_group);
+      }
+    }
+  } else {
+    LOG(FATAL) << "Unknown annotation type.";
+  }
+}
+
+#ifdef USE_OPENCV
+template<typename Dtype>
+void DataTransformer<Dtype>::Transform_yolo(const cv::Mat& cv_img,
+                                       Blob<Dtype>* transformed_blob,
+                                       NormalizedBBox* crop_bbox,
+                                       bool* do_mirror, int policy_num ) {
+	//LOG(INFO) << policy_num;
+  // Check dimensions.
+  const int img_channels = cv_img.channels();
+  const int channels = transformed_blob->channels();
+  const int height = transformed_blob->height();
+  const int width = transformed_blob->width();
+  const int num = transformed_blob->num();
+
+  CHECK_GT(img_channels, 0);
+  CHECK(cv_img.depth() == CV_8U) << "Image data type must be unsigned byte";
+  CHECK_EQ(channels, img_channels);
+  CHECK_GE(num, 1);
+
+  const int crop_size = param_.crop_size();
+  const Dtype scale = param_.scale();
+  *do_mirror = param_.mirror() && Rand(2);
+  const bool has_mean_file = param_.has_mean_file();
+  const bool has_mean_values = mean_values_.size() > 0;
+
+    const int num_resize_policies = param_.resize_param_yolo_size();
+  Dtype* mean = NULL;
+  if (has_mean_file) {
+    CHECK_EQ(img_channels, data_mean_.channels());
+    mean = data_mean_.mutable_cpu_data();
+  }
+  if (has_mean_values) {
+    CHECK(mean_values_.size() == 1 || mean_values_.size() == img_channels) <<
+        "Specify either 1 mean_value or as many as channels: " << img_channels;
+    if (img_channels > 1 && mean_values_.size() == 1) {
+      // Replicate the mean_value for simplicity
+      for (int c = 1; c < img_channels; ++c) {
+        mean_values_.push_back(mean_values_[0]);
+      }
+    }
+  }
+
+  int crop_h = param_.crop_h();
+  int crop_w = param_.crop_w();
+  if (crop_size) {
+    crop_h = crop_size;
+    crop_w = crop_size;
+  }
+
+  cv::Mat cv_resized_image, cv_noised_image, cv_cropped_image;
+  if (param_.resize_param_yolo_size()) {
+    cv_resized_image = ApplyResize(cv_img, param_.resize_param_yolo(policy_num));
+  } else {
+    cv_resized_image = cv_img;
+  }
+  if (param_.has_noise_param()) {
+    cv_noised_image = ApplyNoise(cv_resized_image, param_.noise_param());
+  } else {
+    cv_noised_image = cv_resized_image;
+  }
+  int img_height = cv_noised_image.rows;
+  int img_width = cv_noised_image.cols;
+  CHECK_GE(img_height, crop_h);
+  CHECK_GE(img_width, crop_w);
+  //LOG(INFO)<<img_width<<","<<img_height;
+  int h_off = 0;
+  int w_off = 0;
+  if ((crop_h > 0) && (crop_w > 0)) {
+    CHECK_EQ(crop_h, height);
+    CHECK_EQ(crop_w, width);
+    // We only do random crop when we do training.
+    if (phase_ == TRAIN) {
+      h_off = Rand(img_height - crop_h + 1);
+      w_off = Rand(img_width - crop_w + 1);
+    } else {
+      h_off = (img_height - crop_h) / 2;
+      w_off = (img_width - crop_w) / 2;
+    }
+    cv::Rect roi(w_off, h_off, crop_w, crop_h);
+    cv_cropped_image = cv_noised_image(roi);
+  } else {
+    cv_cropped_image = cv_noised_image;
+  }
+
+  // Return the normalized crop bbox.
+  crop_bbox->set_xmin(Dtype(w_off) / img_width);
+  crop_bbox->set_ymin(Dtype(h_off) / img_height);
+  crop_bbox->set_xmax(Dtype(w_off + width) / img_width);
+  crop_bbox->set_ymax(Dtype(h_off + height) / img_height);
+  //LOG(INFO)<<width <<","<<height;
+  if (has_mean_file) {
+    CHECK_EQ(cv_cropped_image.rows, data_mean_.height());
+    CHECK_EQ(cv_cropped_image.cols, data_mean_.width());
+  }
+  CHECK(cv_cropped_image.data);
+
+  Dtype* transformed_data = transformed_blob->mutable_cpu_data();
+  int top_index;
+  for (int h = 0; h < height; ++h) {
+    const uchar* ptr = cv_cropped_image.ptr<uchar>(h);
+    int img_index = 0;
+    int h_idx = h;
+    for (int w = 0; w < width; ++w) {
+      int w_idx = w;
+      if (*do_mirror) {
+        w_idx = (width - 1 - w);
+      }
+      int h_idx_real = h_idx;
+      int w_idx_real = w_idx;
+      for (int c = 0; c < img_channels; ++c) {
+        top_index = (c * height + h_idx_real) * width + w_idx_real;
+        Dtype pixel = static_cast<Dtype>(ptr[img_index++]);
+        if (has_mean_file) {
+          int mean_index = (c * img_height + h_off + h_idx_real) * img_width
+              + w_off + w_idx_real;
+          transformed_data[top_index] =
+              (pixel - mean[mean_index]) * scale;
+        } else {
+          if (has_mean_values) {
+            transformed_data[top_index] =
+                (pixel - mean_values_[c]) * scale;
+          } else {
+            transformed_data[top_index] = pixel * scale;
+          }
+        }
+      }
+    }
+  }
+}
+
+#endif
 
 INSTANTIATE_CLASS(DataTransformer);
 

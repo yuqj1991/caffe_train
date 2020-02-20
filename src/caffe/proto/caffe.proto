@@ -909,6 +909,8 @@ message TransformationParameter {
   optional bool force_gray = 7 [default = false];
   // Resize policy
   optional ResizeParameter resize_param = 8;
+
+  repeated ResizeParameter resize_param_yolo = 16;
   // Noise policy
   optional NoiseParameter noise_param = 9;
   // Distortion policy

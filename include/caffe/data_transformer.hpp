@@ -257,6 +257,7 @@ class DataTransformer {
    *    Datum containing the data to be transformed.
    */
   vector<int> InferBlobShape(const Datum& datum);
+  vector<int> InferBlobShape_yolo(const Datum& datum, int policy_num = 0);
   /**
    * @brief Infers the shape of transformed_blob will have when
    *    the transformation is applied to the data.
@@ -284,7 +285,32 @@ class DataTransformer {
    *    cv::Mat containing the data to be transformed.
    */
   vector<int> InferBlobShape(const cv::Mat& cv_img);
+  vector<int> InferBlobShape_yolo(const cv::Mat& cv_img, int policy_num = 0);
 #endif  // USE_OPENCV
+
+// yolo resize mode rand
+  void Transform_yolo(const AnnotatedDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 RepeatedPtrField<AnnotationGroup>* transformed_anno_vec, int policy_num = 0);
+  void Transform_yolo(const AnnotatedDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 RepeatedPtrField<AnnotationGroup>* transformed_anno_vec,
+                 bool* do_mirror, int policy_num = 0);
+  void Transform_yolo(const AnnotatedDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 vector<AnnotationGroup>* transformed_anno_vec,
+                 bool* do_mirror, int policy_num = 0);
+  void Transform_yolo(const AnnotatedDatum& anno_datum,
+                 Blob<Dtype>* transformed_blob,
+                 vector<AnnotationGroup>* transformed_anno_vec, int policy_num = 0);
+  void TransformAnnotation_yolo(
+      const AnnotatedDatum& anno_datum, const bool do_resize,
+      const NormalizedBBox& crop_bbox, const bool do_mirror,
+      RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all, int policy_num = 0);
+  #ifdef USE_OPENCV
+  void Transform_yolo(const cv::Mat& cv_img, Blob<Dtype>* transformed_blob,
+                 NormalizedBBox* crop_bbox, bool* do_mirror, int policy_num = 0);
+  #endif
 
  protected:
    /**
@@ -317,6 +343,11 @@ class DataTransformer {
   Phase phase_;
   Blob<Dtype> data_mean_;
   vector<Dtype> mean_values_;
+
+//yolo augement reside rand
+
+  void Transform_yolo(const Datum& datum, Blob<Dtype>* transformed_blob,
+                 NormalizedBBox* crop_bbox, bool* do_mirror, int policy_num = 0);
 };
 
 }  // namespace caffe
