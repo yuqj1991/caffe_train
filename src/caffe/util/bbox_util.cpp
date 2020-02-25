@@ -433,7 +433,7 @@ void EncodeBBox(
       encode_bbox->set_ymax(
           (bbox.ymax() - prior_bbox.ymax()) / prior_height / prior_variance[3]);
     }
-  }else if (code_type == PriorBoxParameter_CodeType_CORNER_GRID) {
+  }else if (code_type == PriorBoxParameter_CodeType_RECEPTIVE_CENTER) {
     float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
     CHECK_GT(prior_width, 0);
     float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
@@ -454,11 +454,33 @@ void EncodeBBox(
       encode_bbox->set_ymax((prior_center_y - bbox.ymax()) / prior_height);
     } else {
       encode_bbox->set_xmin((prior_center_x - bbox.xmin()) / prior_width / prior_variance[0]);
-      encode_bbox->set_ymin((bbox_center_y -bbox.ymin()) / prior_height / prior_variance[1]);
+      encode_bbox->set_ymin((prior_center_y -bbox.ymin()) / prior_height / prior_variance[1]);
       encode_bbox->set_xmax(
           (prior_center_x - bbox.xmax()) / prior_width / prior_variance[2]);
       encode_bbox->set_ymax(
           (prior_center_y - bbox.ymax()) / prior_height / prior_variance[3]);
+    }
+  } else if (code_type == PriorBoxParameter_CodeType_CORNNER_CENTER){
+    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+    CHECK_GT(prior_width, 0);
+    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+    CHECK_GT(prior_height, 0);
+    float bbox_width = bbox.xmax() - bbox.xmin();
+    CHECK_GT(bbox_width, 0);
+    float bbox_height = bbox.ymax() - bbox.ymin();
+    CHECK_GT(bbox_height, 0);
+    if (encode_variance_in_target) {
+      encode_bbox->set_xmin((prior_bbox.xmin() - bbox.xmin()) / prior_width);
+      encode_bbox->set_ymin((prior_bbox.ymin() - bbox.ymin()) / prior_height);
+      encode_bbox->set_xmax(log(bbox_width / prior_width) / prior_width);
+      encode_bbox->set_ymax(log(bbox_height / prior_height) / prior_height);
+    } else {
+      encode_bbox->set_xmin((prior_bbox.xmin() - bbox.xmin()) / prior_width / prior_variance[0]);
+      encode_bbox->set_ymin((prior_bbox.ymin() -bbox.ymin()) / prior_height / prior_variance[1]);
+      encode_bbox->set_xmax(
+          log(bbox_width / prior_width) / prior_width / prior_variance[2]);
+      encode_bbox->set_ymax(
+          log(bbox_height / prior_height) / prior_height / prior_variance[3]);
     }
   } else {
     LOG(FATAL) << "Unknown encode type.";
@@ -522,35 +544,6 @@ void DecodeBBox(
     decode_bbox->set_ymin(decode_bbox_center_y - decode_bbox_height / 2.);
     decode_bbox->set_xmax(decode_bbox_center_x + decode_bbox_width / 2.);
     decode_bbox->set_ymax(decode_bbox_center_y + decode_bbox_height / 2.);
-  } else if (code_type == PriorBoxParameter_CodeType_CORNER_GRID) {
-    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
-    CHECK_GT(prior_width, 0);
-    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
-    CHECK_GT(prior_height, 0);
-    float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
-    float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
-
-    float decode_bbox_center_x, decode_bbox_center_y;
-    float decode_bbox_width, decode_bbox_height;
-    if (variance_encoded_in_target) {
-      // variance is encoded in target, we simply need to retore the offset
-      // predictions.
-      decode_bbox_center_x = prior_center_x - bbox.xmin() * prior_width;
-      decode_bbox_center_y = prior_center_y - bbox.ymin() * prior_height;
-      decode_bbox_width = prior_center_x - bbox.xmax() * prior_width;
-      decode_bbox_height = prior_center_y - bbox.ymax() * prior_height;
-    } else {
-      // variance is encoded in bbox, we need to scale the offset accordingly.
-      decode_bbox_center_x = prior_center_x - bbox.xmin() * prior_width * prior_variance[0];
-      decode_bbox_center_y = prior_center_y - bbox.ymin() * prior_height * prior_variance[1];
-      decode_bbox_width = prior_center_x - bbox.xmax() * prior_width * prior_variance[2];
-      decode_bbox_height = prior_center_y - bbox.ymax() * prior_height * prior_variance[3];
-    }
-
-    decode_bbox->set_xmin(decode_bbox_center_x);
-    decode_bbox->set_ymin(decode_bbox_center_y);
-    decode_bbox->set_xmax(decode_bbox_width);
-    decode_bbox->set_ymax(decode_bbox_height);
   } else if (code_type == PriorBoxParameter_CodeType_CORNER_SIZE) {
     float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
     CHECK_GT(prior_width, 0);
@@ -574,6 +567,65 @@ void DecodeBBox(
       decode_bbox->set_ymax(
           prior_bbox.ymax() + prior_variance[3] * bbox.ymax() * prior_height);
     }
+  } else if (code_type == PriorBoxParameter_CodeType_RECEPTIVE_CENTER) {
+    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+    CHECK_GT(prior_width, 0);
+    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+    CHECK_GT(prior_height, 0);
+    float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
+    float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
+
+    float bbox_xmin, bbox_xmax, bbox_ymin, bbox_ymax;
+    if (variance_encoded_in_target) {
+      // variance is encoded in target, we simply need to retore the offset
+      // predictions.
+      bbox_xmin = prior_center_x - bbox.xmin() * prior_width;
+      bbox_ymin = prior_center_y - bbox.ymin() * prior_height;
+      bbox_xmax = prior_center_x - bbox.xmax() * prior_width;
+      bbox_ymax = prior_center_y - bbox.ymax() * prior_height;
+    } else {
+      // variance is encoded in bbox, we need to scale the offset accordingly.
+      bbox_xmin = prior_center_x - bbox.xmin() * prior_width * prior_variance[0];
+      bbox_ymin = prior_center_y - bbox.ymin() * prior_height * prior_variance[1];
+      bbox_xmax = prior_center_x - bbox.xmax() * prior_width * prior_variance[2];
+      bbox_ymax = prior_center_y - bbox.ymax() * prior_height * prior_variance[3];
+    }
+
+    decode_bbox->set_xmin(bbox_xmin);
+    decode_bbox->set_ymin(bbox_ymin);
+    decode_bbox->set_xmax(bbox_xmax);
+    decode_bbox->set_ymax(bbox_ymax);
+  } else if (code_type == PriorBoxParameter_CodeType_CORNNER_CENTER) {
+    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+    CHECK_GT(prior_width, 0);
+    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+    CHECK_GT(prior_height, 0);
+
+    float bbox_xmin, bbox_ymin;
+    float decode_bbox_width, decode_bbox_height;
+    if (variance_encoded_in_target) {
+      // variance is encoded in target, we simply need to retore the offset
+      // predictions.
+      bbox_xmin = -bbox.xmin() * prior_width + prior_bbox.xmin();
+      bbox_ymin = -bbox.ymin() * prior_height + prior_bbox.ymin();
+      decode_bbox_width = exp(bbox.xmax()) * prior_width;
+      decode_bbox_height = exp(bbox.ymax()) * prior_height;
+    } else {
+      // variance is encoded in bbox, we need to scale the offset accordingly.
+      bbox_xmin =
+          -prior_variance[0] * bbox.xmin() * prior_width + prior_bbox.xmin();
+      bbox_ymin =
+          -prior_variance[1] * bbox.ymin() * prior_height + prior_bbox.ymin();
+      decode_bbox_width =
+          exp(prior_variance[2] * bbox.xmax()) * prior_width;
+      decode_bbox_height =
+          exp(prior_variance[3] * bbox.ymax()) * prior_height;
+    }
+
+    decode_bbox->set_xmin(bbox_xmin);
+    decode_bbox->set_ymin(bbox_ymin);
+    decode_bbox->set_xmax(bbox_xmin + decode_bbox_width);
+    decode_bbox->set_ymax(bbox_ymin + decode_bbox_height);
   } else {
     LOG(FATAL) << "Unknown LocLossType.";
   }
@@ -798,9 +850,6 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
               tiny_gt_indices.push_back(i);
             }
         }
-
-        // printf("___total gt = %ld, tiny gt = %ld\n", gt_indices.size(), tiny_gt_indices.size());
-        
         tiny_gt_num = tiny_gt_indices.size();
 
         if (tiny_gt_num > 0) {
@@ -830,24 +879,14 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
               }
             }
             if (max_gt_idx != -1) {
-              // Found a matched ground truth.
               CHECK_EQ((*match_indices)[i], -1);
-              //(*match_indices)[i] = gt_indices[max_gt_idx];
-              //(*match_overlaps)[i] = max_overlap;
-              //gt_boxnum[max_gt_idx]++;
               tiny_overlaps[max_gt_idx].push_back(pair<int, float>(i, max_overlap));
             }
           }
-        
-          //int top_n = 6;
-          // sort overlap
           for (int i = 0; i < tiny_gt_num; i++) {
             vector<pair<int, float> > tiny_gt_v = tiny_overlaps[i];
             sort(tiny_gt_v.begin(), tiny_gt_v.end(), overlap_cmp);
-            // printf("for tiny gt NO.%d ---- idx =  %d, total tiny gt num = %d\n", tiny_gt_indices[i], i, tiny_gt_num);
-            //int k = 0;    
             for (vector<pair<int, float> > ::iterator it=tiny_gt_v.begin(); it != tiny_gt_v.end(); it++) {
-              //if (k++ < top_n) {
               if(it->second > 0.25){
                 if ((*match_indices)[it->first] == -1) {
                     (*match_indices)[it->first] = tiny_gt_indices[i];
@@ -859,6 +898,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
           }
         }
       }
+      int used_lffd_matches = 0;
       if(use_center_locate_match){
         // Get most overlaped for the rest prediction bboxes.
         for (map<int, map<int, float> >::iterator it = overlaps.begin();
@@ -902,15 +942,16 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
               }
             }
           }
-
           if (center_match_gt_idx != -1) {
             // Found a matched ground truth.
             CHECK_EQ((*match_indices)[i], -1);
             (*match_indices)[i] = gt_indices[center_match_gt_idx];
             (*match_overlaps)[i] = center_match_overlap;
+            used_lffd_matches++;
           }
         }
       }
+      LOG(INFO)<<"**************use lffd match nums: " <<used_lffd_matches;
     }
       break;
     default:

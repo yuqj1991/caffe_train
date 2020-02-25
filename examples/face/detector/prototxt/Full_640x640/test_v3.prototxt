@@ -3153,7 +3153,7 @@ layer {
 			nms_threshold: 0.55
 			top_k: 200
 		}
-		code_type: CORNER_GRID
+		code_type: RECEPTIVE_CENTER
 		keep_top_k: 100
 		confidence_threshold: 0.25
 	}

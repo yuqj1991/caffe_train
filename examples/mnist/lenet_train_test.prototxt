@@ -11,8 +11,8 @@ layer {
     scale: 0.00390625
   }
   data_param {
-    source: "examples/mnist/mnist_train_lmdb"
-    batch_size: 64
+    source: "../../../dataset/mnist/mnist_train_lmdb/"
+    batch_size: 32
     backend: LMDB
   }
 }
@@ -28,8 +28,8 @@ layer {
     scale: 0.00390625
   }
   data_param {
-    source: "examples/mnist/mnist_test_lmdb"
-    batch_size: 100
+    source: "../../../dataset/mnist/mnist_test_lmdb/"
+    batch_size: 16
     backend: LMDB
   }
 }
@@ -161,8 +161,10 @@ layer {
 }
 layer {
   name: "loss"
-  type: "SoftmaxWithLoss"
+  type: "focalSoftmaxWithLoss"
   bottom: "ip2"
   bottom: "label"
   top: "loss"
+  propagate_down: true
+  propagate_down: false
 }
