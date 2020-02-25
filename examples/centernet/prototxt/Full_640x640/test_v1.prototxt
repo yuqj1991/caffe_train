@@ -568,8 +568,6 @@ layer {
         pad: 1
     }
 }
-
-
 layer {
 	name: "detection_out"
 	type: "CenternetDetectionOutput"

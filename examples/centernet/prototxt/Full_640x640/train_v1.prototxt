@@ -479,8 +479,6 @@ layer{
 		bias_term: false
 	}
 }
-
-
 #######################################################################
 #                             modeule two                           #
 #######################################################################
@@ -571,8 +569,6 @@ layer{
 		bias_term: false
 	}
 }
-
-
 layer {
 	name: "centernet_loss"
 	type: "CenterObjectLoss"
@@ -587,7 +583,6 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	loss_param {
-		#ignore_label: 0
 		normalization: VALID
 	}
 	loss_weight: 1.0

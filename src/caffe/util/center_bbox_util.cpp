@@ -80,8 +80,8 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int outpu
                                 + inter_center_y * output_width + inter_center_x;
       gt_data[count * 4 + 0] = diff_x;
       gt_data[count * 4 + 1] = diff_y;
-      gt_data[count * 4 + 2] = Dtype(width);
-      gt_data[count * 4 + 3] = Dtype(height );
+      gt_data[count * 4 + 2] = width;
+      gt_data[count * 4 + 3] = height;
       pred_data[count * 4 + 0] = loc_data[x_loc_index];
       pred_data[count * 4 + 1] = loc_data[y_loc_index];
       pred_data[count * 4 + 2] = loc_data[width_loc_index];
@@ -230,7 +230,7 @@ cv::Mat gaussian2D(const int height, const int width, const float sigma){
     for(int j = 0; j < width; j++){
       int y = j - half_width;
       data[j] = std::exp(float(-(x*x + y*y) / (2* sigma * sigma)));
-      if(data[j] < 0)
+      if(data[j] < 0.00000000005)
         data[j] = 0;
     }
   }
@@ -304,8 +304,8 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
       const Dtype height = Dtype(ymax - ymin);
       Dtype radius = gaussian_radius(width, height, Dtype(0.7));
       radius = std::max(0, int(radius));
-      int center_x = int( (xmin + xmax) / 2 );
-      int center_y = int( (ymin + ymax) / 2 );
+      int center_x = static_cast<int>((xmin + xmax) / 2);
+      int center_y = static_cast<int>((ymin + ymax) / 2);
       #if 0
       LOG(INFO)<<"batch_id: "<<batch_id<<", class_id: "
                 <<class_id<<", radius: "<<radius<<", center_x: "

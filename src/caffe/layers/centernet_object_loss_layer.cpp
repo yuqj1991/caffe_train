@@ -1,4 +1,4 @@
-#include <algorithm>
+98#include <algorithm>
 #include <map>
 #include <utility>
 #include <vector>
@@ -100,22 +100,22 @@ void CenterObjectLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
   num_ = bottom[0]->num();
-  
   CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
-  CHECK_EQ(num_classes_, bottom[2]->channels()) << "num_classes must be equal to label classes";
   CHECK_EQ(num_classes_, bottom[1]->channels()) << "num_classes must be equal to prediction classes";
 }
 
 template <typename Dtype>
 void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-  num_gt_ = bottom[2]->height();
   const Dtype* loc_data = bottom[0]->cpu_data();
-  const Dtype* gt_data = bottom[2]->cpu_data();
+
   const int output_height = bottom[0]->height();
   const int output_width = bottom[0]->width();
   const int num_channels = bottom[0]->channels();
   CHECK_EQ(num_channels, 4);
+
+  const Dtype* gt_data = bottom[2]->cpu_data();
+  num_gt_ = bottom[2]->height();
 
   // Retrieve all ground truth.
   bool use_difficult_gt_ = true;
@@ -186,7 +186,8 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     LOG(INFO)<<"loc loss: "<<loc_loss_.cpu_data()[0]
             <<", conf loss: "<< conf_loss_.cpu_data()[0]
             <<", num_groundtruth: "<<num_groundtruth
-            <<", num_classes: "<<num_classes_<<", output_width: "<<output_width<<", output_height: "<<output_height;
+            <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
+            <<", output_height: "<<output_height;
   }
   iterations_++;
   #endif
