@@ -887,7 +887,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
             vector<pair<int, float> > tiny_gt_v = tiny_overlaps[i];
             sort(tiny_gt_v.begin(), tiny_gt_v.end(), overlap_cmp);
             for (vector<pair<int, float> > ::iterator it=tiny_gt_v.begin(); it != tiny_gt_v.end(); it++) {
-              if(it->second > 0.25){
+              if(it->second > 0.35){
                 if ((*match_indices)[it->first] == -1) {
                     (*match_indices)[it->first] = tiny_gt_indices[i];
                     (*match_overlaps)[it->first] = it->second;
@@ -951,7 +951,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
           }
         }
       }
-      LOG(INFO)<<"**************use lffd match nums: " <<used_lffd_matches;
+      //LOG(INFO)<<"**************use lffd match nums: " <<used_lffd_matches;
     }
       break;
     default:
