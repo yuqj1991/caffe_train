@@ -68,7 +68,7 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
       Dtype width = xmax - xmin;
       Dtype height = ymax - ymin;
       #if 1
-      if(count == 0)
+      if(count == 20)
       LOG(INFO)<<"center_x: "<<center_x<<", center_y: "<<center_y
                <<", inter_center_x: "<<inter_center_x<<", inter_center_y: "<<inter_center_y
                <<", diff_x: "<<diff_x<<", diff_y: "<<diff_y
