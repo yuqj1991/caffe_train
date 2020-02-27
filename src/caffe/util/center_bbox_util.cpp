@@ -44,10 +44,11 @@ template float gaussian_radius(const float heatmap_width, const float heatmap_he
 template double gaussian_radius(const double heatmap_width, const double heatmap_height, const double min_overlap);
 
 template <typename Dtype>
-void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int output_width, 
-                                const int output_height, bool share_location, 
-                                Dtype* pred_data, const int num_channels,
-                                Dtype* gt_data, std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
+void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh_data, 
+                                const int output_width, const int output_height, 
+                                bool share_location, Dtype* pred_loc_data, Dtype* pred_wh_data, 
+                                const int num_channels, Dtype* gt_loc_data, Dtype* gt_wh_data,
+                                std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
   std::map<int, vector<NormalizedBBox> > ::iterator iter;
   int count = 0;
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
@@ -64,8 +65,14 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int outpu
       int inter_center_y = static_cast<int> (center_y);
       Dtype diff_x = center_x - inter_center_x;
       Dtype diff_y = center_y - inter_center_y;
-      Dtype width = gt_bboxes[ii].xmax() - gt_bboxes[ii].xmin();
-      Dtype height = gt_bboxes[ii].ymax() - gt_bboxes[ii].ymin();
+      Dtype width = xmax - xmin;
+      Dtype height = ymax - ymin;
+      #if 1
+      LOG(INFO)<<"center_x: "<<center_x<<", center_y: "<<center_y
+               <<", inter_center_x: "<<inter_center_x<<", inter_center_y: "<<inter_center_y
+               <<", diff_x: "<<diff_x<<", diff_y: "<<diff_y
+               <<", width: "<<width<<", height: "<<height;
+      #endif
       int dimScale = output_height * output_width;
       int x_loc_index = batch_id * num_channels * dimScale 
                                 + inter_center_y * output_width + inter_center_x;
@@ -73,19 +80,19 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int outpu
                                 + dimScale
                                 + inter_center_y * output_width + inter_center_x;
       int width_loc_index = batch_id * num_channels * dimScale
-                                + 2 * dimScale
+                                + 0 * dimScale
                                 + inter_center_y * output_width + inter_center_x;
       int height_loc_index = batch_id * num_channels * dimScale 
-                                + 3 * dimScale
+                                + 1 * dimScale
                                 + inter_center_y * output_width + inter_center_x;
-      gt_data[count * 4 + 0] = diff_x;
-      gt_data[count * 4 + 1] = diff_y;
-      gt_data[count * 4 + 2] = width;
-      gt_data[count * 4 + 3] = height;
-      pred_data[count * 4 + 0] = loc_data[x_loc_index];
-      pred_data[count * 4 + 1] = loc_data[y_loc_index];
-      pred_data[count * 4 + 2] = loc_data[width_loc_index];
-      pred_data[count * 4 + 3] = loc_data[height_loc_index];
+      gt_loc_data[count * num_channels + 0] = diff_x;
+      gt_loc_data[count * num_channels + 1] = diff_y;
+      gt_wh_data[count * num_channels + 0] = width;
+      gt_wh_data[count * num_channels + 1] = height;
+      pred_loc_data[count * num_channels + 0] = loc_data[x_loc_index];
+      pred_loc_data[count * num_channels + 1] = loc_data[y_loc_index];
+      pred_wh_data[count * num_channels + 0] = wh_data[width_loc_index];
+      pred_wh_data[count * num_channels + 1] = wh_data[height_loc_index];
       count++;
       #if 0
       LOG(INFO)<<"diff_x: "<<diff_x<<", diff_y: "<<diff_y<<", width: "<<width  <<", height: "<<height;
@@ -93,14 +100,16 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const int outpu
     }
   }
 }
-template void EncodeCenteGroundTruthAndPredictions(const float* loc_data, const int output_width, 
-                                const int output_height, bool share_location, 
-                                float* pred_data, const int num_channels,
-                                float* gt_data, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
-template void EncodeCenteGroundTruthAndPredictions(const double* loc_data, const int output_width, 
-                                const int output_height, bool share_location, 
-                                double* pred_data, const int num_channels,
-                                double* gt_data, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);                              
+template void EncodeCenteGroundTruthAndPredictions(const float* loc_data, const float* wh_data, 
+                                const int output_width, const int output_height, 
+                                bool share_location, float* pred_loc_data, float* pred_wh_data, 
+                                const int num_channels, float* gt_loc_data, float* gt_wh_data,
+                                std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+template void EncodeCenteGroundTruthAndPredictions(const double* loc_data, const double* wh_data, 
+                                const int output_width, const int output_height, 
+                                bool share_location, double* pred_loc_data, double* pred_wh_data, 
+                                const int num_channels, double* gt_loc_data, double* gt_wh_data,
+                                std::map<int, vector<NormalizedBBox> > all_gt_bboxes);                              
 
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
@@ -127,16 +136,8 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
       int y_loc_index = batch_id * num_channels * dimScale 
                                 + dimScale
                                 + inter_center_y * output_width + inter_center_x;
-      int width_loc_index = batch_id * num_channels * dimScale 
-                                + 2 * dimScale
-                                + inter_center_y * output_width + inter_center_x;
-      int height_loc_index = batch_id * num_channels * dimScale
-                                + 3 * dimScale
-                                + inter_center_y * output_width + inter_center_x;
-      bottom_diff[x_loc_index] = pre_diff[count * 4 + 0];
-      bottom_diff[y_loc_index] = pre_diff[count * 4 + 1];
-      bottom_diff[width_loc_index] = pre_diff[count * 4 + 2];
-      bottom_diff[height_loc_index] = pre_diff[count * 4 + 3];
+      bottom_diff[x_loc_index] = pre_diff[count * 2 + 0];
+      bottom_diff[y_loc_index] = pre_diff[count * 2 + 1];
       count++;
     }
   }
@@ -184,8 +185,8 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             int height_loc_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
             float center_x = w + loc_data[x_loc_index];
             float center_y = h + loc_data[y_loc_index];
-            float width = loc_data[width_loc_index] * output_width;
-            float height = loc_data[height_loc_index] * output_height;
+            float width = loc_data[width_loc_index];
+            float height = loc_data[height_loc_index];
             CenterNetInfo temp_result = {
               .class_id = c,
               .score = keep_max_data[index],

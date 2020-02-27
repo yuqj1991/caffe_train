@@ -516,7 +516,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 2
 		kernel_size: 1
 		#pad: 1
 		weight_filler {
@@ -525,6 +525,106 @@ layer{
 		bias_term: false
 	}
 }
+
+#######################################################################
+#                             modeule three                           #
+#######################################################################
+#################context moudle####################
+layer{
+	name: "conv_wh"
+	type: "Convolution"
+	bottom: "conv5"
+	top: "conv_wh"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	convolution_param {
+		num_output: 128
+		bias_term: false
+		kernel_size: 3
+		group: 128
+		pad: 1
+		weight_filler {
+			type: "msra"
+		}
+	}
+}
+layer {
+	name: "conv_wh/bn"
+	type: "BatchNorm"
+	bottom: "conv_wh"
+	top: "conv_wh"
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+	param {
+		lr_mult: 0
+		decay_mult: 0
+	}
+}
+layer {
+	name: "conv_wh/scale"
+	type: "Scale"
+	bottom: "conv_wh"
+	top: "conv_wh"
+	param {
+		lr_mult: 1.0
+		decay_mult: 0.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0.0
+	}
+	scale_param {
+		filler {
+			value: 1
+		}
+		bias_term: true
+		bias_filler {
+			value: 0
+		}
+	}
+}
+layer {
+	name: "conv_wh/ReLU"
+	type: "ReLU"
+	bottom: "conv_wh"
+	top: "conv_wh"
+}
+layer{
+	name: "conv_wh_1x1"
+	type: "Convolution"
+	bottom: "conv_wh"
+	top: "conv_wh_1x1"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	convolution_param {
+		num_output: 2
+		kernel_size: 1
+		#pad: 1
+		weight_filler {
+			type: "msra"
+		}
+		bias_term: false
+	}
+}
+
+layer{
+	name: "conv_reg"
+	type: "Concat"
+	bottom: "conv_loc_1x1"
+	bottom: "conv_wh_1x1"
+	top: "conv_reg"
+}
+
 layer {
     name: "conf_heatmap_1x1_sigmoid"
 	type: "Sigmoid"
@@ -548,7 +648,7 @@ layer {
 	type: "CenternetDetectionOutput"
 	bottom: "conf_heatmap_1x1_sigmoid"
 	bottom: "conf_heatmap_1x1_pool"
-	bottom: "conv_loc_1x1"
+	bottom: "conv_reg"
 	top: "detection_out"
 	include {
 	phase: TEST

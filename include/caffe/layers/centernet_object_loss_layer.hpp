@@ -37,7 +37,7 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
   // bottom[1] stores the confidence predictions.
   // bottom[2] stores the prior bounding boxes.
   // bottom[3] stores the ground truth bounding boxes.
-  virtual inline int ExactNumBottomBlobs() const { return 3; }
+  virtual inline int ExactNumBottomBlobs() const { return 4; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
@@ -46,7 +46,7 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
-  // The internal localization loss layer.
+  // The internal localization offset loss layer.
   shared_ptr<Layer<Dtype> > loc_loss_layer_;
   CenterObjectParameter_LocLossType loc_loss_type_;
   float loc_weight_;
@@ -60,7 +60,21 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
   Blob<Dtype> loc_gt_;
   // localization loss.
   Blob<Dtype> loc_loss_;
-  Blob<Dtype> loc_Sigmoid_;
+
+  // The internal  object scale loss layer.
+  shared_ptr<Layer<Dtype> > wh_loss_layer_;
+  CenterObjectParameter_LocLossType wh_loss_type_;
+  float wh_weight_;
+  // bottom vector holder used in Forward function.
+  vector<Blob<Dtype>*> wh_bottom_vec_;
+  // top vector holder used in Forward function.
+  vector<Blob<Dtype>*> wh_top_vec_;
+  // blob which stores the matched location prediction.
+  Blob<Dtype> wh_pred_;
+  // blob which stores the corresponding matched ground truth.
+  Blob<Dtype> wh_gt_;
+  // localization loss.
+  Blob<Dtype> wh_loss_;
 
   // The internal confidence loss layer.
   shared_ptr<Layer<Dtype> > conf_loss_layer_;
