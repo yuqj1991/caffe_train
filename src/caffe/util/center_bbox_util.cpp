@@ -18,7 +18,7 @@ int count_one = 0;
 
 namespace caffe {
 template<typename Dtype>
-Dtype gaussian_radius(const Dtype heatmap_width, const Dtype heatmap_height, const Dtype min_overlap){
+Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, const Dtype min_overlap){
 
   Dtype a1  = Dtype(1.0);
   Dtype b1  = (heatmap_width + heatmap_height);
@@ -201,10 +201,12 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
         }
       }
     }
+    LOG(INFO)<<"get_TopK batch_id "<<i << " detection results: "<<batch_result.size();
     if(batch_result.size() > 0){
       if(results->find(i) == results->end()){
         results->insert(std::make_pair(i, batch_result));
       }else{
+
       }
     }
   }
@@ -306,8 +308,8 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
       const Dtype height = Dtype(ymax - ymin);
       Dtype radius = gaussian_radius(width, height, Dtype(0.7));
       radius = std::max(0, int(radius));
-      int center_x = static_cast<int>((xmin + xmax) / 2);
-      int center_y = static_cast<int>((ymin + ymax) / 2);
+      int center_x = static_cast<int>(Dtype((xmin + xmax) / 2));
+      int center_y = static_cast<int>(Dtype((ymin + ymax) / 2));
       #if 0
       LOG(INFO)<<"batch_id: "<<batch_id<<", class_id: "
                 <<class_id<<", radius: "<<radius<<", center_x: "
