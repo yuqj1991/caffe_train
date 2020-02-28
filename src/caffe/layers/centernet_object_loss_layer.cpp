@@ -229,8 +229,9 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
       num_groundtruth += gt_boxes.size();
     }
     CHECK_EQ(num_gt_, num_groundtruth);
-    LOG(INFO)<<"loc loss: "<<loc_loss_.cpu_data()[0]
-             <<", wh_loss: "<<wh_loss_.cpu_data()[0]
+    LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
+            <<", loc loss: "<<loc_loss_.cpu_data()[0]
+            <<", wh_loss: "<<wh_loss_.cpu_data()[0]
             <<", conf loss: "<< conf_loss_.cpu_data()[0]
             <<", num_groundtruth: "<<num_groundtruth
             <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
