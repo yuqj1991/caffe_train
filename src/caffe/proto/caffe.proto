@@ -728,6 +728,11 @@ message LayerParameter {
   optional TransposeParameter transpose_param=8266710;
   optional LSTMParameter lstm_param = 8266711;
   optional LabelSpecificAddParameter label_specific_add_param = 8000;
+    optional UpsampleParameter upsample_param = 150;
+}
+
+message UpsampleParameter{
+  optional int32 scale = 1 [default = 1];
 }
 
 message WarpCtcLossParameter {
