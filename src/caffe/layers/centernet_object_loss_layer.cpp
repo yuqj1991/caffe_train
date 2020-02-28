@@ -165,6 +165,8 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     loc_gt_.Reshape(loc_shape);
     Dtype* loc_pred_data = loc_pred_.mutable_cpu_data();
     Dtype* loc_gt_data = loc_gt_.mutable_cpu_data();
+    wh_pred_.Reshape(loc_shape);
+    wh_gt_.Reshape(loc_shape);
     Dtype* wh_pred_data = wh_pred_.mutable_cpu_data();
     Dtype* wh_gt_data = wh_gt_.mutable_cpu_data();
 
