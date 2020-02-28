@@ -160,7 +160,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     // Form data to pass on to loc_loss_layer_.
     vector<int> loc_shape(2);
     loc_shape[0] = 1;
-    loc_shape[1] = num_gt_ * 4;
+    loc_shape[1] = num_gt_ * 2;
     loc_pred_.Reshape(loc_shape);
     loc_gt_.Reshape(loc_shape);
     Dtype* loc_pred_data = loc_pred_.mutable_cpu_data();
