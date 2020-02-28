@@ -168,11 +168,11 @@ template void _nms_heatmap(const double* conf_data, double* keep_max_data, const
 template <typename Dtype>
 void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
-                  , std::map<int, std::vector<CenterNetInfo> >* results
+                  , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels){
   for(int i = 0; i < num_batch; i++){
     int dim = classes * output_width * output_height;
-    std::vector<CenterNetInfo> batch_result;
+    std::vector<CenterNetInfo > batch_result;
     batch_result.clear();
     for(int c = 0 ; c < classes; c++){
       int dimScale = output_width * output_height;
@@ -184,17 +184,17 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             int y_loc_index = i * loc_channels * dimScale + dimScale + h * output_width + w;
             int width_loc_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
             int height_loc_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
-            float center_x = w + loc_data[x_loc_index];
-            float center_y = h + loc_data[y_loc_index];
-            float width = loc_data[width_loc_index];
-            float height = loc_data[height_loc_index];
+            Dtype center_x = w + loc_data[x_loc_index];
+            Dtype center_y = h + loc_data[y_loc_index];
+            Dtype width = loc_data[width_loc_index];
+            Dtype height = loc_data[height_loc_index];
             CenterNetInfo temp_result = {
               .class_id = c,
               .score = keep_max_data[index],
-              .xmin = float((center_x - float(width / 2)) / output_width),
-              .ymin = float((center_y - float(height / 2)) / output_height),
-              .xmax = float((center_x + float(width / 2)) / output_width),
-              .ymax = float((center_y + float(height / 2)) / output_height)
+              .xmin = Dtype((center_x - Dtype(width / 2)) / output_width),
+              .ymin = Dtype((center_y - Dtype(height / 2)) / output_height),
+              .xmax = Dtype((center_x + Dtype(width / 2)) / output_width),
+              .ymax = Dtype((center_y + Dtype(height / 2)) / output_height)
             };
             batch_result.push_back(temp_result);
           } 
@@ -211,11 +211,11 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
 }
 template  void get_topK(const float* keep_max_data, const float* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
-                  , std::map<int, std::vector<CenterNetInfo> >* results
+                  , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels);
 template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
-                  , std::map<int, std::vector<CenterNetInfo> >* results
+                  , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels);
 
 #ifdef USE_OPENCV

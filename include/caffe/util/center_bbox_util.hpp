@@ -19,14 +19,15 @@
 #include "caffe/caffe.hpp"
 
 namespace caffe {
-typedef struct _CenterNetInfo{
+
+struct CenterNetInfo{
     int class_id;
     float score;
     float xmin;
     float ymin;
     float xmax;
     float ymax;
-}CenterNetInfo;
+};
 
 template<typename Dtype>
 Dtype gaussian_radius(const Dtype heatmap_width, const Dtype heatmap_height, const Dtype min_overlap);
@@ -48,7 +49,7 @@ void _nms_heatmap(const Dtype* conf_data, Dtype* keep_max_data, const int output
 template <typename Dtype>
 void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
                   , const int output_width, const int channels, const int num_batch
-                  , std::map<int, std::vector<CenterNetInfo> > * results
+                  , std::map<int, std::vector<CenterNetInfo > > * results
                   , const int loc_channels);       
 
 #ifdef USE_OPENCV

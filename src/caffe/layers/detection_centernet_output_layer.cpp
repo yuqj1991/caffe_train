@@ -65,7 +65,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
 
   int num_kept = 0;
 
-  std::map<int, vector<CenterNetInfo> > ::iterator iter;
+  std::map<int, vector<CenterNetInfo > > ::iterator iter;
   int count = 0;
   for(iter = results_.begin(); iter != results_.end(); iter++){
     int num_det = iter->second.size();
@@ -98,7 +98,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
   
   for(int i = 0; i < num_; i++){
     if(results_.find(i) != results_.end()){
-      std::vector<CenterNetInfo> result_temp = results_.find(i)->second;
+      std::vector<CenterNetInfo > result_temp = results_.find(i)->second;
       for(unsigned j = 0; j < result_temp.size(); ++j){
         top_data[count * 7] = i;
         top_data[count * 7 + 1] = result_temp[i].class_id + 1;
