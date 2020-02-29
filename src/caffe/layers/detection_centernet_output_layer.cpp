@@ -61,7 +61,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
    num_ =  bottom[0]->num();
   _nms_heatmap(conf_data, keep_max_data, output_height, output_width, classes, num_);
   const Dtype* keep_data = bottom[1]->cpu_data();
-  get_topK(keep_data, loc_data, output_height, output_width, classes, num_, &results_, 4, confidence_threshold_, 0.3);
+  get_topK(keep_data, loc_data, output_height, output_width, classes, num_, &results_, 4, Dtype(confidence_threshold_), 0.3);
 
   int num_kept = 0;
 
