@@ -287,7 +287,7 @@ template  void get_topK(const float* keep_max_data, const float* loc_data, const
 template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > >* results
-                  , const int loc_channels,  double conf_thresh, folat nms_thresh);
+                  , const int loc_channels,  double conf_thresh, double nms_thresh);
 
 #ifdef USE_OPENCV
 
