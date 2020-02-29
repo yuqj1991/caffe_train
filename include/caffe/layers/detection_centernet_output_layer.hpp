@@ -71,7 +71,7 @@ class CenternetDetectionOutputLayer : public Layer<Dtype> {
   bool share_location_;
   int num_loc_classes_;
   int keep_top_k_;
-  float confidence_threshold_;
+  Dtype confidence_threshold_;
   int num_;
   std::map<int, std::vector<CenterNetInfo> > results_;
 
