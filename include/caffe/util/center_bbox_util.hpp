@@ -20,6 +20,9 @@
 
 namespace caffe {
 
+#define NMS_UNION 1
+#define NMS_MIN  2
+
 struct CenterNetInfo{
     int class_id;
     float score;
@@ -27,6 +30,7 @@ struct CenterNetInfo{
     float ymin;
     float xmax;
     float ymax;
+    float area;
 };
 
 template<typename Dtype>
@@ -44,13 +48,15 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
                                 std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
 template <typename Dtype>
 void _nms_heatmap(const Dtype* conf_data, Dtype* keep_max_data, const int output_height
-                  , const int output_width, const int channels, const int num_batch); 
+                  , const int output_width, const int channels, const int num_batch);
+
+void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, float nmsthreshold = 0.3,int type=NMS_MIN);
 
 template <typename Dtype>
 void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
                   , const int output_width, const int channels, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > > * results
-                  , const int loc_channels);       
+                  , const int loc_channels,  Dtype conf_thresh, Dtype nms_thresh);      
 
 #ifdef USE_OPENCV
 template <typename Dtype>
