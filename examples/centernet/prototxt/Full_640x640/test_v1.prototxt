@@ -669,7 +669,7 @@ layer {
 }
 layer {
   name: "conv_3/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_3/expand"
   top: "conv_3/expand"
 }
@@ -704,7 +704,7 @@ layer {
 }
 layer {
   name: "conv_3/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_3/depthwise"
   top: "conv_3/depthwise"
 }
@@ -760,7 +760,7 @@ layer {
 }
 layer {
   name: "conv_4/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_4/expand"
   top: "conv_4/expand"
 }
@@ -794,7 +794,7 @@ layer {
 }
 layer {
   name: "conv_4/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_4/depthwise"
   top: "conv_4/depthwise"
 }
