@@ -43,7 +43,7 @@ void CenternetDetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& b
   // Since the number of bboxes to be kept is unknown before nms, we manually
   // set it to (fake) 1.
   top_shape.push_back(1);
-  // Each row is a 9 dimension vector, which stores
+  // Each row is a 7 dimension vector, which stores
   // [image_id, label, confidence, xmin, ymin, xmax, ymax]
   top_shape.push_back(7);
   top[0]->Reshape(top_shape);
@@ -61,6 +61,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
    num_ =  bottom[0]->num();
   _nms_heatmap(conf_data, keep_max_data, output_height, output_width, classes, num_);
   const Dtype* keep_data = bottom[1]->cpu_data();
+  results_.clear();
   get_topK(keep_data, loc_data, output_height, output_width, classes, num_, &results_, 4, confidence_threshold_, Dtype(0.3));
 
   int num_kept = 0;
@@ -99,6 +100,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
   for(int i = 0; i < num_; i++){
     if(results_.find(i) != results_.end()){
       std::vector<CenterNetInfo > result_temp = results_.find(i)->second;
+      LOG(INFO)<<"batch_id "<<i << " detection results: "<<result_temp.size();
       for(unsigned j = 0; j < result_temp.size(); ++j){
         top_data[count * 7] = i;
         top_data[count * 7 + 1] = result_temp[i].class_id + 1;
@@ -111,7 +113,6 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
       }
     }
   }
-  results_.clear();
 }
 
 #ifdef CPU_ONLY
