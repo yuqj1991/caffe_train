@@ -88,8 +88,8 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
                                 + inter_center_y * output_width + inter_center_x;
       gt_loc_data[count * num_channels + 0] = diff_x;
       gt_loc_data[count * num_channels + 1] = diff_y;
-      gt_wh_data[count * num_channels + 0] = width;
-      gt_wh_data[count * num_channels + 1] = height;
+      gt_wh_data[count * num_channels + 0] = log(width);
+      gt_wh_data[count * num_channels + 1] = log(height);
       pred_loc_data[count * num_channels + 0] = loc_data[x_loc_index];
       pred_loc_data[count * num_channels + 1] = loc_data[y_loc_index];
       pred_wh_data[count * num_channels + 0] = wh_data[width_loc_index];
