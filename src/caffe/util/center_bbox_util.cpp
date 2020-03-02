@@ -264,13 +264,13 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
       }
     }
     nms(batch_temp, batch_result, nms_thresh);
-    LOG(INFO)<<"get_TopK batch_id "<<i << " detection results: "<<batch_result.size();
-    for(unsigned i = 0 ; i < batch_result.size(); i++){
-      batch_result[i].xmin = float(batch_result[i].xmin / (4 * output_width));
-      batch_result[i].xmax = float(batch_result[i].xmax / (4 * output_width));
-      batch_result[i].ymin = float(batch_result[i].ymin / (4 * output_height));
-      batch_result[i].ymax = float(batch_result[i].ymax / (4 * output_height));
-      LOG(INFO)<< batch_result[i].xmin <<", "<<batch_result[i].ymin <<", "<<batch_result[i].xmax<<", "<<batch_result[i].ymax;
+    //LOG(INFO)<<"get_TopK batch_id "<<i << " detection results: "<<batch_result.size();
+    for(unsigned j = 0 ; j < batch_result.size(); j++){
+      batch_result[j].xmin = float(batch_result[j].xmin / (4 * output_width));
+      batch_result[j].xmax = float(batch_result[j].xmax / (4 * output_width));
+      batch_result[j].ymin = float(batch_result[j].ymin / (4 * output_height));
+      batch_result[j].ymax = float(batch_result[j].ymax / (4 * output_height));
+      //LOG(INFO)<< batch_result[j].xmin <<", "<<batch_result[j].ymin <<", "<<batch_result[j].xmax<<", "<<batch_result[j].ymax;
     }
     if(batch_result.size() > 0){
       if(results->find(i) == results->end()){
