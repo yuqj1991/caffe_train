@@ -152,6 +152,25 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     timer.Start();
     // get a anno_datum
     AnnotatedDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
+    #if 1
+    const int img_height = anno_datum.datum().height();
+    const int img_width = anno_datum.datum().width();
+    if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
+      // Go through each AnnotationGroup.
+      for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
+        const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
+        AnnotationGroup transformed_anno_group;
+        // Go through each Annotation.
+        bool has_valid_annotation = false;
+        for (int a = 0; a < anno_group.annotation_size(); ++a) {
+          const Annotation& anno = anno_group.annotation(a);
+          const NormalizedBBox& bbox = anno.bbox();
+          LOG(INFO)<<"origin bbox_width: "<<(bbox.xmax() - bbox.xmin())* img_width <<", origin bbox_height: "
+                    <<(bbox.ymax() - bbox.ymin())* img_height;
+        }
+      }
+    }
+    #endif
     read_time += timer.MicroSeconds();
     float sampleProb = 0.0f;
     caffe_rng_uniform(1, 0.0f, 1.0f, &sampleProb);
