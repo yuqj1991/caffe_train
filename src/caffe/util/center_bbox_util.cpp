@@ -24,19 +24,19 @@ Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, con
   Dtype b1  = (heatmap_width + heatmap_height);
   Dtype c1  = Dtype( heatmap_width * heatmap_height * (1 - min_overlap) / (1 + min_overlap));
   Dtype sq1 = std::sqrt(b1 * b1 - 4 * a1 * c1);
-  Dtype r1  = Dtype((b1 - sq1) / (a1*2));
+  Dtype r1  = Dtype((b1 + sq1) / 2);
 
   Dtype a2  = Dtype(4.0);
   Dtype b2  = 2 * (heatmap_height + heatmap_width);
   Dtype c2  = (1 - min_overlap) * heatmap_width * heatmap_height;
   Dtype sq2 = std::sqrt(b2 * b2 - 4 * a2 * c2);
-  Dtype r2  = Dtype((b2 - sq2) / (2*a2));
+  Dtype r2  = Dtype((b2 + sq2) / 2);
 
   Dtype a3  = Dtype(4 * min_overlap);
   Dtype b3  = -2 * min_overlap * (heatmap_height + heatmap_width);
   Dtype c3  = (min_overlap - 1) * heatmap_width * heatmap_height;
   Dtype sq3 = std::sqrt(b3 * b3 - 4 * a3 * c3);
-  Dtype r3  = Dtype((b3 + sq3) / (2*a3));
+  Dtype r3  = Dtype((b3 + sq3) / 2);
   LOG(INFO)<<r1<<", "<<r2<<", "<<r3;
   return std::min(std::min(r1, r2), r3);
 }
@@ -379,7 +379,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
       const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
       const Dtype width = Dtype(xmax - xmin);
       const Dtype height = Dtype(ymax - ymin);
-      Dtype radius = gaussian_radius(width, height, Dtype(0.7));
+      Dtype radius = gaussian_radius(width, height, Dtype(0.3));
       radius = std::max(0, int(radius));
       int center_x = static_cast<int>(Dtype((xmin + xmax) / 2));
       int center_y = static_cast<int>(Dtype((ymin + ymax) / 2));
