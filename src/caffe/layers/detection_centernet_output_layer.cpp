@@ -111,7 +111,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
         top_data[count * 7 + 6] = result_temp[j].ymax;
         //LOG(INFO)<< result_temp[j].xmin <<", "<<result_temp[j].ymin <<", "<<result_temp[j].xmax<<", "<<result_temp[j].ymax;
         LOG(INFO)<<top_data[count * 7 + 1]<<", "<<top_data[count * 7 + 2]<<", "<<top_data[count * 7 + 3]<<
-                  <<", "<<top_data[count * 7 + 4]<<", "<<top_data[count * 7 + 5]<<", "<<top_data[count * 7 + 6];
+                  ", "<<top_data[count * 7 + 4]<<", "<<top_data[count * 7 + 5]<<", "<<top_data[count * 7 + 6];
         ++count;
       }
     }
