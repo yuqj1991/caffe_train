@@ -37,6 +37,7 @@ Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, con
   Dtype c3  = (min_overlap - 1) * heatmap_width * heatmap_height;
   Dtype sq3 = std::sqrt(b3 * b3 - 4 * a3 * c3);
   Dtype r3  = Dtype((b3 + sq3) / 2);
+  LOG(INFO)<<r1<<", "<<r2<<", "<<r3;
   return std::min(std::min(r1, r2), r3);
 }
 
