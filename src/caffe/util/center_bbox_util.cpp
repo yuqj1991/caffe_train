@@ -37,7 +37,7 @@ Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, con
   Dtype c3  = (min_overlap - 1) * heatmap_width * heatmap_height;
   Dtype sq3 = std::sqrt(b3 * b3 - 4 * a3 * c3);
   Dtype r3  = Dtype((b3 + sq3) / 2);
-  LOG(INFO)<<r1<<", "<<r2<<", "<<r3;
+  //LOG(INFO)<<r1<<", "<<r2<<", "<<r3;
   return std::min(std::min(r1, r2), r3);
 }
 
@@ -267,7 +267,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
       }
     }
     nms(batch_temp, batch_result, nms_thresh);
-    //LOG(INFO)<<"get_TopK batch_id "<<i << " detection results: "<<batch_result.size();
+    LOG(INFO)<<"get_TopK batch_id "<<i << " detection results: "<<batch_result.size();
     for(unsigned j = 0 ; j < batch_result.size(); j++){
       batch_result[j].xmin = float(batch_result[j].xmin / (4 * output_width));
       batch_result[j].xmax = float(batch_result[j].xmax / (4 * output_width));
@@ -383,7 +383,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
       radius = std::max(0, int(radius));
       int center_x = static_cast<int>(Dtype((xmin + xmax) / 2));
       int center_y = static_cast<int>(Dtype((ymin + ymax) / 2));
-      #if 1
+      #if 0
       LOG(INFO)<<"batch_id: "<<batch_id<<", class_id: "
                 <<class_id<<", radius: "<<radius<<", center_x: "
                 <<center_x<<", center_y: "<<center_y<<", output_height: "
