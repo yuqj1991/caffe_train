@@ -233,8 +233,8 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     }
     CHECK_EQ(num_gt_, num_groundtruth);
     LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
-            <<", loc loss: "<<loc_loss_.cpu_data()[0]
-            <<", wh_loss: "<<wh_loss_.cpu_data()[0]
+            <<", loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
+            <<", wh_loss: "<<wh_loss_.cpu_data()[0] / normalizer
             <<", conf loss: "<< conf_loss_.cpu_data()[0]
             <<", normalizer: "<< normalizer
             <<", num_groundtruth: "<<num_groundtruth
