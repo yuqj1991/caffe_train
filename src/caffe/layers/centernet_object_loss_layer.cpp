@@ -208,15 +208,14 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
   if (this->layer_param_.propagate_down(0)) {
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_gt_, num_gt_);
-    LOG(INFO)<<normalizer;
     top[0]->mutable_cpu_data()[0] +=
-        loc_weight_ * loc_loss_.cpu_data()[0]/normalizer;
+        loc_weight_ * loc_loss_.cpu_data()[0] / normalizer;
   }
   if (this->layer_param_.propagate_down(1)) {
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_gt_, num_gt_);
     top[0]->mutable_cpu_data()[0] +=
-        0.1 * wh_loss_.cpu_data()[0]/normalizer;
+        0.1 * wh_loss_.cpu_data()[0] / normalizer;
   }
   if (this->layer_param_.propagate_down(2)) {
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
@@ -237,6 +236,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
             <<", loc loss: "<<loc_loss_.cpu_data()[0]
             <<", wh_loss: "<<wh_loss_.cpu_data()[0]
             <<", conf loss: "<< conf_loss_.cpu_data()[0]
+            <<", normalizer: "<< normalizer
             <<", num_groundtruth: "<<num_groundtruth
             <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
             <<", output_height: "<<output_height;
