@@ -152,7 +152,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     timer.Start();
     // get a anno_datum
     AnnotatedDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
-    #if 1
+    #if 0
     const int img_height = anno_datum.datum().height();
     const int img_width = anno_datum.datum().width();
     if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
