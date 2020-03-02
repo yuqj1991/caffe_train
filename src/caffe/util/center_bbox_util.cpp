@@ -270,6 +270,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
       batch_result[i].xmax = float(batch_result[i].xmax / (4 * output_width));
       batch_result[i].ymin = float(batch_result[i].ymin / (4 * output_height));
       batch_result[i].ymax = float(batch_result[i].ymax / (4 * output_height));
+      LOG(INFO)<< batch_result[i].xmin <<", "<<batch_result[i].ymin <<", "<<batch_result[i].xmax<<", "<<batch_result[i].ymax;
     }
     if(batch_result.size() > 0){
       if(results->find(i) == results->end()){
