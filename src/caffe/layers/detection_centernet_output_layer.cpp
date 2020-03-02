@@ -103,12 +103,13 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
       LOG(INFO)<<"batch_id "<<i << " detection results: "<<result_temp.size();
       for(unsigned j = 0; j < result_temp.size(); ++j){
         top_data[count * 7] = i;
-        top_data[count * 7 + 1] = result_temp[i].class_id + 1;
-        top_data[count * 7 + 2] = result_temp[i].score;
-        top_data[count * 7 + 3] = result_temp[i].xmin;
-        top_data[count * 7 + 4] = result_temp[i].ymin;
-        top_data[count * 7 + 5] = result_temp[i].xmax;
-        top_data[count * 7 + 6] = result_temp[i].ymax;
+        top_data[count * 7 + 1] = result_temp[j].class_id + 1;
+        top_data[count * 7 + 2] = result_temp[j].score;
+        top_data[count * 7 + 3] = result_temp[j].xmin;
+        top_data[count * 7 + 4] = result_temp[j].ymin;
+        top_data[count * 7 + 5] = result_temp[j].xmax;
+        top_data[count * 7 + 6] = result_temp[j].ymax;
+        LOG(INFO)<< result_temp[j].xmin <<", "<<result_temp[j].ymin <<", "<<result_temp[j].xmax<<", "<<result_temp[j].ymax;
         ++count;
       }
     }
