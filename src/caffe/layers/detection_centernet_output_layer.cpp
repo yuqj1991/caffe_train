@@ -100,7 +100,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
   for(int i = 0; i < num_; i++){
     if(results_.find(i) != results_.end()){
       std::vector<CenterNetInfo > result_temp = results_.find(i)->second;
-      //LOG(INFO)<<"batch_id "<<i << " detection results: "<<result_temp.size();
+      LOG(INFO)<<"batch_id "<<i << " detection results: "<<result_temp.size();
       for(unsigned j = 0; j < result_temp.size(); ++j){
         top_data[count * 7] = i;
         top_data[count * 7 + 1] = result_temp[j].class_id + 1;
@@ -110,8 +110,8 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
         top_data[count * 7 + 5] = result_temp[j].xmax;
         top_data[count * 7 + 6] = result_temp[j].ymax;
         LOG(INFO)<< result_temp[j].xmin <<", "<<result_temp[j].ymin <<", "<<result_temp[j].xmax<<", "<<result_temp[j].ymax;
-        LOG(INFO)<<top_data[count * 7 + 1]<<", "<<top_data[count * 7 + 2]<<", "<<top_data[count * 7 + 3]<<
-                  ", "<<top_data[count * 7 + 4]<<", "<<top_data[count * 7 + 5]<<", "<<top_data[count * 7 + 6];
+        /*LOG(INFO)<<top_data[count * 7 + 1]<<", "<<top_data[count * 7 + 2]<<", "<<top_data[count * 7 + 3]<<
+                  ", "<<top_data[count * 7 + 4]<<", "<<top_data[count * 7 + 5]<<", "<<top_data[count * 7 + 6];*/
         ++count;
       }
     }

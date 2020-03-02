@@ -75,10 +75,11 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
                <<", width: "<<width<<", height: "<<height;
       #endif
       int dimScale = output_height * output_width;
-      int x_loc_index = batch_id * num_channels * dimScale 
+      int x_loc_index = batch_id * num_channels * dimScale
+                                + 0 * dimScale
                                 + inter_center_y * output_width + inter_center_x;
       int y_loc_index = batch_id * num_channels * dimScale 
-                                + dimScale
+                                + 1 * dimScale
                                 + inter_center_y * output_width + inter_center_x;
       int width_loc_index = batch_id * num_channels * dimScale
                                 + 0 * dimScale
@@ -132,13 +133,14 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
       int inter_center_x = static_cast<int> (center_x);
       int inter_center_y = static_cast<int> (center_y);
       int dimScale = output_height * output_width;
-      int x_loc_index = batch_id * num_channels * dimScale 
+      int x_loc_index = batch_id * num_channels * dimScale
+                                + 0 * dimScale
                                 + inter_center_y * output_width + inter_center_x;
       int y_loc_index = batch_id * num_channels * dimScale 
-                                + dimScale
+                                + 1 * dimScale
                                 + inter_center_y * output_width + inter_center_x;
-      bottom_diff[x_loc_index] = pre_diff[count * 2 + 0];
-      bottom_diff[y_loc_index] = pre_diff[count * 2 + 1];
+      bottom_diff[x_loc_index] = pre_diff[count * num_channels + 0];
+      bottom_diff[y_loc_index] = pre_diff[count * num_channels + 1];
       count++;
     }
   }
@@ -253,7 +255,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
               .class_id = c,
               .score = keep_max_data[index],
               .xmin = Dtype(center_x - Dtype(width / 2) > 0 ? center_x - Dtype(width / 2) : 0),
-              .ymin = Dtype(center_y - Dtype(height / 2) > 0 ? center_y - Dtype(height / 2) :0 ),
+              .ymin = Dtype(center_y - Dtype(height / 2) > 0 ? center_y - Dtype(height / 2) :0),
               .xmax = Dtype(center_x + Dtype(width / 2) < 4 * output_width ? center_x + Dtype(width / 2) : 4 * output_width),
               .ymax = Dtype(center_y + Dtype(height / 2) < 4 * output_height ? center_y + Dtype(height / 2) : 4 * output_height),
               .area = Dtype(width * height)
@@ -380,7 +382,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
       radius = std::max(0, int(radius));
       int center_x = static_cast<int>(Dtype((xmin + xmax) / 2));
       int center_y = static_cast<int>(Dtype((ymin + ymax) / 2));
-      #if 0
+      #if 1
       LOG(INFO)<<"batch_id: "<<batch_id<<", class_id: "
                 <<class_id<<", radius: "<<radius<<", center_x: "
                 <<center_x<<", center_y: "<<center_y<<", output_height: "
