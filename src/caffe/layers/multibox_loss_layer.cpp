@@ -172,23 +172,6 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
   const Dtype* prior_data = bottom[2]->cpu_data();
   const Dtype* gt_data = bottom[3]->cpu_data();
 
-  #if 0
-  vector<int> Sigmoid_shape(2);
-  Sigmoid_shape[0] = 1;
-  Sigmoid_shape[1] = num_priors_ * num_ * 2;
-  loc_Sigmoid_.Reshape(Sigmoid_shape);
-  Dtype * mutable_Sigmoid_data = loc_Sigmoid_.mutable_cpu_data();
-  for (int i = 0; i < num_; ++i) {
-    for(int j = 0; j< num_priors_; ++j){
-      int start_idx_loc_data = i * num_priors_* 4 + j * 4;
-      int start_idx_Sigmoid_data = i * num_priors_* 2 + j * 2;
-      mutable_Sigmoid_data[start_idx_Sigmoid_data + 0] = Dtype(1 / std::exp(loc_data[start_idx_loc_data + 0]));
-      mutable_Sigmoid_data[start_idx_Sigmoid_data + 1] = Dtype(1 / std::exp(loc_data[start_idx_loc_data + 1]));
-    }
-  }
-  const Dtype * Sigmoid_data = loc_Sigmoid_.cpu_data();
-  #endif
-
   // Retrieve all ground truth.
   map<int, vector<NormalizedBBox> > all_gt_bboxes;
   GetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
