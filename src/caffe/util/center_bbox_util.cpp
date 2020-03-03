@@ -52,6 +52,7 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
                                 std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
   std::map<int, vector<NormalizedBBox> > ::iterator iter;
   int count = 0;
+  CHECK_EQ(num_channels, 2);
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
@@ -118,6 +119,7 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
                                 std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
   std::map<int, vector<NormalizedBBox> > ::iterator iter;
   int count = 0;
+  CHECK_EQ(num_channels, 2);
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
