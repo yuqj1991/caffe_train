@@ -777,6 +777,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
           max_idx = i;
           max_gt_idx = j;
           max_overlap = it->second[j];
+          LOG(INFO)<<"max_idx: "<<max_idx<<", max_overlap: "<<max_overlap;
         }
       }
     }
