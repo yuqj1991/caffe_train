@@ -3845,7 +3845,6 @@ layer {
 		phase: TEST
 	}
 	detection_evaluate_param {
-	
 		num_classes: 2
 		background_label_id: 0
 		overlap_threshold: 0.5
