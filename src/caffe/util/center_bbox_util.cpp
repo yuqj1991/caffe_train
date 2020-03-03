@@ -68,12 +68,9 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
       Dtype diff_y = center_y - inter_center_y;
       Dtype width = xmax - xmin;
       Dtype height = ymax - ymin;
-      #if 0
-      if(count == 25)
-      LOG(INFO)<<"center_x: "<<center_x<<", center_y: "<<center_y
-               <<", inter_center_x: "<<inter_center_x<<", inter_center_y: "<<inter_center_y
-               <<", diff_x: "<<diff_x<<", diff_y: "<<diff_y
-               <<", width: "<<width<<", height: "<<height;
+      #if 1
+      LOG(INFO)<<"center_x: "<<center_x * 4 <<", center_y: "<<center_y * 4
+               <<", bbox width : "<<width * 4<<", bbox height: "<<height * 4;
       #endif
       int dimScale = output_height * output_width;
       int x_loc_index = batch_id * num_channels * dimScale
