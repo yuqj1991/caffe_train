@@ -234,6 +234,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                   , const int loc_channels, Dtype conf_thresh, Dtype nms_thresh){
   std::vector<CenterNetInfo > batch_result;
   int dim = classes * output_width * output_height;
+  CHECK_EQ(loc_channels, 4);
   for(int i = 0; i < num_batch; i++){
     std::vector<CenterNetInfo > batch_temp;
     batch_result.clear();
@@ -251,7 +252,9 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             Dtype center_y = (h + loc_data[y_loc_index]) * 4;
             Dtype width = std::exp(loc_data[width_loc_index]) * 4;
             Dtype height = std::exp(loc_data[height_loc_index]) * 4;
-            LOG(INFO)<<"bbox width: "<<width<<", bbox height: "<<height;
+            LOG(INFO)<<"ori width: "<<loc_data[height_loc_index]
+                     <<", ori_height: "<<loc_data[width_loc_index]
+                     <<", bbox width: "<<width<<", bbox height: "<<height;
             CenterNetInfo temp_result = {
               .class_id = c,
               .score = keep_max_data[index],
