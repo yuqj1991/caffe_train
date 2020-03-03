@@ -780,7 +780,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
         }
       }
     }
-    LOG(INFO)<<"max_idx: "<<max_idx<<", max_overlap: "<<max_overlap;
+    LOG(INFO)<<"max_idx: "<<max_idx<<", max_gt_idx: "<<max_gt_idx<<", max_overlap: "<<max_overlap;
     if (max_idx == -1) {
       // Cannot find good match.
       break;
