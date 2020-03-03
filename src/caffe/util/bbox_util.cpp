@@ -780,17 +780,21 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
         }
       }
     }
-    LOG(INFO)<<"max_idx: "<<max_idx<<", max_gt_idx: "<<max_gt_idx<<", max_overlap: "<<max_overlap;
+    //LOG(INFO)<<"max_idx: "<<max_idx<<", max_gt_idx: "<<max_gt_idx<<", max_overlap: "<<max_overlap;
     if (max_idx == -1) {
       // Cannot find good match.
       break;
     } else {
-      CHECK_EQ((*match_indices)[max_idx], -1);
-      (*match_indices)[max_idx] = gt_indices[max_gt_idx];
-      (*match_overlaps)[max_idx] = max_overlap;
-      gt_boxnum[max_gt_idx]++;
-      // Erase the ground truth.
-      gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
+      if(max_overlap >= 0.65){
+        CHECK_EQ((*match_indices)[max_idx], -1);
+        (*match_indices)[max_idx] = gt_indices[max_gt_idx];
+        (*match_overlaps)[max_idx] = max_overlap;
+        gt_boxnum[max_gt_idx]++;
+        // Erase the ground truth.
+        gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
+      }else{
+        break;
+      }
     }
   }
 
