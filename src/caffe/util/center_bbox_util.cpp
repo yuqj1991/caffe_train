@@ -252,6 +252,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             Dtype center_y = (h + loc_data[y_loc_index]) * 4;
             Dtype width = std::exp(loc_data[width_loc_index]) * 4;
             Dtype height = std::exp(loc_data[height_loc_index]) * 4;
+            LOG(INFO)<<"bbox width: "<<width<<", bbox height: "<<height;
             CenterNetInfo temp_result = {
               .class_id = c,
               .score = keep_max_data[index],
