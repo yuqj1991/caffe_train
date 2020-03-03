@@ -93,7 +93,7 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
       pred_loc_data[count * num_channels + 1] = loc_data[y_loc_index];
       pred_wh_data[count * num_channels + 0] = wh_data[width_loc_index];
       pred_wh_data[count * num_channels + 1] = wh_data[height_loc_index];
-      count++;
+      ++count;
       #if 0
       LOG(INFO)<<"diff_x: "<<diff_x<<", diff_y: "<<diff_y<<", width: "<<width  <<", height: "<<height;
       #endif
@@ -139,7 +139,7 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
                                 + inter_center_y * output_width + inter_center_x;
       bottom_diff[x_loc_index] = pre_diff[count * num_channels + 0];
       bottom_diff[y_loc_index] = pre_diff[count * num_channels + 1];
-      count++;
+      ++count;
     }
   }
 }
