@@ -305,6 +305,7 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
     }
     LOG(INFO)<<"loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
             <<"; conf loss: "<< conf_loss_.cpu_data()[0] / normalizer
+            <<"; normalizar: "<<normalizer
             <<"; num_prior_: "<< num_priors_ 
             <<"; num_matches_: "<< num_matches_
             <<"; num_groundtruth: "<<num_groundtruth;

@@ -49,7 +49,7 @@ layer {
 	annotated_data_param {
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.3
 				max_scale: 1.0
 				min_aspect_ratio: 0.3
 				max_aspect_ratio: 1.0
@@ -62,7 +62,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.4
 				max_scale: 1.0
 				min_aspect_ratio: 0.4
 				max_aspect_ratio: 1.0
@@ -75,7 +75,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.5
 				max_scale: 1.0
 				min_aspect_ratio: 0.5
 				max_aspect_ratio: 1.0
@@ -88,7 +88,7 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.6
 				max_scale: 1.0
 				min_aspect_ratio: 0.6
 				max_aspect_ratio: 1.0
@@ -101,33 +101,33 @@ layer {
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.7
 				max_scale: 1.0
 				min_aspect_ratio: 0.7
 				max_aspect_ratio: 1.0
 				}
 			sample_constraint {
-				min_object_coverage: 1.0
+				min_object_coverage: 0.9
 			}
 			max_sample: 1
 			max_trials: 50
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.8
 				max_scale: 1.0
 				min_aspect_ratio: 0.8
 				max_aspect_ratio: 1.0
 			}
 			sample_constraint {
-				min_object_coverage: 1.0
+				min_object_coverage: 0.9
 			}
 			max_sample: 1
 			max_trials: 50
 		}
 		batch_sampler {
 			sampler {
-				min_scale: 1.0
+				min_scale: 0.9
 				max_scale: 1.0
 				min_aspect_ratio: 0.9
 				max_aspect_ratio: 1.0
@@ -139,12 +139,14 @@ layer {
 			max_trials: 50
 		}
 		data_anchor_sampler{
-			scale: 16
-			scale: 32
-			scale: 64
-			scale: 128
-			scale: 256
-			scale: 512
+			scale: 15
+			scale: 20
+			scale: 40
+			scale: 70
+			scale: 110
+			scale: 250
+			scale: 400
+			scale: 560
 			sample_constraint{
 				min_object_coverage: 0.2
 			}
@@ -3921,7 +3923,6 @@ layer {
 	propagate_down: false
 	propagate_down: false
 	loss_param {
-		#ignore_label: 0
 		normalization: VALID
 	}
 	loss_weight: 1.0
@@ -3932,13 +3933,13 @@ layer {
 		num_classes: 2
 		share_location: true
 		match_type: PER_PREDICTION
-		overlap_threshold: 0.55
+		overlap_threshold: 0.65
 		use_prior_for_matching: true
 		use_center_locate_match: true
 		use_tiny_box_match: true
 		background_label_id: 0
 		use_difficult_gt: true
-		neg_pos_ratio: 3.0
+		neg_pos_ratio: 4.0
 		neg_overlap: 0.35
 		code_type: RECEPTIVE_CENTER
 		ignore_cross_boundary_bbox: false
