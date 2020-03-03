@@ -69,7 +69,7 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
       Dtype diff_y = center_y - inter_center_y;
       Dtype width = xmax - xmin;
       Dtype height = ymax - ymin;
-      #if 1
+      #if 0
       LOG(INFO)<<"center_x: "<<center_x * 4 <<", center_y: "<<center_y * 4
                <<", bbox width : "<<width * 4<<", bbox height: "<<height * 4;
       #endif
