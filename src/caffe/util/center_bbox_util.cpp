@@ -179,11 +179,11 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, 
 			return a.score < b.score;
 		});
 
-	float IOU = 0;
-	float maxX = 0;
-	float maxY = 0;
-	float minX = 0;
-	float minY = 0;
+	float IOU = 0.f;
+	float maxX = 0.f;
+	float maxY = 0.f;
+	float minX = 0.f;
+	float minY = 0.f;
 	std::vector<int> vPick;
 	int nPick = 0;
 	std::multimap<float, int> vScores;
@@ -273,7 +273,6 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
       batch_result[j].xmax = float(batch_result[j].xmax / (4 * output_width));
       batch_result[j].ymin = float(batch_result[j].ymin / (4 * output_height));
       batch_result[j].ymax = float(batch_result[j].ymax / (4 * output_height));
-      //LOG(INFO)<< batch_result[j].xmin <<", "<<batch_result[j].ymin <<", "<<batch_result[j].xmax<<", "<<batch_result[j].ymax;
     }
     if(batch_result.size() > 0){
       if(results->find(i) == results->end()){

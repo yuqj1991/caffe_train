@@ -9,7 +9,7 @@ layer {
 	}
 	transform_param {
 		scale: 0.007843
-		mirror: true
+		mirror: false
 		mean_value: 103.94
 		mean_value: 116.78
 		mean_value: 123.68
