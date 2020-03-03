@@ -88,8 +88,8 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
                                 + inter_center_y * output_width + inter_center_x;
       gt_loc_data[count * num_channels + 0] = diff_x;
       gt_loc_data[count * num_channels + 1] = diff_y;
-      gt_wh_data[count * num_channels + 0] = log(width);
-      gt_wh_data[count * num_channels + 1] = log(height);
+      gt_wh_data[count * num_channels + 0] = (width);
+      gt_wh_data[count * num_channels + 1] = (height);
       pred_loc_data[count * num_channels + 0] = loc_data[x_loc_index];
       pred_loc_data[count * num_channels + 1] = loc_data[y_loc_index];
       pred_wh_data[count * num_channels + 0] = wh_data[width_loc_index];
@@ -250,8 +250,8 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             int height_loc_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
             Dtype center_x = (w + loc_data[x_loc_index]) * 4;
             Dtype center_y = (h + loc_data[y_loc_index]) * 4;
-            Dtype width = std::exp(loc_data[width_loc_index]) * 4;
-            Dtype height = std::exp(loc_data[height_loc_index]) * 4;
+            Dtype width = (loc_data[width_loc_index]) * 4;
+            Dtype height = (loc_data[height_loc_index]) * 4;
             LOG(INFO)<<"ori width: "<<loc_data[height_loc_index]
                      <<", ori_height: "<<loc_data[width_loc_index]
                      <<", bbox width: "<<width<<", bbox height: "<<height;
