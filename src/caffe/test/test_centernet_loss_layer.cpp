@@ -134,7 +134,7 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
       }
       if (i == 2) {
         AnnotationGroup* anno_group = anno_datum.add_annotation_group();
-        anno_group->set_group_label(2);
+        anno_group->set_group_label(1);
         Annotation* anno = anno_group->add_annotation();
         anno->set_instance_id(0);
         NormalizedBBox* bbox = anno->mutable_bbox();
@@ -180,8 +180,8 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     Dtype* gt_data = blob_bottom_gt_->mutable_cpu_data();
     FillItem(gt_data, "0 1 0 0.1 0.1 0.3 0.3 0");
     FillItem(gt_data + 8, "2 1 0 0.1 0.1 0.3 0.3 0");
-    FillItem(gt_data + 8 * 2, "2 2 0 0.2 0.2 0.4 0.4 0");
-    FillItem(gt_data + 8 * 3, "2 2 1 0.6 0.6 0.8 0.9 1");
+    FillItem(gt_data + 8 * 2, "2 1 0 0.2 0.2 0.4 0.4 0");
+    FillItem(gt_data + 8 * 3, "2 1 1 0.6 0.6 0.8 0.9 1");
 #endif  // USE_LMDB
 
     // Fake layer
