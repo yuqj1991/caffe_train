@@ -21,8 +21,8 @@ class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam>
 
  protected:
   CenterNetfocalSigmoidWithLossLayerTest()
-      : blob_bottom_data_(new Blob<Dtype>(10, 1, 16, 16)),
-        blob_bottom_targets_(new Blob<Dtype>(10, 1, 16, 16)),
+      : blob_bottom_data_(new Blob<Dtype>(5, 1, 16, 16)),
+        blob_bottom_targets_(new Blob<Dtype>(5, 1, 16, 16)),
         blob_top_loss_(new Blob<Dtype>()),
         alpha_(2.0), gamma_(4.0) {
     // Fill the data vector
@@ -127,34 +127,5 @@ TYPED_TEST(CenterNetfocalSigmoidWithLossLayerTest, TestGradient) {
   checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
       this->blob_top_vec_, 0);
 }
-
-TYPED_TEST(CenterNetfocalSigmoidWithLossLayerTest, TestIgnoreGradient) {
-  typedef typename TypeParam::Dtype Dtype;
-  FillerParameter data_filler_param;
-  data_filler_param.set_std(1);
-  GaussianFiller<Dtype> data_filler(data_filler_param);
-  data_filler.Fill(this->blob_bottom_data_);
-  LayerParameter layer_param;
-  LossParameter* loss_param = layer_param.mutable_loss_param();
-  loss_param->set_ignore_label(-1);
-  Dtype* target = this->blob_bottom_targets_->mutable_cpu_data();
-  const int count = this->blob_bottom_targets_->count();
-  // Ignore half of targets, then check that diff of this half is zero,
-  // while the other half is nonzero.
-  caffe_set(count / 2, Dtype(-1), target);
-  CenterNetfocalSigmoidWithLossLayer<Dtype> layer(layer_param);
-  layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
-  layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
-  vector<bool> propagate_down(2);
-  propagate_down[0] = true;
-  propagate_down[1] = false;
-  layer.Backward(this->blob_top_vec_, propagate_down, this->blob_bottom_vec_);
-  const Dtype* diff = this->blob_bottom_data_->cpu_diff();
-  for (int i = 0; i < count / 2; ++i) {
-    EXPECT_FLOAT_EQ(diff[i], 0.);
-    EXPECT_NE(diff[i + count / 2], 0.);
-  }
-}
-
 
 }  // namespace caffe

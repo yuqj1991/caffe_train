@@ -312,7 +312,7 @@ TYPED_TEST(centerNetLossLayerTest, TestWhGradient) {
         CenterObjectLossLayer<Dtype> layer(layer_param);
         GradientChecker<Dtype> checker(1e-2, 1e-2, 1701);
         checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
-                                        this->blob_top_vec_, 0);
+                                        this->blob_top_vec_, 1);
       }
     }
   }
@@ -322,8 +322,8 @@ TYPED_TEST(centerNetLossLayerTest, TestConfGradient) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   LossParameter* loss_param = layer_param.mutable_loss_param();
-  layer_param.add_propagate_down(false);
   layer_param.add_propagate_down(true);
+  layer_param.add_propagate_down(false);
   CenterObjectParameter* center_object_loss_param =
       layer_param.mutable_center_object_loss_param();
   center_object_loss_param->set_num_class(this->num_classes_);
@@ -341,7 +341,7 @@ TYPED_TEST(centerNetLossLayerTest, TestConfGradient) {
           CenterObjectLossLayer<Dtype> layer(layer_param);
           GradientChecker<Dtype> checker(1e-2, 1e-2, 1701);
           checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
-                                          this->blob_top_vec_, 1);
+                                          this->blob_top_vec_, 2);
         }
       }
     }
