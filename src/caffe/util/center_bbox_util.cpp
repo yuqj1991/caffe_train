@@ -255,7 +255,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                      <<", bbox width: "<<width<<", bbox height: "<<height;
             Dtype xmin = (center_x - Dtype(width / 2)) > 0 ? center_x - Dtype(width / 2) : 0;
             Dtype xmax = (center_x + Dtype(width / 2)) < 4 * output_width ? center_x + Dtype(width / 2) : 4 * output_width;
-            Dtype ymin = (center_y - Dtype(height / 2)) > 0 ? center_y - Dtype(height / 2) :0；
+            Dtype ymin = (center_y - Dtype(height / 2)) > 0 ? center_y - Dtype(height / 2) :0;
             Dtype ymax = (center_y + Dtype(height / 2)) < 4 * output_height ? center_y + Dtype(height / 2) : 4 * output_height;
             CenterNetInfo temp_result = {
               .class_id = c,
