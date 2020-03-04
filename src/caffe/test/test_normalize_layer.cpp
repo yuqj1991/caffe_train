@@ -5,7 +5,7 @@
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/filler.hpp"
-#include "caffe/layers/normalize_layer.hpp"
+#include "caffe/layers/channel_normalize_layer.hpp"
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
 
@@ -15,10 +15,10 @@
 namespace caffe {
 
 template <typename TypeParam>
-class NormalizeLayerTest : public MultiDeviceTest<TypeParam> {
+class ChannelNormalizeLayerTest : public MultiDeviceTest<TypeParam> {
   typedef typename TypeParam::Dtype Dtype;
  protected:
-  NormalizeLayerTest()
+  ChannelNormalizeLayerTest()
       : blob_bottom_(new Blob<Dtype>(2, 3, 2, 3)),
         blob_top_(new Blob<Dtype>()) {
     // fill the values
@@ -30,19 +30,19 @@ class NormalizeLayerTest : public MultiDeviceTest<TypeParam> {
     blob_bottom_vec_.push_back(blob_bottom_);
     blob_top_vec_.push_back(blob_top_);
   }
-  virtual ~NormalizeLayerTest() { delete blob_bottom_; delete blob_top_; }
+  virtual ~ChannelNormalizeLayerTest() { delete blob_bottom_; delete blob_top_; }
   Blob<Dtype>* const blob_bottom_;
   Blob<Dtype>* const blob_top_;
   vector<Blob<Dtype>*> blob_bottom_vec_;
   vector<Blob<Dtype>*> blob_top_vec_;
 };
 
-TYPED_TEST_CASE(NormalizeLayerTest, TestDtypesAndDevices);
+TYPED_TEST_CASE(ChannelNormalizeLayerTest, TestDtypesAndDevices);
 
-TYPED_TEST(NormalizeLayerTest, TestForward) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestForward) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
   layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
   // Test norm
@@ -67,13 +67,13 @@ TYPED_TEST(NormalizeLayerTest, TestForward) {
   }
 }
 
-TYPED_TEST(NormalizeLayerTest, TestForwardScale) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestForwardScale) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(10);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
   layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
   // Test norm
@@ -98,14 +98,14 @@ TYPED_TEST(NormalizeLayerTest, TestForwardScale) {
   }
 }
 
-TYPED_TEST(NormalizeLayerTest, TestForwardScaleChannels) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestForwardScaleChannels) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_channel_shared(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(10);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
   layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
   // Test norm
@@ -130,12 +130,12 @@ TYPED_TEST(NormalizeLayerTest, TestForwardScaleChannels) {
   }
 }
 
-TYPED_TEST(NormalizeLayerTest, TestForwardEltWise) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestForwardEltWise) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
   layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
   // Test norm
@@ -160,14 +160,14 @@ TYPED_TEST(NormalizeLayerTest, TestForwardEltWise) {
   }
 }
 
-TYPED_TEST(NormalizeLayerTest, TestForwardEltWiseScale) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestForwardEltWiseScale) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(10);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
   layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
   // Test norm
@@ -192,7 +192,7 @@ TYPED_TEST(NormalizeLayerTest, TestForwardEltWiseScale) {
   }
 }
 
-TYPED_TEST(NormalizeLayerTest, TestForwardEltWiseScaleChannel) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestForwardEltWiseScaleChannel) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
@@ -200,7 +200,7 @@ TYPED_TEST(NormalizeLayerTest, TestForwardEltWiseScaleChannel) {
   norm_param->set_channel_shared(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(10);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
   layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
   // Test norm
@@ -225,65 +225,65 @@ TYPED_TEST(NormalizeLayerTest, TestForwardEltWiseScaleChannel) {
   }
 }
 
-TYPED_TEST(NormalizeLayerTest, TestGradient) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestGradient) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   GradientChecker<Dtype> checker(1e-2, 1e-3);
   checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
       this->blob_top_vec_, 0);
 }
 
-TYPED_TEST(NormalizeLayerTest, TestGradientScale) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestGradientScale) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(3);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   GradientChecker<Dtype> checker(1e-2, 1e-3);
   checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
       this->blob_top_vec_);
 }
 
-TYPED_TEST(NormalizeLayerTest, TestGradientScaleChannel) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestGradientScaleChannel) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_channel_shared(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(3);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   GradientChecker<Dtype> checker(1e-2, 1e-3);
   checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
       this->blob_top_vec_);
 }
 
-TYPED_TEST(NormalizeLayerTest, TestGradientEltWise) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestGradientEltWise) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   GradientChecker<Dtype> checker(1e-3, 1e-3);
   checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
       this->blob_top_vec_);
 }
 
-TYPED_TEST(NormalizeLayerTest, TestGradientEltWiseScale) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestGradientEltWiseScale) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(3);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   GradientChecker<Dtype> checker(1e-3, 2e-3);
   checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
       this->blob_top_vec_);
 }
 
-TYPED_TEST(NormalizeLayerTest, TestGradientEltWiseScaleChannel) {
+TYPED_TEST(ChannelNormalizeLayerTest, TestGradientEltWiseScaleChannel) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   NormalizeParameter* norm_param = layer_param.mutable_norm_param();
@@ -291,7 +291,7 @@ TYPED_TEST(NormalizeLayerTest, TestGradientEltWiseScaleChannel) {
   norm_param->set_channel_shared(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(3);
-  NormalizeLayer<Dtype> layer(layer_param);
+  ChannelNormalizeLayer<Dtype> layer(layer_param);
   GradientChecker<Dtype> checker(1e-3, 2e-3);
   checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
       this->blob_top_vec_);
