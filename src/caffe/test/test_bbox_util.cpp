@@ -636,7 +636,7 @@ TEST_F(CPUBBoxUtilTest, TestMatchBBoxLableAllBipartite) {
   int input_width = 16;
 
   MatchBBox(gt_bboxes, pred_bboxes, label, match_type, overlap, true,
-            &match_indices, &match_overlaps, use_center_locate_match,
+            &match_indices, &match_overlaps, use_tiny_box_match, use_center_locate_match,
             bbox_small_list,  bbox_large_list,
             receptive_filed_list,  input_height, input_width);
 
@@ -681,7 +681,7 @@ TEST_F(CPUBBoxUtilTest, TestMatchBBoxLableOnePerPrediction) {
   int input_width = 16;
 
   MatchBBox(gt_bboxes, pred_bboxes, label, match_type, overlap, true,
-            &match_indices, &match_overlaps, use_center_locate_match,
+            &match_indices, &match_overlaps, use_tiny_box_match, use_center_locate_match,
             bbox_small_list,  bbox_large_list,
             receptive_filed_list,  input_height, input_width);
 
@@ -722,7 +722,7 @@ TEST_F(CPUBBoxUtilTest, TestMatchBBoxLableAllPerPrediction) {
   int input_width = 16;
 
   MatchBBox(gt_bboxes, pred_bboxes, label, match_type, overlap, true,
-            &match_indices, &match_overlaps, use_center_locate_match,
+            &match_indices, &match_overlaps, use_tiny_box_match, use_center_locate_match,
             bbox_small_list,  bbox_large_list,
             receptive_filed_list,  input_height, input_width);
 
@@ -765,7 +765,7 @@ TEST_F(CPUBBoxUtilTest, TestMatchBBoxLableAllPerPredictionEx) {
   int input_width = 16;
 
   MatchBBox(gt_bboxes, pred_bboxes, label, match_type, overlap, true,
-            &match_indices, &match_overlaps, use_center_locate_match,
+            &match_indices, &match_overlaps, use_tiny_box_match, use_center_locate_match,
             bbox_small_list,  bbox_large_list,
             receptive_filed_list,  input_height, input_width);
 
