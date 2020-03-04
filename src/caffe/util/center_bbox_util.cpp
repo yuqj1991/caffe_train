@@ -92,9 +92,8 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
       pred_wh_data[count * num_channels + 0] = wh_data[width_loc_index];
       pred_wh_data[count * num_channels + 1] = wh_data[height_loc_index];
       ++count;
-     #if 1
-      LOG(INFO)<<"center_x: "<<center_x * 4 <<", center_y: "<<center_y * 4
-               <<", bbox width : "<<width * 4<<", bbox height: "<<height * 4;
+      #if 0
+      LOG(INFO)<<"center_x: "<<center_x <<", center_y: "<<center_y <<", bbox width : "<<width<<", bbox height: "<<height;
       #endif
     }
   }
@@ -255,7 +254,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                      <<", bbox width: "<<width<<", bbox height: "<<height;
             Dtype xmin = (center_x - Dtype(width / 2)) > 0 ? center_x - Dtype(width / 2) : 0;
             Dtype xmax = (center_x + Dtype(width / 2)) < 4 * output_width ? center_x + Dtype(width / 2) : 4 * output_width;
-            Dtype ymin = (center_y - Dtype(height / 2)) > 0 ? center_y - Dtype(height / 2) :0;
+            Dtype ymin = (center_y - Dtype(height / 2)) > 0 ? center_y - Dtype(height / 2) : 0;
             Dtype ymax = (center_y + Dtype(height / 2)) < 4 * output_height ? center_y + Dtype(height / 2) : 4 * output_height;
             CenterNetInfo temp_result = {
               .class_id = c,

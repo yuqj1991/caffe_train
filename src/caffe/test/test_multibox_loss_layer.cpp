@@ -52,11 +52,11 @@ static MultiBoxLossParameter_MiningType kMiningType[] = {
   MultiBoxLossParameter_MiningType_HARD_EXAMPLE};
 
 template <typename TypeParam>
-class MultiBoxLossLayerTest : public MultiDeviceTest<TypeParam> {
+class MultiBoxSSDLossLayerTest : public MultiDeviceTest<TypeParam> {
   typedef typename TypeParam::Dtype Dtype;
 
  protected:
-  MultiBoxLossLayerTest()
+  MultiBoxSSDLossLayerTest()
       : num_(3),
         num_classes_(3),
         width_(2),
@@ -75,7 +75,7 @@ class MultiBoxLossLayerTest : public MultiDeviceTest<TypeParam> {
     blob_bottom_vec_.push_back(blob_bottom_gt_);
     blob_top_vec_.push_back(blob_top_loss_);
   }
-  virtual ~MultiBoxLossLayerTest() {
+  virtual ~MultiBoxSSDLossLayerTest() {
     delete blob_bottom_prior_;
     delete blob_bottom_loc_;
     delete blob_bottom_conf_;
@@ -324,9 +324,9 @@ class MultiBoxLossLayerTest : public MultiDeviceTest<TypeParam> {
   vector<Blob<Dtype>*> blob_top_vec_;
 };
 
-TYPED_TEST_CASE(MultiBoxLossLayerTest, TestDtypesAndDevices);
+TYPED_TEST_CASE(MultiBoxSSDLossLayerTest, TestDtypesAndDevices);
 
-TYPED_TEST(MultiBoxLossLayerTest, TestSetUp) {
+TYPED_TEST(MultiBoxSSDLossLayerTest, TestSetUp) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   MultiBoxLossParameter* multibox_loss_param =
@@ -349,7 +349,7 @@ TYPED_TEST(MultiBoxLossLayerTest, TestSetUp) {
           multibox_loss_param->set_match_type(match_type);
           multibox_loss_param->set_use_prior_for_matching(use_prior);
           multibox_loss_param->set_mining_type(mining_type);
-          MultiBoxLossLayer<Dtype> layer(layer_param);
+          MultiBoxSSDLossLayer<Dtype> layer(layer_param);
           layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
         }
       }
@@ -357,7 +357,7 @@ TYPED_TEST(MultiBoxLossLayerTest, TestSetUp) {
   }
 }
 
-TYPED_TEST(MultiBoxLossLayerTest, TestLocGradient) {
+TYPED_TEST(MultiBoxSSDLossLayerTest, TestLocGradient) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   layer_param.add_propagate_down(true);
@@ -392,7 +392,7 @@ TYPED_TEST(MultiBoxLossLayerTest, TestLocGradient) {
                 multibox_loss_param->set_use_prior_for_matching(use_prior);
                 multibox_loss_param->set_use_difficult_gt(use_difficult_gt);
                 multibox_loss_param->set_mining_type(mining_type);
-                MultiBoxLossLayer<Dtype> layer(layer_param);
+                MultiBoxSSDLossLayer<Dtype> layer(layer_param);
                 GradientChecker<Dtype> checker(1e-2, 1e-2, 1701);
                 checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
                                                 this->blob_top_vec_, 0);
@@ -405,7 +405,7 @@ TYPED_TEST(MultiBoxLossLayerTest, TestLocGradient) {
   }
 }
 
-TYPED_TEST(MultiBoxLossLayerTest, TestConfGradient) {
+TYPED_TEST(MultiBoxSSDLossLayerTest, TestConfGradient) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   LossParameter* loss_param = layer_param.mutable_loss_param();
@@ -441,7 +441,7 @@ TYPED_TEST(MultiBoxLossLayerTest, TestConfGradient) {
                 multibox_loss_param->set_use_difficult_gt(use_difficult_gt);
                 multibox_loss_param->set_background_label_id(0);
                 multibox_loss_param->set_mining_type(mining_type);
-                MultiBoxLossLayer<Dtype> layer(layer_param);
+                MultiBoxSSDLossLayer<Dtype> layer(layer_param);
                 GradientChecker<Dtype> checker(1e-2, 1e-2, 1701);
                 checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
                                                 this->blob_top_vec_, 1);
