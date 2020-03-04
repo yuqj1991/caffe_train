@@ -227,10 +227,6 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     fake_top_vec.push_back(&fake_output_conf);
     conv_layer_conf.SetUp(fake_bottom_vec, fake_top_vec);
     conv_layer_conf.Forward(fake_bottom_vec, fake_top_vec);
-
-    fake_bottom_vec.clear();
-    fake_bottom_vec.push_back(&fake_output_conf);
-    fake_top_vec.clear();
     
     delete fake_input;
   }
