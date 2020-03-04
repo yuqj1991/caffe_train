@@ -207,16 +207,7 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
 
     // 2) Fill bbox wh size  predictions.
 
-    ConvolutionParameter* convolution_param =
-        layer_param.mutable_convolution_param();
-    convolution_param->add_pad(0);
-    convolution_param->add_kernel_size(1);
-    convolution_param->add_stride(1);
-    int num_output = loc_classes * 2;
-    convolution_param->set_num_output(num_output);
-    convolution_param->mutable_weight_filler()->set_type("xavier");
-    convolution_param->mutable_bias_filler()->set_type("constant");
-    convolution_param->mutable_bias_filler()->set_value(0.1);
+    
     ConvolutionLayer<Dtype> conv_layer_wh(layer_param);
     fake_bottom_vec.clear();
     fake_bottom_vec.push_back(fake_input);
