@@ -70,7 +70,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestForward) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestForwardScale) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(10);
   ChannelNormalizeLayer<Dtype> layer(layer_param);
@@ -101,7 +101,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestForwardScale) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestForwardScaleChannels) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_channel_shared(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(10);
@@ -133,7 +133,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestForwardScaleChannels) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestForwardEltWise) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
   ChannelNormalizeLayer<Dtype> layer(layer_param);
   layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
@@ -163,7 +163,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestForwardEltWise) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestForwardEltWiseScale) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(10);
@@ -195,7 +195,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestForwardEltWiseScale) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestForwardEltWiseScaleChannel) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
   norm_param->set_channel_shared(false);
   norm_param->mutable_scale_filler()->set_type("constant");
@@ -237,7 +237,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestGradient) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestGradientScale) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(3);
   ChannelNormalizeLayer<Dtype> layer(layer_param);
@@ -249,7 +249,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestGradientScale) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestGradientScaleChannel) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_channel_shared(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(3);
@@ -262,7 +262,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestGradientScaleChannel) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestGradientEltWise) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
   ChannelNormalizeLayer<Dtype> layer(layer_param);
   GradientChecker<Dtype> checker(1e-3, 1e-3);
@@ -273,7 +273,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestGradientEltWise) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestGradientEltWiseScale) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
   norm_param->mutable_scale_filler()->set_type("constant");
   norm_param->mutable_scale_filler()->set_value(3);
@@ -286,7 +286,7 @@ TYPED_TEST(ChannelNormalizeLayerTest, TestGradientEltWiseScale) {
 TYPED_TEST(ChannelNormalizeLayerTest, TestGradientEltWiseScaleChannel) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  NormalizeParameter* norm_param = layer_param.mutable_norm_param();
+  ChannelChannelNormalizeParameter* norm_param = layer_param.mutable_norm_param();
   norm_param->set_across_spatial(false);
   norm_param->set_channel_shared(false);
   norm_param->mutable_scale_filler()->set_type("constant");
