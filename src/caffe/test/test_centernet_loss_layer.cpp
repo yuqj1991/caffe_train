@@ -199,9 +199,8 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     ConvolutionLayer<Dtype> conv_layer_loc(layer_param);
     fake_bottom_vec.clear();
     fake_bottom_vec.push_back(fake_input);
-    Blob<Dtype> fake_output_loc;
     fake_top_vec.clear();
-    fake_top_vec.push_back(&fake_output_loc);
+    fake_top_vec.push_back(blob_bottom_loc_);
     conv_layer_loc.SetUp(fake_bottom_vec, fake_top_vec);
     conv_layer_loc.Forward(fake_bottom_vec, fake_top_vec);
 
@@ -210,9 +209,8 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     ConvolutionLayer<Dtype> conv_layer_wh(layer_param);
     fake_bottom_vec.clear();
     fake_bottom_vec.push_back(fake_input);
-    Blob<Dtype> fake_output_wh;
     fake_top_vec.clear();
-    fake_top_vec.push_back(&fake_output_wh);
+    fake_top_vec.push_back(blob_bottom_wh_);
     conv_layer_wh.SetUp(fake_bottom_vec, fake_top_vec);
     conv_layer_wh.Forward(fake_bottom_vec, fake_top_vec);
 
@@ -222,9 +220,8 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     fake_bottom_vec.clear();
     fake_bottom_vec.push_back(fake_input);
     num_output = num_classes_;
-    Blob<Dtype> fake_output_conf;
     fake_top_vec.clear();
-    fake_top_vec.push_back(&fake_output_conf);
+    fake_top_vec.push_back(blob_bottom_conf_);
     conv_layer_conf.SetUp(fake_bottom_vec, fake_top_vec);
     conv_layer_conf.Forward(fake_bottom_vec, fake_top_vec);
     
@@ -258,6 +255,18 @@ TYPED_TEST(centerNetLossLayerTest, TestSetUp) {
     CenterObjectLossLayer<Dtype> layer(layer_param);
     layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
   }
+}
+
+TYPED_TEST(centerNetLossLayerTest, TestForward) {
+  typedef typename TypeParam::Dtype Dtype;
+  LayerParameter layer_param;
+  CenterObjectParameter* center_object_loss_param =
+      layer_param.mutable_center_object_loss_param();
+  center_object_loss_param->set_num_class(this->num_classes_);
+  center_object_loss_param->set_share_location(true);
+  CenterObjectLossLayer<Dtype> layer(layer_param);
+  layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
+  layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
 }
 
 TYPED_TEST(centerNetLossLayerTest, TestLocGradient) {
@@ -335,14 +344,12 @@ TYPED_TEST(centerNetLossLayerTest, TestConfGradient) {
       for (int n = 0; n < 4; ++n) {
         LossParameter_NormalizationMode normalize = kNormalizationModes[n];
         loss_param->set_normalization(normalize);
-        for (int u = 0; u < 2; ++u) {
-          center_object_loss_param->set_conf_loss_type(conf_loss_type);
-          center_object_loss_param->set_share_location(share_location);
-          CenterObjectLossLayer<Dtype> layer(layer_param);
-          GradientChecker<Dtype> checker(1e-2, 1e-2, 1701);
-          checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
-                                          this->blob_top_vec_, 2);
-        }
+        center_object_loss_param->set_conf_loss_type(conf_loss_type);
+        center_object_loss_param->set_share_location(share_location);
+        CenterObjectLossLayer<Dtype> layer(layer_param);
+        GradientChecker<Dtype> checker(1e-2, 1e-2, 1701);
+        checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
+                                        this->blob_top_vec_, 2);
       }
     }
   }
