@@ -21,8 +21,8 @@ class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam>
 
  protected:
   CenterNetfocalSigmoidWithLossLayerTest()
-      : blob_bottom_data_(new Blob<Dtype>(10, 5, 1, 1)),
-        blob_bottom_targets_(new Blob<Dtype>(10, 5, 1, 1)),
+      : blob_bottom_data_(new Blob<Dtype>(10, 1, 16, 16)),
+        blob_bottom_targets_(new Blob<Dtype>(10, 1, 16, 16)),
         blob_top_loss_(new Blob<Dtype>()),
         alpha_(2.0), gamma_(4.0) {
     // Fill the data vector
@@ -35,7 +35,7 @@ class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam>
     FillerParameter targets_filler_param;
     targets_filler_param.set_min(0);
     targets_filler_param.set_max(1);
-    UniformFiller<Dtype> targets_filler(targets_filler_param);
+    GaussianFiller<Dtype> targets_filler(targets_filler_param);
     targets_filler.Fill(blob_bottom_targets_);
     blob_bottom_vec_.push_back(blob_bottom_targets_);
     blob_top_vec_.push_back(blob_top_loss_);
@@ -79,7 +79,7 @@ class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam>
     FillerParameter targets_filler_param;
     targets_filler_param.set_min(0.0);
     targets_filler_param.set_max(1.0);
-    UniformFiller<Dtype> targets_filler(targets_filler_param);
+    GaussianFiller<Dtype> targets_filler(targets_filler_param);
     Dtype eps = 2e-2;
     for (int i = 0; i < 100; ++i) {
       // Fill the data vector
