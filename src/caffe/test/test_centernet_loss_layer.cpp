@@ -50,7 +50,7 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
  protected:
   centerNetLossLayerTest()
       : num_(3),
-        num_classes_(3),
+        num_classes_(1),
         width_(20),
         height_(20),
         blob_bottom_loc_(new Blob<Dtype>(num_, 2, 20, 20)),
