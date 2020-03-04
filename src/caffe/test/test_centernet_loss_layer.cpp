@@ -32,7 +32,7 @@ using boost::scoped_ptr;
 namespace caffe {
 
 static bool kBoolChoices[] = {true, false};
-staticCenterObjectParameter_LocLossType kLocLossTypes[] = {
+static CenterObjectParameter_LocLossType kLocLossTypes[] = {
   CenterObjectParameter_LocLossType_L2,
   CenterObjectParameter_LocLossType_SMOOTH_L1};
 static CenterObjectParameter_ConfLossType kConfLossTypes[] = {
