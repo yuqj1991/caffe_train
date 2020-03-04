@@ -518,6 +518,11 @@ runtest_focal_loss: $(TEST_ALL_BIN)
 	$(TOOL_BUILD_DIR)/caffe
 	$(TEST_FOCAL_LOSS) $(TEST_GPUID) --gtest_shuffle $(TEST_FILTER)
 
+TEST_CENTER_FOCAL_LOSS = .build_release/test/test_center_focal_loss.testbin
+runtest_center_focal_loss: $(TEST_ALL_BIN)
+	$(TOOL_BUILD_DIR)/caffe
+	$(TEST_CENTER_FOCAL_LOSS) $(TEST_GPUID) --gtest_shuffle $(TEST_FILTER)
+
 
 pytest: py
 	cd python; python -m unittest discover -s caffe/test
