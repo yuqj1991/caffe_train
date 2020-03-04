@@ -250,7 +250,7 @@ TYPED_TEST(centerNetLossLayerTest, TestSetUp) {
   LayerParameter layer_param;
   CenterObjectParameter* center_object_loss_param =
       layer_param.mutable_center_object_loss_param();
-  center_object_loss_param->set_num_class(3);
+  center_object_loss_param->set_num_class(num_classes_);
   for (int i = 0; i < 2; ++i) {
     bool share_location = kBoolChoices[i];
     this->Fill(share_location);
@@ -261,6 +261,35 @@ TYPED_TEST(centerNetLossLayerTest, TestSetUp) {
 }
 
 TYPED_TEST(centerNetLossLayerTest, TestLocGradient) {
+  typedef typename TypeParam::Dtype Dtype;
+  LayerParameter layer_param;
+  layer_param.add_propagate_down(true);
+  layer_param.add_propagate_down(false);
+  LossParameter* loss_param = layer_param.mutable_loss_param();
+  CenterObjectParameter* center_object_loss_param =
+      layer_param.mutable_center_object_loss_param();
+  center_object_loss_param->set_num_class(this->num_classes_);
+  for (int l = 0; l < 2; ++l) {
+    CenterObjectParameter_LocLossType loc_loss_type = kLocLossTypes[l];
+    for (int i = 0; i < 2; ++i) {
+      bool share_location = kBoolChoices[i];
+      this->Fill(share_location);
+      for (int n = 0; n < 4; ++n) {
+        LossParameter_NormalizationMode normalize = kNormalizationModes[n];
+        loss_param->set_normalization(normalize);
+        center_object_loss_param->set_loc_loss_type(loc_loss_type);
+        center_object_loss_param->set_share_location(share_location);
+
+        CenterObjectLossLayer<Dtype> layer(layer_param);
+        GradientChecker<Dtype> checker(1e-2, 1e-2, 1701);
+        checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
+                                        this->blob_top_vec_, 0);
+      }
+    }
+  }
+}
+
+TYPED_TEST(centerNetLossLayerTest, TestWhGradient) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   layer_param.add_propagate_down(true);
