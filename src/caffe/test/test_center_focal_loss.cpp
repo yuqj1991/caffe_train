@@ -50,6 +50,7 @@ class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam>
                                          const Dtype* input,
                                          const Dtype* target) {
     Dtype loss = 0;
+    int count = 0;
     for (int i = 0; i < count; ++i) {
       const Dtype prediction = 1 / (1 + exp(-input[i]));
       EXPECT_LE(prediction, 1);
@@ -59,12 +60,13 @@ class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam>
       Dtype label_a = target[i];
       if(label_a == Dtype(1.0)){
         loss -= log(std::max(prediction, Dtype(FLT_MIN))) * std::pow(1 -prediction, alpha_);       
+        count++;
       }else if(label_a < Dtype(1.0)){
         loss -= log(std::max(1 - prediction, Dtype(FLT_MIN))) * std::pow(prediction, alpha_) *
                         std::pow(1 - label_a, gamma_); 
       }
     }
-    return loss / num;
+    return loss / count;
   }
 
   void TestForward() {
