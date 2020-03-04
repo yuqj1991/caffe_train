@@ -1,5 +1,7 @@
 #include <cmath>
 #include <vector>
+#include <algorithm>
+#include <cfloat>
 
 #include "gtest/gtest.h"
 
