@@ -14,11 +14,11 @@
 namespace caffe {
 
 template <typename TypeParam>
-class CenterNetfocalSigmoidWithLossLayer : public MultiDeviceTest<TypeParam> {
+class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam> {
   typedef typename TypeParam::Dtype Dtype;
 
  protected:
-  CenterNetfocalSigmoidWithLossLayer()
+  CenterNetfocalSigmoidWithLossLayerTest()
       : blob_bottom_data_(new Blob<Dtype>(10, 5, 1, 1)),
         blob_bottom_targets_(new Blob<Dtype>(10, 5, 1, 1)),
         blob_top_loss_(new Blob<Dtype>()),
@@ -38,7 +38,7 @@ class CenterNetfocalSigmoidWithLossLayer : public MultiDeviceTest<TypeParam> {
     blob_bottom_vec_.push_back(blob_bottom_targets_);
     blob_top_vec_.push_back(blob_top_loss_);
   }
-  virtual ~CenterNetfocalSigmoidWithLossLayer() {
+  virtual ~CenterNetfocalSigmoidWithLossLayerTest() {
     delete blob_bottom_data_;
     delete blob_bottom_targets_;
     delete blob_top_loss_;
@@ -106,13 +106,13 @@ class CenterNetfocalSigmoidWithLossLayer : public MultiDeviceTest<TypeParam> {
   Dtype gamma_;
 };
 
-TYPED_TEST_CASE(CenterNetfocalSigmoidWithLossLayer, TestDtypesAndDevices);
+TYPED_TEST_CASE(CenterNetfocalSigmoidWithLossLayerTest, TestDtypesAndDevices);
 
-TYPED_TEST(CenterNetfocalSigmoidWithLossLayer, TestSigmoidCrossEntropyLoss) {
+TYPED_TEST(CenterNetfocalSigmoidWithLossLayerTest, TestSigmoidCrossEntropyLoss) {
   this->TestForward();
 }
 
-TYPED_TEST(CenterNetfocalSigmoidWithLossLayer, TestGradient) {
+TYPED_TEST(CenterNetfocalSigmoidWithLossLayerTest, TestGradient) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
   const Dtype kLossWeight = 3.7;
@@ -124,7 +124,7 @@ TYPED_TEST(CenterNetfocalSigmoidWithLossLayer, TestGradient) {
       this->blob_top_vec_, 0);
 }
 
-TYPED_TEST(CenterNetfocalSigmoidWithLossLayer, TestIgnoreGradient) {
+TYPED_TEST(CenterNetfocalSigmoidWithLossLayerTest, TestIgnoreGradient) {
   typedef typename TypeParam::Dtype Dtype;
   FillerParameter data_filler_param;
   data_filler_param.set_std(1);
