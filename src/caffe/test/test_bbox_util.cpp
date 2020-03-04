@@ -586,9 +586,18 @@ TEST_F(CPUBBoxUtilTest, TestMatchBBoxLableOneBipartite) {
 
   vector<int> match_indices;
   vector<float> match_overlaps;
+  const bool use_tiny_box_match = false;
+  const bool use_center_locate_match = false;
+  vector<int> bbox_small_list;
+  vector<int> bbox_large_list;
+  vector<int> receptive_filed_list;
+  int input_height = 16;
+  int input_width = 16;
 
   MatchBBox(gt_bboxes, pred_bboxes, label, match_type, overlap, true,
-            &match_indices, &match_overlaps);
+            &match_indices, &match_overlaps, use_tiny_box_match, use_center_locate_match,
+            bbox_small_list,  bbox_large_list,
+            receptive_filed_list,  input_height, input_width);
 
   EXPECT_EQ(match_indices.size(), 6);
   EXPECT_EQ(match_overlaps.size(), 6);
@@ -618,8 +627,18 @@ TEST_F(CPUBBoxUtilTest, TestMatchBBoxLableAllBipartite) {
   vector<int> match_indices;
   vector<float> match_overlaps;
 
+  const bool use_tiny_box_match = false;
+  const bool use_center_locate_match = false;
+  vector<int> bbox_small_list;
+  vector<int> bbox_large_list;
+  vector<int> receptive_filed_list;
+  int input_height = 16;
+  int input_width = 16;
+
   MatchBBox(gt_bboxes, pred_bboxes, label, match_type, overlap, true,
-            &match_indices, &match_overlaps);
+            &match_indices, &match_overlaps, use_center_locate_match,
+            bbox_small_list,  bbox_large_list,
+            receptive_filed_list,  input_height, input_width);
 
   EXPECT_EQ(match_indices.size(), 6);
   EXPECT_EQ(match_overlaps.size(), 6);
@@ -653,8 +672,18 @@ TEST_F(CPUBBoxUtilTest, TestMatchBBoxLableOnePerPrediction) {
   vector<int> match_indices;
   vector<float> match_overlaps;
 
+  const bool use_tiny_box_match = false;
+  const bool use_center_locate_match = false;
+  vector<int> bbox_small_list;
+  vector<int> bbox_large_list;
+  vector<int> receptive_filed_list;
+  int input_height = 16;
+  int input_width = 16;
+
   MatchBBox(gt_bboxes, pred_bboxes, label, match_type, overlap, true,
-            &match_indices, &match_overlaps);
+            &match_indices, &match_overlaps, use_center_locate_match,
+            bbox_small_list,  bbox_large_list,
+            receptive_filed_list,  input_height, input_width);
 
   EXPECT_EQ(match_indices.size(), 6);
   EXPECT_EQ(match_overlaps.size(), 6);
@@ -684,8 +713,18 @@ TEST_F(CPUBBoxUtilTest, TestMatchBBoxLableAllPerPrediction) {
   vector<int> match_indices;
   vector<float> match_overlaps;
 
+  const bool use_tiny_box_match = false;
+  const bool use_center_locate_match = false;
+  vector<int> bbox_small_list;
+  vector<int> bbox_large_list;
+  vector<int> receptive_filed_list;
+  int input_height = 16;
+  int input_width = 16;
+
   MatchBBox(gt_bboxes, pred_bboxes, label, match_type, overlap, true,
-            &match_indices, &match_overlaps);
+            &match_indices, &match_overlaps, use_center_locate_match,
+            bbox_small_list,  bbox_large_list,
+            receptive_filed_list,  input_height, input_width);
 
   EXPECT_EQ(match_indices.size(), 6);
   EXPECT_EQ(match_overlaps.size(), 6);
@@ -717,8 +756,18 @@ TEST_F(CPUBBoxUtilTest, TestMatchBBoxLableAllPerPredictionEx) {
   vector<int> match_indices;
   vector<float> match_overlaps;
 
+  const bool use_tiny_box_match = false;
+  const bool use_center_locate_match = false;
+  vector<int> bbox_small_list;
+  vector<int> bbox_large_list;
+  vector<int> receptive_filed_list;
+  int input_height = 16;
+  int input_width = 16;
+
   MatchBBox(gt_bboxes, pred_bboxes, label, match_type, overlap, true,
-            &match_indices, &match_overlaps);
+            &match_indices, &match_overlaps, use_center_locate_match,
+            bbox_small_list,  bbox_large_list,
+            receptive_filed_list,  input_height, input_width);
 
   EXPECT_EQ(match_indices.size(), 6);
   EXPECT_EQ(match_overlaps.size(), 6);
