@@ -211,9 +211,9 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     ConvolutionLayer<Dtype> conv_layer_wh(layer_param);
     fake_bottom_vec.clear();
     fake_bottom_vec.push_back(fake_input);
-    Blob<Dtype> fake_output_loc;
+    Blob<Dtype> fake_output_wh;
     fake_top_vec.clear();
-    fake_top_vec.push_back(&fake_output_loc);
+    fake_top_vec.push_back(&fake_output_wh);
     conv_layer_wh.SetUp(fake_bottom_vec, fake_top_vec);
     conv_layer_wh.Forward(fake_bottom_vec, fake_top_vec);
 
@@ -285,7 +285,6 @@ TYPED_TEST(centerNetLossLayerTest, TestLocGradient) {
         center_object_loss_param->set_loc_loss_type(loc_loss_type);
         center_object_loss_param->set_share_location(share_location);
 
-        center_object_loss_param->set_use_difficult_gt(true);
         CenterObjectLossLayer<Dtype> layer(layer_param);
         GradientChecker<Dtype> checker(1e-2, 1e-2, 1701);
         checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
@@ -316,8 +315,6 @@ TYPED_TEST(centerNetLossLayerTest, TestConfGradient) {
           bool use_difficult_gt = kBoolChoices[u];
           center_object_loss_param->set_conf_loss_type(conf_loss_type);
           center_object_loss_param->set_share_location(share_location);
-          center_object_loss_param->set_use_difficult_gt(use_difficult_gt);
-          center_object_loss_param->set_background_label_id(0);
           CenterObjectLossLayer<Dtype> layer(layer_param);
           GradientChecker<Dtype> checker(1e-2, 1e-2, 1701);
           checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_,
