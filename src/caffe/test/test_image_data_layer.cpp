@@ -24,10 +24,12 @@ class ImageDataLayerTest : public MultiDeviceTest<TypeParam> {
   ImageDataLayerTest()
       : seed_(1701),
         blob_top_data_(new Blob<Dtype>()),
-        blob_top_label_(new Blob<Dtype>()) {}
+        blob_top_label_(new Blob<Dtype>()),
+        blob_top_pair_(new Blob<Dtype>()) {}
   virtual void SetUp() {
     blob_top_vec_.push_back(blob_top_data_);
     blob_top_vec_.push_back(blob_top_label_);
+    blob_top_vec_.push_back(blob_top_pair_);
     Caffe::set_random_seed(seed_);
     // Create test input file.
     MakeTempFilename(&filename_);
@@ -57,6 +59,7 @@ class ImageDataLayerTest : public MultiDeviceTest<TypeParam> {
   virtual ~ImageDataLayerTest() {
     delete blob_top_data_;
     delete blob_top_label_;
+    delete blob_top_pair_;
   }
 
   int seed_;
@@ -65,6 +68,7 @@ class ImageDataLayerTest : public MultiDeviceTest<TypeParam> {
   string filename_space_;
   Blob<Dtype>* const blob_top_data_;
   Blob<Dtype>* const blob_top_label_;
+  Blob<Dtype>* const blob_top_pair_;
   vector<Blob<Dtype>*> blob_bottom_vec_;
   vector<Blob<Dtype>*> blob_top_vec_;
 };
