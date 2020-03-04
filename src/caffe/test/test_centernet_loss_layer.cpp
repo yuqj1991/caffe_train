@@ -206,8 +206,7 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     conv_layer_loc.Forward(fake_bottom_vec, fake_top_vec);
 
     // 2) Fill bbox wh size  predictions.
-
-    
+    convolution_param->set_num_output(num_output);
     ConvolutionLayer<Dtype> conv_layer_wh(layer_param);
     fake_bottom_vec.clear();
     fake_bottom_vec.push_back(fake_input);
