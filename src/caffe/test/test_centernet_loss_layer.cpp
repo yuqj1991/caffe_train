@@ -250,7 +250,7 @@ TYPED_TEST(centerNetLossLayerTest, TestSetUp) {
   LayerParameter layer_param;
   CenterObjectParameter* center_object_loss_param =
       layer_param.mutable_center_object_loss_param();
-  center_object_loss_param->set_num_class(num_classes_);
+  center_object_loss_param->set_num_class(this->num_classes_);
   for (int i = 0; i < 2; ++i) {
     bool share_location = kBoolChoices[i];
     this->Fill(share_location);
@@ -336,7 +336,6 @@ TYPED_TEST(centerNetLossLayerTest, TestConfGradient) {
         LossParameter_NormalizationMode normalize = kNormalizationModes[n];
         loss_param->set_normalization(normalize);
         for (int u = 0; u < 2; ++u) {
-          bool use_difficult_gt = kBoolChoices[u];
           center_object_loss_param->set_conf_loss_type(conf_loss_type);
           center_object_loss_param->set_share_location(share_location);
           CenterObjectLossLayer<Dtype> layer(layer_param);
