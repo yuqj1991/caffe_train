@@ -2445,12 +2445,7 @@ message V1LayerParameter {
     SLICE = 33;
     TANH = 23;
     WINDOW_DATA = 24;
-    THRESHOLD = 31;
-    
-    //added by wxl
-    RANK_HARD_LOSS = 40;
-    NORM = 41;
-    
+    THRESHOLD = 31;   
   }
   optional LayerType type = 5;
   repeated BlobProto blobs = 6;
