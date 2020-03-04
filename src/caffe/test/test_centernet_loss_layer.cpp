@@ -198,7 +198,7 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     convolution_param->mutable_bias_filler()->set_value(0.1);
     ConvolutionLayer<Dtype> conv_layer_loc(layer_param);
     fake_bottom_vec.clear();
-    fake_bottom_vec.push_back(fake_blob);
+    fake_bottom_vec.push_back(fake_input);
     Blob<Dtype> fake_output_loc;
     fake_top_vec.clear();
     fake_top_vec.push_back(&fake_output_loc);
@@ -219,7 +219,7 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     convolution_param->mutable_bias_filler()->set_value(0.1);
     ConvolutionLayer<Dtype> conv_layer_wh(layer_param);
     fake_bottom_vec.clear();
-    fake_bottom_vec.push_back(fake_blob);
+    fake_bottom_vec.push_back(fake_input);
     Blob<Dtype> fake_output_loc;
     fake_top_vec.clear();
     fake_top_vec.push_back(&fake_output_loc);
@@ -230,7 +230,7 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     convolution_param->set_num_output(num_classes_);
     ConvolutionLayer<Dtype> conv_layer_conf(layer_param);
     fake_bottom_vec.clear();
-    fake_bottom_vec.push_back(fake_blob);
+    fake_bottom_vec.push_back(fake_input);
     num_output = num_classes_;
     Blob<Dtype> fake_output_conf;
     fake_top_vec.clear();
@@ -242,7 +242,6 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
     fake_bottom_vec.push_back(&fake_output_conf);
     fake_top_vec.clear();
     
-    delete fake_blob;
     delete fake_input;
   }
   int num_;
