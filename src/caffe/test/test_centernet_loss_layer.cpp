@@ -59,8 +59,8 @@ class centerNetLossLayerTest : public MultiDeviceTest<TypeParam> {
         blob_bottom_gt_(new Blob<Dtype>(1, 1, 4, 8)),
         blob_top_loss_(new Blob<Dtype>()) {
     blob_bottom_vec_.push_back(blob_bottom_loc_);
-    blob_bottom_vec_.push_back(blob_bottom_conf_);
     blob_bottom_vec_.push_back(blob_bottom_wh_);
+    blob_bottom_vec_.push_back(blob_bottom_conf_);
     blob_bottom_vec_.push_back(blob_bottom_gt_);
     blob_top_vec_.push_back(blob_top_loss_);
   }
