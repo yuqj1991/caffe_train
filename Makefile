@@ -510,7 +510,7 @@ runtest: $(TEST_ALL_BIN)
 TEST_CENTER = .build_release/test/test_centernet_loss_layer.testbin
 runtest_center_loss: $(TEST_ALL_BIN)
 	$(TOOL_BUILD_DIR)/caffe
-	$(TEST_ALLTEST_CENTER_BIN) $(TEST_GPUID) --gtest_shuffle $(TEST_FILTER)
+	$(TEST_CENTER) $(TEST_GPUID) --gtest_shuffle $(TEST_FILTER)
 
 
 TEST_FOCAL_LOSS = .build_release/test/test_soft_focal_with_loss_layer.testbin
