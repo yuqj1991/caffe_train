@@ -69,10 +69,7 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
       Dtype diff_y = center_y - inter_center_y;
       Dtype width = xmax - xmin;
       Dtype height = ymax - ymin;
-      #if 0
-      LOG(INFO)<<"center_x: "<<center_x * 4 <<", center_y: "<<center_y * 4
-               <<", bbox width : "<<width * 4<<", bbox height: "<<height * 4;
-      #endif
+      
       int dimScale = output_height * output_width;
       int x_loc_index = batch_id * num_channels * dimScale
                                 + 0 * dimScale
@@ -88,15 +85,16 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
                                 + inter_center_y * output_width + inter_center_x;
       gt_loc_data[count * num_channels + 0] = diff_x;
       gt_loc_data[count * num_channels + 1] = diff_y;
-      gt_wh_data[count * num_channels + 0] = (width);
-      gt_wh_data[count * num_channels + 1] = (height);
+      gt_wh_data[count * num_channels + 0] = std::log(width);
+      gt_wh_data[count * num_channels + 1] = std::log(height);
       pred_loc_data[count * num_channels + 0] = loc_data[x_loc_index];
       pred_loc_data[count * num_channels + 1] = loc_data[y_loc_index];
       pred_wh_data[count * num_channels + 0] = wh_data[width_loc_index];
       pred_wh_data[count * num_channels + 1] = wh_data[height_loc_index];
       ++count;
-      #if 0
-      LOG(INFO)<<"diff_x: "<<diff_x<<", diff_y: "<<diff_y<<", width: "<<width  <<", height: "<<height;
+     #if 1
+      LOG(INFO)<<"center_x: "<<center_x * 4 <<", center_y: "<<center_y * 4
+               <<", bbox width : "<<width * 4<<", bbox height: "<<height * 4;
       #endif
     }
   }
@@ -250,18 +248,22 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             int height_loc_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
             Dtype center_x = (w + loc_data[x_loc_index]) * 4;
             Dtype center_y = (h + loc_data[y_loc_index]) * 4;
-            Dtype width = (loc_data[width_loc_index]) * 4;
-            Dtype height = (loc_data[height_loc_index]) * 4;
-            LOG(INFO)<<"ori width: "<<loc_data[height_loc_index]
-                     <<", ori_height: "<<loc_data[width_loc_index]
+            Dtype width = std::exp(loc_data[width_loc_index]) * 4;
+            Dtype height = std::exp(loc_data[height_loc_index]) * 4;
+            LOG(INFO)<<"ori width: "<<loc_data[width_loc_index]
+                     <<", ori_height: "<<loc_data[height_loc_index]
                      <<", bbox width: "<<width<<", bbox height: "<<height;
+            Dtype xmin = (center_x - Dtype(width / 2)) > 0 ? center_x - Dtype(width / 2) : 0;
+            Dtype xmax = (center_x + Dtype(width / 2)) < 4 * output_width ? center_x + Dtype(width / 2) : 4 * output_width;
+            Dtype ymin = (center_y - Dtype(height / 2)) > 0 ? center_y - Dtype(height / 2) :0；
+            Dtype ymax = (center_y + Dtype(height / 2)) < 4 * output_height ? center_y + Dtype(height / 2) : 4 * output_height;
             CenterNetInfo temp_result = {
               .class_id = c,
               .score = keep_max_data[index],
-              .xmin = Dtype(center_x - Dtype(width / 2) > 0 ? center_x - Dtype(width / 2) : 0),
-              .ymin = Dtype(center_y - Dtype(height / 2) > 0 ? center_y - Dtype(height / 2) :0),
-              .xmax = Dtype(center_x + Dtype(width / 2) < 4 * output_width ? center_x + Dtype(width / 2) : 4 * output_width),
-              .ymax = Dtype(center_y + Dtype(height / 2) < 4 * output_height ? center_y + Dtype(height / 2) : 4 * output_height),
+              .xmin = xmin,
+              .ymin = ymin,
+              .xmax = xmax,
+              .ymax = ymax,
               .area = Dtype(width * height)
             };
             batch_temp.push_back(temp_result);
