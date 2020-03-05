@@ -204,7 +204,7 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 			maxY = ((minY - maxY + 1) > 0) ? (minY - maxY + 1) : 0;
 			//IOU reuse for the area of two bbox
 			IOU = maxX * maxY;
-      LOG(INFO)<<"maxX * maxY: " <<IOU;
+      LOG(INFO)<<"maxX: "<<maxX<<", maxY: "<<maxY<<", maxX * maxY: " <<IOU;
 			if (type==NMS_UNION)
 				IOU = IOU / (input[it_idx].area + input[last].area - IOU);
 			else if (type == NMS_MIN) {
