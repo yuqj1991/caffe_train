@@ -37,7 +37,6 @@ Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, con
   Dtype c3  = (min_overlap - 1) * heatmap_width * heatmap_height;
   Dtype sq3 = std::sqrt(b3 * b3 - 4 * a3 * c3);
   Dtype r3  = Dtype((b3 + sq3) / 2);
-  //LOG(INFO)<<r1<<", "<<r2<<", "<<r3;
   return std::min(std::min(r1, r2), r3);
 }
 
@@ -252,13 +251,15 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             Dtype center_y = (h + loc_data[y_loc_index]) * 4;
             Dtype width = std::exp(loc_data[width_loc_index]) * 4 * output_width;
             Dtype height = std::exp(loc_data[height_loc_index]) * 4 * output_height;
+            #if 0
             LOG(INFO)<<"ori width: "<<loc_data[width_loc_index]
                      <<", ori_height: "<<loc_data[height_loc_index]
                      <<", bbox width: "<<width<<", bbox height: "<<height;
-            Dtype xmin = (center_x - Dtype(width / 2)) > 0 ? center_x - Dtype(width / 2) : 0;
-            Dtype xmax = (center_x + Dtype(width / 2)) < 4 * output_width ? center_x + Dtype(width / 2) : 4 * output_width;
-            Dtype ymin = (center_y - Dtype(height / 2)) > 0 ? center_y - Dtype(height / 2) : 0;
-            Dtype ymax = (center_y + Dtype(height / 2)) < 4 * output_height ? center_y + Dtype(height / 2) : 4 * output_height;
+            #endif
+            Dtype xmin = std::min(std::max(center_x - Dtype(width / 2), 0), 4 * output_width);
+            Dtype xmax = std::min(std::max(center_x + Dtype(width / 2), 0), 4 * output_width);
+            Dtype ymin = std::min(std::max(center_y - Dtype(height / 2), 0), 4 * output_height);
+            Dtype ymax = std::min(std::max(center_y + Dtype(height / 2), 0), 4 * output_height);
             CenterNetInfo temp_result = {
               .class_id = c,
               .score = keep_max_data[index],

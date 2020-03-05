@@ -793,6 +793,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
         // Erase the ground truth.
         gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
       }else{
+        // Cannot find good match.
         break;
       }
     }
