@@ -92,7 +92,7 @@ void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh
       pred_wh_data[count * num_channels + 0] = wh_data[width_loc_index];
       pred_wh_data[count * num_channels + 1] = wh_data[height_loc_index];
       ++count;
-      #if 1
+      #if 0
       LOG(INFO)<<"diff_x: "<<diff_x <<", diff_y: "<<diff_y <<", bbox width : "<<std::log(width)<<", bbox height: "<<std::log(height);
       LOG(INFO)<<"##pred diff_x: "<<loc_data[x_loc_index]<<", pred diff_y: "<<loc_data[y_loc_index]
                                   <<", wh_data_w: "<<wh_data[width_loc_index]<<", wh_data_h: "<<wh_data[height_loc_index];
