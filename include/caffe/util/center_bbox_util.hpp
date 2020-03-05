@@ -50,7 +50,7 @@ template <typename Dtype>
 void _nms_heatmap(const Dtype* conf_data, Dtype* keep_max_data, const int output_height
                   , const int output_width, const int channels, const int num_batch);
 
-void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, float nmsthreshold = 0.3,int type=NMS_MIN);
+void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, float nmsthreshold = 0.3,int type=NMS_MIN);
 
 template <typename Dtype>
 void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
