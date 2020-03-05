@@ -191,7 +191,7 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
     LOG(INFO)<<"scores: "<<input[i].score;
 		vScores.insert(std::pair<float, int>(input[i].score, i));
 	}
-	while (vScores.size() > 0) {
+	while (vScores.size() > 1) {
 		int last = vScores.rbegin()->second;
 		vPick.push_back(last);
 		nPick += 1;
