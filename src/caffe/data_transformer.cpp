@@ -658,8 +658,8 @@ void DataTransformer<Dtype>::CropImage_Lffd_Sampling(const AnnotatedDatum& anno_
 		// new resized image shape
 		int new_resized_width = int(anno_datum.datum().width() * new_resized_scale);
 		int new_resized_height = int(anno_datum.datum().height() * new_resized_scale);
-		LOG(INFO)<<"origin width: "<<anno_datum.datum().width()<<", origin height: "<<anno_datum.datum().height();
-		LOG(INFO)<<"width: "<<new_resized_width<<", height: "<<new_resized_height<<", new_resized_scale: "<<new_resized_scale;
+		//LOG(INFO)<<"origin width: "<<anno_datum.datum().width()<<", origin height: "<<anno_datum.datum().height();
+		//LOG(INFO)<<"width: "<<new_resized_width<<", height: "<<new_resized_height<<", new_resized_scale: "<<new_resized_scale;
 		cv::Mat resized_img;
 		cv::resize(cv_img, resized_img, cv::Size(new_resized_width, new_resized_height), 0, 0);
 
@@ -687,7 +687,7 @@ void DataTransformer<Dtype>::CropImage_Lffd_Sampling(const AnnotatedDatum& anno_
 	}
 	
 	// Crop the datum.
-	CropImage(new_Resized_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
+	CropImageAnchor(new_Resized_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
 	cropped_anno_datum->set_type(anno_datum.type());
 	
 	// Transform the annotation according to crop_bbox.
