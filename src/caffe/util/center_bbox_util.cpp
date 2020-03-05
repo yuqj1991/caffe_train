@@ -187,7 +187,6 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 	std::vector<pair<float, int> > vScores;
 	const int num_boxes = input.size();
 	for (int i = 0; i < num_boxes; ++i) {
-    LOG(INFO)<<"scores: "<<input[i].score;
 		vScores.push_back(std::pair<float, int>(input[i].score, i));
 	}
 
