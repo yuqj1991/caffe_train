@@ -204,11 +204,13 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 			maxY = ((minY - maxY + 1) > 0) ? (minY - maxY + 1) : 0;
 			//IOU reuse for the area of two bbox
 			IOU = maxX * maxY;
+      LOG(INFO)<<"maxX * maxY: " <<IOU;
 			if (type==NMS_UNION)
 				IOU = IOU / (input[it_idx].area + input[last].area - IOU);
 			else if (type == NMS_MIN) {
 				IOU = IOU / ((input[it_idx].area < input[last].area) ? input[it_idx].area : input[last].area);
 			}
+      LOG(INFO)<<"IOU: " <<IOU;
 			if (IOU > nmsthreshold) {
 				it = vScores.erase(it);
 			}
@@ -270,7 +272,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
         }
       }
     }
-    //nms(batch_temp, &batch_result, nms_thresh);
+    nms(batch_temp, &batch_result, nms_thresh);
     for(unsigned j = 0 ; j < batch_result.size(); j++){
       batch_result[j].xmin = float(batch_result[j].xmin / (4 * output_width));
       batch_result[j].xmax = float(batch_result[j].xmax / (4 * output_width));
