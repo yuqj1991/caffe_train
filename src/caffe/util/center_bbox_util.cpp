@@ -256,10 +256,10 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                      <<", ori_height: "<<loc_data[height_loc_index]
                      <<", bbox width: "<<width<<", bbox height: "<<height;
             #endif
-            Dtype xmin = std::min(std::max(center_x - Dtype(width / 2), 0), 4 * output_width);
-            Dtype xmax = std::min(std::max(center_x + Dtype(width / 2), 0), 4 * output_width);
-            Dtype ymin = std::min(std::max(center_y - Dtype(height / 2), 0), 4 * output_height);
-            Dtype ymax = std::min(std::max(center_y + Dtype(height / 2), 0), 4 * output_height);
+            Dtype xmin = std::min(std::max(center_x - Dtype(width / 2), float(0.f)), float(4 * output_width));
+            Dtype xmax = std::min(std::max(center_x + Dtype(width / 2), float(0.f)), float(4 * output_width));
+            Dtype ymin = std::min(std::max(center_y - Dtype(height / 2), float(0.f)), float(4 * output_height));
+            Dtype ymax = std::min(std::max(center_y + Dtype(height / 2), float(0.f)), float(4 * output_height));
             CenterNetInfo temp_result = {
               .class_id = c,
               .score = keep_max_data[index],
