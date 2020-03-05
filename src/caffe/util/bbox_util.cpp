@@ -785,7 +785,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
       // Cannot find good match.
       break;
     } else {
-      if(max_overlap >= 0.65){
+      if(max_overlap >= 0.85){
         CHECK_EQ((*match_indices)[max_idx], -1);
         (*match_indices)[max_idx] = gt_indices[max_gt_idx];
         (*match_overlaps)[max_idx] = max_overlap;
@@ -941,8 +941,8 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
               y_inside_gt_box = true;
             }
             if(y_inside_gt_box && x_inside_gt_box){
-              if(BBoxCoverage(gt_bboxes[j], pred_bboxes[i]) > 0.45 
-                                  && BBoxCoverage(pred_bboxes[i], gt_bboxes[j]) > 0.45){
+              if(BBoxCoverage(gt_bboxes[j], pred_bboxes[i]) > 0.25 
+                                  && BBoxCoverage(pred_bboxes[i], gt_bboxes[j]) > 0.25){
                 center_match_gt_idx = j;
                 center_match_overlap = it->second[j];
               }

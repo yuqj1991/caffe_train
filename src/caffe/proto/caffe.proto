@@ -175,6 +175,12 @@ message CenterNetInfo{
   optional float area = 7;
 }
 
+message BboxSampler {
+  repeated int32 bbox_small_scale = 1;
+  repeated int32 bbox_large_scale = 2;
+  repeated int32 ancher_stride = 3;
+}
+
 // Annotation for each object instance.
 message Annotation {
   optional int32 instance_id = 1 [default = 0];
@@ -1181,9 +1187,11 @@ message AnnotatedDataParameter {
   // AnnotatedDatum.
   optional AnnotatedDatum.AnnotationType anno_type = 3;
   repeated DataAnchorSampler data_anchor_sampler =6;
-  optional float sampleprob = 7[default=0.5];
+  optional float up_prob = 7[default = 0.7];
+  optional float low_prob = 9[default = 0.3];
   optional int32 yolo_data_type = 4 [default = 0];
   optional float yolo_data_jitter = 5 [default = 0.3];
+  optional BboxSampler bbox_sampler = 8;
 }
 
 message ArgMaxParameter {

@@ -379,22 +379,19 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
   }
 }
 
-void GenerateLffdSample(const AnnotatedDatum& anno_datum, 
-                                const DataAnchorSampler& data_anchor_sampler,
-                                vector<NormalizedBBox>& object_bboxes,
-                                int resized_height, int resized_width,
-                                NormalizedBBox* samplerbox, float *new_scale ){
-  if(data_anchor_sampler.stride_size() > 0)
-    CHECK_EQ(data_anchor_sampler.scale_size(), data_anchor_sampler.stride_size());
-  vector<int>anchorScale;
-  vector<int>anchorStride;
+void GenerateLffdSample(const AnnotatedDatum& anno_datum,
+                        int resized_height, int resized_width,
+                        NormalizedBBox* samplerbox, 
+                        std::vector<int> bbox_small_size_list,
+                        std::vector<int> bbox_large_size_list,
+                        std::vector<int> anchorStride,
+                        float* target_scale){
+  CHECK_EQ(bbox_large_size_list.size(), bbox_small_size_list.size());
+  vector<NormalizedBBox> object_bboxes;
+  GroupObjectBBoxes(anno_datum, &object_bboxes);
+  int num_output_scale = bbox_small_size_list.size();
   int img_height = anno_datum.datum().height();
   int img_width = anno_datum.datum().width();
-  anchorScale.clear();
-  for(int s = 0 ; s < data_anchor_sampler.scale_size(); s++){
-    anchorScale.push_back(data_anchor_sampler.scale(s));
-    anchorStride.push_back(data_anchor_sampler.stride(s));
-  }
   CHECK_GT(object_bboxes.size(), 0);
   int object_bbox_index = caffe_rng_rand() % object_bboxes.size();
   const float xmin = object_bboxes[object_bbox_index].xmin()*img_width;
@@ -405,37 +402,35 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
   float bbox_height = ymax - ymin;
   float longer_side = COMPAREMAX(bbox_height, bbox_width);
   int scaled_idx = 0, side_length = 0;
-  for(unsigned i = 0; i < anchorScale.size(); i++){
-    if(longer_side >= anchorScale[i]){
-      scaled_idx = i;
-    }
-    if(i != anchorScale.size() - 1){
-      if(longer_side <= anchorScale[i+1]){
-        scaled_idx = i;
-        break;
-      }
+  if(longer_side <= bbox_small_size_list[0]){
+    scaled_idx = 0;
+  }else if(longer_side <= bbox_small_size_list[1]){
+    scaled_idx = caffe_rng_rand() % 2;
+  }else{
+    float prob_;
+    caffe_rng_uniform(1, 0.f, 1.0f, &prob_);
+    if(prob_ > 0.9){
+      scaled_idx = caffe_rng_rand() % num_output_scale;
+    }else{
+      scaled_idx = caffe_rng_rand() % (num_output_scale - 1);
     }
   }
-  if(scaled_idx <= 2)
-    scaled_idx = caffe_rng_rand() % scaled_idx;
-  else
-    scaled_idx = caffe_rng_rand() % anchorScale.size();
-
-  if(scaled_idx == anchorScale.size() - 1){
-    int range_size = anchorScale[scaled_idx] * 0.25;
-    side_length = anchorScale[scaled_idx] + caffe_rng_rand() %(range_size);
-  }else
-    side_length = anchorScale[scaled_idx] + caffe_rng_rand() %(anchorScale[scaled_idx + 1]
-                                                  - anchorScale[scaled_idx]);
-  float target_scale = float(side_length / longer_side);
-
-  *new_scale = target_scale;
+  if(scaled_idx == (num_output_scale - 1)){
+    scaled_idx -= 1;
+    side_length = bbox_large_size_list[num_output_scale - 1] 
+                    + caffe_rng_rand() % (static_cast<int>(bbox_large_size_list[num_output_scale - 1] * 0.5));
+  }else{
+    side_length = bbox_small_size_list[scaled_idx] 
+                    + caffe_rng_rand() % (bbox_large_size_list[scaled_idx] - 
+                                          bbox_small_size_list[scaled_idx]);
+  }
+  *target_scale = float(side_length / longer_side );
 
   for(unsigned i = 0; i < object_bboxes.size(); i++){
-    object_bboxes[i].set_xmin(object_bboxes[i].xmin() * target_scale);
-    object_bboxes[i].set_xmax(object_bboxes[i].xmax() * target_scale);
-    object_bboxes[i].set_ymin(object_bboxes[i].ymin() * target_scale);
-    object_bboxes[i].set_ymax(object_bboxes[i].ymax() * target_scale);
+    object_bboxes[i].set_xmin(object_bboxes[i].xmin() * (*target_scale));
+    object_bboxes[i].set_xmax(object_bboxes[i].xmax() * (*target_scale));
+    object_bboxes[i].set_ymin(object_bboxes[i].ymin() * (*target_scale));
+    object_bboxes[i].set_ymax(object_bboxes[i].ymax() * (*target_scale));
   }
 
   NormalizedBBox target_bbox = object_bboxes[object_bbox_index];
@@ -444,19 +439,22 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
   float offset_x = 0, offset_y = 0;
   caffe_rng_uniform(1, -vibration_length, vibration_length, &offset_x);
   caffe_rng_uniform(1, -vibration_length, vibration_length, &offset_y);
-  float width_offset_org = target_bbox.xmin() + target_bbox.xmax() / 2 + offset_x - resized_width / 2;
-  float height_offset_org = target_bbox.ymin() + target_bbox.ymax() / 2 + offset_y - resized_height / 2;
-  int width_offset_ = std::floor(width_offset_org);
-  int height_offset_ = std::floor(height_offset_org);
+  float width_offset_org = target_bbox.xmin() + (target_bbox.xmin() + target_bbox.xmax()) / 2 + offset_x - resized_width / 2;
+  float height_offset_org = target_bbox.ymin() + (target_bbox.ymin() + target_bbox.ymax()) / 2 + offset_y - resized_height / 2;
 
-  int new_resized_width = int(img_width * target_scale);
-  int new_resized_height = int(img_height * target_scale);
-  float w_off = (float) width_offset_ / new_resized_width;
-  float h_off = (float) height_offset_ / new_resized_height;
+  float width_crop_end = target_bbox.xmin() + (target_bbox.xmin() + target_bbox.xmax()) / 2 + offset_x + resized_width / 2;
+  float height_crop_end = target_bbox.ymin() + (target_bbox.ymin() + target_bbox.ymax()) / 2 + offset_y + resized_height / 2;
+
+  int new_resized_width = int(img_width * (*target_scale));
+  int new_resized_height = int(img_height * (*target_scale));
+  float w_off = (float) width_offset_org / new_resized_width;
+  float h_off = (float) height_offset_org / new_resized_height;
+  float w_end = (float) width_crop_end / new_resized_width;
+  float h_end = (float) height_crop_end / new_resized_height;
   samplerbox->set_xmin(w_off);
   samplerbox->set_ymin(h_off);
-  samplerbox->set_xmax(w_off + float(resized_width/new_resized_width));
-  samplerbox->set_ymax(h_off + float(resized_height/new_resized_height));
+  samplerbox->set_xmax(w_end);
+  samplerbox->set_ymax(h_end);
 }
 
 }  // namespace caffe

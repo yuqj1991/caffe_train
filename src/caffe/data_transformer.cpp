@@ -639,7 +639,8 @@ void DataTransformer<Dtype>::CropImage_anchor_Sampling(const AnnotatedDatum& ann
 template<typename Dtype>
 void DataTransformer<Dtype>::CropImage_Lffd_Sampling(const AnnotatedDatum& anno_datum,
 														const NormalizedBBox& bbox,
-														AnnotatedDatum* cropped_anno_datum, const float new_resized_scale) {
+														AnnotatedDatum* cropped_anno_datum, 
+														const float new_resized_scale) {
 	AnnotatedDatum new_Resized_datum;
 	new_Resized_datum.CopyFrom(anno_datum);
 	//resize origin datum and labels

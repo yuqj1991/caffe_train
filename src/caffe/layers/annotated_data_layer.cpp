@@ -37,7 +37,18 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
   for (int i = 0; i < anno_data_param.data_anchor_sampler_size(); ++i){
     data_anchor_samplers_.push_back(anno_data_param.data_anchor_sampler(i));
   }
-  sampleProbilty_ = anno_data_param.sampleprob();
+  if(anno_data_param.has_bbox_sampler()){
+    int num_scale = anno_data_param.bbox_sampler().bbox_small_scale_size();
+    CHECK_EQ(num_scale, anno_data_param.bbox_sampler().bbox_large_scale_size());
+    CHECK_EQ(num_scale, anno_data_param.bbox_sampler().ancher_stride_size());
+    for(int i = 0; i < num_scale; i++){
+      bbox_large_scale_.push_back(anno_data_param.bbox_sampler().bbox_large_scale(i));
+      bbox_small_scale_.push_back(anno_data_param.bbox_sampler().bbox_small_scale(i));
+      anchor_stride_.push_back(anno_data_param.bbox_sampler().ancher_stride(i));
+    }
+  }
+  upProb_ = anno_data_param.up_prob();
+  lowProb_ = anno_data_param.low_prob();
   label_map_file_ = anno_data_param.label_map_file();
   // Make sure dimension is consistent within batch.
   const TransformationParameter& transform_param =
@@ -152,28 +163,9 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     timer.Start();
     // get a anno_datum
     AnnotatedDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
-    #if 0
-    const int img_height = anno_datum.datum().height();
-    const int img_width = anno_datum.datum().width();
-    if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
-      // Go through each AnnotationGroup.
-      for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
-        const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
-        AnnotationGroup transformed_anno_group;
-        // Go through each Annotation.
-        bool has_valid_annotation = false;
-        for (int a = 0; a < anno_group.annotation_size(); ++a) {
-          const Annotation& anno = anno_group.annotation(a);
-          const NormalizedBBox& bbox = anno.bbox();
-          LOG(INFO)<<"origin bbox_width: "<<(bbox.xmax() - bbox.xmin())* img_width <<", origin bbox_height: "
-                    <<(bbox.ymax() - bbox.ymin())* img_height;
-        }
-      }
-    }
-    #endif
     read_time += timer.MicroSeconds();
-    float sampleProb = 0.0f;
-    caffe_rng_uniform(1, 0.0f, 1.0f, &sampleProb);
+    float anchor_prob = 0.0f;
+    caffe_rng_uniform(1, 0.0f, 1.0f, &anchor_prob);
     timer.Start();
     AnnotatedDatum distort_datum;
     AnnotatedDatum* expand_datum = NULL;
@@ -197,7 +189,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     AnnotatedDatum* sampled_datum = NULL;
     bool has_sampled = false;
-    if (sampleProb > sampleProbilty_){
+    if (anchor_prob > upProb_){
       int resized_height = transform_param.resize_param().height();
       int resized_width = transform_param.resize_param().width();
       vector<NormalizedBBox> sampled_bboxes;
@@ -218,7 +210,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       }else{
         sampled_datum = expand_datum;
       }
-    }else{
+    }else if(anchor_prob <= upProb_ && anchor_prob > lowProb_ ){
       if (batch_samplers_.size() > 0) {
         // Generate sampled bboxes from expand_datum.
         vector<NormalizedBBox> sampled_bboxes;
@@ -234,6 +226,24 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         } else {
           sampled_datum = expand_datum;
         }
+      } else {
+        sampled_datum = expand_datum;
+      }
+    }else if(anchor_prob <= lowProb_ ){
+      if (anno_data_param.has_bbox_sampler()) {
+        // Generate sampled bboxes from expand_datum.
+        NormalizedBBox sampled_bbox;
+        float target_scale;
+        int resized_height_ = transform_param.resize_param().height();
+        int resized_width_ = transform_param.resize_param().width();
+        GenerateLffdSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
+                            bbox_large_scale_, bbox_small_scale_, anchor_stride_, &target_scale);
+        sampled_datum = new AnnotatedDatum();
+        this->data_transformer_->CropImage_Lffd_Sampling(*expand_datum,
+                                            sampled_bbox,
+                                            sampled_datum, 
+                                            target_scale);
+        has_sampled = true;
       } else {
         sampled_datum = expand_datum;
       }
@@ -347,20 +357,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       LOG(FATAL) << "Unknown annotation type.";
     }
   }
-#if 0
-  LOG(INFO)<< "start printf  single image: num_bboxes: "<<num_bboxes;
-  const Dtype* top_label_data = batch->label_.cpu_data();
-  for(int ii=0; ii < num_bboxes; ii++)
-  {
-    int id = ii*8;
-    LOG(INFO) <<"batch_id: "<<top_label_data[id]<<" anno_label: "<<top_label_data[id+1]
-              <<" anno.instance_id: "<<top_label_data[id+2];
-    LOG(INFO)  <<"bbox->xmin: "<<top_label_data[id+3]<<" bbox->ymin: "<<top_label_data[id+4]
-              <<" bbox->xmax: "<<top_label_data[id+5]<<" bbox->ymax: "<<top_label_data[id+6]
-              <<" bbox->difficult: "<<top_label_data[id+7];
-  }
-  LOG(INFO)<< "finished **************************************************** end ";
-#endif
   timer.Stop();
   batch_timer.Stop();
   DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";
