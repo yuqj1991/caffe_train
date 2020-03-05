@@ -658,6 +658,7 @@ void DataTransformer<Dtype>::CropImage_Lffd_Sampling(const AnnotatedDatum& anno_
 		// new resized image shape
 		int new_resized_width = int(new_Resized_datum.datum().width() * new_resized_scale);
 		int new_resized_height = int(new_Resized_datum.datum().height() * new_resized_scale);
+		LOG(INFO)<<"width: "<<new_resized_width<<", height: "<<new_resized_height<<", new_resized_scale: "<<new_resized_scale;
 		cv::Mat resized_img;
 		cv::resize(cv_img, resized_img, cv::Size(new_resized_width, new_resized_height), 0, 0);
 
