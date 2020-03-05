@@ -214,12 +214,12 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 			}
 			if (IOU > nmsthreshold) {
 				it = vScores.erase(it);
-			}
-			else {
+			}else {
 				it++;
 			}
       LOG(INFO)<<"IOU: " <<IOU<<", vScores.size(): "<<vScores.size();
 		}
+    LOG(INFO)<<"...again";
 	}
 	for (int i = 0; i < nPick; i++) {
 		output->push_back(input[vPick[i]]);
