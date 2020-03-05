@@ -186,7 +186,9 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 	int nPick = 0;
 	std::map<float, int> vScores;
 	const int num_boxes = input.size();
+  LOG(INFO)<<"num_boxes: "<<num_boxes;
 	for (int i = 0; i < num_boxes; ++i) {
+    LOG(INFO)<<"scores: "<<input[i].score;
 		vScores.insert(std::pair<float, int>(input[i].score, i));
 	}
 	while (vScores.size() > 0) {
@@ -210,13 +212,13 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 			else if (type == NMS_MIN) {
 				IOU = IOU / ((input[it_idx].area < input[last].area) ? input[it_idx].area : input[last].area);
 			}
-      LOG(INFO)<<"IOU: " <<IOU;
 			if (IOU > nmsthreshold) {
 				it = vScores.erase(it);
 			}
 			else {
 				it++;
 			}
+      LOG(INFO)<<"IOU: " <<IOU<<", vScores.size(): "<<vScores.size();
 		}
 	}
 	for (int i = 0; i < nPick; i++) {
