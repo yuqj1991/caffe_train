@@ -9,6 +9,8 @@
 #include "caffe/common.hpp"
 #include "caffe/filler.hpp"
 #include "caffe/layers/focal_loss_layer_centernet.hpp"
+#include "caffe/layers/annotated_data_layer.hpp"
+#include "caffe/util/center_bbox_util.hpp"
 
 #include "caffe/test/test_caffe_main.hpp"
 #include "caffe/test/test_gradient_check_util.hpp"
@@ -16,13 +18,13 @@
 namespace caffe {
 
 template <typename TypeParam>
-class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam> {
+class CenterNetfocalSigmoidWithLossLayerTest : public CPUDeviceTest<TypeParam> {
   typedef typename TypeParam::Dtype Dtype;
 
  protected:
   CenterNetfocalSigmoidWithLossLayerTest()
-      : blob_bottom_data_(new Blob<Dtype>(5, 1, 16, 16)),
-        blob_bottom_targets_(new Blob<Dtype>(5, 1, 16, 16)),
+      : blob_bottom_data_(new Blob<Dtype>(5, 1, 80, 80)),
+        blob_bottom_targets_(new Blob<Dtype>(5, 1, 80, 80)),
         blob_top_loss_(new Blob<Dtype>()),
         alpha_(2.0), gamma_(4.0) {
     // Fill the data vector
@@ -32,11 +34,7 @@ class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam>
     data_filler.Fill(blob_bottom_data_);
     blob_bottom_vec_.push_back(blob_bottom_data_);
     // Fill the targets vector
-    FillerParameter targets_filler_param;
-    targets_filler_param.set_min(0);
-    targets_filler_param.set_max(1);
-    GaussianFiller<Dtype> targets_filler(targets_filler_param);
-    targets_filler.Fill(blob_bottom_targets_);
+    this->fillBottomData(5, 9);
     blob_bottom_vec_.push_back(blob_bottom_targets_);
     blob_top_vec_.push_back(blob_top_loss_);
   }
@@ -44,6 +42,38 @@ class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam>
     delete blob_bottom_data_;
     delete blob_bottom_targets_;
     delete blob_top_loss_;
+  }
+
+  void fillBottomData(int batch_num, int total_box){
+    std::map<int, vector<NormalizedBBox> > all_gt_bboxes=random_fill_gt_box(batch_num, total_box);
+    Dtype* conf_gt_data = this->blob_bottom_targets_->mutable_cpu_data();
+    GenerateBatchHeatmap(all_gt_bboxes, conf_gt_data, 1, 80, 80);
+  }
+
+  std::map<int, vector<NormalizedBBox> > random_fill_gt_box(int batch_num, int total_box){
+    std::map<int, vector<NormalizedBBox> > all_gt_bboxes;
+    int num_per = total_box / batch_num;
+    int lasted_num = total_box % batch_num;
+    for(int i = 0; i < batch_num; i++){
+      int num = (i == batch_num -1)?(num_per + lasted_num):num_per; 
+      for(int j = 0; j < num; j++){
+        float bbox_width, bbox_height;
+        caffe_rng_uniform(1, 0.f, 1.f, &bbox_width);
+        caffe_rng_uniform(1, 0.f, 1.f, &bbox_height);
+
+        float w_off, h_off;
+        caffe_rng_uniform(1, 0.f, 1 - bbox_width, &w_off);
+        caffe_rng_uniform(1, 0.f, 1 - bbox_height, &h_off);
+        NormalizedBBox sampled_bbox;
+        sampled_bbox.set_xmin(w_off);
+        sampled_bbox.set_ymin(h_off);
+        sampled_bbox.set_xmax(w_off + bbox_width);
+        sampled_bbox.set_ymax(h_off + bbox_height);
+        sampled_bbox.set_label(1);
+        all_gt_bboxes[i].push_back(sampled_bbox);
+      }
+    }
+    return all_gt_bboxes;
   }
 
   Dtype SigmoidCrossEntropyLossReference(const int count, const int num,
@@ -71,21 +101,17 @@ class CenterNetfocalSigmoidWithLossLayerTest : public MultiDeviceTest<TypeParam>
 
   void TestForward() {
     LayerParameter layer_param;
-    const Dtype kLossWeight = 3.7;
+    const Dtype kLossWeight = 1;
     layer_param.add_loss_weight(kLossWeight);
     FillerParameter data_filler_param;
     data_filler_param.set_std(1);
     GaussianFiller<Dtype> data_filler(data_filler_param);
-    FillerParameter targets_filler_param;
-    targets_filler_param.set_min(0.0);
-    targets_filler_param.set_max(1.0);
-    GaussianFiller<Dtype> targets_filler(targets_filler_param);
     Dtype eps = 2e-2;
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 1; ++i) {
       // Fill the data vector
       data_filler.Fill(this->blob_bottom_data_);
       // Fill the targets vector
-      targets_filler.Fill(this->blob_bottom_targets_);
+      this->fillBottomData(5, 9);
       CenterNetfocalSigmoidWithLossLayer<Dtype> layer(layer_param);
       layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
       Dtype layer_loss =
@@ -119,7 +145,7 @@ TYPED_TEST(CenterNetfocalSigmoidWithLossLayerTest, TestSigmoidCrossEntropyLoss) 
 TYPED_TEST(CenterNetfocalSigmoidWithLossLayerTest, TestGradient) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;
-  const Dtype kLossWeight = 3.7;
+  const Dtype kLossWeight = 1;
   layer_param.add_loss_weight(kLossWeight);
   CenterNetfocalSigmoidWithLossLayer<Dtype> layer(layer_param);
   layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);

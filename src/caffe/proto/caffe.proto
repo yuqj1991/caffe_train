@@ -165,6 +165,16 @@ message NormalizedBBox {
   optional float size = 8;
 }
 
+message CenterNetInfo{
+  optional int32 class_id = 1;
+  optional float score = 2;
+  optional float xmin = 3;
+  optional float ymin = 4;
+  optional float xmax = 5;
+  optional float ymax = 6;
+  optional float area = 7;
+}
+
 // Annotation for each object instance.
 message Annotation {
   optional int32 instance_id = 1 [default = 0];
@@ -1186,6 +1196,8 @@ message ArgMaxParameter {
   // for each index of the first / num dimension.
   optional int32 axis = 3;
 }
+
+
 
 message ConcatParameter {
   // The axis along which to concatenate -- may be negative to index from the

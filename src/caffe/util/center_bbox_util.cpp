@@ -174,7 +174,7 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 	std::sort(input.begin(), input.end(),
 		[](const CenterNetInfo& a, const CenterNetInfo& b)
 		{
-			return a.score > b.score;
+			return a.score() > b.score();
 		});
 
 	float IOU = 0.f;
@@ -183,11 +183,10 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 	float minX = 0.f;
 	float minY = 0.f;
 	std::vector<int> vPick;
-	int nPick = 0;
 	std::vector<pair<float, int> > vScores;
 	const int num_boxes = input.size();
 	for (int i = 0; i < num_boxes; ++i) {
-		vScores.push_back(std::pair<float, int>(input[i].score, i));
+		vScores.push_back(std::pair<float, int>(input[i].score(), i));
 	}
 
   while (vScores.size() != 0) {
@@ -196,19 +195,19 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
     for (int k = 0; k < vPick.size(); ++k) {
       if (keep) {
         const int kept_idx = vPick[k];
-        maxX = std::max(input[idx].xmin, input[kept_idx].xmin);
-        maxY = std::max(input[idx].ymin, input[kept_idx].ymin);
-        minX = std::min(input[idx].xmax, input[kept_idx].xmax);
-        minY = std::min(input[idx].ymax, input[kept_idx].ymax);
+        maxX = std::max(input[idx].xmin(), input[kept_idx].xmin());
+        maxY = std::max(input[idx].ymin(), input[kept_idx].ymin());
+        minX = std::min(input[idx].xmax(), input[kept_idx].xmax());
+        minY = std::min(input[idx].ymax(), input[kept_idx].ymax());
         //maxX1 and maxY1 reuse 
         maxX = ((minX - maxX + 1) > 0) ? (minX - maxX + 1) : 0;
         maxY = ((minY - maxY + 1) > 0) ? (minY - maxY + 1) : 0;
         //IOU reuse for the area of two bbox
         IOU = maxX * maxY;
         if (type==NMS_UNION)
-          IOU = IOU / (input[idx].area + input[kept_idx].area - IOU);
+          IOU = IOU / (input[idx].area() + input[kept_idx].area() - IOU);
         else if (type == NMS_MIN) {
-          IOU = IOU / ((input[idx].area < input[kept_idx].area) ? input[idx].area : input[kept_idx].area);
+          IOU = IOU / ((input[idx].area() < input[kept_idx].area()) ? input[idx].area() : input[kept_idx].area());
         }
         keep = IOU <= nmsthreshold;
       } else {
@@ -259,15 +258,14 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             Dtype xmax = std::min(std::max(center_x + Dtype(width / 2), Dtype(0.f)), Dtype(4 * output_width));
             Dtype ymin = std::min(std::max(center_y - Dtype(height / 2), Dtype(0.f)), Dtype(4 * output_height));
             Dtype ymax = std::min(std::max(center_y + Dtype(height / 2), Dtype(0.f)), Dtype(4 * output_height));
-            CenterNetInfo temp_result = {
-              .class_id = c,
-              .score = keep_max_data[index],
-              .xmin = xmin,
-              .ymin = ymin,
-              .xmax = xmax,
-              .ymax = ymax,
-              .area = Dtype(width * height)
-            };
+            CenterNetInfo temp_result;
+            temp_result.set_class_id(c);
+            temp_result.set_score(keep_max_data[index]);
+            temp_result.set_xmin(xmin);
+            temp_result.set_xmax(xmax);
+            temp_result.set_ymin(ymin);
+            temp_result.set_ymax(ymax);
+            temp_result.set_area(width * height);
             batch_temp.push_back(temp_result);
           } 
         }
@@ -275,10 +273,10 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
     }
     nms(batch_temp, &batch_result, nms_thresh);
     for(unsigned j = 0 ; j < batch_result.size(); j++){
-      batch_result[j].xmin = float(batch_result[j].xmin / (4 * output_width));
-      batch_result[j].xmax = float(batch_result[j].xmax / (4 * output_width));
-      batch_result[j].ymin = float(batch_result[j].ymin / (4 * output_height));
-      batch_result[j].ymax = float(batch_result[j].ymax / (4 * output_height));
+      batch_result[j].set_xmin(batch_result[j].xmin() / (4 * output_width));
+      batch_result[j].set_xmax(batch_result[j].xmax() / (4 * output_width));
+      batch_result[j].set_ymin(batch_result[j].ymin() / (4 * output_height));
+      batch_result[j].set_ymax(batch_result[j].ymax() / (4 * output_height));
     }
     if(batch_result.size() > 0){
       if(results->find(i) == results->end()){

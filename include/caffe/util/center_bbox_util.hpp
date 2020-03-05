@@ -23,16 +23,6 @@ namespace caffe {
 #define NMS_UNION 1
 #define NMS_MIN  2
 
-struct CenterNetInfo{
-    int class_id;
-    float score;
-    float xmin;
-    float ymin;
-    float xmax;
-    float ymax;
-    float area;
-};
-
 template<typename Dtype>
 Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, const Dtype min_overlap);
 template <typename Dtype>

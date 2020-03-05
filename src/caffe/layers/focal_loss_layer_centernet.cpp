@@ -28,13 +28,17 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::LayerSetUp(
   alpha_ = 2.0f;
   gamma_ = 4.0f;
   iterations_ = 0;
+  batch_ = bottom[0]->num();
+  num_class_ = bottom[0]->channels();
+  width_ = bottom[0]->width();
+  height_ = bottom[0]->height();
 }
 
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Reshape(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
-  prob_.ReshapeLike(*(bottom[0]));
+  prob_.ReshapeLike(*bottom[0]);
   sigmoid_layer_->Reshape(sigmoid_bottom_vec_, sigmoid_top_vec_);
   if (top.size() >= 2) {
     // sigmoid output
@@ -79,7 +83,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
       }
     }
   }
-  top[0]->mutable_cpu_data()[0] = (loss)/ count;
+  top[0]->mutable_cpu_data()[0] = (loss) / count;
   #if 1
   if(iterations_%1000 == 0){
     LOG(INFO)<<"forward batch_: "<<batch_<<", num_class: "<<num_class_<<", height: "<<height_<<", width: "<<width_

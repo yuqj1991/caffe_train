@@ -13,7 +13,7 @@
 namespace caffe {
 
 bool compare_score(CenterNetInfo a, CenterNetInfo b){
-    return a.score > b.score;
+    return a.score() > b.score();
 }
 
 template <typename Dtype>
@@ -103,16 +103,16 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
       LOG(INFO)<<"batch_id "<<i << " detection results: "<<result_temp.size();
       for(unsigned j = 0; j < result_temp.size(); ++j){
         top_data[count * 7] = i;
-        top_data[count * 7 + 1] = result_temp[j].class_id + 1;
-        top_data[count * 7 + 2] = result_temp[j].score;
-        top_data[count * 7 + 3] = result_temp[j].xmin;
-        top_data[count * 7 + 4] = result_temp[j].ymin;
-        top_data[count * 7 + 5] = result_temp[j].xmax;
-        top_data[count * 7 + 6] = result_temp[j].ymax;
-        LOG(INFO)<<"center_x: "<< (result_temp[j].xmin + result_temp[j].xmax) * 4 * 160 / 2
-                 <<", center_y: "<< (result_temp[j].ymin + result_temp[j].ymax) * 4 * 160 / 2
-                 <<", width: "<< (result_temp[j].xmax - result_temp[j].xmin) * 4 * 160
-                 <<", height: "<< (result_temp[j].ymax - result_temp[j].ymin) * 4 * 160;
+        top_data[count * 7 + 1] = result_temp[j].class_id() + 1;
+        top_data[count * 7 + 2] = result_temp[j].score();
+        top_data[count * 7 + 3] = result_temp[j].xmin();
+        top_data[count * 7 + 4] = result_temp[j].ymin();
+        top_data[count * 7 + 5] = result_temp[j].xmax();
+        top_data[count * 7 + 6] = result_temp[j].ymax();
+        LOG(INFO)<<"center_x: "<< (result_temp[j].xmin() + result_temp[j].xmax()) * 4 * 160 / 2
+                 <<", center_y: "<< (result_temp[j].ymin() + result_temp[j].ymax()) * 4 * 160 / 2
+                 <<", width: "<< (result_temp[j].xmax() - result_temp[j].xmin()) * 4 * 160
+                 <<", height: "<< (result_temp[j].ymax() - result_temp[j].ymin()) * 4 * 160;
         ++count;
       }
     }
