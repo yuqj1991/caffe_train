@@ -656,8 +656,9 @@ void DataTransformer<Dtype>::CropImage_Lffd_Sampling(const AnnotatedDatum& anno_
 			cv_img = DecodeDatumToCVMatNative(new_Resized_datum.datum());
 		}
 		// new resized image shape
-		int new_resized_width = int(new_Resized_datum.datum().width() * new_resized_scale);
-		int new_resized_height = int(new_Resized_datum.datum().height() * new_resized_scale);
+		int new_resized_width = int(anno_datum.datum().width() * new_resized_scale);
+		int new_resized_height = int(anno_datum.datum().height() * new_resized_scale);
+		LOG(INFO)<<"origin width: "<<anno_datum.datum().width()<<", origin height: "<<anno_datum.datum().height();
 		LOG(INFO)<<"width: "<<new_resized_width<<", height: "<<new_resized_height<<", new_resized_scale: "<<new_resized_scale;
 		cv::Mat resized_img;
 		cv::resize(cv_img, resized_img, cv::Size(new_resized_width, new_resized_height), 0, 0);
