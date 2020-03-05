@@ -3194,7 +3194,7 @@ layer {
 		num_classes: 2
 		share_location: true
 		keep_top_k: 100
-		confidence_threshold: 0.25
+		confidence_threshold: 0.15
 	}
 }
 layer {
