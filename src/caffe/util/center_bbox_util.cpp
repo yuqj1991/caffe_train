@@ -174,7 +174,7 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 	std::sort(input.begin(), input.end(),
 		[](const CenterNetInfo& a, const CenterNetInfo& b)
 		{
-			return a.score < b.score;
+			return a.score > b.score;
 		});
 
 	float IOU = 0.f;
@@ -184,44 +184,44 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 	float minY = 0.f;
 	std::vector<int> vPick;
 	int nPick = 0;
-	std::map<float, int> vScores;
+	std::vector<pair<float, int> > vScores;
 	const int num_boxes = input.size();
-  LOG(INFO)<<"num_boxes: "<<num_boxes;
 	for (int i = 0; i < num_boxes; ++i) {
     LOG(INFO)<<"scores: "<<input[i].score;
-		vScores.insert(std::pair<float, int>(input[i].score, i));
+		vScores.push_back(std::pair<float, int>(input[i].score, i));
 	}
-	while (vScores.size() > 1) {
-		int last = vScores.rbegin()->second;
-		vPick.push_back(last);
-		nPick += 1;
-		for (std::map<float, int>::iterator it = vScores.begin(); it != vScores.end();) {
-			int it_idx = it->second;
-			maxX = std::max(input[it_idx].xmin, input[last].xmin);
-			maxY = std::max(input[it_idx].ymin, input[last].ymin);
-			minX = std::min(input[it_idx].xmax, input[last].xmax);
-			minY = std::min(input[it_idx].ymax, input[last].ymax);
-			//maxX1 and maxY1 reuse 
-			maxX = ((minX - maxX + 1) > 0) ? (minX - maxX + 1) : 0;
-			maxY = ((minY - maxY + 1) > 0) ? (minY - maxY + 1) : 0;
-			//IOU reuse for the area of two bbox
-			IOU = maxX * maxY;
-      LOG(INFO)<<"maxX: "<<maxX<<", maxY: "<<maxY<<", maxX * maxY: " <<IOU;
-			if (type==NMS_UNION)
-				IOU = IOU / (input[it_idx].area + input[last].area - IOU);
-			else if (type == NMS_MIN) {
-				IOU = IOU / ((input[it_idx].area < input[last].area) ? input[it_idx].area : input[last].area);
-			}
-			if (IOU > nmsthreshold) {
-				it = vScores.erase(it);
-			}else {
-				it++;
-			}
-      LOG(INFO)<<"IOU: " <<IOU<<", vScores.size(): "<<vScores.size();
-		}
-    LOG(INFO)<<"...again";
-	}
-	for (int i = 0; i < nPick; i++) {
+
+  while (vScores.size() != 0) {
+    const int idx = vScores.front().second;
+    bool keep = true;
+    for (int k = 0; k < vPick.size(); ++k) {
+      if (keep) {
+        const int kept_idx = vPick[k];
+        maxX = std::max(input[idx].xmin, input[kept_idx].xmin);
+        maxY = std::max(input[idx].ymin, input[kept_idx].ymin);
+        minX = std::min(input[idx].xmax, input[kept_idx].xmax);
+        minY = std::min(input[idx].ymax, input[kept_idx].ymax);
+        //maxX1 and maxY1 reuse 
+        maxX = ((minX - maxX + 1) > 0) ? (minX - maxX + 1) : 0;
+        maxY = ((minY - maxY + 1) > 0) ? (minY - maxY + 1) : 0;
+        //IOU reuse for the area of two bbox
+        IOU = maxX * maxY;
+        if (type==NMS_UNION)
+          IOU = IOU / (input[idx].area + input[kept_idx].area - IOU);
+        else if (type == NMS_MIN) {
+          IOU = IOU / ((input[idx].area < input[kept_idx].area) ? input[idx].area : input[kept_idx].area);
+        }
+        keep = IOU <= nmsthreshold;
+      } else {
+        break;
+      }
+    }
+    if (keep) {
+      vPick.push_back(idx);
+    }
+    vScores.erase(vScores.begin());
+  }
+	for (unsigned i = 0; i < vPick.size(); i++) {
 		output->push_back(input[vPick[i]]);
 	}
 }
