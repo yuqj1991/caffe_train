@@ -222,7 +222,7 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, 
 	//vPick.resize(nPick);
 	//output.resize(nPick);
 	for (int i = 0; i < nPick; i++) {
-		output.push_back(vPick[i]);
+		output.push_back(input[vPick[i]]);
 	}
 }
 
