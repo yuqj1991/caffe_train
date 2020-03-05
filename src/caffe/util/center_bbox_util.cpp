@@ -196,19 +196,19 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, 
 		nPick += 1;
 		for (std::map<float, int>::iterator it = vScores.begin(); it != vScores.end();) {
 			int it_idx = it->second;
-			maxX = std::max(input.at(it_idx).xmin, input.at(last).xmin);
-			maxY = std::max(input.at(it_idx).ymin, input.at(last).ymin);
-			minX = std::min(input.at(it_idx).xmax, input.at(last).xmax);
-			minY = std::min(input.at(it_idx).ymax, input.at(last).ymax);
+			maxX = std::max(input[it_idx].xmin, input[last].xmin);
+			maxY = std::max(input[it_idx].ymin, input[last].ymin);
+			minX = std::min(input[it_idx].xmax, input[last].xmax);
+			minY = std::min(input[it_idx].ymax, input[last].ymax);
 			//maxX1 and maxY1 reuse 
 			maxX = ((minX - maxX + 1) > 0) ? (minX - maxX + 1) : 0;
 			maxY = ((minY - maxY + 1) > 0) ? (minY - maxY + 1) : 0;
 			//IOU reuse for the area of two bbox
 			IOU = maxX * maxY;
 			if (type==NMS_UNION)
-				IOU = IOU / (input.at(it_idx).area + input.at(last).area - IOU);
+				IOU = IOU / (input[it_idx].area + input[last].area - IOU);
 			else if (type == NMS_MIN) {
-				IOU = IOU / ((input.at(it_idx).area < input.at(last).area) ? input.at(it_idx).area : input.at(last).area);
+				IOU = IOU / ((input[it_idx].area < input[last].area) ? input[it_idx].area : input[last].area);
 			}
 			if (IOU > nmsthreshold) {
 				it = vScores.erase(it);
