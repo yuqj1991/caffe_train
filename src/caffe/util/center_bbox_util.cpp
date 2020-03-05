@@ -186,7 +186,6 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 	int nPick = 0;
 	std::map<float, int> vScores;
 	const int num_boxes = input.size();
-	//vPick.resize(num_boxes);
 	for (int i = 0; i < num_boxes; ++i) {
 		vScores.insert(std::pair<float, int>(input[i].score, i));
 	}
@@ -218,9 +217,6 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
 			}
 		}
 	}
-
-	//vPick.resize(nPick);
-	//output.resize(nPick);
 	for (int i = 0; i < nPick; i++) {
 		output->push_back(input[vPick[i]]);
 	}
@@ -274,7 +270,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
         }
       }
     }
-    nms(batch_temp, &batch_result, nms_thresh);
+    //nms(batch_temp, &batch_result, nms_thresh);
     for(unsigned j = 0 ; j < batch_result.size(); j++){
       batch_result[j].xmin = float(batch_result[j].xmin / (4 * output_width));
       batch_result[j].xmax = float(batch_result[j].xmax / (4 * output_width));
