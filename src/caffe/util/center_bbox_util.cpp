@@ -166,7 +166,7 @@ template void _nms_heatmap(const float* conf_data, float* keep_max_data, const i
 template void _nms_heatmap(const double* conf_data, double* keep_max_data, const int output_height
                   , const int output_width, const int channels, const int num_batch);
 
-void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, float nmsthreshold,int type)
+void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, float nmsthreshold,int type)
 {
 	if (input.empty()) {
 		return;
@@ -222,7 +222,7 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, 
 	//vPick.resize(nPick);
 	//output.resize(nPick);
 	for (int i = 0; i < nPick; i++) {
-		output.push_back(input[vPick[i]]);
+		output->push_back(input[vPick[i]]);
 	}
 }
 
@@ -274,7 +274,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
         }
       }
     }
-    nms(batch_temp, batch_result, nms_thresh);
+    nms(batch_temp, &batch_result, nms_thresh);
     for(unsigned j = 0 ; j < batch_result.size(); j++){
       batch_result[j].xmin = float(batch_result[j].xmin / (4 * output_width));
       batch_result[j].xmax = float(batch_result[j].xmax / (4 * output_width));
