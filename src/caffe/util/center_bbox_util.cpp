@@ -186,13 +186,13 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, 
 	int nPick = 0;
 	std::map<float, int> vScores;
 	const int num_boxes = input.size();
-	vPick.resize(num_boxes);
+	//vPick.resize(num_boxes);
 	for (int i = 0; i < num_boxes; ++i) {
 		vScores.insert(std::pair<float, int>(input[i].score, i));
 	}
 	while (vScores.size() > 0) {
 		int last = vScores.rbegin()->second;
-		vPick[nPick] = last;
+		vPick.push_back(last);
 		nPick += 1;
 		for (std::map<float, int>::iterator it = vScores.begin(); it != vScores.end();) {
 			int it_idx = it->second;
@@ -219,10 +219,10 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, 
 		}
 	}
 
-	vPick.resize(nPick);
-	output.resize(nPick);
+	//vPick.resize(nPick);
+	//output.resize(nPick);
 	for (int i = 0; i < nPick; i++) {
-		output[i] = input[vPick[i]];
+		output.push_back([vPick[i]]);
 	}
 }
 
