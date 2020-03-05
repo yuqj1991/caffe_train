@@ -184,7 +184,7 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, 
 	float minY = 0.f;
 	std::vector<int> vPick;
 	int nPick = 0;
-	std::multimap<float, int> vScores;
+	std::map<float, int> vScores;
 	const int num_boxes = input.size();
 	vPick.resize(num_boxes);
 	for (int i = 0; i < num_boxes; ++i) {
@@ -194,7 +194,7 @@ void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>& output, 
 		int last = vScores.rbegin()->second;
 		vPick[nPick] = last;
 		nPick += 1;
-		for (std::multimap<float, int>::iterator it = vScores.begin(); it != vScores.end();) {
+		for (std::map<float, int>::iterator it = vScores.begin(); it != vScores.end();) {
 			int it_idx = it->second;
 			maxX = std::max(input.at(it_idx).xmin, input.at(last).xmin);
 			maxY = std::max(input.at(it_idx).ymin, input.at(last).ymin);
@@ -275,7 +275,6 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
       }
     }
     nms(batch_temp, batch_result, nms_thresh);
-    LOG(INFO)<<"get_TopK batch_id "<<i << " detection results: "<<batch_result.size();
     for(unsigned j = 0 ; j < batch_result.size(); j++){
       batch_result[j].xmin = float(batch_result[j].xmin / (4 * output_width));
       batch_result[j].xmax = float(batch_result[j].xmax / (4 * output_width));
