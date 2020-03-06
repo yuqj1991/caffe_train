@@ -307,9 +307,8 @@ std::vector<Dtype> gaussian2D(const int height, const int width, Dtype sigma){
     for(int j = 0; j < width; j++){
       int y = j - half_width;
       heatmap[i * width + j] = std::exp(float(-(x*x + y*y) / (2* sigma * sigma)));
-      LOG(INFO)<<",,,"<<heatmap[i * width + j];
       if(heatmap[i * width + j] < 0.00000000005)
-        heatmap[i * width + j] = 0;
+        heatmap[i * width + j] = Dtype(0.);
     }
   }
   return heatmap;
@@ -330,7 +329,7 @@ void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y,
       for(int col = 0; col < (right + left); col++){
         int heatmap_index = (int(center_y) -top + row) * width + int(center_x) -left + col;
         int gaussian_index = (int(radius) - top + row) * int(diameter) + int(radius) - left + col;
-        
+        LOG(INFO)<<heatmap[heatmap_index]<<", "<<gaussian[gaussian_index];
         heatmap[heatmap_index] = heatmap[heatmap_index] >= gaussian[gaussian_index]  ? heatmap[heatmap_index]:
                                       gaussian[gaussian_index];
       }
