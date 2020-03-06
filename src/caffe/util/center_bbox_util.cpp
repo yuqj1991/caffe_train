@@ -307,6 +307,7 @@ std::vector<Dtype> gaussian2D(const int height, const int width, Dtype sigma){
     for(int j = 0; j < width; j++){
       int y = j - half_width;
       heatmap[i * width + j] = std::exp(float(-(x*x + y*y) / (2* sigma * sigma)));
+      LOG(INFO)<<",,,"<<heatmap[i * width + j];
       if(heatmap[i * width + j] < 0.00000000005)
         heatmap[i * width + j] = 0;
     }
