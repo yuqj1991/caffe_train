@@ -319,7 +319,7 @@ template std::vector<double> gaussian2D(const int height, const int width, const
 
 template<typename Dtype>
 void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius
-                              , const int height, const int width, int k = 1){
+                              , const int height, const int width){
   float diameter = 2 * radius + 1;
   std::vector<Dtype> gaussian = gaussian2D(int(diameter), int(diameter), float(diameter / 6));
   int left = std::min(int(center_x), int(radius)), right = std::min(int(width - center_x), int(radius) + 1);
@@ -330,15 +330,15 @@ void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y,
         int heatmap_index = (int(center_y) -top + row) * width + int(center_x) -left + col;
         int gaussian_index = (int(radius) - top + row) * int(diameter) + int(radius) - left + col;
         
-        heatmap[heatmap_index] = heatmap[heatmap_index] >= gaussian[gaussian_index] * k ? heatmap[heatmap_index]:
-                                      gaussian[gaussian_index] * k;
+        heatmap[heatmap_index] = heatmap[heatmap_index] >= gaussian[gaussian_index]  ? heatmap[heatmap_index]:
+                                      gaussian[gaussian_index];
       }
     }
   }
 }
 
-template void draw_umich_gaussian(std::vector<float> heatmap, int center_x, int center_y, float radius, const int height, const int width, int k = 1);
-template void draw_umich_gaussian(std::vector<double> heatmap, int center_x, int center_y, float radius, const int height, const int width, int k = 1);
+template void draw_umich_gaussian(std::vector<float> heatmap, int center_x, int center_y, float radius, const int height, const int width);
+template void draw_umich_gaussian(std::vector<double> heatmap, int center_x, int center_y, float radius, const int height, const int width);
 
 template <typename Dtype>
 void transferCVMatToBlobData(std::vector<Dtype> heatmap, Dtype* buffer_heat){
