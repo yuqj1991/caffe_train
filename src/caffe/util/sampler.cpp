@@ -404,19 +404,17 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
   int scaled_idx = 0, side_length = 0;
   if(longer_side <= bbox_small_size_list[0]){
     scaled_idx = 0;
-  }else if(longer_side <= bbox_small_size_list[1]){
-    scaled_idx = caffe_rng_rand() % 2;
+  }else if(longer_side <= bbox_small_size_list[2]){
+    scaled_idx = caffe_rng_rand() % 3;
+  }else if(longer_side >= bbox_small_size_list[num_output_scale - 1]){
+    scaled_idx = num_output_scale - 1;
   }else{
-    float prob_;
-    caffe_rng_uniform(1, 0.f, 1.0f, &prob_);
-    if(prob_ > 0.9){
-      scaled_idx = caffe_rng_rand() % num_output_scale;
-    }else{
-      scaled_idx = caffe_rng_rand() % (num_output_scale - 1);
+    for(int ii = 3; ii < num_output_scale - 1; ii++){
+      if(longer_side >= bbox_small_size_list[ii] && longer_side < bbox_small_size_list[ii + 1])
+        scaled_idx = ii;
     }
   }
   if(scaled_idx == (num_output_scale - 1)){
-    scaled_idx -= 1;
     side_length = bbox_large_size_list[num_output_scale - 1] 
                     + caffe_rng_rand() % (static_cast<int>(bbox_large_size_list[num_output_scale - 1] * 0.5));
   }else{
