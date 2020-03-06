@@ -193,11 +193,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     }
     Dtype* conf_gt_data = conf_gt_.mutable_cpu_data();
     caffe_set(conf_gt_.count(), Dtype(0), conf_gt_data);
-    #ifdef USE_OPENCV
     GenerateBatchHeatmap(all_gt_bboxes, conf_gt_data, num_classes_, output_width, output_height);
-    #else
-		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
-	  #endif  // USE_OPENCV
     conf_loss_layer_->Reshape(conf_bottom_vec_, conf_top_vec_);
     conf_loss_layer_->Forward(conf_bottom_vec_, conf_top_vec_);
   } else {

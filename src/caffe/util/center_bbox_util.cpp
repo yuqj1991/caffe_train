@@ -296,7 +296,6 @@ template void get_topK(const double* keep_max_data, const double* loc_data, cons
                   , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels,  double conf_thresh, double nms_thresh);
 
-#ifdef USE_OPENCV
 
 template<typename Dtype>
 std::vector<Dtype> gaussian2D(const int height, const int width, const float sigma){
@@ -345,7 +344,7 @@ template void draw_umich_gaussian(std::vector<double> heatmap, int center_x, int
 template <typename Dtype>
 void transferCVMatToBlobData(std::vector<Dtype> heatmap, Dtype* buffer_heat){
   for(unsigned ii = 0; ii < heatmap.size(); ii++){
-      buffer_heat[ii] = buffer_heat[ii] > heatmap[inline] ? 
+      buffer_heat[ii] = buffer_heat[ii] > heatmap[ii] ? 
                                               buffer_heat[ii] : heatmap[ii];
   }
 }
@@ -363,7 +362,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-      std::vector<Dtype> heatmap((width *height), Dtype(0));
+      std::vector<Dtype> heatmap((output_width *output_height), Dtype(0));
       const int class_id = gt_bboxes[ii].label();
       Dtype *classid_heap = gt_heatmap + (batch_id * num_classes_ + (class_id - 1)) * output_width * output_height;
       const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
@@ -383,7 +382,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
                 <<output_height<<", output_width: "<<output_width
                 <<", bbox_width: "<<width<<", bbox_height: "<<height;
       #endif
-      draw_umich_gaussian( heatmap, center_x, center_y, radius );
+      draw_umich_gaussian( heatmap, center_x, center_y, radius, output_height, output_width );
       transferCVMatToBlobData(heatmap, classid_heap);
       count_gt++;
     }
@@ -411,6 +410,5 @@ template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt
                               const int num_classes_, const int output_width, const int output_height);
 template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, double* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);
-#endif  // USE_OPENCV
 
 }  // namespace caffe
