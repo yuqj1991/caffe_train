@@ -423,7 +423,7 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
                                           bbox_small_size_list[scaled_idx]);
   }
   *target_scale = float(side_length / longer_side );
-  LOG(INFO)<<"side_length: "<<side_length<<", longer_side: "<<longer_side<<", target_scale: "<<*target_scale; 
+  //LOG(INFO)<<"side_length: "<<side_length<<", longer_side: "<<longer_side<<", target_scale: "<<*target_scale; 
 
   for(unsigned i = 0; i < object_bboxes.size(); i++){
     object_bboxes[i].set_xmin(object_bboxes[i].xmin() * (*target_scale));
