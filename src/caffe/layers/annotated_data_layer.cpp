@@ -206,7 +206,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
           this->data_transformer_->CropImage_anchor_Sampling(*expand_datum,
 																			 sampled_bboxes[sample_rnd_index],
 																			 sampled_datum);
-          LOG(INFO)<<"SAMPLE_DATA_ANCHORING";
           has_sampled = true;
         }else{
           sampled_datum = expand_datum;

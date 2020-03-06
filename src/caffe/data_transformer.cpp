@@ -547,8 +547,11 @@ void DataTransformer<Dtype>::CropImage(const Datum& datum,
 		cv::Mat cv_img;
 		if (param_.force_color() || param_.force_gray()) {
 			// If force_color then decode in color otherwise decode in gray.
+			LOG(INFO)<<"BATCH_COLOR_SAMPLE";
 			cv_img = DecodeDatumToCVMat(datum, param_.force_color());
+			
 		} else {
+			LOG(INFO)<<"BATCH_GRAY_SAMPLE";
 			cv_img = DecodeDatumToCVMatNative(datum);
 		}
 		// Crop the image.
