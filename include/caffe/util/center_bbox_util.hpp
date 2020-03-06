@@ -52,7 +52,7 @@ template <typename Dtype>
 void transferCVMatToBlobData(std::vector<Dtype> heatmap, Dtype* buffer_heat);
 
 template <typename Dtype>
-std::vector<Dtype> gaussian2D(const int height, const int width, const float sigma);
+std::vector<Dtype> gaussian2D(const int height, const int width, Dtype sigma);
 
 template <typename Dtype>
 void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius,const int height, const int width);

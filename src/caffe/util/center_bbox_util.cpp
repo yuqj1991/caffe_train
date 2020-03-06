@@ -298,7 +298,7 @@ template void get_topK(const double* keep_max_data, const double* loc_data, cons
 
 
 template<typename Dtype>
-std::vector<Dtype> gaussian2D(const int height, const int width, const float sigma){
+std::vector<Dtype> gaussian2D(const int height, const int width, Dtype sigma){
   int half_width = (width - 1) / 2;
   int half_height = (height - 1) / 2;
   std::vector<Dtype> heatmap((width *height), Dtype(0));
@@ -314,14 +314,14 @@ std::vector<Dtype> gaussian2D(const int height, const int width, const float sig
   return heatmap;
 }
 
-template std::vector<float> gaussian2D(const int height, const int width, const float sigma);
-template std::vector<double> gaussian2D(const int height, const int width, const float sigma);
+template std::vector<float> gaussian2D(const int height, const int width, float sigma);
+template std::vector<double> gaussian2D(const int height, const int width, double sigma);
 
 template<typename Dtype>
 void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius
                               , const int height, const int width){
   float diameter = 2 * radius + 1;
-  std::vector<Dtype> gaussian = gaussian2D(int(diameter), int(diameter), float(diameter / 6));
+  std::vector<Dtype> gaussian = gaussian2D(int(diameter), int(diameter), Dtype(diameter / 6));
   int left = std::min(int(center_x), int(radius)), right = std::min(int(width - center_x), int(radius) + 1);
   int top = std::min(int(center_y), int(radius)), bottom = std::min(int(height - center_y), int(radius) + 1);
   if((left + right) > 0 && (top + bottom) > 0){
