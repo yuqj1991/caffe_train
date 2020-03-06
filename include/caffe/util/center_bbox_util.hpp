@@ -48,7 +48,6 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                   , std::map<int, std::vector<CenterNetInfo > > * results
                   , const int loc_channels,  Dtype conf_thresh, Dtype nms_thresh);      
 
-#ifdef USE_OPENCV
 template <typename Dtype>
 void transferCVMatToBlobData(std::vector<Dtype> heatmap, Dtype* buffer_heat);
 
@@ -62,7 +61,6 @@ template <typename Dtype>
 void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, Dtype* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);
 
-#endif
 
 
 
