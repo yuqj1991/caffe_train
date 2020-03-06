@@ -329,10 +329,10 @@ void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y,
       for(int col = 0; col < (right + left); col++){
         int heatmap_index = (int(center_y) -top + row) * width + int(center_x) -left + col;
         int gaussian_index = (int(radius) - top + row) * int(diameter) + int(radius) - left + col;
-        LOG(INFO)<<"heatmap: "<<heatmap[heatmap_index]<<", gaussian: "<<gaussian[gaussian_index];
+        //LOG(INFO)<<"heatmap: "<<heatmap[heatmap_index]<<", gaussian: "<<gaussian[gaussian_index];
         heatmap[heatmap_index] = heatmap[heatmap_index] >= gaussian[gaussian_index]  ? heatmap[heatmap_index]:
                                       gaussian[gaussian_index];
-        LOG(INFO)<<"heatmap: "<< heatmap[heatmap_index];
+        //LOG(INFO)<<"heatmap: "<< heatmap[heatmap_index];
       }
     }
   }
@@ -358,6 +358,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
   std::map<int, vector<NormalizedBBox> > ::iterator iter;
   count_gt = 0;
   count_one = 0;
+  int count_no_one = 0;
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
@@ -387,7 +388,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
       count_gt++;
     }
   }
-  #if 0
+  #if 1
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
@@ -397,13 +398,14 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
           int index = batch_id * num_classes_ * output_height * output_width + c * output_height * output_width + h * output_width + w;  
           if(gt_heatmap[index] == 1.f){
             count_one++;
-            //LOG(INFO)<<"heatmap center_x: "<< w << ", heatmap center_y; "<< h << ", value: "<<gt_heatmap[index];
+          }else{
+            count_no_one++;
           }
         }
       }
     }
   }
-  //LOG(INFO)<<"count_no_zero: "<<count_no_zero<<", count_zero: "<<count_zero;
+  LOG(INFO)<<"count_no_one: "<<count_no_one<<", count_one: "<<count_one;
   #endif
 }
 template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, float* gt_heatmap, 
