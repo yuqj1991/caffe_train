@@ -337,8 +337,8 @@ void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y,
   }
 }
 
-template void draw_umich_gaussian(std::vector<float> heatmap, int center_x, int center_y, float radius, int k = 1, const int height, const int width);
-template void draw_umich_gaussian(std::vector<double> heatmap, int center_x, int center_y, float radius, int k = 1, const int height, const int width);
+template void draw_umich_gaussian(std::vector<float> heatmap, int center_x, int center_y, float radius, const int height, const int width, int k = 1);
+template void draw_umich_gaussian(std::vector<double> heatmap, int center_x, int center_y, float radius, const int height, const int width, int k = 1);
 
 template <typename Dtype>
 void transferCVMatToBlobData(std::vector<Dtype> heatmap, Dtype* buffer_heat){
