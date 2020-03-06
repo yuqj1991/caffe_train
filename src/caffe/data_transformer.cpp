@@ -475,8 +475,10 @@ void DataTransformer<Dtype>::CropImageAnchor(const Datum& datum, const Normalize
 		cv::Mat cv_img;
 		if (param_.force_color() || param_.force_gray()) {
 			// If force_color then decode in color otherwise decode in gray.
+			LOG(INFO)<<",,,COLOR";
 			cv_img = DecodeDatumToCVMat(datum, param_.force_color());
 		} else {
+			LOG(INFO)<<",,, GRAY";
 			cv_img = DecodeDatumToCVMatNative(datum);
 		}
 		// Crop the image.
