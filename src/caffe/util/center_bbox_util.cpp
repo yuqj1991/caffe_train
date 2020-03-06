@@ -318,7 +318,7 @@ template std::vector<float> gaussian2D(const int height, const int width, float 
 template std::vector<double> gaussian2D(const int height, const int width, double sigma);
 
 template<typename Dtype>
-void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius
+void draw_umich_gaussian(std::vector<Dtype>& heatmap, int center_x, int center_y, float radius
                               , const int height, const int width){
   float diameter = 2 * radius + 1;
   std::vector<Dtype> gaussian = gaussian2D(int(diameter), int(diameter), Dtype(diameter / 6));
@@ -331,15 +331,15 @@ void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y,
         int gaussian_index = (int(radius) - top + row) * int(diameter) + int(radius) - left + col;
         heatmap[heatmap_index] = heatmap[heatmap_index] >= gaussian[gaussian_index]  ? heatmap[heatmap_index]:
                                       gaussian[gaussian_index];
-        if(heatmap[heatmap_index] == Dtype(1.00))
-          LOG(INFO)<<"heatmap: "<< heatmap[heatmap_index];
+        //if(heatmap[heatmap_index] == Dtype(1.00))
+        //  LOG(INFO)<<"heatmap: "<< heatmap[heatmap_index];
       }
     }
   }
 }
 
-template void draw_umich_gaussian(std::vector<float> heatmap, int center_x, int center_y, float radius, const int height, const int width);
-template void draw_umich_gaussian(std::vector<double> heatmap, int center_x, int center_y, float radius, const int height, const int width);
+template void draw_umich_gaussian(std::vector<float>& heatmap, int center_x, int center_y, float radius, const int height, const int width);
+template void draw_umich_gaussian(std::vector<double>& heatmap, int center_x, int center_y, float radius, const int height, const int width);
 
 template <typename Dtype>
 void transferCVMatToBlobData(std::vector<Dtype> heatmap, Dtype* buffer_heat){
@@ -405,7 +405,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
       }
     }
   }
-  LOG(INFO)<<"count_no_one: "<<count_no_one<<", count_one: "<<count_one;
+  LOG(INFO)<<"count_no_one: "<<count_no_one<<", count_one: "<<count_one<<", count_gt: "<<count_gt;
   #endif
 }
 template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, float* gt_heatmap, 
