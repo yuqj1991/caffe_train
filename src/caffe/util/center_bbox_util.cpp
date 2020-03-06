@@ -301,7 +301,7 @@ template<typename Dtype>
 std::vector<Dtype> gaussian2D(const int height, const int width, Dtype sigma){
   int half_width = (width - 1) / 2;
   int half_height = (height - 1) / 2;
-  std::vector<Dtype> heatmap((width *height), Dtype(0));
+  std::vector<Dtype> heatmap((width *height), Dtype(0.));
   for(int i = 0; i < height; i++){
     int x = i - half_height;
     for(int j = 0; j < width; j++){
@@ -361,7 +361,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-      std::vector<Dtype> heatmap((output_width *output_height), Dtype(0));
+      std::vector<Dtype> heatmap((output_width *output_height), Dtype(0.));
       const int class_id = gt_bboxes[ii].label();
       Dtype *classid_heap = gt_heatmap + (batch_id * num_classes_ + (class_id - 1)) * output_width * output_height;
       const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
