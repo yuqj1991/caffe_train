@@ -322,7 +322,6 @@ void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y,
                               , const int height, const int width){
   float diameter = 2 * radius + 1;
   std::vector<Dtype> gaussian = gaussian2D(int(diameter), int(diameter), float(diameter / 6));
-  int height = heatmap.rows, width = heatmap.cols;
   int left = std::min(int(center_x), int(radius)), right = std::min(int(width - center_x), int(radius) + 1);
   int top = std::min(int(center_y), int(radius)), bottom = std::min(int(height - center_y), int(radius) + 1);
   if((left + right) > 0 && (top + bottom) > 0){
