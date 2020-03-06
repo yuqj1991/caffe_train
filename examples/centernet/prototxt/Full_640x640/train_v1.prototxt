@@ -138,7 +138,7 @@ layer {
 			max_sample: 1
 			max_trials: 50
 		}
-    		data_anchor_sampler{
+    data_anchor_sampler{
 			scale: 15
 			scale: 20
 			scale: 40
@@ -148,7 +148,7 @@ layer {
 			scale: 400
 			scale: 560
 			sample_constraint{
-				min_object_coverage: 0.2
+				min_object_coverage: 0.55
 			}
 			max_sample: 1
 			max_trials: 10
