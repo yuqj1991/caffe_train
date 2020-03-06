@@ -50,9 +50,13 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
 
 #ifdef USE_OPENCV
 template <typename Dtype>
-void transferCVMatToBlobData(cv::Mat heatmap, Dtype* buffer_heat);
-cv::Mat gaussian2D(const int height, const int width, const float sigma);
-void draw_umich_gaussian(cv::Mat heatmap, int center_x, int center_y, float radius, int k );
+void transferCVMatToBlobData(std::vector<Dtype> heatmap, Dtype* buffer_heat);
+
+template <typename Dtype>
+std::vector<Dtype> gaussian2D(const int height, const int width, const float sigma);
+
+template <typename Dtype>
+void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius, int k, const int height, const int width );
 
 template <typename Dtype>
 void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, Dtype* gt_heatmap, 

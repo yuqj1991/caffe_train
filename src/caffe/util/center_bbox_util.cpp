@@ -298,69 +298,59 @@ template void get_topK(const double* keep_max_data, const double* loc_data, cons
 
 #ifdef USE_OPENCV
 
-cv::Mat gaussian2D(const int height, const int width, const float sigma){
+template<typename Dtype>
+std::vector<Dtype> gaussian2D(const int height, const int width, const float sigma){
   int half_width = (width - 1) / 2;
   int half_height = (height - 1) / 2;
-  cv::Mat heatmap(cv::Size(width, height), CV_32FC1, cv::Scalar(0));
-  CHECK_EQ(height, heatmap.rows);
-  CHECK_EQ(width, heatmap.cols);
+  std::vector<Dtype> heatmap((width *height), Dtype(0));
   for(int i = 0; i < height; i++){
-    float *data = heatmap.ptr<float>(i);
     int x = i - half_height;
     for(int j = 0; j < width; j++){
       int y = j - half_width;
-      data[j] = std::exp(float(-(x*x + y*y) / (2* sigma * sigma)));
-      if(data[j] < 0.00000000005)
-        data[j] = 0;
+      heatmap[i * width + j] = std::exp(float(-(x*x + y*y) / (2* sigma * sigma)));
+      if(heatmap[i * width + j] < 0.00000000005)
+        heatmap[i * width + j] = 0;
     }
   }
   return heatmap;
 }
 
-void draw_umich_gaussian(cv::Mat heatmap, int center_x, int center_y, float radius, int k = 1){
+template std::vector<float> gaussian2D(const int height, const int width, const float sigma);
+template std::vector<double> gaussian2D(const int height, const int width, const float sigma);
+
+template<typename Dtype>
+void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius, int k = 1
+                              , const int height, const int width){
   float diameter = 2 * radius + 1;
-  cv::Mat gaussian = gaussian2D(int(diameter), int(diameter), float(diameter / 6));
+  std::vector<Dtype> gaussian = gaussian2D(int(diameter), int(diameter), float(diameter / 6));
   int height = heatmap.rows, width = heatmap.cols;
   int left = std::min(int(center_x), int(radius)), right = std::min(int(width - center_x), int(radius) + 1);
   int top = std::min(int(center_y), int(radius)), bottom = std::min(int(height - center_y), int(radius) + 1);
   if((left + right) > 0 && (top + bottom) > 0){
-    cv::Mat masked_heatmap = heatmap(cv::Rect(int(center_x) -left, int(center_y) -top, (right + left), (bottom + top)));
-    cv::Mat masked_gaussian = gaussian(cv::Rect(int(radius) - left, int(radius) - top, (right + left), (bottom + top)));
     for(int row = 0; row < (top + bottom); row++){
-      float *masked_heatmap_data = masked_heatmap.ptr<float>(row);
-      float *masked_gaussian_data = masked_gaussian.ptr<float>(row);
       for(int col = 0; col < (right + left); col++){
-        masked_heatmap_data[col] = masked_heatmap_data[col] >= masked_gaussian_data[col] * k ? masked_heatmap_data[col]:
-                                      masked_gaussian_data[col] * k;
+        int heatmap_index = (int(center_y) -top + row) * width + int(center_x) -left + col;
+        int gaussian_index = (int(radius) - top + row) * int(diameter) + int(radius) - left + col;
+        
+        heatmap[heatmap_index] = heatmap[heatmap_index] >= gaussian[gaussian_index] * k ? heatmap[heatmap_index]:
+                                      gaussian[gaussian_index] * k;
       }
     }
   }
-  #if 0
-  LOG(INFO)<<"left + right: "<<left + right<<",top + bottom: "<<top + bottom; 
-  for(int row = 0; row < height; row++){
-    float *masked_heatmap_data = heatmap.ptr<float>(row);
-    for(int col = 0; col < width; col++){
-      if(masked_heatmap_data[col] == 1.f)
-        LOG(INFO)<<"heatmap center_x: "<< col << ", heatmap center_y; "<< row;
-    }
-  }
-  #endif
 }
 
+template void draw_umich_gaussian(std::vector<float> heatmap, int center_x, int center_y, float radius, int k = 1, const int height, const int width);
+template void draw_umich_gaussian(std::vector<double> heatmap, int center_x, int center_y, float radius, int k = 1, const int height, const int width);
+
 template <typename Dtype>
-void transferCVMatToBlobData(cv::Mat heatmap, Dtype* buffer_heat){
-  int width = heatmap.cols;
-  int height = heatmap.rows;
-  for(int row = 0; row < height; row++){
-    float* data = heatmap.ptr<float>(row);
-    for(int col = 0; col < width; col++){
-      buffer_heat[row*width + col] = buffer_heat[row*width + col] > data[col] ? 
-                                              buffer_heat[row*width + col] : data[col];
-    }
+void transferCVMatToBlobData(std::vector<Dtype> heatmap, Dtype* buffer_heat){
+  for(unsigned ii = 0; ii < heatmap.size(); ii++){
+      buffer_heat[ii] = buffer_heat[ii] > heatmap[inline] ? 
+                                              buffer_heat[ii] : heatmap[ii];
   }
 }
-template void transferCVMatToBlobData(cv::Mat heatmap, float* buffer_heat);
-template void transferCVMatToBlobData(cv::Mat heatmap, double* buffer_heat);
+template void transferCVMatToBlobData(std::vector<float> heatmap, float* buffer_heat);
+template void transferCVMatToBlobData(std::vector<double> heatmap, double* buffer_heat);
 
 
 template <typename Dtype>
@@ -373,7 +363,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-      cv::Mat heatmap(cv::Size(output_width, output_height), CV_32FC1, cv::Scalar(0));
+      std::vector<Dtype> heatmap((width *height), Dtype(0));
       const int class_id = gt_bboxes[ii].label();
       Dtype *classid_heap = gt_heatmap + (batch_id * num_classes_ + (class_id - 1)) * output_width * output_height;
       const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
@@ -415,8 +405,6 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
     }
   }
   //LOG(INFO)<<"count_no_zero: "<<count_no_zero<<", count_zero: "<<count_zero;
-  if(std::abs(count_one - count_gt) > 1)
-    LOG(FATAL) << "count_one is not equal to count_gt: " << count_one <<", "<<count_gt;
   #endif
 }
 template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, float* gt_heatmap, 
