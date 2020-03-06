@@ -55,7 +55,7 @@ template <typename Dtype>
 std::vector<Dtype> gaussian2D(const int height, const int width, const float sigma);
 
 template <typename Dtype>
-void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius, int k, const int height, const int width );
+void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius,const int height, const int width,  int k );
 
 template <typename Dtype>
 void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, Dtype* gt_heatmap, 

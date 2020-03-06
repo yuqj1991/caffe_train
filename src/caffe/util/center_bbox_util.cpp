@@ -318,8 +318,8 @@ template std::vector<float> gaussian2D(const int height, const int width, const 
 template std::vector<double> gaussian2D(const int height, const int width, const float sigma);
 
 template<typename Dtype>
-void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius, int k = 1
-                              , const int height, const int width){
+void draw_umich_gaussian(std::vector<Dtype> heatmap, int center_x, int center_y, float radius
+                              , const int height, const int width, int k = 1){
   float diameter = 2 * radius + 1;
   std::vector<Dtype> gaussian = gaussian2D(int(diameter), int(diameter), float(diameter / 6));
   int left = std::min(int(center_x), int(radius)), right = std::min(int(width - center_x), int(radius) + 1);
