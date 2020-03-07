@@ -244,8 +244,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         sampled_datum = new AnnotatedDatum();
         this->data_transformer_->CropImage_Lffd_Sampling(*expand_datum,
                                             sampled_bbox,
-                                            sampled_datum, 
-                                            target_scale);
+                                            sampled_datum);
         has_sampled = true;
       } else {
         sampled_datum = expand_datum;
