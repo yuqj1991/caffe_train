@@ -148,6 +148,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
   //CHECK_EQ(output_width, bottom[1]->width());
   
   const Dtype* gt_data = bottom[2]->cpu_data();
+  num_gt_ = bottom[2]->height();
 
   // Retrieve all ground truth.
   bool use_difficult_gt_ = true;
