@@ -642,13 +642,13 @@ void DataTransformer<Dtype>::CropImage_Lffd_Sampling(const AnnotatedDatum& anno_
 														const NormalizedBBox& bbox,
 														AnnotatedDatum* cropped_anno_datum) {
 	// Crop the datum.
-	CropImageAnchor(new_Resized_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
+	CropImageAnchor(anno_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
 	cropped_anno_datum->set_type(anno_datum.type());
 	
 	// Transform the annotation according to crop_bbox.
 	const bool do_resize = false;
 	const bool do_mirror = false;
-	TransformAnnotation(new_Resized_datum, do_resize, bbox, do_mirror,
+	TransformAnnotation(anno_datum, do_resize, bbox, do_mirror,
 										cropped_anno_datum->mutable_annotation_group());
 }
 
