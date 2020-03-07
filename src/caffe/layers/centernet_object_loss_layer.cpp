@@ -184,9 +184,9 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
 
   if (num_gt_ >= 1) {
     if (conf_loss_type_ == CenterObjectParameter_ConfLossType_FOCALSIGMOID) {
-      conf_gt_.ReshapeLike(*bottom[2]);
-      conf_pred_.ReshapeLike(*bottom[2]);
-      conf_pred_.CopyFrom(*bottom[2]);
+      conf_gt_.ReshapeLike(*bottom[1]);
+      conf_pred_.ReshapeLike(*bottom[1]);
+      conf_pred_.CopyFrom(*bottom[1]);
     }else {
       LOG(FATAL) << "Unknown confidence loss type.";
     }
