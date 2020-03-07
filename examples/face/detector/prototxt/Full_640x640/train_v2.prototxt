@@ -3965,7 +3965,7 @@ layer {
 		overlap_threshold: 0.65
 		use_prior_for_matching: true
 		use_center_locate_match: true
-		use_tiny_box_match: true
+		use_tiny_box_match: false
 		background_label_id: 0
 		use_difficult_gt: true
 		neg_pos_ratio: 4.0
