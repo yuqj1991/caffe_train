@@ -37,7 +37,7 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
   // bottom[1] stores the confidence predictions.
   // bottom[2] stores the prior bounding boxes.
   // bottom[3] stores the ground truth bounding boxes.
-  virtual inline int ExactNumBottomBlobs() const { return 4; }
+  virtual inline int ExactNumBottomBlobs() const { return 3; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
@@ -61,6 +61,7 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
   // localization loss.
   Blob<Dtype> loc_loss_;
 
+#if 0
   // The internal  object scale loss layer.
   shared_ptr<Layer<Dtype> > wh_loss_layer_;
   CenterObjectParameter_LocLossType wh_loss_type_;
@@ -75,7 +76,7 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
   Blob<Dtype> wh_gt_;
   // localization loss.
   Blob<Dtype> wh_loss_;
-
+#endif
   // The internal confidence loss layer.
   shared_ptr<Layer<Dtype> > conf_loss_layer_;
   CenterObjectParameter_ConfLossType conf_loss_type_;

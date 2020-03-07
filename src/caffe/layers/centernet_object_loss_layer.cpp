@@ -15,7 +15,7 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   if (this->layer_param_.propagate_down_size() == 0) {
     this->layer_param_.add_propagate_down(true);
     this->layer_param_.add_propagate_down(true);
-    this->layer_param_.add_propagate_down(true);
+    //this->layer_param_.add_propagate_down(true);
     this->layer_param_.add_propagate_down(false);
   }
   const CenterObjectParameter& center_object_loss_param =
@@ -23,10 +23,11 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   
   num_classes_ = center_object_loss_param.num_class();
   CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
-  CHECK_EQ(bottom[1]->channels(), bottom[0]->channels()) << "wh channels must equal to offset channels";
-  CHECK_EQ(num_classes_, bottom[2]->channels()) << "num_classes must be equal to prediction classes";
+  //CHECK_EQ(bottom[1]->channels(), bottom[0]->channels()) << "wh channels must equal to offset channels";
+  CHECK_EQ(num_classes_, bottom[1]->channels()) << "num_classes must be equal to prediction classes";
 
   num_ = bottom[0]->num();
+  num_gt_ = bottom[2]->height();
 
   share_location_ = center_object_loss_param.share_location();
   loc_classes_ = share_location_ ? 1 : num_classes_;
@@ -46,7 +47,7 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   loc_loss_type_ = center_object_loss_param.loc_loss_type();
   // fake shape.
   vector<int> loc_shape(1, 1);
-  loc_shape.push_back(2);
+  loc_shape.push_back(4);
   loc_pred_.Reshape(loc_shape);
   loc_gt_.Reshape(loc_shape);
   loc_bottom_vec_.push_back(&loc_pred_);
@@ -70,7 +71,7 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   } else {
     LOG(FATAL) << "Unknown localization loss type.";
   }
-
+#if 0
   // Set up object scale loss layer.
   wh_loss_type_ = center_object_loss_param.loc_loss_type();
   // fake shape.
@@ -99,7 +100,7 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   } else {
     LOG(FATAL) << "Unknown localization loss type.";
   }
-
+#endif
   // Set up confidence loss layer.
   conf_loss_type_ = center_object_loss_param.conf_loss_type();
   conf_bottom_vec_.push_back(&conf_pred_);
@@ -130,25 +131,24 @@ template <typename Dtype>
 void CenterObjectLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
-  num_ = bottom[0]->num();
   CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
-  CHECK_EQ(num_classes_, bottom[2]->channels()) << "num_classes must be equal to prediction classes";
+  CHECK_EQ(num_classes_, bottom[1]->channels()) << "num_classes must be equal to prediction classes";
 }
 
 template <typename Dtype>
 void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
   const Dtype* loc_data = bottom[0]->cpu_data();
-  const Dtype* wh_data = bottom[1]->cpu_data();
   const int output_height = bottom[0]->height();
   const int output_width = bottom[0]->width();
   const int num_channels = bottom[0]->channels();
-  CHECK_EQ(num_channels, bottom[1]->channels());
-  CHECK_EQ(output_height, bottom[1]->height());
-  CHECK_EQ(output_width, bottom[1]->width());
+  //const Dtype* wh_data = bottom[1]->cpu_data();
+  //CHECK_EQ(num_channels, bottom[1]->channels());
+  //CHECK_EQ(output_height, bottom[1]->height());
+  //CHECK_EQ(output_width, bottom[1]->width());
   
-  const Dtype* gt_data = bottom[3]->cpu_data();
-  num_gt_ = bottom[3]->height();
+  const Dtype* gt_data = bottom[2]->cpu_data();
+  num_gt_ = bottom[2]->height();
 
   // Retrieve all ground truth.
   bool use_difficult_gt_ = true;
@@ -161,33 +161,33 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     // Form data to pass on to loc_loss_layer_.
     vector<int> loc_shape(2);
     loc_shape[0] = 1;
-    loc_shape[1] = num_gt_ * 2;
+    loc_shape[1] = num_gt_ * 4;
     loc_pred_.Reshape(loc_shape);
     loc_gt_.Reshape(loc_shape);
     Dtype* loc_pred_data = loc_pred_.mutable_cpu_data();
     Dtype* loc_gt_data = loc_gt_.mutable_cpu_data();
-    wh_pred_.Reshape(loc_shape);
-    wh_gt_.Reshape(loc_shape);
-    Dtype* wh_pred_data = wh_pred_.mutable_cpu_data();
-    Dtype* wh_gt_data = wh_gt_.mutable_cpu_data();
+    //wh_pred_.Reshape(loc_shape);
+    //wh_gt_.Reshape(loc_shape);
+    //Dtype* wh_pred_data = wh_pred_.mutable_cpu_data();
+    //Dtype* wh_gt_data = wh_gt_.mutable_cpu_data();
 
-    EncodeCenteGroundTruthAndPredictions(loc_data, wh_data, output_width, output_height, 
-                                share_location_, loc_pred_data, wh_pred_data, num_channels,
-                                loc_gt_data, wh_gt_data, all_gt_bboxes);
+    EncodeCenteGroundTruthAndPredictions(loc_gt_data, loc_pred_data, output_width, output_height, share_location_,
+                                          loc_data, num_channels, all_gt_bboxes);
     loc_loss_layer_->Reshape(loc_bottom_vec_, loc_top_vec_);
     loc_loss_layer_->Forward(loc_bottom_vec_, loc_top_vec_);
 
-    wh_loss_layer_->Reshape(wh_bottom_vec_, wh_top_vec_);
-    wh_loss_layer_->Forward(wh_bottom_vec_, wh_top_vec_);
+    //wh_loss_layer_->Reshape(wh_bottom_vec_, wh_top_vec_);
+    //wh_loss_layer_->Forward(wh_bottom_vec_, wh_top_vec_);
   } else {
     loc_loss_.mutable_cpu_data()[0] = 0;
-    wh_loss_.mutable_cpu_data()[0] = 0;
+    //wh_loss_.mutable_cpu_data()[0] = 0;
   }
+
   if (num_gt_ >= 1) {
     if (conf_loss_type_ == CenterObjectParameter_ConfLossType_FOCALSIGMOID) {
-      conf_gt_.ReshapeLike(*bottom[2]);
-      conf_pred_.ReshapeLike(*bottom[2]);
-      conf_pred_.CopyFrom(*bottom[2]);
+      conf_gt_.ReshapeLike(*bottom[1]);
+      conf_pred_.ReshapeLike(*bottom[1]);
+      conf_pred_.CopyFrom(*bottom[1]);
     }else {
       LOG(FATAL) << "Unknown confidence loss type.";
     }
@@ -207,13 +207,15 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     top[0]->mutable_cpu_data()[0] +=
         loc_weight_ * loc_loss_.cpu_data()[0] / normalizer;
   }
+  #if 0
   if (this->layer_param_.propagate_down(1)) {
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_gt_, num_gt_);
     top[0]->mutable_cpu_data()[0] +=
         0.1 * wh_loss_.cpu_data()[0] / normalizer;
   }
-  if (this->layer_param_.propagate_down(2)) {
+  #endif
+  if (this->layer_param_.propagate_down(1)) {
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_gt_, num_gt_);
     top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0];/*/normalizer;*/
@@ -230,7 +232,6 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     CHECK_EQ(num_gt_, num_groundtruth);
     LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
             <<", loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
-            <<", wh_loss: "<<wh_loss_.cpu_data()[0] / normalizer
             <<", conf loss: "<< conf_loss_.cpu_data()[0]
             <<", normalizer: "<< normalizer
             <<", num_groundtruth: "<<num_groundtruth
@@ -248,7 +249,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   const int output_height = bottom[0]->height();
   const int output_width = bottom[0]->width();
   const int num_channels = bottom[0]->channels();
-  if (propagate_down[3]) {
+  if (propagate_down[2]) {
     LOG(FATAL) << this->type()
         << " Layer cannot backpropagate to label inputs.";
   }
@@ -276,7 +277,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                         all_gt_bboxes);
     }
   }
-
+#if 0
 if (propagate_down[1]) {
     Dtype* wh_bottom_diff = bottom[1]->mutable_cpu_diff();
     caffe_set(bottom[1]->count(), Dtype(0), wh_bottom_diff);
@@ -299,11 +300,11 @@ if (propagate_down[1]) {
                         all_gt_bboxes);
     }
   }
-
+#endif
   // Back propagate on confidence prediction.
-  if (propagate_down[2]) {
-    Dtype* conf_bottom_diff = bottom[2]->mutable_cpu_diff();
-    caffe_set(bottom[2]->count(), Dtype(0), conf_bottom_diff);
+  if (propagate_down[1]) {
+    Dtype* conf_bottom_diff = bottom[1]->mutable_cpu_diff();
+    caffe_set(bottom[1]->count(), Dtype(0), conf_bottom_diff);
     if (num_gt_ >= 1) {
       vector<bool> conf_propagate_down;
       // Only back propagate on prediction, not ground truth.
@@ -318,7 +319,7 @@ if (propagate_down[1]) {
       caffe_scal(conf_pred_.count(), loss_weight,
                  conf_pred_.mutable_cpu_diff());*/
       // Copy gradient back to bottom[1].
-      bottom[2]->ShareDiff(conf_pred_);
+      bottom[1]->ShareDiff(conf_pred_);
     }
   }
 }

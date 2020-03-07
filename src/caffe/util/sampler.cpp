@@ -384,8 +384,7 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
                         NormalizedBBox* samplerbox, 
                         std::vector<int> bbox_small_size_list,
                         std::vector<int> bbox_large_size_list,
-                        std::vector<int> anchorStride,
-                        float* target_scale){
+                        std::vector<int> anchorStride){
   CHECK_EQ(bbox_large_size_list.size(), bbox_small_size_list.size());
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
@@ -422,16 +421,7 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
                     + caffe_rng_rand() % (bbox_large_size_list[scaled_idx] - 
                                           bbox_small_size_list[scaled_idx]);
   }
-  *target_scale = float(side_length / longer_side );
-  //LOG(INFO)<<"side_length: "<<side_length<<", longer_side: "<<longer_side<<", target_scale: "<<*target_scale; 
-
-  for(unsigned i = 0; i < object_bboxes.size(); i++){
-    object_bboxes[i].set_xmin(object_bboxes[i].xmin() * (*target_scale));
-    object_bboxes[i].set_xmax(object_bboxes[i].xmax() * (*target_scale));
-    object_bboxes[i].set_ymin(object_bboxes[i].ymin() * (*target_scale));
-    object_bboxes[i].set_ymax(object_bboxes[i].ymax() * (*target_scale));
-  }
-
+  
   NormalizedBBox target_bbox = object_bboxes[object_bbox_index];
   
   float vibration_length = float(anchorStride[scaled_idx]);
@@ -444,12 +434,10 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
   float width_crop_end = target_bbox.xmin() + (target_bbox.xmin() + target_bbox.xmax()) / 2 + offset_x + resized_width / 2;
   float height_crop_end = target_bbox.ymin() + (target_bbox.ymin() + target_bbox.ymax()) / 2 + offset_y + resized_height / 2;
 
-  int new_resized_width = int(img_width * (*target_scale));
-  int new_resized_height = int(img_height * (*target_scale));
-  float w_off = (float) width_offset_org / new_resized_width;
-  float h_off = (float) height_offset_org / new_resized_height;
-  float w_end = (float) width_crop_end / new_resized_width;
-  float h_end = (float) height_crop_end / new_resized_height;
+  float w_off = (float) width_offset_org / img_width;
+  float h_off = (float) height_offset_org / img_height;
+  float w_end = (float) width_crop_end / img_width;
+  float h_end = (float) height_crop_end / img_height;
   samplerbox->set_xmin(w_off);
   samplerbox->set_ymin(h_off);
   samplerbox->set_xmax(w_end);

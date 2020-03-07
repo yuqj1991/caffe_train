@@ -26,11 +26,10 @@ namespace caffe {
 template<typename Dtype>
 Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, const Dtype min_overlap);
 template <typename Dtype>
-void EncodeCenteGroundTruthAndPredictions(const Dtype* loc_data, const Dtype* wh_data, 
+void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int output_width, const int output_height, 
-                                bool share_location, Dtype* pred_loc_data, Dtype* pred_wh_data, 
-                                const int num_channels, Dtype* gt_loc_data, Dtype* gt_wh_data,
-                                std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+                                bool share_location, const Dtype* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
                                 const int output_height, 

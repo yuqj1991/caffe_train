@@ -71,8 +71,7 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
                         NormalizedBBox* samplerbox, 
                         std::vector<int> bbox_small_size_list,
                         std::vector<int> bbox_large_size_list,
-                        std::vector<int> anchorStride,
-                        float* target_scale);
+                        std::vector<int> anchorStride);
 
 
 }  // namespace caffe

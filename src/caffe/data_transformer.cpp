@@ -640,61 +640,15 @@ void DataTransformer<Dtype>::CropImage_anchor_Sampling(const AnnotatedDatum& ann
 template<typename Dtype>
 void DataTransformer<Dtype>::CropImage_Lffd_Sampling(const AnnotatedDatum& anno_datum,
 														const NormalizedBBox& bbox,
-														AnnotatedDatum* cropped_anno_datum, 
-														const float new_resized_scale) {
-	AnnotatedDatum new_Resized_datum;
-	new_Resized_datum.CopyFrom(anno_datum);
-	//resize origin datum and labels
-	if (new_Resized_datum.datum().encoded()) {
-	#ifdef USE_OPENCV
-		CHECK(!(param_.force_color() && param_.force_gray()))
-				<< "cannot set both force_color and force_gray";
-		cv::Mat cv_img;
-		if (param_.force_color() || param_.force_gray()) {
-			// If force_color then decode in color otherwise decode in gray.
-			cv_img = DecodeDatumToCVMat(new_Resized_datum.datum(), param_.force_color());
-		} else {
-			cv_img = DecodeDatumToCVMatNative(new_Resized_datum.datum());
-		}
-		// new resized image shape
-		int new_resized_width = int(anno_datum.datum().width() * new_resized_scale);
-		int new_resized_height = int(anno_datum.datum().height() * new_resized_scale);
-		//LOG(INFO)<<"origin width: "<<anno_datum.datum().width()<<", origin height: "<<anno_datum.datum().height();
-		//LOG(INFO)<<"width: "<<new_resized_width<<", height: "<<new_resized_height<<", new_resized_scale: "<<new_resized_scale;
-		cv::Mat resized_img;
-		cv::resize(cv_img, resized_img, cv::Size(new_resized_width, new_resized_height), 0, 0);
-
-		// Save the image into datum.
-		EncodeCVMatToDatum(resized_img, "jpg", new_Resized_datum.mutable_datum());
-	#else
-		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
-	#endif  // USE_OPENCV
-	} else {
-		if (param_.force_color() || param_.force_gray()) {
-			LOG(ERROR) << "force_color and force_gray only for encoded datum";
-		}
-	}
-	for (int g = 0; g < new_Resized_datum.annotation_group_size(); ++g) {
-		AnnotationGroup* anno_group = new_Resized_datum.mutable_annotation_group(g);
-		// Go through each Annotation.
-		for (int a = 0; a < anno_group->annotation_size(); ++a) {
-			Annotation* anno = anno_group->mutable_annotation(a);
-			NormalizedBBox* bbox = anno->mutable_bbox();
-			bbox->set_xmin(bbox->xmin() * new_resized_scale);
-			bbox->set_xmax(bbox->xmax() * new_resized_scale);
-			bbox->set_ymin(bbox->ymin() * new_resized_scale);
-			bbox->set_ymax(bbox->ymax() * new_resized_scale);	
-		}
-	}
-	
+														AnnotatedDatum* cropped_anno_datum) {
 	// Crop the datum.
-	CropImageAnchor(new_Resized_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
+	CropImageAnchor(anno_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
 	cropped_anno_datum->set_type(anno_datum.type());
 	
 	// Transform the annotation according to crop_bbox.
 	const bool do_resize = false;
 	const bool do_mirror = false;
-	TransformAnnotation(new_Resized_datum, do_resize, bbox, do_mirror,
+	TransformAnnotation(anno_datum, do_resize, bbox, do_mirror,
 										cropped_anno_datum->mutable_annotation_group());
 }
 
