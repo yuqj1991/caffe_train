@@ -3120,7 +3120,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 2
+		num_output: 4
 		kernel_size: 1
 		#pad: 1
 		weight_filler {
@@ -3130,37 +3130,7 @@ layer{
 	}
 }
 
-#######################################################################
-#                             modeule three                           #
-#######################################################################
-#################context moudle####################
-layer{
-	name: "conv_wh_1x1"
-	type: "Convolution"
-	bottom: "pyramid_stage_three"
-	top: "conv_wh_1x1"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 2
-		kernel_size: 1
-		#pad: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_term: false
-	}
-}
 
-layer{
-	name: "conv_reg"
-	type: "Concat"
-	bottom: "conv_loc_1x1"
-	bottom: "conv_wh_1x1"
-	top: "conv_reg"
-}
 
 layer {
   name: "conf_heatmap_1x1_sigmoid"
@@ -3185,7 +3155,7 @@ layer {
 	type: "CenternetDetectionOutput"
 	bottom: "conf_heatmap_1x1_sigmoid"
 	bottom: "conf_heatmap_1x1_pool"
-	bottom: "conv_reg"
+	bottom: "conv_loc_1x1"
 	top: "detection_out"
 	include {
 	phase: TEST

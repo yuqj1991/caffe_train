@@ -3275,31 +3275,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 2
-		kernel_size: 1
-		#pad: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_term: false
-	}
-}
-
-#######################################################################
-#                             modeule three                           #
-#######################################################################
-#################context moudle####################
-layer{
-	name: "conv_wh_1x1"
-	type: "Convolution"
-	bottom: "pyramid_stage_three"
-	top: "conv_wh_1x1"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 2
+		num_output: 4
 		kernel_size: 1
 		#pad: 1
 		weight_filler {
@@ -3313,14 +3289,12 @@ layer {
 	name: "centernet_loss"
 	type: "CenterObjectLoss"
 	bottom: "conv_loc_1x1"
-	bottom: "conv_wh_1x1"
 	bottom: "conf_heatmap_1x1"
 	bottom: "label"
 	top: "centernet_loss"
 	include {
 		phase: TRAIN
 	}
-	propagate_down: true
 	propagate_down: true
 	propagate_down: true
 	propagate_down: false
