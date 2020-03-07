@@ -240,7 +240,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         int resized_height_ = transform_param.resize_param().height();
         int resized_width_ = transform_param.resize_param().width();
         GenerateLffdSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
-                            bbox_small_scale_, bbox_large_scale_, anchor_stride_, &target_scale);
+                            bbox_small_scale_, bbox_large_scale_, anchor_stride_);
         sampled_datum = new AnnotatedDatum();
         this->data_transformer_->CropImage_Lffd_Sampling(*expand_datum,
                                             sampled_bbox,
