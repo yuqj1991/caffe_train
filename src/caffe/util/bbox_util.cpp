@@ -920,7 +920,6 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
           for (int j = 0; j < num_gt; ++j) {
             bool x_inside_gt_box = false, y_inside_gt_box = false;
             int receptive_filed_ = int ((pred_bboxes[i].xmax() - pred_bboxes[i].xmin()) * input_width);
-            LOG(INFO)<<receptive_filed_;
             int gt_bbox_size_width = int((gt_bboxes[j].xmax() - gt_bboxes[j].xmin()) * input_width);
             int gt_bbox_size_height = int((gt_bboxes[j].ymax() - gt_bboxes[j].ymin()) * input_height);
             int large_side = std::max(gt_bbox_size_height, gt_bbox_size_width);
