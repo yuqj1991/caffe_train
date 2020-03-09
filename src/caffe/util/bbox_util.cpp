@@ -904,7 +904,6 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
           }
         }
       }
-      int used_lffd_matches = 0;
       if(use_center_locate_match){
         // Get most overlaped for the rest prediction bboxes.
         for (map<int, map<int, float> >::iterator it = overlaps.begin();
@@ -924,28 +923,33 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
             int gt_bbox_size_width = int((gt_bboxes[j].xmax() - gt_bboxes[j].xmin()) * input_width);
             int gt_bbox_size_height = int((gt_bboxes[j].ymax() - gt_bboxes[j].ymin()) * input_height);
             int large_side = std::max(gt_bbox_size_height, gt_bbox_size_width);
-            int num_scale_id = 0;
+            int num_scale_id = -1;
             for(unsigned n = 0 ; n < bbox_small_list.size(); n++){
               if(large_side >= bbox_small_list[n] && large_side <= bbox_large_list[n]){
                 num_scale_id = n;
                 break;
               }
             }
+            if(num_scale_id == -1){
+              continue;
+            }
             if( pred_center_x >= gt_bboxes[j].xmin() && 
-                          pred_center_x <= gt_bboxes[j].xmax() && 
-                          receptive_filed_ == receptive_filed_list[num_scale_id] ){
+                          pred_center_x <= gt_bboxes[j].xmax() /*&& 
+                          "receptive_filed_ == receptive_filed_list[num_scale_id]"*/ ){
               x_inside_gt_box = true;
             }
-            if( pred_center_y >= gt_bboxes[j].ymin() && pred_center_y <= gt_bboxes[j].ymax() &&
-                  receptive_filed_ == receptive_filed_list[num_scale_id]  ){
+            if( pred_center_y >= gt_bboxes[j].ymin() && pred_center_y <= gt_bboxes[j].ymax() /*&&
+                  receptive_filed_ == receptive_filed_list[num_scale_id]*/  ){
               y_inside_gt_box = true;
             }
             if(y_inside_gt_box && x_inside_gt_box){
-              if(BBoxCoverage(gt_bboxes[j], pred_bboxes[i]) > 0.25 
+              center_match_gt_idx = j;
+              center_match_overlap = it->second[j];
+              /*if(BBoxCoverage(gt_bboxes[j], pred_bboxes[i]) > 0.25 
                                   && BBoxCoverage(pred_bboxes[i], gt_bboxes[j]) > 0.25){
                 center_match_gt_idx = j;
                 center_match_overlap = it->second[j];
-              }
+              }*/
             }
           }
           if (center_match_gt_idx != -1) {
@@ -953,11 +957,9 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
             CHECK_EQ((*match_indices)[i], -1);
             (*match_indices)[i] = gt_indices[center_match_gt_idx];
             (*match_overlaps)[i] = center_match_overlap;
-            used_lffd_matches++;
           }
         }
       }
-      //LOG(INFO)<<"**************use lffd match nums: " <<used_lffd_matches;
     }
       break;
     default:
