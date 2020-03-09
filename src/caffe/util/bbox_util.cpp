@@ -920,6 +920,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
           for (int j = 0; j < num_gt; ++j) {
             bool x_inside_gt_box = false, y_inside_gt_box = false;
             int receptive_filed_ = int ((pred_bboxes[i].xmax() - pred_bboxes[i].xmin()) * input_width);
+            LOG(INFO)<<receptive_filed_;
             int gt_bbox_size_width = int((gt_bboxes[j].xmax() - gt_bboxes[j].xmin()) * input_width);
             int gt_bbox_size_height = int((gt_bboxes[j].ymax() - gt_bboxes[j].ymin()) * input_height);
             int large_side = std::max(gt_bbox_size_height, gt_bbox_size_width);
@@ -933,13 +934,14 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
             if(num_scale_id == -1){
               continue;
             }
+            if(receptive_filed_ != receptive_filed_list[num_scale_id]){
+              continue;
+            }
             if( pred_center_x >= gt_bboxes[j].xmin() && 
-                          pred_center_x <= gt_bboxes[j].xmax() /*&& 
-                          "receptive_filed_ == receptive_filed_list[num_scale_id]"*/ ){
+                          pred_center_x <= gt_bboxes[j].xmax() ){
               x_inside_gt_box = true;
             }
-            if( pred_center_y >= gt_bboxes[j].ymin() && pred_center_y <= gt_bboxes[j].ymax() /*&&
-                  receptive_filed_ == receptive_filed_list[num_scale_id]*/  ){
+            if( pred_center_y >= gt_bboxes[j].ymin() && pred_center_y <= gt_bboxes[j].ymax()){
               y_inside_gt_box = true;
             }
             if(y_inside_gt_box && x_inside_gt_box){
