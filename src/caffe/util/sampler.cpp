@@ -111,7 +111,7 @@ void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox, float orl_
   CHECK_LE(sampler.max_scale(), 1.);
   float scale;
 
-  CHECK_LT(sampler.min_scale(), sampler.max_scale());
+  CHECK_LE(sampler.min_scale(), sampler.max_scale());
   caffe_rng_uniform(1, sampler.min_scale(), sampler.max_scale(), &scale);
 
   // Get random aspect ratio.
@@ -119,7 +119,7 @@ void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox, float orl_
   CHECK_GT(sampler.min_aspect_ratio(), 0.);
   CHECK_LT(sampler.max_aspect_ratio(), FLT_MAX);
   float aspect_ratio;
-  CHECK_LT(sampler.min_aspect_ratio(), sampler.max_aspect_ratio());
+  CHECK_LE(sampler.min_aspect_ratio(), sampler.max_aspect_ratio());
   caffe_rng_uniform(1, sampler.min_aspect_ratio(), sampler.max_aspect_ratio(),
       &aspect_ratio);
 
