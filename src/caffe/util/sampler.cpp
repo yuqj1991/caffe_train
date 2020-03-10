@@ -110,6 +110,8 @@ void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox, float orl_
   CHECK_GT(sampler.min_scale(), 0.);
   CHECK_LE(sampler.max_scale(), 1.);
   float scale;
+
+  CHECK_LT(sampler.min_scale(), sampler.max_scale());
   caffe_rng_uniform(1, sampler.min_scale(), sampler.max_scale(), &scale);
 
   // Get random aspect ratio.
@@ -117,6 +119,7 @@ void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox, float orl_
   CHECK_GT(sampler.min_aspect_ratio(), 0.);
   CHECK_LT(sampler.max_aspect_ratio(), FLT_MAX);
   float aspect_ratio;
+  CHECK_LT(sampler.min_aspect_ratio(), sampler.max_aspect_ratio());
   caffe_rng_uniform(1, sampler.min_aspect_ratio(), sampler.max_aspect_ratio(),
       &aspect_ratio);
 
@@ -127,11 +130,13 @@ void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox, float orl_
   float bbox_width = scale * sqrt(aspect_ratio);
   float bbox_height = bbox_width * orl_ratio;
 
-  LOG(INFO)<<"bbox_width: "<<bbox_width<<", bbox_height: "<<bbox_height;
+  //LOG(INFO)<<"bbox_width: "<<bbox_width<<", bbox_height: "<<bbox_height;
 
   // Figure out top left coordinates.
   float w_off, h_off;
+  CHECK_LT(0.f, 1 - bbox_width);
   caffe_rng_uniform(1, 0.f, 1 - bbox_width, &w_off);
+  CHECK_LT(0.f, 1 - bbox_height);
   caffe_rng_uniform(1, 0.f, 1 - bbox_height, &h_off);
 
   sampled_bbox->set_xmin(w_off);
