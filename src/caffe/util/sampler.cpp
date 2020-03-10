@@ -132,7 +132,7 @@ void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox, float orl_
 
   // Figure out top left coordinates.
   float w_off, h_off;
-  CHECK_LT(0.f, 1 - bbox_width) << ", bbox_width: "<<bbox_width;
+  CHECK_LT(0.f, 1 - bbox_width) << ", bbox_width: "<<bbox_width << ", orl_ratio: "<<orl_ratio;
   caffe_rng_uniform(1, 0.f, 1 - bbox_width, &w_off);
   CHECK_LT(0.f, 1 - bbox_height) << ", bbox_height: "<<bbox_height;
   caffe_rng_uniform(1, 0.f, 1 - bbox_height, &h_off);
