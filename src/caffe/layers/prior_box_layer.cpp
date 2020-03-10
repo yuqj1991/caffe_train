@@ -225,16 +225,6 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
               for (int c = 0 ; c < density_ ; ++c){
                 float center_x_temp = center_x - fixed_size_ / 2 + shift/2. + c*shift;
                 float center_y_temp = center_y - fixed_size_ / 2 + shift/2. + r*shift;
-                #if 0
-                  // xmin
-                  top_data[idx++] = (center_x_temp - box_width_ratio / 2.) / img_width >=0 ? (center_x_temp - box_width_ratio / 2.) / img_width : 0 ;
-                  // ymin
-                  top_data[idx++] = (center_y_temp - box_height_ratio / 2.) / img_height >= 0 ? (center_y_temp - box_height_ratio / 2.) / img_height : 0;
-                  // xmax
-                  top_data[idx++] = (center_x_temp + box_width_ratio / 2.) / img_width <= 1 ? (center_x_temp + box_width_ratio / 2.) / img_width : 1;
-                  // ymax
-                  top_data[idx++] = (center_y_temp + box_height_ratio / 2.) / img_height <= 1 ? (center_y_temp + box_height_ratio / 2.) / img_height : 1;
-                #else
                   // xmin
                   top_data[idx++] = (center_x_temp - box_width_ratio / 2.) / img_width;
                   // ymin
@@ -243,12 +233,10 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                   top_data[idx++] = (center_x_temp + box_width_ratio / 2.) / img_width;
                   // ymax
                   top_data[idx++] = (center_y_temp + box_height_ratio / 2.) / img_height ;
-                #endif
               }
             }
           }
-        }
-        else {
+        }else {
           //this code added by gaozhihua for density anchor box
           if (densitys_.size() > 0) {
             CHECK_EQ(fixed_sizes_.size(),densitys_.size());
@@ -266,16 +254,6 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                 top_data[idx++] = (center_x_temp + box_width / 2.) / img_width ;
                 // ymax
                 top_data[idx++] = (center_y_temp + box_height / 2.) / img_height ;
-                /*
-                // xmin
-                top_data[idx++] = (center_x_temp - box_width / 2.) / img_width >=0 ? (center_x_temp - box_width / 2.) / img_width : 0 ;
-                // ymin
-                top_data[idx++] = (center_y_temp - box_height / 2.) / img_height >= 0 ? (center_y_temp - box_height / 2.) / img_height : 0;
-                // xmax
-                top_data[idx++] = (center_x_temp + box_width / 2.) / img_width <= 1 ? (center_x_temp + box_width / 2.) / img_width : 1;
-                // ymax
-                top_data[idx++] = (center_y_temp + box_height / 2.) / img_height <= 1 ? (center_y_temp + box_height / 2.) / img_height : 1;
-                 */
               }
             }
           }
@@ -301,16 +279,6 @@ void PriorBoxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                 top_data[idx++] = (center_x_temp + box_width_ratio / 2.) / img_width;
                 // ymax
                 top_data[idx++] = (center_y_temp + box_height_ratio / 2.) / img_height ;
-                /*
-                // xmin
-                top_data[idx++] = (center_x_temp - box_width_ratio / 2.) / img_width >=0 ? (center_x_temp - box_width_ratio / 2.) / img_width : 0 ;
-                // ymin
-                top_data[idx++] = (center_y_temp - box_height_ratio / 2.) / img_height >= 0 ? (center_y_temp - box_height_ratio / 2.) / img_height : 0;
-                // xmax
-                top_data[idx++] = (center_x_temp + box_width_ratio / 2.) / img_width <= 1 ? (center_x_temp + box_width_ratio / 2.) / img_width : 1;
-                // ymax
-                top_data[idx++] = (center_y_temp + box_height_ratio / 2.) / img_height <= 1 ? (center_y_temp + box_height_ratio / 2.) / img_height : 1;
-                */
               }
             }
           }

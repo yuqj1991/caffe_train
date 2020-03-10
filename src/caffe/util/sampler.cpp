@@ -104,7 +104,7 @@ bool SatisfySampleConstraint(const NormalizedBBox& sampled_bbox,
   return found;
 }
 
-void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox) {
+void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox, float orl_ratio) {
   // Get random scale.
   CHECK_GE(sampler.max_scale(), sampler.min_scale());
   CHECK_GT(sampler.min_scale(), 0.);
@@ -125,7 +125,7 @@ void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox) {
 
   // Figure out bbox dimension.
   float bbox_width = scale * sqrt(aspect_ratio);
-  float bbox_height = scale / sqrt(aspect_ratio);
+  float bbox_height = bbox_width * orl_ratio;
 
   // Figure out top left coordinates.
   float w_off, h_off;
@@ -182,7 +182,7 @@ void SampleBBox_Square(const AnnotatedDatum& anno_datum, const Sampler& sampler,
 void GenerateSamples(const NormalizedBBox& source_bbox,
                      const vector<NormalizedBBox>& object_bboxes,
                      const BatchSampler& batch_sampler,
-                     vector<NormalizedBBox>* sampled_bboxes) {
+                     vector<NormalizedBBox>* sampled_bboxes, float orl_ratio) {
   int found = 0;
   for (int i = 0; i < batch_sampler.max_trials(); ++i) {
     if (batch_sampler.has_max_sample() &&
@@ -191,7 +191,7 @@ void GenerateSamples(const NormalizedBBox& source_bbox,
     }
     // Generate sampled_bbox in the normalized space [0, 1].
     NormalizedBBox sampled_bbox;
-    SampleBBox(batch_sampler.sampler(), &sampled_bbox);
+    SampleBBox(batch_sampler.sampler(), &sampled_bbox, orl_ratio);
     // Transform the sampled_bbox w.r.t. source_bbox.
     LocateBBox(source_bbox, sampled_bbox, &sampled_bbox);
     // Determine if the sampled bbox is positive or negative by the constraint.
@@ -235,6 +235,9 @@ void GenerateBatchSamples(const AnnotatedDatum& anno_datum,
   sampled_bboxes->clear();
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
+  const int img_height = anno_datum.datum().height();
+  const int img_width = anno_datum.datum().width();
+  float ratio = (float)img_height / img_width;
   for (int i = 0; i < batch_samplers.size(); ++i) {
     if (batch_samplers[i].use_original_image()) {
       NormalizedBBox unit_bbox;
@@ -243,7 +246,7 @@ void GenerateBatchSamples(const AnnotatedDatum& anno_datum,
       unit_bbox.set_xmax(1);
       unit_bbox.set_ymax(1);
       GenerateSamples(unit_bbox, object_bboxes, batch_samplers[i],
-                      sampled_bboxes);
+                      sampled_bboxes, ratio);
     }
   }
 }

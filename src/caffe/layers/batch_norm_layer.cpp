@@ -97,6 +97,9 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 
   if (use_global_stats_) {
     // use the stored mean/variance estimates.
+    // 如果使用已经计算好的mean和variance
+    // mean保存在blobs_[0]中，variance保存在blobs_[1]中
+    // 滑动平均系数保存在blobs_[2]中
     const Dtype scale_factor = this->blobs_[2]->cpu_data()[0] == 0 ?
         0 : 1 / this->blobs_[2]->cpu_data()[0];
     caffe_cpu_scale(variance_.count(), scale_factor,
@@ -104,17 +107,44 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     caffe_cpu_scale(variance_.count(), scale_factor,
         this->blobs_[1]->cpu_data(), variance_.mutable_cpu_data());
   } else {
+    // 训练阶段  compute mean
+    // 1.计算均值,先计算HW的，每个通道的均值，在包含N
+    // caffe_cpu_gemv 实现 y =  alpha*A*x+beta*y;
+    // 输出的是channels_*num,
+    // 每次处理的列是spatial_dim，由于spatial_sum_multiplier_初始为1，即NCHW中的
+    // H*W各自相加，得到N*C*average，此处多除以了num，下一步可以不除以。
     // compute mean
+    //这个矩阵与向量相乘，目的是计算每个feature map的数值和，然后在除以1./(num*spatial_dim)
+    //bottom_data: (channels_*num) x (spatial_dim)
+    //spatial_sum_multiplier: spatial_dim x 1
+    //alpha : 1./(num*spatial_dim); beta : 0
+    //num_by_chans = alpha * (bottom_data x spatial_sum_multiplier) + beta * num_by_chans
+    //其中spatial_sum_multiplier的值都为1
+    //注意关键字是CblasTrans！！
+    //num_by_chans_ : channels_ x num;
+    //batch_sum_multiplier_ : num x 1;
+    //mean_ = 1. x (num_by_chans_ x batch_sum_multiplier_)
+    //mean_ : channels_ x 1
+    //计算得到对应channels的平均值，这也解释了为什么之前要除以1./(num*spatial_dim)
+    //而不是仅除以1./spatial_dim，这样减少了计算量
     caffe_cpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
         1. / (num * spatial_dim), bottom_data,
         spatial_sum_multiplier_.cpu_data(), 0.,
         num_by_chans_.mutable_cpu_data());
+    // 2.计算均值，计算N各的平均值.
+    // 由于输出的是channels上的均值，因此需要转置
+    // 上一步得到的N*C的均值，再按照num求均值，因为batch_sum全部为1,
     caffe_cpu_gemv<Dtype>(CblasTrans, num, channels_, 1.,
         num_by_chans_.cpu_data(), batch_sum_multiplier_.cpu_data(), 0.,
         mean_.mutable_cpu_data());
   }
 
   // subtract mean
+  // 此处的均值已经保存在mean_中了
+  // 进行 x - mean_x 操作，需要注意按照通道，即先确定x属于哪个通道.
+  // 因此也是进行两种，先进行H*W的减少均值
+  // caffe_cpu_gemm 实现alpha * A*B + beta* C
+  // 输入是num*1 * 1* channels_,输出是num*channels_
   caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
       batch_sum_multiplier_.cpu_data(), mean_.cpu_data(), 0.,
       num_by_chans_.mutable_cpu_data());
@@ -124,8 +154,12 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 
   if (!use_global_stats_) {
     // compute variance using var(X) = E((X-EX)^2)
+    // 测试的方差上述已经读取了
+    // compute variance using var(X) = E((X-EX)^2)
+    // 此处的top已经为x-mean_x了
     caffe_powx(top[0]->count(), top_data, Dtype(2),
         temp_.mutable_cpu_data());  // (X-EX)^2
+    // 同均值一样，此处先计算spatial_dim的值
     caffe_cpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
         1. / (num * spatial_dim), temp_.cpu_data(),
         spatial_sum_multiplier_.cpu_data(), 0.,
@@ -135,6 +169,9 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         variance_.mutable_cpu_data());  // E((X_EX)^2)
 
     // compute and save moving average
+    // 均值和方差计算完成后，需要更新batch的滑动系数
+    // y = alpha * x + beta * y
+    // this->blobs_[2] 存放的是平均滑动系数
     this->blobs_[2]->mutable_cpu_data()[0] *= moving_average_fraction_;
     this->blobs_[2]->mutable_cpu_data()[0] += 1;
     caffe_cpu_axpby(mean_.count(), Dtype(1), mean_.cpu_data(),
@@ -146,18 +183,23 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         this->blobs_[1]->mutable_cpu_data());
   }
 
-  // normalize variance
+  // normalize variance 
+  // 方差求个根号,加上eps为防止分母为0
   caffe_add_scalar(variance_.count(), eps_, variance_.mutable_cpu_data());
   caffe_powx(variance_.count(), variance_.cpu_data(), Dtype(0.5),
              variance_.mutable_cpu_data());
 
   // replicate variance to input size
+  // top_data = x-mean_x/sqrt(variance_),此处的top_data已经转化为x-mean_x了
+  // 同减均值，也要分C--N*C和  N*C --- N*C*H*W
+  // N*1 *  1*C == N*C
   caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
       batch_sum_multiplier_.cpu_data(), variance_.cpu_data(), 0.,
       num_by_chans_.mutable_cpu_data());
   caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, channels_ * num,
       spatial_dim, 1, 1., num_by_chans_.cpu_data(),
       spatial_sum_multiplier_.cpu_data(), 0., temp_.mutable_cpu_data());
+  // temp最终保存的是sqrt（方差+eps)
   caffe_div(temp_.count(), top_data, temp_.cpu_data(), top_data);
   // TODO(cdoersch): The caching is only needed because later in-place layers
   //                 might clobber the data.  Can we skip this if they won't?
