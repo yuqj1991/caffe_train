@@ -6,6 +6,7 @@ input_shape {
 	dim: 640
 	dim: 640
 }
+
 layer {
 	name: "conv1"
 	type: "Convolution"
@@ -41,6 +42,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -110,6 +114,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv2/scale"
@@ -177,6 +184,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -246,6 +256,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv4/scale"
@@ -311,6 +324,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -389,6 +405,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv6/scale"
@@ -455,6 +474,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -533,6 +555,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv8/scale"
@@ -599,6 +624,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -671,6 +699,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv10/scale"
@@ -736,6 +767,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -811,6 +845,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv12/dw/scale"
@@ -876,6 +913,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv12/scale"
@@ -937,6 +977,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -1002,6 +1045,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -1071,6 +1117,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv14/dw/scale"
@@ -1135,6 +1184,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -1210,6 +1262,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv15/dw/scale"
@@ -1274,6 +1329,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -1343,6 +1401,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv16/dw/scale"
@@ -1407,6 +1468,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -1481,6 +1545,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv17/dw/scale"
@@ -1546,6 +1613,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv17/scale"
@@ -1607,6 +1677,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -1672,6 +1745,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -1741,6 +1817,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv19/dw/scale"
@@ -1805,6 +1884,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -1880,6 +1962,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv20/dw/scale"
@@ -1945,6 +2030,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv20/scale"
@@ -2006,6 +2094,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -2071,6 +2162,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -2140,6 +2234,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv22/dw/scale"
@@ -2204,6 +2301,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -2279,6 +2379,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv23/dw/scale"
@@ -2343,6 +2446,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -2412,6 +2518,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv24/dw/scale"
@@ -2476,6 +2585,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -2551,6 +2663,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv25/dw/scale"
@@ -2615,6 +2730,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: true
 	}
 }
 layer {
@@ -2684,6 +2802,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv26/dw/scale"
@@ -2749,6 +2870,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: true
+	}
 }
 layer {
 	name: "conv26/scale"
@@ -2784,7 +2908,6 @@ layer{
 		operation: SUM
 	}
 }
-
 ############################################################
 #######################priorBox moudle one##################
 ############################################################
@@ -2813,7 +2936,7 @@ layer {
 	top: "conv9_eltwise_loc"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -2860,7 +2983,7 @@ layer {
 	top: "conv9_eltwise_conf_concat"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -2928,7 +3051,7 @@ layer {
 	top: "conv11_eltwise_loc"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -2975,7 +3098,7 @@ layer {
 	top: "conv11_eltwise_conf_concat"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3043,7 +3166,7 @@ layer {
 	top: "conv14_eltwise_loc"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3090,7 +3213,7 @@ layer {
 	top: "conv14_eltwise_conf"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3159,7 +3282,7 @@ layer {
 	top: "conv16_eltwise_loc"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3206,7 +3329,7 @@ layer {
 	top: "conv16_eltwise_conf"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3275,7 +3398,7 @@ layer {
 	top: "dectction_moudle_five_loc"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3322,7 +3445,7 @@ layer {
 	top: "dectction_moudle_five_conf"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3389,7 +3512,7 @@ layer {
 	top: "dectction_moudle_six_loc"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3436,7 +3559,7 @@ layer {
 	top: "dectction_moudle_six_conf"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3503,7 +3626,7 @@ layer {
 	top: "dectction_moudle_seven_loc"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3550,7 +3673,7 @@ layer {
 	top: "dectction_moudle_seven_conf"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3617,7 +3740,7 @@ layer {
 	top: "dectction_moudle_eight_loc"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2
@@ -3664,7 +3787,7 @@ layer {
 	top: "dectction_moudle_eight_conf"
 	param {
 		lr_mult: 1
-		decay_mult: 1
+		decay_mult: 1.0
 	}
 	param {
 		lr_mult: 2

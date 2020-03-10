@@ -223,6 +223,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv1/scale"
@@ -290,6 +293,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -359,6 +365,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv3/scale"
@@ -427,6 +436,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv4/scale"
@@ -492,6 +504,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -570,6 +585,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv6/scale"
@@ -636,6 +654,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -714,6 +735,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv8/scale"
@@ -780,6 +804,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -852,6 +879,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv10/scale"
@@ -917,6 +947,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -992,6 +1025,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv12/dw/scale"
@@ -1057,6 +1093,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv12/scale"
@@ -1118,6 +1157,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -1183,6 +1225,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -1252,6 +1297,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv14/dw/scale"
@@ -1316,6 +1364,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -1391,6 +1442,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv15/dw/scale"
@@ -1455,6 +1509,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -1524,6 +1581,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv16/dw/scale"
@@ -1588,6 +1648,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -1662,6 +1725,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv17/dw/scale"
@@ -1727,6 +1793,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv17/scale"
@@ -1788,6 +1857,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -1853,6 +1925,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -1922,6 +1997,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv19/dw/scale"
@@ -1986,6 +2064,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -2061,6 +2142,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv20/dw/scale"
@@ -2126,6 +2210,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv20/scale"
@@ -2187,6 +2274,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -2252,6 +2342,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -2321,6 +2414,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv22/dw/scale"
@@ -2385,6 +2481,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -2460,6 +2559,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv23/dw/scale"
@@ -2524,6 +2626,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -2593,6 +2698,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv24/dw/scale"
@@ -2657,6 +2765,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -2732,6 +2843,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv25/dw/scale"
@@ -2796,6 +2910,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
@@ -2865,6 +2982,9 @@ layer {
 		lr_mult: 0
 		decay_mult: 0
 	}
+	batch_norm_param {
+		use_global_stats: false
+	}
 }
 layer {
 	name: "conv26/dw/scale"
@@ -2929,6 +3049,9 @@ layer {
 	param {
 		lr_mult: 0
 		decay_mult: 0
+	}
+	batch_norm_param {
+		use_global_stats: false
 	}
 }
 layer {
