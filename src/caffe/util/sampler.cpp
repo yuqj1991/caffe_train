@@ -134,7 +134,7 @@ void SampleBBox(const Sampler& sampler, NormalizedBBox* sampled_bbox, float orl_
   float w_off, h_off;
   CHECK_LE(0.f, 1 - bbox_width) << ", bbox_width: "<<bbox_width <<", bbox_height: "<<bbox_height<< ", orl_ratio: "<<orl_ratio;
   caffe_rng_uniform(1, 0.f, 1 - bbox_width, &w_off);
-  CHECK_LE(0.f, 1 - bbox_height) << ", bbox_width: "<<bbox_width<<", bbox_height: "<<bbox_height;
+  CHECK_LE(0.f, orl_ratio - bbox_height) << ", bbox_width: "<<bbox_width<<", bbox_height: "<<bbox_height;
   caffe_rng_uniform(1, 0.f, orl_ratio - bbox_height, &h_off);
 
   sampled_bbox->set_xmin(w_off);
