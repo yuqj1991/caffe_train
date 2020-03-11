@@ -252,6 +252,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         sampled_datum = expand_datum;
       }
     }
+    LOG(INFO)<<"anchor_prob: "<<anchor_prob;
     CHECK(sampled_datum != NULL);
     timer.Start();
     vector<int> shape =
