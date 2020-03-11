@@ -481,10 +481,10 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
     float height_offset_ = resized_ymin + (resized_ymin + resized_ymax) / 2 + offset_y - resized_height / 2;
     float width_end = resized_xmin + (resized_xmin + resized_xmax) / 2 + offset_x + resized_width / 2;
     float height_end = resized_ymin + (resized_ymin + resized_ymax) / 2 + offset_y + resized_height / 2;
-    float w_off = (float) width_offset_ / Resized_ori_Height;
-    float h_off = (float) height_offset_ / Resized_ori_Width;
-    float w_end = (float) width_end / Resized_ori_Height;
-    float h_end = (float) height_end / Resized_ori_Width;
+    float w_off = (float) width_offset_ / Resized_ori_Width;
+    float h_off = (float) height_offset_ / Resized_ori_Height;
+    float w_end = (float) width_end / Resized_ori_Width;
+    float h_end = (float) height_end / Resized_ori_Height;
     samplerbox->set_xmin(w_off);
     samplerbox->set_ymin(h_off);
     samplerbox->set_xmax(w_end);
