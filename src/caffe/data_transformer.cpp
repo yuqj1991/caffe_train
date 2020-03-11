@@ -1768,7 +1768,7 @@ void DataTransformer<Dtype>::TransformAnnotation_yolo(
     RepeatedPtrField<AnnotationGroup>* transformed_anno_group_all, int policy_num) {
   const int img_height = anno_datum.datum().height();
   const int img_width = anno_datum.datum().width();
-  const int num_resize_policies = param_.resize_param_yolo_size();
+  //const int num_resize_policies = param_.resize_param_yolo_size();
   //LOG(INFO) << policy_num;
   //LOG(INFO) << img_width << "," << img_height;
   if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
@@ -1812,7 +1812,6 @@ void DataTransformer<Dtype>::TransformAnnotation_yolo(
                 crop_bbox, transformed_bbox);
           }
         }
-		//LOG(INFO) << num_resize_policies;
       }
       // Save for output.
       if (has_valid_annotation) {
@@ -1850,7 +1849,7 @@ void DataTransformer<Dtype>::Transform_yolo(const cv::Mat& cv_img,
   const bool has_mean_file = param_.has_mean_file();
   const bool has_mean_values = mean_values_.size() > 0;
 
-    const int num_resize_policies = param_.resize_param_yolo_size();
+    //const int num_resize_policies = param_.resize_param_yolo_size();
   Dtype* mean = NULL;
   if (has_mean_file) {
     CHECK_EQ(img_channels, data_mean_.channels());
