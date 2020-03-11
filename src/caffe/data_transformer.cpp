@@ -1103,7 +1103,6 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 									const NormalizedBBox& bbox, cv::Mat* crop_img) {
 	int img_height = img.rows;
 	int img_width = img.cols;
-	LOG(INFO)<<img_height<<", "<<img_width;
 	#if 1
 	float xmin = bbox.xmin() * img_width;
 	float ymin = bbox.ymin() * img_height;
@@ -1111,6 +1110,7 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	float ymax = bbox.ymax() * img_height;
 
 	float w_off = xmin, h_off = ymin, width = xmax - xmin, height = ymax - ymin;
+
 	float cross_xmin = std::max(0.f, w_off);
 	float cross_ymin = std::max(0.f, h_off); 
 	float cross_xmax = std::min(w_off + width - 1, float(img_width));
@@ -1125,9 +1125,11 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 
 	int roi_x1 = static_cast<int>(roi_xmin);
 	int roi_y1 = static_cast<int>(roi_ymin);
-
+	LOG(INFO)<<img_height<<", "<<img_width<<", "<<width<<", "<<height;
 	int cross_x1 = static_cast<int>(cross_xmin);
 	int cross_y1 = static_cast<int>(cross_ymin);
+	LOG(INFO)<<cross_x1<<", "<<cross_y1<<", "<<cross_width<<", "<<cross_height;
+	LOG(INFO)<<roi_x1<<", "<<roi_y1<<", "<<roi_width<<", "<<roi_height;
 	crop_img->create(int(height), int(width), CV_8UC3);
 	crop_img->setTo(cv::Scalar(0));
 
@@ -1179,13 +1181,7 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	CHECK_LE(roi_h_off + height, crop_height);
 	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, width, height);
 	img(bbox_roi_cross).copyTo((*crop_img)(bbox_roi_crop));
-	#if 0
-	LOG(INFO)<<"img_width: "<<img_width<<", img_height: "<<img_height<<", w_off: "<<w_off
-				<<", h_off: "<<h_off<<", width: "<<width<<", height: "<<height;
-
-	LOG(INFO)<<"crop_width: "<<crop_width<<", crop_height: "<<crop_height
-				<<", roi_w_off: "<<roi_w_off<<", roi_h_off: "<<roi_h_off;
-	#endif
+	
 	#endif
 }
 
