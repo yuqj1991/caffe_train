@@ -403,16 +403,22 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
           break;
         }
         AnnotatedDatum temp_anno_datum;
+        NormalizedBBox temp_sampled_bbox;
         GenerateDataAnchorSample(anno_datum, data_anchor_samplers[i], object_bboxes, resized_height, 
-                                resized_width, sampled_bbox, &temp_anno_datum, trans_param, do_resize);
-        if (SatisfySampleConstraint(*sampled_bbox, object_bboxes,
+                                resized_width, &temp_sampled_bbox, &temp_anno_datum, trans_param, do_resize);
+        if (SatisfySampleConstraint(temp_sampled_bbox, object_bboxes,
                                       data_anchor_samplers[i].sample_constraint())){
           found++;
           resized_anno_datum->CopyFrom(temp_anno_datum);
+          sampled_bbox->CopyFrom(temp_sampled_bbox);
         }
       }
       if(found == 0){
         resized_anno_datum->CopyFrom(anno_datum);
+        sampled_bbox->set_xmin(0.f);
+        sampled_bbox->set_ymin(0.f);
+        sampled_bbox->set_xmax(1.f);
+        sampled_bbox->set_ymax(1.f);
       }
     }else{
       LOG(FATAL)<<"must use original_image";
