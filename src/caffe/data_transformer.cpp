@@ -1111,9 +1111,6 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	
 	float w_off = xmin, h_off = ymin, width = xmax - xmin, height = ymax - ymin;
 
-	LOG(INFO)<<"img_height: "<<img_height<<", img_width: "<<img_width<<", width: "<<width<<", height: "<<height;
-	LOG(INFO)<<"xmin: "<<xmin<<", ymin: "<<ymin<<", xmax: "<<xmax<<", ymax: "<<ymax;
-
 	float cross_xmin = std::min(std::max(0.f, w_off), float(img_width));
 	float cross_ymin = std::min(std::max(0.f, h_off), float(img_height)); 
 	float cross_xmax = std::min(std::max(0.f, w_off + width - 1), float(img_width));
