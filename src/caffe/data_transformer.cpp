@@ -1111,8 +1111,8 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	
 	float w_off = xmin, h_off = ymin, width = xmax - xmin, height = ymax - ymin;
 
-	LOG(INFO)<<"img: "<<img_height<<", "<<img_width<<", "<<width<<", "<<height;
-	LOG(INFO)<<"cooradinates: "<<xmin<<", "<<ymin<<", "<<xmax<<", "<<ymax;
+	LOG(INFO)<<"img_height: "<<img_height<<", img_width: "<<img_width<<", width: "<<width<<", height: "<<height;
+	LOG(INFO)<<"xmin: "<<xmin<<", ymin: "<<ymin<<", xmax: "<<xmax<<", ymax: "<<ymax;
 
 	float cross_xmin = std::min(std::max(0.f, w_off), float(img_width));
 	float cross_ymin = std::min(std::max(0.f, h_off), float(img_height)); 
@@ -1132,8 +1132,8 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	int roi_y1 = static_cast<int>(roi_ymin);
 	int cross_x1 = static_cast<int>(cross_xmin);
 	int cross_y1 = static_cast<int>(cross_ymin);
-	LOG(INFO)<<"cross: "<<cross_x1<<", "<<cross_y1<<", "<<cross_width<<", "<<cross_height;
-	LOG(INFO)<<"roi: "<<roi_x1<<", "<<roi_y1<<", "<<roi_width<<", "<<roi_height;
+	LOG(INFO)<<"cross_x1: "<<cross_x1<<", cross_y1: "<<cross_y1<<", cross_width: "<<cross_width<<", cross_height: "<<cross_height;
+	LOG(INFO)<<"roi_x1: "<<roi_x1<<", roi_y1: "<<roi_y1<<", roi_width: "<<roi_width<<", roi_height: "<<roi_height;
 	crop_img->create(int(height), int(width), CV_8UC3);
 	crop_img->setTo(cv::Scalar(0));
 
