@@ -494,6 +494,11 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
     float h_off = (float) height_offset_ / Resized_ori_Height;
     float w_end = (float) width_end_ / Resized_ori_Width;
     float h_end = (float) height_end_ / Resized_ori_Height;
+    sampled_bbox->set_xmin(w_off);
+    sampled_bbox->set_ymin(h_off);
+    sampled_bbox->set_xmax(w_end);
+    sampled_bbox->set_ymax(h_end);
+    #if 0
     LOG(INFO)<<"scale: "<<scale << ", Resized_ori_Height: "<<Resized_ori_Height
               <<", Resized_ori_Width: "<<Resized_ori_Width<<", resized_xmin: "
               <<resized_xmin<<", resized_xmax: "<<resized_xmax<<", resized_ymin: "
@@ -501,10 +506,7 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
               <<", h_off: "<<height_offset_<<", w_end: "<<width_end_<<", h_end: "<<height_end_
               <<", vibration_length: "<<vibration_length<<", offset_x: "<<offset_x<<", offset_y: "
               <<offset_y;
-    sampled_bbox->set_xmin(w_off);
-    sampled_bbox->set_ymin(h_off);
-    sampled_bbox->set_xmax(w_end);
-    sampled_bbox->set_ymax(h_end);
+    #endif
   }
 }
 
