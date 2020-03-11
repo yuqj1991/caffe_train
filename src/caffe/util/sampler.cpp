@@ -524,6 +524,7 @@ void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized
 			LOG(ERROR) << "force_color and force_gray only for encoded datum";
 		}
 	}
+  resized_anno_datum->set_type(anno_datum.type());
   // labels trans
   if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
 		// Go through each AnnotationGroup.
