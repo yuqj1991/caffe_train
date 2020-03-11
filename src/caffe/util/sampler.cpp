@@ -409,14 +409,13 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                       data_anchor_samplers[i].sample_constraint())){
           found++;
           resized_anno_datum->CopyFrom(temp_anno_datum);
-          CHECK_GT(resized_anno_datum->datum().channels(), 0);
-          LOG(INFO)<<"channels: "<<resized_anno_datum->datum().channels();
         }
       }
     }else{
       LOG(FATAL)<<"must use original_image";
     }
   }
+  CHECK_GT(resized_anno_datum->datum().channels(), 0)<<"channels: "<<resized_anno_datum->datum().channels();
 }
 
 void GenerateLffdSample(const AnnotatedDatum& anno_datum,
