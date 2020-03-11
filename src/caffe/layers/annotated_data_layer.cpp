@@ -172,6 +172,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     timer.Start();
     AnnotatedDatum distort_datum;
     AnnotatedDatum* expand_datum = NULL;
+    AnnotatedDatum* resized_anno_datum = NULL;
+    bool do_resize = false;
     if (transform_param.has_distort_param()) {
       distort_datum.CopyFrom(anno_datum);
       this->data_transformer_->DistortImage(anno_datum.datum(),
@@ -195,21 +197,19 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     if (anchor_prob > upProb_){
       int resized_height = transform_param.resize_param().height();
       int resized_width = transform_param.resize_param().width();
-      vector<NormalizedBBox> sampled_bboxes;
+      NormalizedBBox sampled_bbox;
       if(data_anchor_samplers_.size() > 0){
+        resized_anno_datum = new AnnotatedDatum();
+        do_resize = true;
         GenerateBatchDataAnchorSamples(*expand_datum, data_anchor_samplers_,
                                 resized_height, resized_width,
-                                &sampled_bboxes);
-        if(sampled_bboxes.size() > 0){
-          int sample_rnd_index = caffe_rng_rand() % sampled_bboxes.size();
-          sampled_datum = new AnnotatedDatum();
-          this->data_transformer_->CropImage_anchor_Sampling(*expand_datum,
-																			 sampled_bboxes[sample_rnd_index],
-																			 sampled_datum);
-          has_sampled = true;
-        }else{
-          sampled_datum = expand_datum;
-        }
+                                &sampled_bbox, resized_anno_datum, transform_param, do_resize);
+        
+        sampled_datum = new AnnotatedDatum();
+        this->data_transformer_->CropImage_anchor_Sampling(*resized_anno_datum,
+                                      sampled_bbox,
+                                      sampled_datum);
+        has_sampled = true;
       }else{
         sampled_datum = expand_datum;
       }
@@ -239,8 +239,11 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         float target_scale;
         int resized_height_ = transform_param.resize_param().height();
         int resized_width_ = transform_param.resize_param().width();
+        resized_anno_datum = new AnnotatedDatum();
+        do_resize = true;
         GenerateLffdSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
-                            bbox_small_scale_, bbox_large_scale_, anchor_stride_);
+                            bbox_small_scale_, bbox_large_scale_, anchor_stride_,
+                            resized_anno_datum, transform_param, do_resize);
         sampled_datum = new AnnotatedDatum();
         this->data_transformer_->CropImage_Lffd_Sampling(*expand_datum,
                                             sampled_bbox,
@@ -313,6 +316,9 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     if (transform_param.has_expand_param()) {
       delete expand_datum;
+    }
+    if(do_resize){
+      delete resized_anno_datum;
     }
     trans_time += timer.MicroSeconds();
     reader_.free().push(const_cast<AnnotatedDatum*>(&anno_datum));
