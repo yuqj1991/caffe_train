@@ -1127,7 +1127,7 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 
 	int roi_x1 = static_cast<int>(roi_xmin);
 	int roi_y1 = static_cast<int>(roi_ymin);
-	LOG(INFO)<<img_height<<", "<<img_width<<", "<<width<<", "<<height;
+	LOG(INFO)<<"img: "<<img_height<<", "<<img_width<<", "<<width<<", "<<height;
 	int cross_x1 = static_cast<int>(cross_xmin);
 	int cross_y1 = static_cast<int>(cross_ymin);
 	LOG(INFO)<<"cross: "<<cross_x1<<", "<<cross_y1<<", "<<cross_width<<", "<<cross_height;
