@@ -482,10 +482,6 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
     float resized_xmax = target_bbox.xmax() * Resized_ori_Width;
     float resized_ymin = target_bbox.ymin() * Resized_ori_Height;
     float resized_ymax = target_bbox.ymax() * Resized_ori_Height;
-    LOG(INFO)<<"scale: "<<scale << ", Resized_ori_Height: "<<Resized_ori_Height
-              <<", Resized_ori_Width: "<<Resized_ori_Width<<", resized_xmin: "
-              <<resized_xmin<<", resized_xmax: "<<resized_xmax<<", resized_ymin: "
-              <<resized_ymin<<", resized_ymax: "<<resized_ymax;
     float vibration_length = float(anchorStride[scaled_idx]);
     float offset_x = 0.f, offset_y = 0.f;
     caffe_rng_uniform(1, -vibration_length, vibration_length, &offset_x);
@@ -498,8 +494,12 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
     float h_off = (float) height_offset_ / Resized_ori_Height;
     float w_end = (float) width_end_ / Resized_ori_Width;
     float h_end = (float) height_end_ / Resized_ori_Height;
-    LOG(INFO)<<"w_off: "<<w_off<<", h_off: "<<h_off
-              <<", w_end: "<<w_end<<", h_end: "<<h_end<< "Resized_ori_Height: "<<Resized_ori_Height
+    LOG(INFO)<<"scale: "<<scale << ", Resized_ori_Height: "<<Resized_ori_Height
+              <<", Resized_ori_Width: "<<Resized_ori_Width<<", resized_xmin: "
+              <<resized_xmin<<", resized_xmax: "<<resized_xmax<<", resized_ymin: "
+              <<resized_ymin<<", resized_ymax: "<<resized_ymax;
+    LOG(INFO)<<"w_off: "<<width_offset_<<", h_off: "<<height_offset_
+              <<", w_end: "<<width_end_<<", h_end: "<<height_end_<< ", Resized_ori_Height: "<<Resized_ori_Height
               <<", Resized_ori_Width: "<<Resized_ori_Width;
     sampled_bbox->set_xmin(w_off);
     sampled_bbox->set_ymin(h_off);
