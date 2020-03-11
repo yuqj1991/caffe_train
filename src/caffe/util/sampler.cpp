@@ -282,7 +282,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
                                 const vector<NormalizedBBox>& object_bboxes,
                                 int resized_height, int resized_width,
                                 NormalizedBBox* samplerbox, AnnotatedDatum* resized_anno_datum,
-                                TransformationParameter& trans_param, bool do_resize){
+                                const TransformationParameter& trans_param, bool do_resize){
   vector<int>anchorScale;
   int img_height = anno_datum.datum().height();
   int img_width = anno_datum.datum().width();
@@ -390,7 +390,7 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                 const vector<DataAnchorSampler>& data_anchor_samplers,
                                 int resized_height, int resized_width, 
                                 NormalizedBBox* sampled_bbox, AnnotatedDatum* resized_anno_datum, 
-                                TransformationParameter& trans_param, bool do_resize) {
+                                const TransformationParameter& trans_param, bool do_resize) {
   CHECK_EQ(data_anchor_samplers.size(), 1);
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
@@ -425,7 +425,7 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
                         std::vector<int> bbox_large_size_list,
                         std::vector<int> anchorStride, 
                         AnnotatedDatum* resized_anno_datum, 
-                        TransformationParameter& trans_param,
+                        const TransformationParameter& trans_param,
                         bool do_resize){
   CHECK_EQ(bbox_large_size_list.size(), bbox_small_size_list.size());
   vector<NormalizedBBox> object_bboxes;
@@ -493,7 +493,7 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
 }
 
 void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized_anno_datum, 
-                      float scale, TransformationParameter& trans_param){
+                      float scale, const TransformationParameter& trans_param){
   const Datum datum = anno_datum.datum();
   const int img_width = datum.width();
   const int img_height = datum.height();
