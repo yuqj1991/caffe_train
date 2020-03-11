@@ -497,10 +497,11 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
     LOG(INFO)<<"scale: "<<scale << ", Resized_ori_Height: "<<Resized_ori_Height
               <<", Resized_ori_Width: "<<Resized_ori_Width<<", resized_xmin: "
               <<resized_xmin<<", resized_xmax: "<<resized_xmax<<", resized_ymin: "
-              <<resized_ymin<<", resized_ymax: "<<resized_ymax;
-    LOG(INFO)<<"w_off: "<<width_offset_<<", h_off: "<<height_offset_
-              <<", w_end: "<<width_end_<<", h_end: "<<height_end_<< ", Resized_ori_Height: "<<Resized_ori_Height
-              <<", Resized_ori_Width: "<<Resized_ori_Width;
+              <<resized_ymin<<", resized_ymax: "<<resized_ymax<<", w_off: "<<width_offset_
+              <<", h_off: "<<height_offset_<<", w_end: "<<width_end_<<", h_end: "<<height_end_
+              << ", Resized_ori_Height: "<<Resized_ori_Height<<", Resized_ori_Width: "<<Resized_ori_Width
+              <<", vibration_length: "<<vibration_length<<", offset_x: "<<offset_x<<", offset_y: "
+              <<offset_y;
     sampled_bbox->set_xmin(w_off);
     sampled_bbox->set_ymin(h_off);
     sampled_bbox->set_xmax(w_end);
