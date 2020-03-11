@@ -411,6 +411,9 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
           resized_anno_datum->CopyFrom(temp_anno_datum);
         }
       }
+      if(found == 0){
+        resized_anno_datum->CopyFrom(anno_datum);
+      }
     }else{
       LOG(FATAL)<<"must use original_image";
     }
