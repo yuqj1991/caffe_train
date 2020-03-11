@@ -1108,15 +1108,15 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	float ymin = bbox.ymin() * img_height;
 	float xmax = bbox.xmax() * img_width;
 	float ymax = bbox.ymax() * img_height;
-
+	LOG(INFO)<<"img: "<<img_height<<", "<<img_width<<", "<<width<<", "<<height;
 	LOG(INFO)<<"cooradinates: "<<xmin<<", "<<ymin<<", "<<xmax<<", "<<ymax;
 
 	float w_off = xmin, h_off = ymin, width = xmax - xmin, height = ymax - ymin;
 
-	float cross_xmin = std::max(0.f, w_off);
-	float cross_ymin = std::max(0.f, h_off); 
-	float cross_xmax = std::min(w_off + width - 1, float(img_width));
-	float cross_ymax = std::min(h_off + height - 1, float(img_height));
+	float cross_xmin = std::min(std::max(0.f, w_off), float(img_width));
+	float cross_ymin = std::min(std::max(0.f, h_off), float(img_height)); 
+	float cross_xmax = std::min(std::max(0.f, w_off + width - 1), float(img_width));
+	float cross_ymax = std::min(std::max(0.f, h_off + height - 1), float(img_height));
 	LOG(INFO)<<"cross_xmin: "<<cross_xmin<<", cross_xmax: "<<cross_xmax
 			<<", cross_ymin: "<<cross_ymin<<", cross_ymax: "<<cross_ymax;
 	int cross_width = static_cast<int>(cross_xmax - cross_xmin);
@@ -1129,7 +1129,6 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 
 	int roi_x1 = static_cast<int>(roi_xmin);
 	int roi_y1 = static_cast<int>(roi_ymin);
-	LOG(INFO)<<"img: "<<img_height<<", "<<img_width<<", "<<width<<", "<<height;
 	int cross_x1 = static_cast<int>(cross_xmin);
 	int cross_y1 = static_cast<int>(cross_ymin);
 	LOG(INFO)<<"cross: "<<cross_x1<<", "<<cross_y1<<", "<<cross_width<<", "<<cross_height;
