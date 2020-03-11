@@ -495,6 +495,8 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
     samplerbox->set_ymin(h_off);
     samplerbox->set_xmax(w_end);
     samplerbox->set_ymax(h_end);
+    LOG(INFO)<< "Resized_ori_Height: "<<Resized_ori_Height
+              <<", Resized_ori_Width: "<<Resized_ori_Width;
   }
 }
 

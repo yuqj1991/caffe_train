@@ -1103,6 +1103,7 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 									const NormalizedBBox& bbox, cv::Mat* crop_img) {
 	int img_height = img.rows;
 	int img_width = img.cols;
+	LOG(INFO)<<img_height<<", "<<img_width;
 	#if 1
 	float xmin = bbox.xmin() * img_width;
 	float ymin = bbox.ymin() * img_height;
