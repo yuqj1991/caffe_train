@@ -520,7 +520,9 @@ void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized
 		}
 		// Expand the image.
 		cv::Mat resized_img;
-    cv::resize(cv_img, resized_img, cv::Size(int(img_width * scale), int(img_height * scale)), 0, 0,
+    int Resized_img_Height = int(img_height * scale);
+    int Resized_img_Width = int(img_width * scale);
+    cv::resize(cv_img, resized_img, cv::Size(Resized_img_Width, Resized_img_Height), 0, 0,
                  cv::INTER_CUBIC);
 		EncodeCVMatToDatum(resized_img, "jpg", resized_anno_datum->mutable_datum());
 		resized_anno_datum->mutable_datum()->set_label(datum.label());
@@ -540,6 +542,7 @@ void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized
 	} else {
 		LOG(FATAL) << "Unknown annotation type.";
 	}
+  CHECK_GT(resized_anno_datum->datum().channels(), 0);
 }
 
 }  // namespace caffe
