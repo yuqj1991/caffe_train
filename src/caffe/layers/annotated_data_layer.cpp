@@ -236,7 +236,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       if (anno_data_param.has_bbox_sampler()) {
         // Generate sampled bboxes from expand_datum.
         NormalizedBBox sampled_bbox;
-        float target_scale;
         int resized_height_ = transform_param.resize_param().height();
         int resized_width_ = transform_param.resize_param().width();
         resized_anno_datum = new AnnotatedDatum();
