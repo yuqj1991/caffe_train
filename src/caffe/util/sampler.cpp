@@ -410,6 +410,7 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
           found++;
           resized_anno_datum->CopyFrom(temp_anno_datum);
           CHECK_GT(resized_anno_datum->datum().channels(), 0);
+          LOG(INFO)<<"channels: "<<resized_anno_datum->datum().channels();
         }
       }
     }else{
