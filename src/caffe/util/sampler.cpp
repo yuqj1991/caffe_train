@@ -281,7 +281,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
                                 const DataAnchorSampler& data_anchor_sampler,
                                 const vector<NormalizedBBox>& object_bboxes,
                                 int resized_height, int resized_width,
-                                NormalizedBBox* samplerbox, AnnotatedDatum* resized_anno_datum,
+                                NormalizedBBox* sampled_bbox, AnnotatedDatum* resized_anno_datum,
                                 const TransformationParameter& trans_param, bool do_resize){
   vector<int>anchorScale;
   int img_height = anno_datum.datum().height();
@@ -380,10 +380,10 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     w_end = w_off + float(sample_box_size / img_width);
     h_end = h_off + float(sample_box_size / img_height);
   }
-  samplerbox->set_xmin(w_off);
-  samplerbox->set_ymin(h_off);
-  samplerbox->set_xmax(w_end);
-  samplerbox->set_ymax(h_end);
+  sampled_bbox->set_xmin(w_off);
+  sampled_bbox->set_ymin(h_off);
+  sampled_bbox->set_xmax(w_end);
+  sampled_bbox->set_ymax(h_end);
 }// func GenerateDataAnchorSamples
 
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
@@ -429,7 +429,7 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
 
 void GenerateLffdSample(const AnnotatedDatum& anno_datum,
                         int resized_height, int resized_width,
-                        NormalizedBBox* samplerbox, 
+                        NormalizedBBox* sampled_bbox, 
                         std::vector<int> bbox_small_size_list,
                         std::vector<int> bbox_large_size_list,
                         std::vector<int> anchorStride, 
@@ -487,25 +487,24 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
               <<resized_xmin<<", resized_xmax: "<<resized_xmax<<", resized_ymin: "
               <<resized_ymin<<", resized_ymax: "<<resized_ymax;
     float vibration_length = float(anchorStride[scaled_idx]);
-    float offset_x = 0, offset_y = 0;
+    float offset_x = 0.f, offset_y = 0.f;
     caffe_rng_uniform(1, -vibration_length, vibration_length, &offset_x);
     caffe_rng_uniform(1, -vibration_length, vibration_length, &offset_y);
     float width_offset_ = resized_xmin + (resized_xmin + resized_xmax) / 2 + offset_x - resized_width / 2;
     float height_offset_ = resized_ymin + (resized_ymin + resized_ymax) / 2 + offset_y - resized_height / 2;
-    float width_end = resized_xmin + (resized_xmin + resized_xmax) / 2 + offset_x + resized_width / 2;
-    float height_end = resized_ymin + (resized_ymin + resized_ymax) / 2 + offset_y + resized_height / 2;
+    float width_end_ = resized_xmin + (resized_xmin + resized_xmax) / 2 + offset_x + resized_width / 2;
+    float height_end_ = resized_ymin + (resized_ymin + resized_ymax) / 2 + offset_y + resized_height / 2;
     float w_off = (float) width_offset_ / Resized_ori_Width;
     float h_off = (float) height_offset_ / Resized_ori_Height;
-    float w_end = (float) width_end / Resized_ori_Width;
-    float h_end = (float) height_end / Resized_ori_Height;
+    float w_end = (float) width_end_ / Resized_ori_Width;
+    float h_end = (float) height_end_ / Resized_ori_Height;
     LOG(INFO)<<"w_off: "<<w_off<<", h_off: "<<h_off
-              <<", w_end: "<<w_end<<", h_end: "<<h_end;
-    samplerbox->set_xmin(w_off);
-    samplerbox->set_ymin(h_off);
-    samplerbox->set_xmax(w_end);
-    samplerbox->set_ymax(h_end);
-    LOG(INFO)<< "Resized_ori_Height: "<<Resized_ori_Height
+              <<", w_end: "<<w_end<<", h_end: "<<h_end<< "Resized_ori_Height: "<<Resized_ori_Height
               <<", Resized_ori_Width: "<<Resized_ori_Width;
+    sampled_bbox->set_xmin(w_off);
+    sampled_bbox->set_ymin(h_off);
+    sampled_bbox->set_xmax(w_end);
+    sampled_bbox->set_ymax(h_end);
   }
 }
 
