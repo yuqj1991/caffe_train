@@ -402,14 +402,13 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
             found >= data_anchor_samplers[i].max_sample()) {
           break;
         }
+        AnnotatedDatum temp_anno_datum;
         GenerateDataAnchorSample(anno_datum, data_anchor_samplers[i], object_bboxes, resized_height, 
-                                resized_width, sampled_bbox, resized_anno_datum, trans_param, do_resize);
+                                resized_width, sampled_bbox, &temp_anno_datum, trans_param, do_resize);
         if (SatisfySampleConstraint(*sampled_bbox, object_bboxes,
                                       data_anchor_samplers[i].sample_constraint())){
           found++;
-        }else{
-          sampled_bbox->Clear();
-          resized_anno_datum->Clear();
+          resized_anno_datum->CopyFrom(temp_anno_datum);
         }
       }
     }else{
