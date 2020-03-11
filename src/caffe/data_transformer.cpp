@@ -1117,6 +1117,8 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	float cross_ymin = std::max(0.f, h_off); 
 	float cross_xmax = std::min(w_off + width - 1, float(img_width));
 	float cross_ymax = std::min(h_off + height - 1, float(img_height));
+	LOG(INFO)<<"cross_xmin: "<<cross_xmin<<", cross_xmax: "<<cross_xmax
+			<<", cross_ymin: "<<cross_ymin<<", cross_ymax: "<<cross_ymax;
 	int cross_width = static_cast<int>(cross_xmax - cross_xmin);
 	int	cross_height = static_cast<int>(cross_ymax - cross_ymin);
 
