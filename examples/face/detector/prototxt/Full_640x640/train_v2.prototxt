@@ -4085,17 +4085,17 @@ layer {
 		num_classes: 2
 		share_location: true
 		match_type: PER_PREDICTION
-		overlap_threshold: 0.65
+		overlap_threshold: 0.55
 		use_prior_for_matching: true
 		use_center_locate_match: true
 		use_tiny_box_match: false
 		background_label_id: 0
 		use_difficult_gt: true
 		neg_pos_ratio: 4.0
-		neg_overlap: 0.35
+		neg_overlap: 0.55
 		code_type: RECEPTIVE_CENTER
 		ignore_cross_boundary_bbox: false
-		mining_type: HARD_EXAMPLE
+		mining_type: MAX_NEGATIVE
 		
 		bbox_small_list: 10
 		bbox_small_list: 15
