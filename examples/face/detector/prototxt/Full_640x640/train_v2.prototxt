@@ -4080,7 +4080,7 @@ layer {
 	loss_weight: 1.0
 	multibox_loss_param {
 		loc_loss_type: SMOOTH_L1
-		conf_loss_type: SOFTMAX
+		conf_loss_type: FOCALSOFTMAX
 		loc_weight: 1.0
 		num_classes: 2
 		share_location: true
@@ -4095,7 +4095,7 @@ layer {
 		neg_overlap: 0.55
 		code_type: RECEPTIVE_CENTER
 		ignore_cross_boundary_bbox: false
-		mining_type: MAX_NEGATIVE
+		mining_type: NONE
 		
 		bbox_small_list: 10
 		bbox_small_list: 15
