@@ -57,7 +57,7 @@ class FeaturemapObjectLossLayer : public LossLayer<Dtype> {
   int bias_num_;
   int net_width_;
   int net_height_;
-  float ignore_thresh_;
+  Dtype ignore_thresh_;
 };
 
 }  // namespace caffe
