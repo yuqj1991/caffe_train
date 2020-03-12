@@ -65,8 +65,10 @@ void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_da
       int inter_center_y = static_cast<int> (center_y);
       Dtype diff_x = center_x - inter_center_x;
       Dtype diff_y = center_y - inter_center_y;
-      Dtype width = gt_bboxes[ii].xmax() - gt_bboxes[ii].xmin();
-      Dtype height = gt_bboxes[ii].ymax() - gt_bboxes[ii].ymin();
+      //Dtype width = gt_bboxes[ii].xmax() - gt_bboxes[ii].xmin();
+      //Dtype height = gt_bboxes[ii].ymax() - gt_bboxes[ii].ymin();
+      Dtype width = xmax - xmin;
+      Dtype height = ymax - ymin;
       
       int dimScale = output_height * output_width;
       int x_loc_index = batch_id * num_channels * dimScale
@@ -252,8 +254,8 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             int height_loc_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
             Dtype center_x = (w + loc_data[x_loc_index]) * 4;
             Dtype center_y = (h + loc_data[y_loc_index]) * 4;
-            Dtype width = std::exp(loc_data[width_loc_index]) * 4 * output_width;
-            Dtype height = std::exp(loc_data[height_loc_index]) * 4 * output_height;
+            Dtype width = std::exp(loc_data[width_loc_index]) * 4 ;
+            Dtype height = std::exp(loc_data[height_loc_index]) * 4 ;
             Dtype xmin = std::min(std::max(center_x - Dtype(width / 2), Dtype(0.f)), Dtype(4 * output_width));
             Dtype xmax = std::min(std::max(center_x + Dtype(width / 2), Dtype(0.f)), Dtype(4 * output_width));
             Dtype ymin = std::min(std::max(center_y - Dtype(height / 2), Dtype(0.f)), Dtype(4 * output_height));
