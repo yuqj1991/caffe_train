@@ -546,14 +546,14 @@ template void EncodeYoloObject(const int batch_size, const int num_channels, con
                               const float* channel_pred_data,
                               std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                               std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
-                              float* bottom_diff, float* ignore_thresh);
+                              float* bottom_diff, float ignore_thresh);
 template void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
                               const int output_width, const int output_height, 
                               const int net_width, const int net_height,
                               const double* channel_pred_data,
                               std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                               std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
-                              double* bottom_diff, double* ignore_thresh);
+                              double* bottom_diff, double ignore_thresh);
 
 
 

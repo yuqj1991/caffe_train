@@ -121,7 +121,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           const Dtype* channel_pred_data,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                           std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
-                          Dtype* bottom_diff, Dtype* ignore_thresh);
+                          Dtype* bottom_diff, Dtype ignore_thresh);
 
 
 }  // namespace caffe
