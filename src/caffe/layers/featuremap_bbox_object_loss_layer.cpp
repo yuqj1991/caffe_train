@@ -20,8 +20,9 @@ void FeaturemapObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bo
       this->layer_param_.center_object_loss_param();
   
   if(center_object_loss_param.has_bias_num()){
-    for(int i = 0; i < center_object_loss_param.bias_scale_size(); i++){
-      bias_scale.push_back(center_object_loss_param.bias_scale(i));
+    for(int i = 0; i < center_object_loss_param.bias_scale_size() / 2; i++){
+      bias_scale_.push_back(std::pair<int, int>(center_object_loss_param.bias_scale(i * 2), 
+                    center_object_loss_param.bias_scale(i * 2 + 1)));
     }
     for(int i = 0; i < center_object_loss_param.bias_mask_size(); i++){
       bias_mask_.push_back(center_object_loss_param.bias_mask(i));

@@ -2305,7 +2305,7 @@ message CenterObjectParameter {
   // region when encode_type is CORNER or CORNER_SIZE.
   optional bool bp_inside = 19 [default = false];
 
-  repeated float bias_scale = 20;
+  repeated int32 bias_scale = 20;
   optional int32 bias_num = 21[default = 9];
   repeated int32 bias_mask = 23;
   optional int32 net_width = 24;

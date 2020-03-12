@@ -52,7 +52,7 @@ class FeaturemapObjectLossLayer : public LossLayer<Dtype> {
   // How to normalize the loss.
   LossParameter_NormalizationMode normalization_;
 
-  std::vector<std::pair<Dtype, Dtype> > bias_scale_;
+  std::vector<std::pair<int, int> > bias_scale_;
   std::vector<int> bias_mask_;
   int bias_num_;
   int net_width_;

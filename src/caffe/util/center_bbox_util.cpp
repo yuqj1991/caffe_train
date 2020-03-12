@@ -424,7 +424,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           const int net_width, const int net_height,
                           const Dtype* channel_pred_data,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
-                          std::vector<int> mask_bias, std::vector<std::pair<Dtype, Dtype> >bias_scale, 
+                          std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
                           Dtype* bottom_diff, Dtype* ignore_thresh){
   CHECK_EQ(net_height, net_width);
   int stride_channel = 5 + num_classes;
@@ -545,14 +545,14 @@ template void EncodeYoloObject(const int batch_size, const int num_channels, con
                               const int net_width, const int net_height,
                               const float* channel_pred_data,
                               std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
-                              std::vector<int> mask_bias, std::vector<std::pair<float, float> >bias_scale, 
+                              std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
                               float* bottom_diff, float* ignore_thresh);
 template void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
                               const int output_width, const int output_height, 
                               const int net_width, const int net_height,
                               const double* channel_pred_data,
                               std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
-                              std::vector<int> mask_bias, std::vector<std::pair<double, double> >bias_scale, 
+                              std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
                               double* bottom_diff, double* ignore_thresh);
 
 
