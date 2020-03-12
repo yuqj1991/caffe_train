@@ -417,6 +417,58 @@ template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt
 
 
 
+float Yoloverlap(float x1, float w1, float x2, float w2)
+{
+    float l1 = x1 - w1/2;
+    float l2 = x2 - w2/2;
+    float left = l1 > l2 ? l1 : l2;
+    float r1 = x1 + w1/2;
+    float r2 = x2 + w2/2;
+    float right = r1 < r2 ? r1 : r2;
+    return right - left;
+}
+
+float boxIntersection(NormalizedBBox a, NormalizedBBox b)
+{
+    float a_center_x = (float)(a.xmin() + a.xmax()) / 2;
+    float a_center_y = (float)(a.ymin() + a.ymax()) / 2;
+    float a_w = (float)(a.xmax() - a.xmin());
+    float a_h = (float)(a.ymax() - a.ymin());
+    float b_center_x = (float)(b.xmin() + b.xmax()) / 2;
+    float b_center_y = (float)(b.ymin() + b.ymax()) / 2;
+    float b_w = (float)(b.xmax() - b.xmin());
+    float b_h = (float)(b.ymax() - b.ymin());
+    float w = Yoloverlap(a_center_x, a_w, b_center_x, b_w);
+    float h = Yoloverlap(a_center_y, a_h, b_center_y, b_h);
+    if(w < 0 || h < 0) return 0;
+    float area = w*h;
+    return area;
+}
+
+float boxUnion(NormalizedBBox a, NormalizedBBox b)
+{
+    float i = boxIntersection(a, b);
+    float a_w = (float)(a.xmax() - a.xmin());
+    float a_h = (float)(a.ymax() - a.ymin());
+    float b_w = (float)(b.xmax() - b.xmin());
+    float b_h = (float)(b.ymax() - b.ymin());
+    float u = a_h*a_w + b_w*b_h - i;
+    return u;
+}
+
+float YoloBBoxIou(NormalizedBBox a, NormalizedBBox b){
+    return (float)boxIntersection(a, b)/boxUnion(a, b);
+}
+
+int int_index(std::vector<int>a, int val, int n)
+{
+    int i;
+    for(i = 0; i < n; ++i){
+        if(a[i] == val) return i;
+    }
+    return -1;
+}
+
 // 置信度得分，用逻辑回归来做，loss_delta梯度值，既前向又后向
 template <typename Dtype>
 void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
