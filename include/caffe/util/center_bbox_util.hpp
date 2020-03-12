@@ -1,9 +1,3 @@
-#ifdef USE_OPENCV
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#endif  // USE_OPENCV
-
 #ifndef CAFFE_UTIL_BBOX_UTIL_H_CENTER_HEATMAP_
 #define CAFFE_UTIL_BBOX_UTIL_H_CENTER_HEATMAP_
 
@@ -61,6 +55,73 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
                               const int num_classes_, const int output_width, const int output_height);
 
 
+template <typename Dtype>
+void EncodeYoloGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
+                                const int output_width, const int output_height, 
+                                bool share_location, const Dtype* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+
+
+float Yoloverlap(float x1, float w1, float x2, float w2)
+{
+    float l1 = x1 - w1/2;
+    float l2 = x2 - w2/2;
+    float left = l1 > l2 ? l1 : l2;
+    float r1 = x1 + w1/2;
+    float r2 = x2 + w2/2;
+    float right = r1 < r2 ? r1 : r2;
+    return right - left;
+}
+
+float boxIntersection(NormalizedBBox a, NormalizedBBox b)
+{
+    float a_center_x = (float)(a.xmin() + a.xmax()) / 2;
+    float a_center_y = (float)(a.ymin() + a.ymax()) / 2;
+    float a_w = (float)(a.xmax() - a.xmin());
+    float a_h = (float)(a.ymax() - a.ymin());
+    float b_center_x = (float)(b.xmin() + b.xmax()) / 2;
+    float b_center_y = (float)(b.ymin() + b.ymax()) / 2;
+    float b_w = (float)(b.xmax() - b.xmin());
+    float b_h = (float)(b.ymax() - b.ymin());
+    float w = Yoloverlap(a_center_x, a_w, b_center_x, b_w);
+    float h = Yoloverlap(a_center_y, a_h, b_center_y, b_h);
+    if(w < 0 || h < 0) return 0;
+    float area = w*h;
+    return area;
+}
+
+float boxUnion(NormalizedBBox a, NormalizedBBox b)
+{
+    float i = boxIntersection(a, b);
+    float a_w = (float)(a.xmax() - a.xmin());
+    float a_h = (float)(a.ymax() - a.ymin());
+    float b_w = (float)(b.xmax() - b.xmin());
+    float b_h = (float)(b.ymax() - b.ymin());
+    float u = a_h*a_w + b_w*b_h - i;
+    return u;
+}
+
+float YoloBBoxIou(NormalizedBBox a, NormalizedBBox b){
+    return (float)boxIntersection(a, b)/boxUnion(a, b);
+}
+
+int int_index(std::vector<int>a, int val, int n)
+{
+    int i;
+    for(i = 0; i < n; ++i){
+        if(a[i] == val) return i;
+    }
+    return -1;
+}
+
+template <typename Dtype>
+void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int net_width, const int net_height,
+                          const Dtype* channel_pred_data,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::vector<int> mask_bias, std::vector<std::pair<Dtype, Dtype> >bias_scale, 
+                          Dtype* bottom_diff, Dtype* ignore_thresh);
 
 
 }  // namespace caffe

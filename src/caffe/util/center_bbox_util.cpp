@@ -417,6 +417,144 @@ template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt
 
 
 
+// 置信度得分，用逻辑回归来做，loss_delta梯度值，既前向又后向
+template <typename Dtype>
+void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int net_width, const int net_height,
+                          const Dtype* channel_pred_data,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::vector<int> mask_bias, std::vector<std::pair<Dtype, Dtype> >bias_scale, 
+                          Dtype* bottom_diff, Dtype* ignore_thresh){
+  CHECK_EQ(net_height, net_width);
+  int stride_channel = 5 + num_classes;
+  int stride_feature = net_height / output_height;
+  CHECK_EQ(num_channels, (5 + num_classes) * mask_bias.size()) << "num_channels shoule be set to \
+                              including bias_x, bias_y, width, height, object_confidence and classes";
+  for(int b = 0; b < batch_size; b++){
+    vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+    int dimScale = output_height * output_width;
+    for(int h = 0; h < output_height; h++){
+      for(int w = 0; w < output_width; w++){
+        int x_index = b * num_channels * dimScale
+                                  + m * stride_channel + 0 * dimScale + h * output_width + w;
+        int y_index = b * num_channels * dimScale 
+                                  + m * stride_channel + 1 * dimScale + h * output_width + w;
+        int width_index = b * num_channels * dimScale
+                                  + m * stride_channel + 2 * dimScale + h * output_width + w;
+        int height_index = b * num_channels * dimScale 
+                                  + m * stride_channel + 3 * dimScale + h * output_width + w;
+        int object_index = b * num_channels * dimScale 
+                                  + m * stride_channel + 4 * dimScale + h * output_width + w;
+        for(unsigned m = 0; m < mask_bias.size(); m++){
+          NormalizedBBox predBox;
+          float bb_xmin = (channel_pred_data[x_index] + w) / output_width;
+          float bb_ymin = (channel_pred_data[y_index] + h) / output_height;
+          float bb_width = (float)std::exp(channel_pred_data[width_index]) 
+                                                          * bias_scale[mask_bias[m]].first / net_width;
+          float bb_height = (float)std::exp(channel_pred_data[height_index]) 
+                                                          * bias_scale[mask_bias[m]].second / net_height;
+          predBox.set_xmin(bb_ymin);
+          predBox.set_xmax(bb_xmin + bb_width);
+          predBox.set_ymin(bb_ymin);
+          predBox.set_ymax(bb_ymin + bb_height);
+          float best_iou = 0;
+          int best_t = 0;
+          for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+            float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+            if (iou > best_iou) {
+              best_iou = iou;
+              best_t = ii;
+            }
+          }
+          bottom_diff[object_index] = 0 - channel_pred_data[object_index];
+          if(best_iou > ignore_thresh){
+            bottom_diff[object_index] = 0;
+          }
+        }
+      }
+    }
+    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+      const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+      const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+      const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+      const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+      float best_iou = 0.f;
+      int best_mask = 0;
+      for(unsigned m = 0; m < bias_scale.size(); m++){
+        NormalizedBBox anchor_bbox ; 
+        float bias_width = bias_scale[m].first;
+        float bias_height = bias_scale[m].second;
+        float bias_xmin = 0 - (float)bias_width / 2 / net_width;
+        float bias_ymin = 0 - (float)bias_height / 2 / net_height;
+        float bias_xmax = 0 + (float)bias_width / 2 / net_width;
+        float bias_ymax = 0 + (float)bias_height / 2 / net_height;
+        anchor_bbox.set_xmin(bias_xmin);
+        anchor_bbox.set_xmax(bias_xmax);
+        anchor_bbox.set_ymin(bias_ymin);
+        anchor_bbox.set_ymax(bias_ymax);
+        float iou = YoloBBoxIou(gt_bboxes[ii], anchor_bbox);
+        if (iou > best_iou){
+          best_iou = iou;
+          best_mask = m;
+        }
+      }
+      int mask_n = int_index(mask_bias, best_mask, mask_bias.size());
+      if(mask_n > 0){
+        Dtype center_x = Dtype((xmin + xmax) / 2);
+        Dtype center_y = Dtype((ymin + ymax) / 2);
+        int inter_center_x = static_cast<int> (center_x);
+        int inter_center_y = static_cast<int> (center_y);
+        Dtype diff_x = center_x - inter_center_x;
+        Dtype diff_y = center_y - inter_center_y;
+        Dtype width = std::log((xmax - xmin) * stride_feature / bias_scale[mask_n].first);
+        Dtype height = std::log((ymax - ymin) * stride_feature / bias_scale[mask_n].second);
+        int x_index = b * num_channels * dimScale + mask_n * stride_channel + 0 * dimScale
+                                + inter_center_y * output_width + inter_center_x;
+        int y_index = b * num_channels * dimScale + mask_n * stride_channel + 1 * dimScale
+                                  + inter_center_y * output_width + inter_center_x;
+        int width_index = b * num_channels * dimScale + mask_n * stride_channel + 2 * dimScale
+                                  + inter_center_y * output_width + inter_center_x;
+        int height_index = b * num_channels * dimScale + mask_n * stride_channel + 3 * dimScale
+                                  + inter_center_y * output_width + inter_center_x;
+        int object_index = b * num_channels * dimScale + mask_n * stride_channel + 4 * dimScale
+                                  + inter_center_y * output_width + inter_center_x;
+        float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
+        bottom_diff[x_index] = delta_scale * (diff_x - channel_pred_data[x_index]);
+        bottom_diff[y_index] = delta_scale * (diff_y - channel_pred_data[y_index]);
+        bottom_diff[width_index] = delta_scale * (width - channel_pred_data[width_index]);
+        bottom_diff[height_index] = delta_scale * (height - channel_pred_data[height_index]);
+        bottom_diff[object_index] = 1 - channel_pred_data[object_index];
+
+        // class score
+        // 特殊情况，face数据集，包含了背景目标，而实际上不需要背景目标，所以减一
+        int class_lable = gt_bboxes[ii].label() - 1; 
+        int class_index = b * num_channels * dimScale + mask_n * stride_channel + 5 * dimScale
+                                  + inter_center_y * output_width + inter_center_x;
+        
+        for(int c = 0; c < num_classes; c++){
+          bottom_diff[class_index + c * dimScale] = ((c == class)?1 : 0)
+                                                              - channel_pred_data[class_index + c * dimScale];
+        }
+      }
+    } 
+  }
+}
+template void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
+                              const int output_width, const int output_height, 
+                              const int net_width, const int net_height,
+                              const float* channel_pred_data,
+                              std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                              std::vector<int> mask_bias, std::vector<std::pair<float, float> >bias_scale, 
+                              float* bottom_diff, float* ignore_thresh);
+template void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
+                              const int output_width, const int output_height, 
+                              const int net_width, const int net_height,
+                              const double* channel_pred_data,
+                              std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                              std::vector<int> mask_bias, std::vector<std::pair<double, double> >bias_scale, 
+                              double* bottom_diff, double* ignore_thresh);
+
 
 
 }  // namespace caffe
