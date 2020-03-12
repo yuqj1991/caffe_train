@@ -415,4 +415,8 @@ template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt
 template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, double* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);
 
+
+
+
+
 }  // namespace caffe

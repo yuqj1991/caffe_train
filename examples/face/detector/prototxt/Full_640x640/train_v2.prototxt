@@ -4095,7 +4095,7 @@ layer {
 		neg_overlap: 0.35
 		code_type: RECEPTIVE_CENTER
 		ignore_cross_boundary_bbox: false
-		mining_type: MAX_NEGATIVE
+		mining_type: HARD_EXAMPLE
 		
 		bbox_small_list: 10
 		bbox_small_list: 15

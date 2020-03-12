@@ -1223,7 +1223,7 @@ void MineHardExamples(const Blob<Dtype>& conf_blob,
          it != match_indices.end(); ++it) {
       const int label = it->first;
       int num_sel = 0;
-      // Get potential indices and loss pairs.
+      // Get potential indices and loss pairs. ,loss_indices vector <loss<pred, gt pair>, gt_index>
       vector<pair<float, int> > loss_indices;
       for (int m = 0; m < match_indices[label].size(); ++m) {
         if (IsEligibleMining(mining_type, match_indices[label][m],
