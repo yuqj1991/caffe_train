@@ -436,17 +436,17 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
     int dimScale = output_height * output_width;
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
-        int x_index = b * num_channels * dimScale
-                                  + m * stride_channel + 0 * dimScale + h * output_width + w;
-        int y_index = b * num_channels * dimScale 
-                                  + m * stride_channel + 1 * dimScale + h * output_width + w;
-        int width_index = b * num_channels * dimScale
-                                  + m * stride_channel + 2 * dimScale + h * output_width + w;
-        int height_index = b * num_channels * dimScale 
-                                  + m * stride_channel + 3 * dimScale + h * output_width + w;
-        int object_index = b * num_channels * dimScale 
-                                  + m * stride_channel + 4 * dimScale + h * output_width + w;
         for(unsigned m = 0; m < mask_bias.size(); m++){
+          int x_index = b * num_channels * dimScale
+                                  + m * stride_channel + 0 * dimScale + h * output_width + w;
+          int y_index = b * num_channels * dimScale 
+                                    + m * stride_channel + 1 * dimScale + h * output_width + w;
+          int width_index = b * num_channels * dimScale
+                                    + m * stride_channel + 2 * dimScale + h * output_width + w;
+          int height_index = b * num_channels * dimScale 
+                                    + m * stride_channel + 3 * dimScale + h * output_width + w;
+          int object_index = b * num_channels * dimScale 
+                                    + m * stride_channel + 4 * dimScale + h * output_width + w;
           NormalizedBBox predBox;
           float bb_xmin = (channel_pred_data[x_index] + w) / output_width;
           float bb_ymin = (channel_pred_data[y_index] + h) / output_height;
@@ -533,7 +533,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                                   + inter_center_y * output_width + inter_center_x;
         
         for(int c = 0; c < num_classes; c++){
-          bottom_diff[class_index + c * dimScale] = ((c == class)?1 : 0)
+          bottom_diff[class_index + c * dimScale] = ((c == class_lable)?1 : 0) \
                                                               - channel_pred_data[class_index + c * dimScale];
         }
       }
