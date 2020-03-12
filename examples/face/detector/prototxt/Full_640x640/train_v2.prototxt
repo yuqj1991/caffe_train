@@ -4087,7 +4087,7 @@ layer {
 		match_type: PER_PREDICTION
 		overlap_threshold: 0.55
 		use_prior_for_matching: true
-		use_center_locate_match: true
+		use_center_locate_match: false
 		use_tiny_box_match: false
 		background_label_id: 0
 		use_difficult_gt: true
