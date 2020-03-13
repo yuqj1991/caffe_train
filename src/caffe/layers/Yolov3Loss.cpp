@@ -32,7 +32,7 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   net_width_ = center_object_loss_param.net_width();
   bias_num_ = center_object_loss_param.bias_num();
   ignore_thresh_ = center_object_loss_param.ignore_thresh();
-  CHECK_EQ(bias_num_, bias_scale_.size() / 2); // anchor size
+  CHECK_EQ(bias_num_, bias_scale_.size()); // anchor size
   
   num_classes_ = center_object_loss_param.num_class();
   CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
