@@ -592,7 +592,8 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         Dtype diff_y = center_y - inter_center_y;
         Dtype width = std::log((xmax - xmin) * stride_feature / bias_scale[mask_n].first);
         Dtype height = std::log((ymax - ymin) * stride_feature / bias_scale[mask_n].second);
-        LOG(INFO)<<"diff_x: "<<diff_x<<", diff_y: "<<diff_y<<", width: "<<width<<", height: "<<height;
+        LOG(INFO)<<"diff_x: "<<diff_x<<", diff_y: "<<diff_y<<", width: "<<width<<", height: "<<height
+                  <<", mask_n: "<<mask_n<<", bias_scale: "<<bias_scale[mask_n].first;
         int x_index = b * num_channels * dimScale + (mask_n * stride_channel + 0)* dimScale
                                 + inter_center_y * output_width + inter_center_x;
         int y_index = b * num_channels * dimScale + (mask_n * stride_channel + 1)* dimScale
