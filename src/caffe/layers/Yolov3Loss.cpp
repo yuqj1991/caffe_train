@@ -84,7 +84,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const int output_width = bottom[0]->width();
   const int num_channels = bottom[0]->channels();
   Dtype * bottom_diff = bottom[0]->mutable_cpu_diff();
-    
+
   YoloScoreShow trainScore;
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
   if (num_gt_ >= 1) {
@@ -112,7 +112,8 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                       <<num_classes_<<", num_groundtruth: "<<num_groundtruth_<<" Avg IOU: "
                       <<trainScore.avg_iou/trainScore.count<<", Class: "<<trainScore.avg_cat/trainScore.class_count
                       <<", Obj: "<<trainScore.avg_obj/trainScore.count<<", No obj: "<<trainScore.avg_anyobj/(dimScale*bias_mask_.size()*num_)
-                      <<", .5R: "<<trainScore.recall/trainScore.count<<", .75R: "<<trainScore.recall75/trainScore.count<<", count: "<<count;
+                      <<", .5R: "<<trainScore.recall/trainScore.count<<", .75R: "<<trainScore.recall75/trainScore.count
+                      <<", count: "<<trainScore.count;
   }
   iterations_++;
   #endif

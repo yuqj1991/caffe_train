@@ -54,7 +54,7 @@ class Yolov3LossLayer : public LossLayer<Dtype> {
   LossParameter_NormalizationMode normalization_;
 
   std::vector<std::pair<int, int> > bias_scale_;
-  std::pair<int, std::vector<int> > bias_mask_;
+  std::vector<int> bias_mask_;
   int bias_num_;
   int net_width_;
   int net_height_;
