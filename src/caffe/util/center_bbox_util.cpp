@@ -643,4 +643,43 @@ template void EncodeYoloObject(const int batch_size, const int num_channels, con
 
 
 
+template <typename Dtype>
+void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
+      const int background_label_id, const bool use_difficult_gt,
+      std::map<int, vector<NormalizedBBox> >* all_gt_bboxes, int batch_size){
+  all_gt_bboxes->clear();
+  for(int b = 0; b < batch_size; b++){
+    for (int i = 0; i < num_gt; ++i) {
+      int start_idx = b * num_gt * 8 +  i * 8;
+      int item_id = gt_data[start_idx];
+      if (item_id == -1) {
+        continue;
+      }
+      int label = gt_data[start_idx + 1];
+      CHECK_NE(background_label_id, label)
+          << "Found background label in the dataset.";
+      bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
+      if (!use_difficult_gt && difficult) {
+        continue;
+      }
+      NormalizedBBox bbox;
+      bbox.set_label(label);
+      bbox.set_xmin(gt_data[start_idx + 3]);
+      bbox.set_ymin(gt_data[start_idx + 4]);
+      bbox.set_xmax(gt_data[start_idx + 5]);
+      bbox.set_ymax(gt_data[start_idx + 6]);
+      bbox.set_difficult(difficult);
+      float bbox_size = BBoxSize(bbox);
+      bbox.set_size(bbox_size);
+      (*all_gt_bboxes)[item_id].push_back(bbox);
+    }
+  }
+}
+template void GetYoloGroundTruth(const float* gt_data, int num_gt,
+      const int background_label_id, const bool use_difficult_gt,
+      std::map<int, vector<NormalizedBBox> >* all_gt_bboxes, int batch_size);
+
+template void GetYoloGroundTruth(const double* gt_data, const int num_gt,
+      const int background_label_id, const bool use_difficult_gt,
+      std::map<int, vector<NormalizedBBox> >* all_gt_bboxes, int batch_size);
 }  // namespace caffe

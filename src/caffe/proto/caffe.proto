@@ -1192,6 +1192,7 @@ message AnnotatedDataParameter {
   optional int32 yolo_data_type = 4 [default = 0];
   optional float yolo_data_jitter = 5 [default = 0.3];
   optional BboxSampler bbox_sampler = 8;
+  optional bool yoloformat = 10[default = false];
 }
 
 message ArgMaxParameter {

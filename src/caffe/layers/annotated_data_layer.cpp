@@ -63,6 +63,7 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
         << "Only support batch size of 1 for FIT_SMALL_SIZE.";
     }
   }
+  YoloFormat_ = anno_data_param.yoloformat();
 
   // Read a data point, and use it to initialize the top blob.
   AnnotatedDatum& anno_datum = *(reader_.full().peek());
@@ -328,6 +329,40 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   if (this->output_labels_ && has_anno_type_) {
     vector<int> label_shape(4);
     if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) {
+      if(YoloFormat_){ // Yolo 格式的label数据
+        label_shape[0] = batch_size;
+        label_shape[1] = 1;
+        label_shape[3] = 8;
+        if (num_bboxes == 0) {
+          // Store all -1 in the label.
+          label_shape[2] = 1;
+          batch->label_.Reshape(label_shape);
+          caffe_set<Dtype>(8, -1, batch->label_.mutable_cpu_data());
+        } else {
+          label_shape[2] = num_bboxes;
+          batch->label_.Reshape(label_shape);
+          top_label = batch->label_.mutable_cpu_data();
+          for (int item_id = 0; item_id < batch_size; ++item_id) {
+            const vector<AnnotationGroup>& anno_vec = all_anno[item_id];
+            for (int g = 0; g < anno_vec.size(); ++g) {
+              const AnnotationGroup& anno_group = anno_vec[g];
+              for (int a = 0; a < anno_group.annotation_size(); ++a) {
+                int idx = item_id * num_bboxes * 8 + g * anno_group.annotation_size() + a;
+                const Annotation& anno = anno_group.annotation(a);
+                const NormalizedBBox& bbox = anno.bbox();
+                top_label[idx++] = item_id;
+                top_label[idx++] = anno_group.group_label();
+                top_label[idx++] = anno.instance_id();
+                top_label[idx++] = bbox.xmin();
+                top_label[idx++] = bbox.ymin();
+                top_label[idx++] = bbox.xmax();
+                top_label[idx++] = bbox.ymax();
+                top_label[idx++] = bbox.difficult();
+              }
+            }
+          }
+        }
+      }else{   // SSD 格式的label数据
         label_shape[0] = 1;
         label_shape[1] = 1;
         label_shape[3] = 8;
@@ -358,6 +393,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 top_label[idx++] = bbox.ymax();
                 top_label[idx++] = bbox.difficult();
               }
+            }
           }
         }
       }

@@ -79,9 +79,11 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   num_gt_ = bottom[bottom_size_ - 1]->height(); 
   bool use_difficult_gt_ = true;
   Dtype background_label_id_ = -1;
+  num_ = bottom[bottom_size_ - 1]->num();
   all_gt_bboxes.clear();
-  GetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
-                 &all_gt_bboxes);
+  
+  GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
+                 &all_gt_bboxes, num_);
   // prediction data
   for(unsigned i = 0; i < bottom_size_ - 1; i++){
     Dtype* channel_pred_data = bottom[i]->mutable_cpu_data();
