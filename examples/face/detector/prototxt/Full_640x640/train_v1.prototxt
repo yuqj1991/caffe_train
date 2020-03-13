@@ -1814,24 +1814,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		biases: 10
-		biases: 19
-		biases: 18
-		biases: 32
-		biases: 28
-		biases: 49
-		biases: 40
-		biases: 78
-		biases: 66
-		biases: 125
-		biases: 69
-		biases: 65
-		biases: 115
-		biases: 173
-		biases: 189
-		biases: 273
-		biases: 305
-		biases: 395
+		bias_mask: 10
+		bias_mask: 19
+		bias_mask: 18
+		bias_mask: 32
+		bias_mask: 28
+		bias_mask: 49
+		bias_mask: 40
+		bias_mask: 78
+		bias_mask: 66
+		bias_mask: 125
+		bias_mask: 69
+		bias_mask: 65
+		bias_mask: 115
+		bias_mask: 173
+		bias_mask: 189
+		bias_mask: 273
+		bias_mask: 305
+		bias_mask: 395
 		
 		bias_num: 9
 
@@ -1864,24 +1864,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		biases: 10
-		biases: 19
-		biases: 18
-		biases: 32
-		biases: 28
-		biases: 49
-		biases: 40
-		biases: 78
-		biases: 66
-		biases: 125
-		biases: 69
-		biases: 65
-		biases: 115
-		biases: 173
-		biases: 189
-		biases: 273
-		biases: 305
-		biases: 395
+		bias_mask: 10
+		bias_mask: 19
+		bias_mask: 18
+		bias_mask: 32
+		bias_mask: 28
+		bias_mask: 49
+		bias_mask: 40
+		bias_mask: 78
+		bias_mask: 66
+		bias_mask: 125
+		bias_mask: 69
+		bias_mask: 65
+		bias_mask: 115
+		bias_mask: 173
+		bias_mask: 189
+		bias_mask: 273
+		bias_mask: 305
+		bias_mask: 395
 		
 		bias_num: 9
 
@@ -1915,24 +1915,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		biases: 10
-		biases: 19
-		biases: 18
-		biases: 32
-		biases: 28
-		biases: 49
-		biases: 40
-		biases: 78
-		biases: 66
-		biases: 125
-		biases: 69
-		biases: 65
-		biases: 115
-		biases: 173
-		biases: 189
-		biases: 273
-		biases: 305
-		biases: 395
+		bias_mask: 10
+		bias_mask: 19
+		bias_mask: 18
+		bias_mask: 32
+		bias_mask: 28
+		bias_mask: 49
+		bias_mask: 40
+		bias_mask: 78
+		bias_mask: 66
+		bias_mask: 125
+		bias_mask: 69
+		bias_mask: 65
+		bias_mask: 115
+		bias_mask: 173
+		bias_mask: 189
+		bias_mask: 273
+		bias_mask: 305
+		bias_mask: 395
 		
 		bias_num: 9
 
