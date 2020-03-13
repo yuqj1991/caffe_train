@@ -40,10 +40,6 @@ layer {
 			saturation_upper: 1.5
 			random_order_prob: 0.0
 		}
-		expand_param {
-			prob: 0.5
-			max_expand_ratio: 2.0
-		}
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
@@ -1818,24 +1814,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 15
-		bias_scale: 15
-		bias_scale: 40
-		bias_scale: 40
-		bias_scale: 70
-		bias_scale: 70
-		bias_scale: 110
-		bias_scale: 110
-		bias_scale: 180
-		bias_scale: 180
-		bias_scale: 250
-		bias_scale: 250
-		bias_scale: 320
-		bias_scale: 320
-		bias_scale: 400
-		bias_scale: 400
-		bias_scale: 560
-		bias_scale: 560
+		biases: 10
+		biases: 19
+		biases: 18
+		biases: 32
+		biases: 28
+		biases: 49
+		biases: 40
+		biases: 78
+		biases: 66
+		biases: 125
+		biases: 69
+		biases: 65
+		biases: 115
+		biases: 173
+		biases: 189
+		biases: 273
+		biases: 305
+		biases: 395
 		
 		bias_num: 9
 
@@ -1868,24 +1864,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 15
-		bias_scale: 15
-		bias_scale: 40
-		bias_scale: 40
-		bias_scale: 70
-		bias_scale: 70
-		bias_scale: 110
-		bias_scale: 110
-		bias_scale: 180
-		bias_scale: 180
-		bias_scale: 250
-		bias_scale: 250
-		bias_scale: 320
-		bias_scale: 320
-		bias_scale: 400
-		bias_scale: 400
-		bias_scale: 560
-		bias_scale: 560
+		biases: 10
+		biases: 19
+		biases: 18
+		biases: 32
+		biases: 28
+		biases: 49
+		biases: 40
+		biases: 78
+		biases: 66
+		biases: 125
+		biases: 69
+		biases: 65
+		biases: 115
+		biases: 173
+		biases: 189
+		biases: 273
+		biases: 305
+		biases: 395
 		
 		bias_num: 9
 
@@ -1919,24 +1915,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 15
-		bias_scale: 15
-		bias_scale: 40
-		bias_scale: 40
-		bias_scale: 70
-		bias_scale: 70
-		bias_scale: 110
-		bias_scale: 110
-		bias_scale: 180
-		bias_scale: 180
-		bias_scale: 250
-		bias_scale: 250
-		bias_scale: 320
-		bias_scale: 320
-		bias_scale: 400
-		bias_scale: 400
-		bias_scale: 560
-		bias_scale: 560
+		biases: 10
+		biases: 19
+		biases: 18
+		biases: 32
+		biases: 28
+		biases: 49
+		biases: 40
+		biases: 78
+		biases: 66
+		biases: 125
+		biases: 69
+		biases: 65
+		biases: 115
+		biases: 173
+		biases: 189
+		biases: 273
+		biases: 305
+		biases: 395
 		
 		bias_num: 9
 

@@ -1791,38 +1791,40 @@ layer {
 
 		#anchor_scale list(width, height)
 
-		biases: 15
-		biases: 15
+		biases: 10
+		biases: 19
+		biases: 18
+		biases: 32
+		biases: 28
+		biases: 49
 		biases: 40
-		biases: 40
-		biases: 70
-		biases: 70
-		biases: 110
-		biases: 110
-		biases: 180
-		biases: 180
-		biases: 250
-		biases: 250
-		biases: 320
-		biases: 320
-		biases: 400
-		biases: 400
-		biases: 560
-		biases: 560
+		biases: 78
+		biases: 66
+		biases: 125
+		biases: 69
+		biases: 65
+		biases: 115
+		biases: 173
+		biases: 189
+		biases: 273
+		biases: 305
+		biases: 395
 
 
-		mask:6
-		mask:7
-		mask:8
-		mask:3
-		mask:4
-		mask:5
+
+
 		mask:0
 		mask:1
 		mask:2
-		anchors_scale:32
-		anchors_scale:16
+		mask:3
+		mask:4
+		mask:5
+		mask:6
+		mask:7
+		mask:8
 		anchors_scale:8
+		anchors_scale:16
+		anchors_scale:32
 		mask_group_num:3
 	}
 }
