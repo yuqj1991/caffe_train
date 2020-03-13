@@ -510,8 +510,9 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
         for(unsigned m = 0; m < mask_bias.size(); m++){
+          LOG(INFO)<<"output_dim: "<<output_height<<", mask: "<<mask_bias[m];
           int x_index = b * num_channels * dimScale
-                                  + (m * stride_channel + 0)* dimScale + h * output_width + w;
+                                    + (m * stride_channel + 0)* dimScale + h * output_width + w;
           int y_index = b * num_channels * dimScale 
                                     + (m * stride_channel + 1)* dimScale + h * output_width + w;
           int width_index = b * num_channels * dimScale

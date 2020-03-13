@@ -164,7 +164,7 @@ void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
           }
         }
       } 
-        caffe_scal(bottom[i]->count(), loss_weight, bottom[i]->mutable_cpu_diff());
+      caffe_scal(bottom[i]->count(), loss_weight, bottom[i]->mutable_cpu_diff());
     }
   }
 }
