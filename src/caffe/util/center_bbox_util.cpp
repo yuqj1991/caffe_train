@@ -626,12 +626,11 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                                   + inter_center_y * output_width + inter_center_x;
         if ( bottom_diff[class_index]){
           bottom_diff[class_index + class_lable * dimScale] = 1 - channel_pred_data[class_index + class_lable * dimScale];
-          if(avg_cat) 
-            avg_cat += channel_pred_data[class_index + class_lable * dimScale];
+          avg_cat += channel_pred_data[class_index + class_lable * dimScale];
         }else{
           for(int c = 0; c < num_classes; c++){
             bottom_diff[class_index + c * dimScale] = ((c == class_lable)?1 : 0) - channel_pred_data[class_index + c * dimScale];
-            if(c == class_lable && avg_cat) 
+            if(c == class_lable) 
               avg_cat += channel_pred_data[class_index + c * dimScale];
           }
         }
