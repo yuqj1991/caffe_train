@@ -12,10 +12,8 @@ template <typename Dtype>
 void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::LayerSetUp(bottom, top);
-  bottom_size_ = bottom.size();
   if (this->layer_param_.propagate_down_size() == 0) {
-    for(int i = 0; i < bottom_size_ - 1; i++)
-      this->layer_param_.add_propagate_down(true);
+    this->layer_param_.add_propagate_down(true);
     this->layer_param_.add_propagate_down(false);
   }
   const CenterObjectParameter& center_object_loss_param =
@@ -27,17 +25,8 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       bias_scale_.push_back(std::pair<int, int>(center_object_loss_param.bias_scale(i * 2), 
                     center_object_loss_param.bias_scale(i * 2 + 1)));
     }
-    bias_mask_group_num_ = center_object_loss_param.bias_mask_group_num();
-    CHECK_EQ(bottom_size_ - 1, bias_mask_group_num_) << "bias_mask_group must be equal to bottom size";
-    int num_mask_per_group = center_object_loss_param.bias_mask_size() / bias_mask_group_num_ ; 
-
-    for(int j = 0; j < bias_mask_group_num_; j++){
-      std::vector<int> mask_group_index;
-      mask_group_index.clear();
-      for(int i = 0; i < num_mask_per_group; i++){
-        mask_group_index.push_back(center_object_loss_param.bias_mask(j * num_mask_per_group + i));
-      }
-      bias_mask_.push_back(std::pair<int, std::vector<int> >(j, mask_group_index));
+    for(int i = 0; i < center_object_loss_param.bias_mask_size(); i++){
+      bias_mask_.push_back(center_object_loss_param.bias_mask(i));
     }
   }
   
@@ -49,7 +38,7 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   
   num_classes_ = center_object_loss_param.num_class();
   CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
-  CHECK_EQ((4 + 1 + num_classes_) * bias_mask_[0].second.size(), bottom[0]->channels()) 
+  CHECK_EQ((4 + 1 + num_classes_) * bias_mask_.size(), bottom[0]->channels()) 
             << "num_classes must be equal to prediction classes";
   
   if (!this->layer_param_.loss_param().has_normalization() &&
@@ -74,9 +63,8 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
   
   // gt_boxes
-  bottom_size_ = bottom.size();
-  const Dtype* gt_data = bottom[bottom_size_ - 1]->cpu_data();
-  num_gt_ = bottom[bottom_size_ - 1]->height(); 
+  const Dtype* gt_data = bottom[1]->cpu_data();
+  num_gt_ = bottom[1]->height(); 
   bool use_difficult_gt_ = true;
   Dtype background_label_id_ = -1;
   num_ = bottom[bottom_size_ - 1]->num();
@@ -89,85 +77,85 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
     num_groundtruth_ += gt_boxes.size();
   }
+  LOG(INFO)<<"num_groundtruth: "<<num_groundtruth_;
   // prediction data
-  for(unsigned i = 0; i < bottom_size_ - 1; i++){
-    Dtype* channel_pred_data = bottom[i]->mutable_cpu_data();
-    const int output_height = bottom[i]->height();
-    const int output_width = bottom[i]->width();
-    const int num_channels = bottom[i]->channels();
-    Dtype * bottom_diff = bottom[i]->mutable_cpu_diff();
+  Dtype* channel_pred_data = bottom[0]->mutable_cpu_data();
+  const int output_height = bottom[0]->height();
+  const int output_width = bottom[0]->width();
+  const int num_channels = bottom[0]->channels();
+  Dtype * bottom_diff = bottom[0]->mutable_cpu_diff();
 
-    num_ = bottom[i]->num();  
-
-    caffe_set(bottom[i]->count(), Dtype(0), bottom_diff);
-    if (num_gt_ >= 1) {
-      EncodeYoloObject(num_, num_channels, num_classes_, output_width, output_height, 
-                            net_width_, net_height_,
-                            channel_pred_data, all_gt_bboxes,
-                            bias_mask_[i].second, bias_scale_, 
-                            bottom_diff, ignore_thresh_);
-      const Dtype * diff = bottom[i]->cpu_diff();
-      Dtype sum_squre = Dtype(0);
-      for(int j = 0; j < bottom[i]->count(); j++){
-        sum_squre += std::pow(diff[j], 2);
-      }
-      Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-          normalization_, num_, num_groundtruth_, num_groundtruth_);
-      top[0]->mutable_cpu_data()[0] += sum_squre / normalizer;
-      //LOG(INFO)<<"total loss: "<<sum_squre / normalizer;
-    } else {
-      top[0]->mutable_cpu_data()[0] += 0;
+  num_ = bottom[0]->num();  
+  YoloScoreShow trainScore;
+  caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
+  if (num_gt_ >= 1) {
+    EncodeYoloObject(num_, num_channels, num_classes_, output_width, output_height, 
+                          net_width_, net_height_,
+                          channel_pred_data, all_gt_bboxes,
+                          bias_mask_, bias_scale_, 
+                          bottom_diff, ignore_thresh_, &trainScore);
+    const Dtype * diff = bottom[0]->cpu_diff();
+    Dtype sum_squre = Dtype(0.);
+    for(int j = 0; j < bottom[0]->count(); j++){
+      sum_squre += std::pow(diff[j], 2);
     }
-    #if 1 
-    if(iterations_ % 1000 == 0){ 
-      LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
-              <<", num_groundtruth: "<<num_groundtruth_
-              <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
-              <<", output_height: "<<output_height;
-    }
-    iterations_++;
-    #endif
+    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+        normalization_, num_, num_groundtruth_, num_groundtruth_);
+    top[0]->mutable_cpu_data()[0] += sum_squre / normalizer;
+    //LOG(INFO)<<"total loss: "<<sum_squre / normalizer;
+  } else {
+    top[0]->mutable_cpu_data()[0] += 0;
   }
+  #if 1 
+  if(iterations_ % 10 == 0){ 
+    LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
+            <<", num_groundtruth: "<<num_groundtruth_
+            <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
+            <<", output_height: "<<output_height;
+    LOG(INFO)<<"Region "<<output_width<<" Avg IOU: "<<avg_iou/count<<", Class: "<<avg_cat/class_count
+                      <<", Obj: "<<avg_obj/count<<", No obj: "<<avg_anyobj/(dimScale*bias_mask_.size()*num_)
+                      <<", .5R: "<<recall/count<<", .75R: "<<recall75/count<<", count: "<<count;
+  }
+  iterations_++;
+  #endif
 }
 
 template <typename Dtype>
 void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
-  if (propagate_down[bottom_size_ - 1]) {
+  if (propagate_down[1]) {
     LOG(FATAL) << this->type()
         << " Layer cannot backpropagate to label inputs.";
   }
   
-  for(unsigned i = 0; i < bottom_size_ - 1; i++){
-    if (propagate_down[i]) {
-      Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-          normalization_, num_, num_groundtruth_, num_groundtruth_);
-      Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
-      const int output_height = bottom[i]->height();
-      const int output_width = bottom[i]->width();
-      const int num_channels = bottom[i]->channels();
-      Dtype* bottom_diff = bottom[i]->mutable_cpu_diff();
-      const Dtype* bottom_data = bottom[i]->cpu_data();
-      num_ = bottom[i]->num();
-      int channel_per_box = 4 + 1 + num_classes_;
-      int mask_size_ = bias_mask_[i].second.size();
-      int dimScale = output_height * output_width;
-      CHECK_EQ(channel_per_box * mask_size_, num_channels);
-      for(int j = 0; j < num_; j++){
-        for (int s = 0; s < dimScale; s++) {
-          for(int mm = 0; mm < mask_size_; mm++){
-            int mask_index = j * num_channels * dimScale + mm * channel_per_box * dimScale + s;
-            for(int cc = 0; cc < channel_per_box; cc++){
-              int index = mask_index + cc * dimScale;
-              if(cc != 2 && cc != 3)
-                bottom_diff[index] = bottom_diff[index] * logistic_gradient(bottom_data[index]);
-            }
+  if (propagate_down[0]) {
+    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+        normalization_, num_, num_groundtruth_, num_groundtruth_);
+    Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+    const int output_height = bottom[0]->height();
+    const int output_width = bottom[0]->width();
+    const int num_channels = bottom[0]->channels();
+    Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+    const Dtype* bottom_data = bottom[0]->cpu_data();
+    num_ = bottom[0]->num();
+    int channel_per_box = 4 + 1 + num_classes_;
+    int mask_size_ = bias_mask_.size();
+    int dimScale = output_height * output_width;
+    CHECK_EQ(channel_per_box * mask_size_, num_channels);
+    for(int j = 0; j < num_; j++){
+      for (int s = 0; s < dimScale; s++) {
+        for(int mm = 0; mm < mask_size_; mm++){
+          int mask_index = j * num_channels * dimScale + mm * channel_per_box * dimScale + s;
+          for(int cc = 0; cc < channel_per_box; cc++){
+            int index = mask_index + cc * dimScale;
+            if(cc != 2 && cc != 3)
+              bottom_diff[index] = bottom_diff[index] * logistic_gradient(bottom_data[index]);
           }
         }
-      } 
-      caffe_scal(bottom[i]->count(), loss_weight, bottom[i]->mutable_cpu_diff());
-    }
+      }
+    } 
+    caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
   }
 }
 

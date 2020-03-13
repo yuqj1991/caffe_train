@@ -62,7 +62,16 @@ void EncodeYoloGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_dat
                                 const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
 
 
-
+typedef struct _YoloScoreShow{
+      float avg_iou;
+      float recall;
+      float recall75;
+      float avg_cat;
+      float avg_obj;
+      float avg_anyobj;
+      int count;
+      int class_count;
+}YoloScoreShow;
 
 template <typename Dtype>
 void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
@@ -71,7 +80,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           Dtype* channel_pred_data,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                           std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
-                          Dtype* bottom_diff, Dtype ignore_thresh);
+                          Dtype* bottom_diff, Dtype ignore_thresh, YoloScoreShow *Score);
 
 template <typename Dtype>
 void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
