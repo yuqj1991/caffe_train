@@ -84,6 +84,11 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   
   GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
                  &all_gt_bboxes, num_);
+  num_groundtruth_ = 0;
+  for(int i = 0; i < all_gt_bboxes.size(); i++){
+    vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
+    num_groundtruth_ += gt_boxes.size();
+  }
   // prediction data
   for(unsigned i = 0; i < bottom_size_ - 1; i++){
     Dtype* channel_pred_data = bottom[i]->mutable_cpu_data();
@@ -107,7 +112,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         sum_squre += std::pow(diff[j], 2);
       }
       Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-          normalization_, num_, num_gt_, num_gt_);
+          normalization_, num_, num_groundtruth_, num_groundtruth_);
       top[0]->mutable_cpu_data()[0] += sum_squre / normalizer;
       LOG(INFO)<<"total loss: "<<sum_squre / normalizer;
     } else {
@@ -115,14 +120,9 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
     #if 1 
     if(iterations_ % 1000 == 0){
-      int num_groundtruth = 0;
-      for(int i = 0; i < all_gt_bboxes.size(); i++){
-        vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
-        num_groundtruth += gt_boxes.size();
-      }
-      CHECK_EQ(num_gt_, num_groundtruth);
+      
       LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
-              <<", num_groundtruth: "<<num_groundtruth
+              <<", num_groundtruth: "<<num_groundtruth_
               <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
               <<", output_height: "<<output_height;
     }
@@ -139,10 +139,11 @@ void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     LOG(FATAL) << this->type()
         << " Layer cannot backpropagate to label inputs.";
   }
+  
   for(unsigned i = 0; i < bottom_size_ - 1; i++){
     if (propagate_down[i]) {
       Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-          normalization_, num_, num_gt_, num_gt_);
+          normalization_, num_, num_groundtruth_, num_groundtruth_);
       Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
       const int output_height = bottom[i]->height();
       const int output_width = bottom[i]->width();
