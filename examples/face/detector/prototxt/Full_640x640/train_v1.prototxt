@@ -40,6 +40,10 @@ layer {
 			saturation_upper: 1.5
 			random_order_prob: 0.0
 		}
+		expand_param {
+			prob: 0.5
+			max_expand_ratio: 2.0
+		}
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
@@ -47,141 +51,6 @@ layer {
 		backend: LMDB
 	}
 	annotated_data_param {
-		batch_sampler {
-			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
-				min_aspect_ratio: 0.3
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 0.6
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
-				min_aspect_ratio: 0.4
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 0.7
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
-				min_aspect_ratio: 0.5
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 0.8
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
-				min_aspect_ratio: 0.6
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 0.9
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.0
-				}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 1.0
-				max_scale: 1.0
-				min_aspect_ratio: 0.9
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		data_anchor_sampler{
-			scale: 15
-			scale: 40
-			scale: 70
-			scale: 110
-			scale: 180
-			scale: 250
-			scale: 320
-			scale: 400
-			scale: 560
-			sample_constraint{
-				min_object_coverage: 0.6
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		bbox_sampler{
-			bbox_small_scale: 10
-			bbox_small_scale: 15
-			bbox_small_scale: 20
-			bbox_small_scale: 40
-			bbox_small_scale: 70
-			bbox_small_scale: 110
-			bbox_small_scale: 250
-			bbox_small_scale: 400
-			
-			bbox_large_scale: 15
-			bbox_large_scale: 20
-			bbox_large_scale: 40
-			bbox_large_scale: 70
-			bbox_large_scale: 110
-			bbox_large_scale: 250
-			bbox_large_scale: 400
-			bbox_large_scale: 560
-			
-			ancher_stride: 4
-			ancher_stride: 4
-			ancher_stride: 8
-			ancher_stride: 8
-			ancher_stride: 16
-			ancher_stride: 32
-			ancher_stride: 32
-			ancher_stride: 32
-		}
 		up_prob: 0.7
 		low_prob: 0.4
 		label_map_file: "../labelmap.prototxt"
