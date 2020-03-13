@@ -495,11 +495,11 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
   for(int b = 0; b < batch_size; b++){
     for(unsigned m = 0; m < mask_bias.size(); m++){
       int x_index = b * num_channels * dimScale
-                                  + m * stride_channel * dimScale + 0 * dimScale;
+                                  + (m * stride_channel + 0)* dimScale;
       for(int i = 0; i < 2 * dimScale; i++)
         channel_pred_data[x_index + i] = YOloSigmoid(channel_pred_data[x_index + i]);
       int object_index = b * num_channels * dimScale
-                                  + m * stride_channel * dimScale+ 4 * dimScale;
+                                  + (m * stride_channel + 4)* dimScale;
       for(int i = 0; i < (num_classes + 1) * dimScale; i++){
         channel_pred_data[object_index + i] = YOloSigmoid(channel_pred_data[object_index + i]);
       }
@@ -511,15 +511,15 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
       for(int w = 0; w < output_width; w++){
         for(unsigned m = 0; m < mask_bias.size(); m++){
           int x_index = b * num_channels * dimScale
-                                  + m * stride_channel* dimScale + 0 * dimScale + h * output_width + w;
+                                  + (m * stride_channel + 0)* dimScale + h * output_width + w;
           int y_index = b * num_channels * dimScale 
-                                    + m * stride_channel* dimScale + 1 * dimScale + h * output_width + w;
+                                    + (m * stride_channel + 1)* dimScale + h * output_width + w;
           int width_index = b * num_channels * dimScale
-                                    + m * stride_channel* dimScale + 2 * dimScale + h * output_width + w;
+                                    + (m * stride_channel + 2)* dimScale + h * output_width + w;
           int height_index = b * num_channels * dimScale 
-                                    + m * stride_channel* dimScale + 3 * dimScale + h * output_width + w;
+                                    + (m * stride_channel + 3)* dimScale + h * output_width + w;
           int object_index = b * num_channels * dimScale 
-                                    + m * stride_channel* dimScale + 4 * dimScale + h * output_width + w;
+                                    + (m * stride_channel + 4)* dimScale + h * output_width + w;
           NormalizedBBox predBox;
           float bb_xmin = (channel_pred_data[x_index] + w) / output_width;
           float bb_ymin = (channel_pred_data[y_index] + h) / output_height;
@@ -591,15 +591,15 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         Dtype diff_y = center_y - inter_center_y;
         Dtype width = std::log((xmax - xmin) * stride_feature / bias_scale[mask_n].first);
         Dtype height = std::log((ymax - ymin) * stride_feature / bias_scale[mask_n].second);
-        int x_index = b * num_channels * dimScale + mask_n * stride_channel* dimScale + 0 * dimScale
+        int x_index = b * num_channels * dimScale + (mask_n * stride_channel + 0)* dimScale
                                 + inter_center_y * output_width + inter_center_x;
-        int y_index = b * num_channels * dimScale + mask_n * stride_channel* dimScale + 1 * dimScale
+        int y_index = b * num_channels * dimScale + (mask_n * stride_channel + 1)* dimScale
                                   + inter_center_y * output_width + inter_center_x;
-        int width_index = b * num_channels * dimScale + mask_n * stride_channel* dimScale + 2 * dimScale
+        int width_index = b * num_channels * dimScale + (mask_n * stride_channel + 2)* dimScale
                                   + inter_center_y * output_width + inter_center_x;
-        int height_index = b * num_channels * dimScale + mask_n * stride_channel* dimScale + 3 * dimScale
+        int height_index = b * num_channels * dimScale + (mask_n * stride_channel + 3)* dimScale
                                   + inter_center_y * output_width + inter_center_x;
-        int object_index = b * num_channels * dimScale + mask_n * stride_channel* dimScale + 4 * dimScale
+        int object_index = b * num_channels * dimScale + (mask_n * stride_channel + 4)* dimScale
                                   + inter_center_y * output_width + inter_center_x;
         float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
         bottom_diff[x_index] = delta_scale * (diff_x - channel_pred_data[x_index]);
@@ -611,12 +611,11 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         // class score
         // 特殊情况，face数据集，包含了背景目标，而实际上不需要背景目标，所以减一
         int class_lable = gt_bboxes[ii].label() - 1; 
-        int class_index = b * num_channels * dimScale + mask_n * stride_channel* dimScale + 5 * dimScale
+        int class_index = b * num_channels * dimScale + (mask_n * stride_channel + 5)* dimScale
                                   + inter_center_y * output_width + inter_center_x;
         
         for(int c = 0; c < num_classes; c++){
-          bottom_diff[class_index + c * dimScale] = ((c == class_lable)?1 : 0) \
-                                                              - channel_pred_data[class_index + c * dimScale];
+          bottom_diff[class_index + c * dimScale] = ((c == class_lable)?1 : 0) - channel_pred_data[class_index + c * dimScale];
         }
       }
     } 
