@@ -68,7 +68,7 @@ template <typename Dtype>
 void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int net_width, const int net_height,
-                          const Dtype* channel_pred_data,
+                          Dtype* channel_pred_data,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                           std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
                           Dtype* bottom_diff, Dtype ignore_thresh);

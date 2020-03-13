@@ -8,15 +8,13 @@
 #include "boost/filesystem.hpp"
 #include "boost/foreach.hpp"
 
-//#include "caffe/layers/region_loss_layer.hpp"
-#include "caffe/layers/yolov3_detection_output_layer.hpp"
+#include "caffe/layers/Yolov3DetectionLayer.hpp"
 #include "caffe/util/io.hpp"
 #include "caffe/util/bbox_util.hpp"
 
 namespace caffe {
 template <typename Dtype>
-inline Dtype sigmoid(Dtype x)
-{
+inline Dtype sigmoid(Dtype x){
 	return 1. / (1. + exp(-x));
 }
 template <typename Dtype>
@@ -64,8 +62,7 @@ Dtype box_iou(vector<Dtype> a, vector<Dtype> b)
 	return box_intersection(a, b) / box_union(a, b);
 }
 template <typename Dtype>
-void setNormalizedBBox(NormalizedBBox& bbox, Dtype x, Dtype y, Dtype w, Dtype h)
-{
+void setNormalizedBBox(NormalizedBBox& bbox, Dtype x, Dtype y, Dtype w, Dtype h){
 	Dtype xmin = x - w / 2.0;
 	Dtype xmax = x + w / 2.0;
 	Dtype ymin = y - h / 2.0;
@@ -114,17 +111,8 @@ void ApplyNms(vector< PredictionResult<Dtype> >& boxes, vector<int>& idxes, Dtyp
 
 			Dtype iou = box_iou(Bbox1, Bbox2);
 			if (iou >= threshold) {
-			idx_map[j] = 1;
-			}
-			/*	NormalizedBBox Bbox1, Bbox2;
-			setNormalizedBBox(Bbox1, boxes[i].x, boxes[i].y, boxes[i].w, boxes[i].h);
-			setNormalizedBBox(Bbox2, boxes[j].x, boxes[j].y, boxes[j].w, boxes[j].h);
-
-			float overlap = JaccardOverlap(Bbox1, Bbox2, true);
-
-			if (overlap >= threshold) {
 				idx_map[j] = 1;
-			}*/
+			}
 		}
 	}
 	for (int i = 0; i < boxes.size(); ++i) {
@@ -165,9 +153,8 @@ void class_index_and_score(Dtype* input, int classes, PredictionResult<Dtype>& p
 	predict.classScore = large;
 }
 template <typename Dtype>
-void get_region_box2(vector<Dtype> &b, Dtype* x, vector<Dtype> biases, int n, int index, int i, int j, int lw, int lh, int w, int h, int stride) {
-
-	//LOG(INFO) << lw << "," << lh << "," << w << "," << h << "," << stride;
+void get_yolo_box(vector<Dtype> &b, Dtype* x, vector<Dtype> biases, int n, 
+						int index, int i, int j, int lw, int lh, int w, int h, int stride) {
 	b.clear();
 	b.push_back((i + (x[index + 0 * stride])) / lw);
 	b.push_back((j + (x[index + 1 * stride])) / lh);
@@ -175,18 +162,18 @@ void get_region_box2(vector<Dtype> &b, Dtype* x, vector<Dtype> biases, int n, in
 	b.push_back(exp(x[index + 3 * stride]) * biases[2 * n + 1] / (h));
 }
 template <typename Dtype>
-void Yolov3DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+void Yolov3DetectionLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   const Yolov3DetectionOutputParameter& yolov3_detection_output_param =
       this->layer_param_.yolov3_detection_output_param();
   CHECK(yolov3_detection_output_param.has_num_classes()) << "Must specify num_classes";
   side_ = bottom[0]->width();
   num_class_ = yolov3_detection_output_param.num_classes();
-  num_ = yolov3_detection_output_param.num_box();
+  mask_num_box_ = yolov3_detection_output_param.num_box();
   coords_ = 4;
   confidence_threshold_ = yolov3_detection_output_param.confidence_threshold();
   nms_threshold_ = yolov3_detection_output_param.nms_threshold();
-  mask_group_num_ = yolov3_detection_output_param.mask_group_num();
+  mask_num_group_ = yolov3_detection_output_param.mask_group_num();
   for (int c = 0; c < yolov3_detection_output_param.biases_size(); ++c) {
      biases_.push_back(yolov3_detection_output_param.biases(c));
   } 
@@ -196,17 +183,14 @@ void Yolov3DetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& b
   for (int c = 0; c < yolov3_detection_output_param.anchors_scale_size(); ++c) {
 	  anchors_scale_.push_back(yolov3_detection_output_param.anchors_scale(c));
   }
-  groups_num_ = yolov3_detection_output_param.mask_size() / mask_group_num_;
+  groups_num_ = yolov3_detection_output_param.mask_size() / mask_num_group_;
   
-  CHECK_EQ(bottom.size(), mask_group_num_);
+  CHECK_EQ(bottom.size(), mask_num_group_);
 }
 
 template <typename Dtype>
-void Yolov3DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
+void Yolov3DetectionLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-
-  //CHECK_EQ(bottom[0]->num(), 1);
-  // num() and channels() are 1.
   vector<int> top_shape(2, 1);
   // Since the number of bboxes to be kept is unknown before nms, we manually
   // set it to (fake) 1.
@@ -218,22 +202,20 @@ void Yolov3DetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bott
 }
 template <typename Dtype>
 bool BoxSortDecendScore(const PredictionResult<Dtype>& box1, const PredictionResult<Dtype>& box2) {
-	return box1.confidence> box2.confidence;
+	return box1.confidence > box2.confidence;
 }
 template <typename Dtype>
-void Yolov3DetectionOutputLayer<Dtype>::Forward_cpu(
+void Yolov3DetectionLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
 	const int num = bottom[0]->num();
 	
-	int len = 4 + num_class_ + 1;
-	//int stride = side_*side_;
+	int len = 4 + 1 + num_class_;
 
-
-	
 	int mask_offset = 0;
 	vector< PredictionResult<Dtype> > predicts;
 	predicts.clear();
-	Dtype *class_score = new Dtype[num_class_];
+
+	std::vector<float> class_score(num_class_, 0.f);
 	
 	for (int t = 0; t < bottom.size(); t++) {
 		side_ = bottom[t]->width();
@@ -241,65 +223,43 @@ void Yolov3DetectionOutputLayer<Dtype>::Forward_cpu(
 		swap_.ReshapeLike(*bottom[t]);
 		Dtype* swap_data = swap_.mutable_cpu_data();
 		const Dtype* input_data = bottom[t]->cpu_data();
+		const int layerDim = len * mask_num_box_* side_ * side_ ;
 		for (int b = 0; b < bottom[t]->num(); b++) {
 			for (int s = 0; s < side_*side_; s++) {
-				//LOG(INFO) << s;
-				for (int n = 0; n < num_; n++) {
-					//LOG(INFO) << bottom[t]->count(1);
-					int index = n*len*stride + s + b*bottom[t]->count(1);
+				for (int n = 0; n < mask_num_box_; n++) {
+					int channelIndex = b*layerDim + n*len*stride + s;
 					vector<Dtype> pred;
-					
 					for (int c = 0; c < len; ++c) {
-						int index2 = c*stride + index;
-						//LOG(INFO)<<index2;
+						int index2 = c*stride + channelIndex;
 						if (c == 2 || c == 3) {
-							swap_data[index2] = (input_data[index2 + 0]);
-						}
-						else {
+							swap_data[index2] = (input_data[index2]);
+						}else {
 							if (c > 4) {
-								//LOG(INFO) << c - 5;
-								class_score[c - 5] = sigmoid(input_data[index2 + 0]);
-							}
-							else {
-								swap_data[index2] = sigmoid(input_data[index2 + 0]);
+								class_score[c - 5] = sigmoid(input_data[index2]);
+							}else {
+								swap_data[index2] = sigmoid(input_data[index2]);
 							}
 						}
 					}
-					int y2 = s / side_;
-					int x2 = s % side_;
-					//LOG(INFO) << x2 << "," << y2;
-					Dtype obj_score = swap_data[index + 4 * stride];
-					//LOG(INFO) << obj_score;
-					get_region_box2(pred, swap_data, biases_, mask_[n + mask_offset], index, x2, y2, side_, side_, side_*anchors_scale_[t], side_*anchors_scale_[t], stride);
-					//LOG(INFO)<<anchors_scale_[t];
-					//LOG(INFO) << pred[0] << "," << pred[1];
-					//float maxmima_score = 0;
+					int point_y = s / side_;
+					int point_x = s % side_;
+					Dtype obj_score = swap_data[channelIndex + 4 * stride];
+					get_yolo_box(pred, swap_data, biases_, mask_[n + mask_offset], 
+									channelIndex, point_x, point_y, side_, side_, side_*anchors_scale_[t], 
+																	side_*anchors_scale_[t], stride);
 					PredictionResult<Dtype> predict;
 					for (int c = 0; c < num_class_; ++c) {
 						class_score[c] *= obj_score;
-						//LOG(INFO) << class_score[c];
-						if (class_score[c] > confidence_threshold_)
-						{						
-							//if(class_score[c]>maxmima_score)
-							{
-								//maxmima_score = class_score[c];
-								predict.x = pred[0];
-								predict.y = pred[1];
-								predict.w = pred[2];
-								predict.h = pred[3];
-								predict.classType = c ;
-								predict.confidence = class_score[c];
-								predicts.push_back(predict);							
-							}
-
-							//LOG(INFO) << predict.x << "," << predict.y << "," << predict.w << "," << predict.h;
-							//LOG(INFO) << predict.confidence;
+						if (class_score[c] > confidence_threshold_){						
+							predict.x = pred[0];
+							predict.y = pred[1];
+							predict.w = pred[2];
+							predict.h = pred[3];
+							predict.classType = c ;
+							predict.confidence = class_score[c];
+							predicts.push_back(predict);
 						}
 					}
-					//if(maxmima_score> confidence_threshold_)
-					//{
-					//	predicts.push_back(predict);
-					//}
 				}
 			}
 		}
@@ -307,15 +267,12 @@ void Yolov3DetectionOutputLayer<Dtype>::Forward_cpu(
 		
 	}
 
-	delete[] class_score;
 	std::sort(predicts.begin(), predicts.end(), BoxSortDecendScore<Dtype>);
     vector<int> idxes;
     int num_kept = 0;
     if(predicts.size() > 0){
-		//LOG(INFO) << predicts.size();
 		ApplyNms(predicts, idxes, nms_threshold_);
 		num_kept = idxes.size();
-		//LOG(INFO) << num_kept;
     }
     vector<int> top_shape(2, 1);
     top_shape.push_back(num_kept);
@@ -334,24 +291,26 @@ void Yolov3DetectionOutputLayer<Dtype>::Forward_cpu(
       top_data[0] = i;
       top_data += 7;
     }
-  } 
-  else {
+  }else {
     top[0]->Reshape(top_shape);
     top_data = top[0]->mutable_cpu_data();
     for (int i = 0; i < num_kept; i++){
       top_data[i*7] = 0;                              //Image_Id
-      top_data[i*7+1] = predicts[idxes[i]].classType + 1; //label
-      top_data[i*7+2] = predicts[idxes[i]].confidence; //confidence
+      top_data[i*7+1] = predicts[idxes[i]].classType + 1; //label, 为了迎合假设有背景所以 + 1
+      top_data[i*7+2] = predicts[idxes[i]].confidence; //confidence， 类别置信度
+
 	  float left = (predicts[idxes[i]].x - predicts[idxes[i]].w / 2.);
 	  float right = (predicts[idxes[i]].x + predicts[idxes[i]].w / 2.);
 	  float top = (predicts[idxes[i]].y - predicts[idxes[i]].h / 2.);
 	  float bot = (predicts[idxes[i]].y + predicts[idxes[i]].h / 2.);
 
-      top_data[i*7+3] = left;
-      top_data[i*7+4] = top;
-      top_data[i*7+5] = right;
-      top_data[i*7+6] = bot;
-	  DLOG(INFO) << "Detection box"  << "," << predicts[idxes[i]].classType << "," << predicts[idxes[i]].x << "," << predicts[idxes[i]].y << "," << predicts[idxes[i]].w << "," << predicts[idxes[i]].h;
+      top_data[i*7 + 3] = left;
+      top_data[i*7 + 4] = top;
+      top_data[i*7 + 5] = right;
+      top_data[i*7 + 6] = bot;
+	  DLOG(INFO) << "Detection box"  << ",classType: " << predicts[idxes[i]].classType 
+	  				<< ", x: " << predicts[idxes[i]].x << ", y: " << predicts[idxes[i]].y 
+					<< ", w: " << predicts[idxes[i]].w << ", h: " << predicts[idxes[i]].h;
     }
 
   }
@@ -359,10 +318,10 @@ void Yolov3DetectionOutputLayer<Dtype>::Forward_cpu(
 }
 
 #ifdef CPU_ONLY
-STUB_GPU_FORWARD(Yolov3DetectionOutputLayer, Forward);
+STUB_GPU_FORWARD(Yolov3DetectionLayer, Forward);
 #endif
 
-INSTANTIATE_CLASS(Yolov3DetectionOutputLayer);
-REGISTER_LAYER_CLASS(Yolov3DetectionOutput);
+INSTANTIATE_CLASS(Yolov3DetectionLayer);
+REGISTER_LAYER_CLASS(Yolov3Detection);
 
 }  // namespace caffe

@@ -359,8 +359,7 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
                               const int num_classes_, const int output_width, const int output_height){
   std::map<int, vector<NormalizedBBox> > ::iterator iter;
   count_gt = 0;
-  count_one = 0;
-  int count_no_one = 0;
+  
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
@@ -391,6 +390,8 @@ void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
     }
   }
   #if 0
+  count_one = 0;
+  int count_no_one = 0;
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
@@ -469,23 +470,44 @@ int int_index(std::vector<int>a, int val, int n)
     return -1;
 }
 
+template <typename Dtype>
+Dtype YOloSigmoid(Dtype x){
+	return 1. / (1. + exp(-x));
+}
+
+template double YOloSigmoid(double x);
+template float YOloSigmoid(float x);
+
 // 置信度得分，用逻辑回归来做，loss_delta梯度值，既前向又后向
 template <typename Dtype>
 void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int net_width, const int net_height,
-                          const Dtype* channel_pred_data,
+                          Dtype* channel_pred_data,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                           std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
                           Dtype* bottom_diff, Dtype ignore_thresh){
   CHECK_EQ(net_height, net_width);
   int stride_channel = 5 + num_classes;
   int stride_feature = net_height / output_height;
+  int dimScale = output_height * output_width;
   CHECK_EQ(num_channels, (5 + num_classes) * mask_bias.size()) << "num_channels shoule be set to \
                               including bias_x, bias_y, width, height, object_confidence and classes";
   for(int b = 0; b < batch_size; b++){
+    for(unsigned m = 0; m < mask_bias.size(); m++){
+      int x_index = b * num_channels * dimScale
+                                  + m * stride_channel + 0 * dimScale;
+      for(int i = 0; i < 2 * dimScale; i++)
+        channel_pred_data[x_index + i] = YOloSigmoid(channel_pred_data[x_index + i]);
+      int object_index = b * num_channels * dimScale
+                                  + m * stride_channel + 4 * dimScale;
+      for(int i = 0; i < (num_classes + 1) * dimScale; i++){
+        channel_pred_data[object_index + i] = YOloSigmoid(channel_pred_data[object_index + i]);
+      }
+    }
+  }
+  for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
-    int dimScale = output_height * output_width;
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
         for(unsigned m = 0; m < mask_bias.size(); m++){
@@ -595,14 +617,14 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
 template void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
                               const int output_width, const int output_height, 
                               const int net_width, const int net_height,
-                              const float* channel_pred_data,
+                              float* channel_pred_data,
                               std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                               std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
                               float* bottom_diff, float ignore_thresh);
 template void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
                               const int output_width, const int output_height, 
                               const int net_width, const int net_height,
-                              const double* channel_pred_data,
+                              double* channel_pred_data,
                               std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                               std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
                               double* bottom_diff, double ignore_thresh);

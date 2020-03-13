@@ -20,16 +20,16 @@ namespace caffe {
  *
  */
 template <typename Dtype>
-class FeaturemapObjectLossLayer : public LossLayer<Dtype> {
+class Yolov3LossLayer : public LossLayer<Dtype> {
  public:
-  explicit FeaturemapObjectLossLayer(const LayerParameter& param)
+  explicit Yolov3LossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "FeaturemapObjectLoss"; }
+  virtual inline const char* type() const { return "Yolov3Loss"; }
   virtual inline int ExactNumBottomBlobs() const { return 2; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 

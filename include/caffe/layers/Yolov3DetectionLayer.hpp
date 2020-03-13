@@ -20,26 +20,23 @@ using namespace boost::property_tree;  // NOLINT(build/namespaces)
 namespace caffe {
 
 /**
- * @brief Generate the detection output based on location and confidence
- * predictions by doing non maximum suppression.
- *
- * Intended for use with MultiBox detection method.
+ * @brief 
+ * Yolov3Detection
  *
  * NOTE: does not implement Backwards operation.
  */
 template <typename Dtype>
-class Yolov3DetectionOutputLayer : public Layer<Dtype> {
+class Yolov3DetectionLayer : public Layer<Dtype> {
  public:
-  explicit Yolov3DetectionOutputLayer(const LayerParameter& param)
+  explicit Yolov3DetectionLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "DetectionOutput"; }
+  virtual inline const char* type() const { return "Yolov3Detection"; }
   virtual inline int MinBottomBlobs() const { return 1; }
-  //virtual inline int MaxBottomBlobs() const { return 4; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
@@ -69,10 +66,10 @@ class Yolov3DetectionOutputLayer : public Layer<Dtype> {
 
   int side_;
   int num_class_;
-  int num_;
+  int mask_num_box_;
   int coords_;
   
-  int mask_group_num_;
+  int mask_num_group_;
   int groups_num_;
 
   Dtype confidence_threshold_;
@@ -81,7 +78,6 @@ class Yolov3DetectionOutputLayer : public Layer<Dtype> {
   vector<Dtype> anchors_scale_;
   vector<Dtype> mask_;
   Blob<Dtype> swap_;
-  
 
 };
 

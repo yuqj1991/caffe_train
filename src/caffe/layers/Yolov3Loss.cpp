@@ -3,13 +3,13 @@
 #include <utility>
 #include <vector>
 
-#include "caffe/layers/featuremap_bbox_object_loss_layer.hpp"
+#include "caffe/layers/Yolov3Loss.hpp"
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
 
 template <typename Dtype>
-void FeaturemapObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::LayerSetUp(bottom, top);
   if (this->layer_param_.propagate_down_size() == 0) {
@@ -51,15 +51,15 @@ void FeaturemapObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bo
 }
 
 template <typename Dtype>
-void FeaturemapObjectLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
+void Yolov3LossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
 }
 
 template <typename Dtype>
-void FeaturemapObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-  const Dtype* channel_pred_data = bottom[0]->cpu_data();
+  Dtype* channel_pred_data = bottom[0]->mutable_cpu_data();
   const int output_height = bottom[0]->height();
   const int output_width = bottom[0]->width();
   const int num_channels = bottom[0]->channels();
@@ -116,7 +116,7 @@ void FeaturemapObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& b
 }
 
 template <typename Dtype>
-void FeaturemapObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
   if (propagate_down[1]) {
@@ -131,7 +131,7 @@ void FeaturemapObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& 
   }
 }
 
-INSTANTIATE_CLASS(FeaturemapObjectLossLayer);
-REGISTER_LAYER_CLASS(FeaturemapObjectLoss);
+INSTANTIATE_CLASS(Yolov3LossLayer);
+REGISTER_LAYER_CLASS(Yolov3Loss);
 
 }  // namespace caffe
