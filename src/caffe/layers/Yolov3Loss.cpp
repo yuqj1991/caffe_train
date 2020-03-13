@@ -27,7 +27,7 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
                     center_object_loss_param.bias_scale(i * 2 + 1)));
     }
     bias_mask_group_num_ = center_object_loss_param.bias_mask_group_num();
-    CHECK_EQ(bottom_size_, bias_mask_group_num_) << "bias_mask_group must be equal to bottom size";
+    CHECK_EQ(bottom_size_ - 1, bias_mask_group_num_) << "bias_mask_group must be equal to bottom size";
     int num_mask_per_group = center_object_loss_param.bias_mask_size() / bias_mask_group_num_ ; 
 
     for(int j = 0; j < bias_mask_group_num_; j++){
