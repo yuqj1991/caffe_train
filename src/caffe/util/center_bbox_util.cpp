@@ -618,7 +618,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         bottom_diff[width_index] = delta_scale * (width - channel_pred_data[width_index]);
         bottom_diff[height_index] = delta_scale * (height - channel_pred_data[height_index]);
         bottom_diff[object_index] = 1 - channel_pred_data[object_index];
-        
+        avg_obj +=  channel_pred_data[object_index];
         // class score
         // 特殊情况，face数据集，包含了背景目标，而实际上不需要背景目标，所以减一
         int class_lable = gt_bboxes[ii].label() - 1; 
@@ -652,6 +652,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         if(iou > .5) recall += 1;
         if(iou > .75) recall75 += 1;
         avg_iou += iou;
+        
       }
     } 
   }
