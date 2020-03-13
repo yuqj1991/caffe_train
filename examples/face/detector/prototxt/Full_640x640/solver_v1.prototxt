@@ -1,7 +1,7 @@
 train_net: "../prototxt/Full_640x640/train_v1.prototxt"
-#test_net: "../prototxt/Full_640x640/test_v1.prototxt"
-#test_iter: 5000
-#test_interval: 5000
+test_net: "../prototxt/Full_640x640/test_v1.prototxt"
+test_iter: 5000
+test_interval: 5000
 base_lr: 0.01
 display: 100
 lr_policy: "multistep"
@@ -12,7 +12,7 @@ snapshot_prefix: "../snapshot/face"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
-#test_initialization: false
+test_initialization: true
 max_iter: 240000
 average_loss: 10
 stepvalue: 50000
