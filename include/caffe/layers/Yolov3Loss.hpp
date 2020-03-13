@@ -30,7 +30,7 @@ class Yolov3LossLayer : public LossLayer<Dtype> {
       const vector<Blob<Dtype>*>& top);
 
   virtual inline const char* type() const { return "Yolov3Loss"; }
-  virtual inline int ExactNumBottomBlobs() const { return 2; }
+  virtual inline int MinBottomBlobs() const { return 2; } 
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
@@ -43,6 +43,7 @@ class Yolov3LossLayer : public LossLayer<Dtype> {
 
   int num_gt_;
   int num_;
+  unsigned bottom_size_;
 
 
   std::map<int, vector<NormalizedBBox> > all_gt_bboxes;
@@ -53,11 +54,12 @@ class Yolov3LossLayer : public LossLayer<Dtype> {
   LossParameter_NormalizationMode normalization_;
 
   std::vector<std::pair<int, int> > bias_scale_;
-  std::vector<int> bias_mask_;
+  std::vector<std::pair<int, std::vector<int> > > bias_mask_;
   int bias_num_;
   int net_width_;
   int net_height_;
   Dtype ignore_thresh_;
+  int bias_mask_group_num_;
 };
 
 }  // namespace caffe

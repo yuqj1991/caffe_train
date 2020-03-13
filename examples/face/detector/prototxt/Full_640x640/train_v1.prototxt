@@ -1936,6 +1936,8 @@ layer {
 	name: "Yolov3LossOne"
 	type: "Yolov3Loss"
 	bottom: "dectction_moudle_one_out"
+	bottom: "dectction_moudle_two_out"
+	bottom: "dectction_moudle_three_out"
 	bottom: "label"
 	top: "Yolov3LossOne"
 	loss_weight: 1
@@ -1946,6 +1948,8 @@ layer {
 		normalization: VALID
 	}
 	propagate_down: true
+	propagate_down: true
+	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
 		bias_scale: 15
@@ -1968,102 +1972,19 @@ layer {
 		bias_scale: 560
 		
 		bias_num: 9
+
 		bias_mask: 0
 		bias_mask: 1
 		bias_mask: 2
-		ignore_thresh: 0.5
-		net_width: 640
-		net_height: 640
-		
-		num_class: 1
-	}
-}
-
-layer {
-	name: "Yolov3LossTwo"
-	type: "Yolov3Loss"
-	bottom: "dectction_moudle_two_out"
-	bottom: "label"
-	top: "Yolov3LossTwo"
-	loss_weight: 1
-	include {
-		phase: TRAIN
-	}
-	loss_param {
-		normalization: VALID
-	}
-	propagate_down: true
-	propagate_down: false
-	center_object_loss_param {
-		bias_scale: 15
-		bias_scale: 15
-		bias_scale: 40
-		bias_scale: 40
-		bias_scale: 70
-		bias_scale: 70
-		bias_scale: 110
-		bias_scale: 110
-		bias_scale: 180
-		bias_scale: 180
-		bias_scale: 250
-		bias_scale: 250
-		bias_scale: 320
-		bias_scale: 320
-		bias_scale: 400
-		bias_scale: 400
-		bias_scale: 560
-		bias_scale: 560
-		
-		bias_num: 9
-		bias_mask: 3
 		bias_mask: 4
 		bias_mask: 5
-		ignore_thresh: 0.5
-		net_width: 640
-		net_height: 640
-		
-		num_class: 1
-	}
-}
-layer {
-	name: "Yolov3LossThree"
-	type: "Yolov3Loss"
-	bottom: "dectction_moudle_three_out"
-	bottom: "label"
-	top: "Yolov3LossThree"
-	loss_weight: 1
-	include {
-		phase: TRAIN
-	}
-	loss_param {
-		normalization: VALID
-	}
-	propagate_down: true
-	propagate_down: false
-	center_object_loss_param {
-		bias_scale: 15
-		bias_scale: 15
-		bias_scale: 40
-		bias_scale: 40
-		bias_scale: 70
-		bias_scale: 70
-		bias_scale: 110
-		bias_scale: 110
-		bias_scale: 180
-		bias_scale: 180
-		bias_scale: 250
-		bias_scale: 250
-		bias_scale: 320
-		bias_scale: 320
-		bias_scale: 400
-		bias_scale: 400
-		bias_scale: 560
-		bias_scale: 560
-		
-		bias_num: 9
 		bias_mask: 6
 		bias_mask: 7
 		bias_mask: 8
+		bias_mask: 9
+		
+		bias_mask_group_num: 3
+		
 		ignore_thresh: 0.5
 		net_width: 640
 		net_height: 640
