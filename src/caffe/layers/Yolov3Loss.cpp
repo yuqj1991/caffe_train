@@ -67,7 +67,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   num_gt_ = bottom[1]->height(); 
   bool use_difficult_gt_ = true;
   Dtype background_label_id_ = -1;
-  num_ = bottom[bottom_size_ - 1]->num();
+  num_ = bottom[0]->num();
   all_gt_bboxes.clear();
   
   GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
@@ -84,8 +84,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const int output_width = bottom[0]->width();
   const int num_channels = bottom[0]->channels();
   Dtype * bottom_diff = bottom[0]->mutable_cpu_diff();
-
-  num_ = bottom[0]->num();  
+    
   YoloScoreShow trainScore;
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
   if (num_gt_ >= 1) {
@@ -107,14 +106,13 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 0;
   }
   #if 1 
-  if(iterations_ % 10 == 0){ 
-    LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
-            <<", num_groundtruth: "<<num_groundtruth_
-            <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
-            <<", output_height: "<<output_height;
-    LOG(INFO)<<"Region "<<output_width<<" Avg IOU: "<<avg_iou/count<<", Class: "<<avg_cat/class_count
-                      <<", Obj: "<<avg_obj/count<<", No obj: "<<avg_anyobj/(dimScale*bias_mask_.size()*num_)
-                      <<", .5R: "<<recall/count<<", .75R: "<<recall75/count<<", count: "<<count;
+  if(iterations_ % 10 == 0){    
+    int dimScale = output_height * output_width;       
+    LOG(INFO)<<"Region "<<output_width<<"total loss: "<<top[0]->mutable_cpu_data()[0]<<", num_classes: "
+                      <<num_classes_<<", num_groundtruth: "<<num_groundtruth_<<" Avg IOU: "
+                      <<trainScore.avg_iou/trainScore.count<<", Class: "<<trainScore.avg_cat/trainScore.class_count
+                      <<", Obj: "<<trainScore.avg_obj/trainScore.count<<", No obj: "<<trainScore.avg_anyobj/(dimScale*bias_mask_.size()*num_)
+                      <<", .5R: "<<trainScore.recall/trainScore.count<<", .75R: "<<trainScore.recall75/trainScore.count<<", count: "<<count;
   }
   iterations_++;
   #endif
