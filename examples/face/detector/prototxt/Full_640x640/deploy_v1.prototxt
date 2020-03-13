@@ -1426,7 +1426,6 @@ layer{
 		num_output: 18
 		bias_term: false
 		kernel_size: 1
-		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1587,7 +1586,6 @@ layer{
 		num_output: 18
 		bias_term: false
 		kernel_size: 1
-		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1748,7 +1746,6 @@ layer{
 		num_output: 18
 		bias_term: false
 		kernel_size: 1
-		pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1789,19 +1786,18 @@ layer {
 		biases: 560
 
 
-		mask:0
-		mask:1
-		mask:2
-		mask:3
-		mask:4
-		mask:5
 		mask:6
 		mask:7
 		mask:8
-
-		anchors_scale:8
-		anchors_scale:16
+		mask:3
+		mask:4
+		mask:5
+		mask:0
+		mask:1
+		mask:2
 		anchors_scale:32
+		anchors_scale:16
+		anchors_scale:8
 		mask_group_num:3
 	}
 }
