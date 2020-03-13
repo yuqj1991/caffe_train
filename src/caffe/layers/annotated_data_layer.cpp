@@ -106,13 +106,24 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
         for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
           num_bboxes += anno_datum.annotation_group(g).annotation_size();
         }
-        label_shape[0] = 1;
-        label_shape[1] = 1;
-        // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
-        // cpu_data and gpu_data for consistent prefetch thread. Thus we make
-        // sure there is at least one bbox.
-        label_shape[2] = std::max(num_bboxes, 1);
-        label_shape[3] = 8;
+        if(YoloFormat_){
+          label_shape[0] = batch_size;
+          label_shape[1] = 1;
+          // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
+          // cpu_data and gpu_data for consistent prefetch thread. Thus we make
+          // sure there is at least one bbox.
+          label_shape[2] = std::max(num_bboxes, 1);
+          label_shape[3] = 8;
+        }else{
+          label_shape[0] = 1;
+          label_shape[1] = 1;
+          // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
+          // cpu_data and gpu_data for consistent prefetch thread. Thus we make
+          // sure there is at least one bbox.
+          label_shape[2] = std::max(num_bboxes, 1);
+          label_shape[3] = 8;
+        }
+        
       } else {
         LOG(FATAL) << "Unknown annotation type.";
       }
