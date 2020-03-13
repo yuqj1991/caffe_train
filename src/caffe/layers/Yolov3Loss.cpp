@@ -112,7 +112,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       top[0]->mutable_cpu_data()[0] += 0;
     }
     #if 1 
-    if(iterations_ % 1000 == 0){
+    if(iterations_ % 1000 != 0){
       int num_groundtruth = 0;
       for(int i = 0; i < all_gt_bboxes.size(); i++){
         vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
