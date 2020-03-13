@@ -491,8 +491,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
   int stride_channel = 5 + num_classes;
   int stride_feature = net_height / output_height;
   int dimScale = output_height * output_width;
-  CHECK_EQ(num_channels, (5 + num_classes) * mask_bias.size()) << "num_channels shoule be set to \
-                              including bias_x, bias_y, width, height, object_confidence and classes";
+  CHECK_EQ(num_channels, (5 + num_classes) * mask_bias.size()) << "num_channels shoule be set to including bias_x, bias_y, width, height, object_confidence and classes";
   for(int b = 0; b < batch_size; b++){
     for(unsigned m = 0; m < mask_bias.size(); m++){
       int x_index = b * num_channels * dimScale

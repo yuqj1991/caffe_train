@@ -21,6 +21,7 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   const CenterObjectParameter& center_object_loss_param =
       this->layer_param_.center_object_loss_param();
   
+  // bias_mask_
   if(center_object_loss_param.has_bias_num()){
     for(int i = 0; i < center_object_loss_param.bias_scale_size() / 2; i++){
       bias_scale_.push_back(std::pair<int, int>(center_object_loss_param.bias_scale(i * 2), 
@@ -32,13 +33,14 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
     for(int j = 0; j < bias_mask_group_num_; j++){
       std::vector<int> mask_group_index;
+      mask_group_index.clear();
       for(int i = 0; i < num_mask_per_group; i++){
-        mask_group_index.clear();
         mask_group_index.push_back(center_object_loss_param.bias_mask(j * num_mask_per_group + i));
       }
       bias_mask_.push_back(std::pair<int, std::vector<int> >(j, mask_group_index));
     }
   }
+  
   net_height_ = center_object_loss_param.net_height();
   net_width_ = center_object_loss_param.net_width();
   bias_num_ = center_object_loss_param.bias_num();
@@ -70,6 +72,7 @@ void Yolov3LossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
+  
   // gt_boxes
   bottom_size_ = bottom.size();
   const Dtype* gt_data = bottom[bottom_size_ - 1]->cpu_data();
