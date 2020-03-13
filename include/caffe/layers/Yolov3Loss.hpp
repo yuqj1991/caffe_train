@@ -31,6 +31,7 @@ class Yolov3LossLayer : public LossLayer<Dtype> {
 
   virtual inline const char* type() const { return "Yolov3Loss"; }
   virtual inline int MinBottomBlobs() const { return 2; } 
+  virtual inline int ExactNumBottomBlobs() const { return -1; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
