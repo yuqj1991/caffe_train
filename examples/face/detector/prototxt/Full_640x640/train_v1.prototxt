@@ -1937,7 +1937,7 @@ layer{
 }
 layer {
 	name: "Yolov3LossOne"
-	type: "Yolov3"
+	type: "Yolov3Loss"
 	bottom: "dectction_moudle_one_out"
 	bottom: "label"
 	top: "Yolov3Loss_One"
@@ -1976,7 +1976,7 @@ layer {
 
 layer {
 	name: "Yolov3LossTwo"
-	type: "Yolov3"
+	type: "Yolov3Loss"
 	bottom: "dectction_moudle_two_out"
 	bottom: "label"
 	top: "Yolov3Loss_two"
@@ -2014,7 +2014,7 @@ layer {
 }
 layer {
 	name: "Yolov3LossThree"
-	type: "Yolov3"
+	type: "Yolov3Loss"
 	bottom: "dectction_moudle_three_out"
 	bottom: "label"
 	top: "Yolov3Loss_Three"
