@@ -49,7 +49,7 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   
   num_classes_ = center_object_loss_param.num_class();
   CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
-  CHECK_EQ((4 + 1 + num_classes_) * bias_mask_.size(), bottom[0]->channels()) 
+  CHECK_EQ((4 + 1 + num_classes_) * bias_mask_[0].size(), bottom[0]->channels()) 
             << "num_classes must be equal to prediction classes";
   
   if (!this->layer_param_.loss_param().has_normalization() &&
