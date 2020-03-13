@@ -142,6 +142,28 @@ void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
           normalization_, num_, num_gt_, num_gt_);
       Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+      const int output_height = bottom[i]->height();
+      const int output_width = bottom[i]->width();
+      const int num_channels = bottom[i]->channels();
+      Dtype* bottom_diff = bottom[i]->mutable_cpu_diff();
+      const Dtype* bottom_data = bottom[i]->cpu_data();
+      num_ = bottom[i]->num();
+      int channel_per_box = 4 + 1 + num_classes_;
+      int mask_size_ = bias_mask_[i].second.size();
+      int dimScale = output_height * output_width;
+      CHECK_EQ(channel_per_box * mask_size_, num_channels);
+      for(int j = 0; j < num_; j++){
+        for (int s = 0; s < dimScale; s++) {
+          for(int mm = 0; mm < mask_size_; mm++){
+            int mask_index = j * num_channels * dimScale + mm * channel_per_box * dimScale + s;
+            for(int cc = 0; cc < channel_per_box; cc++){
+              int index = mask_index + cc * dimScale;
+              if(cc != 2 && cc != 3)
+                bottom_diff[index] = bottom_diff[index] * logistic_gradient(bottom_data[index]);
+            }
+          }
+        }
+      } 
         caffe_scal(bottom[i]->count(), loss_weight, bottom[i]->mutable_cpu_diff());
     }
   }
