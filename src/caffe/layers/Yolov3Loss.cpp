@@ -77,7 +77,6 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
     num_groundtruth_ += gt_boxes.size();
   }
-  LOG(INFO)<<"num_groundtruth: "<<num_groundtruth_;
   // prediction data
   Dtype* channel_pred_data = bottom[0]->mutable_cpu_data();
   const int output_height = bottom[0]->height();
@@ -101,14 +100,13 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_groundtruth_, num_groundtruth_);
     top[0]->mutable_cpu_data()[0] += sum_squre / normalizer;
-    //LOG(INFO)<<"total loss: "<<sum_squre / normalizer;
   } else {
     top[0]->mutable_cpu_data()[0] += 0;
   }
   #if 1 
   if(iterations_ % 10 == 0){    
     int dimScale = output_height * output_width;       
-    LOG(INFO)<<"Region "<<output_width<<"total loss: "<<top[0]->mutable_cpu_data()[0]<<", num_classes: "
+    LOG(INFO)<<"Region "<<output_width<<": total loss: "<<top[0]->mutable_cpu_data()[0]<<", num_classes: "
                       <<num_classes_<<", num_groundtruth: "<<num_groundtruth_<<" Avg IOU: "
                       <<trainScore.avg_iou/trainScore.count<<", Class: "<<trainScore.avg_cat/trainScore.class_count
                       <<", Obj: "<<trainScore.avg_obj/trainScore.count<<", No obj: "<<trainScore.avg_anyobj/(dimScale*bias_mask_.size()*num_)
