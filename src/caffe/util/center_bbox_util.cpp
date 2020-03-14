@@ -568,7 +568,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         NormalizedBBox anchor_bbox ; 
         NormalizedBBox shfit_gt_bbox;
         Dtype shift_x_min = 0 - Dtype((xmax - xmin) / (2 * output_width));
-        Dtype shift_x_max = 0 + Dtype((xmax - xmin) / (2 * output_width);
+        Dtype shift_x_max = 0 + Dtype((xmax - xmin) / (2 * output_width));
         Dtype shift_y_min = 0 - Dtype((ymax - ymin) / (2 * output_height));
         Dtype shift_y_max = 0 + Dtype((ymax - ymin) / (2 * output_height));
         shfit_gt_bbox.set_xmin(shift_x_min);
@@ -592,7 +592,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         }
       }
       #if 1
-      
+
       #endif
       int mask_n = int_index(mask_bias, best_mask_scale, mask_bias.size());
       if(mask_n > 0){
