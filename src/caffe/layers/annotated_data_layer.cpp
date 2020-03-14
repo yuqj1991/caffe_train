@@ -354,7 +354,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
           batch->label_.Reshape(label_shape);
           caffe_set<Dtype>(8 * num_bboxes * batch_size, -1, batch->label_.mutable_cpu_data());
           top_label = batch->label_.mutable_cpu_data();
-          int idx = 0;
           for (int item_id = 0; item_id < batch_size; ++item_id) {
             const vector<AnnotationGroup>& anno_vec = all_anno[item_id];
             int idx = item_id * num_bboxes * 8 ;
