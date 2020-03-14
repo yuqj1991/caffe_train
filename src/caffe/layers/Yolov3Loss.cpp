@@ -70,10 +70,10 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   num_ = bottom[0]->num();
   all_gt_bboxes.clear();
   
-  /*GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
-                 &all_gt_bboxes, num_);*/
-  GetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
-                 &all_gt_bboxes);
+  GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
+                 &all_gt_bboxes, num_);
+  //GetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
+  //               &all_gt_bboxes);
   num_groundtruth_ = 0;
   for(int i = 0; i < all_gt_bboxes.size(); i++){
     vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];

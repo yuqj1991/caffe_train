@@ -340,7 +340,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   if (this->output_labels_ && has_anno_type_) {
     vector<int> label_shape(4);
     if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) {
-      /*if(YoloFormat_){ // Yolo 格式的label数据
+      if(YoloFormat_){ // Yolo 格式的label数据
         label_shape[0] = batch_size;
         label_shape[1] = 1;
         label_shape[3] = 8;
@@ -354,12 +354,13 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
           batch->label_.Reshape(label_shape);
           caffe_set<Dtype>(8 * num_bboxes * batch_size, -1, batch->label_.mutable_cpu_data());
           top_label = batch->label_.mutable_cpu_data();
+          int idx = 0;
           for (int item_id = 0; item_id < batch_size; ++item_id) {
             const vector<AnnotationGroup>& anno_vec = all_anno[item_id];
+            int idx = item_id * num_bboxes * 8 ;
             for (int g = 0; g < anno_vec.size(); ++g) {
               const AnnotationGroup& anno_group = anno_vec[g];
               for (int a = 0; a < anno_group.annotation_size(); ++a) {
-                int idx = item_id * num_bboxes * 8 + g * anno_group.annotation_size() + a;
                 const Annotation& anno = anno_group.annotation(a);
                 const NormalizedBBox& bbox = anno.bbox();
                 top_label[idx++] = item_id;
@@ -374,7 +375,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             }
           }
         }
-      }else*/{   // SSD 格式的label数据
+      }else{   // SSD 格式的label数据
         label_shape[0] = 1;
         label_shape[1] = 1;
         label_shape[3] = 8;
