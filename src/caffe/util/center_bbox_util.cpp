@@ -593,7 +593,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         }
       }
       int mask_n = int_index(mask_bias, best_mask_scale, mask_bias.size());
-      if(mask_n > 0){
+      if(mask_n >= 0){
         Dtype center_x = Dtype((xmin + xmax) / 2);
         Dtype center_y = Dtype((ymin + ymax) / 2);
         int inter_center_x = static_cast<int> (center_x);
@@ -657,7 +657,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
       }
     } 
   }
-  #if 1
+  #if 0
   LOG(INFO)<<"Region: "<<output_height<<", count: "<<count;
   #endif
   Score->avg_anyobj = avg_anyobj;
