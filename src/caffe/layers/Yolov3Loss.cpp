@@ -104,7 +104,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 0;
   }
   #if 1 
-  if(iterations_ % 100 == 0){    
+  if(iterations_ % 50 == 0){    
     int dimScale = output_height * output_width;  
     LOG(INFO)<<"all num_gt boxes: "<<num_gt_;     
     LOG(INFO)<<"Region "<<output_width<<": total loss: "<<top[0]->mutable_cpu_data()[0]<<", num_groundtruth: "<<num_groundtruth_<<" Avg IOU: "
