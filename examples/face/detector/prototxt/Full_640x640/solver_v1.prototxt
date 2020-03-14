@@ -15,10 +15,10 @@ snapshot_after_train: true
 test_initialization: false
 max_iter: 240000
 average_loss: 10
-stepvalue: 50000
-stepvalue: 100000
-stepvalue: 200000
-iter_size: 4
+stepvalue: 20000
+stepvalue: 80000
+stepvalue: 120000
+iter_size: 2
 type: "RMSProp"
 eval_type: "detection"
 ap_version: "11point"
