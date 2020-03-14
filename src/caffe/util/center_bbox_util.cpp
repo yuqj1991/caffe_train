@@ -551,7 +551,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
             }
           }
           avg_anyobj += channel_pred_data[object_index];
-          bottom_diff[object_index] = 0 - channel_pred_data[object_index];
+          bottom_diff[object_index] = (-1) * (0 - channel_pred_data[object_index]);
           if(best_iou > ignore_thresh){
             bottom_diff[object_index] = 0;
           }
@@ -614,11 +614,11 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         int object_index = b * num_channels * dimScale + (mask_n * stride_channel + 4)* dimScale
                                   + inter_center_y * output_width + inter_center_x;
         float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
-        bottom_diff[x_index] = delta_scale * (diff_x - channel_pred_data[x_index]);
-        bottom_diff[y_index] = delta_scale * (diff_y - channel_pred_data[y_index]);
-        bottom_diff[width_index] = delta_scale * (width - channel_pred_data[width_index]);
-        bottom_diff[height_index] = delta_scale * (height - channel_pred_data[height_index]);
-        bottom_diff[object_index] = 1 - channel_pred_data[object_index];
+        bottom_diff[x_index] = (-1) * delta_scale * (diff_x - channel_pred_data[x_index]);
+        bottom_diff[y_index] = (-1) *delta_scale * (diff_y - channel_pred_data[y_index]);
+        bottom_diff[width_index] = (-1) *delta_scale * (width - channel_pred_data[width_index]);
+        bottom_diff[height_index] = (-1) *delta_scale * (height - channel_pred_data[height_index]);
+        bottom_diff[object_index] = (-1) * (1 - channel_pred_data[object_index]);
         avg_obj +=  channel_pred_data[object_index];
         // class score
         // 特殊情况，face数据集，包含了背景目标，而实际上不需要背景目标，所以减一
@@ -630,7 +630,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
           avg_cat += channel_pred_data[class_index + class_lable * dimScale];
         }else{
           for(int c = 0; c < num_classes; c++){
-            bottom_diff[class_index + c * dimScale] = ((c == class_lable)?1 : 0) - channel_pred_data[class_index + c * dimScale];
+            bottom_diff[class_index + c * dimScale] =( -1) * (((c == class_lable)?1 : 0) - channel_pred_data[class_index + c * dimScale]);
             if(c == class_lable) 
               avg_cat += channel_pred_data[class_index + c * dimScale];
           }
