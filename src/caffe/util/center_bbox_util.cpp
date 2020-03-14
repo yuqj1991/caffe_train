@@ -488,7 +488,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
                           Dtype* bottom_diff, Dtype ignore_thresh, YoloScoreShow *Score){
   CHECK_EQ(net_height, net_width);
-  int stride_channel = 5 + num_classes;
+  int stride_channel = 4 + 1 + num_classes;
   int stride_feature = net_height / output_height;
   int dimScale = output_height * output_width;
   float avg_iou = 0;
@@ -657,9 +657,6 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
       }
     } 
   }
-  #if 0
-  LOG(INFO)<<"Region: "<<output_height<<", count: "<<count;
-  #endif
   Score->avg_anyobj = avg_anyobj;
   Score->avg_cat = avg_cat;
   Score->avg_iou = avg_iou;

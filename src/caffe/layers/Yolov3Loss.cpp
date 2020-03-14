@@ -72,8 +72,6 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   
   GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
                  &all_gt_bboxes, num_);
-  //GetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
-  //               &all_gt_bboxes);
   num_groundtruth_ = 0;
   for(int i = 0; i < all_gt_bboxes.size(); i++){
     vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
@@ -88,7 +86,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 
   YoloScoreShow trainScore;
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
-  if (num_gt_ >= 1) {
+  if (num_groundtruth_ >= 1) {
     EncodeYoloObject(num_, num_channels, num_classes_, output_width, output_height, 
                           net_width_, net_height_,
                           channel_pred_data, all_gt_bboxes,
@@ -97,7 +95,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const Dtype * diff = bottom[0]->cpu_diff();
     Dtype sum_squre = Dtype(0.);
     for(int j = 0; j < bottom[0]->count(); j++){
-      sum_squre += std::pow(diff[j], 2);
+      sum_squre += diff[j] * diff[j];
     }
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_groundtruth_, num_groundtruth_);
@@ -106,7 +104,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     top[0]->mutable_cpu_data()[0] += 0;
   }
   #if 1 
-  if(iterations_ % 10 == 0){    
+  if(iterations_ % 100 == 0){    
     int dimScale = output_height * output_width;  
     LOG(INFO)<<"all num_gt boxes: "<<num_gt_;     
     LOG(INFO)<<"Region "<<output_width<<": total loss: "<<top[0]->mutable_cpu_data()[0]<<", num_groundtruth: "<<num_groundtruth_<<" Avg IOU: "
@@ -143,13 +141,14 @@ void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     int dimScale = output_height * output_width;
     CHECK_EQ(channel_per_box * mask_size_, num_channels);
     for(int j = 0; j < num_; j++){
-      for (int s = 0; s < dimScale; s++) {
-        for(int mm = 0; mm < mask_size_; mm++){
-          int mask_index = j * num_channels * dimScale + mm * channel_per_box * dimScale + s;
-          for(int cc = 0; cc < channel_per_box; cc++){
-            int index = mask_index + cc * dimScale;
-            if(cc != 2 && cc != 3)
+      for(int mm = 0; mm < mask_size_; mm++){
+        for(int cc = 0; cc < channel_per_box; cc++){
+          int channal_index = j * num_channels * dimScale + (mm * channel_per_box + cc) * dimScale;
+          if(cc != 2 && cc != 3){
+            for(int s = 0; s < dimScale; s++){
+              int index = channal_index + s;
               bottom_diff[index] = bottom_diff[index] * logistic_gradient(bottom_data[index]);
+            }
           }
         }
       }
