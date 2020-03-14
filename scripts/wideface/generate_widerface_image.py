@@ -142,8 +142,8 @@ def draw_histogram_specfic_range_base_data():
 	classfy_.truncate()
 	classfy_.close()
 
-	static_data = collectFaceData('../../dataset/facedata/wider_face/JPEGImages/wider_train/images',
-														'../../dataset/facedata/wider_face/label',
+	static_data = collectFaceData('../../../dataset/facedata/wider_face/JPEGImages/wider_train/images',
+														'../../../dataset/facedata/wider_face/label',
 													classflyFile)
 	img_num = static_data.count
 	face_num += static_data.face_count
@@ -402,11 +402,11 @@ def main():
 	# generate imagesetfile xmlfile & labelfile
 	if 1:
 		for sub in widerSetFile:
-			splitfile = "../../dataset/facedata/wider_face_split/"+widerfaceSplitDict[sub]
+			splitfile = "../../../dataset/facedata/wider_face_split/"+widerfaceSplitDict[sub]
 			generate_pascal_image_set(splitfile, root_dir + '/JPEGImages/', sub, root_dir+'/ImageSets/Main')
 			print('samples: ', samples)
 			print("samples_width: %d, and samples_height: %d"%(samples_width, samples_height))
-			shuffle_imageSetfile('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+sub+'.txt')
+			shuffle_imageSetfile('../../../dataset/facedata/wider_face/ImageSets/Main'+'/'+sub+'.txt')
 			
 	# static and get classflyFile
 	if 1:
