@@ -530,16 +530,16 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
           int object_index = b * num_channels * dimScale 
                                     + (m * stride_channel + 4)* dimScale + h * output_width + w;
           NormalizedBBox predBox;
-          float bb_xmin = (channel_pred_data[x_index] + w) / output_width;
-          float bb_ymin = (channel_pred_data[y_index] + h) / output_height;
+          float bb_center_x = (channel_pred_data[x_index] + w) / output_width;
+          float bb_center_y = (channel_pred_data[y_index] + h) / output_height;
           float bb_width = (float)std::exp(channel_pred_data[width_index]) 
                                                           * bias_scale[mask_bias[m]].first / net_width;
           float bb_height = (float)std::exp(channel_pred_data[height_index]) 
                                                           * bias_scale[mask_bias[m]].second / net_height;
-          predBox.set_xmin(bb_ymin);
-          predBox.set_xmax(bb_xmin + bb_width);
-          predBox.set_ymin(bb_ymin);
-          predBox.set_ymax(bb_ymin + bb_height);
+          predBox.set_xmin(bb_center_x - bb_width / 2);
+          predBox.set_xmax(bb_center_x + bb_width / 2);
+          predBox.set_ymin(bb_center_y - bb_height / 2);
+          predBox.set_ymax(bb_center_y + bb_height / 2);
           float best_iou = 0;
           int best_t = 0;
           for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -638,16 +638,16 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         ++count;
         ++class_count;
         NormalizedBBox predBox;
-        float bb_xmin = (channel_pred_data[x_index] + inter_center_x) / output_width;
-        float bb_ymin = (channel_pred_data[y_index] + inter_center_y) / output_height;
+        float bb_center_x = (channel_pred_data[x_index] + inter_center_x) / output_width;
+        float bb_center_y = (channel_pred_data[y_index] + inter_center_y) / output_height;
         float bb_width = (float)std::exp(channel_pred_data[width_index]) 
                                                         * bias_scale[best_mask_scale].first / net_width;
         float bb_height = (float)std::exp(channel_pred_data[height_index]) 
                                                         * bias_scale[best_mask_scale].second / net_height;
-        predBox.set_xmin(bb_ymin);
-        predBox.set_xmax(bb_xmin + bb_width);
-        predBox.set_ymin(bb_ymin);
-        predBox.set_ymax(bb_ymin + bb_height);
+        predBox.set_xmin(bb_center_x - bb_width / 2);
+        predBox.set_xmax(bb_center_x + bb_width / 2);
+        predBox.set_ymin(bb_center_y - bb_height / 2);
+        predBox.set_ymax(bb_center_y + bb_height / 2);
         float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
         if(iou > .5) recall += 1;
         if(iou > .75) recall75 += 1;
