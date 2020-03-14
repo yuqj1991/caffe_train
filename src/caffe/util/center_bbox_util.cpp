@@ -567,20 +567,20 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
       for(unsigned m = 0; m < bias_scale.size(); m++){
         NormalizedBBox anchor_bbox ; 
         NormalizedBBox shfit_gt_bbox;
-        Dtype shift_x_min = 0 - Dtype((xmax - xmin) / 2 / output_width);
-        Dtype shift_x_max = 0 + Dtype((xmax - xmin) / 2 / output_width);
-        Dtype shift_y_min = 0 - Dtype((ymax - ymin) / 2 / output_height);
-        Dtype shift_y_max = 0 + Dtype((ymax - ymin) / 2 / output_height);
+        Dtype shift_x_min = 0 - Dtype((xmax - xmin) / (2 * output_width));
+        Dtype shift_x_max = 0 + Dtype((xmax - xmin) / (2 * output_width);
+        Dtype shift_y_min = 0 - Dtype((ymax - ymin) / (2 * output_height));
+        Dtype shift_y_max = 0 + Dtype((ymax - ymin) / (2 * output_height));
         shfit_gt_bbox.set_xmin(shift_x_min);
         shfit_gt_bbox.set_xmax(shift_x_max);
         shfit_gt_bbox.set_ymin(shift_y_min);
         shfit_gt_bbox.set_ymax(shift_y_max);
         float bias_width = bias_scale[m].first;
         float bias_height = bias_scale[m].second;
-        float bias_xmin = 0 - (float)bias_width / 2 / net_width;
-        float bias_ymin = 0 - (float)bias_height / 2 / net_height;
-        float bias_xmax = 0 + (float)bias_width / 2 / net_width;
-        float bias_ymax = 0 + (float)bias_height / 2 / net_height;
+        float bias_xmin = 0 - (float)bias_width / (2 * net_width);
+        float bias_ymin = 0 - (float)bias_height / (2 * net_height);
+        float bias_xmax = 0 + (float)bias_width / (2 * net_width);
+        float bias_ymax = 0 + (float)bias_height / (2 * net_height);
         anchor_bbox.set_xmin(bias_xmin);
         anchor_bbox.set_xmax(bias_xmax);
         anchor_bbox.set_ymin(bias_ymin);
@@ -591,6 +591,9 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
           best_mask_scale = m;
         }
       }
+      #if 1
+      
+      #endif
       int mask_n = int_index(mask_bias, best_mask_scale, mask_bias.size());
       if(mask_n > 0){
         Dtype center_x = Dtype((xmin + xmax) / 2);
