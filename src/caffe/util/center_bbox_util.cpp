@@ -513,6 +513,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
       }
     }
   }
+  int gt_idx = 0;
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
     for(int h = 0; h < output_height; h++){
@@ -592,7 +593,8 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         }
       }
       #if 1
-
+      LOG(INFO)<<"Region: "<<output_height<<", gt_idx: "<<gt_idx<<", mask_scale_best: "<<best_mask_scale;
+      gt_idx++;
       #endif
       int mask_n = int_index(mask_bias, best_mask_scale, mask_bias.size());
       if(mask_n > 0){
