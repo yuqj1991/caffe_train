@@ -592,11 +592,11 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
           best_mask_scale = m;
         }
       }
+      int mask_n = int_index(mask_bias, best_mask_scale, mask_bias.size());
       #if 1
-      LOG(INFO)<<"Region: "<<output_height<<", gt_idx: "<<gt_idx<<", mask_scale_best: "<<best_mask_scale;
+      LOG(INFO)<<"Region: "<<output_height<<", gt_idx: "<<gt_idx<<", mask_scale_best: "<<best_mask_scale<<", mask_n: "<<mask_n;
       gt_idx++;
       #endif
-      int mask_n = int_index(mask_bias, best_mask_scale, mask_bias.size());
       if(mask_n > 0){
         Dtype center_x = Dtype((xmin + xmax) / 2);
         Dtype center_y = Dtype((ymin + ymax) / 2);
