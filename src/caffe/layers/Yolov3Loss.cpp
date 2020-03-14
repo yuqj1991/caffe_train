@@ -107,7 +107,8 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   #if 1 
   if(iterations_ % 10 == 0){    
-    int dimScale = output_height * output_width;       
+    int dimScale = output_height * output_width;  
+    LOG(INTO)<<"all num_gt boxes: "<<num_gt_;     
     LOG(INFO)<<"Region "<<output_width<<": total loss: "<<top[0]->mutable_cpu_data()[0]<<", num_groundtruth: "<<num_groundtruth_<<" Avg IOU: "
                       <<trainScore.avg_iou/trainScore.count<<", Class: "<<trainScore.avg_cat/trainScore.class_count
                       <<", Obj: "<<trainScore.avg_obj/trainScore.count<<", No obj: "<<trainScore.avg_anyobj/(dimScale*bias_mask_.size()*num_)
