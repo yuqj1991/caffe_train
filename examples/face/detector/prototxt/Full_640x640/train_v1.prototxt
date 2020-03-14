@@ -1814,37 +1814,37 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 10
-		bias_scale: 19
-		bias_scale: 18
-		bias_scale: 32
+		bias_scale: 16
 		bias_scale: 28
-		bias_scale: 49
-		bias_scale: 40
-		bias_scale: 78
-		bias_scale: 66
-		bias_scale: 125
+		bias_scale: 25
+		bias_scale: 45
+		bias_scale: 36
 		bias_scale: 69
-		bias_scale: 65
-		bias_scale: 115
-		bias_scale: 173
-		bias_scale: 189
-		bias_scale: 273
-		bias_scale: 305
-		bias_scale: 395
-		
+		bias_scale: 56
+		bias_scale: 108
+		bias_scale: 63
+		bias_scale: 60
+		bias_scale: 87
+		bias_scale: 181
+		bias_scale: 114
+		bias_scale: 111
+		bias_scale: 167
+		bias_scale: 245
+		bias_scale: 282
+		bias_scale: 370
+
 		bias_num: 9
 
 		bias_mask: 0
 		bias_mask: 1
 		bias_mask: 2
-		
+
 		bias_mask_group_num: 1
-		
+
 		ignore_thresh: 0.5
 		net_width: 640
 		net_height: 640
-		
+
 		num_class: 1
 	}
 }
@@ -1864,24 +1864,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 10
-		bias_scale: 19
-		bias_scale: 18
-		bias_scale: 32
+		bias_scale: 16
 		bias_scale: 28
-		bias_scale: 49
-		bias_scale: 40
-		bias_scale: 78
-		bias_scale: 66
-		bias_scale: 125
+		bias_scale: 25
+		bias_scale: 45
+		bias_scale: 36
 		bias_scale: 69
-		bias_scale: 65
-		bias_scale: 115
-		bias_scale: 173
-		bias_scale: 189
-		bias_scale: 273
-		bias_scale: 305
-		bias_scale: 395
+		bias_scale: 56
+		bias_scale: 108
+		bias_scale: 63
+		bias_scale: 60
+		bias_scale: 87
+		bias_scale: 181
+		bias_scale: 114
+		bias_scale: 111
+		bias_scale: 167
+		bias_scale: 245
+		bias_scale: 282
+		bias_scale: 370
 		
 		bias_num: 9
 
@@ -1915,24 +1915,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 10
-		bias_scale: 19
-		bias_scale: 18
-		bias_scale: 32
+		bias_scale: 16
 		bias_scale: 28
-		bias_scale: 49
-		bias_scale: 40
-		bias_scale: 78
-		bias_scale: 66
-		bias_scale: 125
+		bias_scale: 25
+		bias_scale: 45
+		bias_scale: 36
 		bias_scale: 69
-		bias_scale: 65
-		bias_scale: 115
-		bias_scale: 173
-		bias_scale: 189
-		bias_scale: 273
-		bias_scale: 305
-		bias_scale: 395
+		bias_scale: 56
+		bias_scale: 108
+		bias_scale: 63
+		bias_scale: 60
+		bias_scale: 87
+		bias_scale: 181
+		bias_scale: 114
+		bias_scale: 111
+		bias_scale: 167
+		bias_scale: 245
+		bias_scale: 282
+		bias_scale: 370
 		
 		bias_num: 9
 
