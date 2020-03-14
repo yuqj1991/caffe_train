@@ -409,7 +409,7 @@ def main():
 			shuffle_imageSetfile('../../dataset/facedata/wider_face/ImageSets/Main'+'/'+sub+'.txt')
 			
 	# static and get classflyFile
-	if 0:
+	if 1:
 		draw_histogram_specfic_range_base_data()
 if __name__ == '__main__':
 	main()
