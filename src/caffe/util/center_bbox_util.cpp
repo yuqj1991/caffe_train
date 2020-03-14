@@ -593,10 +593,6 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         }
       }
       int mask_n = int_index(mask_bias, best_mask_scale, mask_bias.size());
-      #if 1
-      LOG(INFO)<<"Region: "<<output_height<<", gt_idx: "<<gt_idx<<", mask_scale_best: "<<best_mask_scale<<", mask_n: "<<mask_n;
-      gt_idx++;
-      #endif
       if(mask_n > 0){
         Dtype center_x = Dtype((xmin + xmax) / 2);
         Dtype center_y = Dtype((ymin + ymax) / 2);
@@ -640,8 +636,8 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
           }
         }
 
-        ++count;
-        ++class_count;
+        count++;
+        class_count++;
         NormalizedBBox predBox;
         float bb_center_x = (channel_pred_data[x_index] + inter_center_x) / output_width;
         float bb_center_y = (channel_pred_data[y_index] + inter_center_y) / output_height;
@@ -661,6 +657,9 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
       }
     } 
   }
+  #if 1
+  LOG(INFO)<<"Region: "<<output_height<<", count: "<<count;
+  #endif
   Score->avg_anyobj = avg_anyobj;
   Score->avg_cat = avg_cat;
   Score->avg_iou = avg_iou;
