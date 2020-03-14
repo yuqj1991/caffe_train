@@ -5,26 +5,29 @@ import os, cv2, sys, shutil
 import numpy as np
 from xml.dom.minidom import Document
 
-rootdir = "../../dataset/facedata"
+rootdir = "../../../dataset/facedata"
 convet2yoloformat = False
 convert2vocformat = True
 
 # 最小取20大小的脸，并且补齐
-minsize2select = 32
+minsize2select = 10
 cropsize2select = 60
 usepadding = True
 
 datasetprefix = "../../../dataset/facedata/wider_face"  #
 use_blur_occlu_attri = False #True #
 
+classflyFile = "./wider_face_classfly_distance_data.txt"
+
+
 def convertimgset(img_set="train"):
     imgdir = rootdir + '/wider_face/' + "JPEGImages/wider_" + img_set + "/images"
     gtfilepath = rootdir + "/wider_face_split/wider_face_" + img_set + "_bbx_gt.txt"
-    imagesdir = rootdir + '/wider_face/' + "/annoImg"
-    vocannotationdir = rootdir + '/wider_face/' + "/Annotations"
-    labelsdir = rootdir + '/wider_face/' + "/label"
-    cropImgsDir = rootdir + '/wider_face/' + "/CropImg"
-    croplabelsdir = rootdir + '/wider_face/' + "/Croplabel"
+    imagesdir = rootdir + '/wider_face/' + "annoImg"
+    vocannotationdir = rootdir + '/wider_face/' + "Annotations"
+    labelsdir = rootdir + '/wider_face/' + "label"
+    cropImgsDir = rootdir + '/wider_face/' + "CropImg"
+    croplabelsdir = rootdir + '/wider_face/' + "Croplabel"
     if not os.path.exists(imagesdir):
         os.mkdir(imagesdir)
     if not os.path.exists(labelsdir):
@@ -47,28 +50,23 @@ def convertimgset(img_set="train"):
     f_set = open(rootdir + '/wider_face/' + "/ImageSets/Main/" + img_set + ".txt", 'w')
     if use_blur_occlu_attri:
         f_set_crop = open(rootdir + '/wider_face/' + "/ImageSets/Main/crop_" + img_set + ".txt", 'w')
+    classfly_file = open(classflyFile, 'a+')
+    
     with open(gtfilepath, 'r') as gtfile:
         while (True):  # and len(faces)<10
             filename = gtfile.readline()[:-1]
             if (filename == ""):
                 break;
-            sys.stdout.write("\r" + str(index) + ":" + filename + "\t\t\t")
+            sys.stdout.write("\r" + str(index) + ":" + filename + "\n")
             sys.stdout.flush()
             imgpath = imgdir + "/" + filename
             img = cv2.imread(imgpath)
+            img_width = img.shape[1]
+            img_height = img.shape[0]
             if not img.data:
                 break;
 
             saveimg = img.copy()
-            # imgheight = img.shape[0]
-            # imgwidth = img.shape[1]
-            # maxl = max(imgheight, imgwidth)
-            # paddingleft = (maxl - imgwidth) >> 1
-            # paddingright = (maxl - imgwidth) >> 1
-            # paddingbottom = (maxl - imgheight) >> 1
-            # paddingtop = (maxl - imgheight) >> 1
-            # saveimg = cv2.copyMakeBorder(img, paddingtop, paddingbottom, paddingleft, paddingright, cv2.BORDER_CONSTANT,
-            #                              value=0)
             showimg = saveimg.copy()
             numbbox = int(gtfile.readline())
             bboxes = []
@@ -89,7 +87,7 @@ def convertimgset(img_set="train"):
                 x2 = x + width
                 y2 = y + height
                 # face=img[x:x2,y:y2]
-                if width >= minsize2select and height >= minsize2select and blur != 2 and occlu != 2:
+                if width >= minsize2select and height >= minsize2select:
                     bboxes.append(bbox)
                     occlus.append(occlu)
                     blurs.append(blur)
@@ -229,12 +227,24 @@ def convertimgset(img_set="train"):
                     ymax = doc.createElement('ymax')
                     ymax.appendChild(doc.createTextNode(str(bbox[1] + bbox[3])))
                     bndbox.appendChild(ymax)
+                    if img_set == "train":
+                        ################### cluster BBox ############################
+                        ## get relative x, y , w, h corresponind width, height#######
+                        ################### cluster BBox ############################
+                        class_bdx_center_x = float((int(bbox[0])+int(bbox[0])+int(bbox[2]))/(2*int(img_width)))
+                        class_bdx_center_y = float((int(bbox[1])+int(bbox[1])+int(bbox[3]))/(2*int(img_height)))
+                        class_bdx_w = float(int(bbox[2])/int(img_width))
+                        class_bdx_h = float(int(bbox[3])/int(img_height))
+                        classfly_content = str(class_bdx_center_x) + ' ' + str(class_bdx_center_y) + ' ' + str(class_bdx_w)+ ' '+str(class_bdx_h)+'\n'
+                        classfly_file.writelines(classfly_content)
+                        ###################### end cluster BBox ####################
                 f = open(xmlpath, "w")
                 f.write(doc.toprettyxml(indent=''))
                 f.close()
                 # cv2.imshow("img",showimg)
             # cv2.waitKey()
             index = index + 1
+    classfly_file.close()
     f_set.close()
 
 def generatetxt(img_set="train"):
@@ -276,6 +286,9 @@ def generatevocsets(img_set="train"):
 
 
 def convertdataset():
+    classfy_ = open(classflyFile, "w")
+    classfy_.truncate()
+    classfy_.close()
     img_sets = ["train", "val"]
     for img_set in img_sets:
         convertimgset(img_set)

@@ -1791,24 +1791,24 @@ layer {
 
 		#anchor_scale list(width, height)
 
-		biases: 16
-		biases: 28
-		biases: 25
-		biases: 45
-		biases: 36
-		biases: 69
+		biases: 8
+		biases: 14
+		biases: 13
+		biases: 24
+		biases: 21
+		biases: 37
+		biases: 32
 		biases: 56
-		biases: 108
-		biases: 63
-		biases: 60
-		biases: 87
-		biases: 181
-		biases: 114
-		biases: 111
-		biases: 167
-		biases: 245
-		biases: 282
-		biases: 370
+		biases: 54
+		biases: 83
+		biases: 76
+		biases: 139
+		biases: 132
+		biases: 190
+		biases: 207
+		biases: 296
+		biases: 324
+		biases: 416
 
 		mask:0
 		mask:1
