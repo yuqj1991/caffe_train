@@ -489,7 +489,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           Dtype* bottom_diff, Dtype ignore_thresh, YoloScoreShow *Score){
   CHECK_EQ(net_height, net_width);
   int stride_channel = 4 + 1 + num_classes;
-  int stride_feature = net_height / output_height;
+  //int stride_feature = net_height / output_height;
   int dimScale = output_height * output_width;
   float avg_iou = 0;
   float recall = 0;
@@ -499,7 +499,8 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
   float avg_anyobj = 0;
   int count = 0;
   int class_count = 0;
-  CHECK_EQ(num_channels, (5 + num_classes) * mask_bias.size()) << "num_channels shoule be set to including bias_x, bias_y, width, height, object_confidence and classes";
+  CHECK_EQ(num_channels, (5 + num_classes) * mask_bias.size()) 
+          << "num_channels shoule be set to including bias_x, bias_y, width, height, object_confidence and classes";
   for(int b = 0; b < batch_size; b++){
     for(unsigned m = 0; m < mask_bias.size(); m++){
       int x_index = b * num_channels * dimScale
@@ -513,13 +514,11 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
       }
     }
   }
-  int gt_idx = 0;
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
         for(unsigned m = 0; m < mask_bias.size(); m++){
-          //LOG(INFO)<<"output_dim: "<<output_height<<", mask: "<<mask_bias[m];
           int x_index = b * num_channels * dimScale
                                     + (m * stride_channel + 0)* dimScale + h * output_width + w;
           int y_index = b * num_channels * dimScale 
@@ -542,12 +541,10 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
           predBox.set_ymin(bb_center_y - bb_height / 2);
           predBox.set_ymax(bb_center_y + bb_height / 2);
           float best_iou = 0;
-          int best_t = 0;
           for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
             float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
             if (iou > best_iou) {
               best_iou = iou;
-              best_t = ii;
             }
           }
           avg_anyobj += channel_pred_data[object_index];
@@ -559,19 +556,19 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
       }
     }
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-      const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
-      const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
-      const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
-      const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+      const Dtype xmin = gt_bboxes[ii].xmin();
+      const Dtype ymin = gt_bboxes[ii].ymin();
+      const Dtype xmax = gt_bboxes[ii].xmax();
+      const Dtype ymax = gt_bboxes[ii].ymax();
       float best_iou = 0.f;
       int best_mask_scale = 0;
       for(unsigned m = 0; m < bias_scale.size(); m++){
         NormalizedBBox anchor_bbox ; 
         NormalizedBBox shfit_gt_bbox;
-        Dtype shift_x_min = 0 - Dtype((xmax - xmin) / (2 * output_width));
-        Dtype shift_x_max = 0 + Dtype((xmax - xmin) / (2 * output_width));
-        Dtype shift_y_min = 0 - Dtype((ymax - ymin) / (2 * output_height));
-        Dtype shift_y_max = 0 + Dtype((ymax - ymin) / (2 * output_height));
+        Dtype shift_x_min = 0 - Dtype((xmax - xmin) / 2);
+        Dtype shift_x_max = 0 + Dtype((xmax - xmin) / 2);
+        Dtype shift_y_min = 0 - Dtype((ymax - ymin) / 2);
+        Dtype shift_y_max = 0 + Dtype((ymax - ymin) / 2);
         shfit_gt_bbox.set_xmin(shift_x_min);
         shfit_gt_bbox.set_xmax(shift_x_max);
         shfit_gt_bbox.set_ymin(shift_y_min);
@@ -594,14 +591,14 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
       }
       int mask_n = int_index(mask_bias, best_mask_scale, mask_bias.size());
       if(mask_n >= 0){
-        Dtype center_x = Dtype((xmin + xmax) / 2);
-        Dtype center_y = Dtype((ymin + ymax) / 2);
+        Dtype center_x = Dtype((xmin + xmax) / 2) * output_width;
+        Dtype center_y = Dtype((ymin + ymax) / 2) * output_height;
         int inter_center_x = static_cast<int> (center_x);
         int inter_center_y = static_cast<int> (center_y);
         Dtype diff_x = center_x - inter_center_x;
         Dtype diff_y = center_y - inter_center_y;
-        Dtype width = std::log((xmax - xmin) * stride_feature / bias_scale[best_mask_scale].first);
-        Dtype height = std::log((ymax - ymin) * stride_feature / bias_scale[best_mask_scale].second);
+        Dtype width = std::log((xmax - xmin) * net_width / bias_scale[best_mask_scale].first);
+        Dtype height = std::log((ymax - ymin) * net_height / bias_scale[best_mask_scale].second);
         
         int x_index = b * num_channels * dimScale + (mask_n * stride_channel + 0)* dimScale
                                 + inter_center_y * output_width + inter_center_x;
@@ -613,7 +610,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                                   + inter_center_y * output_width + inter_center_x;
         int object_index = b * num_channels * dimScale + (mask_n * stride_channel + 4)* dimScale
                                   + inter_center_y * output_width + inter_center_x;
-        float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
+        float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin);
         bottom_diff[x_index] = (-1) * delta_scale * (diff_x - channel_pred_data[x_index]);
         bottom_diff[y_index] = (-1) *delta_scale * (diff_y - channel_pred_data[y_index]);
         bottom_diff[width_index] = (-1) *delta_scale * (width - channel_pred_data[width_index]);
@@ -630,7 +627,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
           avg_cat += channel_pred_data[class_index + class_lable * dimScale];
         }else{
           for(int c = 0; c < num_classes; c++){
-            bottom_diff[class_index + c * dimScale] =( -1) * (((c == class_lable)?1 : 0) - channel_pred_data[class_index + c * dimScale]);
+            bottom_diff[class_index + c * dimScale] =(-1) * (((c == class_lable)?1 : 0) - channel_pred_data[class_index + c * dimScale]);
             if(c == class_lable) 
               avg_cat += channel_pred_data[class_index + c * dimScale];
           }
@@ -695,6 +692,7 @@ void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
       if (item_id == -1) {
         continue;
       }
+      CHECK_EQ(b ,item_id);
       int label = gt_data[start_idx + 1];
       CHECK_NE(background_label_id, label)
           << "Found background label in the dataset.";

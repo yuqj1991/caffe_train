@@ -99,9 +99,9 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_groundtruth_, num_groundtruth_);
-    top[0]->mutable_cpu_data()[0] += sum_squre / normalizer;
+    top[0]->mutable_cpu_data()[0] = sum_squre / normalizer;
   } else {
-    top[0]->mutable_cpu_data()[0] += 0;
+    top[0]->mutable_cpu_data()[0] = 0;
   }
   #if 1 
   if(iterations_ % 50 == 0){    
