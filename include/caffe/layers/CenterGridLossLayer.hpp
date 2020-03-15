@@ -20,16 +20,16 @@ namespace caffe {
  *
  */
 template <typename Dtype>
-class Yolov3LossLayer : public LossLayer<Dtype> {
+class CenterGridLossLayer : public LossLayer<Dtype> {
  public:
-  explicit Yolov3LossLayer(const LayerParameter& param)
+  explicit CenterGridLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "Yolov3Loss"; }
+  virtual inline const char* type() const { return "CenterGridLoss"; }
   virtual inline int ExactNumBottomBlobs() const { return 2; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
@@ -53,12 +53,13 @@ class Yolov3LossLayer : public LossLayer<Dtype> {
   // How to normalize the loss.
   LossParameter_NormalizationMode normalization_;
 
-  std::vector<std::pair<int, int> > bias_scale_;
-  std::vector<int> bias_mask_;
-  int bias_num_;
+  std::pair<int, int>  bbox_range_scale_;
+  int anchor_scale_;
   int net_width_;
   int net_height_;
   Dtype ignore_thresh_;
+  Blob<Dtype> label_data_;
+  int count_postive_;
 };
 
 }  // namespace caffe

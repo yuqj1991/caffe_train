@@ -2313,6 +2313,8 @@ message CenterObjectParameter {
   optional int32 net_height = 25;
   optional float ignore_thresh = 26 [default = 0.5];
   optional int32 bias_mask_group_num = 27 [default = 3];
+  optional int32 low_bbox_scale = 28;
+  optional int32 up_bbox_scale = 29;
 }
 
 message SliceParameter {

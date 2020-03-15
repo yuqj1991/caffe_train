@@ -3,13 +3,13 @@
 #include <utility>
 #include <vector>
 
-#include "caffe/layers/Yolov3Loss.hpp"
+#include "caffe/layers/CenterGridLossLayer.hpp"
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
 
 template <typename Dtype>
-void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+void CenterGridLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::LayerSetUp(bottom, top);
   if (this->layer_param_.propagate_down_size() == 0) {
@@ -21,24 +21,21 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   
   // bias_mask_
   if(center_object_loss_param.has_bias_num()){
-    for(int i = 0; i < center_object_loss_param.bias_scale_size() / 2; i++){
-      bias_scale_.push_back(std::pair<int, int>(center_object_loss_param.bias_scale(i * 2), 
-                    center_object_loss_param.bias_scale(i * 2 + 1)));
-    }
-    for(int i = 0; i < center_object_loss_param.bias_mask_size(); i++){
-      bias_mask_.push_back(center_object_loss_param.bias_mask(i));
-    }
+    CHECK_EQ(center_object_loss_param.bias_scale_size(), 1);
+    CHECK_EQ(center_object_loss_param.bias_num(), 1);
+    anchor_scale_ = center_object_loss_param.bias_scale(0);
+    int low_bbox = center_object_loss_param.low_bbox_scale();
+    int up_bbox = center_object_loss_param.up_bbox_scale();
+    bbox_range_scale_ = std::make_pair<int, int>(low_bbox, up_bbox);
   }
   
   net_height_ = center_object_loss_param.net_height();
   net_width_ = center_object_loss_param.net_width();
-  bias_num_ = center_object_loss_param.bias_num();
   ignore_thresh_ = center_object_loss_param.ignore_thresh();
-  CHECK_EQ(bias_num_, bias_scale_.size()); // anchor size
   
   num_classes_ = center_object_loss_param.num_class();
   CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
-  CHECK_EQ((4 + 1 + num_classes_) * bias_mask_.size(), bottom[0]->channels()) 
+  CHECK_EQ((4 + 1 + num_classes_) *1, bottom[0]->channels()) 
             << "num_classes must be equal to prediction classes";
   
   if (!this->layer_param_.loss_param().has_normalization() &&
@@ -50,16 +47,19 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     normalization_ = this->layer_param_.loss_param().normalization();
   }
   iterations_ = 0;
+  vector<int> label_shape(1, 1);
+  label_shape.push_back(1);
+  label_data_.Reshape(label_shape);
 }
 
 template <typename Dtype>
-void Yolov3LossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
+void CenterGridLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
 }
 
 template <typename Dtype>
-void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
   
   // gt_boxes
@@ -84,22 +84,33 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const int num_channels = bottom[0]->channels();
   Dtype * bottom_diff = bottom[0]->mutable_cpu_diff();
 
-  YoloScoreShow trainScore;
+  vector<int> label_shape(2, 1);
+  label_shape.push_back(num_);
+  label_shape.push_back(output_height*output_width);
+  label_data_.Reshape(label_shape);
+
+  Dtype *label_muti_data = label_data_.mutable_cpu_data();
+
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
   if (num_groundtruth_ >= 1) {
-    EncodeYoloObject(num_, num_channels, num_classes_, output_width, output_height, 
+    Dtype class_score = EncodeCenterGridObject(num_, num_channels, num_classes_, output_width, output_height, 
                           net_width_, net_height_,
-                          channel_pred_data, all_gt_bboxes,
-                          bias_mask_, bias_scale_, 
-                          bottom_diff, ignore_thresh_, &trainScore);
+                          channel_pred_data,  anchor_scale_, 
+                          bbox_range_scale_,
+                          all_gt_bboxes, label_muti_data, bottom_diff, 
+                          ignore_thresh_, &count_postive_);
     const Dtype * diff = bottom[0]->cpu_diff();
     Dtype sum_squre = Dtype(0.);
-    for(int j = 0; j < bottom[0]->count(); j++){
-      sum_squre += diff[j] * diff[j];
+    int dimScale = output_height * output_width;
+    for(int b = 0; b < num_; b++){
+      for(int j = 0; j < 5 * dimScale; j++){ // loc loss
+        sum_squre += diff[b * (4 + 1 + num_classes_) * dimScale + j] * diff[b * (4 + 1 + num_classes_) * dimScale + j];
+      }
     }
+    
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-        normalization_, num_, num_groundtruth_, num_groundtruth_);
-    top[0]->mutable_cpu_data()[0] = sum_squre / normalizer;
+        normalization_, num_, count_postive_, count_postive_);
+    top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / normalizer;
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
   }
@@ -107,18 +118,15 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   if(iterations_ % 100 == 0){    
     int dimScale = output_height * output_width;  
     LOG(INFO);     
-    LOG(INFO)<<"all num_gt boxes: "<<num_gt_<<", Region "<<output_width<<": total loss: "<<top[0]->mutable_cpu_data()[0]<<", num_groundtruth: "<<num_groundtruth_<<" Avg IOU: "
-                      <<trainScore.avg_iou/trainScore.count<<", Class: "<<trainScore.avg_cat/trainScore.class_count
-                      <<", Obj: "<<trainScore.avg_obj/trainScore.count<<", No obj: "<<trainScore.avg_anyobj/(dimScale*bias_mask_.size()*num_)
-                      <<", .5R: "<<trainScore.recall/trainScore.count<<", .75R: "<<trainScore.recall75/trainScore.count
-                      <<", count: "<<trainScore.count;
+    LOG(INFO)<<"all num_gt boxes: "<<num_gt_<<", Region "<<output_width<<": total loss: "<<top[0]->mutable_cpu_data()[0]
+                      <<", count: "<<count_postive_;
   }
   iterations_++;
   #endif
 }
 
 template <typename Dtype>
-void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
   if (propagate_down[1]) {
@@ -128,36 +136,12 @@ void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   
   if (propagate_down[0]) {
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-        normalization_, num_, num_groundtruth_, num_groundtruth_);
-    Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
-    const int output_height = bottom[0]->height();
-    const int output_width = bottom[0]->width();
-    const int num_channels = bottom[0]->channels();
-    Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
-    const Dtype* bottom_data = bottom[0]->cpu_data();
-    num_ = bottom[0]->num();
-    int channel_per_box = 4 + 1 + num_classes_;
-    int mask_size_ = bias_mask_.size();
-    int dimScale = output_height * output_width;
-    CHECK_EQ(channel_per_box * mask_size_, num_channels);
-    for(int j = 0; j < num_; j++){
-      for(int mm = 0; mm < mask_size_; mm++){
-        for(int cc = 0; cc < channel_per_box; cc++){
-          int channal_index = j * num_channels * dimScale + (mm * channel_per_box + cc) * dimScale;
-          if(cc != 2 && cc != 3){
-            for(int s = 0; s < dimScale; s++){
-              int index = channal_index + s;
-              bottom_diff[index] = bottom_diff[index] * logistic_gradient(bottom_data[index]);
-            }
-          }
-        }
-      }
-    } 
+        normalization_, num_, count_postive_, count_postive_);
     caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
   }
 }
 
-INSTANTIATE_CLASS(Yolov3LossLayer);
-REGISTER_LAYER_CLASS(Yolov3Loss);
+INSTANTIATE_CLASS(CenterGridLossLayer);
+REGISTER_LAYER_CLASS(CenterGridLoss);
 
 }  // namespace caffe
