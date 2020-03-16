@@ -835,13 +835,13 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         Dtype gt_center_y = Dtype((ymax + ymin)  / 2);
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
-            if((w + 0.5) + (anchor_scale/downRatio) >= output_width)
+            if((w + 0.5) + (anchor_scale/downRatio) / 2 >= output_width)
               continue;
-            if((h + 0.5) + (anchor_scale/downRatio) >= output_height)
+            if((h + 0.5) + (anchor_scale/downRatio) / 2>= output_height)
               continue;
-            if((w + 0.5) - (anchor_scale/downRatio) < 0)
+            if((w + 0.5) - (anchor_scale/downRatio) / 2 < 0)
               continue;
-            if((h + 0.5) - (anchor_scale/downRatio) < 0)
+            if((h + 0.5) - (anchor_scale/downRatio) / 2 < 0)
               continue;
             Dtype center_x_bias = (gt_center_x - (w + 0.5)) * downRatio / anchor_scale;
             Dtype center_y_bias = (gt_center_y - (h + 0.5)) * downRatio / anchor_scale;
