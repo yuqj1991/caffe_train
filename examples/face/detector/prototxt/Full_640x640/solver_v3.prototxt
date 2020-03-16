@@ -7,7 +7,7 @@ display: 100
 lr_policy: "multistep"
 gamma: 0.1
 weight_decay: 0.0005
-snapshot: 10000
+snapshot: 5000
 snapshot_prefix: "../snapshot/face"
 solver_mode: GPU
 debug_info: false

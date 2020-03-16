@@ -959,10 +959,10 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
         float bb_xmax = (channel_pred_data[width_index] * anchor_scale /downRatio + w + 0.5) / output_height;
         float bb_ymax = (channel_pred_data[height_index] * anchor_scale /downRatio + w + 0.5) / output_height;
         
-        float xmin = std::min(std::max(bb_xmin, Dtype(0.f)), Dtype(1.0));
-        float ymin = std::min(std::max(bb_ymin, Dtype(0.f)), Dtype(1.0));
-        float xmax = std::min(std::max(bb_xmax, Dtype(0.f)), Dtype(1.0));
-        float ymax = std::min(std::max(bb_ymax, Dtype(0.f)), Dtype(1.0));                                     
+        float xmin = std::min(std::max(bb_xmin, (0.f)), (1.f));
+        float ymin = std::min(std::max(bb_ymin, (0.f)), (1.f));
+        float xmax = std::min(std::max(bb_xmax, (0.f)), (1.f));
+        float ymax = std::min(std::max(bb_ymax, (0.f)), (1.f));                                     
         
         Dtype obj_score = channel_pred_data[object_index];
         Dtype label_score = channel_pred_data[class_index];
@@ -982,5 +982,17 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
     }
   }
 }
+
+template void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int net_width, const int net_height,
+                          float* channel_pred_data, const int anchor_scale, float conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results);
+
+template void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int net_width, const int net_height,
+                          double* channel_pred_data, const int anchor_scale, double conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results);
 
 }  // namespace caffe
