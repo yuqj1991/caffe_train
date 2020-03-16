@@ -770,7 +770,6 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
   CHECK_EQ(num_classes, 1);
   int dimScale = output_height * output_width;
   int downRatio = net_height / output_height;
-  int count = 0;
   Dtype score_loss = Dtype(0.);
   CHECK_EQ(num_channels, (5 + num_classes)) 
           << "num_channels shoule be set to including bias_x, bias_y, width, height, object_confidence and classes";
@@ -784,6 +783,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
   
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+    int count = 0;
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
         int x_index = b * num_channels * dimScale
@@ -884,6 +884,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         }
       }
     }
+    (*count_postive) += count;
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
@@ -892,10 +893,10 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
     }else{
       score_loss += 0;
     }
-    LOG(INFO)<<"count: "<<count <<", score_loss: "<<score_loss;
+    //LOG(INFO)<<"count: "<<count <<", score_loss: "<<score_loss;
     
   }
-  (*count_postive) = count;
+  
   return score_loss;
 }
 
