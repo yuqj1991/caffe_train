@@ -110,9 +110,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       }
     }
     
-    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-        normalization_, num_, count_postive_, count_postive_);
-    top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / normalizer;
+    top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / num_;
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
   }
@@ -138,9 +136,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
   
   if (propagate_down[0]) {
-    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-        normalization_, num_, count_postive_, count_postive_);
-    Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+    Dtype loss_weight = top[0]->cpu_diff()[0] / num_;
     caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
   }
 }

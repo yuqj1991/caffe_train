@@ -97,9 +97,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     for(int j = 0; j < bottom[0]->count(); j++){
       sum_squre += diff[j] * diff[j];
     }
-    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-        normalization_, num_, num_groundtruth_, num_groundtruth_);
-    top[0]->mutable_cpu_data()[0] = sum_squre / normalizer;
+    top[0]->mutable_cpu_data()[0] = sum_squre / num_;
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
   }
@@ -127,9 +125,9 @@ void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
   
   if (propagate_down[0]) {
-    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-        normalization_, num_, num_groundtruth_, num_groundtruth_);
-    Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+    /*Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+        normalization_, num_, num_groundtruth_, num_groundtruth_);*/
+    Dtype loss_weight = top[0]->cpu_diff()[0] / num_;
     const int output_height = bottom[0]->height();
     const int output_width = bottom[0]->width();
     const int num_channels = bottom[0]->channels();
