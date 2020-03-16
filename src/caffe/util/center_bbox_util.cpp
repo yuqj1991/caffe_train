@@ -835,9 +835,9 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         Dtype gt_center_y = Dtype((ymax + ymin)  / 2);
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
-            if((w + 0.5) + (anchor_scale/downRatio) < 0)
+            if((w + 0.5) + (anchor_scale/downRatio) >= output_width)
               continue;
-            if((h + 0.5) + (anchor_scale/downRatio) < 0)
+            if((h + 0.5) + (anchor_scale/downRatio) >= output_height)
               continue;
             if((w + 0.5) - (anchor_scale/downRatio) < 0)
               continue;
