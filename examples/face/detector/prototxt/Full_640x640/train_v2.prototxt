@@ -4095,11 +4095,11 @@ layer {
 		use_tiny_box_match: false
 		background_label_id: 0
 		use_difficult_gt: true
-		neg_pos_ratio: 4.0
+		neg_pos_ratio: 3.0
 		neg_overlap: 0.55
-		code_type: RECEPTIVE_CENTER
+		code_type: CENTER_SIZE
 		ignore_cross_boundary_bbox: false
-		mining_type: NONE
+		mining_type: MAX_NEGATIVE
 		
 		bbox_small_list: 10
 		bbox_small_list: 15
