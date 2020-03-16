@@ -731,7 +731,7 @@ Dtype focal_loss(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bott
       loss -= alpha_ * std::pow(pred_data[i], gamma_) * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN)));
       // diff
       Dtype diff_elem_ = alpha_ * std::pow(pred_data[i], gamma_);
-      Dtype diff_next_ = pred_data[i] - gamma_ * (1 - pred_data[i] * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN))));
+      Dtype diff_next_ = pred_data[i] - gamma_ * (1 - pred_data[i]) * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN)));
       bottom_diff[i] = diff_elem_ * diff_next_;
     }else if(label_data[i] == 1){ //gt_boxes包围的都认为是正样本
       loss -= alpha_ * std::pow(1 - pred_data[i], gamma_) * std::log(std::max(pred_data[i], Dtype(FLT_MIN)));
@@ -886,7 +886,6 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         }
       }
     }
-    postive += count;
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
@@ -895,7 +894,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
     }else{
       score_loss += 0;
     }
-    //LOG(INFO)<<"count: "<<count <<", score_loss: "<<score_loss;
+    postive += count;
     
   }
   *count_postive = postive;
