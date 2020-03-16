@@ -892,6 +892,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
     }else{
       score_loss += 0;
     }
+    LOG(INFO)<<"count: "<<count <<", score_loss: "<<score_loss;
     
   }
   (*count_postive) = count;
