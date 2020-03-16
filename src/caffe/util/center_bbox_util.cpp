@@ -731,13 +731,13 @@ Dtype focal_loss(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bott
       loss -= (1 - alpha_) * std::pow(pred_data[i], gamma_) * std::log(1 - pred_data[i]);
       // diff
       Dtype diff_elem_ = (1 - alpha_) * std::pow(pred_data[i], gamma_);
-      Dtype diff_next_ = pred_data[i] - gamma_ * (1 - pred_data[i] * std::log(1 - pred_data[i]));
+      Dtype diff_next_ = pred_data[i] - gamma_ * (1 - pred_data[i] * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN))));
       bottom_diff[i] = diff_elem_ * diff_next_;
     }else if(label_data[i] == 1){
       loss -= alpha_ * std::pow(1 - pred_data[i], gamma_) * std::log(pred_data[i]);
       // diff
       Dtype diff_elem_ = alpha_ * std::pow(1 - pred_data[i], gamma_);
-      Dtype diff_next_ = gamma_ * pred_data[i] * std::log(pred_data[i]) + pred_data[i] - 1;
+      Dtype diff_next_ = gamma_ * pred_data[i] * std::log(std::max(pred_data[i], Dtype(FLT_MIN))) + pred_data[i] - 1;
       bottom_diff[i] = diff_elem_ * diff_next_;
     }
   }
@@ -867,7 +867,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
     }
     int gt_class_index =  b * dimScale;
     int pred_class_index = b * num_channels * dimScale + 5* dimScale;
-    score_loss += focal_loss(class_label +gt_class_index, channel_pred_data + pred_class_index, 
+    score_loss += focal_loss(class_label + gt_class_index, channel_pred_data + pred_class_index, 
                                 dimScale, bottom_diff + pred_class_index);
   }
   (*count_postive) = count;
