@@ -873,10 +873,15 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         }
       }
     }
-    int gt_class_index =  b * dimScale;
-    int pred_class_index = b * num_channels * dimScale + 5* dimScale;
-    score_loss += focal_loss(class_label + gt_class_index, channel_pred_data + pred_class_index, 
-                                dimScale, bottom_diff + pred_class_index);
+    if(count > 0){
+      int gt_class_index =  b * dimScale;
+      int pred_class_index = b * num_channels * dimScale + 5* dimScale;
+      score_loss += focal_loss(class_label + gt_class_index, channel_pred_data + pred_class_index, 
+                                  dimScale, bottom_diff + pred_class_index);
+    }else{
+      score_loss += 0;
+    }
+    
   }
   (*count_postive) = count;
   return score_loss;
