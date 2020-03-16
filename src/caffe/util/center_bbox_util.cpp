@@ -806,7 +806,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         predBox.set_xmin(bb_xmin);
         predBox.set_xmax(bb_xmax);
         predBox.set_ymin(bb_ymin);
-        predBox.set_ymax(bb_xmax);
+        predBox.set_ymax(bb_ymax);
         float best_iou = 0;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
           float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
