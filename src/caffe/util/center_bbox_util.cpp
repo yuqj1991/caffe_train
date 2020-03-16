@@ -728,13 +728,13 @@ Dtype focal_loss(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bott
   Dtype loss = Dtype(0.);
   for(int i = 0; i < dimScale; i++){
     if(label_data[i] == 0){
-      loss -= (1 - alpha_) * std::pow(pred_data[i], gamma_) * std::log(1 - pred_data[i]);
+      loss -= (1 - alpha_) * std::pow(pred_data[i], gamma_) * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN)));
       // diff
       Dtype diff_elem_ = (1 - alpha_) * std::pow(pred_data[i], gamma_);
       Dtype diff_next_ = pred_data[i] - gamma_ * (1 - pred_data[i] * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN))));
       bottom_diff[i] = diff_elem_ * diff_next_;
     }else if(label_data[i] == 1){
-      loss -= alpha_ * std::pow(1 - pred_data[i], gamma_) * std::log(pred_data[i]);
+      loss -= alpha_ * std::pow(1 - pred_data[i], gamma_) * std::log(std::max(pred_data[i], Dtype(FLT_MIN)));
       // diff
       Dtype diff_elem_ = alpha_ * std::pow(1 - pred_data[i], gamma_);
       Dtype diff_next_ = gamma_ * pred_data[i] * std::log(std::max(pred_data[i], Dtype(FLT_MIN))) + pred_data[i] - 1;
