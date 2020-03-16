@@ -780,6 +780,8 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
       channel_pred_data[object_index + i] = CenterSigmoid(channel_pred_data[object_index + i]);
     }
   }
+
+  int postive = 0;
   
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
@@ -884,7 +886,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         }
       }
     }
-    (*count_postive) += count;
+    postive += count;
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
@@ -896,7 +898,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
     //LOG(INFO)<<"count: "<<count <<", score_loss: "<<score_loss;
     
   }
-  
+  *count_postive = postive;
   return score_loss;
 }
 
