@@ -843,10 +843,10 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
               continue;
             if((h + 0.5) - (anchor_scale/downRatio) / 2 < 0)
               continue;
-            Dtype center_x_bias = (gt_center_x - (w + 0.5)) * downRatio / anchor_scale;
-            Dtype center_y_bias = (gt_center_y - (h + 0.5)) * downRatio / anchor_scale;
-            Dtype width = std::log((xmax - xmin) * downRatio / anchor_scale);
-            Dtype height = std::log((ymax - ymin) * downRatio / anchor_scale);
+            Dtype xmin_bias = (xmin - (w + 0.5)) * downRatio / anchor_scale;
+            Dtype ymin_bias = (ymin - (h + 0.5)) * downRatio / anchor_scale;
+            Dtype xmax_bias = (xmax - (w + 0.5)) * downRatio / anchor_scale;
+            Dtype ymax_bias = (ymax - (h + 0.5)) * downRatio / anchor_scale;
             int x_index = b * num_channels * dimScale
                                       + 0* dimScale + h * output_width + w;
             int y_index = b * num_channels * dimScale 
@@ -858,10 +858,10 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
             float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
-            bottom_diff[x_index] = (-1) * delta_scale * (center_x_bias - channel_pred_data[x_index]);
-            bottom_diff[y_index] = (-1) * delta_scale * (center_y_bias - channel_pred_data[y_index]);
-            bottom_diff[width_index] = (-1) * delta_scale * (width - channel_pred_data[width_index]);
-            bottom_diff[height_index] = (-1) * delta_scale * (height - channel_pred_data[height_index]);
+            bottom_diff[x_index] = (-1) * delta_scale * (xmin_bias - channel_pred_data[x_index]);
+            bottom_diff[y_index] = (-1) * delta_scale * (ymin_bias - channel_pred_data[y_index]);
+            bottom_diff[width_index] = (-1) * delta_scale * (xmax_bias - channel_pred_data[width_index]);
+            bottom_diff[height_index] = (-1) * delta_scale * (ymax_bias - channel_pred_data[height_index]);
             bottom_diff[object_index] = (-1) * (1 - channel_pred_data[object_index]);
             // class score 
             // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
@@ -935,17 +935,15 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
         int class_index = b * dimScale
                                   + 5* dimScale + h * output_width + w;
         NormalizedBBox predBox;
-        float bb_center_x = (channel_pred_data[x_index] * anchor_scale /downRatio + w + 0.5) / output_width;
-        float bb_center_y = (channel_pred_data[y_index] * anchor_scale /downRatio + h + 0.5) / output_height;
-        float bb_width = (float)std::exp(channel_pred_data[width_index]) 
-                                                        * anchor_scale / (net_width);
-        float bb_height = (float)std::exp(channel_pred_data[height_index]) 
-                                                        * anchor_scale / (net_height);
+        float bb_xmin = (channel_pred_data[x_index] * anchor_scale /downRatio + w + 0.5) / output_width;
+        float bb_ymin = (channel_pred_data[y_index] * anchor_scale /downRatio + h + 0.5) / output_height;
+        float bb_xmax = (channel_pred_data[width_index] * anchor_scale /downRatio + w + 0.5) / output_height;
+        float bb_ymax = (channel_pred_data[height_index] * anchor_scale /downRatio + w + 0.5) / output_height;
         
-        float xmin = std::min(std::max(bb_center_x - bb_width / 2, Dtype(0.f)), Dtype(1.0));
-        float ymin = std::min(std::max(bb_center_y - bb_height / 2, Dtype(0.f)), Dtype(1.0));
-        float xmax = std::min(std::max(bb_center_x + bb_width / 2, Dtype(0.f)), Dtype(1.0));
-        float ymax = std::min(std::max(bb_center_y + bb_height / 2, Dtype(0.f)), Dtype(1.0));                                     
+        float xmin = std::min(std::max(bb_xmin, Dtype(0.f)), Dtype(1.0));
+        float ymin = std::min(std::max(bb_ymin, Dtype(0.f)), Dtype(1.0));
+        float xmax = std::min(std::max(bb_xmax, Dtype(0.f)), Dtype(1.0));
+        float ymax = std::min(std::max(bb_ymax, Dtype(0.f)), Dtype(1.0));                                     
         
         Dtype obj_score = channel_pred_data[object_index];
         Dtype label_score = channel_pred_data[class_index];
