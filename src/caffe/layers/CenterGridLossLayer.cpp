@@ -91,9 +91,11 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 
   Dtype *label_muti_data = label_data_.mutable_cpu_data();
 
+  Dtype class_score = Dtype(0.);
+
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
   if (num_groundtruth_ >= 1) {
-    Dtype class_score = EncodeCenterGridObject(num_, num_channels, num_classes_, output_width, output_height, 
+    class_score = EncodeCenterGridObject(num_, num_channels, num_classes_, output_width, output_height, 
                           net_width_, net_height_,
                           channel_pred_data,  anchor_scale_, 
                           bbox_range_scale_,
@@ -117,8 +119,10 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   #if 1 
   if(iterations_ % 100 == 0){    
     LOG(INFO);     
-    LOG(INFO)<<"all num_gt boxes: "<<num_gt_<<", Region "<<output_width<<": total loss: "<<top[0]->mutable_cpu_data()[0]
-                      <<", count: "<<count_postive_;
+    LOG(INFO)<<"all num_gt boxes: "<<num_gt_<<", Region "<<output_width
+              <<": total loss: "<<top[0]->mutable_cpu_data()[0]
+              <<", class score: "<<class_score / count_postive_
+              <<", count: "<<count_postive_;
   }
   iterations_++;
   #endif
