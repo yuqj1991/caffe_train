@@ -30,18 +30,18 @@ namespace caffe {
  * NOTE: does not implement Backwards operation.
  */
 template <typename Dtype>
-class CenternetDetectionOutputLayer : public Layer<Dtype> {
+class CenterGridOutputLayer : public Layer<Dtype> {
  public:
-  explicit CenternetDetectionOutputLayer(const LayerParameter& param)
+  explicit CenterGridOutputLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "CenternetDetectionOutput"; }
+  virtual inline const char* type() const { return "CenterGridOutput"; }
   virtual inline int MinBottomBlobs() const { return 3; }
-  virtual inline int MaxBottomBlobs() const { return 4; }
+  virtual inline int ExactNumBottomBlobs() const { return -1; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
  protected:
@@ -68,13 +68,15 @@ class CenternetDetectionOutputLayer : public Layer<Dtype> {
     NOT_IMPLEMENTED;
   }
   int num_classes_;
-  bool share_location_;
+  std::vector<int> anchor_scale_;
   int num_loc_classes_;
   int keep_top_k_;
   Dtype confidence_threshold_;
   int num_;
   std::map<int, std::vector<CenterNetInfo> > results_;
-
+  int bottom_size_;
+  std::vector<int> downRatio_;
+  float ignore_thresh_ ;
 };
 
 }  // namespace caffe

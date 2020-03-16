@@ -1490,6 +1490,9 @@ message DetectionOutputParameter {
   optional uint32 num_lpchinese = 15;
   optional uint32 num_lpenglish = 16;
   optional uint32 num_lpletter = 17;
+  repeated int32 bias_scale = 18;
+  repeated int32 down_ratio = 19;
+  optional float ignore_thresh = 20[default = 0.5];
 }
 message YoloDetectionOutputParameter {
   // Yolo detection output layer

@@ -26,7 +26,7 @@ void CenterGridLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     anchor_scale_ = center_object_loss_param.bias_scale(0);
     int low_bbox = center_object_loss_param.low_bbox_scale();
     int up_bbox = center_object_loss_param.up_bbox_scale();
-    bbox_range_scale_ = std::make_pair<int, int>(low_bbox, up_bbox);
+    bbox_range_scale_ = std::make_pair(low_bbox, up_bbox);
   }
   
   net_height_ = center_object_loss_param.net_height();
@@ -116,7 +116,6 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   #if 1 
   if(iterations_ % 100 == 0){    
-    int dimScale = output_height * output_width;  
     LOG(INFO);     
     LOG(INFO)<<"all num_gt boxes: "<<num_gt_<<", Region "<<output_width<<": total loss: "<<top[0]->mutable_cpu_data()[0]
                       <<", count: "<<count_postive_;
@@ -137,6 +136,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   if (propagate_down[0]) {
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, count_postive_, count_postive_);
+    Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
     caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
   }
 }

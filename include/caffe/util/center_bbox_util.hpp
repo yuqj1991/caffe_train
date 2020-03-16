@@ -33,7 +33,7 @@ template <typename Dtype>
 void _nms_heatmap(const Dtype* conf_data, Dtype* keep_max_data, const int output_height
                   , const int output_width, const int channels, const int num_batch);
 
-void nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, float nmsthreshold = 0.3,int type=NMS_MIN);
+void center_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, float nmsthreshold = 0.3,int type=NMS_MIN);
 
 template <typename Dtype>
 void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
@@ -101,7 +101,8 @@ template <typename Dtype>
 void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int net_width, const int net_height,
-                          Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh);
+                          Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results);
 
 }  // namespace caffe
 
