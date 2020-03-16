@@ -84,7 +84,7 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const int num_channels = bottom[0]->channels();
   Dtype * bottom_diff = bottom[0]->mutable_cpu_diff();
 
-  YoloScoreShow trainScore;
+  
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
   if (num_groundtruth_ >= 1) {
     EncodeYoloObject(num_, num_channels, num_classes_, output_width, output_height, 
@@ -97,7 +97,10 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     for(int j = 0; j < bottom[0]->count(); j++){
       sum_squre += diff[j] * diff[j];
     }
-    top[0]->mutable_cpu_data()[0] = sum_squre / num_;
+    if(trainScore.count > 0)
+      top[0]->mutable_cpu_data()[0] = sum_squre / trainScore.count;
+    else
+      top[0]->mutable_cpu_data()[0] = sum_squre / num_;
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
   }
@@ -125,9 +128,11 @@ void Yolov3LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
   
   if (propagate_down[0]) {
-    /*Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-        normalization_, num_, num_groundtruth_, num_groundtruth_);*/
-    Dtype loss_weight = top[0]->cpu_diff()[0] / num_;
+    Dtype loss_weight = Dtype(0.);
+    if(trainScore.count)
+      loss_weight = top[0]->cpu_diff()[0] / trainScore.count;
+    else
+      loss_weight = top[0]->cpu_diff()[0] / num_;
     const int output_height = bottom[0]->height();
     const int output_width = bottom[0]->width();
     const int num_channels = bottom[0]->channels();

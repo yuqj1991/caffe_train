@@ -59,6 +59,7 @@ class Yolov3LossLayer : public LossLayer<Dtype> {
   int net_width_;
   int net_height_;
   Dtype ignore_thresh_;
+  YoloScoreShow trainScore;
 };
 
 }  // namespace caffe
