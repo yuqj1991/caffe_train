@@ -727,13 +727,13 @@ Dtype focal_loss(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bott
   Dtype gamma_ = 2.f;
   Dtype loss = Dtype(0.);
   for(int i = 0; i < dimScale; i++){
-    if(label_data[i] == 0){
+    if(label_data[i] == 0.5){ // gt_boxes周围的小格子，因为离gt_box较近，所以计算这里的负样本
       loss -= alpha_ * std::pow(pred_data[i], gamma_) * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN)));
       // diff
       Dtype diff_elem_ = alpha_ * std::pow(pred_data[i], gamma_);
       Dtype diff_next_ = pred_data[i] - gamma_ * (1 - pred_data[i] * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN))));
       bottom_diff[i] = diff_elem_ * diff_next_;
-    }else if(label_data[i] == 1){
+    }else if(label_data[i] == 1){ //gt_boxes包围的都认为是正样本
       loss -= alpha_ * std::pow(1 - pred_data[i], gamma_) * std::log(std::max(pred_data[i], Dtype(FLT_MIN)));
       // diff
       Dtype diff_elem_ = alpha_ * std::pow(1 - pred_data[i], gamma_);
@@ -833,6 +833,19 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
         Dtype gt_center_x = Dtype((xmax + xmin)  / 2);
         Dtype gt_center_y = Dtype((ymax + ymin)  / 2);
+        int RF_xmin = static_cast<int>(xmin + 0.5 - anchor_scale/downRatio);
+        int RF_xmax = static_cast<int>(xmax + 0.5 + anchor_scale/downRatio);
+        int RF_ymin = static_cast<int>(ymin + 0.5 - anchor_scale/downRatio);
+        int RF_ymax = static_cast<int>(ymax + 0.5 + anchor_scale/downRatio);
+        for(int h = RF_ymin; h < RF_ymax; h++){
+          for(int w = RF_xmin; w < RF_xmax; w++){
+            if(RF_xmin < 0 || RF_xmax >= output_width || RF_ymin <0 || RF_ymax >= output_height)
+              continue;
+            int class_index = b * dimScale
+                                  +  h * output_width + w;
+            class_label[class_index] = 0.5;
+          }
+        }
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if((w + 0.5) + (anchor_scale/downRatio) / 2 >= output_width)
