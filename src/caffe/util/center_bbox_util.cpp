@@ -799,16 +799,14 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         int class_index = b * dimScale
                                   + h * output_width + w;
         NormalizedBBox predBox;
-        float bb_center_x = (channel_pred_data[x_index] * anchor_scale /downRatio + w + 0.5) / output_width;
-        float bb_center_y = (channel_pred_data[y_index] * anchor_scale /downRatio + h + 0.5) / output_height;
-        float bb_width = (float)std::exp(channel_pred_data[width_index]) 
-                                                        * anchor_scale / (net_width);
-        float bb_height = (float)std::exp(channel_pred_data[height_index]) 
-                                                        * anchor_scale / (net_height);
-        predBox.set_xmin(bb_center_x - bb_width / 2);
-        predBox.set_xmax(bb_center_x + bb_width / 2);
-        predBox.set_ymin(bb_center_y - bb_height / 2);
-        predBox.set_ymax(bb_center_y + bb_height / 2);
+        float bb_xmin = (channel_pred_data[x_index] * anchor_scale /downRatio + w + 0.5) / output_width;
+        float bb_ymin = (channel_pred_data[y_index] * anchor_scale /downRatio + h + 0.5) / output_height;
+        float bb_xmax = (channel_pred_data[width_index] * anchor_scale /downRatio + w + 0.5) / output_height;
+        float bb_ymax = (channel_pred_data[height_index] * anchor_scale /downRatio + w + 0.5) / output_height;
+        predBox.set_xmin(bb_xmin);
+        predBox.set_xmax(bb_xmax);
+        predBox.set_ymin(bb_ymin);
+        predBox.set_ymax(bb_xmax);
         float best_iou = 0;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
           float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
@@ -831,8 +829,8 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
       int large_side = std::max(static_cast<int>((gt_bboxes[ii].xmax() - gt_bboxes[ii].xmin()) * net_width), 
                           static_cast<int>((gt_bboxes[ii].ymax() - gt_bboxes[ii].ymin()) * net_width));
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        Dtype gt_center_x = Dtype((xmax + xmin)  / 2);
-        Dtype gt_center_y = Dtype((ymax + ymin)  / 2);
+        //Dtype gt_center_x = Dtype((xmax + xmin)  / 2);
+        //Dtype gt_center_y = Dtype((ymax + ymin)  / 2);
         int RF_xmin = static_cast<int>(xmin + 0.5 - anchor_scale/downRatio);
         int RF_xmax = static_cast<int>(xmax + 0.5 + anchor_scale/downRatio);
         int RF_ymin = static_cast<int>(ymin + 0.5 - anchor_scale/downRatio);
@@ -952,7 +950,7 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
                                   + 4* dimScale + h * output_width + w;
         int class_index = b * dimScale
                                   + 5* dimScale + h * output_width + w;
-        NormalizedBBox predBox;
+
         float bb_xmin = (channel_pred_data[x_index] * anchor_scale /downRatio + w + 0.5) / output_width;
         float bb_ymin = (channel_pred_data[y_index] * anchor_scale /downRatio + h + 0.5) / output_height;
         float bb_xmax = (channel_pred_data[width_index] * anchor_scale /downRatio + w + 0.5) / output_height;
