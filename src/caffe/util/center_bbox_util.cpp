@@ -833,14 +833,22 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
         Dtype gt_center_x = Dtype((xmax + xmin)  / 2);
         Dtype gt_center_y = Dtype((ymax + ymin)  / 2);
-        for(int h = ymin; h < ymax; h++){
-          for(int w = xmin; w < xmax; w++){
+        for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
+          for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+            if((w + 0.5) + (anchor_scale/downRatio) < 0)
+              continue;
+            if((h + 0.5) + (anchor_scale/downRatio) < 0)
+              continue;
+            if((w + 0.5) - (anchor_scale/downRatio) < 0)
+              continue;
+            if((h + 0.5) - (anchor_scale/downRatio) < 0)
+              continue;
             Dtype center_x_bias = (gt_center_x - (w + 0.5)) * downRatio / anchor_scale;
             Dtype center_y_bias = (gt_center_y - (h + 0.5)) * downRatio / anchor_scale;
             Dtype width = std::log((xmax - xmin) * downRatio / anchor_scale);
             Dtype height = std::log((ymax - ymin) * downRatio / anchor_scale);
             int x_index = b * num_channels * dimScale
-                                  + 0* dimScale + h * output_width + w;
+                                      + 0* dimScale + h * output_width + w;
             int y_index = b * num_channels * dimScale 
                                       + 1* dimScale + h * output_width + w;
             int width_index = b * num_channels * dimScale
