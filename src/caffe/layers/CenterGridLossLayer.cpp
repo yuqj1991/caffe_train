@@ -104,7 +104,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     
     int dimScale = output_height * output_width;
     for(int b = 0; b < num_; b++){
-      for(int j = 0; j < 5 * dimScale; j++){ // loc loss
+      for(int j = 0; j < 5 * dimScale; j++){ // loc loss + objectness loss
         sum_squre += diff[b * (4 + 1 + num_classes_) * dimScale + j] * diff[b * (4 + 1 + num_classes_) * dimScale + j];
       }
     }
@@ -149,6 +149,19 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
   
   if (propagate_down[0]) {
+    const int output_height = bottom[0]->height();
+    const int output_width = bottom[0]->width();
+    const int num_channels = bottom[0]->channels();
+    Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+    const Dtype* bottom_data = bottom[0]->cpu_data();
+    num_ = bottom[0]->num();
+    int dimScale = output_height * output_width;
+    for(int b = 0; b < num_; b++){
+      int object_index = b * num_channels * dimScale + 4 * dimScale;
+      for(int i = 0; i < dimScale; i++){
+        bottom_diff[object_index + i] = bottom_diff[object_index + i] * logistic_gradient(bottom_data[object_index + i]);
+      }
+    }
     Dtype loss_weight = Dtype(0.);
     if(count_postive_ > 0)
       loss_weight = top[0]->cpu_diff()[0] / count_postive_;

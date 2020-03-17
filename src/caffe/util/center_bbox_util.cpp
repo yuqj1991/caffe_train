@@ -407,8 +407,6 @@ void draw_umich_gaussian(std::vector<Dtype>& heatmap, int center_x, int center_y
         int gaussian_index = (int(radius) - top + row) * int(diameter) + int(radius) - left + col;
         heatmap[heatmap_index] = heatmap[heatmap_index] >= gaussian[gaussian_index]  ? heatmap[heatmap_index]:
                                       gaussian[gaussian_index];
-        //if(heatmap[heatmap_index] == Dtype(1.00))
-        //  LOG(INFO)<<"heatmap: "<< heatmap[heatmap_index];
       }
     }
   }
