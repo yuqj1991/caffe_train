@@ -956,8 +956,8 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
 
         float bb_xmin = (channel_pred_data[x_index] * anchor_scale /downRatio + w + 0.5) / output_width;
         float bb_ymin = (channel_pred_data[y_index] * anchor_scale /downRatio + h + 0.5) / output_height;
-        float bb_xmax = (channel_pred_data[width_index] * anchor_scale /downRatio + w + 0.5) / output_height;
-        float bb_ymax = (channel_pred_data[height_index] * anchor_scale /downRatio + w + 0.5) / output_height;
+        float bb_xmax = (channel_pred_data[width_index] * anchor_scale /downRatio + w + 0.5) / output_width;
+        float bb_ymax = (channel_pred_data[height_index] * anchor_scale /downRatio + h + 0.5) / output_height;
         
         float xmin = std::min(std::max(bb_xmin, (0.f)), (1.f));
         float ymin = std::min(std::max(bb_ymin, (0.f)), (1.f));
