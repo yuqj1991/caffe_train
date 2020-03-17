@@ -84,7 +84,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
       }
     }
   }
-  top[0]->mutable_cpu_data()[0] = Dtype(postive_loss) / postive_count + Dtype(negitive_loss) / negtive_count;
+  top[0]->mutable_cpu_data()[0] = Dtype(postive_loss) / postive_count + Dtype(negitive_loss) / postive_count;
   #if 1
   if(iterations_%100 == 0){
     LOG(INFO)<<"forward batch_: "<<batch_<<", num_class: "<<num_class_
@@ -127,7 +127,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<D
             }else if(label_a < Dtype(1.0))
               bottom_diff[index] = std::pow(1 - label_a, gamma_) * std::pow(prob_a, alpha_) * 
                                                 ( prob_a - alpha_ * (1 - prob_a) * log(std::max(1 - prob_a, Dtype(FLT_MIN))));
-              caffe_scal(1, negtive_loss_weight, bottom_diff + index);
+              caffe_scal(1, postive_loss_weight, bottom_diff + index);
           }
         }
       }
