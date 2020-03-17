@@ -256,7 +256,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                         share_location_, loc_bottom_diff, num_channels,
                         all_gt_bboxes);
       // 针对前两层通道，使用了sigmoid，进行规范化，因此需要反向传播
-      const Dtype *bottom_data = bottom[0]->cpu_data();
+      /*const Dtype *bottom_data = bottom[0]->cpu_data();
       const int num_batch = bottom[0]->num();
       int dimScale = output_height * output_width;
       for(int b = 0; b < num_batch; b++){
@@ -264,7 +264,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         for(int j = 0; j < 2 * dimScale; j++){
           loc_bottom_diff[x_index + j] = loc_bottom_diff[x_index + j] * 
                                                     logistic_gradient(bottom_data[x_index + j]);
-        }
+        }*/
       }
     }
   }
