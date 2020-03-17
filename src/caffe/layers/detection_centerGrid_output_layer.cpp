@@ -82,7 +82,6 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
   // nms 去除多余的框
   std::map<int, vector<CenterNetInfo > > ::iterator iter;
   for(iter = results_.begin(); iter != results_.end(); iter++){
-    int item_id = iter->first;
     std::sort(iter->second.begin(), iter->second.end(), GridCompareScore);
     std::vector<CenterNetInfo> temp_result = iter->second;
     std::vector<CenterNetInfo> nms_result;
