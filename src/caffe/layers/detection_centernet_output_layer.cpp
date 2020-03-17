@@ -53,7 +53,7 @@ template <typename Dtype>
 void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   const Dtype* conf_data = bottom[0]->cpu_data();
-  const Dtype* loc_data = bottom[2]->cpu_data();
+  Dtype* loc_data = bottom[2]->mutable_cpu_data();
   const int output_height = bottom[0]->height();
   const int output_width = bottom[0]->width();
   const int classes = bottom[0]->channels();

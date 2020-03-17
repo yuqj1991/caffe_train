@@ -17,6 +17,67 @@ int count_gt = 0;
 int count_one = 0;
 
 namespace caffe {
+  float Yoloverlap(float x1, float w1, float x2, float w2)
+{
+    float l1 = x1 - w1/2;
+    float l2 = x2 - w2/2;
+    float left = l1 > l2 ? l1 : l2;
+    float r1 = x1 + w1/2;
+    float r2 = x2 + w2/2;
+    float right = r1 < r2 ? r1 : r2;
+    return right - left;
+}
+
+float boxIntersection(NormalizedBBox a, NormalizedBBox b)
+{
+    float a_center_x = (float)(a.xmin() + a.xmax()) / 2;
+    float a_center_y = (float)(a.ymin() + a.ymax()) / 2;
+    float a_w = (float)(a.xmax() - a.xmin());
+    float a_h = (float)(a.ymax() - a.ymin());
+    float b_center_x = (float)(b.xmin() + b.xmax()) / 2;
+    float b_center_y = (float)(b.ymin() + b.ymax()) / 2;
+    float b_w = (float)(b.xmax() - b.xmin());
+    float b_h = (float)(b.ymax() - b.ymin());
+    float w = Yoloverlap(a_center_x, a_w, b_center_x, b_w);
+    float h = Yoloverlap(a_center_y, a_h, b_center_y, b_h);
+    if(w < 0 || h < 0) return 0;
+    float area = w*h;
+    return area;
+}
+
+float boxUnion(NormalizedBBox a, NormalizedBBox b)
+{
+    float i = boxIntersection(a, b);
+    float a_w = (float)(a.xmax() - a.xmin());
+    float a_h = (float)(a.ymax() - a.ymin());
+    float b_w = (float)(b.xmax() - b.xmin());
+    float b_h = (float)(b.ymax() - b.ymin());
+    float u = a_h*a_w + b_w*b_h - i;
+    return u;
+}
+
+float YoloBBoxIou(NormalizedBBox a, NormalizedBBox b){
+    return (float)boxIntersection(a, b)/boxUnion(a, b);
+}
+
+int int_index(std::vector<int>a, int val, int n)
+{
+    int i;
+    for(i = 0; i < n; ++i){
+        if(a[i] == val) return i;
+    }
+    return -1;
+}
+
+template <typename Dtype>
+Dtype CenterSigmoid(Dtype x){
+	return 1. / (1. + exp(-x));
+}
+
+template double CenterSigmoid(double x);
+template float CenterSigmoid(float x);
+
+
 template<typename Dtype>
 Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, const Dtype min_overlap){
 
@@ -46,11 +107,17 @@ template double gaussian_radius(const double heatmap_width, const double heatmap
 template <typename Dtype>
 void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int output_width, const int output_height, 
-                                bool share_location, const Dtype* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
+                                bool share_location, Dtype* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, int num_batch){
   std::map<int, vector<NormalizedBBox> > ::iterator iter;
   int count = 0;
   CHECK_EQ(num_channels, 4);
+  int dimScale = output_height * output_width;
+  for(int b = 0; b < num_batch; b++){
+    int x_index = b * num_channels * dimScale;
+    for(int i = 0; i < 2 * dimScale; i++)
+      channel_loc_data[x_index + i] = CenterSigmoid(channel_loc_data[x_index + i]);
+  }
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
@@ -69,8 +136,7 @@ void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_da
       //Dtype height = gt_bboxes[ii].ymax() - gt_bboxes[ii].ymin();
       Dtype width = xmax - xmin;
       Dtype height = ymax - ymin;
-      
-      int dimScale = output_height * output_width;
+
       int x_loc_index = batch_id * num_channels * dimScale
                                 + 0 * dimScale
                                 + inter_center_y * output_width + inter_center_x;
@@ -103,12 +169,12 @@ void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_da
 }
 template void EncodeCenteGroundTruthAndPredictions(float* gt_loc_data, float* pred_loc_data,
                                 const int output_width, const int output_height, 
-                                bool share_location, const float* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+                                bool share_location, float* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, int num_batch);
 template void EncodeCenteGroundTruthAndPredictions(double* gt_loc_data, double* pred_loc_data,
                                 const int output_width, const int output_height, 
-                                bool share_location, const double* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);                              
+                                bool share_location, double* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, int num_batch);                              
 
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
@@ -232,18 +298,23 @@ void center_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* o
 }
 
 template <typename Dtype>
-void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
+void get_topK(const Dtype* keep_max_data, Dtype* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels, Dtype conf_thresh, Dtype nms_thresh){
   std::vector<CenterNetInfo > batch_result;
   int dim = classes * output_width * output_height;
+  int dimScale = output_width * output_height;
   CHECK_EQ(loc_channels, 4);
+  for(int b = 0; b < num_batch; b++){
+    int x_index = b * loc_channels * dimScale;
+    for(int i = 0; i < 2 * dimScale; i++)
+      loc_data[x_index + i] = CenterSigmoid(loc_data[x_index + i]);
+  }
   for(int i = 0; i < num_batch; i++){
     std::vector<CenterNetInfo > batch_temp;
     batch_result.clear();
     for(int c = 0 ; c < classes; c++){
-      int dimScale = output_width * output_height;
       for(int h = 0; h < output_height; h++){
         for(int w = 0; w < output_width; w++){
           int index = i * dim + c * dimScale + h * output_width + w;
@@ -289,11 +360,11 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
     }
   }
 }
-template  void get_topK(const float* keep_max_data, const float* loc_data, const int output_height
+template  void get_topK(const float* keep_max_data, float* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels, float conf_thresh, float nms_thresh);
-template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
+template void get_topK(const double* keep_max_data, double* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels,  double conf_thresh, double nms_thresh);
@@ -415,68 +486,6 @@ template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt
                               const int num_classes_, const int output_width, const int output_height);
 template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, double* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);
-
-
-
-float Yoloverlap(float x1, float w1, float x2, float w2)
-{
-    float l1 = x1 - w1/2;
-    float l2 = x2 - w2/2;
-    float left = l1 > l2 ? l1 : l2;
-    float r1 = x1 + w1/2;
-    float r2 = x2 + w2/2;
-    float right = r1 < r2 ? r1 : r2;
-    return right - left;
-}
-
-float boxIntersection(NormalizedBBox a, NormalizedBBox b)
-{
-    float a_center_x = (float)(a.xmin() + a.xmax()) / 2;
-    float a_center_y = (float)(a.ymin() + a.ymax()) / 2;
-    float a_w = (float)(a.xmax() - a.xmin());
-    float a_h = (float)(a.ymax() - a.ymin());
-    float b_center_x = (float)(b.xmin() + b.xmax()) / 2;
-    float b_center_y = (float)(b.ymin() + b.ymax()) / 2;
-    float b_w = (float)(b.xmax() - b.xmin());
-    float b_h = (float)(b.ymax() - b.ymin());
-    float w = Yoloverlap(a_center_x, a_w, b_center_x, b_w);
-    float h = Yoloverlap(a_center_y, a_h, b_center_y, b_h);
-    if(w < 0 || h < 0) return 0;
-    float area = w*h;
-    return area;
-}
-
-float boxUnion(NormalizedBBox a, NormalizedBBox b)
-{
-    float i = boxIntersection(a, b);
-    float a_w = (float)(a.xmax() - a.xmin());
-    float a_h = (float)(a.ymax() - a.ymin());
-    float b_w = (float)(b.xmax() - b.xmin());
-    float b_h = (float)(b.ymax() - b.ymin());
-    float u = a_h*a_w + b_w*b_h - i;
-    return u;
-}
-
-float YoloBBoxIou(NormalizedBBox a, NormalizedBBox b){
-    return (float)boxIntersection(a, b)/boxUnion(a, b);
-}
-
-int int_index(std::vector<int>a, int val, int n)
-{
-    int i;
-    for(i = 0; i < n; ++i){
-        if(a[i] == val) return i;
-    }
-    return -1;
-}
-
-template <typename Dtype>
-Dtype CenterSigmoid(Dtype x){
-	return 1. / (1. + exp(-x));
-}
-
-template double CenterSigmoid(double x);
-template float CenterSigmoid(float x);
 
 // 置信度得分,用逻辑回归来做,loss_delta梯度值,既前向又后向
 template <typename Dtype>
