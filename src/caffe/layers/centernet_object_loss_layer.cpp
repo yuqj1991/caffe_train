@@ -245,6 +245,16 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       loc_propagate_down.push_back(false);
       loc_loss_layer_->Backward(loc_top_vec_, loc_propagate_down,
                                 loc_bottom_vec_);
+      // Scale gradient.
+      Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+          normalization_, num_, num_gt_, num_gt_);
+      Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+      caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
+      // Copy gradient back to bottom[0].
+      const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
+      CopyDiffToBottom(loc_pred_diff, output_width, output_height, 
+                        share_location_, loc_bottom_diff, num_channels,
+                        all_gt_bboxes);
       // 针对前两层通道，使用了sigmoid，进行规范化，因此需要反向传播
       const Dtype *bottom_data = bottom[0]->cpu_data();
       const int num_batch = bottom[0]->num();
@@ -256,16 +266,6 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                                                     logistic_gradient(bottom_data[x_index + j]);
         }
       }
-      // Scale gradient.
-      Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-          normalization_, num_, num_gt_, num_gt_);
-      Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
-      caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
-      // Copy gradient back to bottom[0].
-      const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
-      CopyDiffToBottom(loc_pred_diff, output_width, output_height, 
-                        share_location_, loc_bottom_diff, num_channels,
-                        all_gt_bboxes);
     }
   }
   // Back propagate on confidence prediction.
