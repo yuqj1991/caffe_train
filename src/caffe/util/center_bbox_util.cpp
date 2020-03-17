@@ -975,7 +975,7 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
             temp_result.set_xmax(xmax);
             temp_result.set_ymin(ymin);
             temp_result.set_ymax(ymax);
-            temp_result.set_area((xmax - xmin)* (ymax - ymin));
+            temp_result.set_area((xmax - xmin) * (ymax - ymin));
             (*results)[b].push_back(temp_result);
         } 
       }
