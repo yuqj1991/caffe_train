@@ -951,7 +951,7 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
                                   + 3* dimScale + h * output_width + w;
         int object_index = b * num_channels * dimScale 
                                   + 4* dimScale + h * output_width + w;
-        int class_index = b * dimScale
+        int class_index = b * num_channels * dimScale
                                   + 5* dimScale + h * output_width + w;
 
         float bb_xmin = (channel_pred_data[x_index] * anchor_scale /downRatio + w + 0.5) / output_width;
