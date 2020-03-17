@@ -4542,56 +4542,6 @@ layer{
 	}
 }
 
-
-layer {
-	name: "detection_out"
-	type: "Yolov3Detection"
-	bottom: "dectction_moudle_one_out"
-	bottom: "dectction_moudle_two_out"
-	bottom: "dectction_moudle_three_out"
-	top: "detection_out"
-
-	yolov3_detection_output_param {
-	confidence_threshold: 0.25
-		nms_threshold: 0.45
-		num_classes: 1
-
-		#anchor_scale list(width, height)
-
-		biases: 8
-		biases: 14
-		biases: 13
-		biases: 24
-		biases: 21
-		biases: 37
-		biases: 32
-		biases: 56
-		biases: 54
-		biases: 83
-		biases: 76
-		biases: 139
-		biases: 132
-		biases: 190
-		biases: 207
-		biases: 296
-		biases: 324
-		biases: 416
-
-		mask:0
-		mask:1
-		mask:2
-		mask:3
-		mask:4
-		mask:5
-		mask:6
-		mask:7
-		mask:8
-		anchors_scale:4
-		anchors_scale:8
-		anchors_scale:16
-		mask_group_num:3
-	}
-}
 layer {
 	name: "detection_out"
 	type: "Yolov3Detection"
