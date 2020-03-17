@@ -264,8 +264,8 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         for(int j = 0; j < 2 * dimScale; j++){
           loc_bottom_diff[x_index + j] = loc_bottom_diff[x_index + j] * 
                                                     logistic_gradient(bottom_data[x_index + j]);
-        }*/
-      }
+        }
+      }*/
     }
   }
   // Back propagate on confidence prediction.
