@@ -22,8 +22,9 @@ Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, con
 template <typename Dtype>
 void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int output_width, const int output_height, 
-                                bool share_location, const Dtype* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, int num_batch);
+                                bool share_location, Dtype* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
+                                int num_batch);
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
                                 const int output_height, 

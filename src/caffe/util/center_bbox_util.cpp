@@ -108,7 +108,8 @@ template <typename Dtype>
 void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, Dtype* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, int num_batch){
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
+                                int num_batch){
   std::map<int, vector<NormalizedBBox> > ::iterator iter;
   int count = 0;
   CHECK_EQ(num_channels, 4);
@@ -170,11 +171,13 @@ void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_da
 template void EncodeCenteGroundTruthAndPredictions(float* gt_loc_data, float* pred_loc_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, float* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, int num_batch);
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                                int num_batch);
 template void EncodeCenteGroundTruthAndPredictions(double* gt_loc_data, double* pred_loc_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, double* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, int num_batch);                              
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
+                                int num_batch);                              
 
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
