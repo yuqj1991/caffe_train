@@ -792,9 +792,11 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
   }
 
   int postive = 0;
+
   
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+    std::vector<int> mask_Rf_anchor(dimScale, 0);
     int count = 0;
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
@@ -811,10 +813,10 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         int class_index = b * dimScale
                                   + h * output_width + w;
         NormalizedBBox predBox;
-        float bb_xmin = (channel_pred_data[x_index] * anchor_scale /downRatio + w + 0.5) / output_width;
-        float bb_ymin = (channel_pred_data[y_index] * anchor_scale /downRatio + h + 0.5) / output_height;
-        float bb_xmax = (channel_pred_data[width_index] * anchor_scale /downRatio + w + 0.5) / output_height;
-        float bb_ymax = (channel_pred_data[height_index] * anchor_scale /downRatio + w + 0.5) / output_height;
+        float bb_xmin = ((w + 0.5) - channel_pred_data[x_index] * anchor_scale /downRatio) / output_width;
+        float bb_ymin = ((h + 0.5) - channel_pred_data[y_index] * anchor_scale /downRatio) / output_height;
+        float bb_xmax = ((w + 0.5) - channel_pred_data[width_index] * anchor_scale /downRatio) / output_width;
+        float bb_ymax = ((h + 0.5)- channel_pred_data[height_index] * anchor_scale /downRatio) / output_height;
         predBox.set_xmin(bb_xmin);
         predBox.set_xmax(bb_xmax);
         predBox.set_ymin(bb_ymin);
@@ -841,12 +843,10 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
       int large_side = std::max(static_cast<int>((gt_bboxes[ii].xmax() - gt_bboxes[ii].xmin()) * net_width), 
                           static_cast<int>((gt_bboxes[ii].ymax() - gt_bboxes[ii].ymin()) * net_width));
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        //Dtype gt_center_x = Dtype((xmax + xmin)  / 2);
-        //Dtype gt_center_y = Dtype((ymax + ymin)  / 2);
-        int RF_xmin = static_cast<int>(xmin + 0.5 - anchor_scale/downRatio);
-        int RF_xmax = static_cast<int>(xmax + 0.5 + anchor_scale/downRatio);
-        int RF_ymin = static_cast<int>(ymin + 0.5 - anchor_scale/downRatio);
-        int RF_ymax = static_cast<int>(ymax + 0.5 + anchor_scale/downRatio);
+        int RF_xmin = static_cast<int>(xmin + 0.5 - anchor_scale/(2 * downRatio));
+        int RF_xmax = static_cast<int>(xmax + 0.5 + anchor_scale/(2 * downRatio));
+        int RF_ymin = static_cast<int>(ymin + 0.5 - anchor_scale/(2 * downRatio));
+        int RF_ymax = static_cast<int>(ymax + 0.5 + anchor_scale/(2 * downRatio));
         for(int h = RF_ymin; h < RF_ymax; h++){
           for(int w = RF_xmin; w < RF_xmax; w++){
             if(w < 0 || w >= output_width || h <0 || h >= output_height)
@@ -866,10 +866,12 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
               continue;
             if((h + 0.5) - (anchor_scale/downRatio) / 2 < 0)
               continue;
-            Dtype xmin_bias = (xmin - (w + 0.5)) * downRatio / anchor_scale;
-            Dtype ymin_bias = (ymin - (h + 0.5)) * downRatio / anchor_scale;
-            Dtype xmax_bias = (xmax - (w + 0.5)) * downRatio / anchor_scale;
-            Dtype ymax_bias = (ymax - (h + 0.5)) * downRatio / anchor_scale;
+            if(mask_Rf_anchor[h * output_width + w] == 1)
+              continue;
+            Dtype xmin_bias = ((w + 0.5) - xmin) * downRatio / anchor_scale;
+            Dtype ymin_bias = ((h + 0.5) - ymin) * downRatio / anchor_scale;
+            Dtype xmax_bias = ((w + 0.5) - xmax) * downRatio / anchor_scale;
+            Dtype ymax_bias = ((h + 0.5) - ymax) * downRatio / anchor_scale;
             int x_index = b * num_channels * dimScale
                                       + 0* dimScale + h * output_width + w;
             int y_index = b * num_channels * dimScale 
@@ -892,6 +894,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
                                   +  h * output_width + w;
             class_label[class_index] = 1;
             count++;
+            mask_Rf_anchor[h * output_width + w] == 1;
           }
         }
       }
@@ -946,9 +949,8 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
       channel_pred_data[object_index + i] = CenterSigmoid(channel_pred_data[object_index + i]);
     }
   }
-  //std::vector<CenterNetInfo > batch_result;
+
   for(int b = 0; b < batch_size; b++){
-    //batch_result.clear();
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
         int x_index = b * num_channels * dimScale
@@ -964,10 +966,10 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
         int class_index = b * num_channels * dimScale
                                   + 5* dimScale + h * output_width + w;
 
-        float bb_xmin = (channel_pred_data[x_index] * anchor_scale /downRatio + w + 0.5) / output_width;
-        float bb_ymin = (channel_pred_data[y_index] * anchor_scale /downRatio + h + 0.5) / output_height;
-        float bb_xmax = (channel_pred_data[width_index] * anchor_scale /downRatio + w + 0.5) / output_width;
-        float bb_ymax = (channel_pred_data[height_index] * anchor_scale /downRatio + h + 0.5) / output_height;
+        float bb_xmin = ((w + 0.5) - channel_pred_data[x_index] * anchor_scale /downRatio) / output_width;
+        float bb_ymin = ((h + 0.5) - channel_pred_data[y_index] * anchor_scale /downRatio) / output_height;
+        float bb_xmax = ((w + 0.5) - channel_pred_data[width_index] * anchor_scale /downRatio) / output_width;
+        float bb_ymax = ((h + 0.5)- channel_pred_data[height_index] * anchor_scale /downRatio) / output_height;
         
         float xmin = std::min(std::max(bb_xmin, (0.f)), (1.f));
         float ymin = std::min(std::max(bb_ymin, (0.f)), (1.f));
