@@ -894,7 +894,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
                                   +  h * output_width + w;
             class_label[class_index] = 1;
             count++;
-            mask_Rf_anchor[h * output_width + w] == 1;
+            mask_Rf_anchor[h * output_width + w] = 1;
           }
         }
       }
