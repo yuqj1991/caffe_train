@@ -222,8 +222,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         sampled_datum = expand_datum;
       }
 		  
-	  }
-    if (anchor_prob > upProb_){
+	  }else if (anchor_prob > upProb_){
       int resized_height = transform_param.resize_param().height();
       int resized_width = transform_param.resize_param().width();
       NormalizedBBox sampled_bbox;
