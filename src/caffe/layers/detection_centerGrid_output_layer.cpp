@@ -93,9 +93,9 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
     }else{
       num_kept += num_det;
     }
-    results_[item_id].clear();
+    iter->second.clear();
     for(unsigned ii = 0; ii < nms_result.size(); ii++){
-      results_[item_id].push_back(nms_result[ii]);
+      iter->second.push_back(nms_result[ii]);
     }
   }
   vector<int> top_shape(2, 1);
