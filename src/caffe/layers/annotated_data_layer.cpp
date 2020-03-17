@@ -206,23 +206,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     AnnotatedDatum* sampled_datum = NULL;
     bool has_sampled = false;
-    if (YoloFormat_) {
-      float yolo_data_jitter_ = 0.3;
-      vector<NormalizedBBox> sampled_bboxes;
-      GenerateJitterSamples(yolo_data_jitter_, &sampled_bboxes);
-      if (sampled_bboxes.size() > 0) {
-        // Randomly pick a sampled bbox and crop the expand_datum.
-        int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
-        sampled_datum = new AnnotatedDatum();
-        this->data_transformer_->CropImage(*expand_datum,
-                                          sampled_bboxes[rand_idx],
-                                          sampled_datum);
-        has_sampled = true;
-      } else {
-        sampled_datum = expand_datum;
-      }
-		  
-	  }else if (anchor_prob > upProb_){
+    if (anchor_prob > upProb_){
       int resized_height = transform_param.resize_param().height();
       int resized_width = transform_param.resize_param().width();
       NormalizedBBox sampled_bbox;
@@ -242,10 +226,15 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         sampled_datum = expand_datum;
       }
     }else if(anchor_prob <= upProb_ && anchor_prob > lowProb_ ){
-      if (batch_samplers_.size() > 0) {
+      if (batch_samplers_.size() > 0 || YoloFormat_) {
         // Generate sampled bboxes from expand_datum.
         vector<NormalizedBBox> sampled_bboxes;
-        GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
+        if(YoloFormat_){
+          float yolo_data_jitter_ = 0.3;
+          GenerateJitterSamples(yolo_data_jitter_, &sampled_bboxes);
+        }else{
+          GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
+        }
         if (sampled_bboxes.size() > 0) {
           // Randomly pick a sampled bbox and crop the expand_datum.
           int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
