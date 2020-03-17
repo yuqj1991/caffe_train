@@ -17,8 +17,20 @@ namespace caffe {
 #define NMS_UNION 1
 #define NMS_MIN  2
 
+typedef struct _YoloScoreShow{
+      float avg_iou;
+      float recall;
+      float recall75;
+      float avg_cat;
+      float avg_obj;
+      float avg_anyobj;
+      int count;
+      int class_count;
+}YoloScoreShow;
+
 template<typename Dtype>
 Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, const Dtype min_overlap);
+
 template <typename Dtype>
 void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int output_width, const int output_height, 
@@ -61,18 +73,6 @@ void EncodeYoloGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_dat
                                 const int output_width, const int output_height, 
                                 bool share_location, const Dtype* channel_loc_data,
                                 const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
-
-
-typedef struct _YoloScoreShow{
-      float avg_iou;
-      float recall;
-      float recall75;
-      float avg_cat;
-      float avg_obj;
-      float avg_anyobj;
-      int count;
-      int class_count;
-}YoloScoreShow;
 
 template <typename Dtype>
 void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
