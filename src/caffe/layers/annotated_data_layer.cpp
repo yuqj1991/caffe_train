@@ -206,6 +206,23 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     AnnotatedDatum* sampled_datum = NULL;
     bool has_sampled = false;
+    if (YoloFormat_) {
+      float yolo_data_jitter_ = 0.3;
+      vector<NormalizedBBox> sampled_bboxes;
+      GenerateJitterSamples(yolo_data_jitter_, &sampled_bboxes);
+      if (sampled_bboxes.size() > 0) {
+        // Randomly pick a sampled bbox and crop the expand_datum.
+        int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+        sampled_datum = new AnnotatedDatum();
+        this->data_transformer_->CropImage(*expand_datum,
+                                          sampled_bboxes[rand_idx],
+                                          sampled_datum);
+        has_sampled = true;
+      } else {
+        sampled_datum = expand_datum;
+      }
+		  
+	  }
     if (anchor_prob > upProb_){
       int resized_height = transform_param.resize_param().height();
       int resized_width = transform_param.resize_param().width();
