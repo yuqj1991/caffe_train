@@ -920,13 +920,12 @@ template double EncodeCenterGridObject(const int batch_size, const int num_chann
 template <typename Dtype>
 void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int net_width, const int net_height,
+                          const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results){
   CHECK_EQ(num_classes, 1); // face class
   CHECK_EQ(num_channels, 4 + 1 + num_classes);
   int dimScale = output_height * output_width;
-  int downRatio = net_height / output_height;
   for(int b = 0; b < batch_size; b++){
     int object_index = b * num_channels * dimScale
                                 + 4 * dimScale;
@@ -985,13 +984,13 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
 
 template void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int net_width, const int net_height,
+                          const int downRatio,
                           float* channel_pred_data, const int anchor_scale, float conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results);
 
 template void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int net_width, const int net_height,
+                          const int downRatio,
                           double* channel_pred_data, const int anchor_scale, double conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results);
 

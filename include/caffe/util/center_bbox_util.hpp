@@ -100,7 +100,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
 template <typename Dtype>
 void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int net_width, const int net_height,
+                          const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results);
 

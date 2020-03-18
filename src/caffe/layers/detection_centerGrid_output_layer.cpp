@@ -69,11 +69,9 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
     const int output_width = bottom[t]->width();
     num_ = bottom[t]->num();
     int num_channels = bottom[t]->channels();
-    int net_width = output_width * downRatio_[t];
-    int net_height = output_height * downRatio_[t];
     GetCenterGridObjectResult(num_, num_channels, num_classes_,
                           output_width, output_height, 
-                          net_width, net_height,
+                          downRatio_[t],
                           channel_pred_data, anchor_scale_[t], confidence_threshold_, &results_);
     
   }
