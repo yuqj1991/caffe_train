@@ -3633,33 +3633,21 @@ layer {
 		ignore_cross_boundary_bbox: false
 		mining_type: MAX_NEGATIVE
 		
-		bbox_small_list: 10
 		bbox_small_list: 15
 		bbox_small_list: 20
-		bbox_small_list: 40
 		bbox_small_list: 70
-		bbox_small_list: 110
-		bbox_small_list: 250
 		bbox_small_list: 400
-
-		bbox_large_list: 15
+		
 		bbox_large_list: 20
-		bbox_large_list: 40
 		bbox_large_list: 70
 		bbox_large_list: 110
-		bbox_large_list: 250
-		bbox_large_list: 400
 		bbox_large_list: 560
 
-		receptive_field_list: 15
 		receptive_field_list: 20
-		receptive_field_list: 40
 		receptive_field_list: 70
 		receptive_field_list: 110
-		receptive_field_list: 250
-		receptive_field_list: 400
 		receptive_field_list: 560
-		num_output_scales: 8
+		num_output_scales: 4
 		net_input_height: 640
 		net_input_width: 640
 	}
