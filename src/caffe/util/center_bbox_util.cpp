@@ -834,7 +834,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
         for(int h = RF_ymin; h < RF_ymax; h++){
           for(int w = RF_xmin; w < RF_xmax; w++){
-            if(w < 0 || w >= output_width || h <0 || h >= output_height)
+            if(w < 0 || w >= (output_width - 1) || h <0 || h >= (output_height - 1))
               continue;
             int class_index = b * dimScale
                                   +  h * output_width + w;
@@ -843,9 +843,9 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         }
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
-            if(w + (anchor_scale/downRatio) / 2 >= output_width)
+            if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
               continue;
-            if(h + (anchor_scale/downRatio) / 2>= output_height)
+            if(h + (anchor_scale/downRatio) / 2>= output_height - 1)
               continue;
             if(w - (anchor_scale/downRatio) / 2 < 0)
               continue;
