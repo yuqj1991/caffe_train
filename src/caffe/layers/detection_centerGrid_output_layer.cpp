@@ -65,8 +65,8 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
   results_.clear();
   for(int t = 0; t < bottom_size_; t++){
     Dtype *channel_pred_data = bottom[t]->mutable_cpu_data();
-    const int output_height = bottom[0]->height();
-    const int output_width = bottom[0]->width();
+    const int output_height = bottom[t]->height();
+    const int output_width = bottom[t]->width();
     num_ = bottom[t]->num();
     int num_channels = bottom[t]->channels();
     int net_width = output_width * downRatio_[t];
