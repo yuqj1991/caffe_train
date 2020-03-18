@@ -4714,10 +4714,10 @@ layer {
 		share_location: true
 		keep_top_k: 200
 		confidence_threshold: 0.15
-		anchor_scale: 550
-		anchor_scale: 250
-		anchor_scale: 110
-		anchor_scale: 40
+		bias_scale: 550
+		bias_scale: 250
+		bias_scale: 110
+		bias_scale: 40
 		
 		down_ratio: 32
 		down_ratio: 16
