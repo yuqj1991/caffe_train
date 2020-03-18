@@ -3616,7 +3616,7 @@ layer {
 	loss_weight: 1.0
 	multibox_loss_param {
 		loc_loss_type: SMOOTH_L1
-		conf_loss_type: FOCALSOFTMAX
+		conf_loss_type: SOFTMAX
 		loc_weight: 1.0
 		num_classes: 2
 		share_location: true
