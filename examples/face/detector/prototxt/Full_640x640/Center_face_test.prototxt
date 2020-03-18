@@ -98,7 +98,7 @@ layer {
 }
 layer {
   name: "Conv/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "Conv"
   top: "Conv"
 }
@@ -169,7 +169,7 @@ layer {
 }
 layer {
   name: "conv/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv/depthwise"
   top: "conv/depthwise"
 }
@@ -238,7 +238,7 @@ layer {
 }
 layer {
   name: "conv/project/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv/project"
   top: "conv/project"
 }
@@ -307,7 +307,7 @@ layer {
 }
 layer {
   name: "conv_1/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_1/expand"
   top: "conv_1/expand"
 }
@@ -379,7 +379,7 @@ layer {
 }
 layer {
   name: "conv_1/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_1/depthwise"
   top: "conv_1/depthwise"
 }
@@ -511,7 +511,7 @@ layer {
 }
 layer {
   name: "conv_2/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_2/expand"
   top: "conv_2/expand"
 }
@@ -582,7 +582,7 @@ layer {
 }
 layer {
   name: "conv_2/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_2/depthwise"
   top: "conv_2/depthwise"
 }
@@ -728,7 +728,7 @@ layer {
 }
 layer {
   name: "conv_3/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_3/expand"
   top: "conv_3/expand"
 }
@@ -808,7 +808,7 @@ layer {
 }
 layer {
   name: "conv_3/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_3/depthwise"
   top: "conv_3/depthwise"
 }
@@ -954,7 +954,7 @@ layer {
 }
 layer {
   name: "conv_4/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_4/expand"
   top: "conv_4/expand"
 }
@@ -1033,7 +1033,7 @@ layer {
 }
 layer {
   name: "conv_4/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_4/depthwise"
   top: "conv_4/depthwise"
 }
@@ -1179,7 +1179,7 @@ layer {
 }
 layer {
   name: "conv_5/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_5/expand"
   top: "conv_5/expand"
 }
@@ -1250,7 +1250,7 @@ layer {
 }
 layer {
   name: "conv_5/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_5/depthwise"
   top: "conv_5/depthwise"
 }
@@ -1389,7 +1389,7 @@ layer {
 }
 layer {
   name: "conv_6/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_6/expand"
   top: "conv_6/expand"
 }
@@ -1461,7 +1461,7 @@ layer {
 }
 layer {
   name: "conv_6/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_6/depthwise"
   top: "conv_6/depthwise"
 }
@@ -1593,7 +1593,7 @@ layer {
 }
 layer {
   name: "conv_7/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_7/expand"
   top: "conv_7/expand"
 }
@@ -1664,7 +1664,7 @@ layer {
 }
 layer {
   name: "conv_7/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_7/depthwise"
   top: "conv_7/depthwise"
 }
@@ -1803,7 +1803,7 @@ layer {
 }
 layer {
   name: "conv_8/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_8/expand"
   top: "conv_8/expand"
 }
@@ -1874,7 +1874,7 @@ layer {
 }
 layer {
   name: "conv_8/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_8/depthwise"
   top: "conv_8/depthwise"
 }
@@ -2013,7 +2013,7 @@ layer {
 }
 layer {
   name: "conv_9/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_9/expand"
   top: "conv_9/expand"
 }
@@ -2084,7 +2084,7 @@ layer {
 }
 layer {
   name: "conv_9/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_9/depthwise"
   top: "conv_9/depthwise"
 }
@@ -2223,7 +2223,7 @@ layer {
 }
 layer {
   name: "conv_10/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_10/expand"
   top: "conv_10/expand"
 }
@@ -2294,7 +2294,7 @@ layer {
 }
 layer {
   name: "conv_10/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_10/depthwise"
   top: "conv_10/depthwise"
 }
@@ -2426,7 +2426,7 @@ layer {
 }
 layer {
   name: "conv_11/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_11/expand"
   top: "conv_11/expand"
 }
@@ -2497,7 +2497,7 @@ layer {
 }
 layer {
   name: "conv_11/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_11/depthwise"
   top: "conv_11/depthwise"
 }
@@ -2636,7 +2636,7 @@ layer {
 }
 layer {
   name: "conv_12/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_12/expand"
   top: "conv_12/expand"
 }
@@ -2707,7 +2707,7 @@ layer {
 }
 layer {
   name: "conv_12/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_12/depthwise"
   top: "conv_12/depthwise"
 }
@@ -2846,7 +2846,7 @@ layer {
 }
 layer {
   name: "conv_13/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_13/expand"
   top: "conv_13/expand"
 }
@@ -2918,7 +2918,7 @@ layer {
 }
 layer {
   name: "conv_13/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_13/depthwise"
   top: "conv_13/depthwise"
 }
@@ -3050,7 +3050,7 @@ layer {
 }
 layer {
   name: "conv_14/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_14/expand"
   top: "conv_14/expand"
 }
@@ -3121,7 +3121,7 @@ layer {
 }
 layer {
   name: "conv_14/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_14/depthwise"
   top: "conv_14/depthwise"
 }
@@ -3260,7 +3260,7 @@ layer {
 }
 layer {
   name: "conv_15/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_15/expand"
   top: "conv_15/expand"
 }
@@ -3331,7 +3331,7 @@ layer {
 }
 layer {
   name: "conv_15/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_15/depthwise"
   top: "conv_15/depthwise"
 }
@@ -3470,7 +3470,7 @@ layer {
 }
 layer {
   name: "conv_16/expand/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_16/expand"
   top: "conv_16/expand"
 }
@@ -3541,7 +3541,7 @@ layer {
 }
 layer {
   name: "conv_16/depthwise/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_16/depthwise"
   top: "conv_16/depthwise"
 }
@@ -3610,7 +3610,7 @@ layer {
 }
 layer {
   name: "conv_16/project/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_16/project"
   top: "conv_16/project"
 }
@@ -3681,7 +3681,7 @@ layer {
 }
 layer {
   name: "conv_16/project_pyramid/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_16/project_pyramid"
   top: "conv_16/project_pyramid"
 }
@@ -3752,7 +3752,7 @@ layer {
 }
 layer {
   name: "conv_16/project_pyramid_3x3/relu"
-  type: "ReLU"
+  type: "ReLU6"
   bottom: "conv_16/project_pyramid_3x3"
   top: "conv_16/project_pyramid_3x3"
 }
@@ -4168,89 +4168,82 @@ layer {
 #######################################################################
 #                             modeule one                             #
 #######################################################################
+#################context moudle####################
 layer{
-	name: "dectction_moudle_one_out"
-	type: "Convolution"
-	bottom: "pyramid_stage_one"
-	top: "dectction_moudle_one_out"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 6
-		bias_term: false
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-#######################################################################
-#                             modeule two                             #
-#######################################################################
-layer{
-	name: "dectction_moudle_two_out"
-	type: "Convolution"
-	bottom: "pyramid_stage_two"
-	top: "dectction_moudle_two_out"
-	param {
-		lr_mult: 1
-		decay_mult: 1
-	}
-	convolution_param {
-		num_output: 6
-		bias_term: false
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-	}
-}
-#######################################################################
-#                             modeule three                           #
-#######################################################################
-layer{
-	name: "dectction_moudle_three_out"
+	name: "conf_heatmap_1x1"
 	type: "Convolution"
 	bottom: "pyramid_stage_three"
-	top: "dectction_moudle_three_out"
+	top: "conf_heatmap_1x1"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 6
-		bias_term: false
+		num_output: 1
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
 		}
+		bias_term: false
+	}
+}
+#######################################################################
+#                             modeule two                           #
+#######################################################################
+#################context moudle####################
+layer{
+	name: "conv_loc_1x1"
+	type: "Convolution"
+	bottom: "pyramid_stage_three"
+	top: "conv_loc_1x1"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	convolution_param {
+		num_output: 4
+		kernel_size: 1
+		#pad: 1
+		weight_filler {
+			type: "msra"
+		}
+		bias_term: false
 	}
 }
 
 layer {
+  name: "conf_heatmap_1x1_sigmoid"
+	type: "Sigmoid"
+	bottom: "conf_heatmap_1x1"
+	top: "conf_heatmap_1x1_sigmoid"
+}
+layer {
+  name: "conf_heatmap_1x1_pool"
+	type: "Pooling"
+  bottom: "conf_heatmap_1x1_sigmoid"
+  top: "conf_heatmap_1x1_pool"
+  pooling_param {
+      pool: MAX
+      kernel_size: 3
+      stride: 1
+      pad: 1
+  }
+}
+layer {
 	name: "detection_out"
-	type: "CenterGridOutput"
-	bottom: "dectction_moudle_one_out"
-	bottom: "dectction_moudle_two_out"
-	bottom: "dectction_moudle_three_out"
+	type: "CenternetDetectionOutput"
+	bottom: "conf_heatmap_1x1_sigmoid"
+	bottom: "conf_heatmap_1x1_pool"
+	bottom: "conv_loc_1x1"
 	top: "detection_out"
 	include {
-		phase: TEST
+	phase: TEST
 	}
 	detection_output_param {
-		num_classes: 1
+		num_classes: 2
 		share_location: true
-		keep_top_k: 100
-		confidence_threshold: 0.25
-		bias_scale: 550
-		bias_scale: 180
-		bias_scale: 40
-		
-		down_ratio: 16
-		down_ratio: 8
-		down_ratio: 4
+		keep_top_k: 200
+		confidence_threshold: 0.15
 	}
 }
 layer {
@@ -4263,9 +4256,10 @@ layer {
 		phase: TEST
 	}
 	detection_evaluate_param {
+	
 		num_classes: 2
 		background_label_id: 0
-		overlap_threshold: 0.5
+		overlap_threshold: 0.3
 		evaluate_difficult_gt: false
 	}
 }

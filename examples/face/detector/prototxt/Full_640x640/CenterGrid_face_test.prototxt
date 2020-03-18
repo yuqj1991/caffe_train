@@ -5,11 +5,10 @@ layer {
 	top: "data"
 	top: "label"
 	include {
-		phase: TRAIN
+		phase: TEST
 	}
 	transform_param {
 		scale: 0.007843
-		mirror: false
 		mean_value: 103.94
 		mean_value: 116.78
 		mean_value: 123.68
@@ -19,174 +18,16 @@ layer {
 			height: 640
 			width: 640
 			interp_mode: LINEAR
-			interp_mode: AREA
-			interp_mode: NEAREST
-			interp_mode: CUBIC
-			interp_mode: LANCZOS4
-		}
-		emit_constraint {
-			emit_type: CENTER
-		}
-		distort_param {
-			brightness_prob: 0.5
-			brightness_delta: 32.0
-			contrast_prob: 0.5
-			contrast_lower: 0.5
-			contrast_upper: 1.5
-			hue_prob: 0.5
-			hue_delta: 18.0
-			saturation_prob: 0.5
-			saturation_lower: 0.5
-			saturation_upper: 1.5
-			random_order_prob: 0.0
-		}
-		expand_param {
-			prob: 0.5
-			max_expand_ratio: 2.0
 		}
 	}
 	data_param {
-		source: "../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 4
+		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
+		batch_size: 1
 		backend: LMDB
 	}
 	annotated_data_param {
 		batch_sampler {
-			sampler {
-				min_scale: 0.3
-				max_scale: 1.0
-				min_aspect_ratio: 0.3
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
 		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.4
-				max_scale: 1.0
-				min_aspect_ratio: 0.4
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.5
-				max_scale: 1.0
-				min_aspect_ratio: 0.5
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.6
-				max_scale: 1.0
-				min_aspect_ratio: 0.6
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.7
-				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.0
-				}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.8
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.9
-				max_scale: 1.0
-				min_aspect_ratio: 0.9
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_object_coverage: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		data_anchor_sampler{
-			scale: 15
-			scale: 20
-			scale: 40
-			scale: 70
-			scale: 110
-			scale: 250
-			scale: 400
-			scale: 560
-			sample_constraint{
-				min_object_coverage: 0.85
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-		bbox_sampler{
-			bbox_small_scale: 10
-			bbox_small_scale: 15
-			bbox_small_scale: 20
-			bbox_small_scale: 40
-			bbox_small_scale: 70
-			bbox_small_scale: 110
-			bbox_small_scale: 250
-			bbox_small_scale: 400
-			
-			bbox_large_scale: 15
-			bbox_large_scale: 20
-			bbox_large_scale: 40
-			bbox_large_scale: 70
-			bbox_large_scale: 110
-			bbox_large_scale: 250
-			bbox_large_scale: 400
-			bbox_large_scale: 560
-			
-			ancher_stride: 4
-			ancher_stride: 4
-			ancher_stride: 8
-			ancher_stride: 8
-			ancher_stride: 16
-			ancher_stride: 32
-			ancher_stride: 32
-			ancher_stride: 32
-		}
-		up_prob: 0.7
-		low_prob: 0.4
 		label_map_file: "../labelmap.prototxt"
 	}
 }
@@ -228,7 +69,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -257,7 +98,7 @@ layer {
 }
 layer {
   name: "Conv/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "Conv"
   top: "Conv"
 }
@@ -299,7 +140,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -328,7 +169,7 @@ layer {
 }
 layer {
   name: "conv/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv/depthwise"
   top: "conv/depthwise"
 }
@@ -368,7 +209,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -397,7 +238,7 @@ layer {
 }
 layer {
   name: "conv/project/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv/project"
   top: "conv/project"
 }
@@ -437,7 +278,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -466,7 +307,7 @@ layer {
 }
 layer {
   name: "conv_1/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_1/expand"
   top: "conv_1/expand"
 }
@@ -509,7 +350,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -538,7 +379,7 @@ layer {
 }
 layer {
   name: "conv_1/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_1/depthwise"
   top: "conv_1/depthwise"
 }
@@ -578,7 +419,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -641,7 +482,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -670,7 +511,7 @@ layer {
 }
 layer {
   name: "conv_2/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_2/expand"
   top: "conv_2/expand"
 }
@@ -712,7 +553,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -741,7 +582,7 @@ layer {
 }
 layer {
   name: "conv_2/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_2/depthwise"
   top: "conv_2/depthwise"
 }
@@ -781,7 +622,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -858,7 +699,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -887,7 +728,7 @@ layer {
 }
 layer {
   name: "conv_3/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_3/expand"
   top: "conv_3/expand"
 }
@@ -938,7 +779,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -967,7 +808,7 @@ layer {
 }
 layer {
   name: "conv_3/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_3/depthwise"
   top: "conv_3/depthwise"
 }
@@ -1014,7 +855,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1084,7 +925,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1113,7 +954,7 @@ layer {
 }
 layer {
   name: "conv_4/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_4/expand"
   top: "conv_4/expand"
 }
@@ -1163,7 +1004,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1192,7 +1033,7 @@ layer {
 }
 layer {
   name: "conv_4/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_4/depthwise"
   top: "conv_4/depthwise"
 }
@@ -1239,7 +1080,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1309,7 +1150,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1338,7 +1179,7 @@ layer {
 }
 layer {
   name: "conv_5/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_5/expand"
   top: "conv_5/expand"
 }
@@ -1380,7 +1221,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1409,7 +1250,7 @@ layer {
 }
 layer {
   name: "conv_5/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_5/depthwise"
   top: "conv_5/depthwise"
 }
@@ -1449,7 +1290,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1519,7 +1360,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1548,7 +1389,7 @@ layer {
 }
 layer {
   name: "conv_6/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_6/expand"
   top: "conv_6/expand"
 }
@@ -1591,7 +1432,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1620,7 +1461,7 @@ layer {
 }
 layer {
   name: "conv_6/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_6/depthwise"
   top: "conv_6/depthwise"
 }
@@ -1660,7 +1501,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1723,7 +1564,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1752,7 +1593,7 @@ layer {
 }
 layer {
   name: "conv_7/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_7/expand"
   top: "conv_7/expand"
 }
@@ -1794,7 +1635,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1823,7 +1664,7 @@ layer {
 }
 layer {
   name: "conv_7/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_7/depthwise"
   top: "conv_7/depthwise"
 }
@@ -1863,7 +1704,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1933,7 +1774,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -1962,7 +1803,7 @@ layer {
 }
 layer {
   name: "conv_8/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_8/expand"
   top: "conv_8/expand"
 }
@@ -2004,7 +1845,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2033,7 +1874,7 @@ layer {
 }
 layer {
   name: "conv_8/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_8/depthwise"
   top: "conv_8/depthwise"
 }
@@ -2073,7 +1914,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2143,7 +1984,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2172,7 +2013,7 @@ layer {
 }
 layer {
   name: "conv_9/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_9/expand"
   top: "conv_9/expand"
 }
@@ -2214,7 +2055,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2243,7 +2084,7 @@ layer {
 }
 layer {
   name: "conv_9/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_9/depthwise"
   top: "conv_9/depthwise"
 }
@@ -2283,7 +2124,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2353,7 +2194,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2382,7 +2223,7 @@ layer {
 }
 layer {
   name: "conv_10/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_10/expand"
   top: "conv_10/expand"
 }
@@ -2424,7 +2265,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2453,7 +2294,7 @@ layer {
 }
 layer {
   name: "conv_10/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_10/depthwise"
   top: "conv_10/depthwise"
 }
@@ -2493,7 +2334,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2556,7 +2397,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2585,7 +2426,7 @@ layer {
 }
 layer {
   name: "conv_11/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_11/expand"
   top: "conv_11/expand"
 }
@@ -2627,7 +2468,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2656,7 +2497,7 @@ layer {
 }
 layer {
   name: "conv_11/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_11/depthwise"
   top: "conv_11/depthwise"
 }
@@ -2696,7 +2537,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2766,7 +2607,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2795,7 +2636,7 @@ layer {
 }
 layer {
   name: "conv_12/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_12/expand"
   top: "conv_12/expand"
 }
@@ -2837,7 +2678,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2866,7 +2707,7 @@ layer {
 }
 layer {
   name: "conv_12/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_12/depthwise"
   top: "conv_12/depthwise"
 }
@@ -2906,7 +2747,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -2976,7 +2817,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3005,7 +2846,7 @@ layer {
 }
 layer {
   name: "conv_13/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_13/expand"
   top: "conv_13/expand"
 }
@@ -3048,7 +2889,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3077,7 +2918,7 @@ layer {
 }
 layer {
   name: "conv_13/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_13/depthwise"
   top: "conv_13/depthwise"
 }
@@ -3117,7 +2958,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3180,7 +3021,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3209,7 +3050,7 @@ layer {
 }
 layer {
   name: "conv_14/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_14/expand"
   top: "conv_14/expand"
 }
@@ -3251,7 +3092,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3280,7 +3121,7 @@ layer {
 }
 layer {
   name: "conv_14/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_14/depthwise"
   top: "conv_14/depthwise"
 }
@@ -3320,7 +3161,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3390,7 +3231,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3419,7 +3260,7 @@ layer {
 }
 layer {
   name: "conv_15/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_15/expand"
   top: "conv_15/expand"
 }
@@ -3461,7 +3302,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3490,7 +3331,7 @@ layer {
 }
 layer {
   name: "conv_15/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_15/depthwise"
   top: "conv_15/depthwise"
 }
@@ -3530,7 +3371,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3600,7 +3441,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3629,7 +3470,7 @@ layer {
 }
 layer {
   name: "conv_16/expand/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_16/expand"
   top: "conv_16/expand"
 }
@@ -3671,7 +3512,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3700,7 +3541,7 @@ layer {
 }
 layer {
   name: "conv_16/depthwise/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_16/depthwise"
   top: "conv_16/depthwise"
 }
@@ -3740,7 +3581,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3769,7 +3610,7 @@ layer {
 }
 layer {
   name: "conv_16/project/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_16/project"
   top: "conv_16/project"
 }
@@ -3811,7 +3652,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3840,7 +3681,7 @@ layer {
 }
 layer {
   name: "conv_16/project_pyramid/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_16/project_pyramid"
   top: "conv_16/project_pyramid"
 }
@@ -3882,7 +3723,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -3911,7 +3752,7 @@ layer {
 }
 layer {
   name: "conv_16/project_pyramid_3x3/relu"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_16/project_pyramid_3x3"
   top: "conv_16/project_pyramid_3x3"
 }
@@ -3952,7 +3793,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -4016,7 +3857,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -4087,7 +3928,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -4151,7 +3992,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -4223,7 +4064,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -4287,7 +4128,7 @@ layer {
     decay_mult: 0
   }
   batch_norm_param {
-    use_global_stats: false
+    use_global_stats: true
     eps: 0.001
   }
 }
@@ -4327,71 +4168,108 @@ layer {
 #######################################################################
 #                             modeule one                             #
 #######################################################################
-#################context moudle####################
 layer{
-	name: "conf_heatmap_1x1"
+	name: "dectction_moudle_one_out"
 	type: "Convolution"
-	bottom: "pyramid_stage_three"
-	top: "conf_heatmap_1x1"
+	bottom: "pyramid_stage_one"
+	top: "dectction_moudle_one_out"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 1
+		num_output: 6
+		bias_term: false
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
 		}
-		bias_term: false
 	}
 }
 #######################################################################
-#                             modeule two                           #
+#                             modeule two                             #
 #######################################################################
-#################context moudle####################
 layer{
-	name: "conv_loc_1x1"
+	name: "dectction_moudle_two_out"
 	type: "Convolution"
-	bottom: "pyramid_stage_three"
-	top: "conv_loc_1x1"
+	bottom: "pyramid_stage_two"
+	top: "dectction_moudle_two_out"
 	param {
 		lr_mult: 1
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 6
+		bias_term: false
 		kernel_size: 1
-		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
+	}
+}
+#######################################################################
+#                             modeule three                           #
+#######################################################################
+layer{
+	name: "dectction_moudle_three_out"
+	type: "Convolution"
+	bottom: "pyramid_stage_three"
+	top: "dectction_moudle_three_out"
+	param {
+		lr_mult: 1
+		decay_mult: 1
+	}
+	convolution_param {
+		num_output: 6
 		bias_term: false
+		kernel_size: 1
+		weight_filler {
+			type: "msra"
+		}
 	}
 }
 
 layer {
-	name: "centernet_loss"
-	type: "CenterObjectLoss"
-	bottom: "conv_loc_1x1"
-	bottom: "conf_heatmap_1x1"
-	bottom: "label"
-	top: "centernet_loss"
+	name: "detection_out"
+	type: "CenterGridOutput"
+	bottom: "dectction_moudle_one_out"
+	bottom: "dectction_moudle_two_out"
+	bottom: "dectction_moudle_three_out"
+	top: "detection_out"
 	include {
-		phase: TRAIN
+		phase: TEST
 	}
-	propagate_down: true
-	propagate_down: true
-	propagate_down: false
-	loss_param {
-		normalization: VALID
-	}
-	loss_weight: 1.0
-	center_object_loss_param {
-		loc_loss_type: SMOOTH_L1
-		conf_loss_type: FOCALSIGMOID
-		loc_weight: 1.0
-		num_class: 1
+	detection_output_param {
+		num_classes: 1
 		share_location: true
+		keep_top_k: 100
+		confidence_threshold: 0.15
+		nms_param {
+			nms_threshold: 0.3
+			top_k: 200
+		}
+		bias_scale: 550
+		bias_scale: 180
+		bias_scale: 40
+		
+		down_ratio: 16
+		down_ratio: 8
+		down_ratio: 4
+	}
+}
+layer {
+	name: "detection_eval"
+	type: "DetectionEvaluate"
+	bottom: "detection_out"
+	bottom: "label"
+	top: "detection_eval"
+	include {
+		phase: TEST
+	}
+	detection_evaluate_param {
+		num_classes: 2
+		background_label_id: 0
+		overlap_threshold: 0.3
+		evaluate_difficult_gt: false
 	}
 }

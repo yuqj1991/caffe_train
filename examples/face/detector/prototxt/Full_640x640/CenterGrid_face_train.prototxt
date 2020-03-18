@@ -4411,7 +4411,7 @@ layer {
 		share_location: true
 		net_height: 640
 		net_width: 640
-		ignore_thresh: 0.5
+		ignore_thresh: 0.3
 		bias_scale: 550
 		low_bbox_scale: 210
 		up_bbox_scale: 560
@@ -4441,7 +4441,7 @@ layer {
 		share_location: true
 		net_height: 640
 		net_width: 640
-		ignore_thresh: 0.5
+		ignore_thresh: 0.3
 		bias_scale: 250
 		low_bbox_scale: 25
 		up_bbox_scale: 210
@@ -4471,7 +4471,7 @@ layer {
 		share_location: true
 		net_height: 640
 		net_width: 640
-		ignore_thresh: 0.5
+		ignore_thresh: 0.3
 		bias_scale: 40
 		low_bbox_scale: 8
 		up_bbox_scale: 25

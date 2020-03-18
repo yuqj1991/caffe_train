@@ -299,8 +299,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   float scaleChoose = 0.0f; 
   float min_resize_val = 0.f, max_resize_val = 0.f;
   for(int j = 0; j < anchorScale.size() -1; ++j){
-    if(bbox_aera >= std::pow(anchorScale[j], 2) && bbox_aera < std::pow(anchorScale[j+1], 2))
-    {
+    if(bbox_aera >= std::pow(anchorScale[j], 2) && bbox_aera < std::pow(anchorScale[j+1], 2)){
       range_size = j + 1;
       break;
     }
@@ -331,20 +330,24 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     ResizedCropSample(anno_datum, resized_anno_datum, scale, trans_param);
     int Resized_ori_Height = int(scale * img_height);
     int Resized_ori_Width = int(scale * img_width);
+    int Resized_bbox_width = int(scale * bbox_width);
+    int Resized_bbox_height = int(scale * bbox_height);
+    const float Resized_xmin = object_bboxes[object_bbox_index].xmin()*Resized_ori_Width;
+    const float Resized_ymin = object_bboxes[object_bbox_index].ymin()*Resized_ori_Height;
     if(resized_width < std::max(Resized_ori_Height, Resized_ori_Width)){
-      if(bbox_width <= resized_width){
-        caffe_rng_uniform(1, bbox_width + xmin - resized_width, xmin, &width_offset_org );
+      if(Resized_bbox_width <= resized_width){
+        caffe_rng_uniform(1, Resized_bbox_width + Resized_xmin - resized_width, Resized_xmin, &width_offset_org );
       }else{
-        caffe_rng_uniform(1, xmin, bbox_width + xmin - resized_width, &width_offset_org);
+        caffe_rng_uniform(1, Resized_xmin, Resized_bbox_width + Resized_xmin - resized_width, &width_offset_org);
       }
-      if(bbox_height <= resized_height){
-        caffe_rng_uniform(1, ymin + bbox_height - resized_height, ymin, &height_offset_org);
+      if(Resized_bbox_height <= resized_height){
+        caffe_rng_uniform(1, Resized_ymin + Resized_bbox_height - resized_height, Resized_ymin, &height_offset_org);
       }else{
-        caffe_rng_uniform(1, ymin, ymin + bbox_height - resized_height, &height_offset_org);
+        caffe_rng_uniform(1, Resized_ymin, Resized_ymin + Resized_bbox_height - resized_height, &height_offset_org);
       }
     }else{
-      caffe_rng_uniform(1, float(Resized_ori_Height-resized_height), 0.0f, &height_offset_org);
       caffe_rng_uniform(1, float(Resized_ori_Width-resized_width), 0.0f, &width_offset_org);
+      caffe_rng_uniform(1, float(Resized_ori_Height-resized_height), 0.0f, &height_offset_org);
     }
     int width_offset_ = std::floor(width_offset_org);
     int height_offset_ = std::floor(height_offset_org);
@@ -353,34 +356,13 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     w_end = w_off + float(resized_width / Resized_ori_Width);
     h_end = h_off + float(resized_height / Resized_ori_Height);
   }else{
-    float sample_box_size = (float) bbox_width * resized_width / scaleChoose;
-    if(sample_box_size < std::max(img_width, img_height)){
-      if(bbox_width <= sample_box_size){
-        caffe_rng_uniform(1, bbox_width + xmin - sample_box_size, xmin, &width_offset_org );
-      }else{
-        caffe_rng_uniform(1, xmin, bbox_width + xmin - sample_box_size, &width_offset_org);
-      }
-      if(bbox_height <= sample_box_size){
-        caffe_rng_uniform(1, ymin + bbox_height - sample_box_size, ymin, &height_offset_org);
-      }else{
-        caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_box_size, &height_offset_org);
-      }
-    }else{
-      caffe_rng_uniform(1, img_height-sample_box_size, 0.0f, &height_offset_org);
-      caffe_rng_uniform(1, img_width-sample_box_size, 0.0f, &width_offset_org);
-    }
-    int width_offset_ = std::floor(width_offset_org);
-    int height_offset_ = std::floor(height_offset_org);
-    w_off = (float) width_offset_ / img_width;
-    h_off = (float) height_offset_ / img_height;
-    w_end = w_off + float(sample_box_size / img_width);
-    h_end = h_off + float(sample_box_size / img_height);
+    LOG(FATAL)<<"need to make do resize";
   }
   sampled_bbox->set_xmin(w_off);
   sampled_bbox->set_ymin(h_off);
   sampled_bbox->set_xmax(w_end);
   sampled_bbox->set_ymax(h_end);
-}// func GenerateDataAnchorSamples
+}
 
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                 const vector<DataAnchorSampler>& data_anchor_samplers,

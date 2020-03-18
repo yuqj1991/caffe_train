@@ -3950,12 +3950,12 @@ layer {
 		share_location: true
 		background_label_id: 0
 		nms_param {
-			nms_threshold: 0.55
+			nms_threshold: 0.3
 			top_k: 200
 		}
-		code_type: RECEPTIVE_CENTER
+		code_type: CENTER_SIZE
 		keep_top_k: 100
-		confidence_threshold: 0.25
+		confidence_threshold: 0.15
 	}
 }
 layer {
@@ -3970,7 +3970,7 @@ layer {
 	detection_evaluate_param {
 		num_classes: 2
 		background_label_id: 0
-		overlap_threshold: 0.5
+		overlap_threshold: 0.3
 		evaluate_difficult_gt: false
 	}
 }

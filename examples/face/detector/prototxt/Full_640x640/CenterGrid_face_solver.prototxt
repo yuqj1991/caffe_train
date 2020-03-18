@@ -1,5 +1,5 @@
-train_net: "../prototxt/Full_640x640/train_v3.prototxt"
-test_net: "../prototxt/Full_640x640/test_v3.prototxt"
+train_net: "../prototxt/Full_640x640/CenterGrid_face_train.prototxt"
+test_net: "../prototxt/Full_640x640/CenterGrid_face_test.prototxt"
 test_iter: 5000
 test_interval: 5000
 base_lr: 0.00125
@@ -8,7 +8,7 @@ lr_policy: "multistep"
 gamma: 0.1
 weight_decay: 0.0005
 snapshot: 5000
-snapshot_prefix: "../snapshot/face"
+snapshot_prefix: "../snapshot/CenterGrid_face"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
