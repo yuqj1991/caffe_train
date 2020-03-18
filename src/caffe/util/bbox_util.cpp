@@ -785,17 +785,17 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
       // Cannot find good match.
       break;
     } else {
-      if(max_overlap >= 0.55){
+      //if(max_overlap >= 0.55){
         CHECK_EQ((*match_indices)[max_idx], -1);
         (*match_indices)[max_idx] = gt_indices[max_gt_idx];
         (*match_overlaps)[max_idx] = max_overlap;
         gt_boxnum[max_gt_idx]++;
         // Erase the ground truth.
         gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
-      }else{
+      //}else{
         // Cannot find good match.
-        break;
-      }
+      //  break;
+      //}
     }
   }
 
