@@ -138,12 +138,11 @@ void CenterObjectLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-  Dtype* loc_data = bottom[0]->mutable_cpu_data();
+  const Dtype* loc_data = bottom[0]->cpu_data();
   const int output_height = bottom[0]->height();
   const int output_width = bottom[0]->width();
   const int num_channels = bottom[0]->channels();
-  int num_batch = bottom[0]->num();
-  
+    
   const Dtype* gt_data = bottom[2]->cpu_data();
   num_gt_ = bottom[2]->height();
 
@@ -172,7 +171,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
 
     EncodeCenteGroundTruthAndPredictions(loc_gt_data, loc_pred_data, 
                                           output_width, output_height, share_location_,
-                                          loc_data, num_channels, all_gt_bboxes, num_batch);
+                                          loc_data, num_channels, all_gt_bboxes);
     loc_loss_layer_->Reshape(loc_bottom_vec_, loc_top_vec_);
     loc_loss_layer_->Forward(loc_bottom_vec_, loc_top_vec_);
 

@@ -34,9 +34,8 @@ Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, con
 template <typename Dtype>
 void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int output_width, const int output_height, 
-                                bool share_location, Dtype* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
-                                int num_batch);
+                                bool share_location, const Dtype* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
                                 const int output_height, 
@@ -49,7 +48,7 @@ void _nms_heatmap(const Dtype* conf_data, Dtype* keep_max_data, const int output
 void center_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, float nmsthreshold = 0.3,int type=NMS_MIN);
 
 template <typename Dtype>
-void get_topK(const Dtype* keep_max_data, Dtype* loc_data, const int output_height
+void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
                   , const int output_width, const int channels, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > > * results
                   , const int loc_channels,  Dtype conf_thresh, Dtype nms_thresh);      

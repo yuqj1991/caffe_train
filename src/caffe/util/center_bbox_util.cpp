@@ -107,9 +107,8 @@ template double gaussian_radius(const double heatmap_width, const double heatmap
 template <typename Dtype>
 void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int output_width, const int output_height, 
-                                bool share_location, Dtype* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
-                                int num_batch){
+                                bool share_location, const Dtype* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
   std::map<int, vector<NormalizedBBox> > ::iterator iter;
   int count = 0;
   CHECK_EQ(num_channels, 4);
@@ -163,14 +162,12 @@ void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_da
 }
 template void EncodeCenteGroundTruthAndPredictions(float* gt_loc_data, float* pred_loc_data,
                                 const int output_width, const int output_height, 
-                                bool share_location, float* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
-                                int num_batch);
+                                bool share_location, const float* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
 template void EncodeCenteGroundTruthAndPredictions(double* gt_loc_data, double* pred_loc_data,
                                 const int output_width, const int output_height, 
-                                bool share_location, double* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes, 
-                                int num_batch);                              
+                                bool share_location, const double* channel_loc_data,
+                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);                              
 
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
@@ -294,7 +291,7 @@ void center_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* o
 }
 
 template <typename Dtype>
-void get_topK(const Dtype* keep_max_data, Dtype* loc_data, const int output_height
+void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels, Dtype conf_thresh, Dtype nms_thresh){
@@ -351,11 +348,11 @@ void get_topK(const Dtype* keep_max_data, Dtype* loc_data, const int output_heig
     }
   }
 }
-template  void get_topK(const float* keep_max_data, float* loc_data, const int output_height
+template  void get_topK(const float* keep_max_data, const float* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels, float conf_thresh, float nms_thresh);
-template void get_topK(const double* keep_max_data, double* loc_data, const int output_height
+template void get_topK(const double* keep_max_data, const double* loc_data, const int output_height
                   , const int output_width, const int classes, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > >* results
                   , const int loc_channels,  double conf_thresh, double nms_thresh);

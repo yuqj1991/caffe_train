@@ -110,7 +110,6 @@ class CenterNetfocalSigmoidWithLossLayer : public LossLayer<Dtype> {
   float gamma_;
   int iterations_;
   int postive_count;
-  int negtive_count;
 };
 
 }  // namespace caffe
