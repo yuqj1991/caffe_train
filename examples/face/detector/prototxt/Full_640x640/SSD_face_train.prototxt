@@ -3218,6 +3218,7 @@ layer {
 	bottom: "data"
 	top: "conv16_eltwise_priorbox"
 	prior_box_param {
+		min_size: 40
 		min_size: 70
 		flip: true
 		clip: false
@@ -3244,7 +3245,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3291,7 +3292,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 2
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3450,6 +3451,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_eight_priorbox"
 	prior_box_param {
+		min_size: 250.0
+		min_size: 400.0
 		min_size: 560.0
 		flip: true
 		clip: false
@@ -3475,7 +3478,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3522,7 +3525,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 2
+		num_output: 6
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -3628,7 +3631,7 @@ layer {
 		background_label_id: 0
 		use_difficult_gt: true
 		neg_pos_ratio: 3.0
-		neg_overlap: 0.55
+		neg_overlap: 0.35
 		code_type: CENTER_SIZE
 		ignore_cross_boundary_bbox: false
 		mining_type: MAX_NEGATIVE
@@ -3636,7 +3639,7 @@ layer {
 		bbox_small_list: 15
 		bbox_small_list: 20
 		bbox_small_list: 70
-		bbox_small_list: 400
+		bbox_small_list: 110
 		
 		bbox_large_list: 20
 		bbox_large_list: 70
