@@ -336,12 +336,20 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     const float Resized_ymin = object_bboxes[object_bbox_index].ymin()*Resized_ori_Height;
     if(resized_width < std::max(Resized_ori_Height, Resized_ori_Width)){
       if(Resized_bbox_width <= resized_width){
-        caffe_rng_uniform(1, Resized_bbox_width + Resized_xmin - resized_width, Resized_xmin, &width_offset_org );
+        if(Resized_bbox_width == resized_width){
+          width_offset_org = xmin;
+        }else{
+          caffe_rng_uniform(1, Resized_bbox_width + Resized_xmin - resized_width, Resized_xmin, &width_offset_org );
+        }
       }else{
         caffe_rng_uniform(1, Resized_xmin, Resized_bbox_width + Resized_xmin - resized_width, &width_offset_org);
       }
       if(Resized_bbox_height <= resized_height){
-        caffe_rng_uniform(1, Resized_ymin + Resized_bbox_height - resized_height, Resized_ymin, &height_offset_org);
+        if(Resized_bbox_height == resized_height){
+          height_offset_org = ymin;
+        }else{
+          caffe_rng_uniform(1, Resized_ymin + Resized_bbox_height - resized_height, Resized_ymin, &height_offset_org);
+        }
       }else{
         caffe_rng_uniform(1, Resized_ymin, Resized_ymin + Resized_bbox_height - resized_height, &height_offset_org);
       }
