@@ -2908,120 +2908,6 @@ layer{
 		operation: SUM
 	}
 }
-############################################################
-#######################priorBox moudle one##################
-############################################################
-layer {
-	name: "conv9_eltwise_priorbox"
-	type: "PriorBox"
-	bottom: "conv9_eltwise"
-	bottom: "data"
-	top: "conv9_eltwise_priorbox"
-	prior_box_param {
-		min_size: 16
-		flip: true
-		clip: false
-		variance: 0.1
-		variance: 0.1
-		variance: 0.2
-		variance: 0.2
-		offset: 0.75
-	}
-}
-
-layer {
-	name: "conv9_eltwise_loc"
-	type: "Convolution"
-	bottom: "conv9_eltwise"
-	top: "conv9_eltwise_loc"
-	param {
-		lr_mult: 1
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 4
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "conv9_eltwise_loc_perm"
-	type: "Permute"
-	bottom: "conv9_eltwise_loc"
-	top: "conv9_eltwise_loc_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "conv9_eltwise_loc_flat"
-	type: "Flatten"
-	bottom: "conv9_eltwise_loc_perm"
-	top: "conv9_eltwise_loc_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-
-layer {
-	name: "conv9_eltwise_conf_concat"
-	type: "Convolution"
-	bottom: "conv9_eltwise"
-	top: "conv9_eltwise_conf_concat"
-	param {
-		lr_mult: 1
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 2
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "conv9_eltwise_conf_concat_perm"
-	type: "Permute"
-	bottom: "conv9_eltwise_conf_concat"
-	top: "conv9_eltwise_conf_concat_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "conv9_eltwise_conf_concat_flat"
-	type: "Flatten"
-	bottom: "conv9_eltwise_conf_concat_perm"
-	top: "conv9_eltwise_conf_concat_flat"
-	flatten_param {
-		axis: 1
-	}
-}
 
 ############################################################
 #######################priorBox moudle two##################
@@ -3138,120 +3024,6 @@ layer {
 	}
 }
 
-############################################################
-#######################priorBox moudle three ###############
-############################################################
-layer {
-	name: "conv14_eltwise_priorbox"
-	type: "PriorBox"
-	bottom: "conv14_eltwise"
-	bottom: "data"
-	top: "conv14_eltwise_priorbox"
-	prior_box_param {
-		min_size: 40
-		flip: true
-		clip: false
-		variance: 0.1
-		variance: 0.1
-		variance: 0.2
-		variance: 0.2
-		offset: 0.875
-	}
-}
-
-layer {
-	name: "conv14_eltwise_loc"
-	type: "Convolution"
-	bottom: "conv14_eltwise"
-	top: "conv14_eltwise_loc"
-	param {
-		lr_mult: 1
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 4
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "conv14_eltwise_loc_perm"
-	type: "Permute"
-	bottom: "conv14_eltwise_loc"
-	top: "conv14_eltwise_loc_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "conv14_eltwise_loc_flat"
-	type: "Flatten"
-	bottom: "conv14_eltwise_loc_perm"
-	top: "conv14_eltwise_loc_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-
-layer {
-	name: "conv14_eltwise_conf"
-	type: "Convolution"
-	bottom: "conv14_eltwise"
-	top: "conv14_eltwise_conf"
-	param {
-		lr_mult: 1
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 2
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "conv14_eltwise_conf_concat_perm"
-	type: "Permute"
-	bottom: "conv14_eltwise_conf"
-	top: "conv14_eltwise_conf_concat_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "conv14_eltwise_conf_concat_flat"
-	type: "Flatten"
-	bottom: "conv14_eltwise_conf_concat_perm"
-	top: "conv14_eltwise_conf_concat_flat"
-	flatten_param {
-		axis: 1
-	}
-}
 
 ############################################################
 #######################priorBox moudle four ################
@@ -3485,234 +3257,6 @@ layer {
 	}
 }
 ############################################################
-#######################priorBox moudle six ################
-############################################################
-layer {
-	name: "dectction_moudle_six_priorbox"
-	type: "PriorBox"
-	bottom: "conv22_eltwise"
-	bottom: "data"
-	top: "dectction_moudle_six_priorbox"
-	prior_box_param {
-		min_size: 250.0
-		flip: true
-		clip: false
-		variance: 0.1
-		variance: 0.1
-		variance: 0.2
-		variance: 0.2
-		offset: 0.9
-		#step: 64
-	}
-}
-layer {
-	name: "dectction_moudle_six_loc"
-	type: "Convolution"
-	bottom: "conv22_eltwise"
-	top: "dectction_moudle_six_loc"
-	param {
-		lr_mult: 1
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 4
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "dectction_moudle_six_loc_perm"
-	type: "Permute"
-	bottom: "dectction_moudle_six_loc"
-	top: "dectction_moudle_six_loc_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "dectction_moudle_six_loc_flat"
-	type: "Flatten"
-	bottom: "dectction_moudle_six_loc_perm"
-	top: "dectction_moudle_six_loc_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-
-layer {
-	name: "dectction_moudle_six_conf"
-	type: "Convolution"
-	bottom: "conv22_eltwise"
-	top: "dectction_moudle_six_conf"
-	param {
-		lr_mult: 1
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 2
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "dectction_moudle_six_conf_concat_perm"
-	type: "Permute"
-	bottom: "dectction_moudle_six_conf"
-	top: "dectction_moudle_six_conf_concat_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "dectction_moudle_six_conf_concat_flat"
-	type: "Flatten"
-	bottom: "dectction_moudle_six_conf_concat_perm"
-	top: "dectction_moudle_six_conf_concat_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-############################################################
-#######################priorBox moudle seven ################
-############################################################
-layer {
-	name: "dectction_moudle_seven_priorbox"
-	type: "PriorBox"
-	bottom: "conv24_eltwise"
-	bottom: "data"
-	top: "dectction_moudle_seven_priorbox"
-	prior_box_param {
-		min_size: 400.0
-		flip: true
-		clip: false
-		variance: 0.1
-		variance: 0.1
-		variance: 0.2
-		variance: 0.2
-		offset: 0.9
-		#step: 64
-	}
-}
-layer {
-	name: "dectction_moudle_seven_loc"
-	type: "Convolution"
-	bottom: "conv24_eltwise"
-	top: "dectction_moudle_seven_loc"
-	param {
-		lr_mult: 1
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 4
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "dectction_moudle_seven_loc_perm"
-	type: "Permute"
-	bottom: "dectction_moudle_seven_loc"
-	top: "dectction_moudle_seven_loc_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "dectction_moudle_seven_loc_flat"
-	type: "Flatten"
-	bottom: "dectction_moudle_seven_loc_perm"
-	top: "dectction_moudle_seven_loc_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-
-layer {
-	name: "dectction_moudle_seven_conf"
-	type: "Convolution"
-	bottom: "conv24_eltwise"
-	top: "dectction_moudle_seven_conf"
-	param {
-		lr_mult: 1
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2
-		decay_mult: 0
-	}
-	convolution_param {
-		num_output: 2
-		kernel_size: 1
-		weight_filler {
-			type: "msra"
-		}
-		bias_filler {
-			type: "constant"
-			value: 0.0
-		}
-	}
-}
-layer {
-	name: "dectction_moudle_seven_conf_concat_perm"
-	type: "Permute"
-	bottom: "dectction_moudle_seven_conf"
-	top: "dectction_moudle_seven_conf_concat_perm"
-	permute_param {
-		order: 0
-		order: 2
-		order: 3
-		order: 1
-	}
-}
-layer {
-	name: "dectction_moudle_seven_conf_concat_flat"
-	type: "Flatten"
-	bottom: "dectction_moudle_seven_conf_concat_perm"
-	top: "dectction_moudle_seven_conf_concat_flat"
-	flatten_param {
-		axis: 1
-	}
-}
-############################################################
 #######################priorBox moudle eight ################
 ############################################################
 layer {
@@ -3830,13 +3374,9 @@ layer {
 layer {
 	name: "mbox_priorbox"
 	type: "Concat"
-	bottom: "conv9_eltwise_priorbox"
 	bottom: "conv11_eltwise_priorbox"
-	bottom: "conv14_eltwise_priorbox"
 	bottom: "conv16_eltwise_priorbox"
 	bottom: "dectction_moudle_five_priorbox"
-	bottom: "dectction_moudle_six_priorbox"
-	bottom: "dectction_moudle_seven_priorbox"
 	bottom: "dectction_moudle_eight_priorbox"
 	top: "mbox_priorbox"
 	concat_param {
@@ -3847,13 +3387,9 @@ layer {
 layer {
 	name: "mbox_loc"
 	type: "Concat"
-	bottom: "conv9_eltwise_loc_flat"
 	bottom: "conv11_eltwise_loc_flat"
-	bottom: "conv14_eltwise_loc_flat"
 	bottom: "conv16_eltwise_loc_flat"
 	bottom: "dectction_moudle_five_loc_flat"
-	bottom: "dectction_moudle_six_loc_flat"
-	bottom: "dectction_moudle_seven_loc_flat"
 	bottom: "dectction_moudle_eight_loc_flat"
 	top: "mbox_loc"
 	concat_param {
@@ -3865,13 +3401,9 @@ layer {
 layer {
 	name: "mbox_conf"
 	type: "Concat"
-	bottom: "conv9_eltwise_conf_concat_flat"
 	bottom: "conv11_eltwise_conf_concat_flat"
-	bottom: "conv14_eltwise_conf_concat_flat"
 	bottom: "conv16_eltwise_conf_concat_flat"
 	bottom: "dectction_moudle_five_conf_concat_flat"
-	bottom: "dectction_moudle_six_conf_concat_flat"
-	bottom: "dectction_moudle_seven_conf_concat_flat"
 	bottom: "dectction_moudle_eight_conf_concat_flat"
 	top: "mbox_conf"
 	concat_param {
@@ -3925,11 +3457,11 @@ layer {
 		share_location: true
 		background_label_id: 0
 		nms_param {
-			nms_threshold: 0.55
+			nms_threshold: 0.35
 			top_k: 200
 		}
 		code_type: RECEPTIVE_CENTER
 		keep_top_k: 100
-		confidence_threshold: 0.25
+		confidence_threshold: 0.15
 	}
 }

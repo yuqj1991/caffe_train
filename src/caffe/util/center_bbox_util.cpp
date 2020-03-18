@@ -114,11 +114,6 @@ void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_da
   int count = 0;
   CHECK_EQ(num_channels, 4);
   int dimScale = output_height * output_width;
-  /*for(int b = 0; b < num_batch; b++){
-    int x_index = b * num_channels * dimScale;
-    for(int i = 0; i < 2 * dimScale; i++)
-      channel_loc_data[x_index + i] = CenterSigmoid(channel_loc_data[x_index + i]);
-  }*/
   for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
     int batch_id = iter->first;
     vector<NormalizedBBox> gt_bboxes = iter->second;
@@ -307,11 +302,6 @@ void get_topK(const Dtype* keep_max_data, Dtype* loc_data, const int output_heig
   int dim = classes * output_width * output_height;
   int dimScale = output_width * output_height;
   CHECK_EQ(loc_channels, 4);
-  /*for(int b = 0; b < num_batch; b++){
-    int x_index = b * loc_channels * dimScale;
-    for(int i = 0; i < 2 * dimScale; i++)
-      loc_data[x_index + i] = CenterSigmoid(loc_data[x_index + i]);
-  }*/
   for(int i = 0; i < num_batch; i++){
     std::vector<CenterNetInfo > batch_temp;
     batch_result.clear();
