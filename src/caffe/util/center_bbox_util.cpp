@@ -980,7 +980,7 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
         Dtype obj_score = channel_pred_data[object_index];
         Dtype label_score = channel_pred_data[class_index];
         label_score *= obj_score;
-        LOG(INFO)<<"label_score: "<<label_score;
+        //LOG(INFO)<<"label_score: "<<label_score;
         if(label_score >= conf_thresh){
             CenterNetInfo temp_result;
             temp_result.set_class_id(0);
