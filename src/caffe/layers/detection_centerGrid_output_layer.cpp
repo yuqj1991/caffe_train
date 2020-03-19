@@ -127,10 +127,10 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
         top_data[count * 7] = i;
         top_data[count * 7 + 1] = result_temp[j].class_id() + 1;
         top_data[count * 7 + 2] = result_temp[j].score();
-        top_data[count * 7 + 3] = result_temp[j].xmin();
-        top_data[count * 7 + 4] = result_temp[j].ymin();
-        top_data[count * 7 + 5] = result_temp[j].xmax();
-        top_data[count * 7 + 6] = result_temp[j].ymax();
+        top_data[count * 7 + 3] = result_temp[j].xmin() / 640;
+        top_data[count * 7 + 4] = result_temp[j].ymin() / 640;
+        top_data[count * 7 + 5] = result_temp[j].xmax() / 640;
+        top_data[count * 7 + 6] = result_temp[j].ymax() / 640;
         /*LOG(INFO)<<"class: "<<top_data[count * 7 + 1]<<", score: "<< result_temp[j].score()
                  <<", center_x: "<< (result_temp[j].xmin() + result_temp[j].xmax()) / 2
                  <<", center_y: "<< (result_temp[j].ymin() + result_temp[j].ymax()) / 2
