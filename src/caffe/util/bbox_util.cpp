@@ -797,12 +797,9 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
                  (gt_bboxes[max_gt_idx].ymax() - gt_bboxes[max_gt_idx].ymin()) * 640 
                  <<", pred_bbox width: "<< (pred_bboxes[max_idx].xmax() - pred_bboxes[max_idx].xmin()) * 640;
         #endif
-
-        // Erase the ground truth.
-        gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
-      }else{
-        continue;
       }
+      // Erase the ground truth.
+      gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
     }
   }
 
