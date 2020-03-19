@@ -45,7 +45,7 @@ void CenterGridOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   CHECK_EQ(bottom[0]->num(), bottom[1]->num());
   CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
   CHECK_EQ(bottom[0]->channels(), bottom[2]->channels());
-  CHECK_EQ(bottom[0]->channels(), 4 + 1 + num_classes_);
+  CHECK_EQ(bottom[0]->channels(), 4 + num_classes_);
   // num() and channels() are 1.
   vector<int> top_shape(2, 1);
   // Since the number of bboxes to be kept is unknown before nms, we manually
@@ -69,7 +69,6 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
     const int output_width = bottom[t]->width();
     num_ = bottom[t]->num();
     int num_channels = bottom[t]->channels();
-    //LOG(INFO)<<"downRatio_: "<<downRatio_[t]<<", anchor_scale_: "<<anchor_scale_[t] << ", output_height: "<<output_height;
     GetCenterGridObjectResult(num_, num_channels, num_classes_,
                           output_width, output_height, 
                           downRatio_[t],

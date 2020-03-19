@@ -90,7 +90,7 @@ void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
 template <typename Dtype>
 Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int net_width, const int net_height,
+                          const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
