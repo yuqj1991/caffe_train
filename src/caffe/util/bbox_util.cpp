@@ -780,15 +780,16 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
         }
       }
     }
-    //LOG(INFO)<<"max_idx: "<<max_idx<<", max_gt_idx: "<<max_gt_idx<<", max_overlap: "<<max_overlap;
     if (max_idx == -1) {
       break;
     } else {
-      //if(max_overlap >= 0.55){
+      if(max_overlap >= 0.45){
         CHECK_EQ((*match_indices)[max_idx], -1);
         (*match_indices)[max_idx] = gt_indices[max_gt_idx];
         (*match_overlaps)[max_idx] = max_overlap;
-        #if 1
+        gt_boxnum[max_gt_idx]++;
+
+        #if 0
         LOG(INFO)<<"match overlap: "<<max_overlap <<", gt_boxes width: "
                  << (gt_bboxes[max_gt_idx].xmax() - gt_bboxes[max_gt_idx].xmin()) * 640 
                  <<", gt_boxes height: "<< (gt_bboxes[max_gt_idx].ymax() - gt_bboxes[max_gt_idx].ymin()) * 640 
@@ -796,12 +797,12 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
                  (gt_bboxes[max_gt_idx].ymax() - gt_bboxes[max_gt_idx].ymin()) * 640 
                  <<", pred_bbox width: "<< (pred_bboxes[max_idx].xmax() - pred_bboxes[max_idx].xmin()) * 640;
         #endif
-        gt_boxnum[max_gt_idx]++;
+
         // Erase the ground truth.
         gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
-      //}else{
-      //  break;
-      //}
+      }else{
+        continue;
+      }
     }
   }
 
