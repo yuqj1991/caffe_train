@@ -1193,6 +1193,12 @@ message AnnotatedDataParameter {
   optional float yolo_data_jitter = 5 [default = 0.3];
   optional BboxSampler bbox_sampler = 8;
   optional bool yoloformat = 10[default = false];
+  enum CROP_TYPE {
+    CROP_BATCH = 0;
+    CROP_ANCHOR = 1;
+    CROP_LFFD_CENTER = 2;
+  }
+  optional CROP_TYPE  crop_type = 11 [default = CROP_BATCH];
 }
 
 message ArgMaxParameter {

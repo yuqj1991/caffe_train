@@ -43,6 +43,7 @@ class AnnotatedDataLayer : public BasePrefetchingDataLayer<Dtype> {
   float lowProb_;
   string label_map_file_;
   bool YoloFormat_;
+  AnnotatedDataParameter_CROP_TYPE crop_type_ ;
 };
 
 }  // namespace caffe
