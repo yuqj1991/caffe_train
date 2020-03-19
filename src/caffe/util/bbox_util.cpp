@@ -783,7 +783,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
     if (max_idx == -1) {
       break;
     } else {
-      if(max_overlap >= 0.45){
+      if(max_overlap >= 0.55){
         CHECK_EQ((*match_indices)[max_idx], -1);
         (*match_indices)[max_idx] = gt_indices[max_gt_idx];
         (*match_overlaps)[max_idx] = max_overlap;
