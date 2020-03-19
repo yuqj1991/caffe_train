@@ -792,7 +792,7 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
         LOG(INFO)<<"match overlap: "<<max_overlap <<", gt_boxes width: "
                  << (gt_bboxes[max_gt_idx].xmax() - gt_bboxes[max_gt_idx].xmin()) * 640 
                  <<", gt_boxes height: "<< (gt_bboxes[max_gt_idx].ymax() - gt_bboxes[max_gt_idx].ymin()) * 640 
-                 <<", gt_bboxes area: "<< (gt_bboxes[max_gt_idx].ymax() - gt_bboxes[max_gt_idx].ymin()) * 640 *
+                 <<", gt_bboxes area: "<< (gt_bboxes[max_gt_idx].xmax() - gt_bboxes[max_gt_idx].xmin()) * 640 *
                  (gt_bboxes[max_gt_idx].ymax() - gt_bboxes[max_gt_idx].ymin()) * 640 
                  <<", pred_bbox width: "<< (pred_bboxes[max_idx].xmax() - pred_bboxes[max_idx].xmin()) * 640;
         #endif
