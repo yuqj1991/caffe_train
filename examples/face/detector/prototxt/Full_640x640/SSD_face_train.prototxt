@@ -3060,7 +3060,7 @@ layer {
 	bottom: "data"
 	top: "conv11_eltwise_priorbox"
 	prior_box_param {
-		min_size: 21
+		min_size: 10
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3175,8 +3175,8 @@ layer {
 	bottom: "data"
 	top: "conv16_eltwise_priorbox"
 	prior_box_param {
-		min_size: 40
-		min_size: 75
+		min_size: 23
+		min_size: 52
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3291,7 +3291,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 137.0
+		min_size: 119.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3395,7 +3395,6 @@ layer {
 		axis: 1
 	}
 }
-
 ############################################################
 #######################priorBox moudle eight ################
 ############################################################
@@ -3406,8 +3405,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_eight_priorbox"
 	prior_box_param {
-		min_size: 250.0
-		min_size: 458.0
+		min_size: 268.0
+		min_size: 596.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3577,7 +3576,7 @@ layer {
 		num_classes: 2
 		share_location: true
 		match_type: PER_PREDICTION
-		overlap_threshold: 0.55
+		overlap_threshold: 0.45
 		use_prior_for_matching: true
 		use_center_locate_match: false
 		use_tiny_box_match: false

@@ -2919,7 +2919,7 @@ layer {
 	bottom: "data"
 	top: "conv11_eltwise_priorbox"
 	prior_box_param {
-		min_size: 21
+		min_size: 10
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3024,7 +3024,6 @@ layer {
 	}
 }
 
-
 ############################################################
 #######################priorBox moudle four ################
 ############################################################
@@ -3035,8 +3034,8 @@ layer {
 	bottom: "data"
 	top: "conv16_eltwise_priorbox"
 	prior_box_param {
-		min_size: 40
-		min_size: 75
+		min_size: 23
+		min_size: 52
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3151,7 +3150,7 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
-		min_size: 137.0
+		min_size: 119.0
 		flip: true
 		clip: false
 		variance: 0.1
@@ -3265,8 +3264,8 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_eight_priorbox"
 	prior_box_param {
-		min_size: 250.0
-		min_size: 458
+		min_size: 268.0
+		min_size: 596.0
 		flip: true
 		clip: false
 		variance: 0.1
