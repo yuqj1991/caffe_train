@@ -62,6 +62,10 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
 
   bottom_size_ = bottom.size();
+  int output_height_ = bottom[0]->height();
+  int output_width_ = bottom[0]->width();
+  int net_height_ = output_height_ * downRatio_[0];
+  int net_width_ = output_width_ * downRatio_[0];
   results_.clear();
   for(int t = 0; t < bottom_size_; t++){
     Dtype *channel_pred_data = bottom[t]->mutable_cpu_data();
@@ -82,7 +86,6 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
   for(iter = results_.begin(); iter != results_.end(); iter++){
     std::sort(iter->second.begin(), iter->second.end(), GridCompareScore);
     std::vector<CenterNetInfo> temp_result = iter->second;
-    LOG(INFO)<<"batch_id: "<<iter->first<<", detector_result size: "<<temp_result.size();
     std::vector<CenterNetInfo> nms_result;
     center_nms(temp_result, &nms_result, ignore_thresh_);
     int num_det = nms_result.size();
@@ -97,7 +100,6 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
     for(unsigned ii = 0; ii < nms_result.size(); ii++){
       iter->second.push_back(nms_result[ii]);
     }
-    LOG(INFO)<<"nms result size: "<<nms_result.size()<<", det_result size: "<<iter->second.size();
   }
   vector<int> top_shape(2, 1);
   top_shape.push_back(num_kept);
@@ -122,20 +124,20 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
   for(int i = 0; i < num_; i++){
     if(results_.find(i) != results_.end()){
       std::vector<CenterNetInfo > result_temp = results_.find(i)->second;
-      //LOG(INFO)<<"batch_id "<<i << " detection results: "<<result_temp.size();
+      LOG(INFO)<<"batch_id "<<i << " detection results: "<<result_temp.size();
       for(unsigned j = 0; j < result_temp.size(); ++j){
         top_data[count * 7] = i;
         top_data[count * 7 + 1] = result_temp[j].class_id() + 1;
         top_data[count * 7 + 2] = result_temp[j].score();
-        top_data[count * 7 + 3] = result_temp[j].xmin() / 640;
-        top_data[count * 7 + 4] = result_temp[j].ymin() / 640;
-        top_data[count * 7 + 5] = result_temp[j].xmax() / 640;
-        top_data[count * 7 + 6] = result_temp[j].ymax() / 640;
-        /*LOG(INFO)<<"class: "<<top_data[count * 7 + 1]<<", score: "<< result_temp[j].score()
+        top_data[count * 7 + 3] = result_temp[j].xmin() / net_width_;
+        top_data[count * 7 + 4] = result_temp[j].ymin() / net_height_;
+        top_data[count * 7 + 5] = result_temp[j].xmax() / net_width_;
+        top_data[count * 7 + 6] = result_temp[j].ymax() / net_height_;
+        LOG(INFO)<<"class: "<<top_data[count * 7 + 1]<<", score: "<< result_temp[j].score()
                  <<", center_x: "<< (result_temp[j].xmin() + result_temp[j].xmax()) / 2
                  <<", center_y: "<< (result_temp[j].ymin() + result_temp[j].ymax()) / 2
                  <<", width: "<< result_temp[j].xmax() - result_temp[j].xmin()
-                 <<", height: "<< result_temp[j].ymax() - result_temp[j].ymin();*/
+                 <<", height: "<< result_temp[j].ymax() - result_temp[j].ymin();
         ++count;
       }
     }
