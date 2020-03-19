@@ -104,7 +104,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     
     int dimScale = output_height * output_width;
     for(int b = 0; b < num_; b++){
-      for(int j = 0; j < (4 + 1 + num_classes_) * dimScale; j++){ // loc loss + objectness loss
+      for(int j = 0; j < (4 + 1) * dimScale; j++){ // loc loss + objectness loss
         sum_squre += diff[b * (4 + 1 + num_classes_) * dimScale + j] * diff[b * (4 + 1 + num_classes_) * dimScale + j];
       }
     }
@@ -158,7 +158,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     int dimScale = output_height * output_width;
     for(int b = 0; b < num_; b++){
       int object_index = b * num_channels * dimScale + 4 * dimScale;
-      for(int i = 0; i < 2 * dimScale; i++){
+      for(int i = 0; i < 1 * dimScale; i++){
         bottom_diff[object_index + i] = bottom_diff[object_index + i] * logistic_gradient(bottom_data[object_index + i]);
       }
     }

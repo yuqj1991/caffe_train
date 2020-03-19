@@ -876,7 +876,7 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
             bottom_diff[object_index] = (-1) * (1 - channel_pred_data[object_index]);
 
             // class score 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标,所以减一
-            int class_lable = gt_bboxes[ii].label() - 1; 
+            /*int class_lable = gt_bboxes[ii].label() - 1; 
             int class_object_index = b * num_channels * dimScale 
                                       + 5* dimScale + h * output_width + w;
             if ( bottom_diff[class_object_index]){
@@ -885,27 +885,27 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
               for(int c = 0; c < num_classes; c++){
                 bottom_diff[class_object_index + c * dimScale] =(-1) * (((c == class_lable)?1 : 0) - channel_pred_data[class_object_index + c * dimScale]);
               }
-            }
+            }*/
             // class score 
             // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
-            /*int class_index = b * dimScale
+            int class_index = b * dimScale
                                   +  h * output_width + w;
             class_label[class_index] = 1;
             
-            mask_Rf_anchor[h * output_width + w] = 1;*/
+            mask_Rf_anchor[h * output_width + w] = 1;
             count++;
           }
         }
       }
     }
-    /*if(count > 0){
+    if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
       score_loss += focal_loss(class_label + gt_class_index, channel_pred_data + pred_class_index, 
                                   dimScale, bottom_diff + pred_class_index);
     }else{
       score_loss += 0;
-    }*/
+    }
     postive += count;
     
   }
@@ -981,6 +981,7 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
         Dtype label_score = channel_pred_data[class_index];
         label_score *= obj_score;
         if(label_score >= conf_thresh){
+            LOG(INFO)<<""
             CenterNetInfo temp_result;
             temp_result.set_class_id(0);
             temp_result.set_score(label_score);
