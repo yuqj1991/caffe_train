@@ -790,8 +790,8 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
         (*match_overlaps)[max_idx] = max_overlap;
         #if 1
         LOG(INFO)<<"match overlap: "<<max_overlap <<", gt_boxes width: "
-                 << gt_bboxes[max_gt_idx].xmax() - gt_bboxes[max_gt_idx].xmin() 
-                 <<", pred_bbox width: "<< pred_bboxes[max_idx].xmax() - pred_bboxes[max_idx].xmin();
+                 << (gt_bboxes[max_gt_idx].xmax() - gt_bboxes[max_gt_idx].xmin()) * 640 
+                 <<", pred_bbox width: "<< (pred_bboxes[max_idx].xmax() - pred_bboxes[max_idx].xmin()) * 640;
         #endif
         gt_boxnum[max_gt_idx]++;
         // Erase the ground truth.
