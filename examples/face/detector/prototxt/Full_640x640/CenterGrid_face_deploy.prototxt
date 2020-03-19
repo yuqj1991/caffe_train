@@ -4602,7 +4602,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 6
+		num_output: 5
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4623,7 +4623,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 6
+		num_output: 5
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4644,7 +4644,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 6
+		num_output: 5
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4665,7 +4665,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 6
+		num_output: 5
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
