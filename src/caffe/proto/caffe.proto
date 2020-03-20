@@ -1195,8 +1195,7 @@ message AnnotatedDataParameter {
   optional bool yoloformat = 10[default = false];
   enum CROP_TYPE {
     CROP_BATCH = 0;
-    CROP_ANCHOR = 1;
-    CROP_LFFD_CENTER = 2;
+    CROP_METHOD_RANDOM = 1;
   }
   optional CROP_TYPE  crop_type = 11 [default = CROP_BATCH];
 }

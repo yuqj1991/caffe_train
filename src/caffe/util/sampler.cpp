@@ -5,6 +5,8 @@
 #include "caffe/util/sampler.hpp"
 #include "caffe/util/im_transforms.hpp"
 #include "caffe/util/io.hpp"
+#include "google/protobuf/repeated_field.h"
+using google::protobuf::RepeatedPtrField;
 
 #define COMPAREMIN(a, b) (a >= b ? b : a)
 #define COMPAREMAX(a, b) (a >= b ? a : b)
@@ -501,7 +503,8 @@ void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized
   const Datum datum = anno_datum.datum();
   const int img_width = datum.width();
   const int img_height = datum.height();
-
+  int Resized_img_Height = int(img_height * scale);
+  int Resized_img_Width = int(img_width * scale);
   // image data
   if (datum.encoded()) {
 #ifdef USE_OPENCV
@@ -516,8 +519,6 @@ void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized
 		}
 		// Expand the image.
 		cv::Mat resized_img;
-    int Resized_img_Height = int(img_height * scale);
-    int Resized_img_Width = int(img_width * scale);
     cv::resize(cv_img, resized_img, cv::Size(Resized_img_Width, Resized_img_Height), 0, 0,
                  cv::INTER_CUBIC);
 		EncodeCVMatToDatum(resized_img, "jpg", resized_anno_datum->mutable_datum());
@@ -531,10 +532,38 @@ void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized
 		}
 	}
   resized_anno_datum->set_type(anno_datum.type());
+  RepeatedPtrField<AnnotationGroup>* Resized_anno_group = resized_anno_datum->mutable_annotation_group();
   // labels trans
   if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
 		// Go through each AnnotationGroup.
-    resized_anno_datum->mutable_annotation_group()->CopyFrom(anno_datum.annotation_group());
+    for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
+      const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
+			AnnotationGroup transformed_anno_group ;
+
+			for (int a = 0; a < anno_group.annotation_size(); ++a) {
+				const Annotation& anno = anno_group.annotation(a);
+				const NormalizedBBox& bbox = anno.bbox();
+				// Adjust bounding box annotation.
+				NormalizedBBox resize_bbox = bbox;
+        float x_min = bbox.xmin() * img_width;
+        float y_min = bbox.ymin() * img_height;
+        float x_max = bbox.xmax() * img_width;
+        float y_max = bbox.ymax() * img_height;
+        x_min = std::max(0.f, x_min * Resized_img_Width / img_width);
+        x_max = std::min(float(Resized_img_Width), x_max * Resized_img_Width / img_width);
+        y_min = std::max(0.f, y_min * Resized_img_Height / img_height);
+        y_max = std::min(float(Resized_img_Height), y_max * Resized_img_Height / img_height);
+				resize_bbox.set_xmin(x_min / Resized_img_Width);
+        resize_bbox.set_xmax(x_max / Resized_img_Width);
+        resize_bbox.set_ymin(y_min / Resized_img_Height);
+        resize_bbox.set_ymax(y_max / Resized_img_Height);
+        Annotation* transformed_anno = transformed_anno_group.add_annotation();
+        NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
+				transformed_bbox->CopyFrom(resize_bbox);
+			}
+      transformed_anno_group.set_group_label(anno_group.group_label());
+			Resized_anno_group->Add()->CopyFrom(transformed_anno_group);
+    }
 	} else {
 		LOG(FATAL) << "Unknown annotation type.";
 	}

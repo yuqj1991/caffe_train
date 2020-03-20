@@ -226,7 +226,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       } else {
         sampled_datum = expand_datum;
       }
-    }else {
+    }else if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_METHOD_RANDOM){
       if(anchor_prob > upProb_){
         int resized_height = transform_param.resize_param().height();
         int resized_width = transform_param.resize_param().width();
@@ -244,6 +244,25 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                                         sampled_datum);
           has_sampled = true;
         }else{
+          sampled_datum = expand_datum;
+        }
+      }else if(anchor_prob > lowProb_ && anchor_prob <= upProb_){
+        if (batch_samplers_.size() > 0) {
+          // Generate sampled bboxes from expand_datum.
+          vector<NormalizedBBox> sampled_bboxes;
+          GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
+          if (sampled_bboxes.size() > 0) {
+            // Randomly pick a sampled bbox and crop the expand_datum.
+            int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+            sampled_datum = new AnnotatedDatum();
+            this->data_transformer_->CropImage(*expand_datum,
+                                              sampled_bboxes[rand_idx],
+                                              sampled_datum);
+            has_sampled = true;
+          } else {
+            sampled_datum = expand_datum;
+          }
+        } else {
           sampled_datum = expand_datum;
         }
       }else if(anchor_prob <= lowProb_ ){
