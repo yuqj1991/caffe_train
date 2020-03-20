@@ -137,6 +137,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     fullImageSetDir_.push_back(std::make_pair(newDirectory, label));
     //LOG(INFO)<< "directory: " << newDirectory << ", label: " << label;
   }
+  infile.close();
   LOG(INFO)<<" fullImageSetDir_ size: " << fullImageSetDir_.size() << ", get file directory successfully";
   /**************遍历人脸数据集根目录文件夹完成*******/
 

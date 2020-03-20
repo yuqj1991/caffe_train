@@ -31,7 +31,7 @@ using namespace cv;
 using namespace std;
 
 #define COMPAREMIN_T(a, b) (a >= b ? b : a)
-#if 1
+
 struct NormalizedBBox_S{
    float xmin;
    float ymin;
@@ -65,7 +65,7 @@ bool SatisfySampleConstraint_F(NormalizedBBox_S sample_bbox,
   return found;
 }
 
-std::vector<NormalizedBBox_S> ResizedCropSample(const cv::Mat& src_img, cv::Mat resized_img, float scale, 
+std::vector<NormalizedBBox_S> ResizedCropSample(const cv::Mat& src_img, cv::Mat *resized_img, float scale, 
                         std::vector<NormalizedBBox_S> src_gt_bboxes){
   const int img_width = src_img.cols;
   const int img_height = src_img.rows;
@@ -73,7 +73,7 @@ std::vector<NormalizedBBox_S> ResizedCropSample(const cv::Mat& src_img, cv::Mat 
   // image data
   int Resized_img_Height = int(img_height * scale);
   int Resized_img_Width = int(img_width * scale);
-  cv::resize(src_img, resized_img, cv::Size(Resized_img_Width, Resized_img_Height), 0, 0,
+  cv::resize(src_img, &resized_img, cv::Size(Resized_img_Width, Resized_img_Height), 0, 0,
                 cv::INTER_CUBIC);
   std::vector<NormalizedBBox_S> Resized_gt_bboxes;
   for(unsigned ii = 0; ii < src_gt_bboxes.size(); ii++){
@@ -99,7 +99,7 @@ void GenerateDataAnchorSample(cv::Mat img,
                                 std::vector<int>anchorScale,
                                 const vector<NormalizedBBox_S>& object_bboxes,
                                 int resized_height, int resized_width,
-                                NormalizedBBox_S* sampled_bbox, cv::Mat resized_img,
+                                NormalizedBBox_S* sampled_bbox, cv::Mat *resized_img,
                                 bool do_resize){
   int img_height = img.rows;
   int img_width = img.cols;
@@ -190,7 +190,7 @@ void GenerateDataAnchorSample(cv::Mat img,
 void GenerateBatchDataAnchorSamples(const cv::Mat src_img, vector<NormalizedBBox_S> object_bboxes, 
                                 const vector<std::vector<int> >& data_anchor_samplers,
                                 int resized_height, int resized_width, 
-                                NormalizedBBox_S* sampled_bbox, cv::Mat resized_img, 
+                                NormalizedBBox_S* sampled_bbox, cv::Mat* resized_img, 
                                 bool do_resize, int max_sample) {
   CHECK_EQ(data_anchor_samplers.size(), 1);
   for (int i = 0; i < data_anchor_samplers.size(); ++i) {
@@ -217,21 +217,139 @@ void GenerateBatchDataAnchorSamples(const cv::Mat src_img, vector<NormalizedBBox
   }
 }
 
+void CropImageData_Anchor(const cv::Mat& img,
+									const NormalizedBBox& bbox, cv::Mat* crop_img) {
+	int img_height = img.rows;
+	int img_width = img.cols;
+	#if 1
+	float xmin = bbox.xmin() * img_width;
+	float ymin = bbox.ymin() * img_height;
+	float xmax = bbox.xmax() * img_width;
+	float ymax = bbox.ymax() * img_height;
+	
+	float w_off = xmin, h_off = ymin, width = xmax - xmin, height = ymax - ymin;
 
+	float cross_xmin = std::min(std::max(0.f, w_off), float(img_width));
+	float cross_ymin = std::min(std::max(0.f, h_off), float(img_height)); 
+	float cross_xmax = std::min(std::max(0.f, w_off + width - 1), float(img_width));
+	float cross_ymax = std::min(std::max(0.f, h_off + height - 1), float(img_height));
+	//LOG(INFO)<<"cross_xmin: "<<cross_xmin<<", cross_xmax: "<<cross_xmax
+	//		<<", cross_ymin: "<<cross_ymin<<", cross_ymax: "<<cross_ymax;
+	int cross_width = static_cast<int>(cross_xmax - cross_xmin);
+	int	cross_height = static_cast<int>(cross_ymax - cross_ymin);
 
-void Crop_img(){
+	float roi_xmin = w_off >= 0 ? 0 : std::fabs(w_off);
+	float roi_ymin = h_off >= 0 ? 0 : std::fabs(h_off);
+	int roi_width = cross_width;
+	int roi_height = cross_height;
 
+	int roi_x1 = static_cast<int>(roi_xmin);
+	int roi_y1 = static_cast<int>(roi_ymin);
+	int cross_x1 = static_cast<int>(cross_xmin);
+	int cross_y1 = static_cast<int>(cross_ymin);
+	crop_img->create(int(height), int(width), CV_8UC3);
+	crop_img->setTo(cv::Scalar(0));
+
+	cv::Rect bbox_cross(cross_x1, cross_y1, cross_width, cross_height);
+	cv::Rect bbox_roi(roi_x1, roi_y1, roi_width, roi_height);
+	img(bbox_cross).copyTo((*crop_img)(bbox_roi));
 }
-                              
-#endif
+
+void transformGroundTruth(std::map<int, std::vector<NormalizedBBox_S> >all_gt_bboxes,
+                        bool do_resize, const int Resized_Height, const int Resized_Width,
+                        const int img_Height, const int img_Width, 
+                        const NormalizedBBox_S sampled_bbox,
+                        std::map<int, std::vector<NormalizedBBox_S> > *trans_gt_bboxes){
+  std::map<int, std::vector<NormalizedBBox_S> >::iterator iter;
+  for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    std::vector<NormalizedBBox_S> gt_bboxes = iter->second;
+    int sample_id = iter->first;
+    for(unsigned ii = 0; gt_bboxes.size(); ii++){
+      NormalizedBBox_S bbox;
+      if(do_resize){
+        float x_min = gt_bboxes[ii].xmin * img_Width;
+        float y_min = gt_bboxes[ii].ymin * img_Height;
+        float x_max = gt_bboxes[ii].xmax * img_Width;
+        float y_max = gt_bboxes[ii].ymax * img_Height;
+        x_min = std::max(0.f, x_min * Resized_Width / img_Width);
+        x_max = std::min(float(Resized_Width), x_max * Resized_Width / img_Width);
+        y_min = std::max(0.f, y_min * Resized_Height / img_Height);
+        y_max = std::min(float(Resized_Height), y_max * Resized_Height / img_Height);
+        NormalizedBBox_S Resized_bbox = {
+          .xmin = x_min,
+          .ymin = y_min,
+          .xmax = x_max,
+          .ymax = y_max
+        };
+        bbox = Resized_bbox;
+      }else{
+        bbox = gt_bboxes[ii];
+      }
+      NormalizedBBox proj_bbox, crop_bbox, resized_bbox;
+      resized_bbox.set_xmin(bbox.xmin);
+      resized_bbox.set_xmax(bbox.xmax);
+      resized_bbox.set_ymin(bbox.ymin);
+      resized_bbox.set_ymax(bbox.ymax);
+
+      crop_bbox.set_xmin(sampled_bbox.xmin);
+      crop_bbox.set_xmax(sampled_bbox.xmax);
+      crop_bbox.set_ymin(sampled_bbox.ymin);
+      crop_bbox.set_ymax(sampled_bbox.ymax);
+      if (ProjectBBox(crop_bbox, resize_bbox, &proj_bbox)) {
+        bbox = {
+          .xmin = proj_bbox.xmin(),
+          .ymin = proj_bbox.ymin(),
+          .xmax = proj_bbox.xmax(),
+          .ymax = proj_bbox.ymax()
+        };
+        (*trans_gt_bboxes)[sample_id].push_back(bbox);
+      }
+    }
+  }
+}
+
 
 int main(){
   int loop_time = 12;
   int batch_size = 32;
-  std::vector<string> img_filenames;
-  std::vector<std::vector<NormalizedBBox_S> >all_gt_bboxes;
+  std::string srcTestfile = "";
+  std::string root_folder = "";
+  std::vector<std::pair<string, string> > img_filenames;
+  std::map<int, std::vector<NormalizedBBox_S> >all_gt_bboxes;
   // 读文件，文件里面存着真实值，包括图像文件， 和真是坐标值文件
-
+  // 随机裁剪，生成再Resize到相对应大小的（640， 640）
+  std::ifstream infile(srcTestfile.c_str());
+  string line;
+  size_t pos;
+  std::stringstream sstr ;
+  while(std::getline(infile, line)){
+    pos = line.find_last_of(' ');
+    std::string label_file = line.substr(pos+1);
+    std::string img_file = root_folder + string("/") + line.substr(0, pos);
+    img_filenames.push_back(std::make_pair(img_file, label_file));
+  }
+  infile.close();
+  int numSamples = img_filenames.size();
+  for(int ii = 0; ii < numSamples; ii++){
+    std::label_file = img_filenames[ii].second;
+    infile(label_file.c_str());
+    float xmin, ymin, width, height, blur, occur;
+    while(std::getline(infile, line)){
+      sstr << line;
+      sstr >> xmin >> ymin >> width >> height >>blur >> occur;
+      float xmax = xmin + width;
+      float ymax = ymin + height;
+      NormalizedBBox_S label_bbox = {
+        .xmin = xmin,
+        .ymin = ymin,
+        .xmax = xmax,
+        .ymax = ymax
+      };
+      all_gt_bboxes[ii].push_back(label_bbox);
+      sstr.clear();
+    }
+    infile.close();
+  }
   // 循环操作
   for(int ii = 0; ii < loop_time; ii++){
     for(int jj = 0; jj < batch_size; jj++){
