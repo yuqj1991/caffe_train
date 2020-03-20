@@ -88,7 +88,7 @@ void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
       std::map<int, vector<NormalizedBBox> >* all_gt_bboxes, int batch_size);
 
 template <typename Dtype>
-Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const int num_classes,
+Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, 
@@ -98,7 +98,24 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
                           Dtype ignore_thresh, int *count_postive);
 
 template <typename Dtype>
-void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
+void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results);
+
+template <typename Dtype> 
+Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          Dtype* channel_pred_data, const int anchor_scale, 
+                          std::pair<int, int> loc_truth_scale,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          Dtype* class_label, Dtype* bottom_diff, 
+                          Dtype ignore_thresh, int *count_postive);
+
+template <typename Dtype> 
+void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 

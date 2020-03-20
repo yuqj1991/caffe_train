@@ -742,6 +742,135 @@ Dtype focal_loss(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bott
 template float focal_loss(float* label_data, float *pred_data, int dimScale,  float *bottom_diff);
 template double focal_loss(double* label_data, double *pred_data, int dimScale,  double *bottom_diff);
 
+
+// label_data shape N : 1
+// pre_data shape N : k (object classes)
+// dimScale is the number of what ?? N * K ??
+template <typename Dtype>
+Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, Dtype *bottom_diff, 
+                            const int num_channels){
+  Dtype loss = Dtype(0.f);
+  int dimScale = output_height * output_width;
+  int label_idx = 0;
+  for(int b = 0; b < batch_size; b++){
+    for(int h = 0; h < output_height; h++){
+      for(int w = 0; w < output_width; w++){
+        Dtype label_value = Dtype(label_data[b * dimScale + h * output_width + w]);
+        if(label_value == 0.5)
+          label_idx = 0;
+        else{
+          label_idx = 1;
+        }
+        int label_index = b * num_channels * dimScale + (4 + label_idx) * dimScale + h * output_width + w;
+        if(label_value != 0.){
+          loss -= log(std::max(pre_data[label_index],
+                           Dtype(FLT_MIN)));
+          bottom_diff[label_index] -= 1;
+        }
+      }
+    }
+  }
+  return loss;
+}
+
+template float softmax_loss_entropy(float* label_data, float* pre_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, float *bottom_diff, 
+                            const int num_channels);
+template double softmax_loss_entropy(double* label_data, double* pre_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, double *bottom_diff, 
+                            const int num_channels);
+
+
+template <typename T>
+bool SortScorePairDescendCenter(const pair<T, float>& pair1,
+                          const pair<T, float>& pair2) {
+  return pair1.second > pair2.second;
+}
+
+template <typename Dtype>
+void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
+            const int label_channel, const int num_channels,
+            const int outheight, const int outwidth){
+  int dimScale = outheight * outwidth;
+  for(int b = 0; b < batch_size; b++){
+    for(int h = 0; h < outheight; h++){
+      for(int w = 0; w < outwidth; w++){
+        int class_index = b * num_channels * dimScale + 4 *dimScale + h * outwidth + w;
+        Dtype MaxVaule = Dtype(0.f);
+        Dtype sumValue = Dtype(0.f);
+        // 求出每组的最大值
+        for(int c = 0; c< label_channel; c++){
+          MaxVaule = std::max(MaxVaule, pred_data[class_index + c * dimScale]);
+        }
+        // 每个样本组减去最大值， 计算exp，求和
+        for(int c = 0; c< label_channel; c++){
+          pred_data[class_index + c * dimScale] -= MaxVaule;
+          pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale]);
+          sumValue += pred_data[class_index + c * dimScale];
+        }
+        // 计算softMax
+        for(int c = 0; c< label_channel; c++){
+          pred_data[class_index + c * dimScale] = Dtype(pred_data[class_index + c * dimScale] / sumValue);
+        }
+      }
+    }
+  }
+}
+template void SoftmaxCenterGrid(float * pred_data, const int batch_size,
+            const int label_channel, const int num_channels,
+            const int outheight, const int outwidth);
+template void SoftmaxCenterGrid(double * pred_data, const int batch_size,
+            const int label_channel, const int num_channels,
+            const int outheight, const int outwidth);
+// hard sampling mine postive : negative 1: 10
+// 按理来说是需要重新统计负样本的编号，以及获取到他的数值
+// label_data : K x H x W
+// pred_data : K x H x W x N
+template <typename Dtype>
+void select_hard_sample(Dtype *label_data, Dtype *pred_data, 
+                          const int negative_ratio, std::vector<int> postive, 
+                          const int output_height, const int output_width,
+                          const int num_channels, const int batch_size){
+  CHECK_EQ(num_channels, 4 + 2) << "x, y, width, height + label classes containing background + face";
+  int dimScale = output_height * output_width;
+  std::vector<std::pair<int, float> > loss_value_indices;
+  for(int b = 0; b < batch_size; b ++){
+    loss_value_indices.clear();
+    int num_postive = postive[b];
+    for(int h = 0; h < output_height; h ++){
+      for(int w = 0; w < output_width; w ++){
+        if(label_data[b * dimScale + h * output_width +w] != 1){
+          int negative_index = h * output_width + w;
+          Dtype perd_ = pred_data[b * num_channels * dimScale  + 5 * dimScale + h * output_width + w];
+          Dtype loss = (-1) * log(std::max(perd_,  Dtype(FLT_MIN)));
+          loss_value_indices.push_back(std::make_pair(negative_index, loss));
+        }
+      }
+    }
+    std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
+    int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
+    for(int ii = 0; ii < num_negative; ii++){
+      int h = loss_value_indices[ii].first / output_width;
+      int w = loss_value_indices[ii].first % output_width;
+      label_data[b * dimScale + h * output_width + w] = 0.5;
+    }
+  }
+}
+
+template void select_hard_sample(float *label_data, float *pred_data, 
+                          const int negative_ratio, std::vector<int> postive, 
+                          const int output_height, const int output_width,
+                          const int num_channels, const int batch_size);
+template void select_hard_sample(double *label_data, double *pred_data, 
+                          const int negative_ratio, std::vector<int> postive, 
+                          const int output_height, const int output_width,
+                          const int num_channels, const int batch_size);
+
+
 // 每一层使用感受野作为anchor,此anchor只匹配相对应大小范围的gt_boxes, 
 // anchor 生成的方式是按照感受野的大小来生成的,所以每层只有一个感受野大小的anchor, 用于匹配相应的gt_boxes;
 // anchor 的匹配方式是按照每个anchor中心落在真实框之内匹配呢？,还是直接基于每个格子中心来进行预测呢？最终直接使用中心来
@@ -753,7 +882,7 @@ template double focal_loss(double* label_data, double *pred_data, int dimScale, 
 
 
 template <typename Dtype> 
-Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const int num_classes,
+Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, 
@@ -764,13 +893,13 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
   CHECK_EQ(num_classes, 1);
   int dimScale = output_height * output_width;
   Dtype score_loss = Dtype(0.);
-  CHECK_EQ(num_channels, (4 + num_classes)) 
+  CHECK_EQ(num_channels, (4 + 1 + num_classes)) 
           << "num_channels shoule be set to including bias_x, bias_y, width, height, object_confidence and classes";
   for(int b = 0; b < batch_size; b++){
-    int class_index = b * num_channels * dimScale
+    int object_index = b * num_channels * dimScale
                                 + 4 * dimScale;
-    for(int i = 0; i < (num_classes) * dimScale; i++){
-      channel_pred_data[class_index + i] = CenterSigmoid(channel_pred_data[class_index + i]);
+    for(int i = 0; i < (num_classes + 1) * dimScale; i++){
+      channel_pred_data[object_index + i] = CenterSigmoid(channel_pred_data[object_index + i]);
     }
   }
 
@@ -781,6 +910,40 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
     std::vector<int> mask_Rf_anchor(dimScale, 0);
     int count = 0;
+    for(int h = 0; h < output_height; h++){
+      for(int w = 0; w < output_width; w++){
+        int x_index = b * num_channels * dimScale
+                                  + 0* dimScale + h * output_width + w;
+        int y_index = b * num_channels * dimScale 
+                                  + 1* dimScale + h * output_width + w;
+        int width_index = b * num_channels * dimScale
+                                  + 2* dimScale + h * output_width + w;
+        int height_index = b * num_channels * dimScale 
+                                  + 3* dimScale + h * output_width + w;
+        int object_index = b * num_channels * dimScale 
+                                  + 4* dimScale + h * output_width + w;
+        NormalizedBBox predBox;
+        float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /downRatio) / output_width;
+        float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /downRatio) / output_height;
+        float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /downRatio) / output_width;
+        float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /downRatio) /output_height;
+        predBox.set_xmin(bb_xmin);
+        predBox.set_xmax(bb_xmax);
+        predBox.set_ymin(bb_ymin);
+        predBox.set_ymax(bb_ymax);
+        float best_iou = 0;
+        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+          float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+          if (iou > best_iou) {
+            best_iou = iou;
+          }
+        }
+        bottom_diff[object_index] = (-1) * (0 - channel_pred_data[object_index]);
+        if(best_iou > ignore_thresh){
+          bottom_diff[object_index] = 0;
+        }
+      }
+    }
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
       const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
       const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
@@ -827,6 +990,198 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
                                       + 2* dimScale + h * output_width + w;
             int height_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
+            int object_index = b * num_channels * dimScale 
+                                      + 4* dimScale + h * output_width + w;
+            
+            float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
+            bottom_diff[x_index] = (-1) * delta_scale * (xmin_bias - channel_pred_data[x_index]);
+            bottom_diff[y_index] = (-1) * delta_scale * (ymin_bias - channel_pred_data[y_index]);
+            bottom_diff[width_index] = (-1) * delta_scale * (xmax_bias - channel_pred_data[width_index]);
+            bottom_diff[height_index] = (-1) * delta_scale * (ymax_bias - channel_pred_data[height_index]);
+            bottom_diff[object_index] = (-1) * (1 - channel_pred_data[object_index]);
+            // class score 
+            // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
+            int class_index = b * dimScale
+                                  +  h * output_width + w;
+            class_label[class_index] = 1;
+            
+            mask_Rf_anchor[h * output_width + w] = 1;
+            count++;
+          }
+        }
+      }
+    }
+    if(count > 0){
+      int gt_class_index =  b * dimScale;
+      int pred_class_index = b * num_channels * dimScale + 5* dimScale;
+      score_loss += focal_loss(class_label + gt_class_index, channel_pred_data + pred_class_index, 
+                                  dimScale, bottom_diff + pred_class_index);
+    }else{
+      score_loss += 0;
+    }
+    postive += count;
+    
+  }
+  *count_postive = postive;
+  return score_loss;
+}
+
+template float EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          float* channel_pred_data, const int anchor_scale, 
+                          std::pair<int, int> loc_truth_scale,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          float* class_label, float* bottom_diff, 
+                          float ignore_thresh, int *count_postive);
+
+template double EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          double* channel_pred_data, const int anchor_scale, 
+                          std::pair<int, int> loc_truth_scale,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          double* class_label, double* bottom_diff, 
+                          double ignore_thresh, int *count_postive);
+
+template <typename Dtype>
+void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results){
+  // face class 人脸类型
+  CHECK_EQ(num_classes, 1);
+  CHECK_EQ(num_channels, 4 + 1 + num_classes);
+  int dimScale = output_height * output_width;
+  for(int b = 0; b < batch_size; b++){
+    int object_index = b * num_channels * dimScale + 4 * dimScale;
+    for(int i = 0; i < (num_classes + 1) * dimScale; i++){
+      channel_pred_data[object_index + i] = CenterSigmoid(channel_pred_data[object_index + i]);
+    }
+  }
+
+  for(int b = 0; b < batch_size; b++){
+    for(int h = 0; h < output_height; h++){
+      for(int w = 0; w < output_width; w++){
+        int x_index = b * num_channels * dimScale
+                                  + 0* dimScale + h * output_width + w;
+        int y_index = b * num_channels * dimScale 
+                                  + 1* dimScale + h * output_width + w;
+        int width_index = b * num_channels * dimScale
+                                  + 2* dimScale + h * output_width + w;
+        int height_index = b * num_channels * dimScale 
+                                  + 3* dimScale + h * output_width + w;
+        int object_index = b * num_channels * dimScale 
+                                  + 4* dimScale + h * output_width + w;
+        int class_index = b * num_channels * dimScale
+                                  + 5* dimScale + h * output_width + w;
+
+        float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /downRatio) *downRatio;
+        float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /downRatio) *downRatio;
+        float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /downRatio) *downRatio;
+        float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /downRatio) *downRatio;
+        
+        float xmin = std::min(std::max(bb_xmin, (0.f)), float(downRatio * output_width));
+        float ymin = std::min(std::max(bb_ymin, (0.f)), float(downRatio * output_height));
+        float xmax = std::min(std::max(bb_xmax, (0.f)), float(downRatio * output_width));
+        float ymax = std::min(std::max(bb_ymax, (0.f)), float(downRatio * output_height));
+
+        if((xmax - xmin) <= 0 || (ymax - ymin) <= 0)
+          continue;                                     
+        
+        Dtype label_score = channel_pred_data[class_index] * channel_pred_data[object_index];
+        
+        if(label_score >= conf_thresh){
+            CenterNetInfo temp_result;
+            temp_result.set_class_id(0);
+            temp_result.set_score(label_score);
+            temp_result.set_xmin(xmin);
+            temp_result.set_xmax(xmax);
+            temp_result.set_ymin(ymin);
+            temp_result.set_ymax(ymax);
+            temp_result.set_area((xmax - xmin) * (ymax - ymin));
+            (*results)[b].push_back(temp_result);
+        } 
+      }
+    }
+  }
+}
+
+template void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          float* channel_pred_data, const int anchor_scale, float conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results);
+
+template void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          double* channel_pred_data, const int anchor_scale, double conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results);
+
+
+template <typename Dtype> 
+Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          Dtype* channel_pred_data, const int anchor_scale, 
+                          std::pair<int, int> loc_truth_scale,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          Dtype* class_label, Dtype* bottom_diff, 
+                          Dtype ignore_thresh, int *count_postive){
+  CHECK_EQ(num_classes, 2);
+  int dimScale = output_height * output_width;
+  Dtype score_loss = Dtype(0.);
+  CHECK_EQ(num_channels, (4 + num_classes)) << "num_channels shoule be set to including bias_x, bias_y, width, height, classes";
+  for(int b = 0; b < batch_size; b++){
+    int class_index = b * num_channels * dimScale
+                                + 4 * dimScale;
+    SoftmaxCenterGrid(channel_pred_data + class_index, batch_size, num_classes, num_channels
+                        , output_height, output_width);
+  }
+
+  int postive = 0;
+  caffe_set(batch_size * dimScale, Dtype(0), class_label);
+  std::vector<int>postive_batch(batch_size, 0);
+
+  for(int b = 0; b < batch_size; b++){
+    vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+    std::vector<int> mask_Rf_anchor(dimScale, 0);
+    int count = 0;
+    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+      const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+      const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+      const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+      const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+      const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+      const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+      int large_side = std::max(gt_bbox_height, gt_bbox_width);
+      if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+        for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
+          for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+            if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
+              continue;
+            if(h + (anchor_scale/downRatio) / 2>= output_height - 1)
+              continue;
+            if(w - (anchor_scale/downRatio) / 2 < 0)
+              continue;
+            if(h - (anchor_scale/downRatio) / 2 < 0)
+              continue;
+            if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
+              continue;
+            Dtype xmin_bias = (w - xmin) * downRatio / anchor_scale;
+            Dtype ymin_bias = (h - ymin) * downRatio / anchor_scale;
+            Dtype xmax_bias = (w - xmax) * downRatio / anchor_scale;
+            Dtype ymax_bias = (h - ymax) * downRatio / anchor_scale;
+            int x_index = b * num_channels * dimScale
+                                      + 0* dimScale + h * output_width + w;
+            int y_index = b * num_channels * dimScale 
+                                      + 1* dimScale + h * output_width + w;
+            int width_index = b * num_channels * dimScale
+                                      + 2* dimScale + h * output_width + w;
+            int height_index = b * num_channels * dimScale 
+                                      + 3* dimScale + h * output_width + w;
             
             float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
             bottom_diff[x_index] = (-1) * delta_scale * (xmin_bias - channel_pred_data[x_index]);
@@ -846,22 +1201,19 @@ Dtype EncodeCenterGridObject(const int batch_size, const int num_channels, const
         }
       }
     }
-    if(count > 0){
-      int gt_class_index =  b * dimScale;
-      int pred_class_index = b * num_channels * dimScale + 4* dimScale;
-      score_loss += focal_loss(class_label + gt_class_index, channel_pred_data + pred_class_index, 
-                                  dimScale, bottom_diff + pred_class_index);
-    }else{
-      score_loss += 0;
-    }
+    postive_batch[b] = count;
     postive += count;
-    
   }
+  // 计算softMax loss value 
+  select_hard_sample(class_label, channel_pred_data, 10, postive_batch, 
+                        output_height, output_width, num_channels, batch_size);
+  softmax_loss_entropy(class_label, channel_pred_data, batch_size, output_height,
+                        output_width, bottom_diff, num_channels);
   *count_postive = postive;
   return score_loss;
 }
 
-template float EncodeCenterGridObject(const int batch_size, const int num_channels, const int num_classes,
+template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           float* channel_pred_data, const int anchor_scale, 
@@ -870,7 +1222,7 @@ template float EncodeCenterGridObject(const int batch_size, const int num_channe
                           float* class_label, float* bottom_diff, 
                           float ignore_thresh, int *count_postive);
 
-template double EncodeCenterGridObject(const int batch_size, const int num_channels, const int num_classes,
+template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           double* channel_pred_data, const int anchor_scale, 
@@ -880,20 +1232,19 @@ template double EncodeCenterGridObject(const int batch_size, const int num_chann
                           double ignore_thresh, int *count_postive);
 
 template <typename Dtype>
-void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
+void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results){
-  // face class 人脸类型
-  CHECK_EQ(num_classes, 1);
+  // face class 人脸类型 包括背景 + face人脸，两类
+  CHECK_EQ(num_classes, 2);
   CHECK_EQ(num_channels, 4 + num_classes);
   int dimScale = output_height * output_width;
   for(int b = 0; b < batch_size; b++){
     int class_index = b * num_channels * dimScale + 4 * dimScale;
-    for(int i = 0; i < (num_classes) * dimScale; i++){
-      channel_pred_data[class_index + i] = CenterSigmoid(channel_pred_data[class_index + i]);
-    }
+    SoftmaxCenterGrid(channel_pred_data + class_index, batch_size, num_classes,
+                      num_channels, output_height, output_width);
   }
 
   for(int b = 0; b < batch_size; b++){
@@ -907,8 +1258,9 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
                                   + 2* dimScale + h * output_width + w;
         int height_index = b * num_channels * dimScale 
                                   + 3* dimScale + h * output_width + w;
+                
         int class_index = b * num_channels * dimScale
-                                  + 4* dimScale + h * output_width + w;
+                                  + 5* dimScale + h * output_width + w;
 
         float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /downRatio) *downRatio;
         float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /downRatio) *downRatio;
@@ -941,16 +1293,15 @@ void GetCenterGridObjectResult(const int batch_size, const int num_channels, con
   }
 }
 
-template void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
+template void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           float* channel_pred_data, const int anchor_scale, float conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results);
 
-template void GetCenterGridObjectResult(const int batch_size, const int num_channels, const int num_classes,
+template void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           double* channel_pred_data, const int anchor_scale, double conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results);
-
 }  // namespace caffe

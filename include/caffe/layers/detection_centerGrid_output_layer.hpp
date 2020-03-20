@@ -77,6 +77,7 @@ class CenterGridOutputLayer : public Layer<Dtype> {
   int bottom_size_;
   std::vector<int> downRatio_;
   float ignore_thresh_ ;
+  DetectionOutputParameter_CLASS_TYPE class_type_;
 };
 
 }  // namespace caffe

@@ -4744,7 +4744,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 5
+		num_output: 6
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4765,7 +4765,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 5
+		num_output: 6
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4786,7 +4786,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 5
+		num_output: 6
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4807,7 +4807,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 5
+		num_output: 6
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4843,7 +4843,8 @@ layer {
 		bias_scale: 550
 		low_bbox_scale: 210
 		up_bbox_scale: 500
-		
+
+		class_type: SIGMOID
 		bias_num: 1
 	}
 }
@@ -4873,7 +4874,8 @@ layer {
 		bias_scale: 250
 		low_bbox_scale: 110
 		up_bbox_scale: 210
-		
+
+		class_type: SIGMOID
 		bias_num: 1
 	}
 }
@@ -4903,7 +4905,8 @@ layer {
 		bias_scale: 110
 		low_bbox_scale: 25
 		up_bbox_scale: 110
-		
+
+		class_type: SIGMOID
 		bias_num: 1
 	}
 }
@@ -4933,7 +4936,8 @@ layer {
 		bias_scale: 40
 		low_bbox_scale: 8
 		up_bbox_scale: 25
-		
+
+		class_type: SIGMOID
 		bias_num: 1
 	}
 }

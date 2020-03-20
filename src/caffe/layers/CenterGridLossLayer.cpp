@@ -32,12 +32,7 @@ void CenterGridLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   net_height_ = center_object_loss_param.net_height();
   net_width_ = center_object_loss_param.net_width();
   ignore_thresh_ = center_object_loss_param.ignore_thresh();
-  
-  num_classes_ = center_object_loss_param.num_class();
-  CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
-  CHECK_EQ((4 + num_classes_) *1, bottom[0]->channels()) 
-            << "num_classes must be equal to prediction classes";
-  
+   
   if (!this->layer_param_.loss_param().has_normalization() &&
       this->layer_param_.loss_param().has_normalize()) {
     normalization_ = this->layer_param_.loss_param().normalize() ?
@@ -50,6 +45,18 @@ void CenterGridLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   vector<int> label_shape(1, 1);
   label_shape.push_back(1);
   label_data_.Reshape(label_shape);
+  class_type_ = center_object_loss_param.class_type();
+  num_classes_ = center_object_loss_param.num_class();
+  CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
+  if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
+    CHECK_EQ((4 + 1 + num_classes_) *1, bottom[0]->channels()) 
+              << "num_classes must be equal to prediction classes";
+  }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
+    CHECK_EQ((4  + num_classes_) *1, bottom[0]->channels()) 
+              << "softmax num_classes must be equal to contain background";
+  }else{
+    LOG(FATAL)<<"unknown class type";
+  }
 }
 
 template <typename Dtype>
@@ -95,31 +102,46 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
   if (num_groundtruth_ >= 1) {
     const int downRatio = net_height_ / output_height;
-    class_score = EncodeCenterGridObject(num_, num_channels, num_classes_, output_width, output_height, 
+    if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
+      class_score = EncodeCenterGridObjectSigmoid(num_, num_channels, num_classes_, output_width, output_height, 
                           downRatio,
                           channel_pred_data,  anchor_scale_, 
                           bbox_range_scale_,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
                           ignore_thresh_, &count_postive_);
-    const Dtype * diff = bottom[0]->cpu_diff();
-    
-    int dimScale = output_height * output_width;
-    for(int b = 0; b < num_; b++){
-      for(int j = 0; j < 4 * dimScale; j++){ // loc loss + objectness loss
-        sum_squre += diff[b * (4 + num_classes_) * dimScale + j] * diff[b * (4 + num_classes_) * dimScale + j];
+      const Dtype * diff = bottom[0]->cpu_diff();
+      
+      int dimScale = output_height * output_width;
+      for(int b = 0; b < num_; b++){
+        for(int j = 0; j < (4 + 1) * dimScale; j++){ // loc loss + objectness loss
+          sum_squre += diff[b * (4 + 1 + num_classes_) * dimScale + j] * diff[b * (4 + 1 + num_classes_) * dimScale + j];
+        }
+      }
+    }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
+      class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
+                          downRatio,
+                          channel_pred_data,  anchor_scale_, 
+                          bbox_range_scale_,
+                          all_gt_bboxes, label_muti_data, bottom_diff, 
+                          ignore_thresh_, &count_postive_);
+      const Dtype * diff = bottom[0]->cpu_diff();
+      
+      int dimScale = output_height * output_width;
+      for(int b = 0; b < num_; b++){
+        for(int j = 0; j < 4 * dimScale; j++){ // loc loss + objectness loss
+          sum_squre += diff[b * (4 + num_classes_) * dimScale + j] * diff[b * (4 + num_classes_) * dimScale + j];
+        }
       }
     }
     if(count_postive_ > 0)
-      top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / count_postive_;
-    else
-      top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / num_;
-    
+        top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / count_postive_;
+      else
+        top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / num_;    
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
   }
   #if 1 
-  if(iterations_ % 100 == 0){    
-    LOG(INFO);
+  if(iterations_ % 100 == 0){
     Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.);
 
     if(count_postive_ > 0){
@@ -150,19 +172,22 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
   
   if (propagate_down[0]) {
-    /*const int output_height = bottom[0]->height();
-    const int output_width = bottom[0]->width();
-    const int num_channels = bottom[0]->channels();
-    Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
-    const Dtype* bottom_data = bottom[0]->cpu_data();
-    num_ = bottom[0]->num();
-    int dimScale = output_height * output_width;
-    for(int b = 0; b < num_; b++){
-      int class_index = b * num_channels * dimScale + 4 * dimScale;
-      for(int i = 0; i < 1 * dimScale; i++){
-        bottom_diff[class_index + i] = bottom_diff[class_index + i] * logistic_gradient(bottom_data[object_index + i]);
+    if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
+      const int output_height = bottom[0]->height();
+      const int output_width = bottom[0]->width();
+      const int num_channels = bottom[0]->channels();
+      Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+      const Dtype* bottom_data = bottom[0]->cpu_data();
+      num_ = bottom[0]->num();
+      int dimScale = output_height * output_width;
+      for(int b = 0; b < num_; b++){
+        int object_index = b * num_channels * dimScale + 4 * dimScale;
+        for(int i = 0; i < 1 * dimScale; i++){
+          bottom_diff[object_index + i] = bottom_diff[object_index + i] * 
+                                                    logistic_gradient(bottom_data[object_index + i]);
+        }
       }
-    }*/
+    }
     Dtype loss_weight = Dtype(0.);
     if(count_postive_ > 0)
       loss_weight = top[0]->cpu_diff()[0] / count_postive_;

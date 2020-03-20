@@ -36,6 +36,7 @@ void CenterGridOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   confidence_threshold_ = detection_output_param.has_confidence_threshold() ?
       detection_output_param.confidence_threshold() : -FLT_MAX;
   ignore_thresh_ = detection_output_param.ignore_thresh();
+  class_type_ = detection_output_param.class_type();
 }
 
 template <typename Dtype>
@@ -45,7 +46,7 @@ void CenterGridOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   CHECK_EQ(bottom[0]->num(), bottom[1]->num());
   CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
   CHECK_EQ(bottom[0]->channels(), bottom[2]->channels());
-  CHECK_EQ(bottom[0]->channels(), 4 + num_classes_);
+  CHECK_GE(bottom[0]->channels(), 4 + num_classes_);
   // num() and channels() are 1.
   vector<int> top_shape(2, 1);
   // Since the number of bboxes to be kept is unknown before nms, we manually
@@ -73,12 +74,21 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
     const int output_width = bottom[t]->width();
     num_ = bottom[t]->num();
     int num_channels = bottom[t]->channels();
-    GetCenterGridObjectResult(num_, num_channels, num_classes_,
+    if(class_type_ == DetectionOutputParameter_CLASS_TYPE_SIGMOID){
+      GetCenterGridObjectResultSigmoid(num_, num_channels, num_classes_,
                           output_width, output_height, 
                           downRatio_[t],
                           channel_pred_data, anchor_scale_[t], confidence_threshold_, &results_);
-    
+    }else if(class_type_ == DetectionOutputParameter_CLASS_TYPE_SOFTMAX){
+      GetCenterGridObjectResultSoftMax(num_, num_channels, num_classes_,
+                          output_width, output_height, 
+                          downRatio_[t],
+                          channel_pred_data, anchor_scale_[t], confidence_threshold_, &results_);
+    }else {
+      LOG(FATAL)<<"unknown class type";
+    }
   }
+  
   int num_kept = 0;
 
   // nms 去除多余的框

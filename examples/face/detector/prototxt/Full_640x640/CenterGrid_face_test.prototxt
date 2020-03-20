@@ -4648,7 +4648,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 5
+		num_output: 6
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4669,7 +4669,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 5
+		num_output: 6
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4690,7 +4690,7 @@ layer{
 		decay_mult: 1
 	}
 	convolution_param {
-		num_output: 5
+		num_output: 6
 		bias_term: false
 		kernel_size: 1
 		weight_filler {
@@ -4719,7 +4719,9 @@ layer {
 		bias_scale: 250
 		bias_scale: 110
 		bias_scale: 40
-		
+
+		class_type: SIGMOID
+
 		down_ratio: 32
 		down_ratio: 16
 		down_ratio: 8

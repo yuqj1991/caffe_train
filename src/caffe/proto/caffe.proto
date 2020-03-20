@@ -1498,7 +1498,12 @@ message DetectionOutputParameter {
   optional uint32 num_lpletter = 17;
   repeated int32 bias_scale = 18;
   repeated int32 down_ratio = 19;
-  optional float ignore_thresh = 20[default = 0.5];
+  optional float ignore_thresh = 20[default = 0.3];
+  enum CLASS_TYPE{
+    SIGMOID = 0;
+    SOFTMAX = 1;
+  }
+  optional CLASS_TYPE class_type = 21[default = SIGMOID];
 }
 message YoloDetectionOutputParameter {
   // Yolo detection output layer
@@ -2324,6 +2329,11 @@ message CenterObjectParameter {
   optional int32 bias_mask_group_num = 27 [default = 3];
   optional int32 low_bbox_scale = 28;
   optional int32 up_bbox_scale = 29;
+  enum CLASS_TYPE {
+    SIGMOID = 0;
+    SOFTMAX = 1;
+  }
+  optional CLASS_TYPE class_type = 30[default = SIGMOID];
 }
 
 message SliceParameter {
