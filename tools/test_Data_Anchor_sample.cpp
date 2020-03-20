@@ -18,6 +18,7 @@
 #include "caffe/util/format.hpp"
 #include "caffe/util/io.hpp"
 #include "caffe/util/rng.hpp"
+#include "caffe/util/bbox_util.hpp"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -29,18 +30,77 @@ using boost::scoped_ptr;
 using namespace cv;
 using namespace std;
 
-struct NormalizedBBox{
+#define COMPAREMIN_T(a, b) (a >= b ? b : a)
+#if 1
+struct NormalizedBBox_S{
    float xmin;
    float ymin;
    float xmax;
    float ymax;
 };
+
+bool SatisfySampleConstraint_F(NormalizedBBox_S sample_bbox, 
+                              std::vector<NormalizedBBox_S> object_bboxes,
+                                    float min_coverage){
+  bool found = false;
+  NormalizedBBox test_bbox;
+  test_bbox.set_xmin(sample_bbox.xmin);
+  test_bbox.set_xmax(sample_bbox.xmax);
+  test_bbox.set_ymin(sample_bbox.ymin);
+  test_bbox.set_ymax(sample_bbox.ymax);
+  for(unsigned ii = 0; ii < object_bboxes.size(); ii ++){
+    NormalizedBBox gt_bbox;
+    gt_bbox.set_xmin(object_bboxes[ii].xmin);
+    gt_bbox.set_xmax(object_bboxes[ii].xmax);
+    gt_bbox.set_ymin(object_bboxes[ii].ymin);
+    gt_bbox.set_ymax(object_bboxes[ii].ymax);
+    const float object_coverage = BBoxCoverage(gt_bbox, test_bbox);
+    if(min_coverage < object_coverage)
+      continue;
+    found = true;
+    if (found) {
+      return true;
+    }
+  }
+  return found;
+}
+
+std::vector<NormalizedBBox_S> ResizedCropSample(const cv::Mat& src_img, cv::Mat resized_img, float scale, 
+                        std::vector<NormalizedBBox_S> src_gt_bboxes){
+  const int img_width = src_img.cols;
+  const int img_height = src_img.rows;
+
+  // image data
+  int Resized_img_Height = int(img_height * scale);
+  int Resized_img_Width = int(img_width * scale);
+  cv::resize(src_img, resized_img, cv::Size(Resized_img_Width, Resized_img_Height), 0, 0,
+                cv::INTER_CUBIC);
+  std::vector<NormalizedBBox_S> Resized_gt_bboxes;
+  for(unsigned ii = 0; ii < src_gt_bboxes.size(); ii++){
+    float x_min = src_gt_bboxes[ii].xmin * img_width;
+    float y_min = src_gt_bboxes[ii].ymin * img_height;
+    float x_max = src_gt_bboxes[ii].xmax * img_width;
+    float y_max = src_gt_bboxes[ii].ymax * img_height;
+    x_min = std::max(0.f, x_min * Resized_img_Width / img_width);
+    x_max = std::min(float(Resized_img_Width), x_max * Resized_img_Width / img_width);
+    y_min = std::max(0.f, y_min * Resized_img_Height / img_height);
+    y_max = std::min(float(Resized_img_Height), y_max * Resized_img_Height / img_height);
+    NormalizedBBox_S Resized_bbox = {
+      .xmin = x_min,
+      .ymin = y_min,
+      .xmax = x_max,
+      .ymax = y_max
+    };
+    Resized_gt_bboxes.push_back(Resized_bbox);
+  }
+  return Resized_gt_bboxes;
+}
 void GenerateDataAnchorSample(cv::Mat img, 
                                 std::vector<int>anchorScale,
-                                const vector<NormalizedBBox>& object_bboxes,
+                                const vector<NormalizedBBox_S>& object_bboxes,
                                 int resized_height, int resized_width,
-                                NormalizedBBox* sampled_bbox, cv::Mat resized_img,
-                                const TransformationParameter& trans_param, bool do_resize){
+                                NormalizedBBox_S* sampled_bbox, cv::Mat resized_img,
+                                bool do_resize){
   int img_height = img.rows;
   int img_width = img.cols;
   CHECK_GT(object_bboxes.size(), 0);
@@ -71,7 +131,7 @@ void GenerateDataAnchorSample(cv::Mat img,
   }
   if(range_idx_size == range_size){
     min_resize_val = anchorScale[range_idx_size] / 2;
-    max_resize_val = COMPAREMIN((float)anchorScale[range_idx_size] * 2,
+    max_resize_val = COMPAREMIN_T((float)anchorScale[range_idx_size] * 2,
                                                   2*std::sqrt(bbox_aera)) ;
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
   }else{
@@ -84,13 +144,13 @@ void GenerateDataAnchorSample(cv::Mat img,
   float w_off = 0.0f, h_off = 0.0f, w_end = 0.0f, h_end = 0.0f;
   if(do_resize){
     float scale = (float) scaleChoose / bbox_width;
-    ResizedCropSample(anno_datum, resized_anno_datum, scale, trans_param);
+    ResizedCropSample(img, resized_img, scale, object_bboxes);
     int Resized_ori_Height = int(scale * img_height);
     int Resized_ori_Width = int(scale * img_width);
     int Resized_bbox_width = int(scale * bbox_width);
     int Resized_bbox_height = int(scale * bbox_height);
-    const float Resized_xmin = object_bboxes[object_bbox_index].xmin()*Resized_ori_Width;
-    const float Resized_ymin = object_bboxes[object_bbox_index].ymin()*Resized_ori_Height;
+    const float Resized_xmin = object_bboxes[object_bbox_index].xmin*Resized_ori_Width;
+    const float Resized_ymin = object_bboxes[object_bbox_index].ymin*Resized_ori_Height;
     if(resized_width < std::max(Resized_ori_Height, Resized_ori_Width)){
       if(Resized_bbox_width <= resized_width){
         if(Resized_bbox_width == resized_width){
@@ -120,106 +180,64 @@ void GenerateDataAnchorSample(cv::Mat img,
     h_off = (float) height_offset_ / Resized_ori_Height;
     w_end = w_off + float(resized_width / Resized_ori_Width);
     h_end = h_off + float(resized_height / Resized_ori_Height);
-  }else{
-    LOG(FATAL)<<"need to make do resize";
   }
-  sampled_bbox->set_xmin(w_off);
-  sampled_bbox->set_ymin(h_off);
-  sampled_bbox->set_xmax(w_end);
-  sampled_bbox->set_ymax(h_end);
+  sampled_bbox->xmin = w_off;
+  sampled_bbox->xmin = h_off;
+  sampled_bbox->xmax = w_end;
+  sampled_bbox->ymax = h_end;
 }
 
-void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
-                                const vector<DataAnchorSampler>& data_anchor_samplers,
+void GenerateBatchDataAnchorSamples(const cv::Mat src_img, vector<NormalizedBBox_S> object_bboxes, 
+                                const vector<std::vector<int> >& data_anchor_samplers,
                                 int resized_height, int resized_width, 
-                                NormalizedBBox* sampled_bbox, AnnotatedDatum* resized_anno_datum, 
-                                const TransformationParameter& trans_param, bool do_resize) {
+                                NormalizedBBox_S* sampled_bbox, cv::Mat resized_img, 
+                                bool do_resize, int max_sample) {
   CHECK_EQ(data_anchor_samplers.size(), 1);
-  vector<NormalizedBBox> object_bboxes;
-  GroupObjectBBoxes(anno_datum, &object_bboxes);
   for (int i = 0; i < data_anchor_samplers.size(); ++i) {
-    if (data_anchor_samplers[i].use_original_image()) {
-      int found = 0;
-      for (int j = 0; j < data_anchor_samplers[i].max_trials(); ++j) {
-        if (data_anchor_samplers[i].has_max_sample() &&
-            found >= data_anchor_samplers[i].max_sample()) {
-          break;
-        }
-        AnnotatedDatum temp_anno_datum;
-        NormalizedBBox temp_sampled_bbox;
-        GenerateDataAnchorSample(anno_datum, data_anchor_samplers[i], object_bboxes, resized_height, 
-                                resized_width, &temp_sampled_bbox, &temp_anno_datum, trans_param, do_resize);
-        if (SatisfySampleConstraint(temp_sampled_bbox, object_bboxes,
-                                      data_anchor_samplers[i].sample_constraint())){
-          found++;
-          resized_anno_datum->CopyFrom(temp_anno_datum);
-          sampled_bbox->CopyFrom(temp_sampled_bbox);
-        }
+    int found = 0;
+    for (int j = 0; j < 50; ++j) {
+      if (found >= max_sample) {
+        break;
       }
-      if(found == 0){
-        resized_anno_datum->CopyFrom(anno_datum);
-        sampled_bbox->set_xmin(0.f);
-        sampled_bbox->set_ymin(0.f);
-        sampled_bbox->set_xmax(1.f);
-        sampled_bbox->set_ymax(1.f);
+      NormalizedBBox_S temp_sampled_bbox;
+      GenerateDataAnchorSample(src_img, data_anchor_samplers[i], object_bboxes, resized_height, 
+                              resized_width, &temp_sampled_bbox, resized_img, do_resize);
+      if (SatisfySampleConstraint_F(temp_sampled_bbox, object_bboxes, 0.85)){
+        found++;
+        *sampled_bbox = temp_sampled_bbox;
       }
-    }else{
-      LOG(FATAL)<<"must use original_image";
+    }
+    if(found == 0){
+      src_img.copyTo(resized_img);
+      sampled_bbox->xmin = 0.f;
+      sampled_bbox->ymin = 0.f;
+      sampled_bbox->xmax = 1.f;
+      sampled_bbox->ymax = 1.f;
     }
   }
-  CHECK_GT(resized_anno_datum->datum().channels(), 0)<<"channels: "<<resized_anno_datum->datum().channels();
 }
 
-void ResizedCropSample(const cv::Mat& src_img, cv::Mat resized_img, float scale){
-  const Datum datum = anno_datum.datum();
-  const int img_width = datum.width();
-  const int img_height = datum.height();
 
-  // image data
-  cv::Mat resized_img;
-  int Resized_img_Height = int(img_height * scale);
-  int Resized_img_Width = int(img_width * scale);
-  cv::resize(cv_img, resized_img, cv::Size(Resized_img_Width, Resized_img_Height), 0, 0,
-                cv::INTER_CUBIC);
-  EncodeCVMatToDatum(resized_img, "jpg", resized_anno_datum->mutable_datum());
-  resized_anno_datum->mutable_datum()->set_label(datum.label());
-  resized_anno_datum->set_type(anno_datum.type());
-  // labels trans
-  if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
-		// Go through each AnnotationGroup.
-    resized_anno_datum->mutable_annotation_group()->CopyFrom(anno_datum.annotation_group());
-	} else {
-		LOG(FATAL) << "Unknown annotation type.";
-	}
-  CHECK_GT(resized_anno_datum->datum().channels(), 0);
+
+void Crop_img(){
+
 }
                               
-int main(){
-	int batch_id = 1;
-	NormalizedBBox box_1 = {0.2, 0.2, 0.5, 0.4};
-	NormalizedBBox box_2 = {0.6, 0.5, 0.9, 0.9};
-	NormalizedBBox box_3 = {0.3, 0.3, 0.8, 0.5};
-	std::map<int, vector<NormalizedBBox> > all_gt_bboxes;
-	std::vector<NormalizedBBox> box_set;
-	box_set.push_back(box_1);
-	box_set.push_back(box_2);
-	box_set.push_back(box_3);
-	all_gt_bboxes.insert(std::make_pair(0, box_set));
-	const int output_height = 128;
-	const int output_width = 128;
-	const int num_classes_ = 1;
-	cv::Mat gt_heatmap(cv::Size(output_width, output_height), CV_32FC1, cv::Scalar(0));
-	float* gt_heatmap_data =  gt_heatmap.ptr<float>(0);
-	GenerateBatchHeatmap(all_gt_bboxes, gt_heatmap_data, num_classes_, output_width, output_height);
-	
-	/*for(int row = 0; row < output_height; row++){
-		float* gt_heatmap_data_ =  gt_heatmap.ptr<float>(row);
-		for(int col  = 0; col < output_width; col++){
-			printf("%f ", gt_heatmap_data_[col]);
-		}
-		printf("\n");
-	}*/
+#endif
 
-	cv::imshow("Gaussian", gt_heatmap);
-	cv::waitKey(0);
+int main(){
+  int loop_time = 12;
+  int batch_size = 32;
+  std::vector<string> img_filenames;
+  std::vector<std::vector<NormalizedBBox_S> >all_gt_bboxes;
+  // 读文件，文件里面存着真实值，包括图像文件， 和真是坐标值文件
+
+  // 循环操作
+  for(int ii = 0; ii < loop_time; ii++){
+    for(int jj = 0; jj < batch_size; jj++){
+      ;
+    }
+  }
+
+	return 1;
 }
