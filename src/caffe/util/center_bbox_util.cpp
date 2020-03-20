@@ -799,7 +799,7 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
   for(int b = 0; b < batch_size; b++){
     for(int h = 0; h < outheight; h++){
       for(int w = 0; w < outwidth; w++){
-        int class_index = b * num_channels * dimScale + 4 *dimScale + h * outwidth + w;
+        int class_index = h * outwidth + w;
         Dtype MaxVaule = Dtype(0.f);
         Dtype sumValue = Dtype(0.f);
         // 求出每组的最大值
@@ -1135,8 +1135,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   Dtype score_loss = Dtype(0.);
   CHECK_EQ(num_channels, (4 + num_classes)) << "num_channels shoule be set to including bias_x, bias_y, width, height, classes";
   for(int b = 0; b < batch_size; b++){
-    int class_index = b * num_channels * dimScale
-                                + 4 * dimScale;
+    int class_index = b * num_channels * dimScale + 4 * dimScale;
     SoftmaxCenterGrid(channel_pred_data + class_index, batch_size, num_classes, num_channels
                         , output_height, output_width);
   }
