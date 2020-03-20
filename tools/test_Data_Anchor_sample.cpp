@@ -217,7 +217,7 @@ void GenerateBatchDataAnchorSamples(const cv::Mat src_img, vector<NormalizedBBox
   }
 }
 
-void CropImageData_Anchor(const cv::Mat& img,
+void CropImageData_Anchor_T(const cv::Mat& img,
 									const NormalizedBBox& bbox, cv::Mat* crop_img) {
 	int img_height = img.rows;
 	int img_width = img.cols;
@@ -309,6 +309,38 @@ void transformGroundTruth(std::map<int, std::vector<NormalizedBBox_S> >all_gt_bb
 }
 
 
+void Crop_Image_F(const cv::Mat src_img, cv::Mat * crop_img, 
+              const NormalizedBBox_S sampled_bbox, 
+              std::map<int, std::vector<NormalizedBBox_S> > all_gt_bboxes, 
+              std::map<int, std::vector<NormalizedBBox_S> > *trans_gt_bboxes){
+  NormalizedBBox bbox;
+  bbox.set_xmin(sampled_bbox.xmin);
+  bbox.set_xmax(sampled_bbox.xmax);
+  bbox.set_ymin(sampled_bbox.ymin);
+  bbox.set_ymax(sampled_bbox.ymax);
+  CropImageData_Anchor_T(src_img, bbox, crop_img);
+  int img_Height = src_img.rows;
+  int img_Width = src_img.cols;
+  bool do_resize = false;
+  transformGroundTruth(all_gt_bboxes, do_resize, 
+                        0, 0, img_Height, img_Width, 
+                        sampled_bbox, trans_gt_bboxes);
+}
+
+void Resized_Image_F(const cv::Mat src_img, cv::Mat * resized_img, 
+              const int Resized_Height, const int Resized_Width,
+              std::map<int, std::vector<NormalizedBBox_S> > all_gt_bboxes, 
+              std::map<int, std::vector<NormalizedBBox_S> > *trans_gt_bboxes){
+  
+  int img_Height = src_img.rows;
+  int img_Width = src_img.cols;
+  bool do_resize = true;
+  transformGroundTruth(all_gt_bboxes, do_resize, 
+                        Resized_Height, Resized_Width, 
+                        img_Height, img_Width, 
+                        sampled_bbox, trans_gt_bboxes);
+}
+
 int main(){
   int loop_time = 12;
   int batch_size = 32;
@@ -353,7 +385,9 @@ int main(){
   // 循环操作
   for(int ii = 0; ii < loop_time; ii++){
     for(int jj = 0; jj < batch_size; jj++){
-      ;
+      int rand_idx = caffe_rng_rand() % numSamples;
+      cv::Mat srcImg = cv::imread(img_filenames[rand_idx].first);
+
     }
   }
 
