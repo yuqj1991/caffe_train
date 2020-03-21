@@ -334,8 +334,8 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     int Resized_ori_Width = int(scale * img_width);
     int Resized_bbox_width = int(scale * bbox_width);
     int Resized_bbox_height = int(scale * bbox_height);
-    const float Resized_xmin = object_bboxes[object_bbox_index].xmin()*Resized_ori_Width;
-    const float Resized_ymin = object_bboxes[object_bbox_index].ymin()*Resized_ori_Height;
+    const float Resized_xmin = object_bboxes[object_bbox_index].xmin() * Resized_ori_Width;
+    const float Resized_ymin = object_bboxes[object_bbox_index].ymin() * Resized_ori_Height;
     if(resized_width < std::max(Resized_ori_Height, Resized_ori_Width)){
       if(Resized_bbox_width <= resized_width){
         if(Resized_bbox_width == resized_width){
@@ -365,13 +365,17 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     h_off = (float) height_offset_ / Resized_ori_Height;
     w_end = w_off + float(resized_width / Resized_ori_Width);
     h_end = h_off + float(resized_height / Resized_ori_Height);
+    sampled_bbox->set_xmin(w_off);
+    sampled_bbox->set_ymin(h_off);
+    sampled_bbox->set_xmax(w_end);
+    sampled_bbox->set_ymax(h_end);
   }else{
-    LOG(FATAL)<<"need to make do resize";
+    resized_anno_datum->CopyFrom(anno_datum);
+    sampled_bbox->set_xmin(0.f);
+    sampled_bbox->set_ymin(0.f);
+    sampled_bbox->set_xmax(1.f);
+    sampled_bbox->set_ymax(1.f);
   }
-  sampled_bbox->set_xmin(w_off);
-  sampled_bbox->set_ymin(h_off);
-  sampled_bbox->set_xmax(w_end);
-  sampled_bbox->set_ymax(h_end);
 }
 
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
@@ -486,6 +490,16 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
     sampled_bbox->set_ymin(h_off);
     sampled_bbox->set_xmax(w_end);
     sampled_bbox->set_ymax(h_end);
+
+    SampleConstraint min_object_coverage_Constraint;
+    min_object_coverage_Constraint.set_min_object_coverage(0.85);
+    if(!SatisfySampleConstraint(*sampled_bbox, object_bboxes, min_object_coverage_Constraint)){
+      resized_anno_datum->CopyFrom(anno_datum);
+      sampled_bbox->set_xmin(0.f);
+      sampled_bbox->set_ymin(0.f);
+      sampled_bbox->set_xmax(1.f);
+      sampled_bbox->set_ymax(1.f);
+    }
     #if 0
     LOG(INFO)<<"scale: "<<scale << ", Resized_ori_Height: "<<Resized_ori_Height
               <<", Resized_ori_Width: "<<Resized_ori_Width<<", resized_xmin: "
@@ -495,6 +509,12 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
               <<", vibration_length: "<<vibration_length<<", offset_x: "<<offset_x<<", offset_y: "
               <<offset_y;
     #endif
+  }else{
+    resized_anno_datum->CopyFrom(anno_datum);
+    sampled_bbox->set_xmin(0.f);
+    sampled_bbox->set_ymin(0.f);
+    sampled_bbox->set_xmax(1.f);
+    sampled_bbox->set_ymax(1.f);
   }
 }
 
