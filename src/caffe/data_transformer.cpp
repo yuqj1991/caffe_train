@@ -1103,7 +1103,6 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 									const NormalizedBBox& bbox, cv::Mat* crop_img) {
 	int img_height = img.rows;
 	int img_width = img.cols;
-	#if 1
 	float xmin = bbox.xmin() * img_width;
 	float ymin = bbox.ymin() * img_height;
 	float xmax = bbox.xmax() * img_width;
@@ -1115,8 +1114,6 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	float cross_ymin = std::min(std::max(0.f, h_off), float(img_height)); 
 	float cross_xmax = std::min(std::max(0.f, w_off + width - 1), float(img_width));
 	float cross_ymax = std::min(std::max(0.f, h_off + height - 1), float(img_height));
-	//LOG(INFO)<<"cross_xmin: "<<cross_xmin<<", cross_xmax: "<<cross_xmax
-	//		<<", cross_ymin: "<<cross_ymin<<", cross_ymax: "<<cross_ymax;
 	int cross_width = static_cast<int>(cross_xmax - cross_xmin);
 	int	cross_height = static_cast<int>(cross_ymax - cross_ymin);
 
@@ -1135,53 +1132,6 @@ void DataTransformer<Dtype>::CropImageData_Anchor(const cv::Mat& img,
 	cv::Rect bbox_cross(cross_x1, cross_y1, cross_width, cross_height);
 	cv::Rect bbox_roi(roi_x1, roi_y1, roi_width, roi_height);
 	img(bbox_cross).copyTo((*crop_img)(bbox_roi));
-
-
-	#else
-	// Get the crossed_bbox dimension.
-	NormalizedBBox crossed_bbox;
-	ClipBBox(bbox, &crossed_bbox);
-	NormalizedBBox scaled_bbox;
-	ScaleBBox(crossed_bbox, img_height, img_width, &scaled_bbox);
-
-	int w_off = static_cast<int>(scaled_bbox.xmin());
-	w_off = w_off >= 0 ? w_off : 0;
-	int h_off = static_cast<int>(scaled_bbox.ymin());
-	h_off = h_off >= 0 ? h_off : 0;
-	int width = static_cast<int>(scaled_bbox.xmax() - scaled_bbox.xmin());
-	int height = static_cast<int>(scaled_bbox.ymax() - scaled_bbox.ymin());
-	cv::Rect bbox_roi_cross(w_off, h_off, width, height);
-	CHECK_GE(w_off, 0);
-	CHECK_GE(width, 0);
-	CHECK_LE(w_off + width, img_width);
-	CHECK_GE(h_off, 0);
-	CHECK_GE(height, 0);
-	CHECK_LE(h_off + height, img_height);
-	int crop_width = static_cast<int>(img_width * (bbox.xmax() - bbox.xmin()));
-	int crop_height = static_cast<int>(img_height * (bbox.ymax() - bbox.ymin()));
-	crop_img->create(crop_height, crop_width, CV_8UC3);
-	crop_img->setTo(cv::Scalar(0));
-
-	// if crop box out boundary image
-	// Crop the image overlapped by using bbox.
-	NormalizedBBox roi_bbox;
-	roi_bbox.set_xmin( bbox.xmin() >= 0 ? 0 : std::fabs(bbox.xmin()));
-	roi_bbox.set_ymin( bbox.ymin() >= 0 ? 0 : std::fabs(bbox.ymin()));
-	roi_bbox.set_xmax( roi_bbox.xmin() + (crossed_bbox.xmax() - crossed_bbox.xmin()));
-	roi_bbox.set_ymax( roi_bbox.ymin() + (crossed_bbox.ymax()- crossed_bbox.ymin()));
-	
-	int roi_w_off = static_cast<int>(roi_bbox.xmin() * img_width);
-	roi_w_off = roi_w_off >= 0 ? roi_w_off : 0;
-	int roi_h_off = static_cast<int>(roi_bbox.ymin() * img_height);
-	roi_h_off = roi_h_off >= 0 ? roi_h_off : 0;
-	CHECK_GE(roi_w_off, 0);
-	CHECK_LE(roi_w_off + width, crop_width);
-	CHECK_GE(roi_h_off, 0);
-	CHECK_LE(roi_h_off + height, crop_height);
-	cv::Rect bbox_roi_crop(roi_w_off, roi_h_off, width, height);
-	img(bbox_roi_cross).copyTo((*crop_img)(bbox_roi_crop));
-	
-	#endif
 }
 
 template <typename Dtype>

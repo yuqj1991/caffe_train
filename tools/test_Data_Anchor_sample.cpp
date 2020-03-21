@@ -101,6 +101,7 @@ void GenerateDataAnchorSample(cv::Mat img,
                                 const vector<NormalizedBBox_S>& object_bboxes,
                                 int resized_height, int resized_width,
                                 NormalizedBBox_S* sampled_bbox, cv::Mat *resized_img,
+                                std::vector<NormalizedBBox_S>* Resized_object_bboxes,
                                 bool do_resize){
   int img_height = img.rows;
   int img_width = img.cols;
@@ -155,7 +156,7 @@ void GenerateDataAnchorSample(cv::Mat img,
     std::cout <<"scaleChoose: "<<scaleChoose<<", Resized bbox_width: "<<Resized_bbox_width<<", Resized_bbox_height: "<<Resized_bbox_height
               <<", Resized_ori_Width: "<<Resized_ori_Width<<", Resized_ori_Height: "<<Resized_ori_Height << ", "<<", scale: "<<scale
               <<std::endl;
-    std::vector<NormalizedBBox_S>resiezed_gt_bboxes = ResizedCropSample(img, resized_img, scale, object_bboxes);
+    *Resized_object_bboxes = ResizedCropSample(img, resized_img, scale, object_bboxes);
     CHECK_EQ(Resized_ori_Height, resized_img->rows);
     CHECK_EQ(Resized_ori_Width, resized_img->cols);
     const float Resized_xmin = object_bboxes[object_bbox_index].xmin * Resized_ori_Width;
@@ -203,7 +204,8 @@ void GenerateDataAnchorSample(cv::Mat img,
 void GenerateBatchDataAnchorSamples(const cv::Mat src_img, vector<NormalizedBBox_S> object_bboxes, 
                                 const vector<std::vector<int> >& data_anchor_samplers,
                                 int resized_height, int resized_width, 
-                                NormalizedBBox_S* sampled_bbox, cv::Mat* resized_img, 
+                                NormalizedBBox_S* sampled_bbox, cv::Mat* resized_img,
+                                std::vector<NormalizedBBox_S>* Resized_object_bboxes, 
                                 bool do_resize, int max_sample) {
   CHECK_EQ(data_anchor_samplers.size(), 1);
   for (int i = 0; i < data_anchor_samplers.size(); ++i) {
@@ -214,12 +216,14 @@ void GenerateBatchDataAnchorSamples(const cv::Mat src_img, vector<NormalizedBBox
       }
       NormalizedBBox_S temp_sampled_bbox;
       cv::Mat temp_resized_img;
+      std::vector<NormalizedBBox_S> temp_resized_object_bboxes;
       GenerateDataAnchorSample(src_img, data_anchor_samplers[i], object_bboxes, resized_height, 
-                              resized_width, &temp_sampled_bbox, &temp_resized_img, do_resize);
+                              resized_width, &temp_sampled_bbox, &temp_resized_img, &temp_resized_object_bboxes, do_resize);
       if (SatisfySampleConstraint_F(temp_sampled_bbox, object_bboxes, 0.85)){
         found++;
         *sampled_bbox = temp_sampled_bbox;
         temp_resized_img.copyTo(*resized_img);
+        *Resized_object_bboxes = temp_resized_object_bboxes;
       }
     }
     if(found == 0){
@@ -228,6 +232,7 @@ void GenerateBatchDataAnchorSamples(const cv::Mat src_img, vector<NormalizedBBox
       sampled_bbox->ymin = 0.f;
       sampled_bbox->xmax = 1.f;
       sampled_bbox->ymax = 1.f;
+      *Resized_object_bboxes = object_bboxes;
     }
   }
   std::cout <<"sampled_bbox: xmin: "<<sampled_bbox->xmin <<", xmax: "<<sampled_bbox->xmax
@@ -246,10 +251,10 @@ void CropImageData_Anchor_T(const cv::Mat& img,
 	
 	float w_off = xmin, h_off = ymin, width = xmax - xmin, height = ymax - ymin;
 
-	float cross_xmin = std::min(std::max(0.f, w_off), float(img_width - 1));
-	float cross_ymin = std::min(std::max(0.f, h_off), float(img_height - 1)); 
-	float cross_xmax = std::min(std::max(0.f, w_off + width), float(img_width - 1));
-	float cross_ymax = std::min(std::max(0.f, h_off + height), float(img_height - 1));
+	float cross_xmin = std::min(std::max(0.f, w_off), float(img_width));
+	float cross_ymin = std::min(std::max(0.f, h_off), float(img_height)); 
+	float cross_xmax = std::min(std::max(0.f, w_off + width - 1), float(img_width));
+	float cross_ymax = std::min(std::max(0.f, h_off + height -1), float(img_height));
 	int cross_width = static_cast<int>(cross_xmax - cross_xmin);
 	int	cross_height = static_cast<int>(cross_ymax - cross_ymin);
 
@@ -485,13 +490,13 @@ int main(int argc, char** argv){
       int pos_suffix = img_name.find_last_of(".");
       std::string prefix_imgName = img_name.substr(0, pos_suffix);     
       NormalizedBBox_S anchorSampled_bbox;
-      std::vector<NormalizedBBox_S> transfor_gt_bboxes;
+      std::vector<NormalizedBBox_S>resized_gt_bboxes, transfor_gt_bboxes;
       cv::Mat Resized_img, cropImage;
       cv::Mat srcImg = cv::imread(img_filenames[rand_idx].first);
       std::cout<<"file: "<<img_filenames[rand_idx].first<<std::endl;
-      #if 0
+      #if 1
       GenerateBatchDataAnchorSamples(srcImg, all_gt_bboxes.find(rand_idx)->second, anchorSamples, Resized_Height, 
-                                      Resized_Width, &anchorSampled_bbox, &Resized_img, true, 20);
+                                      Resized_Width, &anchorSampled_bbox, &Resized_img, &resized_gt_bboxes, true, 20);
       #else
       GenerateLffdSample_T(srcImg, all_gt_bboxes.find(rand_idx)->second, Resized_Height, Resized_Width, &anchorSampled_bbox,
                                       low_gt_boxes_list, up_gt_boxes_list, anchor_stride_list, &Resized_img, true);
@@ -499,7 +504,7 @@ int main(int argc, char** argv){
       std::cout<<"SAMPEL SUCCESSFULLY"<<std::endl;
       //cv::imshow("Gaussian", Resized_img);
 	    //cv::waitKey(0);
-      Crop_Image_F(Resized_img, &cropImage, anchorSampled_bbox, all_gt_bboxes.find(rand_idx)->second, &transfor_gt_bboxes);
+      Crop_Image_F(Resized_img, &cropImage, anchorSampled_bbox, resized_gt_bboxes, &transfor_gt_bboxes);
       std::cout<<"CROP IMAGE SAMPEL SUCCESSFULLY"<<std::endl;
       std::string saved_img_name = save_folder + "/" + prefix_imgName + "_" + to_string(ii) + "_" + to_string(jj) +".jpg";
       std::cout << "gt transfor_gt_bboxes size: "<< transfor_gt_bboxes.size()<<std::endl;
