@@ -4244,7 +4244,7 @@ layer {
 		share_location: true
 		keep_top_k: 200
 		confidence_threshold: 0.15
-		ignore_thresh: 0.15
+		ignore_thresh: 0.3
 	}
 }
 layer {

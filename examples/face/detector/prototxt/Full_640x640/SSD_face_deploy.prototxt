@@ -3455,7 +3455,7 @@ layer {
 		share_location: true
 		background_label_id: 0
 		nms_param {
-			nms_threshold: 0.15
+			nms_threshold: 0.3
 			top_k: 200
 		}
 		code_type: RECEPTIVE_CENTER

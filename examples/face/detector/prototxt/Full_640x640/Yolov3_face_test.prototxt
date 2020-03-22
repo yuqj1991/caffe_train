@@ -1786,7 +1786,7 @@ layer {
 
 	yolov3_detection_output_param {
 		confidence_threshold: 0.15
-		nms_threshold: 0.15
+		nms_threshold: 0.3
 		num_classes: 1
 
 		#anchor_scale list(width, height)
