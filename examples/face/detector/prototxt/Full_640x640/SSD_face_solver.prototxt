@@ -13,13 +13,13 @@ solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
 test_initialization: false
-max_iter: 240000
+max_iter: 200000
 average_loss: 10
 stepvalue: 35000
-stepvalue: 80000
-stepvalue: 120000
-stepvalue: 160000
-stepvalue: 200000
+stepvalue: 60000
+stepvalue: 100000
+stepvalue: 140000
+stepvalue: 180000
 iter_size: 4
 momentum: 0.9
 #momentum2 : 0.99
