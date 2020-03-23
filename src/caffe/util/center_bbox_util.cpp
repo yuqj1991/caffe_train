@@ -765,8 +765,10 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
         }
         int label_index = b * num_channels * dimScale + (4 + label_idx) * dimScale + h * output_width + w;
         if(label_value != 0.){
-          loss -= log(std::max(pre_data[label_index],
-                           Dtype(FLT_MIN)));
+          Dtype pred_data_value = std::max(pre_data[label_index],Dtype(FLT_MIN));
+          if(pred_data_value == Dtype(FLT_MIN))
+            LOG(INFO)<<"pred_data_value: "<<pred_data_value;
+          loss -= log(pred_data_value);
           bottom_diff[label_index] -= 1;
         }
       }
@@ -808,21 +810,16 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
       // 每个样本组减去最大值， 计算exp，求和
       for(int c = 0; c< label_channel; c++){
         pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
-        LOG(INFO)<<"pred: "<<pred_data[class_index + c * dimScale];
         sumValue += pred_data[class_index + c * dimScale];
       }
       // 计算softMax
       for(int c = 0; c< label_channel; c++){
         pred_data[class_index + c * dimScale] = Dtype(pred_data[class_index + c * dimScale] / sumValue);
       }
-      LOG(INFO)<<" bk_0: "<<pred_data[class_index + 0 * dimScale]
-               <<", face_1: "<<pred_data[class_index + 1 * dimScale];
       CHECK_GE(pred_data[class_index + 0 * dimScale], 0);
       CHECK_GE(pred_data[class_index + 1 * dimScale], 0);
       CHECK_LE(pred_data[class_index + 0 * dimScale], 1);
       CHECK_LE(pred_data[class_index + 1 * dimScale], 1);
-      LOG(INFO)<<"sumValue: "<<sumValue<<", sum pred_data: "
-               <<pred_data[class_index + 0 * dimScale] + pred_data[class_index + 1 * dimScale];
     }
   }
 }
