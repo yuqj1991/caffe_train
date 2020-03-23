@@ -769,7 +769,7 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
         int label_index = b * num_channels * dimScale + (4 + label_idx) * dimScale + h * output_width + w;
         Dtype pred_data_value = std::max(pre_data[label_index],Dtype(FLT_MIN));
         loss -= log(pred_data_value);
-        bottom_diff[label_index] -= 1;
+        bottom_diff[label_index] = pre_data[label_index] - 1;
       }
     }
   }
