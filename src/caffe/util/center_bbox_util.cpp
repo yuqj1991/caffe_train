@@ -815,10 +815,10 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
         pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
         sumValue += pred_data[class_index + c * dimScale];
       }
-      // 计算softMax
       CHECK_GT(sumValue , 0)<<pred_data[class_index + 0 * dimScale]<<", "
                             <<pred_data[class_index + 1 * dimScale]<<", maxValue: "
                             <<MaxVaule<<", bg_0: "<<pred_1<<", face_1: "<<pred_2;
+      // 计算softMax
       for(int c = 0; c< label_channel; c++){
         pred_data[class_index + c * dimScale] = Dtype(pred_data[class_index + c * dimScale] / sumValue);
       }
