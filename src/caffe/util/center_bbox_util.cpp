@@ -815,10 +815,10 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
       for(int c = 0; c< label_channel; c++){
         pred_data[class_index + c * dimScale] = Dtype(pred_data[class_index + c * dimScale] / sumValue);
       }
-      CHECK_GE(pred_data[class_index + 0 * dimScale], 0);
-      CHECK_GE(pred_data[class_index + 1 * dimScale], 0);
-      CHECK_LE(pred_data[class_index + 0 * dimScale], 1);
-      CHECK_LE(pred_data[class_index + 1 * dimScale], 1);
+      CHECK_GE(pred_data[class_index + 0 * dimScale], 0)<<"sumValue: "<<sumValue;
+      CHECK_GE(pred_data[class_index + 1 * dimScale], 0)<<"sumValue: "<<sumValue;
+      CHECK_LE(pred_data[class_index + 0 * dimScale], 1)<<"sumValue: "<<sumValue;
+      CHECK_LE(pred_data[class_index + 1 * dimScale], 1)<<"sumValue: "<<sumValue;
     }
   }
 }
