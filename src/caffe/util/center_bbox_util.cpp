@@ -796,26 +796,24 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
             const int label_channel, const int num_channels,
             const int outheight, const int outwidth){
   int dimScale = outheight * outwidth;
-  for(int b = 0; b < batch_size; b++){
-    for(int h = 0; h < outheight; h++){
-      for(int w = 0; w < outwidth; w++){
-        int class_index = h * outwidth + w;
-        Dtype MaxVaule = Dtype(0.f);
-        Dtype sumValue = Dtype(0.f);
-        // 求出每组的最大值
-        for(int c = 0; c< label_channel; c++){
-          MaxVaule = std::max(MaxVaule, pred_data[class_index + c * dimScale]);
-        }
-        // 每个样本组减去最大值， 计算exp，求和
-        for(int c = 0; c< label_channel; c++){
-          pred_data[class_index + c * dimScale] -= MaxVaule;
-          pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale]);
-          sumValue += pred_data[class_index + c * dimScale];
-        }
-        // 计算softMax
-        for(int c = 0; c< label_channel; c++){
-          pred_data[class_index + c * dimScale] = Dtype(pred_data[class_index + c * dimScale] / sumValue);
-        }
+  for(int h = 0; h < outheight; h++){
+    for(int w = 0; w < outwidth; w++){
+      int class_index = h * outwidth + w;
+      Dtype MaxVaule = Dtype(0.f);
+      Dtype sumValue = Dtype(0.f);
+      // 求出每组的最大值
+      for(int c = 0; c< label_channel; c++){
+        MaxVaule = std::max(MaxVaule, pred_data[class_index + c * dimScale]);
+      }
+      // 每个样本组减去最大值， 计算exp，求和
+      for(int c = 0; c< label_channel; c++){
+        pred_data[class_index + c * dimScale] -= MaxVaule;
+        pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale]);
+        sumValue += pred_data[class_index + c * dimScale];
+      }
+      // 计算softMax
+      for(int c = 0; c< label_channel; c++){
+        pred_data[class_index + c * dimScale] = Dtype(pred_data[class_index + c * dimScale] / sumValue);
       }
     }
   }
@@ -1206,7 +1204,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   // 计算softMax loss value 
   select_hard_sample(class_label, channel_pred_data, 10, postive_batch, 
                         output_height, output_width, num_channels, batch_size);
-  softmax_loss_entropy(class_label, channel_pred_data, batch_size, output_height,
+  score_loss = softmax_loss_entropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
   return score_loss;
