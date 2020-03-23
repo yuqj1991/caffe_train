@@ -4835,7 +4835,7 @@ layer {
 	loss_weight: 1.0
 	center_object_loss_param {
 		loc_weight: 1.0
-		num_class: 1
+		num_class: 2
 		share_location: true
 		net_height: 640
 		net_width: 640
@@ -4866,7 +4866,7 @@ layer {
 	loss_weight: 1.0
 	center_object_loss_param {
 		loc_weight: 1.0
-		num_class: 1
+		num_class: 2
 		share_location: true
 		net_height: 640
 		net_width: 640
@@ -4897,7 +4897,7 @@ layer {
 	loss_weight: 1.0
 	center_object_loss_param {
 		loc_weight: 1.0
-		num_class: 1
+		num_class: 2
 		share_location: true
 		net_height: 640
 		net_width: 640
@@ -4928,7 +4928,7 @@ layer {
 	loss_weight: 1.0
 	center_object_loss_param {
 		loc_weight: 1.0
-		num_class: 1
+		num_class: 2
 		share_location: true
 		net_height: 640
 		net_width: 640
