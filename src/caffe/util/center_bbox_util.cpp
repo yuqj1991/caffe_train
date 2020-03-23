@@ -820,6 +820,7 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
       CHECK_GT(pred_data[class_index + 1 * dimScale], 0);
       CHECK_LT(pred_data[class_index + 0 * dimScale], 1);
       CHECK_LT(pred_data[class_index + 1 * dimScale], 1);
+      LOG(INFO)<<"sumValue: "<<sumValue<<", predta: "<<pred_data[class_index + 0 * dimScale] + pred_data[class_index + 1 * dimScale];
     }
   }
 }
