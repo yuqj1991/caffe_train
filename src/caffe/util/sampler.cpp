@@ -27,7 +27,7 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
 	NormalizedBBox sampled_bbox;
   SampleConstraint min_object_coverage_Constraint;
   min_object_coverage_Constraint.set_min_object_coverage(0.85);
-  if(SatisfySampleConstraint(*sampled_bbox, object_bboxes, min_object_coverage_Constraint)){
+  if(SatisfySampleConstraint(sampled_bbox, object_bboxes, min_object_coverage_Constraint)){
     sampled_bbox.set_xmin(off_x);
     sampled_bbox.set_ymin(off_y);
     sampled_bbox.set_xmax(off_x + img_w);
