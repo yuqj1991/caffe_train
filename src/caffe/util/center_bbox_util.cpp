@@ -796,6 +796,7 @@ template <typename Dtype>
 void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
             const int label_channel, const int num_channels,
             const int outheight, const int outwidth){
+  CHECK_GT(label_channel, 1);
   int dimScale = outheight * outwidth;
   for(int h = 0; h < outheight; h++){
     for(int w = 0; w < outwidth; w++){
