@@ -158,22 +158,6 @@ layer {
 			max_sample: 1
 			max_trials: 50
 		}
-		bbox_sampler{
-			bbox_small_scale: 8
-			bbox_small_scale: 25
-			bbox_small_scale: 110
-			bbox_small_scale: 210
-			
-			bbox_large_scale: 25
-			bbox_large_scale: 110
-			bbox_large_scale: 210
-			bbox_large_scale: 500
-			
-			ancher_stride: 4
-			ancher_stride: 8
-			ancher_stride: 16
-			ancher_stride: 32
-		}
 		crop_type: CROP_METHOD_RANDOM
 		up_prob: 0.7
 		low_prob: 0.3
