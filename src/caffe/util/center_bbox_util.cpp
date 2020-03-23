@@ -807,8 +807,7 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
       }
       // 每个样本组减去最大值， 计算exp，求和
       for(int c = 0; c< label_channel; c++){
-        pred_data[class_index + c * dimScale] -= MaxVaule;
-        pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale]);
+        pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
         sumValue += pred_data[class_index + c * dimScale];
       }
       // 计算softMax
@@ -1202,7 +1201,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  select_hard_sample(class_label, channel_pred_data, 10, postive_batch, 
+  select_hard_sample(class_label, channel_pred_data, 5, postive_batch, 
                         output_height, output_width, num_channels, batch_size);
   score_loss = softmax_loss_entropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
