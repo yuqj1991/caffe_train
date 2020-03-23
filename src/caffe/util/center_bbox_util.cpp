@@ -808,6 +808,7 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
         MaxVaule = std::max(MaxVaule, pred_data[class_index + c * dimScale]);
       }
       // 每个样本组减去最大值， 计算exp，求和
+      LOG(INFO)<<"maxVaule: "<<MaxVaule;
       for(int c = 0; c< label_channel; c++){
         pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
         sumValue += pred_data[class_index + c * dimScale];
