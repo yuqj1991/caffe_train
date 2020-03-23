@@ -9,7 +9,7 @@
 
 namespace caffe {
 
-void GenerateJitterSamples(float jitter, vector<NormalizedBBox>* sampled_bboxes);
+void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vector<NormalizedBBox>* sampled_bboxes);
 
 // Find all annotated NormalizedBBox.
 void GroupObjectBBoxes(const AnnotatedDatum& anno_datum,

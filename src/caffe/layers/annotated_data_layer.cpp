@@ -212,7 +212,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         // Generate sampled bboxes from expand_datum.
         vector<NormalizedBBox> sampled_bboxes;
         if(YoloFormat_)
-          GenerateJitterSamples(0.3, &sampled_bboxes);
+          GenerateJitterSamples(*expand_datum, 0.3, &sampled_bboxes);
         else
           GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
         if (sampled_bboxes.size() > 0) {
