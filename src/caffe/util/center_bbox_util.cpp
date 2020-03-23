@@ -808,19 +808,21 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
       // 每个样本组减去最大值， 计算exp，求和
       for(int c = 0; c< label_channel; c++){
         pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
+        LOG(INFO)<<"pred: "<<pred_data[class_index + c * dimScale];
         sumValue += pred_data[class_index + c * dimScale];
       }
-      LOG(INFO)<<"sumValue: "<<sumValue;
       // 计算softMax
       for(int c = 0; c< label_channel; c++){
         pred_data[class_index + c * dimScale] = Dtype(pred_data[class_index + c * dimScale] / sumValue);
       }
-      LOG(INFO)<<" bk_0: "<<pred_data[class_index + 0 * dimScale]<<", face_1: "<<pred_data[class_index + 1 * dimScale];
+      LOG(INFO)<<" bk_0: "<<pred_data[class_index + 0 * dimScale]
+               <<", face_1: "<<pred_data[class_index + 1 * dimScale];
       CHECK_GT(pred_data[class_index + 0 * dimScale], 0);
       CHECK_GT(pred_data[class_index + 1 * dimScale], 0);
       CHECK_LT(pred_data[class_index + 0 * dimScale], 1);
       CHECK_LT(pred_data[class_index + 1 * dimScale], 1);
-      LOG(INFO)<<"sumValue: "<<sumValue<<", sum pred_data: "<<pred_data[class_index + 0 * dimScale] + pred_data[class_index + 1 * dimScale];
+      LOG(INFO)<<"sumValue: "<<sumValue<<", sum pred_data: "
+               <<pred_data[class_index + 0 * dimScale] + pred_data[class_index + 1 * dimScale];
     }
   }
 }
