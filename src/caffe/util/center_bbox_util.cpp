@@ -854,7 +854,7 @@ void select_hard_sample(Dtype *label_data, Dtype *pred_data,
       for(int w = 0; w < output_width; w ++){
         if(label_data[b * dimScale + h * output_width +w] != 1){
           int negative_index = h * output_width + w;
-          Dtype perd_ = pred_data[b * num_channels * dimScale  + 5 * dimScale + h * output_width + w];
+          Dtype perd_ = pred_data[b * num_channels * dimScale  + 4 * dimScale + h * output_width + w];
           Dtype loss = (-1) * log(std::max(perd_,  Dtype(FLT_MIN)));
           loss_value_indices.push_back(std::make_pair(negative_index, loss));
         }
