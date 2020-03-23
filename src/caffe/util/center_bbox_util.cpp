@@ -817,10 +817,10 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
       }
       LOG(INFO)<<" bk_0: "<<pred_data[class_index + 0 * dimScale]
                <<", face_1: "<<pred_data[class_index + 1 * dimScale];
-      CHECK_GT(pred_data[class_index + 0 * dimScale], 0);
-      CHECK_GT(pred_data[class_index + 1 * dimScale], 0);
-      CHECK_LT(pred_data[class_index + 0 * dimScale], 1);
-      CHECK_LT(pred_data[class_index + 1 * dimScale], 1);
+      CHECK_GE(pred_data[class_index + 0 * dimScale], 0);
+      CHECK_GE(pred_data[class_index + 1 * dimScale], 0);
+      CHECK_LE(pred_data[class_index + 0 * dimScale], 1);
+      CHECK_LE(pred_data[class_index + 1 * dimScale], 1);
       LOG(INFO)<<"sumValue: "<<sumValue<<", sum pred_data: "
                <<pred_data[class_index + 0 * dimScale] + pred_data[class_index + 1 * dimScale];
     }
