@@ -760,7 +760,7 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
         Dtype label_value = Dtype(label_data[b * dimScale + h * output_width + w]);
         if(label_value == 0.5)
           label_idx = 0;
-        else{
+        else if(label_value == 1.0){
           label_idx = 1;
         }
         int label_index = b * num_channels * dimScale + (4 + label_idx) * dimScale + h * output_width + w;
