@@ -319,7 +319,10 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     max_resize_val = COMPAREMIN((float)anchorScale[range_idx_size] * 2,
                                                   2*std::sqrt(bbox_aera));
     CHECK_LE(min_resize_val, max_resize_val);
-    caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
+    if(min_resize_val <= max_resize_val)
+      caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
+    else
+      caffe_rng_uniform(1, max_resize_val, min_resize_val, &scaleChoose);
   }else{
     min_resize_val = anchorScale[range_idx_size] / 2;
     max_resize_val = (float)anchorScale[range_idx_size] * 2;
