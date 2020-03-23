@@ -178,6 +178,7 @@ layer {
 		up_prob: 0.7
 		low_prob: 0.3
 		label_map_file: "../labelmap.prototxt"
+		yoloformat: true
 	}
 }
 
