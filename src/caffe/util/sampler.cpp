@@ -33,10 +33,10 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
     sampled_bbox.set_xmax(off_x + img_w);
     sampled_bbox.set_ymax(off_y + img_h);
   }else{
-    sampled_bbox->set_xmin(0.f);
-    sampled_bbox->set_ymin(0.f);
-    sampled_bbox->set_xmax(1.f);
-    sampled_bbox->set_ymax(1.f);
+    sampled_bbox.set_xmin(0.f);
+    sampled_bbox.set_ymin(0.f);
+    sampled_bbox.set_xmax(1.f);
+    sampled_bbox.set_ymax(1.f);
   }
 	sampled_bboxes->push_back(sampled_bbox);
 
