@@ -961,13 +961,13 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
         }
         for(int h = 0; h < output_height; h++){
           for(int w = 0; w < output_width; w++){
-            if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
+            if((w + (anchor_scale/downRatio) / 2 >= output_width - 1) || (w + (anchor_scale/downRatio) / 2 < xmin))
               continue;
-            if(h + (anchor_scale/downRatio) / 2>= output_height - 1)
+            if((h + (anchor_scale/downRatio) / 2>= output_height - 1) || (h + (anchor_scale/downRatio) / 2) < ymin)
               continue;
-            if(w - (anchor_scale/downRatio) / 2 < 0)
+            if((w - (anchor_scale/downRatio) / 2 < 0) || (w - (anchor_scale/downRatio) / 2) > xmax)
               continue;
-            if(h - (anchor_scale/downRatio) / 2 < 0)
+            if((h - (anchor_scale/downRatio) / 2 < 0) || || (h - (anchor_scale/downRatio) / 2) > ymax)
               continue;
             int x_index = b * num_channels * dimScale
                                   + 0* dimScale + h * output_width + w;
@@ -993,8 +993,6 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
             anchorBbox.set_ymin(bb_ymin);
             anchorBbox.set_ymax(bb_ymax);
             float iou = YoloBBoxIou(anchorBbox, gt_bboxes[ii]);
-            if(iou == 0)
-              continue;
             if(iou > ignore_thresh){
               bottom_diff[object_index] = 0;
               class_label[class_index] = 0.5;
