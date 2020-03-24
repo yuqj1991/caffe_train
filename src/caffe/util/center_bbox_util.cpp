@@ -781,10 +781,8 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
       int label_index = b * num_channels * dimScale + 4 * dimScale;
       caffe_scal(2 * dimScale, loss_weight, bottom_diff + label_index);
     }
-    //LOG(INFO)<<"loss: "<<loss <<", count: "<<count<<", loss * loss_weight: "<<loss * loss_weight;
     return loss * loss_weight;
   }else{
-    //LOG(INFO)<<"loss: "<<loss <<", count: "<<count;
     return loss;
   }
 }
@@ -833,7 +831,7 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
                             <<MaxVaule<<", bg_0: "<<pred_1<<", face_1: "<<pred_2;
       // 计算softMax
       for(int c = 0; c< label_channel; c++){
-        pred_data[class_index + c * dimScale] = Dtype(pred_data[class_index + c * dimScale] / sumValue);
+        pred_data[class_index + c * dimScale] = pred_data[class_index + c * dimScale] / sumValue;
       }
       CHECK_GE(pred_data[class_index + 0 * dimScale], 0)<<"sumValue: "<<sumValue;
       CHECK_GE(pred_data[class_index + 1 * dimScale], 0)<<"sumValue: "<<sumValue;
