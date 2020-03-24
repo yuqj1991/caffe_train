@@ -967,16 +967,8 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
               continue;
             if((w - (anchor_scale/downRatio) / 2 < 0) || (w - (anchor_scale/downRatio) / 2) > xmax)
               continue;
-            if((h - (anchor_scale/downRatio) / 2 < 0) || || (h - (anchor_scale/downRatio) / 2) > ymax)
+            if((h - (anchor_scale/downRatio) / 2 < 0) || (h - (anchor_scale/downRatio) / 2) > ymax)
               continue;
-            int x_index = b * num_channels * dimScale
-                                  + 0* dimScale + h * output_width + w;
-            int y_index = b * num_channels * dimScale 
-                                      + 1* dimScale + h * output_width + w;
-            int width_index = b * num_channels * dimScale
-                                      + 2* dimScale + h * output_width + w;
-            int height_index = b * num_channels * dimScale 
-                                      + 3* dimScale + h * output_width + w;
             int object_index = b * num_channels * dimScale 
                                   + 4* dimScale + h * output_width + w;
             int class_index = b * dimScale
