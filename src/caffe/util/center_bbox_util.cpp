@@ -775,6 +775,7 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
       }
     }
   }
+  LOG(INFO)<<"loss: "<<loss <<", count: "<<count;
   if(count >0){
     Dtype loss_weight = Dtype(1 / count);
     for(int b = 0; b < batch_size; b++){
