@@ -776,7 +776,7 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
     }
   }
   if(count >0){
-    Dtype loss_weight = Dtype(1 / count);
+    Dtype loss_weight = 1.0 / count;
     for(int b = 0; b < batch_size; b++){
       int label_index = b * num_channels * dimScale + 4 * dimScale;
       caffe_scal(2 * dimScale, loss_weight, bottom_diff + label_index);
