@@ -754,6 +754,7 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
   Dtype loss = Dtype(0.f);
   int dimScale = output_height * output_width;
   int label_idx = 0;
+  int count = 0;
   for(int b = 0; b < batch_size; b++){
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
@@ -770,10 +771,17 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
         Dtype pred_data_value = std::max(pre_data[label_index],Dtype(FLT_MIN));
         loss -= log(pred_data_value);
         bottom_diff[label_index] = pre_data[label_index] - 1;
+        count++;
       }
     }
   }
-  return loss;
+  Dtype loss_weight = Dtype(1 / count);
+  for(int b = 0; b < batch_size; b++){
+    int label_index = b * num_channels * dimScale + 4 * dimScale;
+    caffe_scal(2 * dimScale, loss_weight, bottom_diff + label_index);
+  }
+  
+  return loss * loss_weight;
 }
 
 template float softmax_loss_entropy(float* label_data, float* pre_data, 
