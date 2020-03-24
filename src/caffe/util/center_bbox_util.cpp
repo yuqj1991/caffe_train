@@ -775,18 +775,18 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
       }
     }
   }
-  LOG(INFO)<<"loss: "<<loss <<", count: "<<count;
   if(count >0){
     Dtype loss_weight = Dtype(1 / count);
     for(int b = 0; b < batch_size; b++){
       int label_index = b * num_channels * dimScale + 4 * dimScale;
       caffe_scal(2 * dimScale, loss_weight, bottom_diff + label_index);
     }
+    LOG(INFO)<<"loss: "<<loss <<", count: "<<count<<", loss * loss_weight: "<<loss * loss_weight;
     return loss * loss_weight;
   }else{
+    LOG(INFO)<<"loss: "<<loss <<", count: "<<count;
     return loss;
   }
-  
 }
 
 template float softmax_loss_entropy(float* label_data, float* pre_data, 
