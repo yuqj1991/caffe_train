@@ -110,13 +110,17 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
                           ignore_thresh_, &count_postive_);
       const Dtype * diff = bottom[0]->cpu_diff();
-      
+
       int dimScale = output_height * output_width;
       for(int b = 0; b < num_; b++){
         for(int j = 0; j < (4 + 1) * dimScale; j++){ // loc loss + objectness loss
           sum_squre += diff[b * (4 + 1 + num_classes_) * dimScale + j] * diff[b * (4 + 1 + num_classes_) * dimScale + j];
         }
       }
+      if(count_postive_ > 0)
+        top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / count_postive_;
+      else
+        top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / num_; 
     }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
       class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
                           downRatio,
@@ -132,11 +136,12 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
           sum_squre += diff[b * (4 + num_classes_) * dimScale + j] * diff[b * (4 + num_classes_) * dimScale + j];
         }
       }
-    }
-    if(count_postive_ > 0)
-        top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / count_postive_;
+      if(count_postive_ > 0)
+        top[0]->mutable_cpu_data()[0] = (sum_squre) / count_postive_ + class_score;
       else
-        top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / num_;    
+        top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / num_; 
+    }
+    
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
   }
@@ -187,13 +192,34 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                                                     logistic_gradient(bottom_data[object_index + i]);
         }
       }
+      Dtype loss_weight = Dtype(0.);
+      if(count_postive_ > 0)
+        loss_weight = top[0]->cpu_diff()[0] / count_postive_;
+      else 
+        loss_weight = top[0]->cpu_diff()[0] / num_;
+      caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
+    }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
+      Dtype loss_weight = Dtype(0.);
+      if(count_postive_ > 0){
+        loss_weight = top[0]->cpu_diff()[0] / count_postive_;
+        const int output_height = bottom[0]->height();
+        const int output_width = bottom[0]->width();
+        const int num_channels = bottom[0]->channels();
+        Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+        const Dtype* bottom_data = bottom[0]->cpu_data();
+        num_ = bottom[0]->num();
+        int dimScale = output_height * output_width;
+        for(int b = 0; b < num_; b++){
+          for(int i = 0; i < 4 * dimScale; i++){
+            bottom_diff[b *num_channels * dimScale + i] = bottom_diff[b *num_channels * dimScale + i] * loss_weight;
+          }
+        }
+      }else{
+        loss_weight = top[0]->cpu_diff()[0] / num_;
+        caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
+      }
     }
-    Dtype loss_weight = Dtype(0.);
-    if(count_postive_ > 0)
-      loss_weight = top[0]->cpu_diff()[0] / count_postive_;
-    else 
-      loss_weight = top[0]->cpu_diff()[0] / num_;
-    caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
+    
   }
 }
 
