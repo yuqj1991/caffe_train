@@ -1099,7 +1099,7 @@ void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channe
         if((xmax - xmin) <= 0 || (ymax - ymin) <= 0)
           continue;                                     
         
-        Dtype label_score = channel_pred_data[class_index]; /** channel_pred_data[object_index];*/
+        Dtype label_score = channel_pred_data[class_index]* channel_pred_data[object_index];
         
         if(label_score >= conf_thresh){
             CenterNetInfo temp_result;
