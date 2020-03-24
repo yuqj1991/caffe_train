@@ -932,36 +932,9 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
     int count = 0;
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
-        int x_index = b * num_channels * dimScale
-                                  + 0* dimScale + h * output_width + w;
-        int y_index = b * num_channels * dimScale 
-                                  + 1* dimScale + h * output_width + w;
-        int width_index = b * num_channels * dimScale
-                                  + 2* dimScale + h * output_width + w;
-        int height_index = b * num_channels * dimScale 
-                                  + 3* dimScale + h * output_width + w;
         int object_index = b * num_channels * dimScale 
                                   + 4* dimScale + h * output_width + w;
-        NormalizedBBox predBox;
-        float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /downRatio) / output_width;
-        float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /downRatio) / output_height;
-        float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /downRatio) / output_width;
-        float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /downRatio) /output_height;
-        predBox.set_xmin(bb_xmin);
-        predBox.set_xmax(bb_xmax);
-        predBox.set_ymin(bb_ymin);
-        predBox.set_ymax(bb_ymax);
-        float best_iou = 0;
-        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-          float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
-          if (iou > best_iou) {
-            best_iou = iou;
-          }
-        }
-        bottom_diff[object_index] = (-1) * (0 - channel_pred_data[object_index]);
-        if(best_iou > ignore_thresh){
-          bottom_diff[object_index] = 0;
-        }
+        bottom_diff[object_index] = (-1) * (0 - channel_pred_data[object_index]);  
       }
     }
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -986,6 +959,43 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
             class_label[class_index] = 0.5;
           }
         }
+        for(int h = 0; h < output_height; h++){
+          for(int w = 0; w < output_width; w++){
+            int x_index = b * num_channels * dimScale
+                                  + 0* dimScale + h * output_width + w;
+            int y_index = b * num_channels * dimScale 
+                                      + 1* dimScale + h * output_width + w;
+            int width_index = b * num_channels * dimScale
+                                      + 2* dimScale + h * output_width + w;
+            int height_index = b * num_channels * dimScale 
+                                      + 3* dimScale + h * output_width + w;
+            int object_index = b * num_channels * dimScale 
+                                  + 4* dimScale + h * output_width + w;
+            NormalizedBBox predBox;
+            float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /downRatio) / output_width;
+            float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /downRatio) / output_height;
+            float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /downRatio) / output_width;
+            float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /downRatio) /output_height;
+            predBox.set_xmin(bb_xmin);
+            predBox.set_xmax(bb_xmax);
+            predBox.set_ymin(bb_ymin);
+            predBox.set_ymax(bb_ymax);
+            float best_iou = 0;
+            for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+              float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+              if (iou > best_iou) {
+                best_iou = iou;
+              }
+            }
+            if(best_iou > ignore_thresh){
+              bottom_diff[object_index] = 0;
+              int class_index = b * dimScale
+                                  +  h * output_width + w;
+              class_label[class_index] = 0.5;
+            }
+          }
+        }
+        
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)

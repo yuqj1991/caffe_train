@@ -41,7 +41,6 @@ struct NormalizedBBox_S{
    float ymax;
 };
 
-#define LOG_DEBUG(val, ###fmt,)
 
 bool SatisfySampleConstraint_F(NormalizedBBox_S sample_bbox, 
                               std::vector<NormalizedBBox_S> object_bboxes,
