@@ -4714,7 +4714,7 @@ layer {
 		share_location: true
 		keep_top_k: 200
 		confidence_threshold: 0.15
-		ignore_thresh: 0.45
+		ignore_thresh: 0.3
 		bias_scale: 550
 		bias_scale: 250
 		bias_scale: 110
