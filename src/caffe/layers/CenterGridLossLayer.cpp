@@ -118,13 +118,6 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
           sum_squre += diff[b * (4 + 1 + num_classes_) * dimScale + j] * diff[b * (4 + 1 + num_classes_) * dimScale + j];
         }
       }
-      if(count_postive_ > 0){
-        loc_loss = sum_squre / count_postive_;
-        score_loss = class_score / count_postive_;
-      }else{
-        loc_loss = sum_squre / num_;
-        score_loss = class_score / num_;
-      }
     }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
       class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
                           downRatio,
@@ -132,12 +125,13 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                           bbox_range_scale_,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
                           ignore_thresh_, &count_postive_, &sum_squre);
-      if(count_postive_ > 0){
-        loc_loss = sum_squre / count_postive_;
-      }else{
-        loc_loss = sum_squre / num_;
-      }
-      score_loss = class_score;
+    }
+    if(count_postive_ > 0){
+      loc_loss = sum_squre / count_postive_;
+      score_loss = class_score / count_postive_;
+    }else{
+      loc_loss = sum_squre / num_;
+      score_loss = class_score / num_;
     }
     top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
   } else {
@@ -184,12 +178,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       }
       caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
     }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
-      for(int b = 0; b < num_; b++){
-        int loc_index = b * num_channels * dimScale;
-        for(int i = 0; i < 4 * dimScale; i++){
-          bottom_diff[loc_index + i] = bottom_diff[loc_index + i] * loss_weight;
-        }
-      }
+      caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
     }
   }
 }

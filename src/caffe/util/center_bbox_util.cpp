@@ -775,10 +775,7 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
       }
     }
   }
-  if(count > 0){
-    return loss / count;
-  }else
-    return loss;
+  return loss;
 }
 
 template float softmax_loss_entropy(float* label_data, float* pre_data, 
