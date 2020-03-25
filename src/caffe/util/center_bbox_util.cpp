@@ -1189,10 +1189,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
               continue;
             if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
               continue;
-            Dtype xmin_bias = (w - xmin) * downRatio / (anchor_scale * 2);
-            Dtype ymin_bias = (h - ymin) * downRatio / (anchor_scale * 2);
-            Dtype xmax_bias = (w - xmax) * downRatio / (anchor_scale * 2);
-            Dtype ymax_bias = (h - ymax) * downRatio / (anchor_scale * 2);
+            Dtype xmin_bias = (w - xmin) * downRatio * 2 / anchor_scale;
+            Dtype ymin_bias = (h - ymin) * downRatio * 2 / anchor_scale;
+            Dtype xmax_bias = (w - xmax) * downRatio * 2 / anchor_scale;
+            Dtype ymax_bias = (h - ymax) * downRatio * 2 / anchor_scale;
             int x_index = b * num_channels * dimScale
                                       + 0* dimScale + h * output_width + w;
             int y_index = b * num_channels * dimScale 
@@ -1202,7 +1202,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int height_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
             
-            float delta_scale = 1; //2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
+            float delta_scale = 2; //2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
             bottom_diff[x_index] = (-1) * delta_scale * (xmin_bias - channel_pred_data[x_index]);
             bottom_diff[y_index] = (-1) * delta_scale * (ymin_bias - channel_pred_data[y_index]);
             bottom_diff[width_index] = (-1) * delta_scale * (xmax_bias - channel_pred_data[width_index]);
