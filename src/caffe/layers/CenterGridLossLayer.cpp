@@ -100,6 +100,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   Dtype class_score = Dtype(0.);
   Dtype sum_squre = Dtype(0.);
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
+  Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.);
   if (num_groundtruth_ >= 1) {
     const int downRatio = net_height_ / output_height;
     if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
@@ -117,6 +118,13 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
           sum_squre += diff[b * (4 + 1 + num_classes_) * dimScale + j] * diff[b * (4 + 1 + num_classes_) * dimScale + j];
         }
       }
+      if(count_postive_ > 0){
+        loc_loss = sum_squre / count_postive_;
+        score_loss = class_score / count_postive_;
+      }else{
+        loc_loss = sum_squre / num_;
+        score_loss = class_score / num_;
+      }
     }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
       class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
                           downRatio,
@@ -132,30 +140,19 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
           sum_squre += diff[b * (4 + num_classes_) * dimScale + j] * diff[b * (4 + num_classes_) * dimScale + j];
         }
       }
-    }
-    if(count_postive_ > 0){
-      if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
-        top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / count_postive_;
-      }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
-        top[0]->mutable_cpu_data()[0] = sum_squre / count_postive_ + class_score;
+      if(count_postive_ > 0){
+        loc_loss = sum_squre / count_postive_;
+      }else{
+        loc_loss = sum_squre / num_;
       }
+      score_loss = class_score;
     }
+    top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
   }
   #if 1 
   if(iterations_ % 100 == 0){
-    Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.);
-
-    if(count_postive_ > 0){
-      if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
-        loc_loss = sum_squre / count_postive_;
-        score_loss = class_score / count_postive_;
-      }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
-        loc_loss = sum_squre / count_postive_;
-        score_loss = class_score;
-      }
-    }
     LOG(INFO)<<"all num_gt boxes: "<<num_gt_<<", Region "<<output_width
               <<": total loss: "<<top[0]->mutable_cpu_data()[0]
               <<", loc loss: "<< loc_loss
