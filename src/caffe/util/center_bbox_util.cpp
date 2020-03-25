@@ -914,6 +914,7 @@ Dtype smoothL1_Loss(Dtype x, Dtype* x_diff){
     loss = fabs_x_value - 0.5;
     *x_diff = (Dtype(0) < x) - (x < Dtype(0));
   }
+  return loss;
 }
 template float smoothL1_Loss(float x, float* x_diff);
 template double smoothL1_Loss(double x, double* x_diff);
