@@ -4840,7 +4840,7 @@ layer {
 		net_height: 640
 		net_width: 640
 		ignore_thresh: 0.3
-		bias_scale: 550
+		bias_scale: 512
 		low_bbox_scale: 210
 		up_bbox_scale: 500
 
@@ -4871,7 +4871,7 @@ layer {
 		net_height: 640
 		net_width: 640
 		ignore_thresh: 0.3
-		bias_scale: 250
+		bias_scale: 256
 		low_bbox_scale: 110
 		up_bbox_scale: 210
 
@@ -4902,7 +4902,7 @@ layer {
 		net_height: 640
 		net_width: 640
 		ignore_thresh: 0.3
-		bias_scale: 110
+		bias_scale: 128
 		low_bbox_scale: 25
 		up_bbox_scale: 110
 
@@ -4933,7 +4933,7 @@ layer {
 		net_height: 640
 		net_width: 640
 		ignore_thresh: 0.3
-		bias_scale: 40
+		bias_scale: 64
 		low_bbox_scale: 8
 		up_bbox_scale: 25
 

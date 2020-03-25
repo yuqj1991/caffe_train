@@ -4715,10 +4715,10 @@ layer {
 		keep_top_k: 500
 		confidence_threshold: 0.15
 		ignore_thresh: 0.3
-		bias_scale: 550
-		bias_scale: 250
-		bias_scale: 110
-		bias_scale: 40
+		bias_scale: 512
+		bias_scale: 256
+		bias_scale: 128
+		bias_scale: 64
 
 		class_type: SIGMOID
 
