@@ -802,7 +802,7 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
   for(int b = 0; b < batch_size; b ++){
     for(int h = 0; h < outheight; h++){
       for(int w = 0; w < outwidth; w++){
-        int class_index = b * num_channels + 4 * dimScale +  h * outwidth + w;
+        int class_index = b * num_channels * dimScale + 4 * dimScale +  h * outwidth + w;
         Dtype MaxVaule = pred_data[class_index + 0 * dimScale];
         Dtype sumValue = Dtype(0.f);
         // 求出每组的最大值
@@ -829,7 +829,7 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
         CHECK_LE(pred_data[class_index + 0 * dimScale], 1)<<"sumValue: "<<sumValue;
         CHECK_LE(pred_data[class_index + 1 * dimScale], 1)<<"sumValue: "<<sumValue;
       }
-  }
+    }
   }
 }
 template void SoftmaxCenterGrid(float * pred_data, const int batch_size,
