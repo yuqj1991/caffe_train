@@ -998,10 +998,10 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
               continue;
             if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
               continue;
-            Dtype xmin_bias = (w - xmin) * downRatio / anchor_scale;
-            Dtype ymin_bias = (h - ymin) * downRatio / anchor_scale;
-            Dtype xmax_bias = (w - xmax) * downRatio / anchor_scale;
-            Dtype ymax_bias = (h - ymax) * downRatio / anchor_scale;
+            Dtype xmin_bias = (w - xmin) * downRatio *2 / anchor_scale;
+            Dtype ymin_bias = (h - ymin) * downRatio *2 / anchor_scale;
+            Dtype xmax_bias = (w - xmax) * downRatio *2/ anchor_scale;
+            Dtype ymax_bias = (h - ymax) * downRatio *2/ anchor_scale;
             int x_index = b * num_channels * dimScale
                                       + 0* dimScale + h * output_width + w;
             int y_index = b * num_channels * dimScale 
@@ -1097,10 +1097,10 @@ void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channe
         int class_index = b * num_channels * dimScale
                                   + 5* dimScale + h * output_width + w;
 
-        float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /downRatio) *downRatio;
-        float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /downRatio) *downRatio;
-        float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /downRatio) *downRatio;
-        float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /downRatio) *downRatio;
+        float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /(2*downRatio)) *downRatio;
+        float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /(2*downRatio)) *downRatio;
+        float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /(2*downRatio)) *downRatio;
+        float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /(2*downRatio)) *downRatio;
         
         float xmin = std::min(std::max(bb_xmin, (0.f)), float(downRatio * output_width));
         float ymin = std::min(std::max(bb_ymin, (0.f)), float(downRatio * output_height));
@@ -1328,4 +1328,150 @@ template void GetCenterGridObjectResultSoftMax(const int batch_size, const int n
                           const int downRatio,
                           double* channel_pred_data, const int anchor_scale, double conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results);
+
+#if 0
+Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          Dtype* channel_pred_data, const int anchor_scale, 
+                          std::pair<int, int> loc_truth_scale,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          Dtype* class_label, Dtype* bottom_diff, 
+                          Dtype ignore_thresh, int *count_postive){
+  CHECK_EQ(num_classes, 1);
+  int dimScale = output_height * output_width;
+  Dtype score_loss = Dtype(0.);
+  CHECK_EQ(num_channels, (4 + 1 + num_classes)) 
+          << "num_channels shoule be set to including bias_x, bias_y, width, height, object_confidence and classes";
+  for(int b = 0; b < batch_size; b++){
+    int object_index = b * num_channels * dimScale
+                                + 4 * dimScale;
+    for(int i = 0; i < (num_classes + 1) * dimScale; i++){
+      channel_pred_data[object_index + i] = CenterSigmoid(channel_pred_data[object_index + i]);
+    }
+  }
+
+  int postive = 0;
+  caffe_set(batch_size * dimScale, Dtype(0), class_label);
+
+  for(int b = 0; b < batch_size; b++){
+    vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+    std::vector<int> mask_Rf_anchor(dimScale, 0);
+    int count = 0;
+    for(int h = 0; h < output_height; h++){
+      for(int w = 0; w < output_width; w++){
+        int x_index = b * num_channels * dimScale
+                                  + 0* dimScale + h * output_width + w;
+        int y_index = b * num_channels * dimScale 
+                                  + 1* dimScale + h * output_width + w;
+        int width_index = b * num_channels * dimScale
+                                  + 2* dimScale + h * output_width + w;
+        int height_index = b * num_channels * dimScale 
+                                  + 3* dimScale + h * output_width + w;
+        int object_index = b * num_channels * dimScale 
+                                  + 4* dimScale + h * output_width + w;
+        NormalizedBBox predBox;
+        float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /downRatio) / output_width;
+        float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /downRatio) / output_height;
+        float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /downRatio) / output_width;
+        float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /downRatio) /output_height;
+        predBox.set_xmin(bb_xmin);
+        predBox.set_xmax(bb_xmax);
+        predBox.set_ymin(bb_ymin);
+        predBox.set_ymax(bb_ymax);
+        float best_iou = 0;
+        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+          float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+          if (iou > best_iou) {
+            best_iou = iou;
+          }
+        }
+        bottom_diff[object_index] = (-1) * (0 - channel_pred_data[object_index]);
+        if(best_iou > ignore_thresh){
+          bottom_diff[object_index] = 0;
+        }
+      }
+    }
+    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+      const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+      const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+      const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+      const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+      const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+      const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+      int large_side = std::max(gt_bbox_height, gt_bbox_width);
+      if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+        int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
+        int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
+        int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
+        int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
+        for(int h = RF_ymin; h < RF_ymax; h++){
+          for(int w = RF_xmin; w < RF_xmax; w++){
+            if(w < 0 || w >= (output_width - 1) || h <0 || h >= (output_height - 1))
+              continue;
+            int class_index = b * dimScale
+                                  +  h * output_width + w;
+            class_label[class_index] = 0.5;
+          }
+        }
+        for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
+          for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+            if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
+              continue;
+            if(h + (anchor_scale/downRatio) / 2>= output_height - 1)
+              continue;
+            if(w - (anchor_scale/downRatio) / 2 < 0)
+              continue;
+            if(h - (anchor_scale/downRatio) / 2 < 0)
+              continue;
+            if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
+              continue;
+            Dtype xmin_bias = (w - xmin) * downRatio / anchor_scale;
+            Dtype ymin_bias = (h - ymin) * downRatio / anchor_scale;
+            Dtype xmax_bias = (w - xmax) * downRatio / anchor_scale;
+            Dtype ymax_bias = (h - ymax) * downRatio / anchor_scale;
+            int x_index = b * num_channels * dimScale
+                                      + 0* dimScale + h * output_width + w;
+            int y_index = b * num_channels * dimScale 
+                                      + 1* dimScale + h * output_width + w;
+            int width_index = b * num_channels * dimScale
+                                      + 2* dimScale + h * output_width + w;
+            int height_index = b * num_channels * dimScale 
+                                      + 3* dimScale + h * output_width + w;
+            int object_index = b * num_channels * dimScale 
+                                      + 4* dimScale + h * output_width + w;
+            
+            float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
+            bottom_diff[x_index] = (-1) * delta_scale * (xmin_bias - channel_pred_data[x_index]);
+            bottom_diff[y_index] = (-1) * delta_scale * (ymin_bias - channel_pred_data[y_index]);
+            bottom_diff[width_index] = (-1) * delta_scale * (xmax_bias - channel_pred_data[width_index]);
+            bottom_diff[height_index] = (-1) * delta_scale * (ymax_bias - channel_pred_data[height_index]);
+            bottom_diff[object_index] = (-1) * (1 - channel_pred_data[object_index]);
+            // class score 
+            // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
+            int class_index = b * dimScale
+                                  +  h * output_width + w;
+            class_label[class_index] = 1;
+            
+            mask_Rf_anchor[h * output_width + w] = 1;
+            count++;
+          }
+        }
+      }
+    }
+    if(count > 0){
+      int gt_class_index =  b * dimScale;
+      int pred_class_index = b * num_channels * dimScale + 5* dimScale;
+      score_loss += focal_loss(class_label + gt_class_index, channel_pred_data + pred_class_index, 
+                                  dimScale, bottom_diff + pred_class_index);
+    }else{
+      score_loss += 0;
+    }
+    postive += count;
+    
+  }
+  *count_postive = postive;
+  return score_loss;
+}
+#endif
 }  // namespace caffe
