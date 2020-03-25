@@ -963,25 +963,38 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
               continue;
             if((h - (anchor_scale/downRatio) / 2 < 0) || (h - (anchor_scale/downRatio) / 2) > ymax)
               continue;
+            int x_index = b * num_channels * dimScale
+                                      + 0* dimScale + h * output_width + w;
+            int y_index = b * num_channels * dimScale 
+                                      + 1* dimScale + h * output_width + w;
+            int width_index = b * num_channels * dimScale
+                                      + 2* dimScale + h * output_width + w;
+            int height_index = b * num_channels * dimScale 
+                                      + 3* dimScale + h * output_width + w;
             int object_index = b * num_channels * dimScale 
-                                  + 4* dimScale + h * output_width + w;
-            int class_index = b * dimScale
-                                  +  h * output_width + w;
+                                      + 4* dimScale + h * output_width + w;
+            int class_index = b * dimScale +  h * output_width + w;
             //if(class_label[class_index] == 0.5)
             //  continue;
-            NormalizedBBox anchorBbox;
-            float bb_xmin = (w - anchor_scale /downRatio / 2) / output_width;
-            float bb_ymin = (h - anchor_scale /downRatio / 2) / output_height;
-            float bb_xmax = (w + anchor_scale /downRatio / 2) / output_width;
-            float bb_ymax = (h + anchor_scale /downRatio / 2) /output_height;
-            anchorBbox.set_xmin(bb_xmin);
-            anchorBbox.set_xmax(bb_xmax);
-            anchorBbox.set_ymin(bb_ymin);
-            anchorBbox.set_ymax(bb_ymax);
-            float iou = YoloBBoxIou(anchorBbox, gt_bboxes[ii]);
-            if(iou > ignore_thresh){
+            NormalizedBBox predBox;
+            float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /(2*downRatio)) / output_height;
+            float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /(2*downRatio)) /output_height;
+            predBox.set_xmin(bb_xmin);
+            predBox.set_xmax(bb_xmax);
+            predBox.set_ymin(bb_ymin);
+            predBox.set_ymax(bb_ymax);
+            float best_iou = 0;
+            for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+              float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+              if (iou > best_iou) {
+                best_iou = iou;
+              }
+            }
+            bottom_diff[object_index] = (-1) * (0 - channel_pred_data[object_index]);
+            if(best_iou > ignore_thresh){
               bottom_diff[object_index] = 0;
-              //class_label[class_index] = 0.5;
             }
           }
         }
