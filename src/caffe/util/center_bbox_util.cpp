@@ -768,16 +768,16 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
         }
         
         int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
-        Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
+        Dtype MaxVaule = pre_data[bg_index + 0 * dimScale];
         Dtype sumValue = Dtype(0.f);
         // 求出每组的最大值, 计算出概率值
         for(int c = 0; c < 2; c++){
-          MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
+          MaxVaule = std::max(MaxVaule, pre_data[bg_index + c * dimScale]);
         }
         for(int c = 0; c< 2; c++){
-          sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
+          sumValue += std::exp(pre_data[bg_index + c * dimScale] - MaxVaule);
         }
-        Dtype pred_data_value = std::exp(pred_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
+        Dtype pred_data_value = std::exp(pre_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
         loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
         bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
         count++;
@@ -1007,7 +1007,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
                                       + 3* dimScale + h * output_width + w;
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
-            int class_index = b * dimScale +  h * output_width + w;
+            //int class_index = b * dimScale +  h * output_width + w;
             //if(class_label[class_index] == 0.5)
             //  continue;
             NormalizedBBox predBox;
