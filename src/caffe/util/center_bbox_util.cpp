@@ -1202,7 +1202,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int height_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
             
-            float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
+            float delta_scale = 1; //2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
             bottom_diff[x_index] = (-1) * delta_scale * (xmin_bias - channel_pred_data[x_index]);
             bottom_diff[y_index] = (-1) * delta_scale * (ymin_bias - channel_pred_data[y_index]);
             bottom_diff[width_index] = (-1) * delta_scale * (xmax_bias - channel_pred_data[width_index]);
