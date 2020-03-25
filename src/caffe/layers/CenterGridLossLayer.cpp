@@ -128,16 +128,18 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       
       int dimScale = output_height * output_width;
       for(int b = 0; b < num_; b++){
-        for(int j = 0; j < 4 * dimScale; j++){ // loc loss + objectness loss
+        for(int j = 0; j < 4 * dimScale; j++){ // loc loss loss
           sum_squre += diff[b * (4 + num_classes_) * dimScale + j] * diff[b * (4 + num_classes_) * dimScale + j];
         }
       }
     }
-     if(count_postive_ > 0)
+    if(count_postive_ > 0){
+      if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
         top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / count_postive_;
-      else
-        top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / num_; 
-    
+      }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
+        top[0]->mutable_cpu_data()[0] = (sum_squre) / count_postive_ + class_score;
+      }
+    }
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
   }
@@ -146,13 +148,14 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.);
 
     if(count_postive_ > 0){
-      loc_loss = sum_squre / count_postive_;
-      score_loss = class_score / count_postive_;
-    }else{
-      loc_loss = sum_squre / num_;
-      score_loss = class_score / num_;
+      if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
+        loc_loss = sum_squre / count_postive_;
+        score_loss = class_score / count_postive_;
+      }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
+        loc_loss = sum_squre / count_postive_;
+        score_loss = class_score;
+      }
     }
-
     LOG(INFO)<<"all num_gt boxes: "<<num_gt_<<", Region "<<output_width
               <<": total loss: "<<top[0]->mutable_cpu_data()[0]
               <<", loc loss: "<< loc_loss
@@ -171,16 +174,18 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     LOG(FATAL) << this->type()
         << " Layer cannot backpropagate to label inputs.";
   }
-  
   if (propagate_down[0]) {
+    const int output_height = bottom[0]->height();
+    const int output_width = bottom[0]->width();
+    const int num_channels = bottom[0]->channels();
+    Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+    const Dtype* bottom_data = bottom[0]->cpu_data();
+    num_ = bottom[0]->num();
+    int dimScale = output_height * output_width;
+    Dtype loss_weight = Dtype(0.);
+    if(count_postive_ > 0)
+      loss_weight = top[0]->cpu_diff()[0] / count_postive_;
     if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
-      const int output_height = bottom[0]->height();
-      const int output_width = bottom[0]->width();
-      const int num_channels = bottom[0]->channels();
-      Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
-      const Dtype* bottom_data = bottom[0]->cpu_data();
-      num_ = bottom[0]->num();
-      int dimScale = output_height * output_width;
       for(int b = 0; b < num_; b++){
         int object_index = b * num_channels * dimScale + 4 * dimScale;
         for(int i = 0; i < 1 * dimScale; i++){
@@ -188,14 +193,15 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                                                     logistic_gradient(bottom_data[object_index + i]);
         }
       }
+      caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
+    }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
+      for(int b = 0; b < num_; b++){
+        int loc_index = b * num_channels * dimScale;
+        for(int i = 0; i < 4 * dimScale; i++){
+          bottom_diff[loc_index + i] = bottom_diff[loc_index + i] * loss_weight;
+        }
+      }
     }
-    Dtype loss_weight = Dtype(0.);
-    if(count_postive_ > 0)
-      loss_weight = top[0]->cpu_diff()[0] / count_postive_;
-    else 
-      loss_weight = top[0]->cpu_diff()[0] / num_;
-    caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
-    
   }
 }
 

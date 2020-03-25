@@ -775,7 +775,10 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
       }
     }
   }
-  return loss;
+  if(count > 0){
+    return loss / count;
+  }else
+    return loss;
 }
 
 template float softmax_loss_entropy(float* label_data, float* pre_data, 
@@ -1178,7 +1181,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
               continue;
-            if(h + (anchor_scale/downRatio) / 2>= output_height - 1)
+            if(h + (anchor_scale/downRatio) / 2 >= output_height - 1)
               continue;
             if(w - (anchor_scale/downRatio) / 2 < 0)
               continue;
