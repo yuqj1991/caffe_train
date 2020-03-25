@@ -759,10 +759,9 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
         Dtype label_value = Dtype(label_data[b * dimScale + h * output_width + w]);
-        if(label_value == 0){
+        if(label_value == 0)
           continue;
-        }
-        if(label_value == 0.5)
+        else if(label_value == 0.5)
           label_idx = 0;
         else if(label_value == 1){
           label_idx = 1;
@@ -800,35 +799,37 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
             const int outheight, const int outwidth){
   CHECK_EQ(label_channel, 2);
   int dimScale = outheight * outwidth;
-  for(int h = 0; h < outheight; h++){
-    for(int w = 0; w < outwidth; w++){
-      int class_index = h * outwidth + w;
-      Dtype MaxVaule = pred_data[class_index + 0 * dimScale];
-      Dtype sumValue = Dtype(0.f);
-      // 求出每组的最大值
-      for(int c = 0; c< label_channel; c++){
-        MaxVaule = std::max(MaxVaule, pred_data[class_index + c * dimScale]);
+  for(int b = 0; b < batch_size; b ++){
+    for(int h = 0; h < outheight; h++){
+      for(int w = 0; w < outwidth; w++){
+        int class_index = b * num_channels + 4 * dimScale +  h * outwidth + w;
+        Dtype MaxVaule = pred_data[class_index + 0 * dimScale];
+        Dtype sumValue = Dtype(0.f);
+        // 求出每组的最大值
+        for(int c = 0; c< label_channel; c++){
+          MaxVaule = std::max(MaxVaule, pred_data[class_index + c * dimScale]);
+        }
+        // 每个样本组减去最大值， 计算exp，求和
+        Dtype pred_1, pred_2;
+        pred_1 = pred_data[class_index + 0 * dimScale];
+        pred_2 = pred_data[class_index + 1 * dimScale];
+        for(int c = 0; c< label_channel; c++){
+          pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
+          sumValue += pred_data[class_index + c * dimScale];
+        }
+        CHECK_GT(sumValue , 0)<<pred_data[class_index + 0 * dimScale]<<", "
+                              <<pred_data[class_index + 1 * dimScale]<<", maxValue: "
+                              <<MaxVaule<<", bg_0: "<<pred_1<<", face_1: "<<pred_2;
+        // 计算softMax
+        for(int c = 0; c< label_channel; c++){
+          pred_data[class_index + c * dimScale] = pred_data[class_index + c * dimScale] / sumValue;
+        }
+        CHECK_GE(pred_data[class_index + 0 * dimScale], 0)<<"sumValue: "<<sumValue;
+        CHECK_GE(pred_data[class_index + 1 * dimScale], 0)<<"sumValue: "<<sumValue;
+        CHECK_LE(pred_data[class_index + 0 * dimScale], 1)<<"sumValue: "<<sumValue;
+        CHECK_LE(pred_data[class_index + 1 * dimScale], 1)<<"sumValue: "<<sumValue;
       }
-      // 每个样本组减去最大值， 计算exp，求和
-      Dtype pred_1, pred_2;
-      pred_1 = pred_data[class_index + 0 * dimScale];
-      pred_2 = pred_data[class_index + 1 * dimScale];
-      for(int c = 0; c< label_channel; c++){
-        pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
-        sumValue += pred_data[class_index + c * dimScale];
-      }
-      CHECK_GT(sumValue , 0)<<pred_data[class_index + 0 * dimScale]<<", "
-                            <<pred_data[class_index + 1 * dimScale]<<", maxValue: "
-                            <<MaxVaule<<", bg_0: "<<pred_1<<", face_1: "<<pred_2;
-      // 计算softMax
-      for(int c = 0; c< label_channel; c++){
-        pred_data[class_index + c * dimScale] = pred_data[class_index + c * dimScale] / sumValue;
-      }
-      CHECK_GE(pred_data[class_index + 0 * dimScale], 0)<<"sumValue: "<<sumValue;
-      CHECK_GE(pred_data[class_index + 1 * dimScale], 0)<<"sumValue: "<<sumValue;
-      CHECK_LE(pred_data[class_index + 0 * dimScale], 1)<<"sumValue: "<<sumValue;
-      CHECK_LE(pred_data[class_index + 1 * dimScale], 1)<<"sumValue: "<<sumValue;
-    }
+  }
   }
 }
 template void SoftmaxCenterGrid(float * pred_data, const int batch_size,
@@ -1164,11 +1165,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   int dimScale = output_height * output_width;
   Dtype score_loss = Dtype(0.), loc_loss = Dtype(0.);
   CHECK_EQ(num_channels, (4 + num_classes)) << "num_channels shoule be set to including bias_x, bias_y, width, height, classes";
-  for(int b = 0; b < batch_size; b++){
-    int class_index = b * num_channels * dimScale + 4 * dimScale;
-    SoftmaxCenterGrid(channel_pred_data + class_index, batch_size, num_classes, num_channels
-                        , output_height, output_width);
-  }
+  SoftmaxCenterGrid(channel_pred_data, batch_size, num_classes, num_channels, output_height, output_width);
 
   int postive = 0;
   caffe_set(batch_size * dimScale, Dtype(0), class_label);
@@ -1275,11 +1272,7 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
   CHECK_EQ(num_classes, 2);
   CHECK_EQ(num_channels, 4 + num_classes);
   int dimScale = output_height * output_width;
-  for(int b = 0; b < batch_size; b++){
-    int class_index = b * num_channels * dimScale + 4 * dimScale;
-    SoftmaxCenterGrid(channel_pred_data + class_index, batch_size, num_classes,
-                      num_channels, output_height, output_width);
-  }
+  SoftmaxCenterGrid(channel_pred_data, batch_size, num_classes, num_channels, output_height, output_width);
 
   for(int b = 0; b < batch_size; b++){
     for(int h = 0; h < output_height; h++){
