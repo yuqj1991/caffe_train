@@ -131,17 +131,9 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                           channel_pred_data,  anchor_scale_, 
                           bbox_range_scale_,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
-                          ignore_thresh_, &count_postive_);
-      const Dtype * diff = bottom[0]->cpu_diff();
-      
-      int dimScale = output_height * output_width;
-      for(int b = 0; b < num_; b++){
-        for(int j = 0; j < 4 * dimScale; j++){ // loc loss loss
-          sum_squre += diff[b * (4 + num_classes_) * dimScale + j] * diff[b * (4 + num_classes_) * dimScale + j];
-        }
-      }
+                          ignore_thresh_, &count_postive_, &sum_squre);
       if(count_postive_ > 0){
-        loc_loss = sum_squre / count_postive_ / 4;
+        loc_loss = sum_squre / count_postive_;
       }else{
         loc_loss = sum_squre / num_;
       }
@@ -153,11 +145,12 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
   #if 1 
   if(iterations_ % 100 == 0){
-    LOG(INFO)<<"all num_gt boxes: "<<num_gt_<<", Region "<<output_width
+    LOG(INFO)<<"";
+    LOG(INFO)<<"Region "<<output_width
               <<": total loss: "<<top[0]->mutable_cpu_data()[0]
               <<", loc loss: "<< loc_loss
-              <<", class score: "<<score_loss
-              <<", count: "<<count_postive_;
+              <<", class loss: "<< score_loss
+              <<", count: "<< count_postive_;
   }
   iterations_++;
   #endif
