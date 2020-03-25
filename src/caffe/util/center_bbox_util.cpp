@@ -1189,10 +1189,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
               continue;
             if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
               continue;
-            Dtype xmin_bias = (w - xmin) * downRatio / anchor_scale;
-            Dtype ymin_bias = (h - ymin) * downRatio / anchor_scale;
-            Dtype xmax_bias = (w - xmax) * downRatio / anchor_scale;
-            Dtype ymax_bias = (h - ymax) * downRatio / anchor_scale;
+            Dtype xmin_bias = (w - xmin) * downRatio / (anchor_scale * 2);
+            Dtype ymin_bias = (h - ymin) * downRatio / (anchor_scale * 2);
+            Dtype xmax_bias = (w - xmax) * downRatio / (anchor_scale * 2);
+            Dtype ymax_bias = (h - ymax) * downRatio / (anchor_scale * 2);
             int x_index = b * num_channels * dimScale
                                       + 0* dimScale + h * output_width + w;
             int y_index = b * num_channels * dimScale 
@@ -1281,10 +1281,10 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
         int class_index = b * num_channels * dimScale
                                   + 5* dimScale + h * output_width + w;
 
-        float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /downRatio) *downRatio;
-        float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /downRatio) *downRatio;
-        float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /downRatio) *downRatio;
-        float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /downRatio) *downRatio;
+        float bb_xmin = (w - channel_pred_data[x_index] * 2 * anchor_scale /downRatio) *downRatio;
+        float bb_ymin = (h - channel_pred_data[y_index] * 2 *  anchor_scale /downRatio) *downRatio;
+        float bb_xmax = (w - channel_pred_data[width_index] * 2 *  anchor_scale /downRatio) *downRatio;
+        float bb_ymax = (h - channel_pred_data[height_index] * 2 *  anchor_scale /downRatio) *downRatio;
         
         float xmin = std::min(std::max(bb_xmin, (0.f)), float(downRatio * output_width));
         float ymin = std::min(std::max(bb_ymin, (0.f)), float(downRatio * output_height));

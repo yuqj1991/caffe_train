@@ -137,7 +137,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
         top[0]->mutable_cpu_data()[0] = (sum_squre + class_score) / count_postive_;
       }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
-        top[0]->mutable_cpu_data()[0] = (sum_squre) / count_postive_ + class_score;
+        top[0]->mutable_cpu_data()[0] = sum_squre / count_postive_ + class_score;
       }
     }
   } else {
