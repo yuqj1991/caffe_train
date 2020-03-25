@@ -1281,10 +1281,10 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
         int class_index = b * num_channels * dimScale
                                   + 5* dimScale + h * output_width + w;
 
-        float bb_xmin = (w - channel_pred_data[x_index] * 2 * anchor_scale /downRatio) *downRatio;
-        float bb_ymin = (h - channel_pred_data[y_index] * 2 *  anchor_scale /downRatio) *downRatio;
-        float bb_xmax = (w - channel_pred_data[width_index] * 2 *  anchor_scale /downRatio) *downRatio;
-        float bb_ymax = (h - channel_pred_data[height_index] * 2 *  anchor_scale /downRatio) *downRatio;
+        float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /(2 * downRatio)) *downRatio;
+        float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+        float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /(2 * downRatio)) *downRatio;
+        float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /(2 * downRatio)) *downRatio;
         
         float xmin = std::min(std::max(bb_xmin, (0.f)), float(downRatio * output_width));
         float ymin = std::min(std::max(bb_ymin, (0.f)), float(downRatio * output_height));
