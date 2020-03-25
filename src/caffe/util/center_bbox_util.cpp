@@ -1244,10 +1244,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int height_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
             
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[x_index] - xmin_bias), bottom_diff[x_index]);
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[y_index] - ymin_bias), bottom_diff[y_index]);
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[width_index] - xmax_bias), bottom_diff[width_index]);
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[height_index] - ymax_bias), bottom_diff[height_index]);
+            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[x_index] - xmin_bias), &(bottom_diff[x_index]));
+            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[y_index] - ymin_bias), &(bottom_diff[y_index]));
+            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[width_index] - xmax_bias), &(bottom_diff[width_index]));
+            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[height_index] - ymax_bias), &(bottom_diff[height_index]));
             
             // class score 
             // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
