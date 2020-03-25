@@ -766,10 +766,20 @@ Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data,
         else if(label_value == 1){
           label_idx = 1;
         }
-        int label_index = b * num_channels * dimScale + (4 + label_idx) * dimScale + h * output_width + w;
-        Dtype pred_data_value = std::max(pre_data[label_index],Dtype(FLT_MIN));
-        loss -= log(pred_data_value);
-        bottom_diff[label_index] = pre_data[label_index] - 1;
+        
+        int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
+        Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
+        Dtype sumValue = Dtype(0.f);
+        // 求出每组的最大值, 计算出概率值
+        for(int c = 0; c < 2; c++){
+          MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
+        }
+        for(int c = 0; c< 2; c++){
+          sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
+        }
+        Dtype pred_data_value = std::exp(pred_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
+        loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
+        bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
         count++;
       }
     }
@@ -857,8 +867,18 @@ void select_hard_sample(Dtype *label_data, Dtype *pred_data,
       for(int w = 0; w < output_width; w ++){
         if(label_data[b * dimScale + h * output_width +w] != 1){
           int negative_index = h * output_width + w;
-          Dtype perd_ = pred_data[b * num_channels * dimScale  + 4 * dimScale + h * output_width + w];
-          Dtype loss = (-1) * log(std::max(perd_,  Dtype(FLT_MIN)));
+          int bg_index = b * num_channels * dimScale  + 4 * dimScale + h * output_width + w;
+          Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
+          Dtype sumValue = Dtype(0.f);
+          // 求出每组的最大值
+          for(int c = 0; c < 2; c++){
+            MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
+          }
+          for(int c = 0; c< 2; c++){
+            sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
+          }
+          Dtype prob = std::exp(pred_data[bg_index] - MaxVaule) / sumValue;
+          Dtype loss = (-1) * log(std::max(prob,  Dtype(FLT_MIN)));
           loss_value_indices.push_back(std::make_pair(negative_index, loss));
         }
       }
@@ -882,6 +902,21 @@ template void select_hard_sample(double *label_data, double *pred_data,
                           const int output_height, const int output_width,
                           const int num_channels, const int batch_size);
 
+
+template <typename Dtype>
+Dtype smoothL1_Loss(Dtype x, Dtype* x_diff){
+  Dtype loss = Dtype(0.);
+  Dtype fabs_x_value = std::fabs(x);
+  if(fabs_x_value < 1){
+    loss = 0.5 * x * x;
+    *x_diff = x;
+  }else{
+    loss = fabs_x_value - 0.5;
+    *x_diff = (Dtype(0) < x) - (x < Dtype(0));
+  }
+}
+template float smoothL1_Loss(float x, float* x_diff);
+template double smoothL1_Loss(double x, double* x_diff);
 
 // 每一层使用感受野作为anchor,此anchor只匹配相对应大小范围的gt_boxes, 
 // anchor 生成的方式是按照感受野的大小来生成的,所以每层只有一个感受野大小的anchor, 用于匹配相应的gt_boxes;
@@ -1165,8 +1200,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   int dimScale = output_height * output_width;
   Dtype score_loss = Dtype(0.), loc_loss = Dtype(0.);
   CHECK_EQ(num_channels, (4 + num_classes)) << "num_channels shoule be set to including bias_x, bias_y, width, height, classes";
-  SoftmaxCenterGrid(channel_pred_data, batch_size, num_classes, num_channels, output_height, output_width);
-
+  
   int postive = 0;
   caffe_set(batch_size * dimScale, Dtype(0), class_label);
   std::vector<int>postive_batch(batch_size, 0);
@@ -1209,16 +1243,11 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int height_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
             
-            float delta_scale = 2; 
-            loc_loss += (xmin_bias - channel_pred_data[x_index]) * (xmin_bias - channel_pred_data[x_index]);
-            loc_loss += (ymin_bias - channel_pred_data[y_index]) * (ymin_bias - channel_pred_data[y_index]);
-            loc_loss += (xmax_bias - channel_pred_data[width_index]) * (xmax_bias - channel_pred_data[width_index]);
-            loc_loss += (ymax_bias - channel_pred_data[height_index]) * (ymax_bias - channel_pred_data[height_index]);
-            bottom_diff[x_index] = (-1) * delta_scale * (xmin_bias - channel_pred_data[x_index]);
-            bottom_diff[y_index] = (-1) * delta_scale * (ymin_bias - channel_pred_data[y_index]);
-            bottom_diff[width_index] = (-1) * delta_scale * (xmax_bias - channel_pred_data[width_index]);
-            bottom_diff[height_index] = (-1) * delta_scale * (ymax_bias - channel_pred_data[height_index]);
-
+            loc_loss += smoothL1_Loss((channel_pred_data[x_index] - xmin_bias), bottom_diff[x_index]);
+            loc_loss += smoothL1_Loss((channel_pred_data[y_index] - ymin_bias), bottom_diff[y_index]);
+            loc_loss += smoothL1_Loss((channel_pred_data[width_index] - xmax_bias), bottom_diff[width_index]);
+            loc_loss += smoothL1_Loss((channel_pred_data[height_index] - ymax_bias), bottom_diff[height_index]);
+            
             // class score 
             // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
             int class_index = b * dimScale
