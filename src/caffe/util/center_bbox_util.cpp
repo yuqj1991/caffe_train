@@ -918,7 +918,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
   }
 
   int postive = 0;
-  caffe_set(batch_size * dimScale, Dtype(0), class_label);
+  caffe_set(batch_size * dimScale, Dtype(0.5), class_label);
 
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
@@ -967,8 +967,8 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
                                   + 4* dimScale + h * output_width + w;
             int class_index = b * dimScale
                                   +  h * output_width + w;
-            if(class_label[class_index] == 0.5)
-              continue;
+            //if(class_label[class_index] == 0.5)
+            //  continue;
             NormalizedBBox anchorBbox;
             float bb_xmin = (w - anchor_scale /downRatio / 2) / output_width;
             float bb_ymin = (h - anchor_scale /downRatio / 2) / output_height;
@@ -981,7 +981,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
             float iou = YoloBBoxIou(anchorBbox, gt_bboxes[ii]);
             if(iou > ignore_thresh){
               bottom_diff[object_index] = 0;
-              class_label[class_index] = 0.5;
+              //class_label[class_index] = 0.5;
             }
           }
         }
@@ -1228,7 +1228,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  select_hard_sample(class_label, channel_pred_data, 5, postive_batch, 
+  select_hard_sample(class_label, channel_pred_data, 3, postive_batch, 
                         output_height, output_width, num_channels, batch_size);
   score_loss = softmax_loss_entropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
