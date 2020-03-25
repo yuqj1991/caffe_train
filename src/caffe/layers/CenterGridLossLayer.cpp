@@ -141,9 +141,9 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         }
       }
       if(count_postive_ > 0){
-        loc_loss = (0.1) * sum_squre / count_postive_;
+        loc_loss = sum_squre / count_postive_;
       }else{
-        loc_loss = (0.1) * sum_squre / num_;
+        loc_loss = sum_squre / num_;
       }
       score_loss = class_score;
     }
