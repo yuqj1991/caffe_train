@@ -1242,24 +1242,22 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int width_index = b * num_channels * dimScale
                                       + 2* dimScale + h * output_width + w;
             int height_index = b * num_channels * dimScale 
-                                      + 3* dimScale + h * output_width + w;
-            Dtype maxValue = std::max(std::fabs(xmax_bias), std::fabs(ymax_bias));
-            maxValue = std::max(std::fabs(xmin_bias), maxValue);
-            maxValue = std::max(std::fabs(ymin_bias), maxValue);
-            if(maxValue >= 2)
+                                      + 3* dimScale + h * output_width + w;        
+            Dtype xmin_loss = smoothL1_Loss(Dtype(channel_pred_data[x_index] - xmin_bias), &(bottom_diff[x_index]));
+            Dtype ymin_loss = smoothL1_Loss(Dtype(channel_pred_data[y_index] - ymin_bias), &(bottom_diff[y_index]));
+            Dtype xmax_loss = smoothL1_Loss(Dtype(channel_pred_data[width_index] - xmax_bias), &(bottom_diff[width_index]));
+            Dtype ymax_loss = smoothL1_Loss(Dtype(channel_pred_data[height_index] - ymax_bias), &(bottom_diff[height_index]));
+             
+            loc_loss += xmin_loss + xmax_loss + ymin_loss + ymax_loss;
+            if(xmin_loss + xmax_loss + ymin_loss + ymax_loss > 4){
               LOG(INFO)<<"Region: "<<output_height
                        <<", xmin_bias: "<< xmin_bias <<", ymin_bias: "<< ymin_bias
-                       <<", xmax_bias: "<< xmax_bias <<", ymax_bias: "<< ymax_bias;
-            LOG(INFO)<<"Region: "<<output_height
-                     <<", xmin_diff: "<< channel_pred_data[x_index] - xmin_bias
-                     <<", ymin_diff: "<< channel_pred_data[y_index] - ymin_bias
-                     <<", xmax_diff: "<< channel_pred_data[width_index] - xmax_bias 
-                     <<", ymax_diff: "<< channel_pred_data[height_index] - ymax_bias;
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[x_index] - xmin_bias), &(bottom_diff[x_index]));
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[y_index] - ymin_bias), &(bottom_diff[y_index]));
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[width_index] - xmax_bias), &(bottom_diff[width_index]));
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[height_index] - ymax_bias), &(bottom_diff[height_index]));
-            
+                       <<", xmax_bias: "<< xmax_bias <<", ymax_bias: "<< ymax_bias
+                       <<", xmin_diff: "<< channel_pred_data[x_index] - xmin_bias
+                       <<", ymin_diff: "<< channel_pred_data[y_index] - ymin_bias
+                       <<", xmax_diff: "<< channel_pred_data[width_index] - xmax_bias 
+                       <<", ymax_diff: "<< channel_pred_data[height_index] - ymax_bias;
+            }
             int class_index = b * dimScale +  h * output_width + w;
             class_label[class_index] = 1;
             mask_Rf_anchor[h * output_width + w] = 1;
