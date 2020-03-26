@@ -1243,6 +1243,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                       + 2* dimScale + h * output_width + w;
             int height_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
+            Dtype maxValue = std::max(std::fabs(xmax_bias), std::fabs(ymax_bias));
+            maxValue = std::max(std::fabs(xmin_bias), maxValue);
+            maxValue = std::max(std::fabs(ymin_bias), maxValue);
+            if(maxValue >= 2)
             LOG(INFO)<<"output_height: "<<output_height<<", xmin_bias: "<<xmin_bias 
                      <<", ymin_bias: "<<ymin_bias
                      <<", xmax_bias: "<<xmax_bias<<", ymax_bias: "<<ymax_bias;
