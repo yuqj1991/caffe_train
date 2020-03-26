@@ -4903,7 +4903,7 @@ layer {
 		net_width: 640
 		ignore_thresh: 0.3
 		bias_scale: 128
-		low_bbox_scale: 48
+		low_bbox_scale: 64
 		up_bbox_scale: 128
 
 		class_type: SIGMOID
@@ -4935,7 +4935,7 @@ layer {
 		ignore_thresh: 0.3
 		bias_scale: 64
 		low_bbox_scale: 8
-		up_bbox_scale: 48
+		up_bbox_scale: 64
 
 		class_type: SIGMOID
 		bias_num: 1
