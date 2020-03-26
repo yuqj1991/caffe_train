@@ -1110,7 +1110,7 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
     loss_value_indices.clear();
     int num_postive = postive[b];
     Dtype test_Value = Dtype(0);
-    int idx_h, idx_w;
+    int idx_h = 0, idx_w = 0;
     bool flages = false;
     for(int h = 0; h < output_height; h ++){
       for(int w = 0; w < output_width; w ++){
@@ -1140,12 +1140,13 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
     }
     std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
     int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
+    LOG(INFO)<<"num_negative: "<<num_negative<<", Region: "<<output_height;
     for(int ii = 0; ii < num_negative; ii++){
       int h = loss_value_indices[ii].first / output_width;
       int w = loss_value_indices[ii].first % output_width;
       label_data[b * dimScale + h * output_width + w] = 0.5;
       if(test_Value == loss_value_indices[ii].second){
-        LOG(INFO)<<"idx_h: "<<idx_h <<", h: "<<h<<", idx_w: "<<idx_w<<", w: "<<w;
+        LOG(INFO)<<"ii: "<<ii<<", idx_h: "<<idx_h <<", h: "<<h<<", idx_w: "<<idx_w<<", w: "<<w;
       }
     }
   }
