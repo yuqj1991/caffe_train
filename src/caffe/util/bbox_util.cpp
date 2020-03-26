@@ -1785,6 +1785,8 @@ void ComputeConfLoss(const Dtype* conf_data, const int num,
           break;
         }
       }
+      if(label == 0)
+        LOG(INFO)<<label;
       Dtype loss = 0;
       if (loss_type == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
         CHECK_GE(label, 0);
