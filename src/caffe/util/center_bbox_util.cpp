@@ -1260,7 +1260,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             Dtype ymax_loss = smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &(bottom_diff[ymax_index]));
              
             loc_loss += xmin_loss + xmax_loss + ymin_loss + ymax_loss;
-            #if 1
+            #if 0
             if(xmin_loss + xmax_loss + ymin_loss + ymax_loss > 12){
               LOG(INFO)<<"";
               LOG(INFO)<<"loc_loss: "<<xmin_loss + xmax_loss + ymin_loss + ymax_loss
