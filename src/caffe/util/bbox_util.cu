@@ -696,6 +696,8 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
         }
       }
       match_data[i * num_preds_per_class + p] = label;
+      if(label == background_label_id)
+        printf("label: %d", label);
     }
   }
   // Get probability data.
