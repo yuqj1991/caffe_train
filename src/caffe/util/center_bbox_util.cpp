@@ -1251,8 +1251,11 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             loc_loss += xmin_loss + xmax_loss + ymin_loss + ymax_loss;
             #if 1
             if(xmin_loss + xmax_loss + ymin_loss + ymax_loss > 12){
+              LOG(INFO)<<"";
               LOG(INFO)<<"loc_loss: "<<xmin_loss + xmax_loss + ymin_loss + ymax_loss
-                       <<", bbox_width: "<<xmax - xmin << ", bbox_height: "<<ymax - ymin;
+                       <<", bbox_width: "<<xmax - xmin 
+                       << ", bbox_height: "<<ymax - ymin
+                       <<", downRatio: "<<downRatio;
               LOG(INFO)<<"Region: "<<output_height
                        <<", xmin_bias: "<< xmin_bias <<", ymin_bias: "<< ymin_bias
                        <<", xmax_bias: "<< xmax_bias <<", ymax_bias: "<< ymax_bias;
