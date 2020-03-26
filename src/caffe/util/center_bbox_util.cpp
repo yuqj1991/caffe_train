@@ -717,7 +717,7 @@ template void GetYoloGroundTruth(const double* gt_data, const int num_gt,
       std::map<int, vector<NormalizedBBox> >* all_gt_bboxes, int batch_size);
 
 template <typename Dtype> 
-Dtype focal_loss(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bottom_diff){
+Dtype FocalLossSigmoid(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bottom_diff){
   Dtype alpha_ = 0.25;
   Dtype gamma_ = 2.f;
   Dtype loss = Dtype(0.);
@@ -739,185 +739,8 @@ Dtype focal_loss(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bott
   return loss;
 }
 
-template float focal_loss(float* label_data, float *pred_data, int dimScale,  float *bottom_diff);
-template double focal_loss(double* label_data, double *pred_data, int dimScale,  double *bottom_diff);
-
-
-// label_data shape N : 1
-// pre_data shape N : k (object classes)
-// dimScale is the number of what ?? N * K ??
-template <typename Dtype>
-Dtype softmax_loss_entropy(Dtype* label_data, Dtype* pre_data, 
-                            const int batch_size, const int output_height, 
-                            const int output_width, Dtype *bottom_diff, 
-                            const int num_channels){
-  Dtype loss = Dtype(0.f);
-  int dimScale = output_height * output_width;
-  int label_idx = 0;
-  int count = 0;
-  for(int b = 0; b < batch_size; b++){
-    for(int h = 0; h < output_height; h++){
-      for(int w = 0; w < output_width; w++){
-        Dtype label_value = Dtype(label_data[b * dimScale + h * output_width + w]);
-        if(label_value == 0)
-          continue;
-        else if(label_value == 0.5)
-          label_idx = 0;
-        else if(label_value == 1){
-          label_idx = 1;
-        }
-        
-        int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
-        Dtype MaxVaule = pre_data[bg_index + 0 * dimScale];
-        Dtype sumValue = Dtype(0.f);
-        // 求出每组的最大值, 计算出概率值
-        for(int c = 0; c < 2; c++){
-          MaxVaule = std::max(MaxVaule, pre_data[bg_index + c * dimScale]);
-        }
-        for(int c = 0; c< 2; c++){
-          sumValue += std::exp(pre_data[bg_index + c * dimScale] - MaxVaule);
-        }
-        Dtype pred_data_value = std::exp(pre_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
-        loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
-        bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
-        count++;
-      }
-    }
-  }
-  return loss;
-}
-
-template float softmax_loss_entropy(float* label_data, float* pre_data, 
-                            const int batch_size, const int output_height, 
-                            const int output_width, float *bottom_diff, 
-                            const int num_channels);
-template double softmax_loss_entropy(double* label_data, double* pre_data, 
-                            const int batch_size, const int output_height, 
-                            const int output_width, double *bottom_diff, 
-                            const int num_channels);
-
-
-template <typename T>
-bool SortScorePairDescendCenter(const pair<T, float>& pair1,
-                          const pair<T, float>& pair2) {
-  return pair1.second > pair2.second;
-}
-
-template <typename Dtype>
-void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
-            const int label_channel, const int num_channels,
-            const int outheight, const int outwidth){
-  CHECK_EQ(label_channel, 2);
-  int dimScale = outheight * outwidth;
-  for(int b = 0; b < batch_size; b ++){
-    for(int h = 0; h < outheight; h++){
-      for(int w = 0; w < outwidth; w++){
-        int class_index = b * num_channels * dimScale + 4 * dimScale +  h * outwidth + w;
-        Dtype MaxVaule = pred_data[class_index + 0 * dimScale];
-        Dtype sumValue = Dtype(0.f);
-        // 求出每组的最大值
-        for(int c = 0; c< label_channel; c++){
-          MaxVaule = std::max(MaxVaule, pred_data[class_index + c * dimScale]);
-        }
-        // 每个样本组减去最大值， 计算exp，求和
-        Dtype pred_1, pred_2;
-        pred_1 = pred_data[class_index + 0 * dimScale];
-        pred_2 = pred_data[class_index + 1 * dimScale];
-        for(int c = 0; c< label_channel; c++){
-          pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
-          sumValue += pred_data[class_index + c * dimScale];
-        }
-        CHECK_GT(sumValue , 0)<<pred_data[class_index + 0 * dimScale]<<", "
-                              <<pred_data[class_index + 1 * dimScale]<<", maxValue: "
-                              <<MaxVaule<<", bg_0: "<<pred_1<<", face_1: "<<pred_2;
-        // 计算softMax
-        for(int c = 0; c< label_channel; c++){
-          pred_data[class_index + c * dimScale] = pred_data[class_index + c * dimScale] / sumValue;
-        }
-        CHECK_GE(pred_data[class_index + 0 * dimScale], 0)<<"sumValue: "<<sumValue;
-        CHECK_GE(pred_data[class_index + 1 * dimScale], 0)<<"sumValue: "<<sumValue;
-        CHECK_LE(pred_data[class_index + 0 * dimScale], 1)<<"sumValue: "<<sumValue;
-        CHECK_LE(pred_data[class_index + 1 * dimScale], 1)<<"sumValue: "<<sumValue;
-      }
-    }
-  }
-}
-template void SoftmaxCenterGrid(float * pred_data, const int batch_size,
-            const int label_channel, const int num_channels,
-            const int outheight, const int outwidth);
-template void SoftmaxCenterGrid(double * pred_data, const int batch_size,
-            const int label_channel, const int num_channels,
-            const int outheight, const int outwidth);
-// hard sampling mine postive : negative 1: 10
-// 按理来说是需要重新统计负样本的编号，以及获取到他的数值
-// label_data : K x H x W
-// pred_data : K x H x W x N
-template <typename Dtype>
-void select_hard_sample(Dtype *label_data, Dtype *pred_data, 
-                          const int negative_ratio, std::vector<int> postive, 
-                          const int output_height, const int output_width,
-                          const int num_channels, const int batch_size){
-  CHECK_EQ(num_channels, 4 + 2) << "x, y, width, height + label classes containing background + face";
-  int dimScale = output_height * output_width;
-  std::vector<std::pair<int, float> > loss_value_indices;
-  for(int b = 0; b < batch_size; b ++){
-    loss_value_indices.clear();
-    int num_postive = postive[b];
-    for(int h = 0; h < output_height; h ++){
-      for(int w = 0; w < output_width; w ++){
-        if(label_data[b * dimScale + h * output_width +w] != 1){
-          int negative_index = h * output_width + w;
-          int bg_index = b * num_channels * dimScale  + 4 * dimScale + h * output_width + w;
-          Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
-          Dtype sumValue = Dtype(0.f);
-          // 求出每组的最大值
-          for(int c = 0; c < 2; c++){
-            MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
-          }
-          for(int c = 0; c< 2; c++){
-            sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
-          }
-          Dtype prob = std::exp(pred_data[bg_index] - MaxVaule) / sumValue;
-          Dtype loss = (-1) * log(std::max(prob,  Dtype(FLT_MIN)));
-          loss_value_indices.push_back(std::make_pair(negative_index, loss));
-        }
-      }
-    }
-    std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
-    int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
-    for(int ii = 0; ii < num_negative; ii++){
-      int h = loss_value_indices[ii].first / output_width;
-      int w = loss_value_indices[ii].first % output_width;
-      label_data[b * dimScale + h * output_width + w] = 0.5;
-    }
-  }
-}
-
-template void select_hard_sample(float *label_data, float *pred_data, 
-                          const int negative_ratio, std::vector<int> postive, 
-                          const int output_height, const int output_width,
-                          const int num_channels, const int batch_size);
-template void select_hard_sample(double *label_data, double *pred_data, 
-                          const int negative_ratio, std::vector<int> postive, 
-                          const int output_height, const int output_width,
-                          const int num_channels, const int batch_size);
-
-
-template <typename Dtype>
-Dtype smoothL1_Loss(Dtype x, Dtype* x_diff){
-  Dtype loss = Dtype(0.);
-  Dtype fabs_x_value = std::fabs(x);
-  if(fabs_x_value < 1){
-    loss = 0.5 * x * x;
-    *x_diff = x;
-  }else{
-    loss = fabs_x_value - 0.5;
-    *x_diff = (Dtype(0) < x) - (x < Dtype(0));
-  }
-  return loss;
-}
-template float smoothL1_Loss(float x, float* x_diff);
-template double smoothL1_Loss(double x, double* x_diff);
+template float FocalLossSigmoid(float* label_data, float *pred_data, int dimScale,  float *bottom_diff);
+template double FocalLossSigmoid(double* label_data, double *pred_data, int dimScale,  double *bottom_diff);
 
 // 每一层使用感受野作为anchor,此anchor只匹配相对应大小范围的gt_boxes, 
 // anchor 生成的方式是按照感受野的大小来生成的,所以每层只有一个感受野大小的anchor, 用于匹配相应的gt_boxes;
@@ -1081,7 +904,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
-      score_loss += focal_loss(class_label + gt_class_index, channel_pred_data + pred_class_index, 
+      score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
                                   dimScale, bottom_diff + pred_class_index);
     }else{
       score_loss += 0;
@@ -1188,6 +1011,194 @@ template void GetCenterGridObjectResultSigmoid(const int batch_size, const int n
                           std::map<int, std::vector<CenterNetInfo > >* results);
 
 
+
+// label_data shape N : 1
+// pre_data shape N : k (object classes)
+// dimScale is the number of what ?? N * K ??
+template <typename Dtype>
+Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pre_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, Dtype *bottom_diff, 
+                            const int num_channels){
+  Dtype loss = Dtype(0.f);
+  int dimScale = output_height * output_width;
+  int label_idx = 0;
+  int count = 0;
+  for(int b = 0; b < batch_size; b++){
+    for(int h = 0; h < output_height; h++){
+      for(int w = 0; w < output_width; w++){
+        Dtype label_value = Dtype(label_data[b * dimScale + h * output_width + w]);
+        if(label_value == 0)
+          continue;
+        else if(label_value == 0.5)
+          label_idx = 0;
+        else if(label_value == 1){
+          label_idx = 1;
+        }
+        
+        int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
+        Dtype MaxVaule = pre_data[bg_index + 0 * dimScale];
+        Dtype sumValue = Dtype(0.f);
+        // 求出每组的最大值, 计算出概率值
+        for(int c = 0; c < 2; c++){
+          MaxVaule = std::max(MaxVaule, pre_data[bg_index + c * dimScale]);
+        }
+        for(int c = 0; c< 2; c++){
+          sumValue += std::exp(pre_data[bg_index + c * dimScale] - MaxVaule);
+        }
+        Dtype pred_data_value = std::exp(pre_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
+        loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
+        bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
+        count++;
+      }
+    }
+  }
+  return loss;
+}
+
+template float SoftmaxLossEntropy(float* label_data, float* pre_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, float *bottom_diff, 
+                            const int num_channels);
+template double SoftmaxLossEntropy(double* label_data, double* pre_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, double *bottom_diff, 
+                            const int num_channels);
+
+
+template <typename T>
+bool SortScorePairDescendCenter(const pair<T, float>& pair1,
+                          const pair<T, float>& pair2) {
+  return pair1.second > pair2.second;
+}
+
+template <typename Dtype>
+void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
+            const int label_channel, const int num_channels,
+            const int outheight, const int outwidth){
+  CHECK_EQ(label_channel, 2);
+  int dimScale = outheight * outwidth;
+  for(int b = 0; b < batch_size; b ++){
+    for(int h = 0; h < outheight; h++){
+      for(int w = 0; w < outwidth; w++){
+        int class_index = b * num_channels * dimScale + 4 * dimScale +  h * outwidth + w;
+        Dtype MaxVaule = pred_data[class_index + 0 * dimScale];
+        Dtype sumValue = Dtype(0.f);
+        // 求出每组的最大值
+        for(int c = 0; c< label_channel; c++){
+          MaxVaule = std::max(MaxVaule, pred_data[class_index + c * dimScale]);
+        }
+        // 每个样本组减去最大值， 计算exp，求和
+        Dtype pred_1, pred_2;
+        pred_1 = pred_data[class_index + 0 * dimScale];
+        pred_2 = pred_data[class_index + 1 * dimScale];
+        for(int c = 0; c< label_channel; c++){
+          pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
+          sumValue += pred_data[class_index + c * dimScale];
+        }
+        CHECK_GT(sumValue , 0)<<pred_data[class_index + 0 * dimScale]<<", "
+                              <<pred_data[class_index + 1 * dimScale]<<", maxValue: "
+                              <<MaxVaule<<", bg_0: "<<pred_1<<", face_1: "<<pred_2;
+        // 计算softMax
+        for(int c = 0; c< label_channel; c++){
+          pred_data[class_index + c * dimScale] = pred_data[class_index + c * dimScale] / sumValue;
+        }
+        CHECK_GE(pred_data[class_index + 0 * dimScale], 0)<<"sumValue: "<<sumValue;
+        CHECK_GE(pred_data[class_index + 1 * dimScale], 0)<<"sumValue: "<<sumValue;
+        CHECK_LE(pred_data[class_index + 0 * dimScale], 1)<<"sumValue: "<<sumValue;
+        CHECK_LE(pred_data[class_index + 1 * dimScale], 1)<<"sumValue: "<<sumValue;
+      }
+    }
+  }
+}
+template void SoftmaxCenterGrid(float * pred_data, const int batch_size,
+            const int label_channel, const int num_channels,
+            const int outheight, const int outwidth);
+template void SoftmaxCenterGrid(double * pred_data, const int batch_size,
+            const int label_channel, const int num_channels,
+            const int outheight, const int outwidth);
+// hard sampling mine postive : negative 1: 10
+// 按理来说是需要重新统计负样本的编号，以及获取到他的数值
+// label_data : K x H x W
+// pred_data : K x H x W x N
+template <typename Dtype>
+void SelectHardSample(Dtype *label_data, Dtype *pred_data, 
+                          const int negative_ratio, std::vector<int> postive, 
+                          const int output_height, const int output_width,
+                          const int num_channels, const int batch_size){
+  CHECK_EQ(num_channels, 4 + 2) << "x, y, width, height + label classes containing background + face";
+  int dimScale = output_height * output_width;
+  std::vector<std::pair<int, float> > loss_value_indices;
+  for(int b = 0; b < batch_size; b ++){
+    loss_value_indices.clear();
+    int num_postive = postive[b];
+    for(int h = 0; h < output_height; h ++){
+      for(int w = 0; w < output_width; w ++){
+        if(label_data[b * dimScale + h * output_width +w] != 1){
+          int negative_index = h * output_width + w;
+          int bg_index = b * num_channels * dimScale  + 4 * dimScale + h * output_width + w;
+          Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
+          Dtype sumValue = Dtype(0.f);
+          // 求出每组的最大值
+          for(int c = 0; c < 2; c++){
+            MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
+          }
+          for(int c = 0; c< 2; c++){
+            sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
+          }
+          Dtype prob = std::exp(pred_data[bg_index] - MaxVaule) / sumValue;
+          Dtype loss = (-1) * log(std::max(prob,  Dtype(FLT_MIN)));
+          loss_value_indices.push_back(std::make_pair(negative_index, loss));
+        }
+      }
+    }
+    std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
+    int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
+    for(int ii = 0; ii < num_negative; ii++){
+      int h = loss_value_indices[ii].first / output_width;
+      int w = loss_value_indices[ii].first % output_width;
+      label_data[b * dimScale + h * output_width + w] = 0.5;
+    }
+  }
+}
+
+template void SelectHardSample(float *label_data, float *pred_data, 
+                          const int negative_ratio, std::vector<int> postive, 
+                          const int output_height, const int output_width,
+                          const int num_channels, const int batch_size);
+template void SelectHardSample(double *label_data, double *pred_data, 
+                          const int negative_ratio, std::vector<int> postive, 
+                          const int output_height, const int output_width,
+                          const int num_channels, const int batch_size);
+
+
+template <typename Dtype>
+Dtype smoothL1_Loss(Dtype x, Dtype* x_diff){
+  Dtype loss = Dtype(0.);
+  Dtype fabs_x_value = std::fabs(x);
+  if(fabs_x_value < 1){
+    loss = 0.5 * x * x;
+    *x_diff = x;
+  }else{
+    loss = fabs_x_value - 0.5;
+    *x_diff = (Dtype(0) < x) - (x < Dtype(0));
+  }
+  return loss;
+}
+template float smoothL1_Loss(float x, float* x_diff);
+template double smoothL1_Loss(double x, double* x_diff);
+
+template <typename Dtype>
+Dtype L2_Loss(Dtype x, Dtype* x_diff){
+  Dtype loss = Dtype(0.);
+  loss = x * x;
+  *x_diff = 2 * x;
+  return loss;
+}
+
+template float L2_Loss(float x, float* x_diff);
+template double L2_Loss(double x, double* x_diff);
+
 template <typename Dtype> 
 Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
@@ -1277,9 +1288,9 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  select_hard_sample(class_label, channel_pred_data, 3, postive_batch, 
+  SelectHardSample(class_label, channel_pred_data, 3, postive_batch, 
                         output_height, output_width, num_channels, batch_size);
-  score_loss = softmax_loss_entropy(class_label, channel_pred_data, batch_size, output_height,
+  score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
   *loc_loss_value = loc_loss;
@@ -1507,7 +1518,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
-      score_loss += focal_loss(class_label + gt_class_index, channel_pred_data + pred_class_index, 
+      score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
                                   dimScale, bottom_diff + pred_class_index);
     }else{
       score_loss += 0;
