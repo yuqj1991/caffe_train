@@ -1249,6 +1249,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             Dtype ymax_loss = smoothL1_Loss(Dtype(channel_pred_data[height_index] - ymax_bias), &(bottom_diff[height_index]));
              
             loc_loss += xmin_loss + xmax_loss + ymin_loss + ymax_loss;
+            #if 0
             if(xmin_loss + xmax_loss + ymin_loss + ymax_loss > 4){
               LOG(INFO)<<"Region: "<<output_height
                        <<", xmin_bias: "<< xmin_bias <<", ymin_bias: "<< ymin_bias
@@ -1258,6 +1259,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                        <<", xmax_diff: "<< channel_pred_data[width_index] - xmax_bias 
                        <<", ymax_diff: "<< channel_pred_data[height_index] - ymax_bias;
             }
+            #endif
             int class_index = b * dimScale +  h * output_width + w;
             class_label[class_index] = 1;
             mask_Rf_anchor[h * output_width + w] = 1;
