@@ -766,15 +766,14 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
   CHECK_EQ(num_channels, (4 + 1 + num_classes)) 
           << "num_channels shoule be set to including bias_x, bias_y, width, height, object_confidence and classes";
   for(int b = 0; b < batch_size; b++){
-    int object_index = b * num_channels * dimScale
-                                + 4 * dimScale;
+    int object_index = b * num_channels * dimScale + 4 * dimScale;
     for(int i = 0; i < (num_classes + 1) * dimScale; i++){
       channel_pred_data[object_index + i] = CenterSigmoid(channel_pred_data[object_index + i]);
     }
   }
 
   int postive = 0;
-  caffe_set(batch_size * dimScale, Dtype(0.5), class_label);
+  caffe_set(batch_size * dimScale, Dtype(0.), class_label);
 
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
@@ -796,7 +795,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
       const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
       int large_side = std::max(gt_bbox_height, gt_bbox_width);
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        /*int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
+        int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
         int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
         int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
         int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
@@ -808,12 +807,12 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
                                   +  h * output_width + w;
             class_label[class_index] = 0.5;
           }
-        }*/
+        }
         for(int h = 0; h < output_height; h++){
           for(int w = 0; w < output_width; w++){
             if((w + (anchor_scale/downRatio) / 2 >= output_width - 1) || (w + (anchor_scale/downRatio) / 2 < xmin))
               continue;
-            if((h + (anchor_scale/downRatio) / 2>= output_height - 1) || (h + (anchor_scale/downRatio) / 2) < ymin)
+            if((h + (anchor_scale/downRatio) / 2 >= output_height - 1) || (h + (anchor_scale/downRatio) / 2) < ymin)
               continue;
             if((w - (anchor_scale/downRatio) / 2 < 0) || (w - (anchor_scale/downRatio) / 2) > xmax)
               continue;
@@ -829,9 +828,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
                                       + 3* dimScale + h * output_width + w;
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
-            //int class_index = b * dimScale +  h * output_width + w;
-            //if(class_label[class_index] == 0.5)
-            //  continue;
+            int class_index = b * dimScale +  h * output_width + w;
             NormalizedBBox predBox;
             float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /(2*downRatio)) / output_width;
             float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /(2*downRatio)) / output_height;
@@ -851,6 +848,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
             bottom_diff[object_index] = (-1) * (0 - channel_pred_data[object_index]);
             if(best_iou > ignore_thresh){
               bottom_diff[object_index] = 0;
+              class_label[class_index] = 0.5;
             }
           }
         }
