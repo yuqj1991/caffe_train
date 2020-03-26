@@ -3,7 +3,7 @@
 #include <utility>
 #include <vector>
 
-#include "caffe/layers/centernet_object_loss_layer.hpp"
+#include "caffe/layers/CenternetLossLayer.hpp"
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
