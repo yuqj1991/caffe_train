@@ -1198,6 +1198,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
                           Dtype ignore_thresh, int *count_postive, Dtype *loc_loss_value){
+  #if 0
   CHECK_EQ(num_classes, 2);
   int dimScale = output_height * output_width;
   Dtype score_loss = Dtype(0.), loc_loss = Dtype(0.);
@@ -1269,7 +1270,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   *count_postive = postive;
   *loc_loss_value = loc_loss;
 
-  #if 1
+  #else
   Dtype test_class_label[8] = {0., 0.5, 0.5, 1., 0.5, 0., 1., 1.};
   Dtype test_pred_data[] = {25.46, 78.25, 35.14, 74.12,
                             25.46, 78.25, 35.14, 74.12,
