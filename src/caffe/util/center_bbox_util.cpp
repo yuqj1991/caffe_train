@@ -1010,9 +1010,8 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
           continue;
         else if(label_value == 0.5)
           label_idx = 0;
-        else if(label_value == 1){
+        else if(label_value == 1)
           label_idx = 1;
-        }
         
         int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
         Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
@@ -1146,10 +1145,8 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
       int w = loss_value_indices[ii].first % output_width;
       label_data[b * dimScale + h * output_width + w] = 0.5;
       if(test_Value == loss_value_indices[ii].second){
-        CHECK_EQ(idx_h, h);
-        CHECK_EQ(idx_w, w);
+        LOG(INFO)<<"idx_h: "<<idx_h <<", h: "<<h<<", idx_w: "<<idx_w<<", w: "<<w;
       }
-
     }
   }
 }
@@ -1270,6 +1267,14 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
   *loc_loss_value = loc_loss;
+
+  #if 1
+  Dtype test_class_label[2 * 2 * 2] = {0., 0.5, 0.5, 1., 0.5, 0., 1., 1.};
+  Dtype test_pred_data[2 * (2 * 2 * 2)] = {
+
+  }
+  #endif
+
   return score_loss;
 }
 
