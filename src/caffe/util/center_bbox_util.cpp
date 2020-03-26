@@ -1110,6 +1110,9 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
   for(int b = 0; b < batch_size; b ++){
     loss_value_indices.clear();
     int num_postive = postive[b];
+    Dtype test_Value = Dtype(0);
+    int idx_h, idx_w;
+    bool flages = false;
     for(int h = 0; h < output_height; h ++){
       for(int w = 0; w < output_width; w ++){
         if(label_data[b * dimScale + h * output_width +w] != 1){
@@ -1127,6 +1130,12 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
           Dtype prob = std::exp(pred_data[bg_index] - MaxVaule) / sumValue;
           Dtype loss = (-1) * log(std::max(prob,  Dtype(FLT_MIN)));
           loss_value_indices.push_back(std::make_pair(negative_index, loss));
+          if(!flages){
+            test_Value = loss;
+            idx_h = h;
+            idx_w = w;
+            flages = true;
+          }
         }
       }
     }
@@ -1135,8 +1144,12 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
     for(int ii = 0; ii < num_negative; ii++){
       int h = loss_value_indices[ii].first / output_width;
       int w = loss_value_indices[ii].first % output_width;
-      LOG(INFO)<<"h: "<<h<<", w: "<<w<<", loss: "<<loss_value_indices[ii].second;
       label_data[b * dimScale + h * output_width + w] = 0.5;
+      if(test_Value == loss_value_indices[ii].second){
+        CHECK_EQ(idx_h, h);
+        CHECK_EQ(idx_w, w);
+      }
+
     }
   }
 }
@@ -1252,7 +1265,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  SelectHardSample(class_label, channel_pred_data, 3, postive_batch, output_height, output_width, num_channels, batch_size);
+  SelectHardSample(class_label, channel_pred_data, 10, postive_batch, output_height, output_width, num_channels, batch_size);
   score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
