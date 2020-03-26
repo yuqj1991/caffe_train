@@ -1282,7 +1282,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
   *loc_loss_value = loc_loss;
-  return score_loss
+  return score_loss;
   #else
   Dtype test_class_label[8] = {0., 0.5, 0.5, 1., 0.5, 0., 1., 1.};
   Dtype test_pred_data[] = {25.46, 78.25, 35.14, 74.12,
@@ -1298,8 +1298,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                             16.43, 67.27, 27.89, 37.44,
                             19.22, 28.55, 35.32, 44.33};
   Dtype test_bottom_diff[48];
-  Dtype test_loss = SoftmaxLossEntropy(test_class_label, test_pred_data, 2, 2,
-                        2, test_bottom_diff, 6);
+  Dtype test_loss = SoftmaxLossEntropy(test_class_label, test_pred_data, 2, 2, 2, test_bottom_diff, 6);
   LOG(INFO)<<"TEST_LOSS: "<<test_loss;
   return 0.;
   #endif
