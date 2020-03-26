@@ -1109,9 +1109,9 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
   for(int b = 0; b < batch_size; b ++){
     loss_value_indices.clear();
     int num_postive = postive[b];
-    Dtype test_Value = Dtype(0);
-    int idx_h = 0, idx_w = 0;
-    bool flages = false;
+    //Dtype test_Value = Dtype(0);
+    //int idx_h = 0, idx_w = 0;
+    //bool flages = false;
     for(int h = 0; h < output_height; h ++){
       for(int w = 0; w < output_width; w ++){
         if(label_data[b * dimScale + h * output_width +w] != 1){
@@ -1129,12 +1129,12 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
           Dtype prob = std::exp(pred_data[bg_index] - MaxVaule) / sumValue;
           Dtype loss = (-1) * log(std::max(prob,  Dtype(FLT_MIN)));
           loss_value_indices.push_back(std::make_pair(negative_index, loss));
-          if(!flages){
+          /*if(!flages){
             test_Value = loss;
             idx_h = h;
             idx_w = w;
             flages = true;
-          }
+          }*/
         }
       }
     }
@@ -1145,11 +1145,11 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
       int h = loss_value_indices[ii].first / output_width;
       int w = loss_value_indices[ii].first % output_width;
       label_data[b * dimScale + h * output_width + w] = 0.5;
-      if(test_Value == loss_value_indices[ii].second){
+      /*if(test_Value == loss_value_indices[ii].second){
         LOG(INFO)<<"ii: "<<ii<<", idx_h: "<<idx_h 
                    <<", h: "<<h<<", idx_w: "<<idx_w<<", w: "<<w
-                   <<"loss_value: "<<loss_value_indices[ii].second;
-      }
+                   <<", loss_value: "<<loss_value_indices[ii].second;
+      }*/
     }
   }
 }
