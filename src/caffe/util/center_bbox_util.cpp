@@ -1255,15 +1255,14 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
               LOG(INFO)<<"loc_loss: "<<xmin_loss + xmax_loss + ymin_loss + ymax_loss
                        <<", bbox_width: "<<xmax - xmin 
                        << ", bbox_height: "<<ymax - ymin
-                       <<", downRatio: "<<downRatio;
+                       <<", downRatio: "<<downRatio
+                       <<", large_side: "<<large_side;
               LOG(INFO)<<"Region: "<<output_height
                        <<", xmin_bias: "<< xmin_bias <<", ymin_bias: "<< ymin_bias
                        <<", xmax_bias: "<< xmax_bias <<", ymax_bias: "<< ymax_bias;
               
-              LOG(INFO)<<"xmin_diff: "<< channel_pred_data[xmin_index] - xmin_bias
-                       <<", ymin_diff: "<< channel_pred_data[ymin_index] - ymin_bias
-                       <<", xmax_diff: "<< channel_pred_data[xmax_index] - xmax_bias 
-                       <<", ymax_diff: "<< channel_pred_data[ymax_index] - ymax_bias;
+              LOG(INFO)<<"xmin_diff: "<< xmin_loss << ", ymin_diff: "<< ymin_loss
+                       <<", xmax_diff: "<< xmax_loss <<", ymax_diff: "<< ymax_loss;
             }
             #endif
             int class_index = b * dimScale +  h * output_width + w;
