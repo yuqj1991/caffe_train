@@ -1290,8 +1290,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   LOG(INFO)<<"TEST_LOSS: "<<test_loss;
 
   #endif
-
-  return score_loss;
+  return 0.;
+  //return score_loss;
 }
 
 template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
