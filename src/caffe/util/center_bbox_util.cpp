@@ -836,6 +836,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
             class_label[class_index] = 0.5;
           }
         }
+        /*
         for(int h = 0; h < output_height; h++){
           for(int w = 0; w < output_width; w++){
             if((w + (anchor_scale/downRatio) / 2 >= output_width - 1) || (w + (anchor_scale/downRatio) / 2 < xmin))
@@ -871,7 +872,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
               class_label[class_index] = 0.5;
             }
           }
-        }
+        }*/
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
