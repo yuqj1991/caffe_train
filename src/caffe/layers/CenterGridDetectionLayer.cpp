@@ -8,7 +8,7 @@
 #include "boost/filesystem.hpp"
 #include "boost/foreach.hpp"
 
-#include "caffe/layers/detection_centerGrid_output_layer.hpp"
+#include "caffe/layers/CenterGridDetectionLayer.hpp"
 
 namespace caffe {
 
