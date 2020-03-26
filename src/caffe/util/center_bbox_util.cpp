@@ -1024,8 +1024,10 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
           sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
         }
         Dtype pred_data_value = std::exp(pred_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
+        Dtype pred_another_data_value = std::exp(pred_data[bg_index + (1 - label_idx) * dimScale] - MaxVaule) / sumValue;
         loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
         bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
+        bottom_diff[bg_index + (1 - label_idx) * dimScale] = pred_another_data_value;
         count++;
       }
     }
@@ -1109,9 +1111,6 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
   for(int b = 0; b < batch_size; b ++){
     loss_value_indices.clear();
     int num_postive = postive[b];
-    //Dtype test_Value = Dtype(0);
-    //int idx_h = 0, idx_w = 0;
-    //bool flages = false;
     for(int h = 0; h < output_height; h ++){
       for(int w = 0; w < output_width; w ++){
         if(label_data[b * dimScale + h * output_width +w] != 1){
@@ -1129,27 +1128,15 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
           Dtype prob = std::exp(pred_data[bg_index] - MaxVaule) / sumValue;
           Dtype loss = (-1) * log(std::max(prob,  Dtype(FLT_MIN)));
           loss_value_indices.push_back(std::make_pair(negative_index, loss));
-          /*if(!flages){
-            test_Value = loss;
-            idx_h = h;
-            idx_w = w;
-            flages = true;
-          }*/
         }
       }
     }
     std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
     int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
-    LOG(INFO)<<"num_negative: "<<num_negative<<", Region: "<<output_height;
     for(int ii = 0; ii < num_negative; ii++){
       int h = loss_value_indices[ii].first / output_width;
       int w = loss_value_indices[ii].first % output_width;
       label_data[b * dimScale + h * output_width + w] = 0.5;
-      /*if(test_Value == loss_value_indices[ii].second){
-        LOG(INFO)<<"ii: "<<ii<<", idx_h: "<<idx_h 
-                   <<", h: "<<h<<", idx_w: "<<idx_w<<", w: "<<w
-                   <<", loss_value: "<<loss_value_indices[ii].second;
-      }*/
     }
   }
 }
