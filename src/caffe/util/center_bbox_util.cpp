@@ -1146,7 +1146,9 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
       int w = loss_value_indices[ii].first % output_width;
       label_data[b * dimScale + h * output_width + w] = 0.5;
       if(test_Value == loss_value_indices[ii].second){
-        //LOG(INFO)<<"ii: "<<ii<<", idx_h: "<<idx_h <<", h: "<<h<<", idx_w: "<<idx_w<<", w: "<<w;
+        LOG(INFO)<<"ii: "<<ii<<", idx_h: "<<idx_h 
+                   <<", h: "<<h<<", idx_w: "<<idx_w<<", w: "<<w
+                   <<"loss_value: "<<loss_value_indices[ii].second;
       }
     }
   }
@@ -1221,7 +1223,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
       const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
       int large_side = std::max(gt_bbox_height, gt_bbox_width);
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
+        /*int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
         int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
         int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
         int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
@@ -1233,7 +1235,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                   +  h * output_width + w;
             class_label[class_index] = 0.5;
           }
-        }
+        }*/
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
@@ -1277,7 +1279,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  // SelectHardSample(class_label, channel_pred_data, 10, postive_batch, output_height, output_width, num_channels, batch_size);
+  SelectHardSample(class_label, channel_pred_data, 10, postive_batch, output_height, output_width, num_channels, batch_size);
   score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
