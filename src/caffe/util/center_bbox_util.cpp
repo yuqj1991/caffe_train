@@ -1247,20 +1247,21 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             maxValue = std::max(std::fabs(xmin_bias), maxValue);
             maxValue = std::max(std::fabs(ymin_bias), maxValue);
             if(maxValue >= 2)
-            LOG(INFO)<<"output_height: "<<output_height<<", xmin_bias: "<<xmin_bias 
-                     <<", ymin_bias: "<<ymin_bias
-                     <<", xmax_bias: "<<xmax_bias<<", ymax_bias: "<<ymax_bias;
+              LOG(INFO)<<"Region: "<<output_height
+                       <<", xmin_bias: "<< xmin_bias <<", ymin_bias: "<< ymin_bias
+                       <<", xmax_bias: "<< xmax_bias <<", ymax_bias: "<< ymax_bias;
+            LOG(INFO)<<"Region: "<<output_height
+                     <<", channel_pred_data[x_index] - xmin_bias: "<< channel_pred_data[x_index] - xmin_bias
+                     <<", channel_pred_data[y_index] - ymin_bias: "<< channel_pred_data[y_index] - ymin_bias
+                     <<", channel_pred_data[width_index] - xmax_bias: "<< channel_pred_data[width_index] - xmax_bias 
+                     <<", channel_pred_data[height_index] - ymax_bias: "<< channel_pred_data[height_index] - ymax_bias;
             loc_loss += smoothL1_Loss(Dtype(channel_pred_data[x_index] - xmin_bias), &(bottom_diff[x_index]));
             loc_loss += smoothL1_Loss(Dtype(channel_pred_data[y_index] - ymin_bias), &(bottom_diff[y_index]));
             loc_loss += smoothL1_Loss(Dtype(channel_pred_data[width_index] - xmax_bias), &(bottom_diff[width_index]));
             loc_loss += smoothL1_Loss(Dtype(channel_pred_data[height_index] - ymax_bias), &(bottom_diff[height_index]));
             
-            // class score 
-            // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
-            int class_index = b * dimScale
-                                  +  h * output_width + w;
+            int class_index = b * dimScale +  h * output_width + w;
             class_label[class_index] = 1;
-            
             mask_Rf_anchor[h * output_width + w] = 1;
             count++;
           }
