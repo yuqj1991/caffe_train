@@ -47,7 +47,7 @@ layer {
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-		batch_size: 4
+		batch_size: 6
 		backend: LMDB
 	}
 	annotated_data_param {
@@ -4841,8 +4841,8 @@ layer {
 		net_width: 640
 		ignore_thresh: 0.3
 		bias_scale: 512
-		low_bbox_scale: 210
-		up_bbox_scale: 500
+		low_bbox_scale: 256
+		up_bbox_scale: 512
 
 		class_type: SOFTMAX
 		bias_num: 1
@@ -4872,8 +4872,8 @@ layer {
 		net_width: 640
 		ignore_thresh: 0.3
 		bias_scale: 256
-		low_bbox_scale: 110
-		up_bbox_scale: 210
+		low_bbox_scale: 128
+		up_bbox_scale: 256
 
 		class_type: SOFTMAX
 		bias_num: 1
@@ -4903,8 +4903,8 @@ layer {
 		net_width: 640
 		ignore_thresh: 0.3
 		bias_scale: 128
-		low_bbox_scale: 25
-		up_bbox_scale: 110
+		low_bbox_scale: 48
+		up_bbox_scale: 128
 
 		class_type: SOFTMAX
 		bias_num: 1
@@ -4933,9 +4933,9 @@ layer {
 		net_height: 640
 		net_width: 640
 		ignore_thresh: 0.3
-		bias_scale: 40
+		bias_scale: 64
 		low_bbox_scale: 8
-		up_bbox_scale: 25
+		up_bbox_scale: 48
 
 		class_type: SOFTMAX
 		bias_num: 1

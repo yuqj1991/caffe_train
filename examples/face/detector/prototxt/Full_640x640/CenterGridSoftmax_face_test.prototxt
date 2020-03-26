@@ -4718,7 +4718,7 @@ layer {
 		bias_scale: 512
 		bias_scale: 256
 		bias_scale: 128
-		bias_scale: 40
+		bias_scale: 64
 
 		class_type: SOFTMAX
 

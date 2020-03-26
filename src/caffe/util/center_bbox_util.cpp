@@ -232,8 +232,7 @@ template void _nms_heatmap(const float* conf_data, float* keep_max_data, const i
 template void _nms_heatmap(const double* conf_data, double* keep_max_data, const int output_height
                   , const int output_width, const int channels, const int num_batch);
 
-void center_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, float nmsthreshold,int type)
-{
+void center_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, float nmsthreshold,int type){
 	if (input.empty()) {
 		return;
 	}
@@ -1013,10 +1012,10 @@ template void GetCenterGridObjectResultSigmoid(const int batch_size, const int n
 
 
 // label_data shape N : 1
-// pre_data shape N : k (object classes)
+// pred_data shape N : k (object classes)
 // dimScale is the number of what ?? N * K ??
 template <typename Dtype>
-Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pre_data, 
+Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, Dtype *bottom_diff, 
                             const int num_channels){
@@ -1037,16 +1036,16 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pre_data,
         }
         
         int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
-        Dtype MaxVaule = pre_data[bg_index + 0 * dimScale];
+        Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
         Dtype sumValue = Dtype(0.f);
         // 求出每组的最大值, 计算出概率值
         for(int c = 0; c < 2; c++){
-          MaxVaule = std::max(MaxVaule, pre_data[bg_index + c * dimScale]);
+          MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
         }
         for(int c = 0; c< 2; c++){
-          sumValue += std::exp(pre_data[bg_index + c * dimScale] - MaxVaule);
+          sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
         }
-        Dtype pred_data_value = std::exp(pre_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
+        Dtype pred_data_value = std::exp(pred_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
         loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
         bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
         count++;
@@ -1056,11 +1055,11 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pre_data,
   return loss;
 }
 
-template float SoftmaxLossEntropy(float* label_data, float* pre_data, 
+template float SoftmaxLossEntropy(float* label_data, float* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, float *bottom_diff, 
                             const int num_channels);
-template double SoftmaxLossEntropy(double* label_data, double* pre_data, 
+template double SoftmaxLossEntropy(double* label_data, double* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, double *bottom_diff, 
                             const int num_channels);
