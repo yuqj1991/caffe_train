@@ -1135,6 +1135,7 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
     for(int ii = 0; ii < num_negative; ii++){
       int h = loss_value_indices[ii].first / output_width;
       int w = loss_value_indices[ii].first % output_width;
+      LOG(INFO)<<"h: "<<h<<", w: "<<w<<", loss: "<<loss_value_indices[ii].second;
       label_data[b * dimScale + h * output_width + w] = 0.5;
     }
   }

@@ -696,8 +696,6 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
         }
       }
       match_data[i * num_preds_per_class + p] = label;
-      if(label == background_label_id)
-        printf("label: %d", label);
     }
   }
   // Get probability data.
@@ -705,6 +703,11 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
   Blob<Dtype> prob_blob;
   prob_blob.ReshapeLike(conf_blob);
   if (loss_type == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
+    Dtype* prob_gpu_data = prob_blob.mutable_gpu_data();
+    SoftMaxGPU(conf_blob.gpu_data(), num * num_preds_per_class, num_classes, 1,
+        prob_gpu_data);
+    conf_gpu_data = prob_blob.gpu_data();
+  }else if(loss_type == MultiBoxLossParameter_ConfLossType_FOCALSOFTMAX) {
     Dtype* prob_gpu_data = prob_blob.mutable_gpu_data();
     SoftMaxGPU(conf_blob.gpu_data(), num * num_preds_per_class, num_classes, 1,
         prob_gpu_data);
