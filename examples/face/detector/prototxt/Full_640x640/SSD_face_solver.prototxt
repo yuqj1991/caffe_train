@@ -16,7 +16,6 @@ test_initialization: false
 max_iter: 200000
 average_loss: 10
 stepvalue: 35000
-stepvalue: 60000
 stepvalue: 100000
 stepvalue: 140000
 stepvalue: 180000
