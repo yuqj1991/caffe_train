@@ -15,7 +15,7 @@ snapshot_after_train: true
 test_initialization: false
 max_iter: 150000
 average_loss: 10
-stepvalue: 20000
+stepvalue: 10000
 stepvalue: 60000
 stepvalue: 100000
 stepvalue: 130000
