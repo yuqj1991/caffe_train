@@ -22,7 +22,7 @@ stepvalue: 180000
 iter_size: 4
 momentum: 0.9
 #momentum2 : 0.99
-#type: "RMSProp"
+#type: "SGD"
 eval_type: "detection"
 ap_version: "11point"
 
