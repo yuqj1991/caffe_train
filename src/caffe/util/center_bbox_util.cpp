@@ -77,6 +77,12 @@ Dtype CenterSigmoid(Dtype x){
 template double CenterSigmoid(double x);
 template float CenterSigmoid(float x);
 
+template <typename T>
+bool SortScorePairDescendCenter(const pair<T, float>& pair1,
+                          const pair<T, float>& pair2) {
+  return pair1.second > pair2.second;
+}
+
 
 template<typename Dtype>
 Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, const Dtype min_overlap){
@@ -741,6 +747,44 @@ Dtype FocalLossSigmoid(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype
 template float FocalLossSigmoid(float* label_data, float *pred_data, int dimScale,  float *bottom_diff);
 template double FocalLossSigmoid(double* label_data, double *pred_data, int dimScale,  double *bottom_diff);
 
+
+// hard sampling mine postive : negative 1: 5 sigmoid
+// 按理来说是需要重新统计负样本的编号，以及获取到他的数值
+// label_data : K x H x W
+// pred_data : K x H x W x N
+template <typename Dtype>
+void SelectHardSampleSigmoid(Dtype *label_data, Dtype *pred_data, const int negative_ratio, const int num_postive, 
+                          const int output_height, const int output_width, const int num_channels){
+  CHECK_EQ(num_channels, 4 + 2) << "x, y, width, height + objectness + label class containing face";
+  std::vector<std::pair<int, float> > loss_value_indices;
+  loss_value_indices.clear();
+  Dtype alpha_ = 0.25;
+  Dtype gamma_ = 2.f;
+  for(int h = 0; h < output_height; h ++){
+    for(int w = 0; w < output_width; w ++){
+      if(label_data[h * output_width +w] != 1){
+        int bg_index = h * output_width + w;
+        // Focal loss when sample belong to background
+        Dtype loss = (-1) * alpha_ * std::pow(pred_data[bg_index], gamma_) * 
+                                     std::log(std::max(1 - pred_data[bg_index],  Dtype(FLT_MIN)));
+        loss_value_indices.push_back(std::make_pair(bg_index, loss));
+      }
+    }
+  }
+  std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
+  int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
+  for(int ii = 0; ii < num_negative; ii++){
+    int h = loss_value_indices[ii].first / output_width;
+    int w = loss_value_indices[ii].first % output_width;
+    label_data[h * output_width + w] = 0.5;
+  }
+}
+template void SelectHardSampleSigmoid(float *label_data, float *pred_data, const int negative_ratio, const int num_postive, 
+                                     const int output_height, const int output_width, const int num_channels);
+template void SelectHardSampleSigmoid(double *label_data, double *pred_data, const int negative_ratio, const int num_postive, 
+                                     const int output_height, const int output_width, const int num_channels);
+
+
 // 每一层使用感受野作为anchor,此anchor只匹配相对应大小范围的gt_boxes, 
 // anchor 生成的方式是按照感受野的大小来生成的,所以每层只有一个感受野大小的anchor, 用于匹配相应的gt_boxes;
 // anchor 的匹配方式是按照每个anchor中心落在真实框之内匹配呢？,还是直接基于每个格子中心来进行预测呢？最终直接使用中心来
@@ -819,9 +863,8 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
       const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
       const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
       int large_side = std::max(gt_bbox_height, gt_bbox_width);
-
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
+        /*int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
         int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
         int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
         int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
@@ -833,7 +876,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
                                   +  h * output_width + w;
             class_label[class_index] = 0.5;
           }
-        }
+        }*/
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
@@ -882,6 +925,8 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
+      SelectHardSampleSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 5, count, 
+                                output_height, output_width, num_channels);
       score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
                                   dimScale, bottom_diff + pred_class_index);
     }else{
@@ -1044,13 +1089,6 @@ template double SoftmaxLossEntropy(double* label_data, double* pred_data,
                             const int output_width, double *bottom_diff, 
                             const int num_channels);
 
-
-template <typename T>
-bool SortScorePairDescendCenter(const pair<T, float>& pair1,
-                          const pair<T, float>& pair2) {
-  return pair1.second > pair2.second;
-}
-
 template <typename Dtype>
 void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
             const int label_channel, const int num_channels,
@@ -1096,12 +1134,12 @@ template void SoftmaxCenterGrid(float * pred_data, const int batch_size,
 template void SoftmaxCenterGrid(double * pred_data, const int batch_size,
             const int label_channel, const int num_channels,
             const int outheight, const int outwidth);
-// hard sampling mine postive : negative 1: 10
+// hard sampling mine postive : negative 1: 5 softmax
 // 按理来说是需要重新统计负样本的编号，以及获取到他的数值
 // label_data : K x H x W
 // pred_data : K x H x W x N
 template <typename Dtype>
-void SelectHardSample(Dtype *label_data, Dtype *pred_data, 
+void SelectHardSampleSoftMax(Dtype *label_data, Dtype *pred_data, 
                           const int negative_ratio, std::vector<int> postive, 
                           const int output_height, const int output_width,
                           const int num_channels, const int batch_size){
@@ -1141,11 +1179,11 @@ void SelectHardSample(Dtype *label_data, Dtype *pred_data,
   }
 }
 
-template void SelectHardSample(float *label_data, float *pred_data, 
+template void SelectHardSampleSoftMax(float *label_data, float *pred_data, 
                           const int negative_ratio, std::vector<int> postive, 
                           const int output_height, const int output_width,
                           const int num_channels, const int batch_size);
-template void SelectHardSample(double *label_data, double *pred_data, 
+template void SelectHardSampleSoftMax(double *label_data, double *pred_data, 
                           const int negative_ratio, std::vector<int> postive, 
                           const int output_height, const int output_width,
                           const int num_channels, const int batch_size);
@@ -1210,19 +1248,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
       const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
       int large_side = std::max(gt_bbox_height, gt_bbox_width);
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        /*int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
-        int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
-        int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
-        int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
-        for(int h = RF_ymin; h < RF_ymax; h++){
-          for(int w = RF_xmin; w < RF_xmax; w++){
-            if(w < 0 || w >= (output_width - 1) || h <0 || h >= (output_height - 1))
-              continue;
-            int class_index = b * dimScale
-                                  +  h * output_width + w;
-            class_label[class_index] = 0.5;
-          }
-        }*/
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
@@ -1266,7 +1291,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  SelectHardSample(class_label, channel_pred_data, 5, postive_batch, output_height, output_width, num_channels, batch_size);
+  SelectHardSampleSoftMax(class_label, channel_pred_data, 5, postive_batch, output_height, output_width, num_channels, batch_size);
   score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
@@ -1392,7 +1417,7 @@ template void GetCenterGridObjectResultSoftMax(const int batch_size, const int n
 // 5. 再对剩余Loss的集合进行从大到小排列，选取一定数量的负样本
 // 6. 只回归计算这样正样本和一部分负样本的总损失，以及回归相应的梯度值
 template <typename Dtype>
-void SelectHardSampleWithOHEM(){
+void SelectHardSampleSoftMaxWithOHEM(){
    NOT_IMPLEMENTED;
  }
 }  // namespace caffe
