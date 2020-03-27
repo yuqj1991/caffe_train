@@ -1210,7 +1210,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
       const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
       int large_side = std::max(gt_bbox_height, gt_bbox_width);
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
+        /*int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
         int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
         int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
         int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
@@ -1222,7 +1222,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                   +  h * output_width + w;
             class_label[class_index] = 0.5;
           }
-        }
+        }*/
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
@@ -1247,10 +1247,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                       + 2* dimScale + h * output_width + w;
             int ymax_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;        
-            Dtype xmin_loss = smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
-            Dtype ymin_loss = smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
-            Dtype xmax_loss = smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &(bottom_diff[xmax_index]));
-            Dtype ymax_loss = smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &(bottom_diff[ymax_index]));
+            Dtype xmin_loss = L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
+            Dtype ymin_loss = L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
+            Dtype xmax_loss = L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &(bottom_diff[xmax_index]));
+            Dtype ymax_loss = L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &(bottom_diff[ymax_index]));
              
             loc_loss += xmin_loss + xmax_loss + ymin_loss + ymax_loss;
             
@@ -1266,7 +1266,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  // SelectHardSample(class_label, channel_pred_data, 10, postive_batch, output_height, output_width, num_channels, batch_size);
+  SelectHardSample(class_label, channel_pred_data, 5, postive_batch, output_height, output_width, num_channels, batch_size);
   score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
