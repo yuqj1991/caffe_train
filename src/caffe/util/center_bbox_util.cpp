@@ -13,9 +13,13 @@
 #include "caffe/util/bbox_util.hpp"
 #include "caffe/util/center_bbox_util.hpp"
 
-#define USE_YOLO_LOSS 1
-#define USE_HARD_SAMPLE 0
-
+#define USE_YOLO_LOSS_SOFTMAX 1
+#define USE_YOLO_LOSS_SIGMOID 1
+#define USE_HARD_SAMPLE_SOFTMAX 1
+#define USE_HARD_SAMPLE_COLESEBOX_SOFTMAX 0
+#define USE_HARD_SAMPLE_SIGMOID 0
+#define USE_HARD_SAMPLE_COLESEBOX_SIGMOID 0
+#define USE_HARD_SAMPLE_ALL 1
 int count_gt = 0;
 int count_one = 0;
 
@@ -845,9 +849,9 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
   }
 
   int postive = 0;
-  #if USE_HARD_SAMPLE
+  #if USE_HARD_SAMPLE_SIGMOID || USE_HARD_SAMPLE_COLESEBOX_SIGMOID
   caffe_set(batch_size * dimScale, Dtype(0.), class_label);
-  #else
+  #elif USE_HARD_SAMPLE_ALL
   caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
   #endif
   for(int b = 0; b < batch_size; b++){
@@ -883,7 +887,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             best_iou = iou;
           }
         }
-        #if USE_YOLO_LOSS
+        #if USE_YOLO_LOSS_SIGMOID
         bottom_diff[object_index] = channel_pred_data[object_index] - 0.;
         if(best_iou > ignore_thresh){
           bottom_diff[object_index] = 0.;
@@ -907,7 +911,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
       const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
       int large_side = std::max(gt_bbox_height, gt_bbox_width);
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        #if 0
+        #if USE_HARD_SAMPLE_COLESEBOX_SIGMOID
         int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
         int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
         int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
@@ -949,7 +953,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
             Dtype xmin_loss = Dtype(0.), xmax_loss = Dtype(0.), ymin_loss = Dtype(0.), ymax_loss = Dtype(0.);
-            #if USE_YOLO_LOSS
+            #if USE_YOLO_LOSS_SIGMOID
             bottom_diff[xmin_index] = 2 * (channel_pred_data[xmin_index] - xmin_bias);
             bottom_diff[ymin_index] = 2 * (channel_pred_data[ymin_index] - ymin_bias);
             bottom_diff[xmax_index] = 2 * (channel_pred_data[xmax_index] - xmax_bias);
@@ -987,7 +991,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
-      #if USE_HARD_SAMPLE
+      #if USE_HARD_SAMPLE_SIGMOID
       SelectHardSampleSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 3, count, 
                                 output_height, output_width, num_channels);
       #endif
@@ -1286,6 +1290,21 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
       int large_side = std::max(gt_bbox_height, gt_bbox_width);
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
+          #if USE_HARD_SAMPLE_COLESEBOX_SOFTMAX
+          int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
+          int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
+          int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
+          int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
+          for(int h = RF_ymin; h < RF_ymax; h++){
+            for(int w = RF_xmin; w < RF_xmax; w++){
+              if(w < 0 || w >= (output_width - 1) || h <0 || h >= (output_height - 1))
+                continue;
+              int class_index = b * dimScale
+                                    +  h * output_width + w;
+              class_label[class_index] = 0.5;
+            }
+          }
+          #endif
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
               continue;
@@ -1310,7 +1329,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int ymax_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
             Dtype xmin_loss = Dtype(0.), xmax_loss = Dtype(0.), ymin_loss = Dtype(0.), ymax_loss = Dtype(0.);
-            #if USE_YOLO_LOSS      
+            #if USE_YOLO_LOSS_SOFTMAX      
             bottom_diff[xmin_index] = 2 * (channel_pred_data[xmin_index] - xmin_bias);
             bottom_diff[ymin_index] = 2 * (channel_pred_data[ymin_index] - ymin_bias);
             bottom_diff[xmax_index] = 2 * (channel_pred_data[xmax_index] - xmax_bias);
@@ -1340,7 +1359,9 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
+  #if USE_HARD_SAMPLE_SOFTMAX
   SelectHardSampleSoftMax(class_label, channel_pred_data, 3, postive_batch, output_height, output_width, num_channels, batch_size);
+  #endif
   score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
