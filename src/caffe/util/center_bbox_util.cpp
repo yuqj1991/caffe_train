@@ -842,7 +842,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
   }
 
   int postive = 0;
-  caffe_set(batch_size * dimScale, Dtype(0.), class_label);
+  caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
 
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
