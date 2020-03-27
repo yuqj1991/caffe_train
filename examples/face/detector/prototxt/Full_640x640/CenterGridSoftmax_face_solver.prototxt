@@ -2,7 +2,7 @@ train_net: "../prototxt/Full_640x640/CenterGridSoftmax_face_train.prototxt"
 test_net: "../prototxt/Full_640x640/CenterGridSoftmax_face_test.prototxt"
 test_iter: 5000
 test_interval: 5000
-base_lr: 0.125
+base_lr: 0.0625
 display: 100
 lr_policy: "multistep"
 gamma: 0.1
