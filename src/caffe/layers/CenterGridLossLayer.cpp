@@ -104,20 +104,12 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   if (num_groundtruth_ >= 1) {
     const int downRatio = net_height_ / output_height;
     if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
-      class_score = EncodeCenterGridObjectSigmoid(num_, num_channels, num_classes_, output_width, output_height, 
+      class_score = EncodeCenterGridObjectSigmoidLoss(num_, num_channels, num_classes_, output_width, output_height, 
                           downRatio,
                           channel_pred_data,  anchor_scale_, 
                           bbox_range_scale_,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
-                          ignore_thresh_, &count_postive_);
-      const Dtype * diff = bottom[0]->cpu_diff();
-
-      int dimScale = output_height * output_width;
-      for(int b = 0; b < num_; b++){
-        for(int j = 0; j < (4 + 1) * dimScale; j++){ // loc loss + objectness loss
-          sum_squre += diff[b * (4 + 1 + num_classes_) * dimScale + j] * diff[b * (4 + 1 + num_classes_) * dimScale + j];
-        }
-      }
+                          ignore_thresh_, &count_postive_, &sum_squre);
     }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
       class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
                           downRatio,

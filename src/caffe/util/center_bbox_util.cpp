@@ -83,6 +83,33 @@ bool SortScorePairDescendCenter(const pair<T, float>& pair1,
   return pair1.second > pair2.second;
 }
 
+template <typename Dtype>
+Dtype smoothL1_Loss(Dtype x, Dtype* x_diff){
+  Dtype loss = Dtype(0.);
+  Dtype fabs_x_value = std::fabs(x);
+  if(fabs_x_value < 1){
+    loss = 0.5 * x * x;
+    *x_diff = x;
+  }else{
+    loss = fabs_x_value - 0.5;
+    *x_diff = (Dtype(0) < x) - (x < Dtype(0));
+  }
+  return loss;
+}
+template float smoothL1_Loss(float x, float* x_diff);
+template double smoothL1_Loss(double x, double* x_diff);
+
+template <typename Dtype>
+Dtype L2_Loss(Dtype x, Dtype* x_diff){
+  Dtype loss = Dtype(0.);
+  loss = 0.5 * x * x;
+  *x_diff = x;
+  return loss;
+}
+
+template float L2_Loss(float x, float* x_diff);
+template double L2_Loss(double x, double* x_diff);
+
 
 template<typename Dtype>
 Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, const Dtype min_overlap){
@@ -794,17 +821,17 @@ template void SelectHardSampleSigmoid(double *label_data, double *pred_data, con
 // loss -03: class loss 分类概率, 使用focalloss,对所有负样本进行计算
 // 只针对单类物体,二分类物体检测
 template <typename Dtype> 
-Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels, const int num_classes,
+Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
-                          Dtype ignore_thresh, int *count_postive){
+                          Dtype ignore_thresh, int *count_postive, Dtype *loc_loss_value){
   CHECK_EQ(num_classes, 1);
   int dimScale = output_height * output_width;
-  Dtype score_loss = Dtype(0.);
+  Dtype score_loss = Dtype(0.), loc_loss = Dtype(0.);
   CHECK_EQ(num_channels, (4 + 1 + num_classes)) 
           << "num_channels shoule be set to including bias_x, bias_y, width, height, object_confidence and classes";
   for(int b = 0; b < batch_size; b++){
@@ -820,6 +847,7 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
     std::vector<int> mask_Rf_anchor(dimScale, 0);
+    std::vector<Dtype> object_loss(dimScale, 0.);
     int count = 0;
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
@@ -849,9 +877,9 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
             best_iou = iou;
           }
         }
-        bottom_diff[object_index] = (-1) * (0 - channel_pred_data[object_index]);
+        object_loss[h * output_width + w] = L2_Loss(Dtype(channel_pred_data[object_index] - 0.), &(bottom_diff[object_index]));
         if(best_iou > ignore_thresh){
-          bottom_diff[object_index] = 0;
+          object_loss[h * output_width + w] = L2_Loss(Dtype(0.), &(bottom_diff[object_index]));
         }
       }
     }
@@ -893,24 +921,24 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
             Dtype ymin_bias = (h - ymin) * downRatio *2 / anchor_scale;
             Dtype xmax_bias = (w - xmax) * downRatio *2/ anchor_scale;
             Dtype ymax_bias = (h - ymax) * downRatio *2/ anchor_scale;
-            int x_index = b * num_channels * dimScale
+            int xmin_index = b * num_channels * dimScale
                                       + 0* dimScale + h * output_width + w;
-            int y_index = b * num_channels * dimScale 
+            int ymin_index = b * num_channels * dimScale 
                                       + 1* dimScale + h * output_width + w;
-            int width_index = b * num_channels * dimScale
+            int xmax_index = b * num_channels * dimScale
                                       + 2* dimScale + h * output_width + w;
-            int height_index = b * num_channels * dimScale 
+            int ymax_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
             
-            float delta_scale = 2 - (float)(xmax - xmin) * (ymax - ymin) / (output_height * output_width);
-            bottom_diff[x_index] = (-1) * delta_scale * (xmin_bias - channel_pred_data[x_index]);
-            bottom_diff[y_index] = (-1) * delta_scale * (ymin_bias - channel_pred_data[y_index]);
-            bottom_diff[width_index] = (-1) * delta_scale * (xmax_bias - channel_pred_data[width_index]);
-            bottom_diff[height_index] = (-1) * delta_scale * (ymax_bias - channel_pred_data[height_index]);
-            bottom_diff[object_index] = (-1) * (1 - channel_pred_data[object_index]);
-            // class score 
+            Dtype xmin_loss = smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
+            Dtype ymin_loss = smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
+            Dtype xmax_loss = smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &(bottom_diff[xmax_index]));
+            Dtype ymax_loss = smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &(bottom_diff[ymax_index]));
+            loc_loss += xmin_loss + xmax_loss + ymin_loss + ymax_loss;
+            object_loss[h * output_width + w] = L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &(bottom_diff[object_index]));
+             // class score 
             // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
             int class_index = b * dimScale
                                   +  h * output_width + w;
@@ -921,6 +949,9 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
           }
         }
       }
+    }
+    for(int nn = 0; nn < dimScale; nn++){
+      loc_loss += object_loss[nn];
     }
     if(count > 0){
       int gt_class_index =  b * dimScale;
@@ -936,26 +967,27 @@ Dtype EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels
     
   }
   *count_postive = postive;
+  *loc_loss_value = loc_loss;
   return score_loss;
 }
 
-template float EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels, const int num_classes,
+template float EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                           float* class_label, float* bottom_diff, 
-                          float ignore_thresh, int *count_postive);
+                          float ignore_thresh, int *count_postive, float *loc_loss_value);
 
-template double EncodeCenterGridObjectSigmoid(const int batch_size, const int num_channels, const int num_classes,
+template double EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
                           double* class_label, double* bottom_diff, 
-                          double ignore_thresh, int *count_postive);
+                          double ignore_thresh, int *count_postive, double *loc_loss_value);
 
 template <typename Dtype>
 void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channels, const int num_classes,
@@ -1187,34 +1219,6 @@ template void SelectHardSampleSoftMax(double *label_data, double *pred_data,
                           const int negative_ratio, std::vector<int> postive, 
                           const int output_height, const int output_width,
                           const int num_channels, const int batch_size);
-
-
-template <typename Dtype>
-Dtype smoothL1_Loss(Dtype x, Dtype* x_diff){
-  Dtype loss = Dtype(0.);
-  Dtype fabs_x_value = std::fabs(x);
-  if(fabs_x_value < 1){
-    loss = 0.5 * x * x;
-    *x_diff = x;
-  }else{
-    loss = fabs_x_value - 0.5;
-    *x_diff = (Dtype(0) < x) - (x < Dtype(0));
-  }
-  return loss;
-}
-template float smoothL1_Loss(float x, float* x_diff);
-template double smoothL1_Loss(double x, double* x_diff);
-
-template <typename Dtype>
-Dtype L2_Loss(Dtype x, Dtype* x_diff){
-  Dtype loss = Dtype(0.);
-  loss = x * x;
-  *x_diff = 2 * x;
-  return loss;
-}
-
-template float L2_Loss(float x, float* x_diff);
-template double L2_Loss(double x, double* x_diff);
 
 template <typename Dtype> 
 Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
