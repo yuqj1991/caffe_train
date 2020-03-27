@@ -168,10 +168,8 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                                                     logistic_gradient(bottom_data[object_index + i]);
         }
       }
-      caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
-    }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
-      caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
     }
+    caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
   }
 }
 
