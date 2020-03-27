@@ -956,7 +956,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
-      SelectHardSampleSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 5, count, 
+      SelectHardSampleSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 3, count, 
                                 output_height, output_width, num_channels);
       score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
                                   dimScale, bottom_diff + pred_class_index);
@@ -1295,7 +1295,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  SelectHardSampleSoftMax(class_label, channel_pred_data, 5, postive_batch, output_height, output_width, num_channels, batch_size);
+  SelectHardSampleSoftMax(class_label, channel_pred_data, 3, postive_batch, output_height, output_width, num_channels, batch_size);
   score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
