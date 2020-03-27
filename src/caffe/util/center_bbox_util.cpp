@@ -965,10 +965,10 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             ymax_loss = bottom_diff[ymax_index] * bottom_diff[ymax_index];
             object_loss[h * output_width + w] = bottom_diff[object_index] * bottom_diff[object_index];
             #else
-            xmin_loss = L2_Loss(channel_pred_data[xmin_index] - xmin_bias, &(bottom_diff[xmin_index]));
-            ymin_loss = L2_Loss(channel_pred_data[ymin_index] - ymin_bias, &(bottom_diff[ymin_index]));
-            xmax_loss = L2_Loss(channel_pred_data[xmax_index] - xmin_bias, &(bottom_diff[xmax_index]));
-            ymax_loss = L2_Loss(channel_pred_data[ymax_index] - ymin_bias, &(bottom_diff[ymax_index]));
+            xmin_loss = L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
+            ymin_loss = L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
+            xmax_loss = L2_Loss(Dtype(channel_pred_data[xmax_index] - xmin_bias), &(bottom_diff[xmax_index]));
+            ymax_loss = L2_Loss(Dtype(channel_pred_data[ymax_index] - ymin_bias), &(bottom_diff[ymax_index]));
             object_loss[h * output_width + w] = L2_Loss(channel_pred_data[object_index] - 1., &(bottom_diff[object_index]));
             #endif
             Dtype sumLossValue = xmin_loss + xmax_loss + ymin_loss + ymax_loss;
@@ -1339,10 +1339,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             ymin_loss = bottom_diff[ymin_index] * bottom_diff[ymin_index];
             ymax_loss = bottom_diff[ymax_index] * bottom_diff[ymax_index];
             #else
-            xmin_loss = smoothL1_Loss(channel_pred_data[xmin_index] - xmin_bias, &(bottom_diff[xmin_index]));
-            ymin_loss = smoothL1_Loss(channel_pred_data[ymin_index] - ymin_bias, &(bottom_diff[ymin_index]));
-            xmax_loss = smoothL1_Loss(channel_pred_data[xmax_index] - xmin_bias, &(bottom_diff[xmax_index]));
-            ymax_loss = smoothL1_Loss(channel_pred_data[ymax_index] - ymin_bias, &(bottom_diff[ymax_index]));
+            xmin_loss = smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
+            ymin_loss = smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
+            xmax_loss = smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmin_bias), &(bottom_diff[xmax_index]));
+            ymax_loss = smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymin_bias), &(bottom_diff[ymax_index]));
             #endif
             Dtype sumLossValue = xmin_loss + xmax_loss + ymin_loss + ymax_loss;
             loc_loss += sumLossValue;
