@@ -3608,23 +3608,5 @@ layer {
 		code_type: CENTER_SIZE
 		ignore_cross_boundary_bbox: false
 		mining_type: MAX_NEGATIVE
-		
-		bbox_small_list: 15
-		bbox_small_list: 20
-		bbox_small_list: 70
-		bbox_small_list: 110
-		
-		bbox_large_list: 20
-		bbox_large_list: 70
-		bbox_large_list: 110
-		bbox_large_list: 560
-
-		receptive_field_list: 20
-		receptive_field_list: 70
-		receptive_field_list: 110
-		receptive_field_list: 560
-		num_output_scales: 4
-		net_input_height: 640
-		net_input_width: 640
 	}
 }
