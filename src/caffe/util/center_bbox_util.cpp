@@ -956,8 +956,8 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
-      SelectHardSampleSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 3, count, 
-                                output_height, output_width, num_channels);
+      /*SelectHardSampleSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 3, count, 
+                                output_height, output_width, num_channels);*/
       score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
                                   dimScale, bottom_diff + pred_class_index);
     }else{
@@ -1192,7 +1192,7 @@ void SelectHardSampleSoftMax(Dtype *label_data, Dtype *pred_data,
           for(int c = 0; c < 2; c++){
             MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
           }
-          for(int c = 0; c< 2; c++){
+          for(int c = 0; c < 2; c++){
             sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
           }
           Dtype prob = std::exp(pred_data[bg_index] - MaxVaule) / sumValue;
