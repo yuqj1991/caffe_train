@@ -13,6 +13,9 @@
 #include "caffe/util/bbox_util.hpp"
 #include "caffe/util/center_bbox_util.hpp"
 
+#define USE_YOLO_LOSS 1
+#define USE_HARD_SAMPLE 0
+
 int count_gt = 0;
 int count_one = 0;
 
@@ -842,8 +845,11 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
   }
 
   int postive = 0;
+  #if USE_HARD_SAMPLE
+  caffe_set(batch_size * dimScale, Dtype(0.), class_label);
+  #else
   caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
-
+  #endif
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
     std::vector<int> mask_Rf_anchor(dimScale, 0);
@@ -877,11 +883,19 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             best_iou = iou;
           }
         }
+        #if USE_YOLO_LOSS
         bottom_diff[object_index] = channel_pred_data[object_index] - 0.;
         if(best_iou > ignore_thresh){
           bottom_diff[object_index] = 0.;
         }
         object_loss[h * output_width + w] = bottom_diff[object_index] * bottom_diff[object_index];
+        #else
+        Dtype object_ness = channel_pred_data[object_index] - 0.;
+        if(best_iou > ignore_thresh){
+          object_ness = 0.;
+        }
+        object_loss[h * output_width + w] = L2_Loss(object_ness, &(bottom_diff[object_index]));
+        #endif
       }
     }
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -893,7 +907,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
       const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
       int large_side = std::max(gt_bbox_height, gt_bbox_width);
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        /*
+        #if 0
         int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
         int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
         int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
@@ -907,7 +921,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             class_label[class_index] = 0.5;
           }
         }
-        */
+        #endif
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
@@ -934,18 +948,27 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                                       + 3* dimScale + h * output_width + w;
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
-            
+            Dtype xmin_loss = Dtype(0.), xmax_loss = Dtype(0.), ymin_loss = Dtype(0.), ymax_loss = Dtype(0.);
+            #if USE_YOLO_LOSS
             bottom_diff[xmin_index] = 2 * (channel_pred_data[xmin_index] - xmin_bias);
             bottom_diff[ymin_index] = 2 * (channel_pred_data[ymin_index] - ymin_bias);
             bottom_diff[xmax_index] = 2 * (channel_pred_data[xmax_index] - xmax_bias);
             bottom_diff[ymax_index] = 2 * (channel_pred_data[ymax_index] - ymax_bias);
             bottom_diff[object_index] = channel_pred_data[object_index] - 1.;
-            Dtype xmin_loss = bottom_diff[xmin_index] * bottom_diff[xmin_index];
-            Dtype xmax_loss = bottom_diff[xmax_index] * bottom_diff[xmax_index];
-            Dtype ymin_loss = bottom_diff[ymin_index] * bottom_diff[ymin_index];
-            Dtype ymax_loss = bottom_diff[ymax_index] * bottom_diff[ymax_index];
+            xmin_loss = bottom_diff[xmin_index] * bottom_diff[xmin_index];
+            xmax_loss = bottom_diff[xmax_index] * bottom_diff[xmax_index];
+            ymin_loss = bottom_diff[ymin_index] * bottom_diff[ymin_index];
+            ymax_loss = bottom_diff[ymax_index] * bottom_diff[ymax_index];
             object_loss[h * output_width + w] = bottom_diff[object_index] * bottom_diff[object_index];
-            loc_loss += xmin_loss + xmax_loss + ymin_loss + ymax_loss;
+            #else
+            xmin_loss = L2_Loss(channel_pred_data[xmin_index] - xmin_bias, &(bottom_diff[xmin_index]));
+            ymin_loss = L2_Loss(channel_pred_data[ymin_index] - ymin_bias, &(bottom_diff[ymin_index]));
+            xmax_loss = L2_Loss(channel_pred_data[xmax_index] - xmin_bias, &(bottom_diff[xmax_index]));
+            ymax_loss = L2_Loss(channel_pred_data[ymax_index] - ymin_bias, &(bottom_diff[ymax_index]));
+            object_loss[h * output_width + w] = L2_Loss(channel_pred_data[object_index] - 1., &(bottom_diff[object_index]));
+            #endif
+            Dtype sumLossValue = xmin_loss + xmax_loss + ymin_loss + ymax_loss;
+            loc_loss += sumLossValue;
             // class score 
             // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
             int class_index = b * dimScale
@@ -964,10 +987,10 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
-      /*
+      #if USE_HARD_SAMPLE
       SelectHardSampleSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 3, count, 
                                 output_height, output_width, num_channels);
-      */
+      #endif
       score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
                                   dimScale, bottom_diff + pred_class_index);
     }else{
@@ -1285,17 +1308,25 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int xmax_index = b * num_channels * dimScale
                                       + 2* dimScale + h * output_width + w;
             int ymax_index = b * num_channels * dimScale 
-                                      + 3* dimScale + h * output_width + w;        
+                                      + 3* dimScale + h * output_width + w;
+            Dtype xmin_loss = Dtype(0.), xmax_loss = Dtype(0.), ymin_loss = Dtype(0.), ymax_loss = Dtype(0.);
+            #if USE_YOLO_LOSS      
             bottom_diff[xmin_index] = 2 * (channel_pred_data[xmin_index] - xmin_bias);
             bottom_diff[ymin_index] = 2 * (channel_pred_data[ymin_index] - ymin_bias);
             bottom_diff[xmax_index] = 2 * (channel_pred_data[xmax_index] - xmax_bias);
             bottom_diff[ymax_index] = 2 * (channel_pred_data[ymax_index] - ymax_bias);
-            Dtype xmin_loss = bottom_diff[xmin_index] * bottom_diff[xmin_index];
-            Dtype xmax_loss = bottom_diff[xmax_index] * bottom_diff[xmax_index];
-            Dtype ymin_loss = bottom_diff[ymin_index] * bottom_diff[ymin_index];
-            Dtype ymax_loss = bottom_diff[ymax_index] * bottom_diff[ymax_index];
-             
-            loc_loss += xmin_loss + xmax_loss + ymin_loss + ymax_loss;
+            xmin_loss = bottom_diff[xmin_index] * bottom_diff[xmin_index];
+            xmax_loss = bottom_diff[xmax_index] * bottom_diff[xmax_index];
+            ymin_loss = bottom_diff[ymin_index] * bottom_diff[ymin_index];
+            ymax_loss = bottom_diff[ymax_index] * bottom_diff[ymax_index];
+            #else
+            xmin_loss = smoothL1_Loss(channel_pred_data[xmin_index] - xmin_bias, &(bottom_diff[xmin_index]));
+            ymin_loss = smoothL1_Loss(channel_pred_data[ymin_index] - ymin_bias, &(bottom_diff[ymin_index]));
+            xmax_loss = smoothL1_Loss(channel_pred_data[xmax_index] - xmin_bias, &(bottom_diff[xmax_index]));
+            ymax_loss = smoothL1_Loss(channel_pred_data[ymax_index] - ymin_bias, &(bottom_diff[ymax_index]));
+            #endif
+            Dtype sumLossValue = xmin_loss + xmax_loss + ymin_loss + ymax_loss;
+            loc_loss += sumLossValue;
             
             int class_index = b * dimScale +  h * output_width + w;
             class_label[class_index] = 1;
