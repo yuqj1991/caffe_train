@@ -1272,10 +1272,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                       + 2* dimScale + h * output_width + w;
             int ymax_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;        
-            Dtype xmin_loss = L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
-            Dtype ymin_loss = L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
-            Dtype xmax_loss = L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &(bottom_diff[xmax_index]));
-            Dtype ymax_loss = L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &(bottom_diff[ymax_index]));
+            Dtype xmin_loss = smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
+            Dtype ymin_loss = smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
+            Dtype xmax_loss = smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &(bottom_diff[xmax_index]));
+            Dtype ymax_loss = smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &(bottom_diff[ymax_index]));
              
             loc_loss += xmin_loss + xmax_loss + ymin_loss + ymax_loss;
             
