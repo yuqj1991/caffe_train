@@ -13,16 +13,15 @@
 #include "caffe/util/bbox_util.hpp"
 #include "caffe/util/center_bbox_util.hpp"
 
-#define USE_YOLO_LOSS_SOFTMAX 1
 #define USE_HARD_SAMPLE_SOFTMAX 1
 #define USE_HARD_SAMPLE_COLESEBOX_SOFTMAX 0
-#define USE_YOLO_LOSS_SIGMOID 0
+
 #define USE_HARD_SAMPLE_SIGMOID 0
-#define USE_HARD_SAMPLE_COLESEBOX_SIGMOID 1
-#define USE_HARD_SAMPLE_ALL 0
+#define USE_HARD_SAMPLE_COLESEBOX_SIGMOID 0
+#define USE_HARD_SAMPLE_ALL 1
+
 int count_gt = 0;
 int count_one = 0;
-
 namespace caffe {
   float Yoloverlap(float x1, float w1, float x2, float w2)
 {
@@ -851,7 +850,8 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
   int postive = 0;
   #if USE_HARD_SAMPLE_SIGMOID || USE_HARD_SAMPLE_COLESEBOX_SIGMOID
   caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
-  #elif USE_HARD_SAMPLE_ALL
+  #endif
+  #if USE_HARD_SAMPLE_ALL
   caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
   #endif
   for(int b = 0; b < batch_size; b++){
@@ -926,7 +926,8 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             class_label[class_index] = 0.5;
           }
         }
-        #elif USE_HARD_SAMPLE_SOGMOID
+        #endif
+        #if USE_HARD_SAMPLE_SIGMOID
         for(int h = 0; h < output_height; h++){
           for(int w = 0; w < output_width; w++){
             int xmin_index = b * num_channels * dimScale
@@ -981,13 +982,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                                       + 3* dimScale + h * output_width + w;
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
-            /*
-            bottom_diff[xmin_index] = 2 * (channel_pred_data[xmin_index] - xmin_bias);
-            bottom_diff[ymin_index] = 2 * (channel_pred_data[ymin_index] - ymin_bias);
-            bottom_diff[xmax_index] = 2 * (channel_pred_data[xmax_index] - xmax_bias);
-            bottom_diff[ymax_index] = 2 * (channel_pred_data[ymax_index] - ymax_bias);
-            bottom_diff[object_index] = 2 * (channel_pred_data[object_index] - 1.);
-            */
+            
             loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
             loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
             loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &(bottom_diff[xmax_index]));
@@ -1344,8 +1339,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             anchorBox.set_ymax(bb_ymax);
             float best_iou = YoloBBoxIou(anchorBox, gt_bboxes[ii]);
             if(best_iou < ignore_thresh){
-              int class_index = b * dimScale
-                                  +  h * output_width + w;
+              int class_index = b * dimScale +  h * output_width + w;
               class_label[class_index] = 0.;
             }
           }
@@ -1375,12 +1369,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                       + 2* dimScale + h * output_width + w;
             int ymax_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
-            /*
-            bottom_diff[xmin_index] = 2 * (channel_pred_data[xmin_index] - xmin_bias);
-            bottom_diff[ymin_index] = 2 * (channel_pred_data[ymin_index] - ymin_bias);
-            bottom_diff[xmax_index] = 2 * (channel_pred_data[xmax_index] - xmax_bias);
-            bottom_diff[ymax_index] = 2 * (channel_pred_data[ymax_index] - ymax_bias);
-            */
+            
             loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
             loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &(bottom_diff[xmax_index]));
             loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
