@@ -106,20 +106,20 @@ template float smoothL1_Loss(float x, float* x_diff);
 template double smoothL1_Loss(double x, double* x_diff);
 
 template <typename Dtype>
-Dtype L2_Loss(Dtype x, Dtype* x_diff, Dtype scale){
+Dtype L2_Loss(Dtype x, Dtype* x_diff){
   Dtype loss = Dtype(0.);
-  loss = scale *scale * x * x;
-  *x_diff =scale * x;
+  loss = x * x;
+  *x_diff =2 * x;
   return loss;
 }
 
-template float L2_Loss(float x, float* x_diff, float scale);
-template double L2_Loss(double x, double* x_diff, double scale);
+template float L2_Loss(float x, float* x_diff);
+template double L2_Loss(double x, double* x_diff);
 
 template <typename Dtype>
 Dtype Object_L2_Loss(Dtype x, Dtype* x_diff){
   Dtype loss = Dtype(0.);
-  loss =x * x;
+  loss =0.5 * x * x;
   *x_diff =x;
   return loss;
 }
@@ -957,11 +957,11 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
             Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff, object_diff;
-            Dtype delta_scale = 2 - (xmax - xmin) * (ymax - ymin) / dimScale;
-            loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff, delta_scale);
-            loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff, delta_scale);
-            loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff, delta_scale);
-            loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff, delta_scale);
+            //Dtype delta_scale = 2 - (xmax - xmin) * (ymax - ymin) / dimScale;
+            loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
             object_loss_temp[h * output_width + w] = Object_L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &object_diff);
 
             bottom_diff[xmin_index] = xmin_diff;
@@ -1336,11 +1336,11 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int ymax_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
             Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
-            Dtype delta_scale = 2 - (xmax - xmin) * (ymax - ymin) / dimScale;
-            loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff, delta_scale);
-            loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff, delta_scale);
-            loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff, delta_scale);
-            loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff, delta_scale);
+            //Dtype delta_scale = 2 - (xmax - xmin) * (ymax - ymin) / dimScale;
+            loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
 
             bottom_diff[xmin_index] = xmin_diff;
             bottom_diff[ymin_index] = ymin_diff;
