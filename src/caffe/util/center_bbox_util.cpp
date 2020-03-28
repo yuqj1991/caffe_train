@@ -13,12 +13,12 @@
 #include "caffe/util/bbox_util.hpp"
 #include "caffe/util/center_bbox_util.hpp"
 
-#define USE_HARD_SAMPLE_SOFTMAX 1
-#define USE_HARD_SAMPLE_COLESEBOX_SOFTMAX 0
+#define USE_HARD_SAMPLE_SOFTMAX 0
+#define USE_HARD_SAMPLE_COLESEBOX_SOFTMAX 1
 
 #define USE_HARD_SAMPLE_SIGMOID 0
-#define USE_HARD_SAMPLE_COLESEBOX_SIGMOID 0
-#define USE_HARD_SAMPLE_ALL 1
+#define USE_HARD_SAMPLE_COLESEBOX_SIGMOID 1
+#define USE_HARD_SAMPLE_ALL 0
 
 int count_gt = 0;
 int count_one = 0;
@@ -848,7 +848,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
   }
 
   int postive = 0;
-  #if USE_HARD_SAMPLE_SIGMOID || USE_HARD_SAMPLE_COLESEBOX_SIGMOID
+  #if USE_HARD_SAMPLE_COLESEBOX_SIGMOID
   caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
   #endif
   #if USE_HARD_SAMPLE_ALL
@@ -927,37 +927,6 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
           }
         }
         #endif
-        #if USE_HARD_SAMPLE_SIGMOID
-        for(int h = 0; h < output_height; h++){
-          for(int w = 0; w < output_width; w++){
-            /*
-            int xmin_index = b * num_channels * dimScale
-                                  + 0* dimScale + h * output_width + w;
-            int ymin_index = b * num_channels * dimScale 
-                                      + 1* dimScale + h * output_width + w;
-            int xmax_index = b * num_channels * dimScale
-                                      + 2* dimScale + h * output_width + w;
-            int ymax_index = b * num_channels * dimScale 
-                                      + 3* dimScale + h * output_width + w;
-            */
-            NormalizedBBox anchorBox;
-            float bb_xmin = (w - anchor_scale /(2*downRatio)) / output_width;
-            float bb_ymin = (h - anchor_scale /(2*downRatio)) / output_height;
-            float bb_xmax = (w + anchor_scale /(2*downRatio)) / output_width;
-            float bb_ymax = (h + anchor_scale /(2*downRatio)) /output_height;
-            anchorBox.set_xmin(bb_xmin);
-            anchorBox.set_xmax(bb_xmax);
-            anchorBox.set_ymin(bb_ymin);
-            anchorBox.set_ymax(bb_ymax);
-            float best_iou = YoloBBoxIou(anchorBox, gt_bboxes[ii]);
-            if(best_iou < ignore_thresh){
-              int class_index = b * dimScale
-                                  +  h * output_width + w;
-              class_label[class_index] = 0.;
-            }
-          }
-        }
-        #endif
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
@@ -1008,10 +977,6 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     if(count > 0){
       int gt_class_index =  b * dimScale;
       int pred_class_index = b * num_channels * dimScale + 5* dimScale;
-      #if USE_HARD_SAMPLE_SIGMOID
-      SelectHardSampleSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 3, count, 
-                                output_height, output_width, num_channels);
-      #endif
       score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
                                       dimScale, bottom_diff + pred_class_index);
     }else{
@@ -1117,8 +1082,6 @@ template void GetCenterGridObjectResultSigmoid(const int batch_size, const int n
                           const int downRatio,
                           double* channel_pred_data, const int anchor_scale, double conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results);
-
-
 
 // label_data shape N : 1
 // pred_data shape N : k (object classes)
@@ -1320,16 +1283,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         #elif USE_HARD_SAMPLE_SOFTMAX
         for(int h = 0; h < output_height; h++){
           for(int w = 0; w < output_width; w++){
-            /*
-            int xmin_index = b * num_channels * dimScale
-                                  + 0* dimScale + h * output_width + w;
-            int ymin_index = b * num_channels * dimScale 
-                                      + 1* dimScale + h * output_width + w;
-            int xmax_index = b * num_channels * dimScale
-                                      + 2* dimScale + h * output_width + w;
-            int ymax_index = b * num_channels * dimScale 
-                                      + 3* dimScale + h * output_width + w;
-            */
             NormalizedBBox anchorBox;
             float bb_xmin = (w - anchor_scale /(2*downRatio)) / output_width;
             float bb_ymin = (h - anchor_scale /(2*downRatio)) / output_height;
@@ -1500,4 +1453,251 @@ template <typename Dtype>
 void SelectHardSampleSoftMaxWithOHEM(){
    NOT_IMPLEMENTED;
  }
+
+
+// anchor匹配方式采用IOU匹配，但是还是分层的概念，每一层匹配不同大小的gt_bboxes
+// 采用overlap > 0.45的为正样本，其他的均为负样本
+// loss = smoothL1loss + focal loss + objectness_loss确定这一层有无目标物体
+// 对于没有匹配到的某一层，则这一层loss值为0
+template <typename Dtype> 
+Dtype EncodeOverlapObjectSigmoidLoss(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          Dtype* channel_pred_data, const int anchor_scale, 
+                          std::pair<int, int> loc_truth_scale,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          Dtype* class_label, Dtype* bottom_diff, 
+                          Dtype ignore_thresh, int *count_postive, Dtype *loc_loss_value){
+  CHECK_EQ(num_classes, 1);
+  int dimScale = output_height * output_width;
+  Dtype score_loss = Dtype(0.), loc_loss = Dtype(0.);
+  CHECK_EQ(num_channels, (4 + 1 + num_classes)) 
+          << "num_channels shoule be set to including bias_x, bias_y, width, height, object_confidence and classes";
+  for(int b = 0; b < batch_size; b++){
+    int object_index = b * num_channels * dimScale + 4 * dimScale;
+    for(int i = 0; i < (num_classes + 1) * dimScale; i++){
+      channel_pred_data[object_index + i] = CenterSigmoid(channel_pred_data[object_index + i]);
+    }
+  }
+  int postive = 0;
+  // 采用focal loss 使用所有的负样本，作为训练
+  caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
+  for(int b = 0; b < batch_size; b++){
+    vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+    std::vector<int> mask_Rf_anchor(dimScale, 0);
+    std::vector<Dtype> object_loss_temp(dimScale, Dtype(0.));
+    int count = 0;
+    for(int h = 0; h < output_height; h++){
+      for(int w = 0; w < output_width; w++){
+        int xmin_index = b * num_channels * dimScale
+                                  + 0* dimScale + h * output_width + w;
+        int ymin_index = b * num_channels * dimScale 
+                                  + 1* dimScale + h * output_width + w;
+        int xmax_index = b * num_channels * dimScale
+                                  + 2* dimScale + h * output_width + w;
+        int ymax_index = b * num_channels * dimScale 
+                                  + 3* dimScale + h * output_width + w;
+        int object_index = b * num_channels * dimScale 
+                                  + 4* dimScale + h * output_width + w;
+        NormalizedBBox predBox;
+        Dtype center_x = (w + 0.5 - channel_pred_data[xmin_index] * anchor_scale /(2*downRatio)) / output_width;
+        Dtype center_y = (h + 0.5 - channel_pred_data[ymin_index] * anchor_scale /(2*downRatio)) / output_height;
+        Dtype pred_width = (std::exp(channel_pred_data[xmax_index]) * anchor_scale / downRatio) / output_width;
+        Dtype pred_height = (std::exp(channel_pred_data[ymax_index]) * anchor_scale / downRatio) /output_height;
+        predBox.set_xmin(center_x - pred_width / 2);
+        predBox.set_xmax(center_x + pred_width / 2);
+        predBox.set_ymin(center_y - pred_height / 2);
+        predBox.set_ymax(center_y + pred_height / 2);
+        float best_iou = 0;
+        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+          const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+          const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+          const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+          const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+          const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+          const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+          int large_side = std::max(gt_bbox_height, gt_bbox_width);
+          if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+            float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+            if (iou > best_iou) {
+                best_iou = iou;
+            }
+          }
+        }
+        Dtype object_value = (channel_pred_data[object_index] - 0.);
+        if(best_iou > ignore_thresh){
+          object_value = 0.;
+        }
+        object_loss_temp[h * output_width + w] = L2_Loss(object_value, &(bottom_diff[object_index]));
+      }
+    }
+    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+      const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+      const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+      const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+      const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+      const Dtype gt_center_x = (xmin + xmax) / 2;
+      const Dtype gt_center_y = (ymin + ymax) / 2;
+      const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+      const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+      int large_side = std::max(gt_bbox_height, gt_bbox_width);
+      if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+        for(int h = 0; h < output_height; h++){
+          for(int w = 0; w < output_width; w++){
+            if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
+              continue;
+            NormalizedBBox anchorBox;
+            float bb_xmin = (w - anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymin = (h - anchor_scale /(2*downRatio)) / output_height;
+            float bb_xmax = (w + anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymax = (h + anchor_scale /(2*downRatio)) /output_height;
+            anchorBox.set_xmin(bb_xmin);
+            anchorBox.set_xmax(bb_xmax);
+            anchorBox.set_ymin(bb_ymin);
+            anchorBox.set_ymax(bb_ymax);
+            float best_iou = YoloBBoxIou(anchorBox, gt_bboxes[ii]);
+            if(best_iou > (ignore_thresh + 0.15)){
+                int x_center_index = b * num_channels * dimScale
+                                    + 0* dimScale + h * output_width + w;
+                int y_center_index = b * num_channels * dimScale 
+                                        + 1* dimScale + h * output_width + w;
+                int width_index = b * num_channels * dimScale
+                                        + 2* dimScale + h * output_width + w;
+                int height_index = b * num_channels * dimScale 
+                                        + 3* dimScale + h * output_width + w;
+                int object_index = b * num_channels * dimScale 
+                                        + 4* dimScale + h * output_width + w;
+                Dtype x_center_bias = (w + 0.5 - gt_center_x) * downRatio *2 / anchor_scale;
+                Dtype y_center_bias = (h + 0.5 - gt_center_y) * downRatio *2 / anchor_scale;
+                Dtype width_bias = std::log((xmax - xmin) * downRatio / anchor_scale);
+                Dtype height_bias = std::log((ymax - ymin) * downRatio / anchor_scale);
+
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[x_center_index] - x_center_bias), &(bottom_diff[x_center_index]));
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[y_center_index] - y_center_bias), &(bottom_diff[y_center_index]));
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[width_index] - width_bias), &(bottom_diff[width_index]));
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[height_index] - height_bias), &(bottom_diff[height_index]));
+                object_loss_temp[h * output_width + w] = L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &(bottom_diff[object_index]));
+                int class_index = b * dimScale +  h * output_width + w;
+                class_label[class_index] = 1;
+                mask_Rf_anchor[h * output_width + w] = 1;
+                count++;
+            }
+          }
+        }
+      }
+    }
+    for(unsigned ii = 0; ii < dimScale; ii++){
+      loc_loss += object_loss_temp[ii];
+    }
+    if(count > 0){
+      int gt_class_index =  b * dimScale;
+      int pred_class_index = b * num_channels * dimScale + 5* dimScale;
+      score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
+                                      dimScale, bottom_diff + pred_class_index);
+    }else{
+      score_loss += 0;
+    }
+    postive += count;
+  }
+  *count_postive = postive;
+  *loc_loss_value = loc_loss;
+  return score_loss;
+}
+
+template float EncodeOverlapObjectSigmoidLoss(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          float* channel_pred_data, const int anchor_scale, 
+                          std::pair<int, int> loc_truth_scale,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          float* class_label, float* bottom_diff, 
+                          float ignore_thresh, int *count_postive, float *loc_loss_value);
+
+template double EncodeOverlapObjectSigmoidLoss(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          double* channel_pred_data, const int anchor_scale, 
+                          std::pair<int, int> loc_truth_scale,
+                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          double* class_label, double* bottom_diff, 
+                          double ignore_thresh, int *count_postive, double *loc_loss_value);
+
+
+template <typename Dtype>
+void GetCenterOverlapResultSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results){
+  // face class 人脸类型
+  CHECK_EQ(num_classes, 1);
+  CHECK_EQ(num_channels, 4 + 1 + num_classes);
+  int dimScale = output_height * output_width;
+  for(int b = 0; b < batch_size; b++){
+    int object_index = b * num_channels * dimScale + 4 * dimScale;
+    for(int i = 0; i < (num_classes + 1) * dimScale; i++){
+      channel_pred_data[object_index + i] = CenterSigmoid(channel_pred_data[object_index + i]);
+    }
+  }
+
+  for(int b = 0; b < batch_size; b++){
+    for(int h = 0; h < output_height; h++){
+      for(int w = 0; w < output_width; w++){
+        int x_index = b * num_channels * dimScale
+                                  + 0* dimScale + h * output_width + w;
+        int y_index = b * num_channels * dimScale 
+                                  + 1* dimScale + h * output_width + w;
+        int width_index = b * num_channels * dimScale
+                                  + 2* dimScale + h * output_width + w;
+        int height_index = b * num_channels * dimScale 
+                                  + 3* dimScale + h * output_width + w;
+        int object_index = b * num_channels * dimScale 
+                                  + 4* dimScale + h * output_width + w;
+        int class_index = b * num_channels * dimScale
+                                  + 5* dimScale + h * output_width + w;
+
+        Dtype center_x = (w + 0.5 - channel_pred_data[x_index] * anchor_scale /(2*downRatio)) * downRatio;
+        Dtype center_y = (h + 0.5 - channel_pred_data[y_index] * anchor_scale /(2*downRatio)) * downRatio;
+        Dtype pred_width = (std::exp(channel_pred_data[width_index]) * anchor_scale / downRatio) * downRatio;
+        Dtype pred_height = (std::exp(channel_pred_data[height_index]) * anchor_scale / downRatio) * downRatio;
+
+                
+        Dtype xmin = std::min(std::max(center_x - pred_width / 2, Dtype(0.f)), Dtype(downRatio * output_width));
+        Dtype ymin = std::min(std::max(center_y - pred_height / 2, Dtype(0.f)), Dtype(downRatio * output_height));
+        Dtype xmax = std::min(std::max(center_x + pred_width / 2, Dtype(0.f)), Dtype(downRatio * output_width));
+        Dtype ymax = std::min(std::max(center_y + pred_height / 2, Dtype(0.f)), Dtype(downRatio * output_height));
+
+        if((xmax - xmin) <= 0 || (ymax - ymin) <= 0)
+          continue;                                     
+        
+        Dtype label_score = channel_pred_data[class_index] * channel_pred_data[object_index];
+        
+        if(label_score >= conf_thresh){
+            CenterNetInfo temp_result;
+            temp_result.set_class_id(0);
+            temp_result.set_score(label_score);
+            temp_result.set_xmin(xmin);
+            temp_result.set_xmax(xmax);
+            temp_result.set_ymin(ymin);
+            temp_result.set_ymax(ymax);
+            temp_result.set_area((xmax - xmin) * (ymax - ymin));
+            (*results)[b].push_back(temp_result);
+        } 
+      }
+    }
+  }
+}
+
+template void GetCenterOverlapResultSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          float* channel_pred_data, const int anchor_scale, float conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results);
+
+template void GetCenterOverlapResultSigmoid(const int batch_size, const int num_channels, const int num_classes,
+                          const int output_width, const int output_height, 
+                          const int downRatio,
+                          double* channel_pred_data, const int anchor_scale, double conf_thresh, 
+                          std::map<int, std::vector<CenterNetInfo > >* results);
+
 }  // namespace caffe
