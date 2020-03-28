@@ -4613,14 +4613,13 @@ layer {
   bottom: "conv_2_project_pyramid"
   top: "pyramid_stage_four"
 }
-
 ############################################################
 #######################priorBox moudle one##################
 ############################################################
 layer {
 	name: "conv11_eltwise_priorbox"
 	type: "PriorBox"
-	bottom: "pyramid_stage_one"
+	bottom: "pyramid_stage_four"
 	bottom: "data"
 	top: "conv11_eltwise_priorbox"
 	prior_box_param {
@@ -4638,7 +4637,7 @@ layer {
 layer {
 	name: "conv11_eltwise_loc"
 	type: "Convolution"
-	bottom: "pyramid_stage_one"
+	bottom: "pyramid_stage_four"
 	top: "conv11_eltwise_loc"
 	param {
 		lr_mult: 1
@@ -4685,7 +4684,7 @@ layer {
 layer {
 	name: "conv11_eltwise_conf_concat"
 	type: "Convolution"
-	bottom: "pyramid_stage_one"
+	bottom: "pyramid_stage_four"
 	top: "conv11_eltwise_conf_concat"
 	param {
 		lr_mult: 1
@@ -4735,7 +4734,7 @@ layer {
 layer {
 	name: "conv16_eltwise_priorbox"
 	type: "PriorBox"
-	bottom: "pyramid_stage_two"
+	bottom: "pyramid_stage_three"
 	bottom: "data"
 	top: "conv16_eltwise_priorbox"
 	prior_box_param {
@@ -4754,7 +4753,7 @@ layer {
 layer {
 	name: "conv16_eltwise_loc"
 	type: "Convolution"
-	bottom: "pyramid_stage_two"
+	bottom: "pyramid_stage_three"
 	top: "conv16_eltwise_loc"
 	param {
 		lr_mult: 1
@@ -4801,7 +4800,7 @@ layer {
 layer {
 	name: "conv16_eltwise_conf"
 	type: "Convolution"
-	bottom: "pyramid_stage_two"
+	bottom: "pyramid_stage_three"
 	top: "conv16_eltwise_conf"
 	param {
 		lr_mult: 1
@@ -4851,7 +4850,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_priorbox"
 	type: "PriorBox"
-	bottom: "pyramid_stage_three"
+	bottom: "pyramid_stage_two"
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
@@ -4869,7 +4868,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_loc"
 	type: "Convolution"
-	bottom: "pyramid_stage_three"
+	bottom: "pyramid_stage_two"
 	top: "dectction_moudle_five_loc"
 	param {
 		lr_mult: 1
@@ -4916,7 +4915,7 @@ layer {
 layer {
 	name: "dectction_moudle_five_conf"
 	type: "Convolution"
-	bottom: "pyramid_stage_three"
+	bottom: "pyramid_stage_two"
 	top: "dectction_moudle_five_conf"
 	param {
 		lr_mult: 1
@@ -4965,7 +4964,7 @@ layer {
 layer {
 	name: "dectction_moudle_eight_priorbox"
 	type: "PriorBox"
-	bottom: "pyramid_stage_four"
+	bottom: "pyramid_stage_one"
 	bottom: "data"
 	top: "dectction_moudle_eight_priorbox"
 	prior_box_param {
@@ -4983,7 +4982,7 @@ layer {
 layer {
 	name: "dectction_moudle_eight_loc"
 	type: "Convolution"
-	bottom: "pyramid_stage_four"
+	bottom: "pyramid_stage_one"
 	top: "dectction_moudle_eight_loc"
 	param {
 		lr_mult: 1
@@ -5030,7 +5029,7 @@ layer {
 layer {
 	name: "dectction_moudle_eight_conf"
 	type: "Convolution"
-	bottom: "pyramid_stage_four"
+	bottom: "pyramid_stage_one"
 	top: "dectction_moudle_eight_conf"
 	param {
 		lr_mult: 1
