@@ -1325,7 +1325,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         output_width, bottom_diff, num_channels);
   *count_postive = postive;
   if(count_postive > 0){
-    LOG(INFO)<<"LOSS VALUE: "<<loc_loss;
+    LOG(INFO)<<"LOSS VALUE: "<<loc_loss/postive;
   }
   return score_loss;
 }
