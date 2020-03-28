@@ -101,6 +101,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   Dtype sum_squre = Dtype(0.);
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
   Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.);
+  //Dtype temp_loss = Dtype(0.);
   if (num_groundtruth_ >= 1) {
     const int downRatio = net_height_ / output_height;
     if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
@@ -110,6 +111,14 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                           bbox_range_scale_,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
                           ignore_thresh_, &count_postive_, &sum_squre);
+    /*const Dtype * diff = bottom[0]->cpu_diff();
+    int dimScale = output_height * output_width;
+    for(int b = 0; b < num_; b++){
+      for(int j = 0; j < (4 + 1) * dimScale; j++){
+        temp_loss += diff[b *num_channels *dimScale + j]*diff[b * num_channels * dimScale + j];
+      }
+    }*/
+    
     }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
       class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
                           downRatio,
@@ -133,7 +142,8 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   if(iterations_ % 100 == 0){
     LOG(INFO)<<"Region "<<output_width
               <<": total loss: "<<top[0]->mutable_cpu_data()[0]
-              <<", loc loss: "<< loc_loss <<", class loss: "<< score_loss 
+              <<", loc loss: "<< loc_loss
+              <<", class loss: "<< score_loss 
               <<", count: "<< count_postive_;
   }
   iterations_++;
