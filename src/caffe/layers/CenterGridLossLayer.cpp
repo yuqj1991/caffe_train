@@ -126,14 +126,16 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                           bbox_range_scale_,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
                           ignore_thresh_, &count_postive_, &sum_squre);
-    }
+    }/*
     if(count_postive_ > 0){
       loc_loss = sum_squre / count_postive_;
       score_loss = class_score / count_postive_;
     }else{
       loc_loss = sum_squre / num_;
       score_loss = class_score / num_;
-    }
+    }*/
+    loc_loss = sum_squre;
+    score_loss = class_score;
     top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
@@ -180,7 +182,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         }
       }
     }
-    caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
+    //caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
   }
 }
 
