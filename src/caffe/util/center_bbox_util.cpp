@@ -896,11 +896,12 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             }
           }
         }
-        Dtype object_value = (channel_pred_data[object_index] - 0.);
+        Dtype object_value = (channel_pred_data[object_index] - 0.), object_diff;
         if(best_iou > ignore_thresh){
           object_value = 0.;
         }
-        object_loss_temp[h * output_width + w] = L2_Loss(object_value, &(bottom_diff[object_index]));
+        object_loss_temp[h * output_width + w] = L2_Loss(object_value, &object_diff);
+        bottom_diff[object_index] = object_diff;
       }
     }
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -941,8 +942,8 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
               continue;
             Dtype xmin_bias = (w - xmin) * downRatio *2 / anchor_scale;
             Dtype ymin_bias = (h - ymin) * downRatio *2 / anchor_scale;
-            Dtype xmax_bias = (w - xmax) * downRatio *2/ anchor_scale;
-            Dtype ymax_bias = (h - ymax) * downRatio *2/ anchor_scale;
+            Dtype xmax_bias = (w - xmax) * downRatio *2 / anchor_scale;
+            Dtype ymax_bias = (h - ymax) * downRatio *2 / anchor_scale;
             int xmin_index = b * num_channels * dimScale
                                       + 0* dimScale + h * output_width + w;
             int ymin_index = b * num_channels * dimScale 
@@ -953,12 +954,18 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                                       + 3* dimScale + h * output_width + w;
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
-            
-            loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
-            loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
-            loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &(bottom_diff[xmax_index]));
-            loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &(bottom_diff[ymax_index]));
-            object_loss_temp[h * output_width + w] = L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &(bottom_diff[object_index]));
+            Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff, object_diff;
+            loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
+            object_loss_temp[h * output_width + w] = L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &object_diff);
+
+            bottom_diff[xmin_index] = xmin_diff;
+            bottom_diff[ymin_index] = ymin_diff;
+            bottom_diff[xmax_index] = xmax_diff;
+            bottom_diff[ymax_index] = ymax_diff;
+            bottom_diff[object_index] = object_diff;
             // class score 
             // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
             int class_index = b * dimScale
@@ -1325,11 +1332,16 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                       + 2* dimScale + h * output_width + w;
             int ymax_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
-            
-            loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &(bottom_diff[xmin_index]));
-            loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &(bottom_diff[xmax_index]));
-            loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &(bottom_diff[ymin_index]));
-            loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &(bottom_diff[ymax_index]));
+            Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
+            loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+            loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
+
+            bottom_diff[xmin_index] = xmin_diff;
+            bottom_diff[ymin_index] = ymin_diff;
+            bottom_diff[xmax_index] = xmax_diff;
+            bottom_diff[ymax_index] = ymax_diff;
             int class_index = b * dimScale +  h * output_width + w;
             class_label[class_index] = 1;
             mask_Rf_anchor[h * output_width + w] = 1;

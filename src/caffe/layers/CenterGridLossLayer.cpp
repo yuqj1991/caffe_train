@@ -133,8 +133,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   if(iterations_ % 100 == 0){
     LOG(INFO)<<"Region "<<output_width
               <<": total loss: "<<top[0]->mutable_cpu_data()[0]
-              <<", loc loss: "<< loc_loss
-              <<", class loss: "<< score_loss
+              <<", loc loss: "<< loc_loss <<", class loss: "<< score_loss 
               <<", count: "<< count_postive_;
   }
   iterations_++;
