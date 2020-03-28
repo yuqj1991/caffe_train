@@ -14,8 +14,8 @@
 #include "caffe/util/center_bbox_util.hpp"
 
 #define USE_YOLO_LOSS_SOFTMAX 1
-#define USE_HARD_SAMPLE_SOFTMAX 0
-#define USE_HARD_SAMPLE_COLESEBOX_SOFTMAX 1
+#define USE_HARD_SAMPLE_SOFTMAX 1
+#define USE_HARD_SAMPLE_COLESEBOX_SOFTMAX 0
 #define USE_YOLO_LOSS_SIGMOID 0
 #define USE_HARD_SAMPLE_SIGMOID 0
 #define USE_HARD_SAMPLE_COLESEBOX_SIGMOID 1
@@ -796,7 +796,7 @@ void SelectHardSampleSigmoid(Dtype *label_data, Dtype *pred_data, const int nega
   Dtype gamma_ = 2.f;
   for(int h = 0; h < output_height; h ++){
     for(int w = 0; w < output_width; w ++){
-      if(label_data[h * output_width +w] != 1){
+      if(label_data[h * output_width +w] == 0.){
         int bg_index = h * output_width + w;
         // Focal loss when sample belong to background
         Dtype loss = (-1) * alpha_ * std::pow(pred_data[bg_index], gamma_) * 
@@ -850,7 +850,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
 
   int postive = 0;
   #if USE_HARD_SAMPLE_SIGMOID || USE_HARD_SAMPLE_COLESEBOX_SIGMOID
-  caffe_set(batch_size * dimScale, Dtype(0.), class_label);
+  caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
   #elif USE_HARD_SAMPLE_ALL
   caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
   #endif
@@ -861,21 +861,21 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     int count = 0;
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
-        int x_index = b * num_channels * dimScale
+        int xmin_index = b * num_channels * dimScale
                                   + 0* dimScale + h * output_width + w;
-        int y_index = b * num_channels * dimScale 
+        int ymin_index = b * num_channels * dimScale 
                                   + 1* dimScale + h * output_width + w;
-        int width_index = b * num_channels * dimScale
+        int xmax_index = b * num_channels * dimScale
                                   + 2* dimScale + h * output_width + w;
-        int height_index = b * num_channels * dimScale 
+        int ymax_index = b * num_channels * dimScale 
                                   + 3* dimScale + h * output_width + w;
         int object_index = b * num_channels * dimScale 
                                   + 4* dimScale + h * output_width + w;
         NormalizedBBox predBox;
-        float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /(2*downRatio)) / output_width;
-        float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /(2*downRatio)) / output_height;
-        float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /(2*downRatio)) / output_width;
-        float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /(2*downRatio)) /output_height;
+        float bb_xmin = (w - channel_pred_data[xmin_index] * anchor_scale /(2*downRatio)) / output_width;
+        float bb_ymin = (h - channel_pred_data[ymin_index] * anchor_scale /(2*downRatio)) / output_height;
+        float bb_xmax = (w - channel_pred_data[xmax_index] * anchor_scale /(2*downRatio)) / output_width;
+        float bb_ymax = (h - channel_pred_data[ymax_index] * anchor_scale /(2*downRatio)) /output_height;
         predBox.set_xmin(bb_xmin);
         predBox.set_xmax(bb_xmax);
         predBox.set_ymin(bb_ymin);
@@ -921,6 +921,35 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             int class_index = b * dimScale
                                   +  h * output_width + w;
             class_label[class_index] = 0.5;
+          }
+        }
+        #endif
+        #if USE_HARD_SAMPLE_SIGMOID
+        for(int h = 0; h < output_height; h++){
+          for(int w = 0; w < output_width; w++){
+            int xmin_index = b * num_channels * dimScale
+                                  + 0* dimScale + h * output_width + w;
+            int ymin_index = b * num_channels * dimScale 
+                                      + 1* dimScale + h * output_width + w;
+            int xmax_index = b * num_channels * dimScale
+                                      + 2* dimScale + h * output_width + w;
+            int ymax_index = b * num_channels * dimScale 
+                                      + 3* dimScale + h * output_width + w;
+            NormalizedBBox predBox;
+            float bb_xmin = (w - channel_pred_data[xmin_index] * anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymin = (h - channel_pred_data[ymin_index] * anchor_scale /(2*downRatio)) / output_height;
+            float bb_xmax = (w - channel_pred_data[xmax_index] * anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymax = (h - channel_pred_data[ymax_index] * anchor_scale /(2*downRatio)) /output_height;
+            predBox.set_xmin(bb_xmin);
+            predBox.set_xmax(bb_xmax);
+            predBox.set_ymin(bb_ymin);
+            predBox.set_ymax(bb_ymax);
+            float best_iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+            if(best_iou < ignore_thresh){
+              int class_index = b * dimScale
+                                  +  h * output_width + w;
+              class_label[class_index] = 0.;
+            }
           }
         }
         #endif
@@ -1102,35 +1131,34 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
                             const int num_channels){
   Dtype loss = Dtype(0.f);
   int dimScale = output_height * output_width;
-  int label_idx = 0;
-  int count = 0;
   for(int b = 0; b < batch_size; b++){
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
         Dtype label_value = Dtype(label_data[b * dimScale + h * output_width + w]);
-        if(label_value == 0)
-          continue;
-        else if(label_value == 0.5)
-          label_idx = 0;
-        else if(label_value == 1)
-          label_idx = 1;
-        
-        int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
-        Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
-        Dtype sumValue = Dtype(0.f);
-        // 求出每组的最大值, 计算出概率值
-        for(int c = 0; c < 2; c++){
-          MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
+        if(label_value == 0 || label_value == -1.){
+           continue;
+        }else{
+          int label_idx = 0;
+          if(label_value == 0.5)
+            label_idx = 0;
+          else if(label_value == 1)
+            label_idx = 1;
+          int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
+          Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
+          Dtype sumValue = Dtype(0.f);
+          // 求出每组的最大值, 计算出概率值
+          for(int c = 0; c < 2; c++){
+            MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
+          }
+          for(int c = 0; c< 2; c++){
+            sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
+          }
+          Dtype pred_data_value = std::exp(pred_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
+          Dtype pred_another_data_value = std::exp(pred_data[bg_index + (1 - label_idx) * dimScale] - MaxVaule) / sumValue;
+          loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
+          bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
+          bottom_diff[bg_index + (1 - label_idx) * dimScale] = pred_another_data_value;
         }
-        for(int c = 0; c< 2; c++){
-          sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
-        }
-        Dtype pred_data_value = std::exp(pred_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
-        Dtype pred_another_data_value = std::exp(pred_data[bg_index + (1 - label_idx) * dimScale] - MaxVaule) / sumValue;
-        loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
-        bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
-        bottom_diff[bg_index + (1 - label_idx) * dimScale] = pred_another_data_value;
-        count++;
       }
     }
   }
@@ -1208,7 +1236,7 @@ void SelectHardSampleSoftMax(Dtype *label_data, Dtype *pred_data,
     int num_postive = postive[b];
     for(int h = 0; h < output_height; h ++){
       for(int w = 0; w < output_width; w ++){
-        if(label_data[b * dimScale + h * output_width +w] != 1){
+        if(label_data[b * dimScale + h * output_width +w] == 0.){
           int negative_index = h * output_width + w;
           int bg_index = b * num_channels * dimScale  + 4 * dimScale + h * output_width + w;
           Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
@@ -1260,7 +1288,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   CHECK_EQ(num_channels, (4 + num_classes)) << "num_channels shoule be set to including bias_x, bias_y, width, height, classes";
   
   int postive = 0;
-  caffe_set(batch_size * dimScale, Dtype(0), class_label);
+  caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
   std::vector<int>postive_batch(batch_size, 0);
 
   for(int b = 0; b < batch_size; b++){
@@ -1276,22 +1304,50 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
       const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
       int large_side = std::max(gt_bbox_height, gt_bbox_width);
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-        for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
-          #if USE_HARD_SAMPLE_COLESEBOX_SOFTMAX
-          int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
-          int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
-          int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
-          int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
-          for(int h = RF_ymin; h < RF_ymax; h++){
-            for(int w = RF_xmin; w < RF_xmax; w++){
-              if(w < 0 || w >= (output_width - 1) || h <0 || h >= (output_height - 1))
-                continue;
+        #if USE_HARD_SAMPLE_COLESEBOX_SOFTMAX
+        int RF_xmin = static_cast<int>(xmin  - anchor_scale/(2 * downRatio));
+        int RF_xmax = static_cast<int>(xmax  + anchor_scale/(2 * downRatio));
+        int RF_ymin = static_cast<int>(ymin  - anchor_scale/(2 * downRatio));
+        int RF_ymax = static_cast<int>(ymax  + anchor_scale/(2 * downRatio));
+        for(int h = RF_ymin; h < RF_ymax; h++){
+          for(int w = RF_xmin; w < RF_xmax; w++){
+            if(w < 0 || w >= (output_width - 1) || h <0 || h >= (output_height - 1))
+              continue;
+            int class_index = b * dimScale
+                                  +  h * output_width + w;
+            class_label[class_index] = 0.5;
+          }
+        }
+        #else
+        for(int h = 0; h < output_height; h++){
+          for(int w = 0; w < output_width; w++){
+            int xmin_index = b * num_channels * dimScale
+                                  + 0* dimScale + h * output_width + w;
+            int ymin_index = b * num_channels * dimScale 
+                                      + 1* dimScale + h * output_width + w;
+            int xmax_index = b * num_channels * dimScale
+                                      + 2* dimScale + h * output_width + w;
+            int ymax_index = b * num_channels * dimScale 
+                                      + 3* dimScale + h * output_width + w;
+            NormalizedBBox predBox;
+            float bb_xmin = (w - channel_pred_data[xmin_index] * anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymin = (h - channel_pred_data[ymin_index] * anchor_scale /(2*downRatio)) / output_height;
+            float bb_xmax = (w - channel_pred_data[xmax_index] * anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymax = (h - channel_pred_data[ymax_index] * anchor_scale /(2*downRatio)) /output_height;
+            predBox.set_xmin(bb_xmin);
+            predBox.set_xmax(bb_xmax);
+            predBox.set_ymin(bb_ymin);
+            predBox.set_ymax(bb_ymax);
+            float best_iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+            if(best_iou < ignore_thresh){
               int class_index = b * dimScale
-                                    +  h * output_width + w;
-              class_label[class_index] = 0.5;
+                                  +  h * output_width + w;
+              class_label[class_index] = 0.;
             }
           }
-          #endif
+        }
+        #endif
+        for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
               continue;
@@ -1341,7 +1397,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   SelectHardSampleSoftMax(class_label, channel_pred_data, 3, postive_batch, output_height, output_width, num_channels, batch_size);
   #endif
   score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
-                        output_width, bottom_diff, num_channels);
+                                  output_width, bottom_diff, num_channels);
   *count_postive = postive;
   *loc_loss_value = loc_loss;
   return score_loss;
