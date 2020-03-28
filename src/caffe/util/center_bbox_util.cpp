@@ -882,17 +882,20 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
         predBox.set_ymax(bb_ymax);
         float best_iou = 0;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-          float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
-          if (iou > best_iou) {
-            best_iou = iou;
+          const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+          const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+          const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+          const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+          const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+          const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+          int large_side = std::max(gt_bbox_height, gt_bbox_width);
+          if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+            float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+            if (iou > best_iou) {
+                best_iou = iou;
+            }
           }
         }
-        /*
-        bottom_diff[object_index] = 2 * (channel_pred_data[object_index] - 0.);
-        if(best_iou > ignore_thresh){
-          bottom_diff[object_index] = 0.;
-        }
-        */
         Dtype object_value = (channel_pred_data[object_index] - 0.);
         if(best_iou > ignore_thresh){
           object_value = 0.;
@@ -923,7 +926,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             class_label[class_index] = 0.5;
           }
         }
-        #elif USE_HARD_SAMPLE_SIGMOID
+        #elif USE_HARD_SAMPLE_SOGMOID
         for(int h = 0; h < output_height; h++){
           for(int w = 0; w < output_width; w++){
             int xmin_index = b * num_channels * dimScale
@@ -1320,6 +1323,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         #elif USE_HARD_SAMPLE_SOFTMAX
         for(int h = 0; h < output_height; h++){
           for(int w = 0; w < output_width; w++){
+            /*
             int xmin_index = b * num_channels * dimScale
                                   + 0* dimScale + h * output_width + w;
             int ymin_index = b * num_channels * dimScale 
@@ -1328,16 +1332,17 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                       + 2* dimScale + h * output_width + w;
             int ymax_index = b * num_channels * dimScale 
                                       + 3* dimScale + h * output_width + w;
-            NormalizedBBox predBox;
-            float bb_xmin = (w - channel_pred_data[xmin_index] * anchor_scale /(2*downRatio)) / output_width;
-            float bb_ymin = (h - channel_pred_data[ymin_index] * anchor_scale /(2*downRatio)) / output_height;
-            float bb_xmax = (w - channel_pred_data[xmax_index] * anchor_scale /(2*downRatio)) / output_width;
-            float bb_ymax = (h - channel_pred_data[ymax_index] * anchor_scale /(2*downRatio)) /output_height;
-            predBox.set_xmin(bb_xmin);
-            predBox.set_xmax(bb_xmax);
-            predBox.set_ymin(bb_ymin);
-            predBox.set_ymax(bb_ymax);
-            float best_iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+            */
+            NormalizedBBox anchorBox;
+            float bb_xmin = (w - anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymin = (h - anchor_scale /(2*downRatio)) / output_height;
+            float bb_xmax = (w + anchor_scale /(2*downRatio)) / output_width;
+            float bb_ymax = (h + anchor_scale /(2*downRatio)) /output_height;
+            anchorBox.set_xmin(bb_xmin);
+            anchorBox.set_xmax(bb_xmax);
+            anchorBox.set_ymin(bb_ymin);
+            anchorBox.set_ymax(bb_ymax);
+            float best_iou = YoloBBoxIou(anchorBox, gt_bboxes[ii]);
             if(best_iou < ignore_thresh){
               int class_index = b * dimScale
                                   +  h * output_width + w;
