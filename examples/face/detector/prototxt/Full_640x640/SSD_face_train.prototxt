@@ -162,7 +162,7 @@ layer {
 			max_sample: 1
 			max_trials: 50
 		}
-		crop_type: CROP_METHOD_RANDOM
+		crop_type: CROP_BATCH
 		up_prob: 0.7
 		low_prob: 0.4
 		label_map_file: "../labelmap.prototxt"
