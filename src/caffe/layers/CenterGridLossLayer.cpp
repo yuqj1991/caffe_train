@@ -111,13 +111,6 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                           bbox_range_scale_,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
                           ignore_thresh_, &count_postive_, &sum_squre);
-    /*const Dtype * diff = bottom[0]->cpu_diff();
-    int dimScale = output_height * output_width;
-    for(int b = 0; b < num_; b++){
-      for(int j = 0; j < (4 + 1) * dimScale; j++){
-        temp_loss += diff[b *num_channels *dimScale + j]*diff[b * num_channels * dimScale + j];
-      }
-    }*/
     
     }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
       class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
@@ -126,16 +119,9 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                           bbox_range_scale_,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
                           ignore_thresh_, &count_postive_, &sum_squre);
-    }/*
-    if(count_postive_ > 0){
-      loc_loss = sum_squre / count_postive_;
-      score_loss = class_score / count_postive_;
-    }else*/{
-      loc_loss = sum_squre / num_;
-      score_loss = class_score / num_;
     }
-    //loc_loss = sum_squre;
-    //score_loss = class_score;
+    loc_loss = sum_squre / num_;
+    score_loss = class_score / num_;
     top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
@@ -169,10 +155,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     num_ = bottom[0]->num();
     int dimScale = output_height * output_width;
     Dtype loss_weight = Dtype(0.);
-    //if(count_postive_ > 0)
-      //loss_weight = top[0]->cpu_diff()[0] / count_postive_;
-    //else
-      loss_weight = top[0]->cpu_diff()[0] / num_;   
+    loss_weight = top[0]->cpu_diff()[0] / num_;   
     if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
       for(int b = 0; b < num_; b++){
         int object_index = b * num_channels * dimScale + 4 * dimScale;
