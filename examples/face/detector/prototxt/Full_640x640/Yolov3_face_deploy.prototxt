@@ -1,4 +1,4 @@
-name: "deepFace"
+name: "Yolov3face"
 input: "data"
 input_shape {
 	dim: 1

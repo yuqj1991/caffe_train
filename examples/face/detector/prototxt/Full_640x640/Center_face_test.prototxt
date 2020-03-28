@@ -1,4 +1,4 @@
-name: "centerNet"
+name: "Centerface"
 layer {
 	name: "data"
 	type: "AnnotatedData"

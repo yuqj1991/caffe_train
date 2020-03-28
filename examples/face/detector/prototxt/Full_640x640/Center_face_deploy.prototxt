@@ -1,4 +1,4 @@
-name: "deepFace"
+name: "Centerface"
 input: "data"
 input_shape {
   dim: 1

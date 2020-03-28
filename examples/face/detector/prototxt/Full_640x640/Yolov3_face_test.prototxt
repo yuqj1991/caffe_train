@@ -1,4 +1,4 @@
-name: "deepFace"
+name: "Yolov3face"
 layer {
 	name: "data"
 	type: "AnnotatedData"
