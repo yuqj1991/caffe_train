@@ -13,8 +13,8 @@
 #include "caffe/util/bbox_util.hpp"
 #include "caffe/util/center_bbox_util.hpp"
 
-#define USE_HARD_SAMPLE_SOFTMAX 0
-#define USE_HARD_SAMPLE_COLESEBOX_SOFTMAX 1
+#define USE_HARD_SAMPLE_SOFTMAX 1
+#define USE_HARD_SAMPLE_COLESEBOX_SOFTMAX 0
 
 #define USE_HARD_SAMPLE_SIGMOID 0
 #define USE_HARD_SAMPLE_COLESEBOX_SIGMOID 1
