@@ -1290,7 +1290,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
           }
         }
         #endif
-        #if USE_HARD_SAMPLE_SOFTMAX
+        #if USE_HARD_SAMPLE_SOFTMAX && 0
         for(int h = 0; h < output_height; h++){
           for(int w = 0; w < output_width; w++){
             NormalizedBBox anchorBox;
