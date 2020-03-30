@@ -13,14 +13,13 @@ solver_mode: GPU
 debug_info: false
 snapshot_after_train: true
 test_initialization: false
-max_iter: 240000
+max_iter: 150000
 average_loss: 10
 stepvalue: 10000
+stepvalue: 30000
 stepvalue: 60000
 stepvalue: 100000
 stepvalue: 130000
-stepvalue: 180000
-stepvalue: 200000
 iter_size: 2
 type: "RMSProp"
 eval_type: "detection"
