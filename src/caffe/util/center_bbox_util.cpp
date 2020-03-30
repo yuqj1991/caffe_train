@@ -1204,7 +1204,6 @@ template void SoftmaxCenterGrid(double * pred_data, const int batch_size,
 // hard sampling mine postive : negative 1: 5 softmax
 // 按理来说是需要重新统计负样本的编号，以及获取到他的数值
 // label_data : K x H x W
-// pred_data : K x H x W x N
 template <typename Dtype>
 void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_loss,
                           const int negative_ratio, std::vector<int> postive, 
@@ -1261,9 +1260,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
   std::vector<int>postive_batch(batch_size, 0);
 
-  //计算每个样本的总损失（loc loss + softmax loss）
+  //计算每个样本的总损失（loc loss + softmax loss
+  #if USE_HARD_SAMPLE_SOFTMAX
   std::vector<Dtype> batch_sample_loss(batch_size * dimScale, Dtype(-1.));
-
+  #endif
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
     std::vector<int> mask_Rf_anchor(dimScale, 0);
@@ -1466,7 +1466,10 @@ template void GetCenterGridObjectResultSoftMax(const int batch_size, const int n
 // 那么，这样来计算每个样本的loss集合，
 //    1).对于一个正样本，计算这个样本的loc_loss + cls_loss。
 //    2).对于一个负样本，计算cls_loss(背景类的置信度得分损失)，SSD中，在计算负样本的时候
-// 4. 使用NMS 去除重复的框
+// 4. 使用NMS 去除重复的框, 针对NMS， 该如何去实现呢？ohem的作者是这样做的，
+//    1).首先第一步box从哪里来，所有计算出来的预测box(160x160)
+//    2).置信得分，以loss为准，具体的每个box的结构为[x1, y1, x2, y2, loss]
+//    3).这样再进行nms，排除多余的框，以框IOU_Thresh > 0.7 为临界阈值
 // 5. 再对剩余Loss的集合进行从大到小排列，选取一定数量的负样本
 // 6. 只回归计算这样正样本和一部分负样本的总损失，以及回归相应的梯度值
 template <typename Dtype>
@@ -1577,30 +1580,30 @@ Dtype EncodeOverlapObjectSigmoidLoss(const int batch_size, const int num_channel
             anchorBox.set_ymax(bb_ymax);
             float best_iou = YoloBBoxIou(anchorBox, gt_bboxes[ii]);
             if(best_iou > (ignore_thresh + 0.15)){
-                int x_center_index = b * num_channels * dimScale
-                                    + 0* dimScale + h * output_width + w;
-                int y_center_index = b * num_channels * dimScale 
-                                        + 1* dimScale + h * output_width + w;
-                int width_index = b * num_channels * dimScale
-                                        + 2* dimScale + h * output_width + w;
-                int height_index = b * num_channels * dimScale 
-                                        + 3* dimScale + h * output_width + w;
-                int object_index = b * num_channels * dimScale 
-                                        + 4* dimScale + h * output_width + w;
-                Dtype x_center_bias = (w + 0.5 - gt_center_x) * downRatio *2 / anchor_scale;
-                Dtype y_center_bias = (h + 0.5 - gt_center_y) * downRatio *2 / anchor_scale;
-                Dtype width_bias = std::log((xmax - xmin) * downRatio / anchor_scale);
-                Dtype height_bias = std::log((ymax - ymin) * downRatio / anchor_scale);
+              int x_center_index = b * num_channels * dimScale
+                                  + 0* dimScale + h * output_width + w;
+              int y_center_index = b * num_channels * dimScale 
+                                      + 1* dimScale + h * output_width + w;
+              int width_index = b * num_channels * dimScale
+                                      + 2* dimScale + h * output_width + w;
+              int height_index = b * num_channels * dimScale 
+                                      + 3* dimScale + h * output_width + w;
+              int object_index = b * num_channels * dimScale 
+                                      + 4* dimScale + h * output_width + w;
+              Dtype x_center_bias = (w + 0.5 - gt_center_x) * downRatio *2 / anchor_scale;
+              Dtype y_center_bias = (h + 0.5 - gt_center_y) * downRatio *2 / anchor_scale;
+              Dtype width_bias = std::log((xmax - xmin) * downRatio / anchor_scale);
+              Dtype height_bias = std::log((ymax - ymin) * downRatio / anchor_scale);
 
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[x_center_index] - x_center_bias), &(bottom_diff[x_center_index]));
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[y_center_index] - y_center_bias), &(bottom_diff[y_center_index]));
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[width_index] - width_bias), &(bottom_diff[width_index]));
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[height_index] - height_bias), &(bottom_diff[height_index]));
-                object_loss_temp[h * output_width + w] = Object_L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &(bottom_diff[object_index]));
-                int class_index = b * dimScale +  h * output_width + w;
-                class_label[class_index] = 1;
-                mask_Rf_anchor[h * output_width + w] = 1;
-                count++;
+              loc_loss += smoothL1_Loss(Dtype(channel_pred_data[x_center_index] - x_center_bias), &(bottom_diff[x_center_index]));
+              loc_loss += smoothL1_Loss(Dtype(channel_pred_data[y_center_index] - y_center_bias), &(bottom_diff[y_center_index]));
+              loc_loss += smoothL1_Loss(Dtype(channel_pred_data[width_index] - width_bias), &(bottom_diff[width_index]));
+              loc_loss += smoothL1_Loss(Dtype(channel_pred_data[height_index] - height_bias), &(bottom_diff[height_index]));
+              object_loss_temp[h * output_width + w] = Object_L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &(bottom_diff[object_index]));
+              int class_index = b * dimScale +  h * output_width + w;
+              class_label[class_index] = 1;
+              mask_Rf_anchor[h * output_width + w] = 1;
+              count++;
             }
           }
         }
