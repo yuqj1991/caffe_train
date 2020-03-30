@@ -15,9 +15,9 @@
 
 #define USE_HARD_SAMPLE_SOFTMAX 1
 
-#define USE_HARD_SAMPLE_SIGMOID 0
+#define USE_HARD_SAMPLE_SIGMOID 1
 #define USE_HARD_SAMPLE_COLESEBOX_SIGMOID 0
-#define USE_HARD_SAMPLE_ALL 1
+#define USE_HARD_SAMPLE_ALL 0
 
 int count_gt = 0;
 int count_one = 0;
