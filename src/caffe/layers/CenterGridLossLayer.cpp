@@ -101,7 +101,6 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   Dtype sum_squre = Dtype(0.);
   caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
   Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.);
-  //Dtype temp_loss = Dtype(0.);
   if (num_groundtruth_ >= 1) {
     const int downRatio = net_height_ / output_height;
     if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
@@ -147,16 +146,16 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         << " Layer cannot backpropagate to label inputs.";
   }
   if (propagate_down[0]) {
-    const int output_height = bottom[0]->height();
-    const int output_width = bottom[0]->width();
-    const int num_channels = bottom[0]->channels();
-    Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
-    const Dtype* bottom_data = bottom[0]->cpu_data();
-    num_ = bottom[0]->num();
-    int dimScale = output_height * output_width;
     Dtype loss_weight = Dtype(0.);
     loss_weight = top[0]->cpu_diff()[0] / num_;   
     if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
+      const int output_height = bottom[0]->height();
+      const int output_width = bottom[0]->width();
+      const int num_channels = bottom[0]->channels();
+      Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+      const Dtype* bottom_data = bottom[0]->cpu_data();
+      num_ = bottom[0]->num();
+      int dimScale = output_height * output_width;
       for(int b = 0; b < num_; b++){
         int object_index = b * num_channels * dimScale + 4 * dimScale;
         for(int i = 0; i < 1 * dimScale; i++){
