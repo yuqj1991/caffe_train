@@ -16,7 +16,6 @@
 #define USE_HARD_SAMPLE_SOFTMAX 1
 
 #define USE_HARD_SAMPLE_SIGMOID 0
-#define USE_HARD_SAMPLE_ALL 1
 
 int count_gt = 0;
 int count_one = 0;
@@ -791,13 +790,11 @@ Dtype FocalLossSigmoid(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype
   for(int i = 0; i < dimScale; i++){
     if(label_data[i] == 0.5){ // gt_boxes周围的小格子，因为离gt_box较近，所以计算这里的负样本
       loss -= alpha_ * std::pow(pred_data[i], gamma_) * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN)));
-      // diff
       Dtype diff_elem_ = alpha_ * std::pow(pred_data[i], gamma_);
       Dtype diff_next_ = pred_data[i] - gamma_ * (1 - pred_data[i]) * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN)));
       bottom_diff[i] = diff_elem_ * diff_next_;
     }else if(label_data[i] == 1){ //gt_boxes包围的都认为是正样本
       loss -= alpha_ * std::pow(1 - pred_data[i], gamma_) * std::log(std::max(pred_data[i], Dtype(FLT_MIN)));
-      // diff
       Dtype diff_elem_ = alpha_ * std::pow(1 - pred_data[i], gamma_);
       Dtype diff_next_ = gamma_ * pred_data[i] * std::log(std::max(pred_data[i], Dtype(FLT_MIN))) + pred_data[i] - 1;
       bottom_diff[i] = diff_elem_ * diff_next_;
@@ -879,8 +876,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
   int postive = 0;
   #if USE_HARD_SAMPLE_SIGMOID
   caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
-  #endif
-  #if USE_HARD_SAMPLE_ALL
+  #else
   caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
   #endif
   for(int b = 0; b < batch_size; b++){
@@ -960,10 +956,17 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
             Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff, object_diff;
+            #if 0
             loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
             loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
             loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
             loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
+            #else
+            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
+            #endif
             object_loss_temp[h * output_width + w] = Object_L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &object_diff);
 
             bottom_diff[xmin_index] = xmin_diff;
@@ -1248,14 +1251,12 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   std::vector<int>postive_batch(batch_size, 0);
 
   //计算每个样本的总损失（loc loss + softmax loss
-  #if USE_HARD_SAMPLE_SOFTMAX
   std::vector<Dtype> batch_sample_loss(batch_size * dimScale, Dtype(-1.));
-  #endif
+
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
     std::vector<int> mask_Rf_anchor(dimScale, 0);
     int count = 0;
-    #if USE_HARD_SAMPLE_SOFTMAX
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
         int bg_index = b * num_channels * dimScale 
@@ -1266,7 +1267,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
       }
     }
-    #endif
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
       const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
       const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
@@ -1316,14 +1316,12 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             class_label[class_index] = 1;
             mask_Rf_anchor[h * output_width + w] = 1;
             count++;
-            #if USE_HARD_SAMPLE_SOFTMAX
             int bg_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
             int face_index = b * num_channels * dimScale 
                                       + 5* dimScale + h * output_width + w;
             Dtype class_loss = SingleSoftmaxLoss(channel_pred_data[bg_index], channel_pred_data[face_index], Dtype(1.0));
             batch_sample_loss[b * dimScale + h * output_width + w] = single_total_loss + class_loss;
-            #endif
           }
         }
       }
@@ -1332,10 +1330,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  #if USE_HARD_SAMPLE_SOFTMAX
-  SelectHardSampleSoftMax(class_label, batch_sample_loss, 3, postive_batch, 
+  SelectHardSampleSoftMax(class_label, batch_sample_loss, 10, postive_batch, 
                                        output_height, output_width, num_channels, batch_size);
-  #endif
   score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
                                   output_width, bottom_diff, num_channels);
   *count_postive = postive;
