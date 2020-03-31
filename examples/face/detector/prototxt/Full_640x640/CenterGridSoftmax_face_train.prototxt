@@ -4894,7 +4894,7 @@ layer {
 	loss_param {
 		normalization: VALID
 	}
-	loss_weight: 1.0
+	loss_weight: 0.8
 	center_object_loss_param {
 		loc_weight: 1.0
 		num_class: 2
@@ -4925,7 +4925,7 @@ layer {
 	loss_param {
 		normalization: VALID
 	}
-	loss_weight: 1.0
+	loss_weight: 0.5
 	center_object_loss_param {
 		loc_weight: 1.0
 		num_class: 2
