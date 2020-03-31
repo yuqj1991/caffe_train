@@ -123,7 +123,7 @@ template float smoothL1_Loss(float x, float* x_diff);
 template double smoothL1_Loss(double x, double* x_diff);
 
 template <typename Dtype>
-Dtype L2_Loss(Dtype x, Dtype* x_diff){
+Dtype smoothL1_LossL2_Loss(Dtype x, Dtype* x_diff){
   Dtype loss = Dtype(0.);
   loss = x * x;
   *x_diff =2 * x;
@@ -956,17 +956,10 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             int object_index = b * num_channels * dimScale 
                                       + 4* dimScale + h * output_width + w;
             Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff, object_diff;
-            #if 0
             loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
             loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
             loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
             loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
-            #else
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
-            loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
-            #endif
             object_loss_temp[h * output_width + w] = Object_L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &object_diff);
 
             bottom_diff[xmin_index] = xmin_diff;
@@ -1330,7 +1323,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     postive += count;
   }
   // 计算softMax loss value 
-  SelectHardSampleSoftMax(class_label, batch_sample_loss, 10, postive_batch, 
+  SelectHardSampleSoftMax(class_label, batch_sample_loss, 3, postive_batch, 
                                        output_height, output_width, num_channels, batch_size);
   score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
                                   output_width, bottom_diff, num_channels);
