@@ -121,7 +121,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
     loc_loss = sum_squre / num_;
     score_loss = class_score / num_;
-    top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
+    top[0]->mutable_cpu_data()[0] = loc_loss + 0.1 * score_loss;
   } else {
     top[0]->mutable_cpu_data()[0] = 0;
   }
