@@ -18,6 +18,7 @@ layer {
 		max_aspect_ratio: 0.7
 		lower: 0.2
 		higher: 0.9
+		is_color: true
 	}
 	transform_param {
 		mirror: true
