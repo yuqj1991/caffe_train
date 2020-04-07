@@ -59,6 +59,8 @@ class CenterNetfocalSigmoidWithLossLayer : public LossLayer<Dtype> {
  protected:
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
   /**
    * @brief Computes the sigmoid loss error gradient w.r.t. the predictions.
    *
@@ -87,6 +89,8 @@ class CenterNetfocalSigmoidWithLossLayer : public LossLayer<Dtype> {
    *      the labels -- ignored as we can't compute their error gradients
    */
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
   
 
