@@ -15,8 +15,8 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
           const int width, Dtype* counts, float gamma, float alpha) {
   CUDA_KERNEL_LOOP(index, nthreads) {
     const int fw = index % width;
+    const int fh = (index / width) % height;
     const int fc = (index / width / height) % channels;
-    const int fh = index / width - fc * height;
     const int fn = (index / width / height) / channels;
     const int dim = (fn * channels + fc) * height * width;
     const Dtype* label_slice = label + dim;
@@ -37,7 +37,7 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-  #if 0
+  #if 1
     sigmoid_layer_->Forward(sigmoid_bottom_vec_, sigmoid_top_vec_);
     const Dtype* prob_data = prob_.gpu_data();
     const Dtype* label = bottom[1]->gpu_data();
@@ -75,8 +75,8 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
           const int width, Dtype* counts, float gamma, float alpha) {
   CUDA_KERNEL_LOOP(index, nthreads) {
     const int fw = index % width;
+    const int fh = (index / width) % height;
     const int fc = (index / width / height) % channels;
-    const int fh = index / width - fc * height;
     const int fn = (index / width / height) / channels;
     const int dim = (fn * channels + fc) * height * width;
     const Dtype* label_slice = label + dim;
@@ -98,7 +98,7 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-  #if 0
+  #if 1
   if (propagate_down[1]) {
     LOG(FATAL) << this->type()
                 <<
