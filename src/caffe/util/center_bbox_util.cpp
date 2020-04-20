@@ -123,7 +123,7 @@ template float smoothL1_Loss(float x, float* x_diff);
 template double smoothL1_Loss(double x, double* x_diff);
 
 template <typename Dtype>
-Dtype smoothL1_LossL2_Loss(Dtype x, Dtype* x_diff){
+Dtype L2_Loss(Dtype x, Dtype* x_diff){
   Dtype loss = Dtype(0.);
   loss = x * x;
   *x_diff =2 * x;
