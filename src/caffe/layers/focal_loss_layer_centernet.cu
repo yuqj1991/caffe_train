@@ -125,7 +125,8 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
     caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
     
     caffe_gpu_asum(nthreads, bottom_diff, &diff_sum);
-    printf("\033[1m\033[45;33m cuda diff_sumarize_a: %f, count: %f  \33[0m\n", diff_sum, valid_count);
+    if(count_iter % 1000 == 0)
+      printf("\033[1m\033[45;33m cuda diff_sumarize_a: %f, count: %f  \33[0m\n", diff_sum, valid_count);
   
   }
   #else
