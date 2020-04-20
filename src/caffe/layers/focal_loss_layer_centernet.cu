@@ -37,6 +37,7 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
+  #if 0
     sigmoid_layer_->Forward(sigmoid_bottom_vec_, sigmoid_top_vec_);
     const Dtype* prob_data = prob_.gpu_data();
     const Dtype* label = bottom[1]->gpu_data();
@@ -62,6 +63,9 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
       printf("\033[1m\033[45;33m batch_: %d, num_class_: %d, width: %d, height: %d, valid_count: %f, loss: %f, final_loss: %f \33[0m\n", 
                                 batch_, num_class_, width_, height_, valid_count, loss, top[0]->mutable_cpu_data()[0]);
     count_iter++;
+  #else
+  Forward_cpu(bottom, top);
+  #endif
 }
 
 template <typename Dtype>
@@ -94,6 +98,7 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
+  #if 0
   if (propagate_down[1]) {
     LOG(FATAL) << this->type()
                 <<
@@ -123,6 +128,9 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
     printf("\033[1m\033[45;33m cuda diff_sumarize_a: %f, count: %f  \33[0m\n", diff_sum, valid_count);
   
   }
+  #else
+  Backward_cpu(top,propagate_down, bottom);
+  #endif
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(CenterNetfocalSigmoidWithLossLayer);
