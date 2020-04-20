@@ -11,4 +11,7 @@ widerface val set
 hard mid easy  
 72% 76% 81%  
 mobilenet-v2 face vggface val accuray  
-99.42%
+99.42%  
+face landmarks + face attributes gender (99.4%)+ bool glasses(99.5%)  
+face head angle(not evaluated)  
+car license plate detect(mAP91%) + recognition(96%, only support anhui car + blue car style)
