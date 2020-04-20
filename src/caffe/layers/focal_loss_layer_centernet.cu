@@ -14,9 +14,9 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
           const int batch, const int channels, const int height,
           const int width, Dtype* counts, float gamma, float alpha) {
   CUDA_KERNEL_LOOP(index, nthreads) {
-    const int fw = (index / width / height) % width;
-    const int fh = (index / width / height) / width;
+    const int fw = index % width;
     const int fc = (index / width / height) % channels;
+    const int fh = index / width - fc * height;
     const int fn = (index / width / height) / channels;
     const int dim = (fn * channels + fc) * height * width;
     const Dtype* label_slice = label + dim;
@@ -70,9 +70,9 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
           const int batch, const int channels, const int height,
           const int width, Dtype* counts, float gamma, float alpha) {
   CUDA_KERNEL_LOOP(index, nthreads) {
-    const int fw = (index / width / height) % width;
-    const int fh = (index / width / height) / width;
+    const int fw = index % width;
     const int fc = (index / width / height) % channels;
+    const int fh = index / width - fc * height;
     const int fn = (index / width / height) / channels;
     const int dim = (fn * channels + fc) * height * width;
     const Dtype* label_slice = label + dim;
