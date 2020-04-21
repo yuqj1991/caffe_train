@@ -29,6 +29,7 @@ void CenternetDetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>
   keep_top_k_ = detection_output_param.keep_top_k();
   confidence_threshold_ = detection_output_param.has_confidence_threshold() ?
       detection_output_param.confidence_threshold() : -FLT_MAX;
+  nms_thresh_ = detection_output_param.ignore_thresh();
 }
 
 template <typename Dtype>
@@ -62,7 +63,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
   _nms_heatmap(conf_data, keep_max_data, output_height, output_width, classes, num_);
   const Dtype* keep_data = bottom[1]->cpu_data();
   results_.clear();
-  get_topK(keep_data, loc_data, output_height, output_width, classes, num_, &results_, 4, confidence_threshold_, Dtype(0.45));
+  get_topK(keep_data, loc_data, output_height, output_width, classes, num_, &results_, 4, confidence_threshold_, nms_thresh_);
 
   int num_kept = 0;
 
@@ -109,10 +110,11 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
         top_data[count * 7 + 4] = result_temp[j].ymin();
         top_data[count * 7 + 5] = result_temp[j].xmax();
         top_data[count * 7 + 6] = result_temp[j].ymax();
-        LOG(INFO)<<"center_x: "<< (result_temp[j].xmin() + result_temp[j].xmax()) * 4 * 160 / 2
-                 <<", center_y: "<< (result_temp[j].ymin() + result_temp[j].ymax()) * 4 * 160 / 2
-                 <<", width: "<< (result_temp[j].xmax() - result_temp[j].xmin()) * 4 * 160
-                 <<", height: "<< (result_temp[j].ymax() - result_temp[j].ymin()) * 4 * 160;
+        LOG(INFO)<<"confidence: " << result_temp[j].score()
+                 <<", center_x: " << (result_temp[j].xmin() + result_temp[j].xmax()) * 4 * 160 / 2
+                 <<", center_y: " << (result_temp[j].ymin() + result_temp[j].ymax()) * 4 * 160 / 2
+                 <<", width: " << (result_temp[j].xmax() - result_temp[j].xmin()) * 4 * 160
+                 <<", height: " << (result_temp[j].ymax() - result_temp[j].ymin()) * 4 * 160;
         ++count;
       }
     }
