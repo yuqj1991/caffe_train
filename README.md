@@ -5,13 +5,16 @@ data augement for pymraidBox implemented by caffe
 yolo layer & reorg layer for darknet implemented by caffe  
 centernet implemented by caffe  
 facenet tripletloss by caffe
-
 centernet face + nms version  
 widerface val set  
 hard mid easy  
-72% 76% 85%  
+72% 84% 85%  
 mobilenet-v2 face vggface val accuray  
 99.42%  
 face landmarks + face attributes gender (99.4%)+ bool glasses(99.5%)  
 face head angle(not evaluated)  
 car license plate detect(mAP91%) + recognition(96%, only support anhui car + blue car style)
+New proposed method CenterGridSoftmax + nms method by using anchor  
+widerface val set  
+hard mid easy  
+72% 84% 86%  
