@@ -146,7 +146,7 @@ class wider(imdb):
         self.write_detections(all_boxes,detections_txt_path)
 
         print('Evaluating detections using python version toolbox...')
-        cmd = 'cd {} && '.format(path)
+        cmd = 'cd {} && '.format('evaluate')
         libsoFile = "./evaluate/bbox.cpython-35mx-x86_64-linux-gnu.so"
         if not os.path.exists(libsoFile):
             cmd += "python3 setup.py build_ext --inplace"
