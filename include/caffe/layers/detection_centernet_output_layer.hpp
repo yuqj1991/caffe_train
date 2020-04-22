@@ -74,7 +74,7 @@ class CenternetDetectionOutputLayer : public Layer<Dtype> {
   Dtype confidence_threshold_;
   int num_;
   std::map<int, std::vector<CenterNetInfo> > results_;
-
+  Dtype nms_thresh_;
 };
 
 }  // namespace caffe

@@ -4217,7 +4217,7 @@ layer {
 	detection_output_param {
 		num_classes: 2
 		share_location: true
-		keep_top_k: 200
+		keep_top_k: 400
 		confidence_threshold: 0.05
 		ignore_thresh: 0.3
 	}

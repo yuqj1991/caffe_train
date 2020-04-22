@@ -147,12 +147,12 @@ class wider(imdb):
 
         print('Evaluating detections using python version toolbox...')
         cmd = 'cd {} && '.format('evaluate')
-        libsoFile = "./evaluate/bbox.cpython-35mx-x86_64-linux-gnu.so"
+        libsoFile = "./evaluate/bbox.cpython-35m-x86_64-linux-gnu.so"
         if not os.path.exists(libsoFile):
-            cmd += "python3 setup.py build_ext --inplace"
+            cmd += "python3 setup.py build_ext --inplace && "
             cmd += "python3 evaluation.py -p ../output/wider_val/face-detector/detections"
         else:
             cmd += "python3 evaluation.py -p ../output/wider_val/face-detector/detections"
-        print('Running:\n{}'.format(cmd))
+        print('Running: {}'.format(cmd))
         subprocess.call(cmd, shell=True)
 
