@@ -18,3 +18,6 @@ New proposed method CenterGridSoftmax + nms method by using anchor
 widerface val set  
 hard mid easy  
 72% 84% 86%  
+
+will add caffe version efficientDet  
+to be continued
