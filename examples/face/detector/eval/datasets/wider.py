@@ -145,16 +145,14 @@ class wider(imdb):
         detections_txt_path = os.path.join(output_dir,'detections')
         self.write_detections(all_boxes,detections_txt_path)
 
-        print('Evaluating detections using official WIDER toolbox...')
-        path = os.path.join(os.path.dirname(__file__), '..', 'wider_eval_tools')
-        eval_output_path = os.path.join(output_dir,'wider_plots')
-        if not os.path.isdir(eval_output_path):
-            os.mkdir(eval_output_path)
+        print('Evaluating detections using python version toolbox...')
         cmd = 'cd {} && '.format(path)
-        cmd += 'matlab -nodisplay -nodesktop '
-        cmd += '-r "dbstop if error; '
-        cmd += 'wider_eval(\'{:s}\',\'{:s}\',\'{:s}\'); quit;"' \
-            .format(detections_txt_path, method_name,eval_output_path)
+        libsoFile = "./evaluate/bbox.cpython-35mx-x86_64-linux-gnu.so"
+        if not os.path.exists(libsoFile):
+            cmd += "python3 setup.py build_ext --inplace"
+            cmd += "python3 evaluation.py -p ../output/wider_val/face-detector/detections"
+        else:
+            cmd += "python3 evaluation.py -p ../output/wider_val/face-detector/detections"
         print('Running:\n{}'.format(cmd))
         subprocess.call(cmd, shell=True)
 
