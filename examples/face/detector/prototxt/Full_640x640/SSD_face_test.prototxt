@@ -5161,7 +5161,7 @@ layer {
 			nms_threshold: 0.3
 			top_k: 200
 		}
-		code_type: CENTER_SIZE
+		code_type: RECEPTIVE_CENTER
 		keep_top_k: 200
 		confidence_threshold: 0.15
 	}
