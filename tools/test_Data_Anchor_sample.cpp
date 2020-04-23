@@ -20,6 +20,8 @@
 #include "caffe/util/io.hpp"
 #include "caffe/util/rng.hpp"
 #include "caffe/util/bbox_util.hpp"
+#include "caffe/util/sampler.hpp"
+#include "caffe/data_transformer.hpp"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -202,7 +204,7 @@ void GenerateDataAnchorSample(cv::Mat img,
   sampled_bbox->ymax = h_end;
 }
 
-void GenerateBatchDataAnchorSamples(const cv::Mat src_img, vector<NormalizedBBox_S> object_bboxes, 
+void GenerateBatchDataAnchorSamples_T(const cv::Mat src_img, vector<NormalizedBBox_S> object_bboxes, 
                                 const vector<std::vector<int> >& data_anchor_samplers,
                                 int resized_height, int resized_width, 
                                 NormalizedBBox_S* sampled_bbox, cv::Mat* resized_img,
@@ -458,6 +460,7 @@ int main(int argc, char** argv){
   }
   infile.close();
   int numSamples = img_filenames.size();
+  #if 0
   for(int ii = 0; ii < numSamples; ii++){
     cv::Mat srcImg = cv::imread(img_filenames[ii].first);
     int img_Height = srcImg.rows;
@@ -496,15 +499,13 @@ int main(int argc, char** argv){
       cv::Mat srcImg = cv::imread(img_filenames[rand_idx].first);
       std::cout<<"file: "<<img_filenames[rand_idx].first<<std::endl;
       #if 1
-      GenerateBatchDataAnchorSamples(srcImg, all_gt_bboxes.find(rand_idx)->second, anchorSamples, Resized_Height, 
+      GenerateBatchDataAnchorSamples_T(srcImg, all_gt_bboxes.find(rand_idx)->second, anchorSamples, Resized_Height, 
                                       Resized_Width, &anchorSampled_bbox, &Resized_img, &resized_gt_bboxes, true, 20);
       #else
       GenerateLffdSample_T(srcImg, all_gt_bboxes.find(rand_idx)->second, Resized_Height, Resized_Width, &anchorSampled_bbox,
                                       low_gt_boxes_list, up_gt_boxes_list, anchor_stride_list, &Resized_img, true);
       #endif
       std::cout<<"SAMPEL SUCCESSFULLY"<<std::endl;
-      //cv::imshow("Gaussian", Resized_img);
-	    //cv::waitKey(0);
       Crop_Image_F(Resized_img, &cropImage, anchorSampled_bbox, resized_gt_bboxes, &transfor_gt_bboxes);
       std::cout<<"CROP IMAGE SAMPEL SUCCESSFULLY"<<std::endl;
       std::string saved_img_name = save_folder + "/" + prefix_imgName + "_" + to_string(ii) + "_" + to_string(jj) +".jpg";
@@ -521,6 +522,130 @@ int main(int argc, char** argv){
       cv::imwrite(saved_img_name, cropImage);
     }
   }
+  #else
+  // 先生成datum，再利用正宗的数据增强接口， 再将其转化为图像
+  std::vector<AnnotatedDatum> source_datum;
+  std::map<std::string, int> name_to_label;
+  const bool check_label = true;
+  const string label_map_file = "../examples/face/detector/labelmap.prototxt";
+  LabelMap label_map;
+  CHECK(ReadProtoFromTextFile(label_map_file, &label_map))
+      << "Failed to read label map file.";
+  CHECK(MapNameToLabel(label_map, check_label, &name_to_label))
+      << "Failed to convert name to label.";
+  const string label_type = "txt";
+  const int resize_height = 0;
+  const int resize_width = 0;
+  const int min_dim = 0;
+  const int max_dim = 0;
+  const bool is_color = true;
+  AnnotatedDatum_AnnotationType type = AnnotatedDatum_AnnotationType_BBOX;
+  std::string encode_type = "jpg";
+  for(int ii = 0; ii < numSamples; ii++){
+    std::string filename = img_filenames[ii].first;
+    std::string labelname = img_filenames[ii].second;
+    
+    AnnotatedDatum anno_datum;
+    ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
+        resize_width, min_dim, max_dim, is_color, encode_type, type, label_type,
+        name_to_label, &anno_datum);
+    anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
+    source_datum.push_back(anno_datum);
+  }
+  // 设置采样参数
+  vector<DataAnchorSampler> data_anchor_samplers_;
+  for(int ii = 0; ii < 1; ii++){
+    DataAnchorSampler samplers;
+    for(int jj = 0; jj < 6; jj++){
+      samplers.add_scale(16 * int(std::pow(2, jj)));
+    }
+    samplers.mutable_sample_constraint()->set_min_object_coverage(0.5);
+    samplers.set_max_sample(1);
+    samplers.set_max_trials(10);
+    data_anchor_samplers_.push_back(samplers);
+  }
+  // 生成Datatransfrm的参数
+  TransformationParameter transform_param;
+  transform_param.set_mirror(false);
+  ResizeParameter* resized_param = transform_param.mutable_resize_param();
+  resized_param->set_height(Resized_Height);
+  resized_param->set_width(Resized_Width);
+  resized_param->set_resize_mode(ResizeParameter_Resize_mode_WARP);
+  resized_param->set_prob(1.0);
+  resized_param->add_interp_mode(ResizeParameter_Interp_mode_LINEAR);
+  resized_param->add_interp_mode(ResizeParameter_Interp_mode_AREA);
+  resized_param->add_interp_mode(ResizeParameter_Interp_mode_NEAREST);
+  resized_param->add_interp_mode(ResizeParameter_Interp_mode_CUBIC);
+  resized_param->add_interp_mode(ResizeParameter_Interp_mode_LANCZOS4);
 
+  EmitConstraint* emit_constranit_ = transform_param.mutable_emit_constraint();
+  emit_constranit_->set_emit_type(EmitConstraint_EmitType_CENTER);
+
+  DataTransformer<float> data_transformer_(transform_param, TEST);
+  // 循环操作
+  for(int ii = 0; ii < loop_time; ii++){
+    for(int jj = 0; jj < batch_size; jj++){
+      int rand_idx = caffe_rng_rand() % numSamples;
+      int pos_name = img_filenames[rand_idx].first.find_last_of("/");
+      std::string img_name = img_filenames[rand_idx].first.substr(pos_name);
+      int pos_suffix = img_name.find_last_of(".");
+      std::string prefix_imgName = img_name.substr(0, pos_suffix);
+
+      AnnotatedDatum& anno_datum = source_datum[rand_idx];
+      AnnotatedDatum* sampled_datum = NULL;
+      int resized_height = transform_param.resize_param().height();
+      int resized_width = transform_param.resize_param().width();
+      AnnotatedDatum* resized_anno_datum = new AnnotatedDatum();
+      bool do_resize = true;
+      NormalizedBBox sampled_bbox;
+      #if 1
+      GenerateBatchDataAnchorSamples(anno_datum, data_anchor_samplers_,
+                              resized_height, resized_width,
+                              &sampled_bbox, resized_anno_datum, transform_param, do_resize);
+      CHECK_GT(resized_anno_datum->datum().channels(), 0);
+      sampled_datum = new AnnotatedDatum();
+      data_transformer_.CropImage_anchor_Sampling(*resized_anno_datum,
+                                    sampled_bbox,
+                                    sampled_datum);
+      #else
+      GenerateLffdSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
+                              bbox_small_scale_, bbox_large_scale_, anchor_stride_,
+                              resized_anno_datum, transform_param, do_resize);
+      CHECK_GT(resized_anno_datum->datum().channels(), 0);
+      sampled_datum = new AnnotatedDatum();
+      data_transformer_.CropImage_Lffd_Sampling(*resized_anno_datum,
+                                          sampled_bbox,
+                                          sampled_datum);
+      #endif
+      CHECK(sampled_datum != NULL);
+      vector<AnnotationGroup> transformed_anno_vec;
+      transformed_anno_vec.clear();
+      Blob<float> transformed_blob;
+      data_transformer_.Transform(*sampled_datum, &transformed_blob,
+                                          &transformed_anno_vec);
+      std::cout<<"SAMPEL SUCCESSFULLY"<<std::endl;
+      // 将数据转换为原来图像的数据
+      std::string saved_img_name = save_folder + "/" + prefix_imgName + "_" + to_string(ii) + "_" + to_string(jj) +".jpg";
+      cv::Mat cropImage = DecodeDatumToCVMatNative(sampled_datum->datum());
+      int Crop_Height = cropImage.rows;
+      int Crop_Width = cropImage.cols;
+      for (int g = 0; g < transformed_anno_vec.size(); ++g) {
+        const AnnotationGroup& anno_group = transformed_anno_vec[g];
+        for (int a = 0; a < anno_group.annotation_size(); ++a) {
+          const Annotation& anno = anno_group.annotation(a);
+          const NormalizedBBox& bbox = anno.bbox();
+          int xmin = int(bbox.xmin() * Crop_Width);
+          int ymin = int(bbox.ymin() * Crop_Height);
+          int xmax = int(bbox.xmax() * Crop_Width);
+          int ymax = int(bbox.ymax() * Crop_Height);
+          cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
+        }
+      }
+      cv::imwrite(saved_img_name, cropImage);
+      delete sampled_datum;
+      delete resized_anno_datum;
+    }
+  }
+  #endif
 	return 1;
 }
