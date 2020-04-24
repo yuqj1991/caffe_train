@@ -420,8 +420,8 @@ int main(int argc, char** argv){
   int batch_size = 32;
   int Resized_Height = 640;
   int Resized_Width = 640;
-  std::string srcTestfile = "/home/deepano/workspace/img_test.txt";
-  std::string save_folder = "/home/deepano/workspace/anchorTestImage";
+  std::string srcTestfile = "../../img_test.txt";
+  std::string save_folder = "../../anchorTestImage";
   std::vector<std::pair<string, string> > img_filenames;
   std::map<int, std::vector<NormalizedBBox_S> >all_gt_bboxes;
   // anchor samples policy
@@ -533,7 +533,7 @@ int main(int argc, char** argv){
       << "Failed to read label map file.";
   CHECK(MapNameToLabel(label_map, check_label, &name_to_label))
       << "Failed to convert name to label.";
-  const string label_type = "txt";
+  const string label_type = "xml";
   const int resize_height = 0;
   const int resize_width = 0;
   const int min_dim = 0;
@@ -552,6 +552,7 @@ int main(int argc, char** argv){
     anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
     source_datum.push_back(anno_datum);
   }
+  LOG(INFO)<<"=====SOURCE DATUM SUCCESSFULLY!=====";
   // 设置采样参数
   vector<DataAnchorSampler> data_anchor_samplers_;
   for(int ii = 0; ii < 1; ii++){
@@ -607,6 +608,7 @@ int main(int argc, char** argv){
       data_transformer_.CropImage_anchor_Sampling(*resized_anno_datum,
                                     sampled_bbox,
                                     sampled_datum);
+      LOG(INFO)<<"=====TEST DATA ANCHOR SAMPLES SUCCESSFULLY!=====";
       #else
       GenerateLffdSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
                               bbox_small_scale_, bbox_large_scale_, anchor_stride_,
@@ -621,9 +623,11 @@ int main(int argc, char** argv){
       vector<AnnotationGroup> transformed_anno_vec;
       transformed_anno_vec.clear();
       Blob<float> transformed_blob;
+      vector<int> shape = data_transformer_.InferBlobShape(sampled_datum->datum());
+      transformed_blob.Reshape(shape);
       data_transformer_.Transform(*sampled_datum, &transformed_blob,
                                           &transformed_anno_vec);
-      std::cout<<"SAMPEL SUCCESSFULLY"<<std::endl;
+      LOG(INFO)<<"SAMPEL SUCCESSFULLY";
       // 将数据转换为原来图像的数据
       std::string saved_img_name = save_folder + "/" + prefix_imgName + "_" + to_string(ii) + "_" + to_string(jj) +".jpg";
       cv::Mat cropImage = DecodeDatumToCVMatNative(sampled_datum->datum());
@@ -642,6 +646,7 @@ int main(int argc, char** argv){
         }
       }
       cv::imwrite(saved_img_name, cropImage);
+      LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
       delete sampled_datum;
       delete resized_anno_datum;
     }

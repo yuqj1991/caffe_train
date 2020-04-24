@@ -14,8 +14,8 @@ minsize2select = 10
 cropsize2select = 60
 usepadding = True
 
-datasetprefix = "../../../dataset/facedata/wider_face"  #
-use_blur_occlu_attri = False #True #
+datasetprefix = "../../../dataset/facedata/wider_face"
+use_blur_occlu_attri = False 
 
 classflyFile = "./wider_face_classfly_distance_data.txt"
 
@@ -57,7 +57,7 @@ def convertimgset(img_set="train"):
             filename = gtfile.readline()[:-1]
             if (filename == ""):
                 break;
-            sys.stdout.write("\r" + str(index) + ":" + filename + "\n")
+            sys.stdout.write("\r" + str(index) + ":" + imgdir + "/" + filename + "\n")
             sys.stdout.flush()
             imgpath = imgdir + "/" + filename
             img = cv2.imread(imgpath)
@@ -116,8 +116,7 @@ def convertimgset(img_set="train"):
                     cv2.rectangle(showimg, (x, y), (x2, y2), (0, 0, 255))
             filename = filename.replace("/", "_")
             if len(bboxes) == 0:
-                print
-                "warrning: no face"
+                print("warrning: no face")
                 continue
             cv2.imwrite(imagesdir + "/" + filename, saveimg)
             # generate filelist
@@ -251,7 +250,7 @@ def generatetxt(img_set="train"):
     gtfilepath = rootdir + "/wider_face_split/wider_face_" + img_set + "_bbx_gt.txt"
     f = open(rootdir + "/" + img_set + ".txt", "w")
     with open(gtfilepath, 'r') as gtfile:
-        while (True):  # and len(faces)<10
+        while (True):
             filename = gtfile.readline()[:-1]
             if (filename == ""):
                 break;
@@ -272,7 +271,7 @@ def generatevocsets(img_set="train"):
     gtfilepath = rootdir + "/wider_face_split/wider_face_" + img_set + "_bbx_gt.txt"
     f = open(rootdir + "/ImageSets/Main/" + img_set + ".txt", 'w')
     with open(gtfilepath, 'r') as gtfile:
-        while (True):  # and len(faces)<10
+        while (True):
             filename = gtfile.readline()[:-1]
             if (filename == ""):
                 break;

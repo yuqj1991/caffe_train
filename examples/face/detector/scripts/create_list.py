@@ -30,7 +30,7 @@ def generate_list(imageSetDir):
 				xmlline_ = root_dataset+imgname+'.xml'
 				xmlline = os.path.abspath(xmlline_) + '\n'
 				if os.path.exists(xmlline_):
-					newline = os.path.abspath(imgline.strip().replace('stive', 'deepano')+'.jpg')+' '+xmlline
+					newline = os.path.abspath(imgline.strip() +'.jpg')+' '+xmlline
 					newfile.write(newline)
 		f.close()
 		newfile.close()
