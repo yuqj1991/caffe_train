@@ -599,7 +599,7 @@ int main(int argc, char** argv){
       AnnotatedDatum* resized_anno_datum = new AnnotatedDatum();
       bool do_resize = true;
       NormalizedBBox sampled_bbox;
-      #if 1
+      #if 0
       GenerateBatchDataAnchorSamples(anno_datum, data_anchor_samplers_,
                               resized_height, resized_width,
                               &sampled_bbox, resized_anno_datum, transform_param, do_resize);
@@ -610,14 +610,15 @@ int main(int argc, char** argv){
                                     sampled_datum);
       LOG(INFO)<<"=====TEST DATA ANCHOR SAMPLES SUCCESSFULLY!=====";
       #else
-      GenerateLffdSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
-                              bbox_small_scale_, bbox_large_scale_, anchor_stride_,
+      GenerateLffdSample(anno_datum, resized_height, resized_width, &sampled_bbox, 
+                              low_gt_boxes_list, up_gt_boxes_list, anchor_stride_list,
                               resized_anno_datum, transform_param, do_resize);
       CHECK_GT(resized_anno_datum->datum().channels(), 0);
       sampled_datum = new AnnotatedDatum();
       data_transformer_.CropImage_Lffd_Sampling(*resized_anno_datum,
                                           sampled_bbox,
                                           sampled_datum);
+      LOG(INFO)<<"=====TEST DATA LFFD SAMPLES SUCCESSFULLY!=====";
       #endif
       CHECK(sampled_datum != NULL);
       vector<AnnotationGroup> transformed_anno_vec;
@@ -625,12 +626,20 @@ int main(int argc, char** argv){
       Blob<float> transformed_blob;
       vector<int> shape = data_transformer_.InferBlobShape(sampled_datum->datum());
       transformed_blob.Reshape(shape);
-      data_transformer_.Transform(*sampled_datum, &transformed_blob,
-                                          &transformed_anno_vec);
+      data_transformer_.Transform(*sampled_datum, &transformed_blob, &transformed_anno_vec);
       LOG(INFO)<<"SAMPEL SUCCESSFULLY";
-      // 将数据转换为原来图像的数据
+      // 将Datum数据转换为原来图像的数据, 并保存成图像
       std::string saved_img_name = save_folder + "/" + prefix_imgName + "_" + to_string(ii) + "_" + to_string(jj) +".jpg";
-      cv::Mat cropImage = DecodeDatumToCVMatNative(sampled_datum->datum());
+      cv::Mat cropImage(transformed_blob.height(), transformed_blob.width(), CV_8UC3);
+      const float* data = transformed_blob.cpu_data();
+      for(int row = 0; row < Resized_Height; row++){
+        unsigned char *ImgData = cropImage.ptr<uchar>(row);
+        for(int col = 0; col < Resized_Width; col++){
+          ImgData[3 * col + 0] = static_cast<uchar>(data[0 * Resized_Height * Resized_Width + row * Resized_Width + col]);
+          ImgData[3 * col + 1] = static_cast<uchar>(data[1 * Resized_Height * Resized_Width + row * Resized_Width + col]);
+          ImgData[3 * col + 2] = static_cast<uchar>(data[2 * Resized_Height * Resized_Width + row * Resized_Width + col]);
+        }
+      }
       int Crop_Height = cropImage.rows;
       int Crop_Width = cropImage.cols;
       for (int g = 0; g < transformed_anno_vec.size(); ++g) {
