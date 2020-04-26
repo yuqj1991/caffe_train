@@ -120,7 +120,7 @@ class DataTransformer {
   void CropImage_anchor_Sampling(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
                  AnnotatedDatum* cropped_anno_datum);
 
-  void CropImage_Lffd_Sampling(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
+  void CropImage_LFFD_Sampling(const AnnotatedDatum& anno_datum, const NormalizedBBox& bbox,
                  AnnotatedDatum* cropped_anno_datum);
 
   void Transform(const AnnoFaceAttributeDatum& anno_datum,

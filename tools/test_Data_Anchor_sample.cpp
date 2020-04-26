@@ -610,12 +610,12 @@ int main(int argc, char** argv){
                                     sampled_datum);
       LOG(INFO)<<"=====TEST DATA ANCHOR SAMPLES SUCCESSFULLY!=====";
       #else
-      GenerateLffdSample(anno_datum, resized_height, resized_width, &sampled_bbox, 
+      GenerateLFFDSample(anno_datum, resized_height, resized_width, &sampled_bbox, 
                               low_gt_boxes_list, up_gt_boxes_list, anchor_stride_list,
                               resized_anno_datum, transform_param, do_resize);
       CHECK_GT(resized_anno_datum->datum().channels(), 0);
       sampled_datum = new AnnotatedDatum();
-      data_transformer_.CropImage_Lffd_Sampling(*resized_anno_datum,
+      data_transformer_.CropImage_LFFD_Sampling(*resized_anno_datum,
                                           sampled_bbox,
                                           sampled_datum);
       LOG(INFO)<<"=====TEST DATA LFFD SAMPLES SUCCESSFULLY!=====";

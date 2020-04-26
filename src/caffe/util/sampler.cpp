@@ -433,7 +433,7 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
   CHECK_GT(resized_anno_datum->datum().channels(), 0)<<"channels: "<<resized_anno_datum->datum().channels();
 }
 
-void GenerateLffdSample(const AnnotatedDatum& anno_datum,
+void GenerateLFFDSample(const AnnotatedDatum& anno_datum,
                         int resized_height, int resized_width,
                         NormalizedBBox* sampled_bbox, 
                         std::vector<int> bbox_small_size_list,
@@ -460,6 +460,8 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
   int scaled_idx = 0, side_length = 0;
   if(longer_side <= bbox_small_size_list[0]){
     scaled_idx = 0;
+  }else if(longer_side <= bbox_small_size_list[1]){
+    scaled_idx = caffe_rng_rand() % 2;
   }else if(longer_side <= bbox_small_size_list[2]){
     scaled_idx = caffe_rng_rand() % 3;
   }else if(longer_side >= bbox_small_size_list[num_output_scale - 1]){
@@ -479,7 +481,7 @@ void GenerateLffdSample(const AnnotatedDatum& anno_datum,
                                           bbox_small_size_list[scaled_idx]);
   }
   if(do_resize){
-    float scale = (float) side_length / bbox_width;
+    float scale = (float) side_length / longer_side;
     ResizedCropSample(anno_datum, resized_anno_datum, scale, trans_param);
     int Resized_ori_Height = int(scale * img_height);
     int Resized_ori_Width = int(scale * img_width);

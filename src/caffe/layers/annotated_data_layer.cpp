@@ -276,12 +276,12 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
           int resized_width_ = transform_param.resize_param().width();
           resized_anno_datum = new AnnotatedDatum();
           do_resize = true;
-          GenerateLffdSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
+          GenerateLFFDSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
                               bbox_small_scale_, bbox_large_scale_, anchor_stride_,
                               resized_anno_datum, transform_param, do_resize);
           CHECK_GT(resized_anno_datum->datum().channels(), 0)<<", anchor_prob: "<<anchor_prob;
           sampled_datum = new AnnotatedDatum();
-          this->data_transformer_->CropImage_Lffd_Sampling(*resized_anno_datum,
+          this->data_transformer_->CropImage_LFFD_Sampling(*resized_anno_datum,
                                               sampled_bbox,
                                               sampled_datum);
           has_sampled = true;

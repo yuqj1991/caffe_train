@@ -467,7 +467,7 @@ void DataTransformer<Dtype>::TransformAnnoCcpd(
 template<typename Dtype>
 void DataTransformer<Dtype>::CropImageAnchor(const Datum& datum, const NormalizedBBox& bbox,
 												Datum* crop_datum) {
-	// If datum is encoded, decode and crop the cv::image.
+	// datum为encoded的，将其解码为cvMat Image, 再进行CropImage
 	if (datum.encoded()) {
 	#ifdef USE_OPENCV
 		CHECK(!(param_.force_color() && param_.force_gray()))
@@ -488,7 +488,7 @@ void DataTransformer<Dtype>::CropImageAnchor(const Datum& datum, const Normalize
 		return;
 	#else
 		LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
-	#endif  // USE_OPENCV
+	#endif
 	} else {
 		if (param_.force_color() || param_.force_gray()) {
 			LOG(ERROR) << "force_color and force_gray only for encoded datum";
@@ -638,7 +638,7 @@ void DataTransformer<Dtype>::CropImage_anchor_Sampling(const AnnotatedDatum& ann
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::CropImage_Lffd_Sampling(const AnnotatedDatum& anno_datum,
+void DataTransformer<Dtype>::CropImage_LFFD_Sampling(const AnnotatedDatum& anno_datum,
 														const NormalizedBBox& bbox,
 														AnnotatedDatum* cropped_anno_datum) {
 	// Crop the datum.
