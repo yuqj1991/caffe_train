@@ -143,12 +143,12 @@ layer {
 			max_trials: 50
 		}
     data_anchor_sampler{
-			scale: 16
-			scale: 32
-			scale: 64
-			scale: 128
-			scale: 256
-			scale: 512
+			scale: 10
+			scale: 23
+			scale: 52
+			scale: 119
+			scale: 268
+			scale: 596
 			sample_constraint{
 				min_object_coverage: 0.75
 			}
@@ -156,28 +156,22 @@ layer {
 			max_trials: 50
 		}
     bbox_sampler{
+      bbox_small_scale: 8
       bbox_small_scale: 10
-      bbox_small_scale: 15
-      bbox_small_scale: 20
-      bbox_small_scale: 40
-      bbox_small_scale: 70
-      bbox_small_scale: 110
-      bbox_small_scale: 250
-      bbox_small_scale: 400
-      bbox_large_scale: 15
-      bbox_large_scale: 20
-      bbox_large_scale: 40
-      bbox_large_scale: 70
-      bbox_large_scale: 110
-      bbox_large_scale: 250
-      bbox_large_scale: 400
-      bbox_large_scale: 560
-      ancher_stride: 4
+      bbox_small_scale: 23
+      bbox_small_scale: 52
+      bbox_small_scale: 119
+      bbox_small_scale: 268
+      bbox_large_scale: 10
+      bbox_large_scale: 23
+      bbox_large_scale: 52
+      bbox_large_scale: 119
+      bbox_large_scale: 268
+      bbox_large_scale: 596
       ancher_stride: 4
       ancher_stride: 8
       ancher_stride: 8
       ancher_stride: 16
-      ancher_stride: 32
       ancher_stride: 32
       ancher_stride: 32
     }
