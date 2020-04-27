@@ -440,11 +440,6 @@ void EncodeBBox(
     CHECK_GT(prior_height, 0);
     float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
     float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
-
-    float bbox_width = bbox.xmax() - bbox.xmin();
-    CHECK_GT(bbox_width, 0);
-    float bbox_height = bbox.ymax() - bbox.ymin();
-    CHECK_GT(bbox_height, 0);
     if (encode_variance_in_target) {
       encode_bbox->set_xmin((prior_center_x - bbox.xmin()) / prior_width);
       encode_bbox->set_ymin((prior_center_y - bbox.ymin()) / prior_height);
