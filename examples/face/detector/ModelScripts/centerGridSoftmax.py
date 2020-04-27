@@ -351,3 +351,17 @@ solver = caffe_pb2.SolverParameter(
         **solver_param)
 with open(solver_file, 'w') as f:
     print(solver, file=f)
+
+max_iter = 0
+# Find most recent snapshot.
+for file in os.listdir(snapshot_dir):
+  if file.endswith(".solverstate"):
+    basename = os.path.splitext(file)[0]
+    iter = int(basename.split("{}_iter_".format(model_name))[1])
+    if iter > max_iter:
+      max_iter = iter
+
+train_src_param = '--weights="{}" \\\n'.format(pretrain_model)
+if resume_training:
+  if max_iter > 0:
+    train_src_param = '--snapshot="{}_iter_{}.solverstate" \\\n'.format(snapshot_prefix, max_iter)
