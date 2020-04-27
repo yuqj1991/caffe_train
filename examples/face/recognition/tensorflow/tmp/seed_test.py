@@ -7,7 +7,7 @@ import facenet
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import array_ops
 
-from six.moves import xrange
+from six.moves import range
 
 tf.app.flags.DEFINE_integer('batch_size', 90,
                             """Number of images to process in a batch.""")
@@ -71,7 +71,7 @@ def run_train():
     with sess.as_default():
       grads_eval = []
       all_vars = []
-      for step in xrange(1):
+      for step in range(1):
         # Generate some random input data
         batch = np.random.random((FLAGS.batch_size, FLAGS.image_size, FLAGS.image_size, 3))
         feed_dict = { images_placeholder: batch }

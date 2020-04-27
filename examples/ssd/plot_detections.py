@@ -24,7 +24,7 @@ def get_labelname(labelmap, labels):
         labels = [labels]
     for label in labels:
         found = False
-        for i in xrange(0, num_labels):
+        for i in range(0, num_labels):
             if label == labelmap.item[i].label:
                 found = True
                 labelnames.append(labelmap.item[i].display_name)

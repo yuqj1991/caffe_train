@@ -33,7 +33,7 @@ import argparse
 import os
 import sys
 import facenet
-from six.moves import xrange  # @UnresolvedImport
+from six.moves import range  # @UnresolvedImport
 
 def main(args):
     with tf.Graph().as_default():
@@ -66,7 +66,7 @@ def freeze_graph_def(sess, input_graph_def, output_node_names):
     for node in input_graph_def.node:
         if node.op == 'RefSwitch':
             node.op = 'Switch'
-            for index in xrange(len(node.input)):
+            for index in range(len(node.input)):
                 if 'moving_' in node.input[index]:
                     node.input[index] = node.input[index] + '/read'
         elif node.op == 'AssignSub':

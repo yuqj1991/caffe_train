@@ -1,3 +1,4 @@
+#-*-coding:utf-8-*-
 from __future__ import print_function
 import sys, os
 import logging
@@ -7,8 +8,8 @@ try:
     import caffe
 except ImportError:
     logging.fatal("Cannot find caffe!")
-import caffe
 from caffe.model_libs import *
+from caffe.model_libs_center import *
 from google.protobuf import text_format
 
 import math
@@ -16,6 +17,7 @@ import os
 import shutil
 import stat
 import subprocess
+
 
 trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
 valDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
@@ -198,9 +200,9 @@ test_transform_param = {
     },
 }
 base_learning_rate = 0.0125
-Job_Name = "CenterGrid{}_face".format("Softmax")
+Job_Name = "CenterGrid{}_face_v2".format("Softmax")
 mdoel_name = "ResideoDeepFace"
-save_dir = "prototxt/Full_{}".format(resize)
+save_dir = "../prototxt/Full_{}".format(resize)
 snapshot_dir = "../snapshot/{}".format(Job_Name)
 train_net_file = "{}/{}_train.prototxt".format(save_dir, Job_Name)
 test_net_file = "{}/{}_test.prototxt".format(save_dir, Job_Name)
@@ -276,22 +278,25 @@ make_if_not_exist(save_dir)
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
         train=True, output_label=True, label_map_file=labelmapPath,
-        transform_param=train_transform_param, batch_sampler=batch_sampler, data_anchor_sampler = data_anchor_sampler, 
-        bbox_sampler = bbox_sampler, crop_type = "CROP_METHOD_RANDOM", YoloForamte = True)
+        transform_param=train_transform_param, batch_sampler=batch_sampler, 
+        data_anchor_sampler = data_anchor_sampler, 
+        bbox_sampler = bbox_sampler, crop_type = P.AnnotatedData.CROP_METHOD_RANDOM, YoloForamte = True)
 
-LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = "data")
+net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
 bias_scale = [512, 256, 128, 64]
-low_bbox_scale = [8, 64, 128, 256]
-up_bbox_scale = [64, 128, 256, 512]
+low_bbox_scale = [256, 128, 64, 8]
+up_bbox_scale = [512, 256, 128, 64]
 from_layers = []
 for idx, detect_output in enumerate(LayerList_Output):
-    from_layers.append(LayerList_Output[idx])
+    from_layers.append(net[detect_output])
     from_layers.append(net.label)
-    CenterGridObjectLoss(net, bias_scale, low_bbox_scale[len(LayerList_Output) - idx - 1], 
-                                up_bbox_scale[len(LayerList_Output) - idx - 1], idx, from_layers)
-
+    CenterGridObjectLoss(net=net, bias_scale= bias_scale[idx], 
+                            low_bbox_scale= low_bbox_scale[idx], 
+                            up_bbox_scale= up_bbox_scale[idx], 
+                            stageidx= idx, from_layers= from_layers)
+    from_layers = []
 with open(train_net_file, 'w') as f:
-    print('name: "{}"'.format("CenterGridFace"), file=f)
+    print('name: "{}_train"'.format("CenterGridFace"), file=f)
     print(net.to_proto(), file=f)
 
 # 创建test.prototxt
@@ -300,8 +305,16 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
         train=False, output_label=True, label_map_file=labelmapPath,
         transform_param=test_transform_param)
 
-LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = "data")
-CenterGridObjectDetect(net, from_layers = LayerList_Output, bias_scale = bias_scale, down_ratio = [32, 16, 8, 4])
+net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, use_global_stats= True)
+DetectListLayer = []
+DetectListScale = []
+DetectListDownRatio = []
+for idx, output in enumerate(LayerList_Output):
+    DetectListLayer.append(net[output])
+    DetectListScale.append(bias_scale[idx])
+    DetectListDownRatio.append(int(32 / math.pow(2, idx)))
+CenterGridObjectDetect(net, from_layers= DetectListLayer, 
+                            bias_scale= DetectListScale, down_ratio= DetectListDownRatio)
 
 det_eval_param = {
     'num_classes': 2,
@@ -314,7 +327,7 @@ net.detection_eval = L.DetectionEvaluate(net.detection_out, net.label,
     include=dict(phase=caffe_pb2.Phase.Value('TEST')))
 
 with open(test_net_file, 'w') as f:
-    print('name: "{}"'.format('CenterGridFace'), file=f)
+    print('name: "{}_test"'.format('CenterGridFace'), file=f)
     print(net.to_proto(), file=f)
 
 #创建 deploy.prototxt, 移除数据层和最后一层评价层
@@ -324,7 +337,7 @@ with open(deploy_net_file, 'w') as f:
     # Remove the first (AnnotatedData) and last (DetectionEvaluate) layer from test net.
     del net_param.layer[0]
     del net_param.layer[-1]
-    net_param.name = '{}_deploy'.format(CenterGridFace)
+    net_param.name = '{}_deploy'.format('CenterGridFace')
     net_param.input.extend(['data'])
     net_param.input_shape.extend([
         caffe_pb2.BlobShape(dim=[1, 3, resize_height, resize_width])])
@@ -334,7 +347,7 @@ with open(deploy_net_file, 'w') as f:
 solver = caffe_pb2.SolverParameter(
         train_net=train_net_file,
         test_net=[test_net_file],
-        snapshot_prefix=snapshot_prefix,
+        snapshot_prefix=snapshot_dir,
         **solver_param)
 with open(solver_file, 'w') as f:
     print(solver, file=f)

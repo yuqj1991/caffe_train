@@ -93,12 +93,12 @@ def test_net(net, imdb, thresh=0.05, output_path=None):
     print('Evaluating {} on {}'.format(net.name,imdb.name))
     timers = {'detect': Timer(), 'misc': Timer()}
     run_inference = True
-    dets = [[[] for _ in xrange(len(imdb))] for _ in xrange(imdb.num_classes)]
+    dets = [[[] for _ in range(len(imdb))] for _ in range(imdb.num_classes)]
     output_dir = get_output_dir(imdb_name=imdb.name, net_name=net.name,output_dir=output_path)
     print('output: ', output_dir)
     # Perform inference on images if necessary
     if run_inference:
-        for i in xrange(len(imdb)):
+        for i in range(len(imdb)):
             im_path =imdb.image_path_at(i)
             print('im_path: ', im_path)
             dets[1][i], detect_time = detect(net, im_path, thresh, timers=timers)

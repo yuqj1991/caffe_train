@@ -44,7 +44,7 @@ class wider(imdb):
                 self._fp_bbox_map[name] = []
                 count += 1
                 n_anno = int(annos[count])
-                for i in xrange(n_anno):
+                for i in range(n_anno):
                     count += 1
                     bbox = annos[count].split(' ')[0:4]
                     bbox = [int(round(float(x))) for x in bbox]

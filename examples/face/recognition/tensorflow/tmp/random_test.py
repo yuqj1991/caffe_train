@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from six.moves import xrange
+from six.moves import range
 
 
 with tf.Graph().as_default():
@@ -111,7 +111,7 @@ with tf.Graph().as_default():
 #files = glob.glob(os.path.join(path, '*.png'))
 #nrof_samples = 30
 #img_list = [None] * nrof_samples
-#for i in xrange(nrof_samples):
+#for i in range(nrof_samples):
     #img_list[i] = misc.imread(files[i])
 #images = np.stack(img_list)
 

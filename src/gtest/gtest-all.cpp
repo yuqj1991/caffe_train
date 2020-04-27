@@ -1583,16 +1583,16 @@ namespace internal {
 
 // Generates a random number from [0, range), using a Linear
 // Congruential Generator (LCG).  Crashes if 'range' is 0 or greater
-// than kMaxRange.
+// than kMarange.
 UInt32 Random::Generate(UInt32 range) {
   // These constants are the same as are used in glibc's rand(3).
-  state_ = (1103515245U*state_ + 12345U) % kMaxRange;
+  state_ = (1103515245U*state_ + 12345U) % kMarange;
 
   GTEST_CHECK_(range > 0)
       << "Cannot generate a number in the range [0, 0).";
-  GTEST_CHECK_(range <= kMaxRange)
+  GTEST_CHECK_(range <= kMarange)
       << "Generation of a number in [0, " << range << ") was requested, "
-      << "but this can only generate numbers in [0, " << kMaxRange << ").";
+      << "but this can only generate numbers in [0, " << kMarange << ").";
 
   // Converting via modulus introduces a bit of downward bias, but
   // it's simple, and a linear congruential generator isn't too good

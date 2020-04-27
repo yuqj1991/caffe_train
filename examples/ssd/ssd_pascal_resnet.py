@@ -28,7 +28,7 @@ def AddExtraLayers(net, use_batchnorm=True):
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 512, 3, 1, 2)
     from_layer = out_layer
 
-    for i in xrange(2, 4):
+    for i in range(2, 4):
       out_layer = "{}/conv{}_1".format(last_layer, i)
       ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 256, 1, 0, 1)
       from_layer = out_layer
@@ -262,7 +262,7 @@ max_ratio = 95
 step = int(math.floor((max_ratio - min_ratio) / (len(mbox_source_layers) - 2)))
 min_sizes = []
 max_sizes = []
-for ratio in xrange(min_ratio, max_ratio + 1, step):
+for ratio in range(min_ratio, max_ratio + 1, step):
   min_sizes.append(min_dim * ratio / 100.)
   max_sizes.append(min_dim * (ratio + step) / 100.)
 min_sizes = [min_dim * 10 / 100.] + min_sizes

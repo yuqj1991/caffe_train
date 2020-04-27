@@ -1,5 +1,10 @@
-import os
-import caffe
+import os,sys,logging
+try:
+    caffe_root = '/home/stive/workspace/caffe_train/'
+    sys.path.insert(0, caffe_root + 'python')
+    import caffe
+except ImportError:
+    logging.fatal("Cannot find caffe!")
 from caffe import layers as L
 from caffe import params as P
 from caffe.proto import caffe_pb2
@@ -30,7 +35,7 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, use_relu, num_output,
     kernel_size, pad, stride, group=1, dilation=1, use_scale=True, lr_mult=1,
     conv_prefix='', conv_postfix='', bn_prefix='', bn_postfix='_bn',
     scale_prefix='', scale_postfix='_scale', bias_prefix='', bias_postfix='_bias',
-    bn_eps=0.001, bn_moving_avg_fraction=0.999, Use_DeConv = False,
+    bn_eps=0.001, bn_moving_avg_fraction=0.999, Use_DeConv = False, use_global_stats = False,
     **bn_params):
   if use_bn:
     # parameters for convolution layer with batchnorm.
@@ -41,7 +46,7 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, use_relu, num_output,
         }
     eps = bn_params.get('eps', bn_eps)
     moving_average_fraction = bn_params.get('moving_average_fraction', bn_moving_avg_fraction)
-    use_global_stats = bn_params.get('use_global_stats', False)
+    use_global_stats = bn_params.get('use_global_stats', use_global_stats)
     # parameters for batchnorm layer.
     bn_kwargs = {
         'param': [
@@ -95,24 +100,21 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, use_relu, num_output,
   [stride_h, stride_w] = UnpackVariable(stride, 2)
   if kernel_h == kernel_w:
     if Use_DeConv:
-        net[conv_name] = L.Deconvolution(net[from_layer], num_output=num_output,
-            kernel_size=kernel_h, pad=pad_h, stride=stride_h, **kwargs)
+        net[conv_name] = L.Deconvolution(net[from_layer], param=[dict(lr_mult=0, decay_mult=0)],
+                                         convolution_param=dict(
+                                         bias_term=False, num_output=num_output, kernel_size=kernel_h,
+                                         stride=stride_h, pad=pad_h, weight_filler=dict(type="msra")))
     else:
         net[conv_name] = L.Convolution(net[from_layer], num_output=num_output,
             kernel_size=kernel_h, pad=pad_h, stride=stride_h, **kwargs)
   else:
-    if Use_DeConv:
-        net[conv_name] = L.Deconvolution(net[from_layer], num_output=num_output,
-            kernel_h=kernel_h, kernel_w=kernel_w, pad_h=pad_h, pad_w=pad_w,
-            stride_h=stride_h, stride_w=stride_w, **kwargs)
-    else:
         net[conv_name] = L.Convolution(net[from_layer], num_output=num_output,
             kernel_h=kernel_h, kernel_w=kernel_w, pad_h=pad_h, pad_w=pad_w,
             stride_h=stride_h, stride_w=stride_w, **kwargs)
   if dilation > 1:
     net.update(conv_name, {'dilation': dilation})
   if group > 1:
-      net.update(conv_name, {'dilation': dilation})
+      net.update(conv_name, {'group': group})
   if use_bn:
     bn_name = '{}{}{}'.format(bn_prefix, out_layer, bn_postfix)
     net[bn_name] = L.BatchNorm(net[conv_name], in_place=True, **bn_kwargs)
@@ -203,7 +205,7 @@ def InceptionTower(net, from_layer, tower_name, layer_params, **bn_param):
 def CreateAnnotatedDataLayer(source, batch_size=32, backend=P.Data.LMDB,
         output_label=True, train=True, label_map_file='', anno_type=None,
         transform_param={}, batch_sampler=[{}], data_anchor_sampler = [{}], 
-        bbox_sampler = {}, crop_type = "CROP_METHOD_BATCH", YoloForamte = False):
+        bbox_sampler = {}, crop_type = P.AnnotatedData.CROP_BATCH, YoloForamte = False):
     if train:
         kwargs = {
                 'include': dict(phase=caffe_pb2.Phase.Value('TRAIN')),
@@ -949,219 +951,3 @@ def CreateMultiBoxHead(net, data_layer="data", num_classes=[], from_layers=[],
         mbox_layers.append(net[name])
 
     return mbox_layers
-
-
-def efficientDetBody(net, from_layer, alpha, beta, gamma, Use_BN = True):
-    kwargs = {
-            'param': [dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
-            'weight_filler': dict(type='xavier'),
-            'bias_filler': dict(type='constant', value=0)}
-    assert from_layer in net.keys()
-
-
-def MobilenetV2BottleBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor, 
-                                    Use_BN = True, Use_scale = True, **bn_param):
-    if strides == 1:
-        out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
-        ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = True,
-                    num_output = fileter_channels * expansion_factor, kernel_size=1, pad=0, stride = strides, use_scale = Use_scale,
-                    **bn_param)
-        out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
-        ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu=True,
-                    num_output = fileter_channels * expansion_factor, kernel_size=3, pad=1, stride = strides, use_scale = Use_scale,
-                    **bn_param)
-        out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
-        ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu=False,
-                    num_output = fileter_channels, kernel_size=1, pad=0, stride = strides, use_scale = Use_scale,
-                    **bn_param)
-        res_name = 'res_sum_{}'.format(from_layer)
-        net[res_name] = L.Eltwise(net[from_layer], net[out_layer_projects])
-        return res_name
-    elif strides == 2:
-        out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
-        ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu=True,
-                    num_output = fileter_channels, kernel_size=1, pad=0, stride = strides, use_scale = Use_scale,
-                    **bn_param)
-        out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
-        ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu=True,
-                    num_output = fileter_channels, kernel_size=1, pad=0, stride = strides, use_scale = Use_scale,
-                    **bn_param)
-        out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
-        ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu=False,
-                    num_output = fileter_channels, kernel_size=1, pad=0, stride = strides, use_scale = Use_scale,
-                    **bn_param)
-        return out_layer_projects           
-
-
-def MobilenetV2Body(net, from_layer, Use_BN = True, **bn_param):
-    assert from_layer in net.keys()
-    index = 0
-    out_layer = "conv_{}".format(index)
-    ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,
-                num_output = 32, kernel_size=3, pad=1, stride = 2, use_scale = True,
-                **bn_param)
-    index += 1
-    ################################
-    # t c  n s
-    # - 32 1 2
-    # 1 16 1 1
-    # 6 24 2 2
-    # 6 32 3 2
-    # 6 64 4 2
-    # 6 96 3 1
-    # 6 160 3 2
-    # 6 320 1 1
-    ###############################
-    Inverted_residual_setting = [[1, 16, 1, 1],
-                                 [6, 24, 2, 2],
-                                 [6, 32, 3, 2],
-                                 [6, 64, 4, 2],
-                                 [6, 96, 3, 1],
-                                 [6, 160, 3, 2],
-                                 [6, 320, 1, 1]]
-    for _, (t, c, n, s) in enumerate(Inverted_residual_setting):
-        if n > 1:
-            if s == 2:
-                layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
-                out_layer = layer_name
-                index += 1
-                strides = 1
-                for id in range(n - 1):
-                    layer_name = MobilenetV2BottleBlock(net, out_layer, index, id, c, strides, t, Use_BN = True, Use_scale = True, **bn_param)
-                    out_layer = layer_name
-                    index += 1
-            elif s == 1:
-                for id in range(n):
-                    layer_name = MobilenetV2BottleBlock(net, out_layer, index, id, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
-                    out_layer = layer_name
-                    index += 1
-        elif n == 1:
-            assert s == 1
-            layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
-            out_layer = layer_name
-            index += 1
-    return net
-
-
-def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx):
-    res_name = "Res_Connect_stage_{}".format(stage_idx)
-    net[res_name] = L.Eltwise(net[from_layer_one], net[from_layer_two], operation = EltwiseOp_SUM)
-    out_layer = "dectction_moudle_{}_out".format(stage_idx)
-    ConvBNLayer(net, res_name, out_layer, use_batchnorm = False, use_relu = False, 6, 1, 0, 1, use_scale = False,
-                lr_mult=1)
-    return out_layer
-
-
-def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale, stageidx, from_layers = [], 
-                         net_height = 640, net_width = 640, normalization_mode = P.Loss.VALID, num_classes= 2, 
-                         loc_weight = 1.0, share_location = True, ignore_thresh = 0.3, class_type = P.CenterObject.SOFTMAX):
-    center_object_loss_param = {
-        'loc_weight': loc_weight,
-        'num_classes': num_classes,
-        'share_location': share_location,
-        'net_height': net_height,
-        'net_width': net_width,
-        'ignore_thresh': ignore_thresh,
-        'bias_scale': bias_scale,
-        'low_bbox_scale': low_bbox_scale,
-        'up_bbox_scale': up_bbox_scale,
-        'class_type': class_type,
-    }
-    loss_param = {
-        'normalization': normalization_mode,
-    }
-    name = 'CenterGridLoss_{}'.format(stageidx)
-    net[name] = L.CenterGridLoss(*from_layers, center_object_loss_param = center_object_loss_param,
-        loss_param=loss_param, include=dict(phase=caffe_pb2.Phase.Value('TRAIN')),
-        propagate_down=[True, False])
-
-
-def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = [], num_classes = 2,
-                           ignore_thresh = 0.3, class_type = P.CenterObject.SOFTMAX, keep_top_k = 200,
-                           class_type = P.DetectionOutput.SOFTMAX, share_location = True, confidence_threshold = 0.15,):
-    det_out_param = {
-        'num_classes': num_classes,
-        'share_location': share_location,
-        'keep_top_k': keep_top_k,
-        'confidence_threshold': confidence_threshold,
-        'class_type': class_type,
-        'bias_scale': bias_scale,
-        'down_ratio': down_ratio,
-    }
-    net.detection_out = L.DetectionOutput(*from_layers, detection_output_param=det_out_param, include=dict(phase=caffe_pb2.Phase.Value('TEST')))
-
-
-
-def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, **bn_param):
-    assert from_layer in net.keys()
-    index = 0
-    feature_stride = [4, 8, 16, 32]
-    accum_stride = 1
-    pre_stride = 1
-    LayerList_Name = []
-    LayerList_Output = []
-    out_layer = "conv_{}".format(index)
-    ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,
-                num_output = 32, kernel_size=3, pad=1, stride = 2, use_scale = True,
-                **bn_param)
-    accum_stride *= 2
-    index += 1
-    ################################
-    # t c  n s
-    # - 32 1 2
-    # 1 16 1 1
-    # 6 24 2 2
-    # 6 32 3 2
-    # 6 64 4 2
-    # 6 96 3 1
-    # 6 160 3 2
-    # 6 320 1 1
-    ###############################
-    Inverted_residual_setting = [[1, 16, 1, 1],
-                                 [6, 24, 2, 2],
-                                 [6, 32, 3, 2],
-                                 [6, 64, 4, 2],
-                                 [6, 96, 3, 1],
-                                 [6, 160, 3, 2],
-                                 [6, 320, 1, 1]]
-    for _, (t, c, n, s) in enumerate(Inverted_residual_setting):
-        accum_stride *= s
-        if n > 1:
-            if s == 2:
-                layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
-                out_layer = layer_name
-                index += 1
-                strides = 1
-                for id in range(n - 1):
-                    layer_name = MobilenetV2BottleBlock(net, out_layer, index, id, c, strides, t, Use_BN = True, Use_scale = True, **bn_param)
-                    out_layer = layer_name
-                    index += 1
-            elif s == 1:
-                for id in range(n):
-                    layer_name = MobilenetV2BottleBlock(net, out_layer, index, id, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
-                    out_layer = layer_name
-                    index += 1
-        elif n == 1:
-            assert s == 1
-            layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
-            out_layer = layer_name
-            index += 1
-        if accum_stride in feature_stride:
-            if accum_stride != pre_stride:
-                LayerList_Name.append(out_layer)
-            elif accum_stride == pre_stride:
-                LayerList_Name[len(LayerList_Name) - 1] == out_layer
-            pre_stride = accum_stride
-    assert len(LayerList_Name) == len(feature_stride)
-    net_last_layer = net.keys()[-1]
-    out_layer = "conv_1_project"
-    ConvBNLayer(net, net_last_layer, out_layer, use_batchnorm = True, use_relu = True, 1280, 1, 0, 1,
-        lr_mult=1)
-    for index in range(len(feature_stride)):
-        net_last_layer = out_layer
-        out_layer = "Deconv_Scale_Up_Stage_{}".format()    
-        ConvBNLayer(net, net_last_layer, out_layer, use_batchnorm = True, use_relu = True, 1280, 1, 0, 1,
-            lr_mult=1, Use_DeConv = True)
-        output_layer = ResConnectBlock(net, out_layer, LayerList_Name[len(feature_stride) - index - 1], index)
-        LayerList_Output.append(out_layer)
-    return LayerList_Output

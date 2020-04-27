@@ -142,7 +142,7 @@ def main(argv):
     print("Loading folder: %s" % args.input_file)
     inputs =[caffe.io.load_image(im_f)
              for im_f in glob.glob(args.input_file + '/*.' + args.ext)]
-    labels = [-1 for _ in xrange(len(inputs))]
+    labels = [-1 for _ in range(len(inputs))]
   else:
     ## Image List Files
     print("Loading file: %s" % args.input_file)

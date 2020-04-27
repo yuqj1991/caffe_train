@@ -153,7 +153,7 @@ def load_pascal_annotation(index, pascal_root):
                          'cow', 'diningtable', 'dog', 'horse',
                          'motorbike', 'person', 'pottedplant',
                          'sheep', 'sofa', 'train', 'tvmonitor')
-    class_to_ind = dict(zip(classes, xrange(21)))
+    class_to_ind = dict(zip(classes, range(21)))
 
     filename = osp.join(pascal_root, 'Annotations', index + '.xml')
     # print 'Loading: {}'.format(filename)

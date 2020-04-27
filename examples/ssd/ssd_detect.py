@@ -26,7 +26,7 @@ def get_labelname(labelmap, labels):
         labels = [labels]
     for label in labels:
         found = False
-        for i in xrange(0, num_labels):
+        for i in range(0, num_labels):
             if label == labelmap.item[i].label:
                 found = True
                 labelnames.append(labelmap.item[i].display_name)
@@ -94,7 +94,7 @@ class CaffeDetection:
         top_ymax = det_ymax[top_indices]
 
         result = []
-        for i in xrange(min(topn, top_conf.shape[0])):
+        for i in range(min(topn, top_conf.shape[0])):
             xmin = top_xmin[i] # xmin = int(round(top_xmin[i] * image.shape[1]))
             ymin = top_ymin[i] # ymin = int(round(top_ymin[i] * image.shape[0]))
             xmax = top_xmax[i] # xmax = int(round(top_xmax[i] * image.shape[1]))

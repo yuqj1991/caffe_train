@@ -76,7 +76,7 @@ import facenet
 import numpy as np
 from sklearn.datasets import load_files
 import tensorflow as tf
-from six.moves import xrange
+from six.moves import range
 
 def main(args):
 
@@ -115,7 +115,7 @@ def main(args):
 			nrof_images = len(paths)
 			nrof_batches = int(np.ceil(1.0*nrof_images / batch_size))
 			emb_array = np.zeros((nrof_images, embedding_size))
-			for i in xrange(nrof_batches):
+			for i in range(nrof_batches):
 				start_index = i*batch_size
 				end_index = min((i+1)*batch_size, nrof_images)
 				paths_batch = paths[start_index:end_index]

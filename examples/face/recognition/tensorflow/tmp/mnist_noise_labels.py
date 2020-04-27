@@ -30,7 +30,7 @@ import time
 from six.moves import urllib  # @UnresolvedImport
 import tensorflow as tf
 import numpy as np
-from six.moves import xrange
+from six.moves import range
 
 SOURCE_URL = 'http://yann.lecun.com/exdb/mnist/'
 WORK_DIRECTORY = 'data'
@@ -289,7 +289,7 @@ def main(argv=None):  # pylint: disable=unused-argument
         if size < EVAL_BATCH_SIZE:
             raise ValueError("batch size for evals larger than dataset: %d" % size)
         predictions = np.ndarray(shape=(size, NUM_LABELS), dtype=np.float32)
-        for begin in xrange(0, size, EVAL_BATCH_SIZE):
+        for begin in range(0, size, EVAL_BATCH_SIZE):
             end = begin + EVAL_BATCH_SIZE
             if end <= size:
                 predictions[begin:end, :] = sess.run(
@@ -309,7 +309,7 @@ def main(argv=None):  # pylint: disable=unused-argument
         tf.global_variables_initializer().run() #pylint: disable=no-member
         print('Initialized!')
         # Loop through training steps.
-        for step in xrange(int(num_epochs * train_size) // BATCH_SIZE):
+        for step in range(int(num_epochs * train_size) // BATCH_SIZE):
             # Compute the offset of the current minibatch in the data.
             # Note that we could use better randomization across epochs.
             offset = (step * BATCH_SIZE) % (train_size - BATCH_SIZE)

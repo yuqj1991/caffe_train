@@ -42,9 +42,9 @@ def get_supported_chart_types():
     field_index, fields = create_field_index()
     num_fields = len(fields)
     supported_chart_types = []
-    for i in xrange(num_fields):
+    for i in range(num_fields):
         if not is_x_axis_field(fields[i]):
-            for j in xrange(num_fields):
+            for j in range(num_fields):
                 if i != j and is_x_axis_field(fields[j]):
                     supported_chart_types.append('%s%s%s' % (
                         fields[i], get_chart_type_description_separator(),
@@ -160,7 +160,7 @@ Supported chart types:""" % (len(get_supported_chart_types()) - 1,
                              get_log_file_suffix())
     supported_chart_types = get_supported_chart_types()
     num = len(supported_chart_types)
-    for i in xrange(num):
+    for i in range(num):
         print '    %d: %s' % (i, supported_chart_types[i])
     sys.exit()
 

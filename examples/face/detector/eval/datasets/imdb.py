@@ -79,12 +79,12 @@ class imdb(object):
 
     def _get_widths(self):
       return [self.roidb[i]['image_size'][0]
-              for i in xrange(self.num_images)]
+              for i in range(self.num_images)]
 
     def append_flipped_images(self):
         num_images = self.num_images
         widths = self._get_widths()
-        for i in xrange(num_images):
+        for i in range(num_images):
             boxes = self.roidb[i]['boxes'].copy()
             oldx1 = boxes[:, 0].copy()
             oldx2 = boxes[:, 2].copy()
@@ -108,7 +108,7 @@ class imdb(object):
         """
 
         roidb = self.roidb
-        for i in xrange(len(self.image_index)):
+        for i in range(len(self.image_index)):
             roidb[i]['image'] = self.image_path_at(i)
             roidb[i]['width'] = roidb[i]['image_size'][0]
             roidb[i]['height'] = roidb[i]['image_size'][1]
