@@ -116,17 +116,15 @@ message EmitConstraint {
   optional float emit_overlap = 2;
 }
 
-// data_anchor_sampler of bbox with provided constriants
 message DataAnchorSampler {
 	// Use original image as the source for sampling.
 	optional bool use_original_image = 1 [default = true];
 	// anchor scale
   repeated int32 scale = 2;
-  repeated int32 stride = 6; //[scale stride from orign image like 4, 8, 16, 32]
 	optional SampleConstraint sample_constraint = 3;
-	optional uint32 max_sample = 4;
+	optional uint32 max_sample = 4 [default = 1];
 	// Maximum number of trials for sampling to avoid infinite loop.
-	optional uint32 max_trials = 5 [default = 100];
+	optional uint32 max_trials = 5 [default = 50];
 }
 
 message LicensePlate {
@@ -176,16 +174,22 @@ message CenterNetInfo{
 }
 
 message BboxSampler {
-  repeated int32 bbox_small_scale = 1;
-  repeated int32 bbox_large_scale = 2;
-  repeated int32 ancher_stride = 3;
+  optional int32 bbox_small_scale = 1;
+  optional int32 bbox_large_scale = 2;
+  optional int32 ancher_stride = 3;
+}
+
+message LFFDSampler {
+  repeated BboxSampler box = 1;
+  optional uint32 max_sample = 2 [default = 1];
+	// Maximum number of trials for sampling to avoid infinite loop.
+	optional uint32 max_trials = 3 [default = 50];
 }
 
 // Annotation for each object instance.
 message Annotation {
   optional int32 instance_id = 1 [default = 0];
   optional NormalizedBBox bbox = 2;
-  
 }
 
 // Group of annotations for a particular label.
@@ -1186,12 +1190,12 @@ message AnnotatedDataParameter {
   // If provided, it will replace the AnnotationType stored in each
   // AnnotatedDatum.
   optional AnnotatedDatum.AnnotationType anno_type = 3;
-  repeated DataAnchorSampler data_anchor_sampler =6;
   optional float up_prob = 7[default = 0.7];
   optional float low_prob = 9[default = 0.3];
   optional int32 yolo_data_type = 4 [default = 0];
   optional float yolo_data_jitter = 5 [default = 0.3];
-  optional BboxSampler bbox_sampler = 8;
+  optional DataAnchorSampler data_anchor_sampler =6;
+  optional LFFDSampler bbox_sampler = 8;
   optional bool yoloformat = 10[default = false];
   enum CROP_TYPE {
     CROP_BATCH = 0;

@@ -34,20 +34,15 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
   for (int i = 0; i < anno_data_param.batch_sampler_size(); ++i) {
     batch_samplers_.push_back(anno_data_param.batch_sampler(i));
   }
-  for (int i = 0; i < anno_data_param.data_anchor_sampler_size(); ++i){
-    data_anchor_samplers_.push_back(anno_data_param.data_anchor_sampler(i));
+  if(anno_data_param.has_data_anchor_sampler()){
+    data_anchor_samplers_.push_back(anno_data_param.data_anchor_sampler());
   }
   if(anno_data_param.has_bbox_sampler()){
-    int num_scale = anno_data_param.bbox_sampler().bbox_small_scale_size();
-    CHECK_EQ(num_scale, anno_data_param.bbox_sampler().bbox_large_scale_size());
-    CHECK_EQ(num_scale, anno_data_param.bbox_sampler().ancher_stride_size());
+    int num_scale = anno_data_param.bbox_sampler().box_size();
     for(int i = 0; i < num_scale; i++){
-      bbox_large_scale_.push_back(anno_data_param.bbox_sampler().bbox_large_scale(i));
-      bbox_small_scale_.push_back(anno_data_param.bbox_sampler().bbox_small_scale(i));
-      anchor_stride_.push_back(anno_data_param.bbox_sampler().ancher_stride(i));
-      LOG(INFO)<<anno_data_param.bbox_sampler().bbox_large_scale(i)<<", "
-                <<anno_data_param.bbox_sampler().bbox_small_scale(i)<<", "
-                <<anno_data_param.bbox_sampler().ancher_stride(i);
+      bbox_large_scale_.push_back(anno_data_param.bbox_sampler().box(i).bbox_large_scale());
+      bbox_small_scale_.push_back(anno_data_param.bbox_sampler().box(i).bbox_small_scale());
+      anchor_stride_.push_back(anno_data_param.bbox_sampler().box(i).ancher_stride());
     }
   }
   upProb_ = anno_data_param.up_prob();
@@ -211,10 +206,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       if (batch_samplers_.size() > 0 || YoloFormat_) {
         // Generate sampled bboxes from expand_datum.
         vector<NormalizedBBox> sampled_bboxes;
-        if(YoloFormat_)
-          GenerateJitterSamples(*expand_datum, 0.3, &sampled_bboxes);
-        else
-          GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
+        GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
         if (sampled_bboxes.size() > 0) {
           // Randomly pick a sampled bbox and crop the expand_datum.
           int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
