@@ -338,7 +338,6 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     max_resize_val = (float)anchorScale[range_idx_size] * 2;
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
   }
-   
   float width_offset_org = 0.0f, height_offset_org = 0.0f;
   float w_off = 0.0f, h_off = 0.0f, w_end = 0.0f, h_end = 0.0f;
   if(do_resize){
@@ -384,11 +383,26 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     sampled_bbox->set_xmax(w_end);
     sampled_bbox->set_ymax(h_end);
   }else{
-    resized_anno_datum->CopyFrom(anno_datum);
-    sampled_bbox->set_xmin(0.f);
-    sampled_bbox->set_ymin(0.f);
-    sampled_bbox->set_xmax(1.f);
-    sampled_bbox->set_ymax(1.f);
+    float sample_bbox_size = (float)bbox_width * resized_width / scaleChoose;
+    if(sample_bbox_size < COMPAREMAX(img_height, img_width)){
+      if(bbox_width <= sample_bbox_size){
+        caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
+      }else{
+        caffe_rng_uniform(1, xmin, xmin + bbox_width - sample_bbox_size, &w_off);
+      }
+      if(bbox_height <= sample_bbox_size){
+        caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
+      }else{
+        caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_bbox_size, &h_off);
+      }
+    }else{
+      caffe_rng_uniform(1, img_width - sample_bbox_size, 0.f, &w_off);
+      caffe_rng_uniform(1, img_height - sample_bbox_size, 0.f, &h_off);
+    }
+    sampled_bbox->set_xmin((float)w_off / img_width);
+    sampled_bbox->set_ymin((float)h_off / img_height);
+    sampled_bbox->set_xmax((float)(w_off + sample_bbox_size) / img_width);
+    sampled_bbox->set_ymax((float)(h_off + sample_bbox_size) / img_height);
   }
 }
 
@@ -430,7 +444,8 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
       LOG(FATAL)<<"must use original_image";
     }
   }
-  CHECK_GT(resized_anno_datum->datum().channels(), 0)<<"channels: "<<resized_anno_datum->datum().channels();
+  if(do_resize)
+    CHECK_GT(resized_anno_datum->datum().channels(), 0)<<"channels: "<<resized_anno_datum->datum().channels();
 }
 
 void GenerateLFFDSample(const AnnotatedDatum& anno_datum,

@@ -596,16 +596,19 @@ int main(int argc, char** argv){
       AnnotatedDatum* sampled_datum = NULL;
       int resized_height = transform_param.resize_param().height();
       int resized_width = transform_param.resize_param().width();
-      AnnotatedDatum* resized_anno_datum = new AnnotatedDatum();
-      bool do_resize = true;
+      AnnotatedDatum* resized_anno_datum = NULL;
+      bool do_resize = false;
+      if(do_resize)
+        resized_anno_datum = new AnnotatedDatum();
       NormalizedBBox sampled_bbox;
-      #if 0
+      #if 1
       GenerateBatchDataAnchorSamples(anno_datum, data_anchor_samplers_,
                               resized_height, resized_width,
                               &sampled_bbox, resized_anno_datum, transform_param, do_resize);
-      CHECK_GT(resized_anno_datum->datum().channels(), 0);
+      if(do_resize)
+        CHECK_GT(resized_anno_datum->datum().channels(), 0);
       sampled_datum = new AnnotatedDatum();
-      data_transformer_.CropImage_anchor_Sampling(*resized_anno_datum,
+      data_transformer_.CropImage_anchor_Sampling(anno_datum,
                                     sampled_bbox,
                                     sampled_datum);
       LOG(INFO)<<"=====TEST DATA ANCHOR SAMPLES SUCCESSFULLY!=====";
@@ -657,7 +660,8 @@ int main(int argc, char** argv){
       cv::imwrite(saved_img_name, cropImage);
       LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
       delete sampled_datum;
-      delete resized_anno_datum;
+      if(do_resize)
+        delete resized_anno_datum;
     }
   }
   #endif
