@@ -326,9 +326,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
           };
         }
         break;
-      default:
-        LOG(FATAL)<<"unsupport crop type";
-        break;
     }
     CHECK(sampled_datum != NULL);
     timer.Start();
