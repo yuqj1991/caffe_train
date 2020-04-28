@@ -268,18 +268,23 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     switch (crop_type_){
       case AnnotatedDataParameter_CROP_TYPE_CROP_BATCH:
         goto SAMPLE_BATCH;
+        LOG(INFO)<<"SAMPLE_BATCH";
         break;
       case AnnotatedDataParameter_CROP_TYPE_CROP_JITTER:
         goto SAMPLE_JITTER;
+        LOG(INFO)<<"SAMPLE_JITTER";
         break;
       case AnnotatedDataParameter_CROP_TYPE_CROP_ANCHOR:
         goto SAMPLE_ANCHOR;
+        LOG(INFO)<<"SAMPLE_ANCHOR";
         break;
       case AnnotatedDataParameter_CROP_TYPE_CROP_GT_BBOX:
         goto SAMPLE_GT_BBOX;
+        LOG(INFO)<<"GT_BBOX";
         break;
       case AnnotatedDataParameter_CROP_TYPE_CROP_RANDOM:
         caffe_rng_uniform(1, 0.0f, 1.0f, &anchor_prob);
+        LOG(INFO)<<"CROP_RANDOM";
         if(anchor_prob > upProb_){
           goto SAMPLE_GT_BBOX;
         }else if(anchor_prob > lowProb_ && anchor_prob <= upProb_){
