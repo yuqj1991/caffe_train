@@ -287,6 +287,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         }else if(anchor_prob <= lowProb_ ){
           goto SAMPLE_BATCH;
         }
+        LOG(INFO)<<"LALAL";
         break;
       default:
         LOG(FATAL)<<"unsupport crop type";
