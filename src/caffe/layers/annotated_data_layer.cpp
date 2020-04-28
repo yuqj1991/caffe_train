@@ -267,7 +267,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }else if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_RANDOM){
       float anchor_prob = 0.0f;
       caffe_rng_uniform(1, 0.0f, 1.0f, &anchor_prob);
-      LOG(INFO)<<"CROP_RANDOM, anchor_prob: "<<anchor_prob;
       if(anchor_prob > upProb_){
         if (anno_data_param.has_bbox_sampler()) {
           NormalizedBBox sampled_bbox;
