@@ -211,7 +211,7 @@ solver_file = "{}/{}_solver.prototxt".format(save_dir, Job_Name)
 
 pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"
 
-gpus = "0,"
+gpus = "0"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 batch_size = 8
