@@ -221,15 +221,16 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         pre_channels = c
     assert len(LayerList_Name) == len(feature_stride)
     net_last_layer = net.keys()[-1]
-
+    '''
     out_layer = "conv_1_expand"
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
                 num_output= 512, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale=True)
     net_last_layer = out_layer
+    '''
     out_layer = "conv_1_project/DepthWise"
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
-                num_output= 512, kernel_size= 3, pad= 1, stride= 2, group= 512,
+                num_output= 320, kernel_size= 3, pad= 1, stride= 2, group= 512,
                 lr_mult=1, use_scale=True)
     net_last_layer = out_layer
     out_layer = "conv_1_project/linear"

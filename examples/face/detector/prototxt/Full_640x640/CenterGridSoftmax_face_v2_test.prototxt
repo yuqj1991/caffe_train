@@ -4113,90 +4113,16 @@ layer {
   top: "Res_Sum_6_0"
 }
 layer {
-  name: "conv_1_expand"
-  type: "Convolution"
-  bottom: "Res_Sum_6_0"
-  top: "conv_1_expand"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 512
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "gaussian"
-      std: 0.00999999977648
-    }
-  }
-}
-layer {
-  name: "conv_1_expand_bn"
-  type: "BatchNorm"
-  bottom: "conv_1_expand"
-  top: "conv_1_expand"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
-  }
-}
-layer {
-  name: "conv_1_expand_scale"
-  type: "Scale"
-  bottom: "conv_1_expand"
-  top: "conv_1_expand"
-  param {
-    lr_mult: 1.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 1.0
-    decay_mult: 0.0
-  }
-  scale_param {
-    filler {
-      type: "constant"
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      type: "constant"
-      value: 0.0
-    }
-  }
-}
-layer {
-  name: "conv_1_expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_1_expand"
-  top: "conv_1_expand"
-}
-layer {
   name: "conv_1_project/DepthWise"
   type: "Convolution"
-  bottom: "conv_1_expand"
+  bottom: "Res_Sum_6_0"
   top: "conv_1_project/DepthWise"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 512
+    num_output: 320
     bias_term: false
     pad: 1
     kernel_size: 3
