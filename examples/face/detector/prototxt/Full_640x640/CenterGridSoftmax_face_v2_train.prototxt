@@ -146,43 +146,7 @@ layer {
       max_trials: 50
     }
     label_map_file: "../labelmap.prototxt"
-    data_anchor_sampler {
-      scale: 8
-      scale: 64
-      scale: 128
-      scale: 256
-      scale: 512
-      sample_constraint {
-        min_object_coverage: 0.75
-      }
-      max_sample: 1
-      max_trials: 50
-    }
     up_prob: 0.699999988079
-    bbox_sampler {
-      box {
-        bbox_small_scale: 8
-        bbox_large_scale: 64
-        ancher_stride: 4
-      }
-      box {
-        bbox_small_scale: 64
-        bbox_large_scale: 128
-        ancher_stride: 8
-      }
-      box {
-        bbox_small_scale: 128
-        bbox_large_scale: 256
-        ancher_stride: 16
-      }
-      box {
-        bbox_small_scale: 256
-        bbox_large_scale: 512
-        ancher_stride: 32
-      }
-      max_sample: 1
-      max_trials: 50
-    }
     low_prob: 0.40000000596
     yoloformat: true
     crop_type: CROP_BATCH
