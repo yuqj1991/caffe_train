@@ -4995,7 +4995,7 @@ layer {
 }
 layer {
   name: "detection_out"
-  type: "DetectionOutput"
+  type: "CenterGridOutput"
   bottom: "Dectction_stage_320"
   bottom: "Dectction_stage_96"
   bottom: "Dectction_stage_32"

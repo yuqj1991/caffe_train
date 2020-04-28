@@ -151,7 +151,7 @@ def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = 
         'bias_scale': bias_scale,
         'down_ratio': down_ratio,
     }
-    net.detection_out = L.DetectionOutput(*from_layers, detection_output_param=det_out_param, 
+    net.detection_out = L.CenterGridOutput(*from_layers, detection_output_param=det_out_param, 
                                                 include=dict(phase=caffe_pb2.Phase.Value('TEST')))
 
 
