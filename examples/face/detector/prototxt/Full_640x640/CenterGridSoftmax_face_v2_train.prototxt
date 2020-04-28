@@ -49,140 +49,140 @@ layer {
     batch_size: 6
     backend: LMDB
   }
-  annotated_data_param {
-    batch_sampler {
-      sampler {
-        min_scale: 0.300000011921
-        max_scale: 1.0
-        min_aspect_ratio: 0.300000011921
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.40000000596
-        max_scale: 1.0
-        min_aspect_ratio: 0.40000000596
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.5
-        max_scale: 1.0
-        min_aspect_ratio: 0.5
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.600000023842
-        max_scale: 1.0
-        min_aspect_ratio: 0.600000023842
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.699999988079
-        max_scale: 1.0
-        min_aspect_ratio: 0.699999988079
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.800000011921
-        max_scale: 1.0
-        min_aspect_ratio: 0.800000011921
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        max_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.899999976158
-        max_scale: 1.0
-        min_aspect_ratio: 0.899999976158
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        max_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    label_map_file: "../labelmap.prototxt"
-    data_anchor_sampler {
-      scale: 8
-      scale: 64
-      scale: 128
-      scale: 256
-      scale: 512
-      sample_constraint {
-        min_object_coverage: 0.75
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    up_prob: 0.699999988079
-    bbox_sampler {
-      box {
-        bbox_small_scale: 8
-        bbox_large_scale: 64
-        ancher_stride: 4
-      }
-      box {
-        bbox_small_scale: 64
-        bbox_large_scale: 128
-        ancher_stride: 8
-      }
-      box {
-        bbox_small_scale: 128
-        bbox_large_scale: 256
-        ancher_stride: 16
-      }
-      box {
-        bbox_small_scale: 256
-        bbox_large_scale: 512
-        ancher_stride: 32
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    low_prob: 0.40000000596
-    yoloformat: true
-    crop_type: CROP_RANDOM
-  }
+	annotated_data_param {
+		batch_sampler {
+			sampler {
+				min_scale: 0.3
+				max_scale: 1.0
+				min_aspect_ratio: 0.3
+				max_aspect_ratio: 1.0
+			}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.4
+				max_scale: 1.0
+				min_aspect_ratio: 0.4
+				max_aspect_ratio: 1.0
+			}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.5
+				max_scale: 1.0
+				min_aspect_ratio: 0.5
+				max_aspect_ratio: 1.0
+			}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.6
+				max_scale: 1.0
+				min_aspect_ratio: 0.6
+				max_aspect_ratio: 1.0
+			}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.7
+				max_scale: 1.0
+				min_aspect_ratio: 0.7
+				max_aspect_ratio: 1.0
+				}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.8
+				max_scale: 1.0
+				min_aspect_ratio: 0.8
+				max_aspect_ratio: 1.0
+			}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		batch_sampler {
+			sampler {
+				min_scale: 0.9
+				max_scale: 1.0
+				min_aspect_ratio: 0.9
+				max_aspect_ratio: 1.0
+			}
+			sample_constraint {
+				min_object_coverage: 1.0
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+		data_anchor_sampler {
+			scale: 8
+			scale: 64
+			scale: 128
+			scale: 256
+			scale: 512
+			sample_constraint {
+				min_object_coverage: 0.75
+			}
+			max_sample: 1
+			max_trials: 50
+		}
+	bbox_sampler {
+		box {
+			bbox_small_scale: 8
+			bbox_large_scale: 64
+			ancher_stride: 4
+		}
+		box {
+			bbox_small_scale: 64
+			bbox_large_scale: 128
+			ancher_stride: 8
+		}
+		box {
+			bbox_small_scale: 128
+			bbox_large_scale: 256
+			ancher_stride: 16
+		}
+		box {
+			bbox_small_scale: 256
+			bbox_large_scale: 512
+			ancher_stride: 32
+		}
+		max_sample: 1
+		max_trials: 50
+	}
+		up_prob: 0.7
+		low_prob: 0.4
+		crop_type: CROP_BATCH
+		yoloformat: true
+		label_map_file: "../labelmap.prototxt"
+	}
 }
 layer {
   name: "conv_0"
