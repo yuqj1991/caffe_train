@@ -20,6 +20,7 @@ void CenterGridLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       this->layer_param_.center_object_loss_param();
   
   // bias_mask_
+  CHECK_EQ(center_object_loss_param.has_bias_num(), 1);
   if(center_object_loss_param.has_bias_num()){
     CHECK_EQ(center_object_loss_param.bias_scale_size(), 1);
     CHECK_EQ(center_object_loss_param.bias_num(), 1);
