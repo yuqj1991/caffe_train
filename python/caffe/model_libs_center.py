@@ -129,6 +129,7 @@ def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale,
         'low_bbox_scale': low_bbox_scale,
         'up_bbox_scale': up_bbox_scale,
         'class_type': class_type,
+        'bias_num': 1,
     }
     loss_param = {
         'normalization': normalization_mode,
