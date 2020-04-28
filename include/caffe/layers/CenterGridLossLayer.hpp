@@ -61,6 +61,9 @@ class CenterGridLossLayer : public LossLayer<Dtype> {
   Blob<Dtype> label_data_;
   int count_postive_;
   CenterObjectParameter_CLASS_TYPE class_type_;
+  std::vector<int>postive_batch_;
+  std::vector<Dtype> batch_sample_loss_;
+  std::vector<int> mask_Rf_anchor_;
 };
 
 }  // namespace caffe

@@ -1241,7 +1241,8 @@ template void SelectHardSampleSoftMax(double *label_data, std::vector<double> ba
 template <typename Dtype> 
 Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio,
+                          const int downRatio, std::vector<int>postive_batch,
+                          std::vector<Dtype> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
@@ -1254,11 +1255,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   
   int postive = 0;
   caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
-  std::vector<int>postive_batch(batch_size, 0);
-
-  //计算每个样本的总损失（loc loss + softmax loss
-  std::vector<Dtype> batch_sample_loss(batch_size * dimScale, Dtype(-1.));
-  std::vector<int> mask_Rf_anchor(dimScale, 0);
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
     int count = 0;
@@ -1341,15 +1337,13 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                   output_width, bottom_diff, num_channels);
   *count_postive = postive;
   *loc_loss_value = loc_loss;
-  batch_sample_loss.clear();
-  postive_batch.clear();
-  mask_Rf_anchor.clear();
   return score_loss;
 }
 
 template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio,
+                          const int downRatio, std::vector<int>postive_batch,
+                          std::vector<float> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
@@ -1358,7 +1352,8 @@ template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int
 
 template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio,
+                          const int downRatio, std::vector<int>postive_batch,
+                          std::vector<double> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
