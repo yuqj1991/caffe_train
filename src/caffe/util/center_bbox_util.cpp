@@ -1258,10 +1258,9 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
 
   //计算每个样本的总损失（loc loss + softmax loss
   std::vector<Dtype> batch_sample_loss(batch_size * dimScale, Dtype(-1.));
-
+  std::vector<int> mask_Rf_anchor(dimScale, 0);
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
-    std::vector<int> mask_Rf_anchor(dimScale, 0);
     int count = 0;
     for(int h = 0; h < output_height; h++){
       for(int w = 0; w < output_width; w++){
@@ -1344,6 +1343,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   *loc_loss_value = loc_loss;
   batch_sample_loss.clear();
   postive_batch.clear();
+  mask_Rf_anchor.clear();
   return score_loss;
 }
 
