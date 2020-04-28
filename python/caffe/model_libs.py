@@ -41,7 +41,8 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, use_relu, num_output,
     # parameters for convolution layer with batchnorm.
     kwargs = {
         'param': [dict(lr_mult=lr_mult, decay_mult=1)],
-        'weight_filler': dict(type='gaussian', std=0.01),
+        'weight_filler': dict(type='msra'),
+        #'weight_filler': dict(type='msra', std=0.01),
         'bias_term': False,
         }
     eps = bn_params.get('eps', bn_eps)
@@ -90,7 +91,7 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, use_relu, num_output,
         'param': [
             dict(lr_mult=lr_mult, decay_mult=1),
             dict(lr_mult=2 * lr_mult, decay_mult=0)],
-        'weight_filler': dict(type='xavier'),
+        'weight_filler': dict(type='msra'),
         'bias_filler': dict(type='constant', value=0)
         }
 

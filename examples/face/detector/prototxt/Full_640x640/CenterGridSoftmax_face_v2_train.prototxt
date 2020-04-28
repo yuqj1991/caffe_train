@@ -182,7 +182,6 @@ layer {
     stride: 2
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -256,7 +255,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -330,7 +328,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -405,7 +402,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -479,7 +475,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -554,7 +549,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -629,7 +623,6 @@ layer {
     stride: 2
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -703,7 +696,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -771,7 +763,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -846,7 +837,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -920,7 +910,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -995,7 +984,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1070,7 +1058,6 @@ layer {
     stride: 2
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1144,7 +1131,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1212,7 +1198,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1287,7 +1272,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1361,7 +1345,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1436,7 +1419,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1511,7 +1493,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1585,7 +1566,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1660,7 +1640,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1735,7 +1714,6 @@ layer {
     stride: 2
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1809,7 +1787,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1877,7 +1854,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -1952,7 +1928,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2026,7 +2001,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2101,7 +2075,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2176,7 +2149,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2250,7 +2222,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2325,7 +2296,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2400,7 +2370,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2474,7 +2443,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2549,7 +2517,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2623,7 +2590,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2698,7 +2664,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2772,7 +2737,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2847,7 +2811,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2922,7 +2885,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -2996,7 +2958,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3071,7 +3032,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3146,7 +3106,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3220,7 +3179,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3295,7 +3253,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3370,7 +3327,6 @@ layer {
     stride: 2
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3444,7 +3400,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3512,7 +3467,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3587,7 +3541,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3661,7 +3614,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3736,7 +3688,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3811,7 +3762,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3885,7 +3835,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -3960,7 +3909,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -4034,7 +3982,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -4109,7 +4056,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -4183,7 +4129,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -4259,7 +4204,6 @@ layer {
     stride: 2
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -4333,7 +4277,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -4474,7 +4417,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -4554,7 +4496,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "xavier"
+      type: "msra"
     }
     bias_filler {
       type: "constant"
@@ -4646,7 +4588,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -4726,7 +4667,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "xavier"
+      type: "msra"
     }
     bias_filler {
       type: "constant"
@@ -4818,7 +4759,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -4898,7 +4838,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "xavier"
+      type: "msra"
     }
     bias_filler {
       type: "constant"
@@ -4990,7 +4930,6 @@ layer {
     stride: 1
     weight_filler {
       type: "msra"
-      std: 0.00999999977648
     }
   }
 }
@@ -5070,7 +5009,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "xavier"
+      type: "msra"
     }
     bias_filler {
       type: "constant"

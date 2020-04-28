@@ -19,21 +19,21 @@ def efficientDetBody(net, from_layer, alpha, beta, gamma, Use_BN = True):
     assert from_layer in net.keys()
 '''
 def MobilenetV2BottleBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor, 
-                                    Use_BN = True, Use_scale = True, **bn_param):
+                                    Use_BN = True, Use_scale = True, use_global_stats= False, **bn_param):
     if strides == 1:
         out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
         ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = True,
                     num_output = fileter_channels * expansion_factor, kernel_size=1, 
-                    pad=0, stride = strides, use_scale = Use_scale, **bn_param)
+                    pad=0, stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
         ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu=True,
                     num_output = fileter_channels * expansion_factor, kernel_size=3, pad=1, 
                     group= fileter_channels * expansion_factor,
-                    stride = strides, use_scale = Use_scale, **bn_param)
+                    stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
         ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu=False,
                     num_output = fileter_channels, kernel_size=1, pad=0, stride = strides, 
-                    use_scale = Use_scale, **bn_param)
+                    use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         res_name = 'Res_Sum_{}_{}'.format(id, repeated_num)
         net[res_name] = L.Eltwise(net[from_layer], net[out_layer_projects])
         return res_name
@@ -41,14 +41,15 @@ def MobilenetV2BottleBlock(net, from_layer, id, repeated_num, fileter_channels, 
         out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
         ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu=True,
                     num_output = fileter_channels * expansion_factor, kernel_size=1, pad=0, stride = 1, 
-                    use_scale = Use_scale, **bn_param)
+                    use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
         ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu=True,
                     num_output = fileter_channels * expansion_factor, kernel_size=1, pad=0, stride = strides, 
-                    group= fileter_channels * expansion_factor, use_scale = Use_scale, **bn_param)
+                    group= fileter_channels * expansion_factor, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
         ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu=False,
-                    num_output = fileter_channels, kernel_size=1, pad=0, stride = 1, use_scale = Use_scale,
+                    num_output = fileter_channels, kernel_size=1, pad=0, stride = 1, use_scale = Use_scale
+                    , use_global_stats= use_global_stats,
                     **bn_param)
         return out_layer_projects           
 
@@ -103,13 +104,13 @@ def MobilenetV2Body(net, from_layer, Use_BN = True, **bn_param):
     return net
 
 
-def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx):
+def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx, use_global_stats):
     res_name = "ResConnect_stage_{}".format(stage_idx)
     net[res_name] = L.Eltwise(net[from_layer_one], net[from_layer_two], operation = P.Eltwise.SUM)
     out_layer = "Dectction_stage_{}".format(stage_idx)
     ConvBNLayer(net, res_name, out_layer, use_bn = False, use_relu = False, 
                 num_output= 6, kernel_size=1, pad = 0, 
-                stride=1, use_scale = False, lr_mult=1)
+                stride=1, use_scale = False, lr_mult=1, use_global_stats= use_global_stats)
     return res_name, out_layer
 
 
@@ -167,6 +168,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
     out_layer = "conv_{}".format(index)
     ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,
                 num_output= 32, kernel_size=3, pad=1, stride = 2, use_scale = True,
+                use_global_stats= use_global_stats,
                 **bn_param)
     accum_stride *= 2
     pre_channels= 32
@@ -182,22 +184,22 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         if n > 1:
             if s == 2:
                 layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, 
-                                                        Use_scale = True, **bn_param)
+                                                        Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                 out_layer = layer_name
                 strides = 1
                 for id in range(n - 1):
                     layer_name = MobilenetV2BottleBlock(net, out_layer, index, id + 1, c, strides, t, Use_BN = True, 
-                                                        Use_scale = True, **bn_param)
+                                                        Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
             elif s == 1:
                 Project_Layer = out_layer
                 out_layer= "Conv_project_{}_{}".format(pre_channels, c)
                 ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
                 num_output= c, kernel_size= 3, pad= 1, stride= 1,
-                lr_mult=1, use_scale=True)
+                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
                 for id in range(n):
                     layer_name = MobilenetV2BottleBlock(net, out_layer, index, id, c, s, t, Use_BN = True, 
-                                                        Use_scale = True, **bn_param)
+                                                        Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
         elif n == 1:
             assert s == 1
@@ -205,9 +207,9 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
             out_layer= "Conv_project_{}_{}".format(pre_channels, c)
             ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
                         num_output= c, kernel_size= 3, pad= 1, stride= 1,
-                        lr_mult=1, use_scale=True)
+                        lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
             layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, 
-                                                        Use_scale = True, **bn_param)
+                                                        Use_scale = True,use_global_stats= use_global_stats, **bn_param)
             out_layer = layer_name
         if accum_stride in feature_stride:
             if accum_stride != pre_stride:
@@ -221,22 +223,15 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         pre_channels = c
     assert len(LayerList_Name) == len(feature_stride)
     net_last_layer = net.keys()[-1]
-    '''
-    out_layer = "conv_1_expand"
-    ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
-                num_output= 512, kernel_size= 1, pad= 0, stride= 1,
-                lr_mult=1, use_scale=True)
-    net_last_layer = out_layer
-    '''
     out_layer = "conv_1_project/DepthWise"
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
                 num_output= 320, kernel_size= 3, pad= 1, stride= 2, group= 320,
-                lr_mult=1, use_scale=True)
+                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
     net_last_layer = out_layer
     out_layer = "conv_1_project/linear"
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
                 num_output= 320, kernel_size= 1, pad= 0, stride= 1,
-                lr_mult=1, use_scale=True)
+                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
     for index in range(len(feature_stride)):
         #Deconv_layer scale up 2x2_s2
         channel_stage = LayerFilters[len(LayerFilters) - index - 1]
@@ -244,16 +239,16 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         Reconnect_layer_one = "Deconv_Scale_Up_Stage_{}".format(channel_stage)
         ConvBNLayer(net, net_last_layer, Reconnect_layer_one, use_bn= True, use_relu = False, 
             num_output= channel_stage, kernel_size= 2, pad= 0, stride= 2,
-            lr_mult=1, Use_DeConv= True, use_scale= True)
+            lr_mult=1, Use_DeConv= True, use_scale= True, use_global_stats= use_global_stats)
         
         # conv_layer linear 1x1
         net_last_layer= LayerList_Name[len(feature_stride) - index - 1]
         Reconnect_layer_two= "{}_linear".format(LayerList_Name[len(feature_stride) - index - 1])
         ConvBNLayer(net, net_last_layer, Reconnect_layer_two, use_bn= True, use_relu = False, 
             num_output= channel_stage, kernel_size= 1, pad= 0, stride= 1,
-            lr_mult=1, use_scale= True)
+            lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
         
         # eltwise_sum layer
-        out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage)
+        out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_global_stats=use_global_stats)
         LayerList_Output.append(detect_layer)
     return net, LayerList_Output
