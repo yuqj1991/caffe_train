@@ -201,6 +201,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     AnnotatedDatum* sampled_datum = NULL;
     bool has_sampled = false;
     SAMPLE_BATCH:
+      LOG(INFO)<<"SAMPLE_BATCH";
       if (batch_samplers_.size() > 0) {
         vector<NormalizedBBox> sampled_bboxes;
         GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
@@ -231,6 +232,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         sampled_datum = expand_datum;
       }
     SAMPLE_ANCHOR:
+      LOG(INFO)<<"ANCHOR";
       int resized_height = transform_param.resize_param().height();
       int resized_width = transform_param.resize_param().width();
       NormalizedBBox sampled_bbox;
@@ -246,6 +248,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         sampled_datum = expand_datum;
       }
     SAMPLE_GT_BBOX:
+      LOG(INFO)<<"GT_BBOX";
       if (anno_data_param.has_bbox_sampler()) {
         NormalizedBBox sampled_bbox;
         int resized_height_ = transform_param.resize_param().height();
@@ -268,23 +271,19 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     switch (crop_type_){
       case AnnotatedDataParameter_CROP_TYPE_CROP_BATCH:
         goto SAMPLE_BATCH;
-        LOG(INFO)<<"SAMPLE_BATCH";
         break;
       case AnnotatedDataParameter_CROP_TYPE_CROP_JITTER:
         goto SAMPLE_JITTER;
-        LOG(INFO)<<"SAMPLE_JITTER";
         break;
       case AnnotatedDataParameter_CROP_TYPE_CROP_ANCHOR:
         goto SAMPLE_ANCHOR;
-        LOG(INFO)<<"SAMPLE_ANCHOR";
         break;
       case AnnotatedDataParameter_CROP_TYPE_CROP_GT_BBOX:
         goto SAMPLE_GT_BBOX;
-        LOG(INFO)<<"GT_BBOX";
         break;
       case AnnotatedDataParameter_CROP_TYPE_CROP_RANDOM:
         caffe_rng_uniform(1, 0.0f, 1.0f, &anchor_prob);
-        LOG(INFO)<<"CROP_RANDOM";
+        LOG(INFO)<<"CROP_RANDOM, anchor_prob: "<<anchor_prob;
         if(anchor_prob > upProb_){
           goto SAMPLE_GT_BBOX;
         }else if(anchor_prob > lowProb_ && anchor_prob <= upProb_){
