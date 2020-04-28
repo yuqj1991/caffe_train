@@ -230,7 +230,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
     '''
     out_layer = "conv_1_project/DepthWise"
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
-                num_output= 320, kernel_size= 3, pad= 1, stride= 2, group= 512,
+                num_output= 320, kernel_size= 3, pad= 1, stride= 2, group= 320,
                 lr_mult=1, use_scale=True)
     net_last_layer = out_layer
     out_layer = "conv_1_project/linear"

@@ -4255,7 +4255,7 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 512
+    group: 320
     stride: 2
     weight_filler {
       type: "gaussian"
