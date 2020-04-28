@@ -219,6 +219,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         sampled_datum = expand_datum;
       }
     SAMPLE_JITTER:
+      LOG(INFO)<<"JITTER";
       vector<NormalizedBBox> sampled_bboxes;
       GenerateJitterSamples(*expand_datum, 0.3, &sampled_bboxes);
       if (sampled_bboxes.size() > 0) {
@@ -291,7 +292,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         }else if(anchor_prob <= lowProb_ ){
           goto SAMPLE_BATCH;
         }
-        LOG(INFO)<<"LALAL";
         break;
       default:
         LOG(FATAL)<<"unsupport crop type";
