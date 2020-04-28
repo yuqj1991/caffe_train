@@ -52,7 +52,7 @@ layer {
     kernel_size: 3
     stride: 2
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -126,7 +126,7 @@ layer {
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -200,7 +200,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -275,7 +275,7 @@ layer {
     group: 16
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -349,7 +349,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -424,7 +424,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -499,7 +499,7 @@ layer {
     group: 144
     stride: 2
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -573,7 +573,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -641,7 +641,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -716,7 +716,7 @@ layer {
     group: 144
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -790,7 +790,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -865,7 +865,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -940,7 +940,7 @@ layer {
     group: 192
     stride: 2
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1014,7 +1014,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1082,7 +1082,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1157,7 +1157,7 @@ layer {
     group: 192
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1231,7 +1231,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1306,7 +1306,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1381,7 +1381,7 @@ layer {
     group: 192
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1455,7 +1455,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1530,7 +1530,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1605,7 +1605,7 @@ layer {
     group: 384
     stride: 2
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1679,7 +1679,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1747,7 +1747,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1822,7 +1822,7 @@ layer {
     group: 384
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1896,7 +1896,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -1971,7 +1971,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2046,7 +2046,7 @@ layer {
     group: 384
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2120,7 +2120,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2195,7 +2195,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2270,7 +2270,7 @@ layer {
     group: 384
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2344,7 +2344,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2419,7 +2419,7 @@ layer {
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2493,7 +2493,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2568,7 +2568,7 @@ layer {
     group: 576
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2642,7 +2642,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2717,7 +2717,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2792,7 +2792,7 @@ layer {
     group: 576
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2866,7 +2866,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -2941,7 +2941,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3016,7 +3016,7 @@ layer {
     group: 576
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3090,7 +3090,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3165,7 +3165,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3240,7 +3240,7 @@ layer {
     group: 960
     stride: 2
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3314,7 +3314,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3382,7 +3382,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3457,7 +3457,7 @@ layer {
     group: 960
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3531,7 +3531,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3606,7 +3606,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3681,7 +3681,7 @@ layer {
     group: 960
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3755,7 +3755,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3830,7 +3830,7 @@ layer {
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3904,7 +3904,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -3979,7 +3979,7 @@ layer {
     group: 1920
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -4053,7 +4053,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -4129,7 +4129,7 @@ layer {
     group: 320
     stride: 2
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -4203,7 +4203,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -4344,7 +4344,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -4516,7 +4516,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -4688,7 +4688,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
@@ -4860,7 +4860,7 @@ layer {
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
+      type: "msra"
       std: 0.00999999977648
     }
   }
