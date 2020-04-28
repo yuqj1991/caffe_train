@@ -170,7 +170,7 @@ layer {
     }
 		up_prob: 0.7
 		low_prob: 0.4
-    crop_type: CROP_METHOD_RANDOM
+    crop_type: CROP_BATCH
 		yoloformat: true
 		label_map_file: "../labelmap.prototxt"
 	}
