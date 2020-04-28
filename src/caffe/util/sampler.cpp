@@ -290,8 +290,8 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
                                 const DataAnchorSampler& data_anchor_sampler,
                                 const vector<NormalizedBBox>& object_bboxes,
                                 int resized_height, int resized_width,
-                                NormalizedBBox* sampled_bbox, AnnotatedDatum* resized_anno_datum,
-                                const TransformationParameter& trans_param, bool do_resize){
+                                NormalizedBBox* sampled_bbox, 
+                                const TransformationParameter& trans_param){
   vector<int>anchorScale;
   int img_height = anno_datum.datum().height();
   int img_width = anno_datum.datum().width();
@@ -338,79 +338,35 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     max_resize_val = (float)anchorScale[range_idx_size] * 2;
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
   }
-  float width_offset_org = 0.0f, height_offset_org = 0.0f;
-  float w_off = 0.0f, h_off = 0.0f, w_end = 0.0f, h_end = 0.0f;
-  if(do_resize){
-    float scale = (float) scaleChoose / bbox_width;
-    ResizedCropSample(anno_datum, resized_anno_datum, scale, trans_param);
-    int Resized_ori_Height = int(scale * img_height);
-    int Resized_ori_Width = int(scale * img_width);
-    int Resized_bbox_width = int(scale * bbox_width);
-    int Resized_bbox_height = int(scale * bbox_height);
-    const float Resized_xmin = object_bboxes[object_bbox_index].xmin() * Resized_ori_Width;
-    const float Resized_ymin = object_bboxes[object_bbox_index].ymin() * Resized_ori_Height;
-    if(resized_width < std::max(Resized_ori_Height, Resized_ori_Width)){
-      if(Resized_bbox_width <= resized_width){
-        if(Resized_bbox_width == resized_width){
-          width_offset_org = xmin;
-        }else if(Resized_bbox_width < resized_width){
-          caffe_rng_uniform(1, Resized_bbox_width + Resized_xmin - resized_width, Resized_xmin, &width_offset_org );
-        }
-      }else{
-        caffe_rng_uniform(1, Resized_xmin, Resized_bbox_width + Resized_xmin - resized_width, &width_offset_org);
-      }
-      if(Resized_bbox_height <= resized_height){
-        if(Resized_bbox_height == resized_height){
-          height_offset_org = ymin;
-        }else if(Resized_bbox_height < resized_height){
-          caffe_rng_uniform(1, Resized_ymin + Resized_bbox_height - resized_height, Resized_ymin, &height_offset_org);
-        }
-      }else{
-        caffe_rng_uniform(1, Resized_ymin, Resized_ymin + Resized_bbox_height - resized_height, &height_offset_org);
-      }
+  float w_off = 0.0f, h_off = 0.0f;
+
+  float sample_bbox_size = (float)bbox_width * resized_width / scaleChoose;
+  if(sample_bbox_size < COMPAREMAX(img_height, img_width)){
+    if(bbox_width <= sample_bbox_size){
+      caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
     }else{
-      caffe_rng_uniform(1, float(Resized_ori_Width-resized_width), 0.0f, &width_offset_org);
-      caffe_rng_uniform(1, float(Resized_ori_Height-resized_height), 0.0f, &height_offset_org);
+      caffe_rng_uniform(1, xmin, xmin + bbox_width - sample_bbox_size, &w_off);
     }
-    int width_offset_ = std::floor(width_offset_org);
-    int height_offset_ = std::floor(height_offset_org);
-    w_off = (float) width_offset_ / Resized_ori_Width;
-    h_off = (float) height_offset_ / Resized_ori_Height;
-    w_end = w_off + float(resized_width / Resized_ori_Width);
-    h_end = h_off + float(resized_height / Resized_ori_Height);
-    sampled_bbox->set_xmin(w_off);
-    sampled_bbox->set_ymin(h_off);
-    sampled_bbox->set_xmax(w_end);
-    sampled_bbox->set_ymax(h_end);
+    if(bbox_height <= sample_bbox_size){
+      caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
+    }else{
+      caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_bbox_size, &h_off);
+    }
   }else{
-    float sample_bbox_size = (float)bbox_width * resized_width / scaleChoose;
-    if(sample_bbox_size < COMPAREMAX(img_height, img_width)){
-      if(bbox_width <= sample_bbox_size){
-        caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
-      }else{
-        caffe_rng_uniform(1, xmin, xmin + bbox_width - sample_bbox_size, &w_off);
-      }
-      if(bbox_height <= sample_bbox_size){
-        caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
-      }else{
-        caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_bbox_size, &h_off);
-      }
-    }else{
-      caffe_rng_uniform(1, img_width - sample_bbox_size, 0.f, &w_off);
-      caffe_rng_uniform(1, img_height - sample_bbox_size, 0.f, &h_off);
-    }
-    sampled_bbox->set_xmin((float)w_off / img_width);
-    sampled_bbox->set_ymin((float)h_off / img_height);
-    sampled_bbox->set_xmax((float)(w_off + sample_bbox_size) / img_width);
-    sampled_bbox->set_ymax((float)(h_off + sample_bbox_size) / img_height);
+    caffe_rng_uniform(1, img_width - sample_bbox_size, 0.f, &w_off);
+    caffe_rng_uniform(1, img_height - sample_bbox_size, 0.f, &h_off);
   }
+  sampled_bbox->set_xmin((float)w_off / img_width);
+  sampled_bbox->set_ymin((float)h_off / img_height);
+  sampled_bbox->set_xmax((float)(w_off + sample_bbox_size) / img_width);
+  sampled_bbox->set_ymax((float)(h_off + sample_bbox_size) / img_height);
 }
 
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                 const vector<DataAnchorSampler>& data_anchor_samplers,
                                 int resized_height, int resized_width, 
-                                NormalizedBBox* sampled_bbox, AnnotatedDatum* resized_anno_datum, 
-                                const TransformationParameter& trans_param, bool do_resize) {
+                                NormalizedBBox* sampled_bbox,
+                                const TransformationParameter& trans_param) {
   CHECK_EQ(data_anchor_samplers.size(), 1);
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
@@ -422,19 +378,16 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
             found >= data_anchor_samplers[i].max_sample()) {
           break;
         }
-        AnnotatedDatum temp_anno_datum;
         NormalizedBBox temp_sampled_bbox;
         GenerateDataAnchorSample(anno_datum, data_anchor_samplers[i], object_bboxes, resized_height, 
-                                resized_width, &temp_sampled_bbox, &temp_anno_datum, trans_param, do_resize);
+                                resized_width, &temp_sampled_bbox, trans_param);
         if (SatisfySampleConstraint(temp_sampled_bbox, object_bboxes,
                                       data_anchor_samplers[i].sample_constraint())){
           found++;
-          resized_anno_datum->CopyFrom(temp_anno_datum);
           sampled_bbox->CopyFrom(temp_sampled_bbox);
         }
       }
       if(found == 0){
-        resized_anno_datum->CopyFrom(anno_datum);
         sampled_bbox->set_xmin(0.f);
         sampled_bbox->set_ymin(0.f);
         sampled_bbox->set_xmax(1.f);
@@ -444,8 +397,6 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
       LOG(FATAL)<<"must use original_image";
     }
   }
-  if(do_resize)
-    CHECK_GT(resized_anno_datum->datum().channels(), 0)<<"channels: "<<resized_anno_datum->datum().channels();
 }
 
 void GenerateLFFDSample(const AnnotatedDatum& anno_datum,
@@ -531,15 +482,6 @@ void GenerateLFFDSample(const AnnotatedDatum& anno_datum,
       sampled_bbox->set_xmax(1.f);
       sampled_bbox->set_ymax(1.f);
     }
-    #if 0
-    LOG(INFO)<<"scale: "<<scale << ", Resized_ori_Height: "<<Resized_ori_Height
-              <<", Resized_ori_Width: "<<Resized_ori_Width<<", resized_xmin: "
-              <<resized_xmin<<", resized_xmax: "<<resized_xmax<<", resized_ymin: "
-              <<resized_ymin<<", resized_ymax: "<<resized_ymax<<", w_off: "<<width_offset_
-              <<", h_off: "<<height_offset_<<", w_end: "<<width_end_<<", h_end: "<<height_end_
-              <<", vibration_length: "<<vibration_length<<", offset_x: "<<offset_x<<", offset_y: "
-              <<offset_y;
-    #endif
   }else{
     resized_anno_datum->CopyFrom(anno_datum);
     sampled_bbox->set_xmin(0.f);

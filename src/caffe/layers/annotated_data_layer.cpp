@@ -175,8 +175,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // get a anno_datum
     AnnotatedDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
     read_time += timer.MicroSeconds();
-    float anchor_prob = 0.0f;
-    caffe_rng_uniform(1, 0.0f, 1.0f, &anchor_prob);
     timer.Start();
     AnnotatedDatum distort_datum;
     AnnotatedDatum* expand_datum = NULL;
@@ -202,16 +200,11 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }
     AnnotatedDatum* sampled_datum = NULL;
     bool has_sampled = false;
-    if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_BATCH){
-      if (batch_samplers_.size() > 0 || YoloFormat_) {
-        // Generate sampled bboxes from expand_datum.
+    SAMPLE_BATCH:
+      if (batch_samplers_.size() > 0) {
         vector<NormalizedBBox> sampled_bboxes;
-        if(YoloFormat_)
-          GenerateJitterSamples(*expand_datum, 0.3, &sampled_bboxes);
-        else
-          GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
+        GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
         if (sampled_bboxes.size() > 0) {
-          // Randomly pick a sampled bbox and crop the expand_datum.
           int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
           sampled_datum = new AnnotatedDatum();
           this->data_transformer_->CropImage(*expand_datum,
@@ -224,71 +217,81 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       } else {
         sampled_datum = expand_datum;
       }
-    }else if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_METHOD_RANDOM){
-      if(anchor_prob > upProb_){
-        int resized_height = transform_param.resize_param().height();
-        int resized_width = transform_param.resize_param().width();
-        NormalizedBBox sampled_bbox;
-        if(data_anchor_samplers_.size() > 0){
-          resized_anno_datum = new AnnotatedDatum();
-          do_resize = true;
-          GenerateBatchDataAnchorSamples(*expand_datum, data_anchor_samplers_,
-                                  resized_height, resized_width,
-                                  &sampled_bbox, resized_anno_datum, transform_param, do_resize);
-          CHECK_GT(resized_anno_datum->datum().channels(), 0) <<", anchor_prob: "<<anchor_prob;
-          sampled_datum = new AnnotatedDatum();
-          this->data_transformer_->CropImage_anchor_Sampling(*resized_anno_datum,
-                                        sampled_bbox,
-                                        sampled_datum);
-          has_sampled = true;
-        }else{
-          sampled_datum = expand_datum;
-        }
-      }else if(anchor_prob > lowProb_ && anchor_prob <= upProb_){
-        if (batch_samplers_.size() > 0) {
-          // Generate sampled bboxes from expand_datum.
-          vector<NormalizedBBox> sampled_bboxes;
-          GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
-          if (sampled_bboxes.size() > 0) {
-            // Randomly pick a sampled bbox and crop the expand_datum.
-            int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
-            sampled_datum = new AnnotatedDatum();
-            this->data_transformer_->CropImage(*expand_datum,
-                                              sampled_bboxes[rand_idx],
-                                              sampled_datum);
-            has_sampled = true;
-          } else {
-            sampled_datum = expand_datum;
-          }
-        } else {
-          sampled_datum = expand_datum;
-        }
-      }else if(anchor_prob <= lowProb_ ){
-        if (anno_data_param.has_bbox_sampler()) {
-          // Generate sampled bboxes from expand_datum.
-          NormalizedBBox sampled_bbox;
-          int resized_height_ = transform_param.resize_param().height();
-          int resized_width_ = transform_param.resize_param().width();
-          resized_anno_datum = new AnnotatedDatum();
-          do_resize = true;
-          GenerateLFFDSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
-                              bbox_small_scale_, bbox_large_scale_, anchor_stride_,
-                              resized_anno_datum, transform_param, do_resize);
-          CHECK_GT(resized_anno_datum->datum().channels(), 0)<<", anchor_prob: "<<anchor_prob;
-          sampled_datum = new AnnotatedDatum();
-          this->data_transformer_->CropImage_LFFD_Sampling(*resized_anno_datum,
-                                              sampled_bbox,
-                                              sampled_datum);
-          has_sampled = true;
-        } else {
-          sampled_datum = expand_datum;
-        }
+    SAMPLE_JITTER:
+      vector<NormalizedBBox> sampled_bboxes;
+      GenerateJitterSamples(*expand_datum, 0.3, &sampled_bboxes);
+      if (sampled_bboxes.size() > 0) {
+        int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+        sampled_datum = new AnnotatedDatum();
+        this->data_transformer_->CropImage(*expand_datum,
+                                          sampled_bboxes[rand_idx],
+                                          sampled_datum);
+        has_sampled = true;
+      } else {
+        sampled_datum = expand_datum;
       }
+    SAMPLE_ANCHOR:
+      int resized_height = transform_param.resize_param().height();
+      int resized_width = transform_param.resize_param().width();
+      NormalizedBBox sampled_bbox;
+      if(data_anchor_samplers_.size() > 0){
+        GenerateBatchDataAnchorSamples(*expand_datum, data_anchor_samplers_,
+                                resized_height, resized_width,
+                                &sampled_bbox, transform_param);
+        sampled_datum = new AnnotatedDatum();
+        this->data_transformer_->CropImage_anchor_Sampling(*expand_datum, sampled_bbox,
+                                                          sampled_datum);
+        has_sampled = true;
+      }else{
+        sampled_datum = expand_datum;
+      }
+    SAMPLE_GT_BBOX:
+      if (anno_data_param.has_bbox_sampler()) {
+        NormalizedBBox sampled_bbox;
+        int resized_height_ = transform_param.resize_param().height();
+        int resized_width_ = transform_param.resize_param().width();
+        resized_anno_datum = new AnnotatedDatum();
+        do_resize = true;
+        GenerateLFFDSample(*expand_datum, resized_height_, resized_width_, &sampled_bbox, 
+                            bbox_small_scale_, bbox_large_scale_, anchor_stride_,
+                            resized_anno_datum, transform_param, do_resize);
+        CHECK_GT(resized_anno_datum->datum().channels(), 0);
+        sampled_datum = new AnnotatedDatum();
+        this->data_transformer_->CropImage_LFFD_Sampling(*resized_anno_datum,
+                                            sampled_bbox,
+                                            sampled_datum);
+        has_sampled = true;
+      } else {
+        sampled_datum = expand_datum;
+      }
+    switch (crop_type_){
+      case AnnotatedDataParameter_CROP_TYPE_CROP_BATCH:
+        goto SAMPLE_BATCH;
+        break;
+      case AnnotatedDataParameter_CROP_TYPE_CROP_JITTER:
+        goto SAMPLE_JITTER;
+        break;
+      case AnnotatedDataParameter_CROP_TYPE_CROP_ANCHOR:
+        goto SAMPLE_ANCHOR;
+        break;
+      case AnnotatedDataParameter_CROP_TYPE_CROP_GT_BBOX:
+        goto SAMPLE_GT_BBOX;
+        break;
+      case AnnotatedDataParameter_CROP_TYPE_CROP_RANDOM:
+        float anchor_prob = 0.0f;
+        caffe_rng_uniform(1, 0.0f, 1.0f, &anchor_prob);
+        if(anchor_prob > upProb_){
+          goto SAMPLE_GT_BBOX;
+        }else if(anchor_prob > lowProb_ && anchor_prob <= upProb_){
+          goto SAMPLE_ANCHOR;
+        }else if(anchor_prob <= lowProb_ ){
+          goto SAMPLE_BATCH;
+        }
+        break;
     }
     CHECK(sampled_datum != NULL);
     timer.Start();
-    vector<int> shape =
-        this->data_transformer_->InferBlobShape(sampled_datum->datum());
+    vector<int> shape = this->data_transformer_->InferBlobShape(sampled_datum->datum());
     if (transform_param.has_resize_param()) {
       if (transform_param.resize_param().resize_mode() ==
           ResizeParameter_Resize_mode_FIT_SMALL_SIZE) {
@@ -309,7 +312,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     vector<AnnotationGroup> transformed_anno_vec;
     if (this->output_labels_) {
       if (has_anno_type_) {
-        // Make sure all data have same annotation type.
         CHECK(sampled_datum->has_type()) << "Some datum misses AnnotationType.";
         if (anno_data_param.has_anno_type()) {
           sampled_datum->set_type(anno_type_);

@@ -56,14 +56,14 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
                                 const DataAnchorSampler& data_anchor_sampler,
                                 const vector<NormalizedBBox>& object_bboxes,
                                 int resized_height, int resized_width,
-                                NormalizedBBox* sampled_bbox, AnnotatedDatum* resized_anno_datum,
-                                const TransformationParameter& trans_param, bool do_resize);
+                                NormalizedBBox* sampled_bbox, 
+                                const TransformationParameter& trans_param);
 
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                 const vector<DataAnchorSampler>& data_anchor_samplers,
                                 int resized_height, int resized_width,
-                                NormalizedBBox* sampled_bbox, AnnotatedDatum* resized_anno_datum,
-                                const TransformationParameter& trans_param, bool do_resize);
+                                NormalizedBBox* sampled_bbox,
+                                const TransformationParameter& trans_param);
 
 void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized_anno_datum, 
                        float scale, const TransformationParameter& trans_param);
