@@ -41,7 +41,7 @@ layer {
     }
     expand_param {
       prob: 0.5
-      max_expand_ratio: 4.0
+      max_expand_ratio: 2.0
     }
   }
   data_param {
@@ -147,19 +147,8 @@ layer {
     }
     label_map_file: "../labelmap.prototxt"
     data_anchor_sampler {
-      scale: 512
-      sample_constraint {
-        min_object_coverage: 0.75
-      }
-      max_sample: 1
-      max_trials: 50
     }
     up_prob: 0.699999988079
-    bbox_sampler {
-      bbox_small_scale: 256
-      bbox_large_scale: 512
-      ancher_stride: 32
-    }
     low_prob: 0.40000000596
     yoloformat: true
     crop_type: CROP_BATCH

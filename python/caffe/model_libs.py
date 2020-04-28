@@ -205,7 +205,7 @@ def InceptionTower(net, from_layer, tower_name, layer_params, **bn_param):
 
 def CreateAnnotatedDataLayer(source, batch_size=32, backend=P.Data.LMDB,
         output_label=True, train=True, label_map_file='', anno_type=None,
-        transform_param={}, batch_sampler=[{}], data_anchor_sampler = [{}], 
+        transform_param={}, batch_sampler=[{}], data_anchor_sampler = {}, 
         bbox_sampler = {}, crop_type = P.AnnotatedData.CROP_BATCH, YoloForamte = False):
     if train:
         kwargs = {

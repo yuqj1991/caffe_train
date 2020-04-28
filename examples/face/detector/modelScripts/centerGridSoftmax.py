@@ -183,7 +183,7 @@ train_transform_param = {
     },
     'expand_param': {
         'prob': 0.5,
-        'max_expand_ratio': 4.0,
+        'max_expand_ratio': 2.0,
     },
     'emit_constraint': {
         'emit_type': caffe_pb2.EmitConstraint.CENTER,
@@ -199,7 +199,7 @@ test_transform_param = {
         'interp_mode': [P.Resize.LINEAR],
     },
 }
-base_learning_rate = 0.0125
+base_learning_rate = 0.0005
 Job_Name = "CenterGrid{}_face_v2".format("Softmax")
 mdoel_name = "ResideoDeepFace"
 save_dir = "../prototxt/Full_{}".format(resize)
@@ -236,8 +236,8 @@ elif normalization_mode == P.Loss.FULL:
     base_learning_rate *= 2000.
 
 # Evaluate on whole test set.
-num_test_image = 4952
-test_batch_size = 8
+num_test_image = 5000
+test_batch_size = 1
 # Ideally test_batch_size should be divisible by num_test_image,
 # otherwise mAP will be slightly off the true value.
 test_iter = int(math.ceil(float(num_test_image) / test_batch_size))
@@ -255,7 +255,7 @@ solver_param = {
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
-    'type': "SGD",
+    'type': "RMSProp",
     'solver_mode': "GPU",
     'device_id': 0,
     'debug_info': False,
@@ -279,8 +279,7 @@ net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
         train=True, output_label=True, label_map_file=labelmapPath,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
-        data_anchor_sampler = data_anchor_sampler, 
-        bbox_sampler = bbox_sampler, crop_type = P.AnnotatedData.CROP_BATCH, YoloForamte = True)
+        crop_type = P.AnnotatedData.CROP_BATCH, YoloForamte = True)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
 bias_scale = [512, 256, 128, 64]
