@@ -206,17 +206,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -279,17 +277,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -352,17 +348,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -426,17 +420,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -499,17 +491,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -573,17 +563,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -647,17 +635,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -720,17 +706,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -787,17 +771,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -861,17 +843,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -934,17 +914,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1008,17 +986,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1082,17 +1058,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1155,17 +1129,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1222,17 +1194,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1296,17 +1266,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1369,17 +1337,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1443,17 +1409,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1517,17 +1481,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1590,17 +1552,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1664,17 +1624,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1738,17 +1696,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1811,17 +1767,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1878,17 +1832,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -1952,17 +1904,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2025,17 +1975,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2099,17 +2047,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2173,17 +2119,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2246,17 +2190,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2320,17 +2262,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2394,17 +2334,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2467,17 +2405,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2541,17 +2477,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2614,17 +2548,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2688,17 +2620,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2761,17 +2691,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2835,17 +2763,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2909,17 +2835,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -2982,17 +2906,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3056,17 +2978,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3130,17 +3050,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3203,17 +3121,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3277,17 +3193,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3351,17 +3265,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3424,17 +3336,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3491,17 +3401,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3565,17 +3473,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3638,17 +3544,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3712,17 +3616,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3786,17 +3688,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3859,17 +3759,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -3933,17 +3831,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4006,17 +3902,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4080,17 +3974,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4153,17 +4045,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4228,17 +4118,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4301,17 +4189,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4374,17 +4260,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4441,17 +4325,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4545,17 +4427,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4612,17 +4492,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4716,17 +4594,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4783,17 +4659,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4887,17 +4761,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }
@@ -4954,17 +4826,15 @@ layer {
     decay_mult: 0.0
   }
   param {
-    lr_mult: 1.0
+    lr_mult: 2.0
     decay_mult: 0.0
   }
   scale_param {
     filler {
-      type: "constant"
       value: 1.0
     }
     bias_term: true
     bias_filler {
-      type: "constant"
       value: 0.0
     }
   }

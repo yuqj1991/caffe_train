@@ -77,9 +77,9 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, use_relu, num_output,
           'bias_term': True,
           'param': [
               dict(lr_mult=bn_lr_mult, decay_mult=0),
-              dict(lr_mult=bn_lr_mult, decay_mult=0)],
-          'filler': dict(type='constant', value=1.0),
-          'bias_filler': dict(type='constant', value=0.0),
+              dict(lr_mult=bn_lr_mult * 2, decay_mult=0)],
+          'filler': dict(value=1.0),
+          'bias_filler': dict(value=0.0),
           }
     else:
       bias_kwargs = {
