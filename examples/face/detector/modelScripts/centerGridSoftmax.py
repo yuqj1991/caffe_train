@@ -249,7 +249,7 @@ solver_param = {
     'lr_policy': "multistep",
     'stepvalue': [10000, 30000, 50000, 70000, 90000],
     'gamma': 0.1,
-    'momentum': 0.9,
+    #'momentum': 0.9,
     'iter_size': iter_size,
     'max_iter': 100000,
     'snapshot': 5000,
@@ -350,34 +350,3 @@ solver = caffe_pb2.SolverParameter(
         **solver_param)
 with open(solver_file, 'w') as f:
     print(solver, file=f)
-'''
-#创建 train_net.sh
-max_iter = 0
-# Find most recent snapshot.
-for file in os.listdir(snapshot_dir):
-  if file.endswith(".solverstate"):
-    basename = os.path.splitext(file)[0]
-    iter = int(basename.split("{}_iter_".format(Job_Name))[1])
-    if iter > max_iter:
-      max_iter = iter
-resume_training = True
-train_src_param = '--weights="{}" \\\n'.format(pretrain_model)
-if resume_training:
-  if max_iter > 0:
-    train_src_param = '--snapshot="{}_iter_{}.solverstate" \\\n'.format(snapshot_dir, max_iter)
-
-job_file = "{}/{}_v2.sh".format("../scripts", Job_Name)
-with open(job_file, 'w') as f:
-  f.write('cd {}\n'.format(caffe_root))
-  f.write('./build/tools/caffe train \\\n')
-  f.write('--solver="{}" \\\n'.format(solver_file))
-  f.write(train_src_param)
-  if solver_param['solver_mode'] == P.Solver.GPU:
-    f.write('--gpu {} 2>&1 | tee {}/{}.log\n'.format(gpus, job_dir, Job_Name))
-  else:
-    f.write('2>&1 | tee {}/{}.log\n'.format(job_dir, Job_Name))
-
-# Copy the python script to job_dir.
-py_file = os.path.abspath(__file__)
-shutil.copy(py_file, job_dir)
-'''
