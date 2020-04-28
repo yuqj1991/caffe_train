@@ -267,6 +267,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     }else if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_RANDOM){
       float anchor_prob = 0.0f;
       caffe_rng_uniform(1, 0.0f, 1.0f, &anchor_prob);
+      # if 0
       if(anchor_prob > upProb_){
         if (anno_data_param.has_bbox_sampler()) {
           NormalizedBBox sampled_bbox;
@@ -286,7 +287,9 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         } else {
           sampled_datum = expand_datum;
         }
-      }else if(anchor_prob > lowProb_ && anchor_prob <= upProb_){
+      }else 
+      #endif
+      if(anchor_prob > 0.5){
         int resized_height = transform_param.resize_param().height();
         int resized_width = transform_param.resize_param().width();
         NormalizedBBox sampled_bbox;
@@ -301,7 +304,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         }else{
           sampled_datum = expand_datum;
         }
-      }else if(anchor_prob <= lowProb_ ){
+      }else if(anchor_prob <= 0.5 ){
         if (batch_samplers_.size() > 0) {
           vector<NormalizedBBox> sampled_bboxes;
           GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
