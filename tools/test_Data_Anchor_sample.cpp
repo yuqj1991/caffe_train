@@ -416,8 +416,8 @@ void GenerateLffdSample_T(const cv::Mat& src_Img, std::vector<NormalizedBBox_S> 
 }
 
 int main(int argc, char** argv){
-  int loop_time = 12;
-  int batch_size = 32;
+  int loop_time = 50;
+  int batch_size = 64;
   int Resized_Height = 640;
   int Resized_Width = 640;
   std::string srcTestfile = "../../img_test.txt";
@@ -597,16 +597,14 @@ int main(int argc, char** argv){
       int resized_height = transform_param.resize_param().height();
       int resized_width = transform_param.resize_param().width();
       AnnotatedDatum* resized_anno_datum = NULL;
-      bool do_resize = false;
+      bool do_resize = true;
       if(do_resize)
         resized_anno_datum = new AnnotatedDatum();
       NormalizedBBox sampled_bbox;
-      #if 1
+      #if 0
       GenerateBatchDataAnchorSamples(anno_datum, data_anchor_samplers_,
                               resized_height, resized_width,
-                              &sampled_bbox, resized_anno_datum, transform_param, do_resize);
-      if(do_resize)
-        CHECK_GT(resized_anno_datum->datum().channels(), 0);
+                              &sampled_bbox, transform_param);
       sampled_datum = new AnnotatedDatum();
       data_transformer_.CropImage_anchor_Sampling(anno_datum,
                                     sampled_bbox,
@@ -635,12 +633,14 @@ int main(int argc, char** argv){
       std::string saved_img_name = save_folder + "/" + prefix_imgName + "_" + to_string(ii) + "_" + to_string(jj) +".jpg";
       cv::Mat cropImage(transformed_blob.height(), transformed_blob.width(), CV_8UC3);
       const float* data = transformed_blob.cpu_data();
-      for(int row = 0; row < Resized_Height; row++){
+      int Trans_Height = transformed_blob.height();
+      int Trans_Width = transformed_blob.width();
+      for(int row = 0; row < Trans_Height; row++){
         unsigned char *ImgData = cropImage.ptr<uchar>(row);
-        for(int col = 0; col < Resized_Width; col++){
-          ImgData[3 * col + 0] = static_cast<uchar>(data[0 * Resized_Height * Resized_Width + row * Resized_Width + col]);
-          ImgData[3 * col + 1] = static_cast<uchar>(data[1 * Resized_Height * Resized_Width + row * Resized_Width + col]);
-          ImgData[3 * col + 2] = static_cast<uchar>(data[2 * Resized_Height * Resized_Width + row * Resized_Width + col]);
+        for(int col = 0; col < Trans_Width; col++){
+          ImgData[3 * col + 0] = static_cast<uchar>(data[0 * Trans_Height * Trans_Width + row * Trans_Width + col]);
+          ImgData[3 * col + 1] = static_cast<uchar>(data[1 * Trans_Height * Trans_Width + row * Trans_Width + col]);
+          ImgData[3 * col + 2] = static_cast<uchar>(data[2 * Trans_Height * Trans_Width + row * Trans_Width + col]);
         }
       }
       int Crop_Height = cropImage.rows;

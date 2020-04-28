@@ -264,6 +264,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       } else {
         sampled_datum = expand_datum;
       }
+    float anchor_prob = 0.0f;
     switch (crop_type_){
       case AnnotatedDataParameter_CROP_TYPE_CROP_BATCH:
         goto SAMPLE_BATCH;
@@ -278,7 +279,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         goto SAMPLE_GT_BBOX;
         break;
       case AnnotatedDataParameter_CROP_TYPE_CROP_RANDOM:
-        float anchor_prob = 0.0f;
         caffe_rng_uniform(1, 0.0f, 1.0f, &anchor_prob);
         if(anchor_prob > upProb_){
           goto SAMPLE_GT_BBOX;
@@ -287,6 +287,9 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         }else if(anchor_prob <= lowProb_ ){
           goto SAMPLE_BATCH;
         }
+        break;
+      default:
+        LOG(FATAL)<<"unsupport crop type";
         break;
     }
     CHECK(sampled_datum != NULL);

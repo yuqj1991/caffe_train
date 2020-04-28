@@ -28,12 +28,6 @@ resize = "{}x{}".format(resize_width, resize_height)
 batch_sampler = [
     {
         'sampler': {
-        },
-        'max_trials': 1,
-        'max_sample': 1,
-    },
-    {
-        'sampler': {
             'min_scale': 0.3,
             'max_scale': 1.0,
             'min_aspect_ratio': 0.3,
@@ -288,7 +282,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         train=True, output_label=True, label_map_file=labelmapPath,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
-        crop_type = P.AnnotatedData.CROP_BATCH, YoloForamte = True)
+        crop_type = P.AnnotatedData.CROP_RANDOM, YoloForamte = True)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
 bias_scale = [512, 256, 128, 64]
