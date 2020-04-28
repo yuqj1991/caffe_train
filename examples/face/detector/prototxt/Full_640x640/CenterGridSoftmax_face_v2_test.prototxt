@@ -28,8 +28,6 @@ layer {
     batch_sampler {
     }
     label_map_file: "../labelmap.prototxt"
-    data_anchor_sampler {
-    }
     up_prob: 0.699999988079
     low_prob: 0.40000000596
     yoloformat: false

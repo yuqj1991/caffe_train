@@ -124,33 +124,41 @@ batch_sampler = [
         'max_sample': 1,
     },
 ]
-data_anchor_sampler = [
-   {
-        'scale': 8,
-        'scale': 64,
-        'scale': 128,
-        'scale': 256,
-        'scale': 512,
+scale = [8, 64, 128, 256, 512]
+data_anchor_sampler = {
+        'scale': scale,
         'sample_constraint': {
             'min_object_coverage': 0.75
         },
         'max_sample': 1,
         'max_trials': 50,
-   },
+}
+bbox = [
+    {
+      'bbox_small_scale': 8,
+      'bbox_large_scale': 64,
+      'ancher_stride': 4,
+    },
+    {
+      'bbox_small_scale': 64,
+      'bbox_large_scale': 128,
+      'ancher_stride': 8,
+    },
+    {
+      'bbox_small_scale': 128,
+      'bbox_large_scale': 256,
+      'ancher_stride': 16,
+    },
+    {
+      'bbox_small_scale': 256,
+      'bbox_large_scale': 512,
+      'ancher_stride': 32,
+    },
 ]
 bbox_sampler = {
-      'bbox_small_scale': 8,
-      'bbox_small_scale': 64,
-      'bbox_small_scale': 128,
-      'bbox_small_scale': 256,
-      'bbox_large_scale': 64,
-      'bbox_large_scale': 128,
-      'bbox_large_scale': 256,
-      'bbox_large_scale': 512,
-      'ancher_stride': 4,
-      'ancher_stride': 8,
-      'ancher_stride': 16,
-      'ancher_stride': 32,
+    'box': bbox,
+    'max_sample': 1,
+    'max_trials': 50,
 }
 train_transform_param = {
     'mirror': True,
@@ -279,6 +287,7 @@ net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
         train=True, output_label=True, label_map_file=labelmapPath,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
+        data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
         crop_type = P.AnnotatedData.CROP_BATCH, YoloForamte = True)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
