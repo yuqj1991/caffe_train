@@ -142,42 +142,9 @@ layer {
 			max_sample: 1
 			max_trials: 50
 		}
-    data_anchor_sampler{
-			scale: 10
-			scale: 23
-			scale: 52
-			scale: 119
-			scale: 268
-			scale: 596
-			sample_constraint{
-				min_object_coverage: 0.75
-			}
-			max_sample: 1
-			max_trials: 50
-		}
-    bbox_sampler{
-      bbox_small_scale: 8
-      bbox_small_scale: 10
-      bbox_small_scale: 23
-      bbox_small_scale: 52
-      bbox_small_scale: 119
-      bbox_small_scale: 268
-      bbox_large_scale: 10
-      bbox_large_scale: 23
-      bbox_large_scale: 52
-      bbox_large_scale: 119
-      bbox_large_scale: 268
-      bbox_large_scale: 596
-      ancher_stride: 4
-      ancher_stride: 8
-      ancher_stride: 8
-      ancher_stride: 16
-      ancher_stride: 32
-      ancher_stride: 32
-    }
 		up_prob: 0.7
 		low_prob: 0.4
-    crop_type: CROP_METHOD_RANDOM
+		crop_type: CROP_BATCH
 		label_map_file: "../labelmap.prototxt"
 	}
 }
