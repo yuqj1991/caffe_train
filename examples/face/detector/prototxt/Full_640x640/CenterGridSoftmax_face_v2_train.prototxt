@@ -162,7 +162,7 @@ layer {
     }
     low_prob: 0.40000000596
     yoloformat: true
-    crop_type: CROP_METHOD_RANDOM
+    crop_type: CROP_BATCH
   }
 }
 layer {
