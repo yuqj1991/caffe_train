@@ -10,16 +10,25 @@ from caffe import params as P
 from caffe.proto import caffe_pb2
 from caffe.model_libs import *
 
-'''
-def efficientDetBody(net, from_layer, alpha, beta, gamma, Use_BN = True):
-    kwargs = {
-            'param': [dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
-            'weight_filler': dict(type='xavier'),
-            'bias_filler': dict(type='constant', value=0)}
+def SEMoudleBlock(net, from_layer, channels, layerPrefix= '', ratio = 0.2):
     assert from_layer in net.keys()
-'''
-def MobilenetV2BottleBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor, 
-                                    Use_BN = True, Use_scale = True, use_global_stats= False, **bn_param):
+    Global_poolingName= "{}_GloabalPool".format(layerPrefix)
+    net[Global_poolingName] = L.Pooling(net[from_layer], pool=P.Pooling.AVE, global_pooling=True)
+    Full_inproductName_Project = "{}_FullinProduct_Project".format(layerPrefix)
+    net[Full_inproductName_Project] = L.InnerProduct(net[Global_poolingName], num_output = channels * ratio)
+    Relu_Name = "{}_Relu".format(layerPrefix)
+    net[Relu_Name] = L.ReLU6(net[Full_inproductName_Project], in_place=True)
+    Full_inproductName_expand = "{}_FullinProduct_Expand".format(layerPrefix)
+    net[Full_inproductName_expand] = L.InnerProduct(net[Relu_Name], num_output = channels)
+    Sigmoid_Name = "{}_Sigmoid".format(layerPrefix)
+    net[Sigmoid_Name] = L.Sigmoid(net[Full_inproductName_expand], in_place= True)
+    Scale_name = "{}_AttentionScale".format(layerPrefix)
+    net[Scale_name] = L.AttentionScale(net[from_layer], net[Sigmoid_Name])
+    return Scale_name
+
+
+def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor, 
+                                    Use_BN = True, Use_scale = True, use_global_stats= False, Use_SE= False, **bn_param):
     if strides == 1:
         out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
         ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = True,
@@ -30,8 +39,12 @@ def MobilenetV2BottleBlock(net, from_layer, id, repeated_num, fileter_channels, 
                     num_output = fileter_channels * expansion_factor, kernel_size=3, pad=1, 
                     group= fileter_channels * expansion_factor,
                     stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
+        out_layer = out_layer_depthswise
+        if Use_SE:
+            out_layer = SEMoudleBlock(net, from_layer= out_layer, channels= fileter_channels * expansion_factor, 
+                                        layerPrefix= 'SE_{}_{}/{}'.format(id, repeated_num, 'attention'), ratio = 0.2) 
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
-        ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu=False,
+        ConvBNLayer(net, out_layer, out_layer_projects, use_bn=Use_BN, use_relu=False,
                     num_output = fileter_channels, kernel_size=1, pad=0, stride = strides, 
                     use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         res_name = 'Res_Sum_{}_{}'.format(id, repeated_num)
@@ -51,7 +64,7 @@ def MobilenetV2BottleBlock(net, from_layer, id, repeated_num, fileter_channels, 
                     num_output = fileter_channels, kernel_size=1, pad=0, stride = 1, use_scale = Use_scale
                     , use_global_stats= use_global_stats,
                     **bn_param)
-        return out_layer_projects           
+        return out_layer_projects
 
 
 def MobilenetV2Body(net, from_layer, Use_BN = True, **bn_param):
@@ -83,22 +96,22 @@ def MobilenetV2Body(net, from_layer, Use_BN = True, **bn_param):
     for _, (t, c, n, s) in enumerate(Inverted_residual_setting):
         if n > 1:
             if s == 2:
-                layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
+                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
                 out_layer = layer_name
                 index += 1
                 strides = 1
                 for id in range(n - 1):
-                    layer_name = MobilenetV2BottleBlock(net, out_layer, index, id, c, strides, t, Use_BN = True, Use_scale = True, **bn_param)
+                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, strides, t, Use_BN = True, Use_scale = True, **bn_param)
                     out_layer = layer_name
                     index += 1
             elif s == 1:
                 for id in range(n):
-                    layer_name = MobilenetV2BottleBlock(net, out_layer, index, id, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
+                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
                     out_layer = layer_name
                     index += 1
         elif n == 1:
             assert s == 1
-            layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
+            layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
             out_layer = layer_name
             index += 1
     return net
@@ -184,12 +197,12 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         accum_stride *= s
         if n > 1:
             if s == 2:
-                layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, 
+                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, 
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                 out_layer = layer_name
                 strides = 1
                 for id in range(n - 1):
-                    layer_name = MobilenetV2BottleBlock(net, out_layer, index, id + 1, c, strides, t, Use_BN = True, 
+                    layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, Use_BN = True, 
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
             elif s == 1:
@@ -199,7 +212,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                 num_output= c, kernel_size= 3, pad= 1, stride= 1,
                 lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
                 for id in range(n):
-                    layer_name = MobilenetV2BottleBlock(net, out_layer, index, id, c, s, t, Use_BN = True, 
+                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, Use_BN = True, 
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
         elif n == 1:
@@ -209,7 +222,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
             ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
                         num_output= c, kernel_size= 3, pad= 1, stride= 1,
                         lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-            layer_name = MobilenetV2BottleBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, 
+            layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, 
                                                         Use_scale = True,use_global_stats= use_global_stats, **bn_param)
             out_layer = layer_name
         if accum_stride in feature_stride:
@@ -253,3 +266,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_global_stats=use_global_stats)
         LayerList_Output.append(detect_layer)
     return net, LayerList_Output
+
+
+def efficientDetBody(net, from_layer, alpha, beta, gamma, Use_BN = True):
+    assert from_layer in net.keys()

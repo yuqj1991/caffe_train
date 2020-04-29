@@ -27,8 +27,8 @@ from caffe import layers as L
 from caffe import params as P
 
 python Caffe API
-Data²ã¶¨Òå
-lmdb/leveldb Data²ã¶¨Òå
+Dataå±‚å®šä¹‰
+lmdb/leveldb Dataå±‚å®šä¹‰
 
 L.Data( 
         source=lmdb,
@@ -41,7 +41,7 @@ L.Data(
                               )
         )
 
-HDF5 Data²ã¶¨Òå
+HDF5 Dataå±‚å®šä¹‰
 L.HDF5Data(
             hdf5_data_param={
                             'source': './training_data_paths.txt',  
@@ -52,7 +52,7 @@ L.HDF5Data(
                     }
             )
 
-mageData Data²ã¶¨Òå
+mageData Dataå±‚å®šä¹‰
 L.ImageData(
                 source=list_path,
                 batch_size=batch_size,
@@ -62,7 +62,7 @@ L.ImageData(
                 ransform_param=dict(crop_size=40,mirror=True)
                 )
 
-Convloution²ã¶¨Òå
+Convloutionå±‚å®šä¹‰
 L.Convolution(  
                 bottom, 
                 kernel_size=ks, 
@@ -71,14 +71,14 @@ L.Convolution(
                 pad=pad, 
                 group=group
                 )
-LRN²ã¶¨Òå
+LRNå±‚å®šä¹‰
 L.LRN(
         bottom, 
         local_size=5, 
         alpha=1e-4, 
         beta=0.75
         )
-Activation²ã¶¨Òå
+Activationå±‚å®šä¹‰
 L.ReLU(
         bottom, 
         in_place=True
@@ -89,37 +89,37 @@ L.Pooling(
             kernel_size=ks, 
             stride=stride
             )
-FullConnect²ã¶¨Òå
+FullConnectå±‚å®šä¹‰
 L.InnerProduct(
                 bottom, 
                 num_output=nout
                 )
-Dropout²ã¶¨Òå
+Dropoutå±‚å®šä¹‰
 L.Dropout(
             bottom, 
             in_place=True
             )
-Loss²ã¶¨Òå
+Losså±‚å®šä¹‰
 L.SoftmaxWithLoss(
                     bottom, 
                     label
                     )
 
+æŸ¥çœ‹æŸä¸€å±‚çš„å®½ï¼Œé«˜ï¼Œshapeï¼Œå¯ä»¥ç”¨net['layer_name'].blobs[].data.shape[]
 
+æ•°æ®å¢å¼ºæ•ˆæœå›¾
 
-Êı¾İÔöÇ¿Ğ§¹ûÍ¼
+å‡è®¾åŸå›¾è¾“å…¥æ˜¯ä¸€å¼ 640*480çš„å›¾ç‰‡ï¼Œè¿™é‡Œç”±äºç‰ˆé¢é—®é¢˜æˆ‘æ”¾ç¼©äº†å›¾ç‰‡å°ºå¯¸å¹¶ä¸”æ²¡åšmean subtractï¼Œç”±äºæœ€åä¼šæœ‰resizeå‚æ•°å¯¼è‡´è¾“å‡ºçš„å›¾ç‰‡éƒ½ä¼šresizeåˆ°300x300ï¼Œä½†æ˜¯ä¸»è¦çœ‹çš„æ˜¯å¢å¼ºçš„æ•ˆæœï¼ŒSSDä¸­çš„æ•°æ®å¢å¼ºçš„é¡ºåºæ˜¯ï¼š
 
-¼ÙÉèÔ­Í¼ÊäÈëÊÇÒ»ÕÅ640*480µÄÍ¼Æ¬£¬ÕâÀïÓÉÓÚ°æÃæÎÊÌâÎÒ·ÅËõÁËÍ¼Æ¬³ß´ç²¢ÇÒÃ»×ömean subtract£¬ÓÉÓÚ×îºó»áÓĞresize²ÎÊıµ¼ÖÂÊä³öµÄÍ¼Æ¬¶¼»áresizeµ½300x300£¬µ«ÊÇÖ÷Òª¿´µÄÊÇÔöÇ¿µÄĞ§¹û£¬SSDÖĞµÄÊı¾İÔöÇ¿µÄË³ĞòÊÇ£º
+DistortImage: è¿™ä¸ªä¸»è¦æ˜¯ä¿®æ”¹å›¾ç‰‡çš„brightnessï¼Œcontrastï¼Œsaturationï¼Œhueï¼Œreordering channelsï¼Œå¹¶æ²¡æ”¹å˜æ ‡ç­¾bbox
 
-DistortImage: Õâ¸öÖ÷ÒªÊÇĞŞ¸ÄÍ¼Æ¬µÄbrightness£¬contrast£¬saturation£¬hue£¬reordering channels£¬²¢Ã»¸Ä±ä±êÇ©bbox
+ExpandImage: è¿™ä¸ªä¸»è¦æ˜¯å°†DistortImageçš„å›¾ç‰‡ç”¨åƒç´ 0è¿›è¡Œæ‰©å±•ï¼Œæ ‡ç­¾bboxæ­¤æ—¶è‚¯å®šä¼šæ”¹å˜ï¼Œå°±é‡æ–°ä»¥é»‘è¾¹çš„å·¦ä¸Šè§’ä¸ºåŸç‚¹è®¡ç®—[0,1]çš„bboxçš„å·¦ä¸Šè§’å’Œå³ä¸‹è§’ä¸¤ä¸ªç‚¹åæ ‡ã€‚
 
-ExpandImage: Õâ¸öÖ÷ÒªÊÇ½«DistortImageµÄÍ¼Æ¬ÓÃÏñËØ0½øĞĞÀ©Õ¹£¬±êÇ©bbox´ËÊ±¿Ï¶¨»á¸Ä±ä£¬¾ÍÖØĞÂÒÔºÚ±ßµÄ×óÉÏ½ÇÎªÔ­µã¼ÆËã[0,1]µÄbboxµÄ×óÉÏ½ÇºÍÓÒÏÂ½ÇÁ½¸öµã×ø±ê¡£
+BatchSampler: ç”±äºè¿™é‡Œé€‰é”™å›¾äº†ï¼ŒBatchSamplerå¿…é¡»è¦æœ‰GTçš„å­˜åœ¨æ‰ä¼šç”Ÿæ•ˆï¼Œç”±äºæˆ‘åšçš„æ˜¯äººçš„æ£€æµ‹æ‰€ä»¥å›¾ä¸­æ²¡äººå°±ä¸ä¼šç”Ÿæˆsampled_bboxesï¼Œåé¢ä¿®æ”¹ä¾‹å­ã€‚sampled_bboxesçš„å€¼æ˜¯éšæœºåœ¨[0, 1]ä¸Šç”Ÿæˆçš„bboxï¼Œå¹¶ä¸”å’ŒæŸä¸ªgt_bboxesçš„IOUåœ¨[min, max]ä¹‹é—´ã€‚ç”±äºprotoä¸­é…çš„max_sampleéƒ½æ˜¯ä¸º1ï¼Œæ‰€ä»¥æ¯ä¸ªbatch_samplerå¯èƒ½ä¼šæœ‰1ä¸ªsampled_bboxï¼Œéšæœºå–ä¸€ä¸ªsampled bboxå¹¶ä¸”è£å‰ªå›¾ç‰‡å’Œæ ‡ç­¾ã€‚æ ‡ç­¾è£å‰ªä¹Ÿå¾ˆå¥½ç†è§£é¦–å…ˆè¦é€šè¿‡ProjectBBoxå°†åŸåæ ‡ç³»æ ‡ç­¾æŠ•å½±åˆ°è£å‰ªåå›¾ç‰‡çš„æ–°åæ ‡ç³»çš„åæ ‡ï¼Œç„¶åå†ClipBBoxåˆ°[0,1]ä¹‹é—´ã€‚
 
-BatchSampler: ÓÉÓÚÕâÀïÑ¡´íÍ¼ÁË£¬BatchSampler±ØĞëÒªÓĞGTµÄ´æÔÚ²Å»áÉúĞ§£¬ÓÉÓÚÎÒ×öµÄÊÇÈËµÄ¼ì²âËùÒÔÍ¼ÖĞÃ»ÈË¾Í²»»áÉú³Ésampled_bboxes£¬ºóÃæĞŞ¸ÄÀı×Ó¡£sampled_bboxesµÄÖµÊÇËæ»úÔÚ[0, 1]ÉÏÉú³ÉµÄbbox£¬²¢ÇÒºÍÄ³¸ögt_bboxesµÄIOUÔÚ[min, max]Ö®¼ä¡£ÓÉÓÚprotoÖĞÅäµÄmax_sample¶¼ÊÇÎª1£¬ËùÒÔÃ¿¸öbatch_sampler¿ÉÄÜ»áÓĞ1¸ösampled_bbox£¬Ëæ»úÈ¡Ò»¸ösampled bbox²¢ÇÒ²Ã¼ôÍ¼Æ¬ºÍ±êÇ©¡£±êÇ©²Ã¼ôÒ²ºÜºÃÀí½âÊ×ÏÈÒªÍ¨¹ıProjectBBox½«Ô­×ø±êÏµ±êÇ©Í¶Ó°µ½²Ã¼ôºóÍ¼Æ¬µÄĞÂ×ø±êÏµµÄ×ø±ê£¬È»ºóÔÙClipBBoxµ½[0,1]Ö®¼ä¡£
+Resizeï¼šæ”¾ç¼©åˆ°300x300ï¼Œæœ€åå°†å›¾ç‰‡æ”¾ç¼©åˆ°300x300ï¼Œæ ‡ç­¾æ¡†ä¹Ÿæ˜¯çº¿æ€§æ”¾ç¼©åæ ‡è€Œå·²ã€‚
 
-Resize£º·ÅËõµ½300x300£¬×îºó½«Í¼Æ¬·ÅËõµ½300x300£¬±êÇ©¿òÒ²ÊÇÏßĞÔ·ÅËõ×ø±ê¶øÒÑ¡£
+Cropï¼šåŸæœ¬data_transformerè¿˜ä¼šcropçš„ï¼Œè¿™ä¸ªå‚æ•°æ˜¯é…åœ¨prototxtä¸­ï¼Œé»˜è®¤æ˜¯åŸå›¾ æ‰€ä»¥å°±å’Œæ²¡cropä¸€æ ·ã€‚å¦‚æœè¦cropçš„è¯æ ‡ç­¾ä¹Ÿæ˜¯ä¼šå’Œä¹‹å‰BatchSampleré‚£æ ·å¤„ç†ã€‚
 
-Crop£ºÔ­±¾data_transformer»¹»ácropµÄ£¬Õâ¸ö²ÎÊıÊÇÅäÔÚprototxtÖĞ£¬Ä¬ÈÏÊÇÔ­Í¼ ËùÒÔ¾ÍºÍÃ»cropÒ»Ñù¡£Èç¹ûÒªcropµÄ»°±êÇ©Ò²ÊÇ»áºÍÖ®Ç°BatchSamplerÄÇÑù´¦Àí¡£
-
-Êı¾İÔöÇ¿£¬data_anchor_sampler
-ÔÚÒ»ÕÅÍ¼ÏñÖĞËæ»ú³éÈ¡Ò»ÕÅsface
+æ•°æ®å¢å¼ºï¼Œdata_anchor_sampler
+åœ¨ä¸€å¼ å›¾åƒä¸­éšæœºæŠ½å–ä¸€å¼ sface
