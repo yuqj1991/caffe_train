@@ -10,6 +10,30 @@ from caffe import params as P
 from caffe.proto import caffe_pb2
 from caffe.model_libs import *
 
+import math
+
+def round_filters(filters, width_coefficient, min_depth=None, depth_divisor= 8, skip=False):
+  """Round number of filters based on depth multiplier."""
+  orig_f = filters
+  if skip or not width_coefficient:
+    return filters
+
+  filters *= width_coefficient
+  min_depth = min_depth or depth_divisor
+  new_filters = max(min_depth, int(filters + depth_divisor / 2) // depth_divisor * depth_divisor)
+  # Make sure that round down does not go down by more than 10%.
+  if new_filters < 0.9 * filters:
+    new_filters += depth_divisor
+  logging.info('round_filter input=%s output=%s', orig_f, new_filters)
+  return int(new_filters)
+
+
+def round_repeats(repeats, depth_coefficient, skip=False):
+  """Round number of filters based on depth multiplier."""
+  if skip or not depth_coefficient:
+    return repeats
+  return int(math.ceil(depth_coefficient * repeats))
+
 def SEMoudleBlock(net, from_layer, channels, layerPrefix= '', ratio = 0.2):
     assert from_layer in net.keys()
     Global_poolingName= "{}_GloabalPool".format(layerPrefix)
@@ -27,8 +51,8 @@ def SEMoudleBlock(net, from_layer, channels, layerPrefix= '', ratio = 0.2):
     return Scale_name
 
 
-def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor, 
-                                    Use_BN = True, Use_scale = True, use_global_stats= False, Use_SE= False, **bn_param):
+def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor, kernel_size= 3,
+                        Use_BN = True, Use_scale = True, use_global_stats= False, Use_SE= False, **bn_param):
     if strides == 1:
         out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
         ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = True,
@@ -36,13 +60,13 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
                     pad=0, stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
         ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu=True,
-                    num_output = fileter_channels * expansion_factor, kernel_size=3, pad=1, 
+                    num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=1, 
                     group= fileter_channels * expansion_factor,
                     stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer = out_layer_depthswise
         if Use_SE:
             out_layer = SEMoudleBlock(net, from_layer= out_layer, channels= fileter_channels * expansion_factor, 
-                                        layerPrefix= 'SE_{}_{}/{}'.format(id, repeated_num, 'attention'), ratio = 0.2) 
+                                        layerPrefix= 'SE_{}_{}/{}'.format(id, repeated_num, 'attention'), ratio = 0.25) 
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
         ConvBNLayer(net, out_layer, out_layer_projects, use_bn=Use_BN, use_relu=False,
                     num_output = fileter_channels, kernel_size=1, pad=0, stride = strides, 
@@ -57,7 +81,7 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
                     use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
         ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu=True,
-                    num_output = fileter_channels * expansion_factor, kernel_size=1, pad=0, stride = strides, 
+                    num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=0, stride = strides, 
                     group= fileter_channels * expansion_factor, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
         ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu=False,
@@ -268,5 +292,111 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
     return net, LayerList_Output
 
 
-def efficientDetBody(net, from_layer, alpha, beta, gamma, Use_BN = True):
+def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_BN = True, use_global_stats= False, **bn_param):
     assert from_layer in net.keys()
+    index = 0
+    feature_stride = [4, 8, 16, 32]
+    accum_stride = 1
+    pre_stride = 1
+    LayerList_Name = []
+    LayerList_Output = []
+    LayerFilters = []
+    out_layer = "conv_{}".format(index)
+    Param_width_channel= round_filters(32, width_coefficient)
+    ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,
+                num_output= Param_width_channel, kernel_size=3, pad=1, stride = 2, use_scale = True,
+                use_global_stats= use_global_stats,
+                **bn_param)
+    accum_stride *= 2
+    pre_channels= Param_width_channel
+                                 #e  c   r  s  k
+    Inverted_residual_setting = [[1, 16, 1, 1, 3],
+                                 [6, 24, 2, 2, 3],
+                                 [6, 40, 2, 2, 5],
+                                 [6, 80, 3, 2, 3],
+                                 [6, 112, 3, 1, 5],
+                                 [6, 192, 4, 2, 5],
+                                 [6, 320, 1, 1, 3]]
+    '''
+    _DEFAULT_BLOCKS_ARGS = [
+    'r1_k3_s11_e1_i32_o16_se0.25', 'r2_k3_s22_e6_i16_o24_se0.25',
+    'r2_k5_s22_e6_i24_o40_se0.25', 'r3_k3_s22_e6_i40_o80_se0.25',
+    'r3_k5_s11_e6_i80_o112_se0.25', 'r4_k5_s22_e6_i112_o192_se0.25',
+    'r1_k3_s11_e6_i192_o320_se0.25',
+    ]
+    '''
+    for _, (t, c, n, s, k) in enumerate(Inverted_residual_setting):
+        accum_stride *= s
+        c = round_filters(c, width_coefficient)
+        n = round_repeats(n, depth_coefficient)
+        if n > 1:
+            if s == 2:
+                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, kernel_size= k, Use_BN = True, 
+                                                        Use_scale = True, use_global_stats= use_global_stats, Use_SE=True,  **bn_param)
+                out_layer = layer_name
+                strides = 1
+                for id in range(n - 1):
+                    layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, kernel_size= k, Use_BN = True, 
+                                                        Use_scale = True, use_global_stats= use_global_stats, Use_SE=True, **bn_param)
+                    out_layer = layer_name
+            elif s == 1:
+                Project_Layer = out_layer
+                out_layer= "Conv_project_{}_{}".format(pre_channels, c)
+                ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
+                num_output= c, kernel_size= 3, pad= 1, stride= 1,
+                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+                for id in range(n):
+                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, kernel_size= k, Use_BN = True, 
+                                                        Use_scale = True, use_global_stats= use_global_stats, Use_SE=True, **bn_param)
+                    out_layer = layer_name
+        elif n == 1:
+            assert s == 1
+            Project_Layer = out_layer
+            out_layer= "Conv_project_{}_{}".format(pre_channels, c)
+            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
+                        num_output= c, kernel_size= 3, pad= 1, stride= 1,
+                        lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+            layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, kernel_size= k, Use_BN = True, 
+                                                        Use_scale = True,use_global_stats= use_global_stats, Use_SE=True, **bn_param)
+            out_layer = layer_name
+        if accum_stride in feature_stride:
+            if accum_stride != pre_stride:
+                LayerList_Name.append(out_layer)
+                LayerFilters.append(c)
+            elif accum_stride == pre_stride:
+                LayerList_Name[len(LayerList_Name) - 1] = out_layer
+                LayerFilters[len(LayerFilters) - 1] = c
+            pre_stride = accum_stride
+        index += 1
+        pre_channels = c
+    assert len(LayerList_Name) == len(feature_stride)
+    net_last_layer = net.keys()[-1]
+    out_layer = "conv_1_project/DepthWise"
+    ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
+                num_output= 320, kernel_size= 3, pad= 1, stride= 2, group= 320,
+                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+    net_last_layer = out_layer
+    out_layer = "conv_1_project/linear"
+    ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
+                num_output= 320, kernel_size= 1, pad= 0, stride= 1,
+                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+    for index in range(len(feature_stride)):
+        #Deconv_layer scale up 2x2_s2
+        channel_stage = LayerFilters[len(LayerFilters) - index - 1]
+        net_last_layer = out_layer
+        Reconnect_layer_one = "Deconv_Scale_Up_Stage_{}".format(channel_stage)
+        ConvBNLayer(net, net_last_layer, Reconnect_layer_one, use_bn= True, use_relu = False, 
+            num_output= channel_stage, kernel_size= 2, pad= 0, stride= 2,
+            lr_mult=1, Use_DeConv= True, use_scale= True, use_global_stats= use_global_stats)
+        
+        # conv_layer linear 1x1
+        net_last_layer= LayerList_Name[len(feature_stride) - index - 1]
+        Reconnect_layer_two= "{}_linear".format(LayerList_Name[len(feature_stride) - index - 1])
+        ConvBNLayer(net, net_last_layer, Reconnect_layer_two, use_bn= True, use_relu = False, 
+            num_output= channel_stage, kernel_size= 1, pad= 0, stride= 1,
+            lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
+        
+        # eltwise_sum layer
+        out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_global_stats=use_global_stats)
+        LayerList_Output.append(detect_layer)
+    return net, LayerList_Output
