@@ -475,7 +475,7 @@ layer {
     num_output: 144
     bias_term: false
     pad: 0
-    kernel_size: 1
+    kernel_size: 3
     group: 144
     stride: 2
     weight_filler {
@@ -898,7 +898,7 @@ layer {
     num_output: 192
     bias_term: false
     pad: 0
-    kernel_size: 1
+    kernel_size: 3
     group: 192
     stride: 2
     weight_filler {
@@ -1536,7 +1536,7 @@ layer {
     num_output: 384
     bias_term: false
     pad: 0
-    kernel_size: 1
+    kernel_size: 3
     group: 384
     stride: 2
     weight_filler {
@@ -3105,7 +3105,7 @@ layer {
     num_output: 960
     bias_term: false
     pad: 0
-    kernel_size: 1
+    kernel_size: 3
     group: 960
     stride: 2
     weight_filler {

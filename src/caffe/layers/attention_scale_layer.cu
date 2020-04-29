@@ -19,7 +19,7 @@ void AttentionScaleLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     int width = bottom[0]->width();
     for(int b = 0; b < batch_size_; b++){
       for(int c = 0; c < channels; c++){
-        caffe_scal(height * width, bottom_data_b + c, top_data + c * height * width);
+        caffe_scal(height * width, bottom_data_b[c], top_data + c * height * width);
       }
       top_data += top[0]->offset(1);
       bottom_data_b += bottom[1]->offset(1);
@@ -47,7 +47,8 @@ void AttentionScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         int width = bottom[0]->width();
         for(int b = 0; b < batch_size_; b++){
           for(int c = 0; c < channels; c++){
-            Dtype diff = caffe_gpu_asum(height * width, bottom_data_a + c * height * width);
+            Dtype diff = 0.f;
+            caffe_gpu_asum(height * width, bottom_data_a + c * height * width, &diff);
             caffe_copy(1, &diff, bottom_diff + c);
           }
           bottom_diff += bottom[i]->offset(1);

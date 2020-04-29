@@ -34,7 +34,7 @@ void AttentionScaleLayer<Dtype>::Forward_cpu(
   int width = bottom[0]->width();
   for(int b = 0; b < batch_size_; b++){
     for(int c = 0; c < channels; c++){
-      caffe_scal(height * width, bottom_data_b + c, top_data + c * height * width);
+      caffe_scal(height * width, bottom_data_b[c], top_data + c * height * width);
     }
     top_data += top[0]->offset(1);
     bottom_data_b += bottom[1]->offset(1);

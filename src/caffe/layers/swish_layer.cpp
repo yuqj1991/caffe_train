@@ -7,7 +7,7 @@ namespace caffe {
 
 template <typename Dtype>
 inline Dtype sigmoid(Dtype x) {
-  return 1. / (1. + exp(-x);
+  return 1. / (1. + exp(-x));
 } 
 template <typename Dtype>
 inline Dtype swish(Dtype x, Dtype beta) {
