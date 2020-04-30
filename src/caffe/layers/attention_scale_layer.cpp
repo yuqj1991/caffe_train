@@ -18,7 +18,9 @@ void AttentionScaleLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   for (int i = 1; i < bottom.size(); ++i) {
     CHECK(bottom[i]->channels() == bottom[0]->channels());
   }
+  CHECK_EQ(bottom[0]->channels(), bottom[1]->count());
   top[0]->ReshapeLike(*bottom[0]);
+  temp_data_.Reshape(*bottom[0]);
 }
 
 template <typename Dtype>
@@ -47,7 +49,7 @@ void AttentionScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   const int count = top[0]->count();
   const Dtype* top_data = top[0]->cpu_data();
   const Dtype* top_diff = top[0]->cpu_diff();
-
+  Dtype* temp_diff = temp_data_.mutable_cpu_data();
   for (int i = 0; i < bottom.size(); ++i) {
     if (propagate_down[i]) {
       const Dtype* bottom_data = bottom[i]->cpu_data();
@@ -62,11 +64,14 @@ void AttentionScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         int width = bottom[0]->width();
         for(int b = 0; b < batch_size_; b++){
           for(int c = 0; c < channels; c++){
-            Dtype diff = caffe_cpu_asum(height * width, bottom_data_a + c * height * width);
+            caffe_mul(height * width, bottom_data_a + c * height * width, top_diff + c * height * width, temp_diff + c * height * width);
+            Dtype diff = caffe_cpu_asum(height * width, temp_diff + c * height * width);
             caffe_copy(1, &diff, bottom_diff + c);
           }
           bottom_diff += bottom[i]->offset(1);
           bottom_data_a += bottom[0]->offset(1);
+          temp_diff += temp_data_.offset(1);
+          top_diff += top[0]->offset(1);
         }
       }
     }

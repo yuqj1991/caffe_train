@@ -8,31 +8,10 @@ except ImportError:
 from caffe import layers as L
 from caffe import params as P
 from caffe.proto import caffe_pb2
-from caffe.model_libs import *
+from caffe.utils import *
 
 import math
 
-def round_filters(filters, width_coefficient, min_depth=None, depth_divisor= 8, skip=False):
-  """Round number of filters based on depth multiplier."""
-  orig_f = filters
-  if skip or not width_coefficient:
-    return filters
-
-  filters *= width_coefficient
-  min_depth = min_depth or depth_divisor
-  new_filters = max(min_depth, int(filters + depth_divisor / 2) // depth_divisor * depth_divisor)
-  # Make sure that round down does not go down by more than 10%.
-  if new_filters < 0.9 * filters:
-    new_filters += depth_divisor
-  logging.info('round_filter input=%s output=%s', orig_f, new_filters)
-  return int(new_filters)
-
-
-def round_repeats(repeats, depth_coefficient, skip=False):
-  """Round number of filters based on depth multiplier."""
-  if skip or not depth_coefficient:
-    return repeats
-  return int(math.ceil(depth_coefficient * repeats))
 
 def SEMoudleBlock(net, from_layer, channels, layerPrefix= '', ratio = 0.2):
     assert from_layer in net.keys()
@@ -49,6 +28,13 @@ def SEMoudleBlock(net, from_layer, channels, layerPrefix= '', ratio = 0.2):
     Scale_name = "{}_AttentionScale".format(layerPrefix)
     net[Scale_name] = L.AttentionScale(net[from_layer], net[Sigmoid_Name])
     return Scale_name
+
+
+def BiFPNBlock(net, from_layers= [], num_levels = 5):
+    assert from_layers in net.keys()
+    assert len(from_layers) == num_levels
+
+
 
 
 def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor, kernel_size= 3,
