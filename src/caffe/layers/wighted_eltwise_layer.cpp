@@ -1,6 +1,6 @@
 #include <cmath>
 #include <vector>
-
+#include "caffe/filler.hpp"
 #include "caffe/layers/wighted_eltwise_layer.hpp"
 
 namespace caffe {
@@ -31,6 +31,7 @@ inline Dtype NormalSum(const Dtype* x, int size){
   return sumValue + 0.0001;
 }
 
+template <typename Dtype>
 void WightEltwiseLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   // Check if we need to set up the weights
@@ -56,19 +57,19 @@ void WightEltwiseLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   vector<int> top_shape = bottom[0]->shape();
   for(unsigned i = 0; i < bottom.size(); i++){
-    CHECK_EQ(top_shape, bottom[i]->shape());
+    CHECK(bottom[i]->shape() == bottom[0]->shape());
   }
   CHECK_GE(bottom.size(), 2);
   top[0]->Reshape(top_shape);
   temp_diff_.Reshape(top_shape);
-  weight_Normal_.Reshape(this->blobs[0]);
+  weight_Normal_.Reshape(this->blobs_[0]->shape());
 }
 
 
 template <typename Dtype>
 void WightEltwiseLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-  int bottome_size = bottom.size();
+  int bottom_size = bottom.size();
   const int count = top[0]->count();
   const Dtype* weight = this->blobs_[0]->cpu_data();
   Dtype* top_data = top[0]->mutable_cpu_data();
@@ -79,7 +80,7 @@ void WightEltwiseLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
   }else if(fusionOp_ == WightedEltwiseParameter_FusionOp_SOFTMAX){
     Dtype maxValue = Dtype(0.);
-    Dtype sumValue = expSum<Dtype>(weight, bottome_size, &maxValue);
+    Dtype sumValue = expSum<Dtype>(weight, bottom_size, &maxValue);
     Dtype* weight_Normal_data = weight_Normal_.mutable_cpu_data();
     for (int i = 0; i < bottom_size; ++i) {
       Dtype SoftWight = std::exp(weight[i] - maxValue) / sumValue;
@@ -87,7 +88,7 @@ void WightEltwiseLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       caffe_axpy(count, SoftWight, bottom[i]->cpu_data(), top_data);
     }
   }else if(fusionOp_ == WightedEltwiseParameter_FusionOp_FASTER){
-    Dtype sumValue = NormalSum<Dtype>(weight, bottome_size);
+    Dtype sumValue = NormalSum<Dtype>(weight, bottom_size);
     Dtype* weight_Normal_data = weight_Normal_.mutable_cpu_data();
     for (int i = 0; i < bottom_size; ++i) {
       Dtype NormalWeight = (weight[i]) / (sumValue);
@@ -101,7 +102,7 @@ template <typename Dtype>
 void WightEltwiseLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
-  int bottome_size = bottom.size();
+  int bottom_size = bottom.size();
   const Dtype *weight = this->blobs_[0]->cpu_data();
   const Dtype *top_diff = top[0]->cpu_diff();
   const Dtype *top_data = top[0]->cpu_data();
@@ -142,17 +143,18 @@ void WightEltwiseLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       for (int j = 0; j < bottom_size; ++j) {
         const int count = bottom[j]->count();
         const Dtype* bottom_data = bottom[j]->cpu_data();
-        caffe_mul(count, bottom_data - top_data, top_diff, temp_data);
+        caffe_sub(count, bottom_data, top_data, temp_data);
+        caffe_mul(count, temp_data, top_diff, temp_data);
         weight_diff[j] = caffe_cpu_asum(count, temp_diff_.cpu_data());
         weight_diff[j] *= weight_Normal_data[j] ;
       }
     }else if(fusionOp_ == WightedEltwiseParameter_FusionOp_FASTER){
-      const Dtype* weight_Normal_data = weight_Normal_.cpu_data();
-      Dtype sumValue = NormalSum<Dtype>(weight, bottome_size);
+      Dtype sumValue = NormalSum<Dtype>(weight, bottom_size);
       for (int j = 0; j < bottom_size; ++j) {
         const int count = bottom[j]->count();
         const Dtype* bottom_data = bottom[j]->cpu_data();
-        caffe_mul(count, bottom_data - top_data, top_diff, temp_data);
+        caffe_sub(count, bottom_data, top_data, temp_data);
+        caffe_mul(count, temp_data, top_diff, temp_data);
         weight_diff[j] = caffe_cpu_asum(count, temp_diff_.cpu_data());
         weight_diff[j] /= sumValue ;
       }

@@ -20,7 +20,7 @@ void AttentionScaleLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   }
   CHECK_EQ(bottom[0]->channels(), bottom[1]->count());
   top[0]->ReshapeLike(*bottom[0]);
-  temp_data_.Reshape(*bottom[0]);
+  temp_data_.ReshapeLike(*bottom[0]);
 }
 
 template <typename Dtype>

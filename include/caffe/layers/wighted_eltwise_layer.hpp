@@ -7,7 +7,7 @@
 #include "caffe/layer.hpp"
 #include "caffe/proto/caffe.pb.h"
 
-#include "caffe/layers/neuron_layer.hpp"
+#include "caffe/layer.hpp"
 
 namespace caffe {
 
@@ -19,7 +19,7 @@ template <typename Dtype>
 class WightEltwiseLayer : public Layer<Dtype> {
  public:
   explicit WightEltwiseLayer(const LayerParameter& param)
-      : NeuronLayer<Dtype>(param) {}
+      : Layer<Dtype>(param) {}
 
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
