@@ -14,7 +14,7 @@
 
 namespace caffe {
 
-float IouThread = 0.05;
+float IouThread = 0.01;
 
 bool SortBBoxAscend(const NormalizedBBox& bbox1, const NormalizedBBox& bbox2) {
   return bbox1.score() < bbox2.score();
