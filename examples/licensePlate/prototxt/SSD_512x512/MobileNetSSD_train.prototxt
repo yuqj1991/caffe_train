@@ -42,12 +42,12 @@ layer {
     }
     expand_param {
       prob: 0.5
-      max_expand_ratio: 4.0
+      max_expand_ratio: 2.0
     }
   }
   data_param {
     source: "../../../../dataset/car_person_data/car_license/ccpd_dataset/lmdb/ccpd_dataset_training_lmdb/"
-		batch_size: 16
+		batch_size: 8
 		backend: LMDB
   }
   annotated_data_param {
@@ -3181,7 +3181,7 @@ layer {
     num_classes: 2
     share_location: true
     match_type: PER_PREDICTION
-    overlap_threshold: 0.75
+    overlap_threshold: 0.55
     use_prior_for_matching: true
     background_label_id: 0
     use_difficult_gt: true
