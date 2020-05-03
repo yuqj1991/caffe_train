@@ -2458,15 +2458,15 @@ layer {
   bottom: "data"
   top: "conv11_mbox_priorbox"
   prior_box_param {
-   	 min_size: 17.0
-	max_size: 27.2
-	flip: true
-	clip: false
-	variance: 0.1
-	variance: 0.1
-	variance: 0.2
-	variance: 0.2
-	offset: 0.5
+   	min_size: 17.0
+    max_size: 27.2
+    flip: true
+    clip: false
+    variance: 0.1
+    variance: 0.1
+    variance: 0.2
+    variance: 0.2
+    offset: 0.5
   }
 }
 layer {
@@ -2568,16 +2568,16 @@ layer {
   bottom: "data"
   top: "conv13_mbox_priorbox"
   prior_box_param {
-    	min_size: 27.2
-	max_size: 54.4
-	aspect_ratio: 2.0
-	flip: true
-	clip: false
-	variance: 0.1
-	variance: 0.1
-	variance: 0.2
-	variance: 0.2
-	offset: 0.5
+    min_size: 27.2
+    max_size: 54.4
+    aspect_ratio: 2.0
+    flip: true
+    clip: false
+    variance: 0.1
+    variance: 0.1
+    variance: 0.2
+    variance: 0.2
+    offset: 0.5
   }
 }
 layer {
@@ -2679,15 +2679,15 @@ layer {
   bottom: "data"
   top: "conv14_2_mbox_priorbox"
   prior_box_param {
-    	min_size: 54.4
-	max_size: 108.8
-	flip: true
-	clip: false
-	variance: 0.1
-	variance: 0.1
-	variance: 0.2
-	variance: 0.2
-	offset: 0.5
+    min_size: 54.4
+    max_size: 108.8
+    flip: true
+    clip: false
+    variance: 0.1
+    variance: 0.1
+    variance: 0.2
+    variance: 0.2
+    offset: 0.5
   }
 }
 layer {
@@ -2789,15 +2789,15 @@ layer {
   bottom: "data"
   top: "conv15_2_mbox_priorbox"
   prior_box_param {
-    	min_size: 108.8
-	max_size: 217.6
-	flip: true
-	clip: false
-	variance: 0.1
-	variance: 0.1
-	variance: 0.2
-	variance: 0.2
-	offset: 0.5
+    min_size: 108.8
+    max_size: 217.6
+    flip: true
+    clip: false
+    variance: 0.1
+    variance: 0.1
+    variance: 0.2
+    variance: 0.2
+    offset: 0.5
   }
 }
 layer {
@@ -2899,15 +2899,15 @@ layer {
   bottom: "data"
   top: "conv16_2_mbox_priorbox"
   prior_box_param {
-    	min_size: 217.6
-	max_size: 363.8
-	flip: true
-	clip: false
-	variance: 0.1
-	variance: 0.1
-	variance: 0.2
-	variance: 0.2
-	offset: 0.5
+    min_size: 217.6
+    max_size: 363.8
+    flip: true
+    clip: false
+    variance: 0.1
+    variance: 0.1
+    variance: 0.2
+    variance: 0.2
+    offset: 0.5
   }
 }
 layer {
@@ -3009,15 +3009,15 @@ layer {
   bottom: "data"
   top: "conv17_2_mbox_priorbox"
   prior_box_param {
-    	min_size: 363.8
-	max_size: 500.0
-	flip: true
-	clip: false
-	variance: 0.1
-	variance: 0.1
-	variance: 0.2
-	variance: 0.2
-	offset: 0.5
+    min_size: 363.8
+    max_size: 500.0
+    flip: true
+    clip: false
+    variance: 0.1
+    variance: 0.1
+    variance: 0.2
+    variance: 0.2
+    offset: 0.5
   }
 }
 layer {
