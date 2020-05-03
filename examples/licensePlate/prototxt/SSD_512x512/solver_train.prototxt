@@ -1,0 +1,27 @@
+train_net: "../prototxt/SSD_512x512/MobileNetSSD_train.prototxt"
+test_net: "../prototxt/SSD_512x512/MobileNetSSD_test.prototxt"
+test_iter: 1500
+test_interval: 5000
+base_lr: 0.01
+display: 100
+max_iter: 200000
+lr_policy: "multistep"
+gamma: 0.5
+weight_decay: 0.0001
+snapshot: 5000
+snapshot_prefix: "../snapshot/SSD_512"
+solver_mode: GPU
+debug_info: false
+snapshot_after_train: true
+test_initialization: false
+average_loss: 10
+stepvalue: 80000
+stepvalue: 100000
+stepvalue: 120000
+stepvalue: 160000
+iter_size: 2
+momentum2 : 0.99
+type: "RMSProp"
+eval_type: "detection"
+ap_version: "11point"
+
