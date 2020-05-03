@@ -3158,7 +3158,7 @@ layer {
 }
 layer {
   name: "mbox_loss"
-  type: "MultiBoxLoss"
+  type: "MultiBoxSSDLoss"
   bottom: "mbox_loc"
   bottom: "mbox_conf"
   bottom: "mbox_priorbox"
