@@ -936,11 +936,6 @@ void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
             if(y_inside_gt_box && x_inside_gt_box){
               center_match_gt_idx = j;
               center_match_overlap = it->second[j];
-              /*if(BBoxCoverage(gt_bboxes[j], pred_bboxes[i]) > 0.25 
-                                  && BBoxCoverage(pred_bboxes[i], gt_bboxes[j]) > 0.25){
-                center_match_gt_idx = j;
-                center_match_overlap = it->second[j];
-              }*/
             }
           }
           if (center_match_gt_idx != -1) {
