@@ -57,7 +57,7 @@ def generate_label(imagefilepath, labelfilepath, classflydataFile):
 	classfly_file.close()
 
 
-def generate_setfile(imagefiledir, setfile, dirprefix):
+def generate_setfile(imagefiledir, setfile):
 	setfile_ = open(setfile, "a+")
 	global lengthTrain
 	for imagefilepath in os.listdir(imagefiledir):
