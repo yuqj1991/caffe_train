@@ -16,8 +16,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 640
-			width: 640
+			height: 608
+			width: 608
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
@@ -51,6 +51,7 @@ layer {
 		low_prob: 0.4
 		label_map_file: "../labelmap.prototxt"
 		yoloformat: true
+		crop_type: CROP_JITTER
 	}
 }
 
@@ -1461,7 +1462,6 @@ layer{
 	convolution_param {
 		num_output: 256
 		kernel_size: 1
-		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1627,7 +1627,6 @@ layer{
 	convolution_param {
 		num_output: 256
 		kernel_size: 1
-		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1793,7 +1792,6 @@ layer{
 	convolution_param {
 		num_output: 512
 		kernel_size: 1
-		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1889,24 +1887,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 8
-		bias_scale: 14
-		bias_scale: 13
-		bias_scale: 24
-		bias_scale: 21
-		bias_scale: 37
-		bias_scale: 32
-		bias_scale: 56
-		bias_scale: 54
-		bias_scale: 83
-		bias_scale: 76
-		bias_scale: 139
-		bias_scale: 132
-		bias_scale: 190
-		bias_scale: 207
-		bias_scale: 296
-		bias_scale: 324
-		bias_scale: 416
+		bias_scale: 7.67
+		bias_scale: 12.93
+		bias_scale: 12.00
+		bias_scale: 22.53
+		bias_scale: 19.4
+		bias_scale: 35.13
+		bias_scale: 30.17
+		bias_scale: 53.60
+		bias_scale: 51.13
+		bias_scale: 78.69
+		bias_scale: 72.16
+		bias_scale: 132.0
+		bias_scale: 125.64
+		bias_scale: 180.48
+		bias_scale: 196.59
+		bias_scale: 281.10
+		bias_scale: 307.67
+		bias_scale: 395.16
 
 		bias_num: 9
 
@@ -1939,24 +1937,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 8
-		bias_scale: 14
-		bias_scale: 13
-		bias_scale: 24
-		bias_scale: 21
-		bias_scale: 37
-		bias_scale: 32
-		bias_scale: 56
-		bias_scale: 54
-		bias_scale: 83
-		bias_scale: 76
-		bias_scale: 139
-		bias_scale: 132
-		bias_scale: 190
-		bias_scale: 207
-		bias_scale: 296
-		bias_scale: 324
-		bias_scale: 416
+		bias_scale: 7.67
+		bias_scale: 12.93
+		bias_scale: 12.00
+		bias_scale: 22.53
+		bias_scale: 19.4
+		bias_scale: 35.13
+		bias_scale: 30.17
+		bias_scale: 53.60
+		bias_scale: 51.13
+		bias_scale: 78.69
+		bias_scale: 72.16
+		bias_scale: 132.0
+		bias_scale: 125.64
+		bias_scale: 180.48
+		bias_scale: 196.59
+		bias_scale: 281.10
+		bias_scale: 307.67
+		bias_scale: 395.16
 		
 		bias_num: 9
 
@@ -1990,24 +1988,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 8
-		bias_scale: 14
-		bias_scale: 13
-		bias_scale: 24
-		bias_scale: 21
-		bias_scale: 37
-		bias_scale: 32
-		bias_scale: 56
-		bias_scale: 54
-		bias_scale: 83
-		bias_scale: 76
-		bias_scale: 139
-		bias_scale: 132
-		bias_scale: 190
-		bias_scale: 207
-		bias_scale: 296
-		bias_scale: 324
-		bias_scale: 416
+		bias_scale: 7.67
+		bias_scale: 12.93
+		bias_scale: 12.00
+		bias_scale: 22.53
+		bias_scale: 19.4
+		bias_scale: 35.13
+		bias_scale: 30.17
+		bias_scale: 53.60
+		bias_scale: 51.13
+		bias_scale: 78.69
+		bias_scale: 72.16
+		bias_scale: 132.0
+		bias_scale: 125.64
+		bias_scale: 180.48
+		bias_scale: 196.59
+		bias_scale: 281.10
+		bias_scale: 307.67
+		bias_scale: 395.16
 		
 		bias_num: 9
 

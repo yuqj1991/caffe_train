@@ -22,7 +22,7 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   // bias_mask_
   if(center_object_loss_param.has_bias_num()){
     for(int i = 0; i < center_object_loss_param.bias_scale_size() / 2; i++){
-      bias_scale_.push_back(std::pair<int, int>(center_object_loss_param.bias_scale(i * 2), 
+      bias_scale_.push_back(std::pair<Dtype, Dtype>(center_object_loss_param.bias_scale(i * 2), 
                     center_object_loss_param.bias_scale(i * 2 + 1)));
     }
     for(int i = 0; i < center_object_loss_param.bias_mask_size(); i++){

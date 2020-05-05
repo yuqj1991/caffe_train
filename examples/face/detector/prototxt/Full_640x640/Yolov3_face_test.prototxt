@@ -15,8 +15,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 640
-			width: 640
+			height: 608
+			width: 608
 			interp_mode: LINEAR
 		}
 	}
@@ -1379,7 +1379,6 @@ layer{
 	convolution_param {
 		num_output: 256
 		kernel_size: 1
-		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1539,7 +1538,6 @@ layer{
 	convolution_param {
 		num_output: 256
 		kernel_size: 1
-		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1699,7 +1697,6 @@ layer{
 	convolution_param {
 		num_output: 512
 		kernel_size: 1
-		#pad: 1
 		weight_filler {
 			type: "msra"
 		}
@@ -1788,27 +1785,24 @@ layer {
 		confidence_threshold: 0.15
 		nms_threshold: 0.3
 		num_classes: 1
-
-		#anchor_scale list(width, height)
-
-		biases: 8
-		biases: 14
-		biases: 13
-		biases: 24
-		biases: 21
-		biases: 37
-		biases: 32
-		biases: 56
-		biases: 54
-		biases: 83
-		biases: 76
-		biases: 139
-		biases: 132
-		biases: 190
-		biases: 207
-		biases: 296
-		biases: 324
-		biases: 416
+		biases: 7.67
+		biases: 12.93
+		biases: 12.00
+		biases: 22.53
+		biases: 19.4
+		biases: 35.13
+		biases: 30.17
+		biases: 53.60
+		biases: 51.13
+		biases: 78.69
+		biases: 72.16
+		biases: 132.0
+		biases: 125.64
+		biases: 180.48
+		biases: 196.59
+		biases: 281.10
+		biases: 307.67
+		biases: 395.16
 
 		mask:0
 		mask:1

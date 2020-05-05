@@ -4624,7 +4624,8 @@ layer {
 	top: "conv11_eltwise_priorbox"
 	prior_box_param {
 		min_size: 10
-		flip: true
+		aspect_ratio: 0.67
+		flip: false
 		clip: false
 		variance: 0.1
 		variance: 0.1
@@ -4648,7 +4649,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4695,7 +4696,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 2
+		num_output: 4
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4740,7 +4741,8 @@ layer {
 	prior_box_param {
 		min_size: 23
 		min_size: 52
-		flip: true
+		aspect_ratio: 0.67
+		flip: false
 		clip: false
 		variance: 0.1
 		variance: 0.1
@@ -4764,7 +4766,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4811,7 +4813,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4854,8 +4856,11 @@ layer {
 	bottom: "data"
 	top: "dectction_moudle_five_priorbox"
 	prior_box_param {
+		min_size: 54.0
+		min_size: 76.0
 		min_size: 119.0
-		flip: true
+		aspect_ratio: 0.67
+		flip: false
 		clip: false
 		variance: 0.1
 		variance: 0.1
@@ -4879,7 +4884,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 24
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4926,7 +4931,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 2
+		num_output: 12
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -4970,7 +4975,8 @@ layer {
 	prior_box_param {
 		min_size: 268.0
 		min_size: 596.0
-		flip: true
+		aspect_ratio: 0.67
+		flip: false
 		clip: false
 		variance: 0.1
 		variance: 0.1
@@ -4993,7 +4999,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 8
+		num_output: 16
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5040,7 +5046,7 @@ layer {
 		decay_mult: 0
 	}
 	convolution_param {
-		num_output: 4
+		num_output: 8
 		kernel_size: 1
 		weight_filler {
 			type: "msra"
@@ -5161,7 +5167,7 @@ layer {
 			nms_threshold: 0.3
 			top_k: 200
 		}
-		code_type: RECEPTIVE_CENTER
+		code_type: CENTER_SIZE
 		keep_top_k: 200
 		confidence_threshold: 0.15
 	}

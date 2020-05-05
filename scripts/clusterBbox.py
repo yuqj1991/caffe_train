@@ -242,7 +242,7 @@ def main():
 	if 1:
 		n_anchors = 9
 		loss_convergence = 1e-2
-		grid_size = 640
+		grid_size = 608
 		iterations_num = 10000
 		plus = 1
 		compute_centroids(classfyFile,n_anchors,loss_convergence,grid_size,iterations_num,plus)

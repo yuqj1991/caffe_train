@@ -223,7 +223,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
       if (sampled_bboxes.size() > 0) {
         int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
         sampled_datum = new AnnotatedDatum();
-        this->data_transformer_->CropImage(*expand_datum,
+        this->data_transformer_->CropImage_LFFD_Sampling(*expand_datum,
                                           sampled_bboxes[rand_idx],
                                           sampled_datum);
         has_sampled = true;

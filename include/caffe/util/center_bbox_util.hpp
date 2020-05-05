@@ -80,7 +80,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           const int net_width, const int net_height,
                           Dtype* channel_pred_data,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
-                          std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
+                          std::vector<int> mask_bias, std::vector<std::pair<Dtype, Dtype> >bias_scale, 
                           Dtype* bottom_diff, Dtype ignore_thresh, YoloScoreShow *Score);
 
 template <typename Dtype>

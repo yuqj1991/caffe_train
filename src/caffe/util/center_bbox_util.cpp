@@ -559,7 +559,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           const int net_width, const int net_height,
                           Dtype* channel_pred_data,
                           std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
-                          std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
+                          std::vector<int> mask_bias, std::vector<std::pair<Dtype, Dtype> >bias_scale, 
                           Dtype* bottom_diff, Dtype ignore_thresh, YoloScoreShow *Score){
   CHECK_EQ(net_height, net_width);
   int stride_channel = 4 + 1 + num_classes;
@@ -647,8 +647,8 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         shfit_gt_bbox.set_xmax(shift_x_max);
         shfit_gt_bbox.set_ymin(shift_y_min);
         shfit_gt_bbox.set_ymax(shift_y_max);
-        float bias_width = bias_scale[m].first;
-        float bias_height = bias_scale[m].second;
+        Dtype bias_width = bias_scale[m].first;
+        Dtype bias_height = bias_scale[m].second;
         float bias_xmin = 0 - (float)bias_width / (2 * net_width);
         float bias_ymin = 0 - (float)bias_height / (2 * net_height);
         float bias_xmax = 0 + (float)bias_width / (2 * net_width);
@@ -742,14 +742,14 @@ template void EncodeYoloObject(const int batch_size, const int num_channels, con
                               const int net_width, const int net_height,
                               float* channel_pred_data,
                               std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
-                              std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
+                              std::vector<int> mask_bias, std::vector<std::pair<float, float> >bias_scale, 
                               float* bottom_diff, float ignore_thresh, YoloScoreShow *Score);
 template void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
                               const int output_width, const int output_height, 
                               const int net_width, const int net_height,
                               double* channel_pred_data,
                               std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
-                              std::vector<int> mask_bias, std::vector<std::pair<int, int> >bias_scale, 
+                              std::vector<int> mask_bias, std::vector<std::pair<double, double> >bias_scale, 
                               double* bottom_diff, double ignore_thresh, YoloScoreShow *Score);
 
 
