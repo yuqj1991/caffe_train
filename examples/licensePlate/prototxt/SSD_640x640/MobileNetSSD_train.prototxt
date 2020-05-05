@@ -1,4 +1,4 @@
-name: "MobileNet-SSD-512-LPr"
+name: "MobileNet-SSD-640"
 layer {
   name: "data"
   type: "AnnotatedData"

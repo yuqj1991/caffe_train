@@ -1,4 +1,4 @@
-name: "MobileNet-SSD-512-LPr"
+name: "MobileNet-SSD-640"
 input: "data"
 input_shape {
   dim: 1

@@ -1,5 +1,5 @@
-train_net: "../prototxt/SSD_512x512/MobileNetSSD_train.prototxt"
-test_net: "../prototxt/SSD_512x512/MobileNetSSD_test.prototxt"
+train_net: "../prototxt/SSD_640x640/MobileNetSSD_train.prototxt"
+test_net: "../prototxt/SSD_640x640/MobileNetSSD_test.prototxt"
 test_iter: 1500
 test_interval: 5000
 base_lr: 0.01
@@ -9,7 +9,7 @@ lr_policy: "multistep"
 gamma: 0.5
 weight_decay: 0.0001
 snapshot: 5000
-snapshot_prefix: "../snapshot/SSD_512"
+snapshot_prefix: "../snapshot/SSD_640"
 solver_mode: GPU
 debug_info: false
 snapshot_after_train: true

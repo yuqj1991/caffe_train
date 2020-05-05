@@ -25,9 +25,9 @@ chars = ["京", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "
 
 def make_parser():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--ssd_model_def', default= '{}examples/licensePlate/net/SSD_300X300/mssd512_voc.prototxt'.format(caffe_root))
+	parser.add_argument('--ssd_model_def', default= '{}examples/licensePlate/net/SSD_300X300/ssd_no_bn_640.prototxt'.format(caffe_root))
 	parser.add_argument('--ssd_image_resize', default=300, type=int)
-	parser.add_argument('--ssd_model_weights', default= '{}examples/licensePlate/net/SSD_300X300/mssd512_voc.caffemodel'.format(caffe_root))
+	parser.add_argument('--ssd_model_weights', default= '{}examples/licensePlate/net/SSD_300X300/ssd_no_bn_640.caffemodel'.format(caffe_root))
 	parser.add_argument('--recog_model_def', default='{}examples/licensePlate/net/LPR/deploy.prototxt'.format(caffe_root))
 	parser.add_argument('--recog_image_width', default=128, type=int)
 	parser.add_argument('--recog_image_height', default=32, type=int)
@@ -114,7 +114,7 @@ def detect(imgfile):
     origimg = cv2.imread(imgfile)
     h = origimg.shape[0]
     w = origimg.shape[1]
-    img = preprocess(origimg, det_inputSize, pixel_means, pixel_stds)
+    img = preprocess(origimg, det_inputSize, means, stds)
     
     img = img.astype(np.float32)
     img = img.transpose((2, 0, 1))
