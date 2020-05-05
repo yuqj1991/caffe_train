@@ -118,7 +118,7 @@ batch_sampler = [
         'max_sample': 1,
     },
 ]
-scale = [8, 64, 128, 256, 512]
+scale = [8, 16, 32, 64, 128, 256, 512]
 data_anchor_sampler = {
         'scale': scale,
         'sample_constraint': {
@@ -129,23 +129,43 @@ data_anchor_sampler = {
 }
 bbox = [
     {
-      'bbox_small_scale': 8,
-      'bbox_large_scale': 64,
+      'bbox_small_scale': 10,
+      'bbox_large_scale': 15,
       'ancher_stride': 4,
     },
     {
-      'bbox_small_scale': 64,
-      'bbox_large_scale': 128,
+      'bbox_small_scale': 15,
+      'bbox_large_scale': 20,
+      'ancher_stride': 4,
+    },
+    {
+      'bbox_small_scale': 20,
+      'bbox_large_scale': 40,
       'ancher_stride': 8,
     },
     {
-      'bbox_small_scale': 128,
-      'bbox_large_scale': 256,
+      'bbox_small_scale': 40,
+      'bbox_large_scale': 70,
+      'ancher_stride': 8,
+    },
+    {
+      'bbox_small_scale': 70,
+      'bbox_large_scale': 110,
       'ancher_stride': 16,
     },
     {
-      'bbox_small_scale': 256,
-      'bbox_large_scale': 512,
+      'bbox_small_scale': 110,
+      'bbox_large_scale': 250,
+      'ancher_stride': 32,
+    },
+    {
+      'bbox_small_scale': 250,
+      'bbox_large_scale': 400,
+      'ancher_stride': 32,
+    },
+    {
+      'bbox_small_scale': 400,
+      'bbox_large_scale': 560,
       'ancher_stride': 32,
     },
 ]
