@@ -365,13 +365,15 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   sampled_bbox->set_ymin((float)h_off / img_height);
   sampled_bbox->set_xmax((float)(w_off + sample_bbox_size) / img_width);
   sampled_bbox->set_ymax((float)(h_off + sample_bbox_size) / img_height);
-  LOG(INFO)<<"CropImage Size: "<<sample_bbox_size <<
-             ", Original long side: "<<image_long_side<<
-             ", Scale Choose: "<<scaleChoose<<
-             ", Area Size: "<<std::pow(scaleChoose, 2)<<
-             ", Original Bbox Area: "<<bbox_aera;
-  LOG(INFO)<<"Original Bbox width: "<<bbox_width <<
-             ", Original Bbox height: "<<bbox_height;
+  #if 0
+    LOG(INFO)<<"CropImage Size: "<<sample_bbox_size <<
+              ", Original long side: "<<image_long_side<<
+              ", Scale Choose: "<<scaleChoose<<
+              ", Area Size: "<<std::pow(scaleChoose, 2)<<
+              ", Original Bbox Area: "<<bbox_aera;
+    LOG(INFO)<<"Original Bbox width: "<<bbox_width <<
+              ", Original Bbox height: "<<bbox_height;
+  #endif
              
 }
 
