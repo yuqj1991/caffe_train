@@ -345,7 +345,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   }
   float w_off = 0.0f, h_off = 0.0f;
 
-  float sample_bbox_size = (float)bbox_width * resized_width / scaleChoose;
+  float sample_bbox_size = (float)scaleChoose * img_width / bbox_width;
   if(sample_bbox_size < COMPAREMAX(img_height, img_width)){
     if(bbox_width <= sample_bbox_size){
       caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
@@ -367,6 +367,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   sampled_bbox->set_ymax((float)(h_off + sample_bbox_size) / img_height);
   LOG(INFO)<<"CropImage Size: "<<sample_bbox_size <<
              ", Scale Choose: "<<scaleChoose<<
+             ", Original Bbox height: "<<bbox_height<<
              ", Original Bbox width: "<<bbox_width<<
              ", Original Height: "<<img_height<<
              ", Original Width: "<<img_width;
