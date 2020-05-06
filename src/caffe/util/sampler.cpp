@@ -367,6 +367,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   sampled_bbox->set_ymax((float)(h_off + sample_bbox_size) / img_height);
   LOG(INFO)<<"CropImage Size: "<<sample_bbox_size <<
              ", Scale Choose: "<<scaleChoose<<
+             ", Original Bbox width: "<<bbox_width<<
              ", Original Height: "<<img_height<<
              ", Original Width: "<<img_width;
 }
