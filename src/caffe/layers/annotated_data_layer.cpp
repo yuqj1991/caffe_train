@@ -286,7 +286,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         } else {
           sampled_datum = expand_datum;
         }
-      }else if(anchor_prob > 0.5){
+      }/*else if(anchor_prob > 0.5){
         int resized_height = transform_param.resize_param().height();
         int resized_width = transform_param.resize_param().width();
         NormalizedBBox sampled_bbox;
@@ -301,7 +301,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         }else{
           sampled_datum = expand_datum;
         }
-      }else if(anchor_prob <= 0.5 ){
+      }*/else if(anchor_prob <= upProb_){
         if (batch_samplers_.size() > 0) {
           vector<NormalizedBBox> sampled_bboxes;
           GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
