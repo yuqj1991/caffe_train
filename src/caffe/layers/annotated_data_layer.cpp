@@ -317,7 +317,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
           }
         } else {
           sampled_datum = expand_datum;
-        };
+        }
       }
     }
     CHECK(sampled_datum != NULL);
