@@ -38,7 +38,7 @@ void WightEltwiseLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   if (this->blobs_.size() > 0) {
     LOG(INFO) << "Skipping parameter initialization";
   } else {
-  this->blobs_.resize(1);
+    this->blobs_.resize(1);
     // Initialize the weights
     vector<int> weight_shape(1, bottom.size());
     this->blobs_[0].reset(new Blob<Dtype>(weight_shape));
