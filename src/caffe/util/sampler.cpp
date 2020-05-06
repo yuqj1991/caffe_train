@@ -344,9 +344,9 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
   }
   float w_off = 0.0f, h_off = 0.0f;
-
-  float sample_bbox_size = img_width * std::pow(scaleChoose, 2) / bbox_aera;
-  if(sample_bbox_size < COMPAREMAX(img_height, img_width)){
+  int image_long_side = COMPAREMAX(img_height, img_width);
+  float sample_bbox_size = image_long_side * std::pow(scaleChoose, 2) / bbox_aera;
+  if(sample_bbox_size < image_long_side){
     if(bbox_width <= sample_bbox_size){
       caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
     }else{
@@ -366,10 +366,12 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   sampled_bbox->set_xmax((float)(w_off + sample_bbox_size) / img_width);
   sampled_bbox->set_ymax((float)(h_off + sample_bbox_size) / img_height);
   LOG(INFO)<<"CropImage Size: "<<sample_bbox_size <<
-             ", Original Width: "<<img_width<<
+             ", Original long side: "<<image_long_side<<
              ", Scale Choose: "<<scaleChoose<<
              ", Area Size: "<<std::pow(scaleChoose, 2)<<
              ", Original Bbox Area: "<<bbox_aera;
+  LOG(INFO)<<"Original Bbox width: "<<bbox_width <<
+             ", Original Bbox height: "<<bbox_height;
              
 }
 
