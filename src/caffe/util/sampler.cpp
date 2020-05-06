@@ -369,8 +369,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
              ", Original Width: "<<img_width<<
              ", Scale Choose: "<<scaleChoose<<
              ", Area Size: "<<std::pow(scaleChoose, 2)<<
-             ", Original Bbox height: "<<bbox_height<<
-             ", Original Bbox width: "<<bbox_width;
+             ", Original Bbox Area: "<<bbox_aera;
              
 }
 
