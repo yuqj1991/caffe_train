@@ -118,7 +118,7 @@ batch_sampler = [
         'max_sample': 1,
     },
 ]
-scale = [8, 16, 32, 64, 128, 256, 512]
+scale = [16, 32, 64, 128, 256, 512]
 data_anchor_sampler = {
         'scale': scale,
         'sample_constraint': {

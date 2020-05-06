@@ -143,7 +143,6 @@ layer {
     }
     label_map_file: "../labelmap.prototxt"
     data_anchor_sampler {
-      scale: 8
       scale: 16
       scale: 32
       scale: 64

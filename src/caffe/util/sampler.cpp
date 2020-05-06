@@ -312,11 +312,11 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   const float ymax = object_bboxes[object_bbox_index].ymax()*img_height;
   float bbox_width = xmax - xmin;
   float bbox_height = ymax - ymin;
-  int range_size = 0, range_idx_size = 0, rng_random_index = 0; 
+  int range_size = 0, rand_idx_size = 0, rng_rand_size = 0; 
   float bbox_aera = bbox_height * bbox_width;
   float scaleChoose = 0.0f; 
   float min_resize_val = 0.f, max_resize_val = 0.f;
-  for(int j = 0; j < anchorScale.size() -1; ++j){
+  for(int j = 0; j < anchorScale.size() - 1; ++j){
     if(bbox_aera >= std::pow(anchorScale[j], 2) && bbox_aera < std::pow(anchorScale[j+1], 2)){
       range_size = j + 1;
       break;
@@ -324,23 +324,23 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
   }
   if(bbox_aera > std::pow(anchorScale[anchorScale.size() - 2], 2))
     range_size = anchorScale.size() - 2;
-  if(range_size==0){
-    range_idx_size = 0;
+  if(range_size == 0){
+    rand_idx_size = 0;
   }else{
-    rng_random_index = caffe_rng_rand() % (range_size + 1);
-    range_idx_size = rng_random_index % (range_size + 1);
+    rng_rand_size = caffe_rng_rand() % range_size;
+    rand_idx_size = rng_rand_size % range_size;
   }
-  if(range_idx_size == range_size){
-    min_resize_val = anchorScale[range_idx_size] / 2;
-    max_resize_val = COMPAREMIN((float)anchorScale[range_idx_size] * 2,
+  if(rand_idx_size == range_size){
+    min_resize_val = anchorScale[rand_idx_size] / 2;
+    max_resize_val = COMPAREMIN((float)anchorScale[rand_idx_size] * 2,
                                                   2*std::sqrt(bbox_aera));
     if(min_resize_val <= max_resize_val)
       caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
     else
       caffe_rng_uniform(1, max_resize_val, min_resize_val, &scaleChoose);
   }else{
-    min_resize_val = anchorScale[range_idx_size] / 2;
-    max_resize_val = (float)anchorScale[range_idx_size] * 2;
+    min_resize_val = anchorScale[rand_idx_size] / 2;
+    max_resize_val = (float)anchorScale[rand_idx_size] * 2;
     caffe_rng_uniform(1, min_resize_val, max_resize_val, &scaleChoose);
   }
   float w_off = 0.0f, h_off = 0.0f;
