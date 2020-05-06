@@ -144,6 +144,8 @@ layer {
 		}
 		data_anchor_sampler {
 			scale: 8
+			scale: 16
+			scale: 32
 			scale: 64
 			scale: 128
 			scale: 256
@@ -154,33 +156,53 @@ layer {
 			max_sample: 1
 			max_trials: 50
 		}
-	bbox_sampler {
-		box {
-			bbox_small_scale: 8
-			bbox_large_scale: 64
-			ancher_stride: 4
+		bbox_sampler {
+			box {
+				bbox_small_scale: 10
+				bbox_large_scale: 15
+				ancher_stride: 4
+			}
+			box {
+				bbox_small_scale: 15
+				bbox_large_scale: 20
+				ancher_stride: 4
+			}
+			box {
+				bbox_small_scale: 20
+				bbox_large_scale: 40
+				ancher_stride: 8
+			}
+			box {
+				bbox_small_scale: 40
+				bbox_large_scale: 70
+				ancher_stride: 8
+			}
+			box {
+				bbox_small_scale: 70
+				bbox_large_scale: 110
+				ancher_stride: 16
+			}
+			box {
+				bbox_small_scale: 110
+				bbox_large_scale: 250
+				ancher_stride: 32
+			}
+			box {
+				bbox_small_scale: 250
+				bbox_large_scale: 400
+				ancher_stride: 32
+			}
+			box {
+				bbox_small_scale: 400
+				bbox_large_scale: 560
+				ancher_stride: 32
+			}
+			max_sample: 1
+			max_trials: 50
 		}
-		box {
-			bbox_small_scale: 64
-			bbox_large_scale: 128
-			ancher_stride: 8
-		}
-		box {
-			bbox_small_scale: 128
-			bbox_large_scale: 256
-			ancher_stride: 16
-		}
-		box {
-			bbox_small_scale: 256
-			bbox_large_scale: 512
-			ancher_stride: 32
-		}
-		max_sample: 1
-		max_trials: 50
-	}
 		up_prob: 0.7
 		low_prob: 0.4
-		crop_type: CROP_BATCH
+		crop_type: CROP_RANDOM
 		yoloformat: true
 		label_map_file: "../labelmap.prototxt"
 	}
