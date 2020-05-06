@@ -10,6 +10,22 @@ from caffe import params as P
 from caffe.proto import caffe_pb2
 import math
 
+
+def UnpackVariable(var, num):
+  assert len > 0
+  if type(var) is list and len(var) == num:
+    return var
+  else:
+    ret = []
+    if type(var) is list:
+      assert len(var) == 1
+      for i in range(0, num):
+        ret.append(var[0])
+    else:
+      for i in range(0, num):
+        ret.append(var)
+    return ret
+
 def ConvBNLayer(net, from_layer, out_layer, use_bn, use_relu, num_output,
     kernel_size, pad, stride, group=1, dilation=1, use_scale=True, lr_mult=1,
     conv_prefix='', conv_postfix='', bn_prefix='', bn_postfix='_bn',
@@ -130,7 +146,3 @@ def round_repeats(repeats, depth_coefficient, skip=False):
   if skip or not depth_coefficient:
     return repeats
   return int(math.ceil(depth_coefficient * repeats))
-
-
-def UpsampleBNLayer(net, from_layer):
-    

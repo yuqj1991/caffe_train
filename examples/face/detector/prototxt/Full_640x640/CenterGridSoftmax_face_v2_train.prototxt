@@ -144,6 +144,8 @@ layer {
     label_map_file: "../labelmap.prototxt"
     data_anchor_sampler {
       scale: 8
+      scale: 16
+      scale: 32
       scale: 64
       scale: 128
       scale: 256
@@ -157,23 +159,43 @@ layer {
     up_prob: 0.699999988079
     bbox_sampler {
       box {
-        bbox_small_scale: 8
-        bbox_large_scale: 64
+        bbox_small_scale: 10
+        bbox_large_scale: 15
         ancher_stride: 4
       }
       box {
-        bbox_small_scale: 64
-        bbox_large_scale: 128
+        bbox_small_scale: 15
+        bbox_large_scale: 20
+        ancher_stride: 4
+      }
+      box {
+        bbox_small_scale: 20
+        bbox_large_scale: 40
         ancher_stride: 8
       }
       box {
-        bbox_small_scale: 128
-        bbox_large_scale: 256
+        bbox_small_scale: 40
+        bbox_large_scale: 70
+        ancher_stride: 8
+      }
+      box {
+        bbox_small_scale: 70
+        bbox_large_scale: 110
         ancher_stride: 16
       }
       box {
-        bbox_small_scale: 256
-        bbox_large_scale: 512
+        bbox_small_scale: 110
+        bbox_large_scale: 250
+        ancher_stride: 32
+      }
+      box {
+        bbox_small_scale: 250
+        bbox_large_scale: 400
+        ancher_stride: 32
+      }
+      box {
+        bbox_small_scale: 400
+        bbox_large_scale: 560
         ancher_stride: 32
       }
       max_sample: 1
@@ -624,7 +646,7 @@ layer {
   convolution_param {
     num_output: 144
     bias_term: false
-    pad: 1
+    pad: 0
     kernel_size: 3
     group: 144
     stride: 2
@@ -1047,7 +1069,7 @@ layer {
   convolution_param {
     num_output: 192
     bias_term: false
-    pad: 1
+    pad: 0
     kernel_size: 3
     group: 192
     stride: 2
@@ -1685,7 +1707,7 @@ layer {
   convolution_param {
     num_output: 384
     bias_term: false
-    pad: 1
+    pad: 0
     kernel_size: 3
     group: 384
     stride: 2
@@ -3254,7 +3276,7 @@ layer {
   convolution_param {
     num_output: 960
     bias_term: false
-    pad: 1
+    pad: 0
     kernel_size: 3
     group: 960
     stride: 2

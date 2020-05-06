@@ -17,21 +17,6 @@ def make_if_not_exist(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-def UnpackVariable(var, num):
-  assert len > 0
-  if type(var) is list and len(var) == num:
-    return var
-  else:
-    ret = []
-    if type(var) is list:
-      assert len(var) == 1
-      for i in range(0, num):
-        ret.append(var[0])
-    else:
-      for i in range(0, num):
-        ret.append(var)
-    return ret
-
 
 def ResBody(net, from_layer, block_name, out2a, out2b, out2c, stride, use_branch1, dilation=1, **bn_param):
   # ResBody(net, 'pool1', '2a', 64, 64, 256, 1, True)
