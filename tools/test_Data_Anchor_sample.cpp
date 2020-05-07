@@ -601,7 +601,7 @@ int main(int argc, char** argv){
       if(do_resize)
         resized_anno_datum = new AnnotatedDatum();
       NormalizedBBox sampled_bbox;
-      #if 0
+      #if 1
       GenerateBatchDataAnchorSamples(anno_datum, data_anchor_samplers_,
                               resized_height, resized_width,
                               &sampled_bbox, transform_param);
