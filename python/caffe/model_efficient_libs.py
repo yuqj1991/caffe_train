@@ -34,7 +34,7 @@ def SEMoudleBlock(net, from_layer, channels, layerPrefix= '', ratio = 0.2, use_s
 
 
 def BiFPNBlock(net, from_layers= [], image_size = 640, min_level = 3, max_level = 7, fpn_cell_repeats = 3, 
-                    fpn_out_channels = 88, use_global_stats = True, use_relu = False, 
+                    fpn_out_channels = 88, use_global_stats = True, use_relu = False, use_swish = True,
                     apply_bn=True, is_training=True, conv_after_downsample=False, 
                     use_nearest_resize=False, pooling_type= None):
     assert len(from_layers) > 0
@@ -76,11 +76,11 @@ def BiFPNBlock(net, from_layers= [], image_size = 640, min_level = 3, max_level 
         {'feat_level': 6, 'inputs_offsets': [3, 5, 10]},
         {'feat_level': 7, 'inputs_offsets': [4, 11]},
     ]
-    for repeate_idx in range(1):
+    for repeate_idx in range(fpn_cell_repeats):
         new_feats = BuildBiFPNLayer(net= net, feats= feats, feat_sizes= feat_sizes, fpn_nodes= pnodes, 
                                         layerPrefix = '{}_BiFPN'.format(repeate_idx),
                                         fpn_out_filters= fpn_out_channels, min_level = min_level, max_level = max_level, 
-                                        use_global_stats = use_global_stats, use_relu = use_relu, concat_method= "fast_attention", 
+                                        use_global_stats = use_global_stats, use_relu = use_relu, use_swish= use_swish, concat_method= "fast_attention", 
                                         apply_bn=apply_bn, is_training=is_training, conv_after_downsample=conv_after_downsample,
                                         separable_conv = True, use_nearest_resize=use_nearest_resize, pooling_type= pooling_type)
         feats = [new_feats[level] for level in range(min_level, max_level + 1)]
@@ -488,7 +488,7 @@ def efficientDetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
     FPNlayer_Name = BiFPNBlock(net= net, from_layers= BaseLayer_Shapes,
                                 image_size = 640, min_level = 3, 
                                 max_level = 7, fpn_cell_repeats = 3, 
-                                fpn_out_channels = 88, use_global_stats = use_global_stats, use_relu= False,
+                                fpn_out_channels = 88, use_global_stats = use_global_stats, use_relu= use_relu, use_swish= use_swish,
                                 apply_bn=Use_BN, is_training=is_training, conv_after_downsample=conv_after_downsample, 
                                 use_nearest_resize= use_nearest_resize, pooling_type= pooling_type)
     '''

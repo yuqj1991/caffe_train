@@ -373,14 +373,14 @@ net.detection_eval = L.DetectionEvaluate(net.detection_out, net.label,
 with open(test_net_file, 'w') as f:
     print('name: "{}_test"'.format('efficientDetCoco'), file=f)
     print(net.to_proto(), file=f)
-'''
+
 #创建 deploy.prototxt, 移除数据层和最后一层评价层
 deploy_net = net
 with open(deploy_net_file, 'w') as f:
     net_param = deploy_net.to_proto()
     # Remove the first (AnnotatedData) and last (DetectionEvaluate) layer from test net.
     del net_param.layer[0]
-    del net_param.layer[-1]
+    #del net_param.layer[-1]
     net_param.name = '{}_deploy'.format('efficientDetCoco')
     net_param.input.extend(['data'])
     net_param.input_shape.extend([
@@ -395,4 +395,3 @@ solver = caffe_pb2.SolverParameter(
         **solver_param)
 with open(solver_file, 'w') as f:
     print(solver, file=f)
-'''

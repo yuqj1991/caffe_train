@@ -157,7 +157,7 @@ def SeparableConv(net, from_layer, use_bn, num_output, channel_multplutir,
   ConvBNLayer(net, from_layer, out_layer, use_bn, group, 
                   kernel_size, pad, stride,use_relu= use_relu, use_swish= use_swish,
                   group=group, dilation=dilation, use_scale=use_scale, lr_mult=1, use_global_stats = use_global_stats)
-  point_layer = "{}_point_conv_{}x{}".format(layerPrefix, 1, 1) # kernel 1 x 1
+  point_layer = "{}_PointWise_{}x{}".format(layerPrefix, 1, 1) # kernel 1 x 1
   ConvBNLayer(net, out_layer, point_layer,  use_bn, num_output, kernel_size = 1, pad= 0, use_relu= use_relu, use_swish= use_swish,
                     stride = 1, group=1, dilation=1, use_scale=use_scale, lr_mult=1, use_global_stats = use_global_stats)
   out_layer = point_layer
@@ -170,7 +170,7 @@ def NormalConv(net, from_layer, use_bn, num_output, channel_multplutir,
     use_relu = False, use_swish= False, layerPrefix = "", **bn_params):
   [kernel_h, kernel_w] = UnpackVariable(kernel_size, 2)
   group = 1
-  out_layer = "{}_Conv_{}x{}".format(layerPrefix, kernel_h, kernel_w)  # kernel 3 x 3
+  out_layer = "{}_NormalConv_{}x{}".format(layerPrefix, kernel_h, kernel_w)  # kernel 3 x 3
   ConvBNLayer(net, from_layer, out_layer, use_bn, num_output * channel_multplutir, 
                   kernel_size, pad, stride,use_relu= use_relu, use_swish= use_swish,
                   group=group, dilation=dilation, use_scale=use_scale, lr_mult=1, use_global_stats = use_global_stats)
@@ -284,62 +284,64 @@ def resample_feature_map(net, from_layer, use_global_stats,
   current_width = from_layer['width']
   out_layer = from_layer['layer']
   if apply_bn and is_training is None:
-      raise ValueError('If BN is applied, need to provide is_training')
+    raise ValueError('If BN is applied, need to provide is_training')
 
-  def _maybe_apply_1x1(net, from_layer):
-      """Apply 1x1 conv to change layer width if necessary."""
-      local_out_layer = from_layer
-      if current_channels != target_channels:
-        local_out_layer= "{}_Conv_1x1_project_{}_{}".format(layerPrefix, current_channels, target_channels)
-        ConvBNLayer(net, from_layer, local_out_layer, use_bn = apply_bn, use_relu = False, use_swish= False,
-                    num_output= target_channels, kernel_size= 1, pad= 0, stride= 1,
-                    lr_mult=1, use_scale=apply_bn, use_global_stats= use_global_stats)
-      return local_out_layer
+  def _maybe_apply_1x1(net, from_layer,apply_bn_d , use_relu_d, use_swish_d):
+    """Apply 1x1 conv to change layer width if necessary."""
+    local_out_layer= "{}_Conv_1x1_project_{}_{}".format(layerPrefix, current_channels, target_channels)
+    ConvBNLayer(net, from_layer, local_out_layer, use_bn = apply_bn_d, use_relu = use_relu_d, use_swish= use_swish_d,
+                num_output= target_channels, kernel_size= 1, pad= 0, stride= 1,
+                lr_mult=1, use_scale=apply_bn_d, use_global_stats= use_global_stats)
+    return local_out_layer
 
   # If conv_after_downsample is True, when downsampling, apply 1x1 after
   # downsampling for efficiency.
   if current_height > target_height and current_width > target_width:
     if not conv_after_downsample:
-      out_layer = _maybe_apply_1x1(net, out_layer)
+      out_layer = _maybe_apply_1x1(net, out_layer, True, False, False)
     height_stride = int((current_height - 1) // target_height + 1)
     width_stride = int((current_width - 1) // target_width + 1)
     if pooling_type == 'max':
-      Global_poolingName= "{}_reduce_Pool".format(layerPrefix)
+      Global_poolingName= "{}_Downsample_Pool".format(layerPrefix)
       net[Global_poolingName] = L.Pooling(net[out_layer], pool=P.Pooling.MAX, kernel_h = height_stride, kernel_w= width_stride,
                                           stride_h=height_stride, stride_w=width_stride, pad = 0,
                                           global_pooling=False)
       out_layer = Global_poolingName
     elif pooling_type == 'avg':
-      Global_poolingName= "{}_reduce_Pool".format(layerPrefix)
+      Global_poolingName= "{}_Downsample_Pool".format(layerPrefix)
       net[Global_poolingName] = L.Pooling(net[out_layer], pool=P.Pooling.AVG, kernel_h = height_stride, kernel_w= width_stride,
                                           stride_h=height_stride, stride_w=width_stride, pad = 0,
                                           global_pooling=False)
       out_layer = Global_poolingName
     elif pooling_type is None:
-      Conv_Name = "{}_reduce_Conv".format(layerPrefix)
-      ConvBNLayer(net, out_layer, Conv_Name, use_bn=True, num_output= target_channels, kernel_size= 3, pad = 1, stride= 2, use_relu= True,
+      Conv_Name = "{}_Downsample_Conv".format(layerPrefix)
+      ConvBNLayer(net, out_layer, Conv_Name, use_bn=True, num_output= target_channels, 
+                    kernel_size= 3, pad = 1, stride= 2, use_relu= False,
                     use_swish= False)
       out_layer = Conv_Name
     else:
       raise ValueError('Unknown pooling type: {}'.format(pooling_type))
     if conv_after_downsample:
-      out_layer = _maybe_apply_1x1(net, out_layer)
+      out_layer = _maybe_apply_1x1(net, out_layer, True, False, False)
   elif current_height <= target_height and current_width <= target_width:
-    out_layer = _maybe_apply_1x1(net, out_layer)
+    out_layer = _maybe_apply_1x1(net, out_layer, True, False, False)
     if current_height < target_height or current_width < target_width:
       height_scale = target_height // current_height
       width_scale = target_width // current_width
       assert height_scale == width_scale
       if (use_nearest_resize or target_height % current_height != 0 or
           target_width % current_width != 0):
-        Upsample_name = "{}_bilinear_Upsample".format(layerPrefix)
+        Upsample_name = "{}_Upsample_bilinear".format(layerPrefix)
         net[Upsample_name] = L.Upsample(net[out_layer], scale= height_scale)
         out_layer = Upsample_name
       else:
-        Upsample_name = "{}_Deconv_Upsample".format(layerPrefix)
-        ConvBNLayer(net, out_layer, Upsample_name, use_bn= apply_bn, use_relu = use_relu, use_swish= use_swish,
-          num_output= target_channels, kernel_size= height_scale + 1, pad= 1, stride= height_scale,
-          lr_mult=1, Use_DeConv= True, use_scale= apply_bn, use_global_stats= use_global_stats)
+        Upsample_name = "{}_Upsample_Deconv".format(layerPrefix)
+        pad = 0
+        kernel_size = target_height + 2 * pad - (current_height - 1) * height_scale
+        ConvBNLayer(net, out_layer, Upsample_name, use_bn= apply_bn, use_relu = use_relu,
+                      use_swish= use_swish,
+                      num_output= target_channels, kernel_size= kernel_size, pad= pad, stride= height_scale,
+                      lr_mult=1, Use_DeConv= True, use_scale= apply_bn, use_global_stats= use_global_stats)
         out_layer = Upsample_name
   else:
     raise ValueError('Incompatible target feature map size: target_height: {},target_width: {}'.format(target_height, target_width))
@@ -359,56 +361,60 @@ def BuildBiFPNLayer(net, feats, feat_sizes, fpn_nodes, layerPrefix = '', fpn_out
     new_node_height = feat_sizes[fnode['feat_level']]['height']
     new_node_width = feat_sizes[fnode['feat_level']]['width']
     nodes = []
-    out_layer = ''
     for idx, input_offset in enumerate(fnode['inputs_offsets']):
       input_node = temp_feats[input_offset]
       #print("length temp_feats: {} temp_feats[{}]: {}, target height: {}".format(len(temp_feats), input_offset, temp_feats[input_offset], new_node_height))
       #print("temp_feats[input_offset]['height']: {}, new_node_height: {}\n".format(temp_feats[input_offset]['height'], new_node_height))
-      '''if(temp_feats[input_offset]['height'] <= new_node_height or temp_feats[input_offset]['height'] > new_node_height):
-        continue'''
-      input_node = resample_feature_map(net, from_layer= input_node, use_global_stats= use_global_stats, use_relu= use_relu, 
-                          target_height= new_node_height, target_width= new_node_width, target_channels= fpn_out_filters,
-                          layerPrefix = '{}_{}_{}'.format(idx, input_offset, len(temp_feats)),
-                          apply_bn= apply_bn, is_training= is_training, conv_after_downsample= conv_after_downsample, 
+      
+      input_node = resample_feature_map(net, from_layer= input_node, use_global_stats= use_global_stats, 
+                          use_relu= False, use_swish= False,
+                          target_height= new_node_height, target_width= new_node_width, 
+                          target_channels= fpn_out_filters,
+                          layerPrefix = '{}_{}_{}_{}_{}'.format(layerPrefix,i, idx, input_offset, len(temp_feats)),
+                          apply_bn= apply_bn, is_training= is_training, 
+                          conv_after_downsample= conv_after_downsample, 
                           use_nearest_resize= use_nearest_resize, pooling_type= pooling_type)
       nodes.append(net[input_node['layer']])
     # Combine all nodes.
     if concat_method == "fast_attention":
-      Attention_Name = "{}_concat_fast_attention".format(layerPrefix)
-      net[Attention_Name] = L.WightEltwise(*nodes, wighted_eltwise_param= dict(operation= P.WightedEltwise.FASTER, 
+      out_layer = "{}_{}_concat_fast_attention".format(layerPrefix, i)
+      net[out_layer] = L.WightEltwise(*nodes, wighted_eltwise_param= dict(operation= P.WightedEltwise.FASTER, 
                                                                                         weight_filler=dict(type="msra")))
-      out_layer = Attention_Name
     elif concat_method == "softmax_attention":
-      Attention_Name = "{}_concat_softmax_attention".format(layerPrefix)
-      net[Attention_Name] = L.WightEltwise(*nodes, wighted_eltwise_param= dict(operation= P.WightedEltwise.SOFTMAX, 
-                                                                                        weight_filler=dict(type="msra")))        
-      out_layer = Attention_Name
-    elif concat_method == "sum_attention":
-      Attention_Name = "{}_concat_sum_attention".format(layerPrefix)
-      net[Attention_Name] = L.WightEltwise(*nodes, wighted_eltwise_param= dict(operation= P.WightedEltwise.FASTER, 
+      out_layer = "{}_{}_concat_softmax_attention".format(layerPrefix, i)
+      net[out_layer] = L.WightEltwise(*nodes, wighted_eltwise_param= dict(operation= P.WightedEltwise.SOFTMAX, 
                                                                                         weight_filler=dict(type="msra")))
-      out_layer = Attention_Name
+    elif concat_method == "sum_attention":
+      out_layer = "{}_{}_concat_sum_attention".format(layerPrefix, i)
+      net[out_layer] = L.WightEltwise(*nodes, wighted_eltwise_param= dict(operation= P.WightedEltwise.FASTER, 
+                                                                                        weight_filler=dict(type="msra")))
     else:
       raise ValueError('unknown weight_method {}'.format(concat_method))
     # operation after combine, like conv & bn
+    print(out_layer)
     if not con_bn_act_pattern:
-      Swish_Name = "{}_swish".format(layerPrefix)
-      net[Swish_Name] = L.Swish(net[out_layer], in_place = True)
-      out_layer = Swish_Name
+      if use_swish:
+        Swish_Name = "{}_{}_swish".format(layerPrefix, i)
+        net[Swish_Name] = L.Swish(net[out_layer], in_place = True)
+        out_layer = Swish_Name
+      elif use_relu:
+        Relu_Name = "{}_{}_relu6".format(layerPrefix, i)
+        net[Relu_Name] = L.ReLU6(net[out_layer], in_place = True)
+        out_layer = Relu_Name
     if separable_conv: # need batch-norm
-      Deconv_Name = "{}_Deconv_3x3".format(layerPrefix)
+      Deconv_Name = "{}_{}_Deconv_3x3".format(layerPrefix, i)
       ConvBNLayer(net, out_layer, Deconv_Name, use_bn = apply_bn, use_relu = False, use_swish= False,
                         num_output= fpn_out_filters, kernel_size= 3, pad= 1, stride= 1, group= fpn_out_filters, 
                         lr_mult=1, use_scale=apply_bn, use_global_stats= use_global_stats, Use_DeConv= False)
       out_layer = Deconv_Name
       Point_Name = "{}_{}_conv_1x1".format(layerPrefix, i)
-      ConvBNLayer(net, out_layer, Point_Name, use_bn = apply_bn, use_relu = False, use_swish= False,
+      ConvBNLayer(net, out_layer, Point_Name, use_bn = apply_bn, use_relu = use_relu, use_swish= use_swish,
                     num_output= fpn_out_filters, kernel_size= 1, pad= 0, stride= 1,
                     lr_mult=1, use_scale=apply_bn, use_global_stats= use_global_stats, Use_DeConv= False)
       out_layer = Point_Name
     else:
-      Conv_name = "{}_conv_3x3".format(layerPrefix)
-      ConvBNLayer(net, out_layer, out_layer, use_bn = apply_bn, use_relu = False, use_swish= False,
+      Conv_name = "{}_{}_conv_3x3".format(layerPrefix, i)
+      ConvBNLayer(net, out_layer, out_layer, use_bn = apply_bn, use_relu = use_relu, use_swish= use_swish,
                     num_output= fpn_out_filters, kernel_size= 3, pad= 1, stride= 1,
                     lr_mult=1, use_scale=apply_bn, use_global_stats= use_global_stats, Use_DeConv= False)
       out_layer = Conv_name
@@ -433,23 +439,22 @@ def class_net(net, images,
               layerPrefix = "",
               separable_conv=True, repeats=4):
   """Class prediction network."""
-  out_layer = "{}_Class_Conv".format(layerPrefix)
   if separable_conv:
     conv_op = functools.partial(SeparableConv, net= net, channel_multplutir = 1)
   else:
     conv_op = functools.partial(NormalConv, net= net, channel_multplutir = 1)
-  for _ in range(repeats):
+  for i in range(repeats):
     images = conv_op(
         from_layer= images, use_bn= True,
         num_output= num_filters, 
-        kernel_size = 3, pad= 1, stride = 1, use_scale= True, use_swish= True, 
-        layerPrefix = "{}_Conv".format(layerPrefix), use_global_stats= is_training)
+        kernel_size = 3, pad= 1, stride = 1, use_scale= True, use_swish= False, use_relu= False, 
+        layerPrefix = "classnet_{}_{}_Conv".format(layerPrefix, i), use_global_stats= is_training)
 
   classes = conv_op(
         from_layer= images, use_bn= False,
         num_output= num_classes * num_anchors,
-        kernel_size = 3, pad= 1, stride = 1,  use_scale= False, use_swish= False, 
-        layerPrefix = "{}_Class_Predict".format(layerPrefix), use_global_stats= is_training)
+        kernel_size = 3, pad= 1, stride = 1,  use_scale= False, use_swish= True, use_relu= False, 
+        layerPrefix = "classnet_{}_Class_Predict".format(layerPrefix), use_global_stats= is_training)
   return classes
 
 
@@ -457,23 +462,22 @@ def box_net(net, images, num_anchors, num_filters,
             is_training, repeats=4,
             separable_conv=True, layerPrefix=''):
   """Box regression network."""
-  out_layer = "{}_Class_Conv".format(layerPrefix)
   if separable_conv:
     conv_op = functools.partial(SeparableConv, net= net, group= num_filters, channel_multplutir = 1)
   else:
     conv_op = functools.partial(NormalConv, net= net, group= 1, channel_multplutir = 1)
-  for _ in range(repeats):
+  for i in range(repeats):
     images = conv_op(
         from_layer= images, use_bn= True,
         num_output= num_filters, 
-        kernel_size = 3, pad= 1, stride = 1, use_scale= True, use_swish= True, 
-        layerPrefix = "{}_Conv".format(layerPrefix), use_global_stats= is_training)
+        kernel_size = 3, pad= 1, stride = 1, use_scale= True, use_swish= True, use_relu= False, 
+        layerPrefix = "boxnet_{}_{}_Conv".format(layerPrefix, i), use_global_stats= is_training)
 
   boxes = conv_op(
         from_layer= images, use_bn= False,
         num_output= 4 * num_anchors,
-        kernel_size = 3, pad= 1, stride = 1,  use_scale= False, use_swish= False, 
-        layerPrefix = "{}_Box_Predict".format(layerPrefix), use_global_stats= is_training)
+        kernel_size = 3, pad= 1, stride = 1,  use_scale= False, use_swish= True, use_relu= False, 
+        layerPrefix = "boxnet_{}_Box_Predict".format(layerPrefix), use_global_stats= is_training)
   return boxes
 
 
