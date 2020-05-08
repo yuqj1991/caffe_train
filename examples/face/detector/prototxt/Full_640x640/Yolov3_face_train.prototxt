@@ -16,8 +16,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 608
-			width: 608
+			height: 640
+			width: 640
 			interp_mode: LINEAR
 			interp_mode: AREA
 			interp_mode: NEAREST
@@ -1887,24 +1887,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 7.67
-		bias_scale: 12.93
-		bias_scale: 12.00
-		bias_scale: 22.53
-		bias_scale: 19.4
-		bias_scale: 35.13
-		bias_scale: 30.17
-		bias_scale: 53.60
-		bias_scale: 51.13
-		bias_scale: 78.69
-		bias_scale: 72.16
-		bias_scale: 132.0
-		bias_scale: 125.64
-		bias_scale: 180.48
-		bias_scale: 196.59
-		bias_scale: 281.10
-		bias_scale: 307.67
-		bias_scale: 395.16
+		bias_scale: 8.0
+		bias_scale: 13.6
+		bias_scale: 12.6
+		bias_scale: 23.7
+		bias_scale: 20.4
+		bias_scale: 37.0
+		bias_scale: 31.8
+		bias_scale: 56.5
+		bias_scale: 53.8
+		bias_scale: 82.8
+		bias_scale: 76.0
+		bias_scale: 138.9
+		bias_scale: 132.2
+		bias_scale: 190.0
+		bias_scale: 206.9
+		bias_scale: 295.8
+		bias_scale: 323.9
+		bias_scale: 416.0
 
 		bias_num: 9
 
@@ -1937,24 +1937,24 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 7.67
-		bias_scale: 12.93
-		bias_scale: 12.00
-		bias_scale: 22.53
-		bias_scale: 19.4
-		bias_scale: 35.13
-		bias_scale: 30.17
-		bias_scale: 53.60
-		bias_scale: 51.13
-		bias_scale: 78.69
-		bias_scale: 72.16
-		bias_scale: 132.0
-		bias_scale: 125.64
-		bias_scale: 180.48
-		bias_scale: 196.59
-		bias_scale: 281.10
-		bias_scale: 307.67
-		bias_scale: 395.16
+		bias_scale: 8.0
+		bias_scale: 13.6
+		bias_scale: 12.6
+		bias_scale: 23.7
+		bias_scale: 20.4
+		bias_scale: 37.0
+		bias_scale: 31.8
+		bias_scale: 56.5
+		bias_scale: 53.8
+		bias_scale: 82.8
+		bias_scale: 76.0
+		bias_scale: 138.9
+		bias_scale: 132.2
+		bias_scale: 190.0
+		bias_scale: 206.9
+		bias_scale: 295.8
+		bias_scale: 323.9
+		bias_scale: 416.0
 		
 		bias_num: 9
 
@@ -1988,31 +1988,30 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-		bias_scale: 7.67
-		bias_scale: 12.93
-		bias_scale: 12.00
-		bias_scale: 22.53
-		bias_scale: 19.4
-		bias_scale: 35.13
-		bias_scale: 30.17
-		bias_scale: 53.60
-		bias_scale: 51.13
-		bias_scale: 78.69
-		bias_scale: 72.16
-		bias_scale: 132.0
-		bias_scale: 125.64
-		bias_scale: 180.48
-		bias_scale: 196.59
-		bias_scale: 281.10
-		bias_scale: 307.67
-		bias_scale: 395.16
+		bias_scale: 8.0
+		bias_scale: 13.6
+		bias_scale: 12.6
+		bias_scale: 23.7
+		bias_scale: 20.4
+		bias_scale: 37.0
+		bias_scale: 31.8
+		bias_scale: 56.5
+		bias_scale: 53.8
+		bias_scale: 82.8
+		bias_scale: 76.0
+		bias_scale: 138.9
+		bias_scale: 132.2
+		bias_scale: 190.0
+		bias_scale: 206.9
+		bias_scale: 295.8
+		bias_scale: 323.9
+		bias_scale: 416.0
 		
 		bias_num: 9
 
 		bias_mask: 6
 		bias_mask: 7
 		bias_mask: 8
-
 		
 		bias_mask_group_num: 1
 		

@@ -15,8 +15,8 @@ layer {
 		resize_param {
 			prob: 1.0
 			resize_mode: WARP
-			height: 608
-			width: 608
+			height: 640
+			width: 640
 			interp_mode: LINEAR
 		}
 	}
@@ -1785,24 +1785,24 @@ layer {
 		confidence_threshold: 0.15
 		nms_threshold: 0.3
 		num_classes: 1
-		biases: 7.67
-		biases: 12.93
-		biases: 12.00
-		biases: 22.53
-		biases: 19.4
-		biases: 35.13
-		biases: 30.17
-		biases: 53.60
-		biases: 51.13
-		biases: 78.69
-		biases: 72.16
-		biases: 132.0
-		biases: 125.64
-		biases: 180.48
-		biases: 196.59
-		biases: 281.10
-		biases: 307.67
-		biases: 395.16
+		biases: 8.0
+		biases: 13.6
+		biases: 12.6
+		biases: 23.7
+		biases: 20.4
+		biases: 37.0
+		biases: 31.8
+		biases: 56.5
+		biases: 53.8
+		biases: 82.8
+		biases: 76.0
+		biases: 138.9
+		biases: 132.2
+		biases: 190.0
+		biases: 206.9
+		biases: 295.8
+		biases: 323.9
+		biases: 416.0
 
 		mask:0
 		mask:1
