@@ -232,7 +232,9 @@ def compute_centroids(label_path,n_anchors,loss_convergence,grid_size,iterations
     for centroid in centroids:
         print("k-means result：\n")
         print("the num of the group_%d: %d"%(ii, len(groups[ii])))
-        print(centroid.w*grid_size, centroid.h*grid_size)
+        print("bias_scale:", centroid.w*grid_size)
+        print("bias_scale:", centroid.h*grid_size)
+        #print(centroid.w*grid_size, centroid.h*grid_size)
         ii+=1
     avgIOU = avg_iou(boxes, centroids)
     print("avgIOU: ", avgIOU)
@@ -242,7 +244,7 @@ def main():
 	if 1:
 		n_anchors = 9
 		loss_convergence = 1e-2
-		grid_size = 608
+		grid_size = 640
 		iterations_num = 10000
 		plus = 1
 		compute_centroids(classfyFile,n_anchors,loss_convergence,grid_size,iterations_num,plus)
