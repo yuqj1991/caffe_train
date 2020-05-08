@@ -3,7 +3,7 @@ from __future__ import print_function
 import sys, os
 import logging
 try:
-    caffe_root = '../../../../../caffe_train/'
+    caffe_root = '../../../../caffe_train/'
     sys.path.insert(0, caffe_root + 'python')
     import caffe
 except ImportError:
@@ -304,10 +304,17 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
         crop_type = P.AnnotatedData.CROP_RANDOM, YoloForamte = True)
 
-class_out, box_Output = efficientDetBody(net= net, from_layer= 'data', width_coefficient =1.0, depth_coefficient= 1.0,
-                                        is_training = True, conv_after_downsample=False, 
-                                        use_nearest_resize=False, pooling_type= "avg",
-                                         Use_BN= True, use_global_stats= False )
+
+'''
+net, class_out = efficientNetBody(net= net, from_layer= 'data', width_coefficient =1.0, depth_coefficient= 1.0,
+                                        Use_BN= True, use_global_stats= False,
+                                        use_relu= True, use_swish = False)
+'''
+classes = efficientDetBody(net=net, from_layer='data', width_coefficient=1.0, depth_coefficient=1.0, 
+                                    Use_BN = True, use_global_stats= False, 
+                                    use_relu = False, use_swish= True,
+                                    is_training=True, conv_after_downsample=False, 
+                                    use_nearest_resize=False, pooling_type= None)
 '''
 bias_scale = [512, 256, 128, 64]
 low_bbox_scale = [256, 128, 64, 8]
@@ -321,21 +328,27 @@ for idx, detect_output in enumerate(LayerList_Output):
                             up_bbox_scale= up_bbox_scale[idx], 
                             stageidx= idx, from_layers= from_layers)
     from_layers = []
-with open(train_net_file, 'w') as f:
-    print('name: "{}_train"'.format("CenterGridFace"), file=f)
-    print(net.to_proto(), file=f)
 '''
+with open(train_net_file, 'w') as f:
+    print('name: "{}_train"'.format("efficientDetCoco"), file=f)
+    print(net.to_proto(), file=f)
+
 # 创建test.prototxt
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batch_size,
         train=False, output_label=True, label_map_file=labelmapPath,
         transform_param=test_transform_param)
-
-test_out, box_out = efficientDetBody(net, from_layer = 'data', 
-                                            width_coefficient =1.0, depth_coefficient= 1.0,
-                                            is_training = False, conv_after_downsample=False, 
-                                            use_nearest_resize=False, pooling_type= "max",
-                                            Use_BN= True, use_global_stats= True)
+'''
+net, test_out = efficientNetBody(net, from_layer = 'data', 
+                                    width_coefficient =1.0, depth_coefficient= 1.0,
+                                    Use_BN= True, use_global_stats= True,
+                                    use_relu= True, use_swish = False)
+'''
+classes = efficientDetBody(net=net, from_layer='data', width_coefficient=1.0, depth_coefficient=1.0, 
+                                    Use_BN = True, use_global_stats= True, 
+                                    use_relu = True, use_swish= False,
+                                    is_training=False, conv_after_downsample=False, 
+                                    use_nearest_resize=False, pooling_type= None)
 '''
 DetectListLayer = []
 DetectListScale = []

@@ -15,6 +15,8 @@ namespace caffe {
 
 void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vector<NormalizedBBox>* sampled_bboxes)
 {
+  NormalizedBBox sampled_bbox;
+  #if 0
 	float img_w,img_h,off_x,off_y;
   float pleft, pright, ptop, pbottom;
   vector<NormalizedBBox> object_bboxes;
@@ -29,7 +31,7 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
 	off_y = ptop;
   img_w = 1.f - pleft - pright;
   img_h = 1.f - ptop - pbottom;
-  NormalizedBBox sampled_bbox;
+  
   sampled_bbox.set_xmin(off_x);
   sampled_bbox.set_ymin(off_y);
   sampled_bbox.set_xmax(off_x + img_w);
@@ -43,8 +45,13 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
     sampled_bbox.set_xmax(1.f);
     sampled_bbox.set_ymax(1.f);
   }
-	sampled_bboxes->push_back(sampled_bbox);
-
+  #else
+  sampled_bbox.set_xmin(0.f);
+  sampled_bbox.set_ymin(0.f);
+  sampled_bbox.set_xmax(1.f);
+  sampled_bbox.set_ymax(1.f);
+  #endif
+  sampled_bboxes->push_back(sampled_bbox);
 }
 
 void GroupObjectBBoxes(const AnnotatedDatum& anno_datum,

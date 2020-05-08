@@ -12,15 +12,19 @@ from caffe.utils import *
 import math
 
 
-def SEMoudleBlock(net, from_layer, channels, layerPrefix= '', ratio = 0.2):
+def SEMoudleBlock(net, from_layer, channels, layerPrefix= '', ratio = 0.2, use_swish = True):
     assert from_layer in net.keys()
     Global_poolingName= "{}_GloabalPool".format(layerPrefix)
     net[Global_poolingName] = L.Pooling(net[from_layer], pool=P.Pooling.AVE, global_pooling=True)
-    Full_inproductName_Project = "{}_FullinProduct_Project".format(layerPrefix)
-    net[Full_inproductName_Project] = L.InnerProduct(net[Global_poolingName], num_output = channels * ratio)
-    Swish_Name = "{}_Swish".format(layerPrefix)
-    net[Swish_Name] = L.Swish(net[Full_inproductName_Project], in_place=True)
-    Full_inproductName_expand = "{}_FullinProduct_Expand".format(layerPrefix)
+    Full_inproductName_Project = "{}_inProduct_Project".format(layerPrefix)
+    net[Full_inproductName_Project] = L.InnerProduct(net[Global_poolingName], num_output = int(channels * ratio))
+    if use_swish:
+        Swish_Name = "{}_Swish".format(layerPrefix)
+        net[Swish_Name] = L.Swish(net[Full_inproductName_Project], in_place=True)
+    else:
+        Swish_Name = "{}_Relu6".format(layerPrefix)
+        net[Swish_Name] = L.ReLU6(net[Full_inproductName_Project], in_place=True)
+    Full_inproductName_expand = "{}_inProduct_Expand".format(layerPrefix)
     net[Full_inproductName_expand] = L.InnerProduct(net[Swish_Name], num_output = channels)
     Sigmoid_Name = "{}_Sigmoid".format(layerPrefix)
     net[Sigmoid_Name] = L.Sigmoid(net[Full_inproductName_expand], in_place= True)
@@ -33,7 +37,11 @@ def BiFPNBlock(net, from_layers= [], image_size = 640, min_level = 3, max_level 
                     fpn_out_channels = 88, use_global_stats = True, use_relu = False, 
                     apply_bn=True, is_training=True, conv_after_downsample=False, 
                     use_nearest_resize=False, pooling_type= None):
-    assert from_layers in net.keys()
+    assert len(from_layers) > 0
+    for i, layer in enumerate(from_layers):
+        if not isinstance(layer, dict):
+            raise ValueError("layer must be dict")
+        assert layer['layer'] in net.keys()
     feat_sizes = get_feat_sizes(image_size, max_level)
     num_levels = max_level - min_level + 1
     feats = []
@@ -41,18 +49,22 @@ def BiFPNBlock(net, from_layers= [], image_size = 640, min_level = 3, max_level 
     for i in range(num_levels):
         if i < len(from_layers):
             feats.append(from_layers[i])
+            if not isinstance(feats[i], dict):
+                raise ValueError("feats[{}] must be dict".format(i))
         else:
-            feats.append(resample_feature_map(net, feats[-1], use_global_stats= use_global_stats, 
-                              use_relu= False, 
-                              target_height= (net.blobs[feats[-1]].shape[2] - 1) // 2 + 1, 
-                              target_width= (net.blobs[feats[-1]].shape[3]  - 1) // 2 + 1,
-                              target_channels= fpn_out_channels, 
-                              current_height= net.blobs[feats[-1]].shape[2], 
-                              current_width= net.blobs[feats[-1]].shape[3],  
-                              current_channels = net.blobs[feats[-1]].shape[1], layerPrefix = '{}_base'.format(i), 
-                              apply_bn= apply_bn, is_training= is_training, conv_after_downsample=conv_after_downsample, 
-                              use_nearest_resize= use_nearest_resize, pooling_type= pooling_type))                 
+            if isinstance(feats[-1], dict):
+                feats.append(resample_feature_map(net, feats[-1], use_global_stats= use_global_stats, 
+                                use_relu= False, 
+                                target_height= (feats[-1]['height'] - 1) // 2 + 1, 
+                                target_width= (feats[-1]["width"]  - 1) // 2 + 1,
+                                target_channels= fpn_out_channels, 
+                                layerPrefix = '{}_base'.format(i), 
+                                apply_bn= apply_bn, is_training= is_training, conv_after_downsample=conv_after_downsample, 
+                                use_nearest_resize= use_nearest_resize, pooling_type= pooling_type))
+            else:
+                raise ValueError("feats[{}] must be dict type".format(i - 1))
     verify_feats_size(net= net, feats= feats, feat_sizes= feat_sizes, min_level= min_level, max_level= max_level)
+
     # need Upsampler node
     pnodes = [
         {'feat_level': 6, 'inputs_offsets': [3, 4]},
@@ -64,8 +76,9 @@ def BiFPNBlock(net, from_layers= [], image_size = 640, min_level = 3, max_level 
         {'feat_level': 6, 'inputs_offsets': [3, 5, 10]},
         {'feat_level': 7, 'inputs_offsets': [4, 11]},
     ]
-    for repeate_idx in range(fpn_cell_repeats):
-        new_feats = BuildBiFPNLayer(net= net, feats= feats, feat_sizes= feat_sizes, fpn_nodes= pnodes, layerPrefix = '{}_BiFPN'.format(repeate_idx),
+    for repeate_idx in range(1):
+        new_feats = BuildBiFPNLayer(net= net, feats= feats, feat_sizes= feat_sizes, fpn_nodes= pnodes, 
+                                        layerPrefix = '{}_BiFPN'.format(repeate_idx),
                                         fpn_out_filters= fpn_out_channels, min_level = min_level, max_level = max_level, 
                                         use_global_stats = use_global_stats, use_relu = use_relu, concat_method= "fast_attention", 
                                         apply_bn=apply_bn, is_training=is_training, conv_after_downsample=conv_after_downsample,
@@ -77,23 +90,35 @@ def BiFPNBlock(net, from_layers= [], image_size = 640, min_level = 3, max_level 
 
 
 def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor, kernel_size= 3,
-                        Use_BN = True, Use_scale = True, use_global_stats= False, Use_SE= False, use_relu = False, use_swish= True, **bn_param):
+                        Use_BN = True, Use_scale = True, use_global_stats= False, Use_SE= False, use_relu = False, use_swish= False, **bn_param):
+    if kernel_size == 3:
+        pad = 1
+    elif kernel_size == 5:
+        pad = 2
     if strides == 1:
         out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
         ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
                     num_output = fileter_channels * expansion_factor, kernel_size=1, 
                     pad=0, stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
-        out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
-        ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
-                    num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=1, 
-                    group= fileter_channels * expansion_factor,
-                    stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
-        out_layer = out_layer_depthswise
         if Use_SE:
+            out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
+            ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = False, use_swish= False,
+                        num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=pad, 
+                        group= fileter_channels * expansion_factor,
+                        stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
+            out_layer = out_layer_depthswise
             out_layer = SEMoudleBlock(net, from_layer= out_layer, channels= fileter_channels * expansion_factor, 
-                                        layerPrefix= 'SE_{}_{}/{}'.format(id, repeated_num, 'attention'), ratio = 0.25) 
+                                        layerPrefix= 'SE_{}_{}/{}'.format(id, repeated_num, 'attention'), ratio = 0.25, 
+                                        use_swish= use_swish) 
+        else:
+            out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
+            ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
+                        num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=pad, 
+                        group= fileter_channels * expansion_factor,
+                        stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
+            out_layer = out_layer_depthswise
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
-        ConvBNLayer(net, out_layer, out_layer_projects, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
+        ConvBNLayer(net, out_layer, out_layer_projects, use_bn=Use_BN, use_relu = False, use_swish= False,
                     num_output = fileter_channels, kernel_size=1, pad=0, stride = strides, 
                     use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         res_name = 'Res_Sum_{}_{}'.format(id, repeated_num)
@@ -106,10 +131,10 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
                     use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
         ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
-                    num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=0, stride = strides, 
+                    num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=pad, stride = strides, 
                     group= fileter_channels * expansion_factor, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
-        ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
+        ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu = False, use_swish= False,
                     num_output = fileter_channels, kernel_size=1, pad=0, stride = 1, use_scale = Use_scale
                     , use_global_stats= use_global_stats,
                     **bn_param)
@@ -317,20 +342,28 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
     return net, LayerList_Output
 
 
-def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_BN = True, use_global_stats= False, **bn_param):
+def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_BN = True, use_global_stats= False, 
+                            use_relu = False, use_swish= True, inputHeight= 640, inputWidth = 640, **bn_param):
     assert from_layer in net.keys()
+    if use_relu and use_swish:
+        raise ValueError("the use_relu and use_swish should not be true at the same time")
+    if not use_relu and not use_swish:
+        raise ValueError("the use_relu and use_swish should not be false at the same time")
     index = 0
     feature_stride = [8, 16, 32]
     accum_stride = 1
     pre_stride = 1
     LayerList_Name = []
     LayerFilters = []
+    LayerShapes = []
     out_layer = "conv_{}".format(index)
     Param_width_channel= round_filters(32, width_coefficient)
-    ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,
+    ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=use_relu, use_swish= use_swish,
                 num_output= Param_width_channel, kernel_size=3, pad=1, stride = 2, use_scale = True,
                 use_global_stats= use_global_stats,
                 **bn_param)
+    layer_height, layer_width = get_layer_shape(False, inputHeight, inputWidth, 3, 1, 2, "conv")
+    current_height, current_width= layer_height, layer_width
     accum_stride *= 2
     pre_channels= Param_width_channel
                                  #e  c   r  s  k
@@ -353,63 +386,119 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
         accum_stride *= s
         c = round_filters(c, width_coefficient)
         n = round_repeats(n, depth_coefficient)
+        
         if n > 1:
             if s == 2:
-                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, kernel_size= k, Use_BN = True, use_relu= False, use_swish= True,
+                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, kernel_size= k, Use_BN = True, 
+                                                        use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True, use_global_stats= use_global_stats, Use_SE=True,  **bn_param)
                 out_layer = layer_name
+                if k == 3:
+                    pad = 1
+                elif k == 5:
+                    pad = 2
+                layer_height, layer_width = get_layer_shape(False, current_height, current_width, k, pad, s, "conv")
+                current_height, current_width= layer_height, layer_width
                 strides = 1
                 for id in range(n - 1):
                     layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, kernel_size= k, Use_BN = True, 
-                                                        use_relu= False, use_swish= True,
+                                                        use_relu=use_relu, use_swish= use_swish,
                                                         Use_scale = True, use_global_stats= use_global_stats, Use_SE=True, **bn_param)
+                    if k == 3:
+                        pad = 1
+                    elif k == 5:
+                        pad = 2
                     out_layer = layer_name
+                    layer_height, layer_width = get_layer_shape(False, current_height, current_width, k, pad, strides, "conv")
+                    current_height, current_width= layer_height, layer_width
             elif s == 1:
                 Project_Layer = out_layer
                 out_layer= "Conv_project_{}_{}".format(pre_channels, c)
-                ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
-                num_output= c, kernel_size= 3, pad= 1, stride= 1,
-                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+                ConvBNLayer(net, Project_Layer, out_layer, use_bn = True,
+                                use_relu=use_relu, use_swish= use_swish,
+                                num_output= c, kernel_size= 3, pad= 1, stride= 1,
+                                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+                
+                layer_height, layer_width = get_layer_shape(False, current_height, current_width, 3, 1, 1, "conv")
+                current_height, current_width= layer_height, layer_width
                 for id in range(n):
                     layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, kernel_size= k, Use_BN = True, 
-                                                        use_relu= False, use_swish= True,
+                                                        use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True, use_global_stats= use_global_stats, Use_SE=True, **bn_param)
                     out_layer = layer_name
+
+                    if k == 3:
+                        pad = 1
+                    elif k == 5:
+                        pad = 2
+                    out_layer = layer_name
+                    layer_height, layer_width = get_layer_shape(False, current_height, current_width, k, pad, s, "conv")
+                    current_height, current_width= layer_height, layer_width
         elif n == 1:
             assert s == 1
             Project_Layer = out_layer
             out_layer= "Conv_project_{}_{}".format(pre_channels, c)
-            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu= False, use_swish= True,
+            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, 
+                        use_relu= use_relu, use_swish= use_swish,
                         num_output= c, kernel_size= 3, pad= 1, stride= 1,
                         lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+            
+            layer_height, layer_width = get_layer_shape(False, current_height, current_width, 3, 1, 1, "conv")
+            current_height, current_width= layer_height, layer_width
             layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, kernel_size= k, Use_BN = True, 
-                                                        use_relu= False, use_swish= True,
+                                                        use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True,use_global_stats= use_global_stats, Use_SE=True, **bn_param)
             out_layer = layer_name
+
+            if k == 3:
+                pad = 1
+            elif k == 5:
+                pad = 2
+            out_layer = layer_name
+            layer_height, layer_width = get_layer_shape(False, current_height, current_width, k, pad, s, "conv")
+            current_height, current_width= layer_height, layer_width
+
         if accum_stride in feature_stride:
             if accum_stride != pre_stride:
                 LayerList_Name.append(out_layer)
                 LayerFilters.append(c)
+                LayerShapes.append({'height': current_height, 'width': current_width, 'channel': c, 'layer': out_layer})
             elif accum_stride == pre_stride:
                 LayerList_Name[len(LayerList_Name) - 1] = out_layer
                 LayerFilters[len(LayerFilters) - 1] = c
+                LayerShapes[len(LayerShapes) - 1] = {'height': current_height, 'width': current_width, 'channel': c, 'layer': out_layer}
             pre_stride = accum_stride
         index += 1
         pre_channels = c
     assert len(LayerList_Name) == len(feature_stride)
-    return net, LayerList_Name
+    return net, LayerShapes
 
 def efficientDetBody(net, from_layer, width_coefficient, depth_coefficient, Use_BN = True, use_global_stats= False, 
+                                use_relu = False, use_swish= True,
                                 is_training=True, conv_after_downsample=False, 
                                 use_nearest_resize=False, pooling_type= None):
-    net, BaseLayer_Name = efficientNetBody(net= net, from_layer= from_layer, width_coefficient= width_coefficient, depth_coefficient= depth_coefficient, 
-                                            Use_BN= Use_BN, use_global_stats= use_global_stats)
-    FPNlayer_Name = BiFPNBlock(net= net, from_layers= BaseLayer_Name, image_size = 640, min_level = 3, 
+    if use_relu and use_swish:
+        raise ValueError("the use_relu and use_swish should not be true at the same time")
+    if not use_relu and not use_swish:
+        raise ValueError("the use_relu and use_swish should not be false at the same time")
+    net, BaseLayer_Shapes = efficientNetBody(net= net, from_layer= from_layer, width_coefficient= width_coefficient, 
+                                            depth_coefficient= depth_coefficient, 
+                                            Use_BN= Use_BN, use_global_stats= use_global_stats,
+                                            use_relu = use_relu, use_swish= use_swish, inputHeight= 640, inputWidth = 640)
+    FPNlayer_Name = BiFPNBlock(net= net, from_layers= BaseLayer_Shapes,
+                                image_size = 640, min_level = 3, 
                                 max_level = 7, fpn_cell_repeats = 3, 
                                 fpn_out_channels = 88, use_global_stats = use_global_stats, use_relu= False,
                                 apply_bn=Use_BN, is_training=is_training, conv_after_downsample=conv_after_downsample, 
                                 use_nearest_resize= use_nearest_resize, pooling_type= pooling_type)
+    '''
+    print(FPNlayer_List)
     
-    class_out, box_out = Build_class_and_box_outputs(net, FPNlayer_Name, 88, num_classes= 99, min_level= 3, max_level= 7, is_training_bn= is_training)
-    return class_out, box_out
+    class_out, box_out = Build_class_and_box_outputs(net, FPNlayer_Name, 88, num_classes= 99, min_level= 3, 
+                                                            max_level= 7, is_training_bn= is_training)
+    print(class_out)
+    print("**************************")
+    print(box_out)
+    '''
+    return FPNlayer_Name
     
