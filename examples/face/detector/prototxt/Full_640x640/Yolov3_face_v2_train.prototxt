@@ -4728,7 +4728,8 @@ layer{
 #######################################################################
 #                            loss                                     #
 #######################################################################
-name: "Yolov3LossOne"
+layer{
+  name: "Yolov3LossOne"
 	type: "Yolov3Loss"
 	bottom: "dectction_moudle_one_out"
 	bottom: "label"
@@ -4782,7 +4783,7 @@ name: "Yolov3LossOne"
 
 		num_class: 1
 	}
-
+}
 layer {
 	name: "Yolov3LossTwo"
 	type: "Yolov3Loss"
