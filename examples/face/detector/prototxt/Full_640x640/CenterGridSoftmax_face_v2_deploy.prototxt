@@ -214,12 +214,6 @@ layer {
   }
 }
 layer {
-  name: "conv_0_0/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_0_0/expand"
-  top: "conv_0_0/expand"
-}
-layer {
   name: "conv_0_0/depthwise"
   type: "Convolution"
   bottom: "conv_0_0/expand"
@@ -284,12 +278,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_0_0/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_0_0/depthwise"
-  top: "conv_0_0/depthwise"
 }
 layer {
   name: "conv_0_0/linear"
@@ -429,12 +417,6 @@ layer {
   }
 }
 layer {
-  name: "conv_1_0/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_1_0/expand"
-  top: "conv_1_0/expand"
-}
-layer {
   name: "conv_1_0/depthwise"
   type: "Convolution"
   bottom: "conv_1_0/expand"
@@ -446,7 +428,7 @@ layer {
   convolution_param {
     num_output: 144
     bias_term: false
-    pad: 0
+    pad: 1
     kernel_size: 3
     group: 144
     stride: 2
@@ -499,12 +481,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_1_0/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_1_0/depthwise"
-  top: "conv_1_0/depthwise"
 }
 layer {
   name: "conv_1_0/linear"
@@ -637,12 +613,6 @@ layer {
   }
 }
 layer {
-  name: "conv_1_1/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_1_1/expand"
-  top: "conv_1_1/expand"
-}
-layer {
   name: "conv_1_1/depthwise"
   type: "Convolution"
   bottom: "conv_1_1/expand"
@@ -707,12 +677,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_1_1/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_1_1/depthwise"
-  top: "conv_1_1/depthwise"
 }
 layer {
   name: "conv_1_1/linear"
@@ -852,12 +816,6 @@ layer {
   }
 }
 layer {
-  name: "conv_2_0/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_2_0/expand"
-  top: "conv_2_0/expand"
-}
-layer {
   name: "conv_2_0/depthwise"
   type: "Convolution"
   bottom: "conv_2_0/expand"
@@ -869,7 +827,7 @@ layer {
   convolution_param {
     num_output: 192
     bias_term: false
-    pad: 0
+    pad: 1
     kernel_size: 3
     group: 192
     stride: 2
@@ -922,12 +880,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_2_0/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_2_0/depthwise"
-  top: "conv_2_0/depthwise"
 }
 layer {
   name: "conv_2_0/linear"
@@ -1060,12 +1012,6 @@ layer {
   }
 }
 layer {
-  name: "conv_2_1/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_2_1/expand"
-  top: "conv_2_1/expand"
-}
-layer {
   name: "conv_2_1/depthwise"
   type: "Convolution"
   bottom: "conv_2_1/expand"
@@ -1130,12 +1076,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_2_1/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_2_1/depthwise"
-  top: "conv_2_1/depthwise"
 }
 layer {
   name: "conv_2_1/linear"
@@ -1275,12 +1215,6 @@ layer {
   }
 }
 layer {
-  name: "conv_2_2/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_2_2/expand"
-  top: "conv_2_2/expand"
-}
-layer {
   name: "conv_2_2/depthwise"
   type: "Convolution"
   bottom: "conv_2_2/expand"
@@ -1345,12 +1279,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_2_2/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_2_2/depthwise"
-  top: "conv_2_2/depthwise"
 }
 layer {
   name: "conv_2_2/linear"
@@ -1490,12 +1418,6 @@ layer {
   }
 }
 layer {
-  name: "conv_3_0/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_3_0/expand"
-  top: "conv_3_0/expand"
-}
-layer {
   name: "conv_3_0/depthwise"
   type: "Convolution"
   bottom: "conv_3_0/expand"
@@ -1507,7 +1429,7 @@ layer {
   convolution_param {
     num_output: 384
     bias_term: false
-    pad: 0
+    pad: 1
     kernel_size: 3
     group: 384
     stride: 2
@@ -1560,12 +1482,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_3_0/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_3_0/depthwise"
-  top: "conv_3_0/depthwise"
 }
 layer {
   name: "conv_3_0/linear"
@@ -1698,12 +1614,6 @@ layer {
   }
 }
 layer {
-  name: "conv_3_1/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_3_1/expand"
-  top: "conv_3_1/expand"
-}
-layer {
   name: "conv_3_1/depthwise"
   type: "Convolution"
   bottom: "conv_3_1/expand"
@@ -1768,12 +1678,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_3_1/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_3_1/depthwise"
-  top: "conv_3_1/depthwise"
 }
 layer {
   name: "conv_3_1/linear"
@@ -1913,12 +1817,6 @@ layer {
   }
 }
 layer {
-  name: "conv_3_2/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_3_2/expand"
-  top: "conv_3_2/expand"
-}
-layer {
   name: "conv_3_2/depthwise"
   type: "Convolution"
   bottom: "conv_3_2/expand"
@@ -1983,12 +1881,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_3_2/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_3_2/depthwise"
-  top: "conv_3_2/depthwise"
 }
 layer {
   name: "conv_3_2/linear"
@@ -2128,12 +2020,6 @@ layer {
   }
 }
 layer {
-  name: "conv_3_3/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_3_3/expand"
-  top: "conv_3_3/expand"
-}
-layer {
   name: "conv_3_3/depthwise"
   type: "Convolution"
   bottom: "conv_3_3/expand"
@@ -2198,12 +2084,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_3_3/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_3_3/depthwise"
-  top: "conv_3_3/depthwise"
 }
 layer {
   name: "conv_3_3/linear"
@@ -2414,12 +2294,6 @@ layer {
   }
 }
 layer {
-  name: "conv_4_0/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_4_0/expand"
-  top: "conv_4_0/expand"
-}
-layer {
   name: "conv_4_0/depthwise"
   type: "Convolution"
   bottom: "conv_4_0/expand"
@@ -2484,12 +2358,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_4_0/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_4_0/depthwise"
-  top: "conv_4_0/depthwise"
 }
 layer {
   name: "conv_4_0/linear"
@@ -2629,12 +2497,6 @@ layer {
   }
 }
 layer {
-  name: "conv_4_1/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_4_1/expand"
-  top: "conv_4_1/expand"
-}
-layer {
   name: "conv_4_1/depthwise"
   type: "Convolution"
   bottom: "conv_4_1/expand"
@@ -2699,12 +2561,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_4_1/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_4_1/depthwise"
-  top: "conv_4_1/depthwise"
 }
 layer {
   name: "conv_4_1/linear"
@@ -2844,12 +2700,6 @@ layer {
   }
 }
 layer {
-  name: "conv_4_2/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_4_2/expand"
-  top: "conv_4_2/expand"
-}
-layer {
   name: "conv_4_2/depthwise"
   type: "Convolution"
   bottom: "conv_4_2/expand"
@@ -2914,12 +2764,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_4_2/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_4_2/depthwise"
-  top: "conv_4_2/depthwise"
 }
 layer {
   name: "conv_4_2/linear"
@@ -3059,12 +2903,6 @@ layer {
   }
 }
 layer {
-  name: "conv_5_0/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_5_0/expand"
-  top: "conv_5_0/expand"
-}
-layer {
   name: "conv_5_0/depthwise"
   type: "Convolution"
   bottom: "conv_5_0/expand"
@@ -3076,7 +2914,7 @@ layer {
   convolution_param {
     num_output: 960
     bias_term: false
-    pad: 0
+    pad: 1
     kernel_size: 3
     group: 960
     stride: 2
@@ -3129,12 +2967,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_5_0/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_5_0/depthwise"
-  top: "conv_5_0/depthwise"
 }
 layer {
   name: "conv_5_0/linear"
@@ -3267,12 +3099,6 @@ layer {
   }
 }
 layer {
-  name: "conv_5_1/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_5_1/expand"
-  top: "conv_5_1/expand"
-}
-layer {
   name: "conv_5_1/depthwise"
   type: "Convolution"
   bottom: "conv_5_1/expand"
@@ -3337,12 +3163,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_5_1/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_5_1/depthwise"
-  top: "conv_5_1/depthwise"
 }
 layer {
   name: "conv_5_1/linear"
@@ -3482,12 +3302,6 @@ layer {
   }
 }
 layer {
-  name: "conv_5_2/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_5_2/expand"
-  top: "conv_5_2/expand"
-}
-layer {
   name: "conv_5_2/depthwise"
   type: "Convolution"
   bottom: "conv_5_2/expand"
@@ -3552,12 +3366,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_5_2/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_5_2/depthwise"
-  top: "conv_5_2/depthwise"
 }
 layer {
   name: "conv_5_2/linear"
@@ -3768,12 +3576,6 @@ layer {
   }
 }
 layer {
-  name: "conv_6_0/expand_relu6"
-  type: "ReLU6"
-  bottom: "conv_6_0/expand"
-  top: "conv_6_0/expand"
-}
-layer {
   name: "conv_6_0/depthwise"
   type: "Convolution"
   bottom: "conv_6_0/expand"
@@ -3838,12 +3640,6 @@ layer {
       value: 0.0
     }
   }
-}
-layer {
-  name: "conv_6_0/depthwise_relu6"
-  type: "ReLU6"
-  bottom: "conv_6_0/depthwise"
-  top: "conv_6_0/depthwise"
 }
 layer {
   name: "conv_6_0/linear"
