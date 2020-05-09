@@ -387,7 +387,6 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
 
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                 const vector<DataAnchorSampler>& data_anchor_samplers,
-                                int resized_height, int resized_width, 
                                 vector<NormalizedBBox>* sampled_bboxes) {
   CHECK_EQ(data_anchor_samplers.size(), 1);
   vector<NormalizedBBox> object_bboxes;
