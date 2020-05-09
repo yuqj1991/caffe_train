@@ -604,9 +604,9 @@ int main(int argc, char** argv){
       #if 1
       GenerateBatchDataAnchorSamples(anno_datum, data_anchor_samplers_, &sampled_bboxes);
       sampled_datum = new AnnotatedDatum();
-      int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+      int rand_id = caffe_rng_rand() % sampled_bboxes.size();
       data_transformer_.CropImage(anno_datum,
-                                    sampled_bboxes[rand_idx],
+                                    sampled_bboxes[rand_id],
                                     sampled_datum);
       LOG(INFO)<<"=====TEST DATA ANCHOR SAMPLES SUCCESSFULLY!=====";
       #else
@@ -615,9 +615,9 @@ int main(int argc, char** argv){
                               resized_anno_datum, transform_param, do_resize);
       CHECK_GT(resized_anno_datum->datum().channels(), 0);
       sampled_datum = new AnnotatedDatum();
-      int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+      int rand_id = caffe_rng_rand() % sampled_bboxes.size();
       data_transformer_.CropImage_Sampling(*resized_anno_datum,
-                                          sampled_bboxes[rand_idx],
+                                          sampled_bboxes[rand_id],
                                           sampled_datum);
       LOG(INFO)<<"=====TEST DATA LFFD SAMPLES SUCCESSFULLY!=====";
       #endif
