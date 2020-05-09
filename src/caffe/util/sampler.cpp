@@ -431,8 +431,8 @@ void GenerateLFFDSample(const AnnotatedDatum& anno_datum,
                         const TransformationParameter& trans_param,
                         bool do_resize){
   CHECK_EQ(bbox_large_size_list.size(), bbox_small_size_list.size());
-  int resized_height = transform_param.resize_param().height();
-  int resized_width = transform_param.resize_param().width();
+  int resized_height = trans_param.resize_param().height();
+  int resized_width = trans_param.resize_param().width();
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
   int num_output_scale = bbox_small_size_list.size();
