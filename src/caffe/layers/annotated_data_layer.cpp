@@ -232,7 +232,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         CHECK_GT(resized_anno_datum->datum().channels(), 0);
         sampled_datum = new AnnotatedDatum();
         this->data_transformer_->CropImage_Sampling(*resized_anno_datum,
-                                            sampled_bbox,
+                                            sampled_bboxes[0],
                                             sampled_datum);
         has_sampled = true;
       } else {
@@ -252,7 +252,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
           CHECK_GT(resized_anno_datum->datum().channels(), 0);
           sampled_datum = new AnnotatedDatum();
           this->data_transformer_->CropImage_Sampling(*resized_anno_datum,
-                                              sampled_bbox,
+                                              sampled_bboxes[0],
                                               sampled_datum);
           has_sampled = true;
         } else {
