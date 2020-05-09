@@ -622,7 +622,7 @@ int main(int argc, char** argv){
       LOG(INFO)<<"=====TEST DATA LFFD SAMPLES SUCCESSFULLY!=====";
       #endif
       CHECK(sampled_datum != NULL);
-      sampled_datum->set_type(anno_datum.anno_type());
+      sampled_datum->set_type(AnnotatedDatum_AnnotationType_BBOX);
       vector<AnnotationGroup> transformed_anno_vec;
       transformed_anno_vec.clear();
       Blob<float> transformed_blob;
