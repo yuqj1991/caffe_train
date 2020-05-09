@@ -55,15 +55,11 @@ void GenerateBatchSamples_Square(const AnnotatedDatum& anno_datum,
 void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum, 
                                 const DataAnchorSampler& data_anchor_sampler,
                                 const vector<NormalizedBBox>& object_bboxes,
-                                int resized_height, int resized_width,
-                                NormalizedBBox* sampled_bbox, 
-                                const TransformationParameter& trans_param);
+                                NormalizedBBox* sampled_bbox);
 
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                 const vector<DataAnchorSampler>& data_anchor_samplers,
-                                int resized_height, int resized_width,
-                                vector<NormalizedBBox>* sampled_bboxes,
-                                const TransformationParameter& trans_param);
+                                vector<NormalizedBBox>* sampled_bboxes);
 
 void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized_anno_datum, 
                        float scale, const TransformationParameter& trans_param);
@@ -71,7 +67,6 @@ void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized
 // LFFD Generate samples by using data_samples
 
 void GenerateLFFDSample(const AnnotatedDatum& anno_datum,
-                        int resized_height, int resized_width,
                         vector<NormalizedBBox>* sampled_bboxes,
                         std::vector<int> bbox_small_size_list,
                         std::vector<int> bbox_large_size_list,

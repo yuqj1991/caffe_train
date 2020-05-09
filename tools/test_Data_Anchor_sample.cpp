@@ -600,24 +600,24 @@ int main(int argc, char** argv){
       bool do_resize = true;
       if(do_resize)
         resized_anno_datum = new AnnotatedDatum();
-      NormalizedBBox sampled_bbox;
+      vector<NormalizedBBox> sampled_bboxes;
       #if 1
-      GenerateBatchDataAnchorSamples(anno_datum, data_anchor_samplers_,
-                              resized_height, resized_width,
-                              &sampled_bbox, transform_param);
+      GenerateBatchDataAnchorSamples(anno_datum, data_anchor_samplers_, &sampled_bboxes);
       sampled_datum = new AnnotatedDatum();
-      data_transformer_.CropImage_anchor_Sampling(anno_datum,
-                                    sampled_bbox,
+      int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+      data_transformer_.CropImage(anno_datum,
+                                    sampled_bboxes[rand_idx],
                                     sampled_datum);
       LOG(INFO)<<"=====TEST DATA ANCHOR SAMPLES SUCCESSFULLY!=====";
       #else
-      GenerateLFFDSample(anno_datum, resized_height, resized_width, &sampled_bbox, 
+      GenerateLFFDSample(anno_datum, &sampled_bboxes, 
                               low_gt_boxes_list, up_gt_boxes_list, anchor_stride_list,
                               resized_anno_datum, transform_param, do_resize);
       CHECK_GT(resized_anno_datum->datum().channels(), 0);
       sampled_datum = new AnnotatedDatum();
-      data_transformer_.CropImage_LFFD_Sampling(*resized_anno_datum,
-                                          sampled_bbox,
+      int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+      data_transformer_.CropImage_Sampling(*resized_anno_datum,
+                                          sampled_bboxes[rand_idx],
                                           sampled_datum);
       LOG(INFO)<<"=====TEST DATA LFFD SAMPLES SUCCESSFULLY!=====";
       #endif

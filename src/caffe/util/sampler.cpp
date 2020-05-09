@@ -304,9 +304,7 @@ void GenerateBatchSamples_Square(const AnnotatedDatum& anno_datum,
 void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum, 
                                 const DataAnchorSampler& data_anchor_sampler,
                                 const vector<NormalizedBBox>& object_bboxes,
-                                int resized_height, int resized_width,
-                                NormalizedBBox* sampled_bbox, 
-                                const TransformationParameter& trans_param){
+                                NormalizedBBox* sampled_bbox){
   vector<int>anchorScale;
   int img_height = anno_datum.datum().height();
   int img_width = anno_datum.datum().width();
@@ -390,8 +388,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                 const vector<DataAnchorSampler>& data_anchor_samplers,
                                 int resized_height, int resized_width, 
-                                vector<NormalizedBBox>* sampled_bboxes,
-                                const TransformationParameter& trans_param) {
+                                vector<NormalizedBBox>* sampled_bboxes) {
   CHECK_EQ(data_anchor_samplers.size(), 1);
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
@@ -405,8 +402,8 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
           break;
         }
         
-        GenerateDataAnchorSample(anno_datum, data_anchor_samplers[i], object_bboxes, resized_height, 
-                                resized_width, &sampled_bbox, trans_param);
+        GenerateDataAnchorSample(anno_datum, data_anchor_samplers[i], object_bboxes, 
+                                  &sampled_bbox);
         if (SatisfySampleConstraint(sampled_bbox, object_bboxes,
                                       data_anchor_samplers[i].sample_constraint())){
           found++;
@@ -426,7 +423,6 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
 }
 
 void GenerateLFFDSample(const AnnotatedDatum& anno_datum,
-                        int resized_height, int resized_width,
                         vector<NormalizedBBox>* sampled_bboxes,
                         std::vector<int> bbox_small_size_list,
                         std::vector<int> bbox_large_size_list,
@@ -435,6 +431,8 @@ void GenerateLFFDSample(const AnnotatedDatum& anno_datum,
                         const TransformationParameter& trans_param,
                         bool do_resize){
   CHECK_EQ(bbox_large_size_list.size(), bbox_small_size_list.size());
+  int resized_height = transform_param.resize_param().height();
+  int resized_width = transform_param.resize_param().width();
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
   int num_output_scale = bbox_small_size_list.size();
