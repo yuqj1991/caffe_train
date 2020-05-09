@@ -17,12 +17,10 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
 {
   NormalizedBBox sampled_bbox;
   float img_w,img_h,off_x,off_y;
-  #if 0
-	
-  float pleft, pright, ptop, pbottom;
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
-
+  #if 0
+  float pleft, pright, ptop, pbottom;
 	caffe_rng_uniform(1, -jitter, jitter, &pleft);
   caffe_rng_uniform(1, -jitter, jitter, &pright);
   caffe_rng_uniform(1, -jitter, jitter, &ptop);
@@ -37,15 +35,6 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
   sampled_bbox.set_ymin(off_y);
   sampled_bbox.set_xmax(off_x + img_w);
   sampled_bbox.set_ymax(off_y + img_h);
-	
-  SampleConstraint min_object_coverage_Constraint;
-  min_object_coverage_Constraint.set_min_object_coverage(0.85);
-  if(!SatisfySampleConstraint(sampled_bbox, object_bboxes, min_object_coverage_Constraint)){
-    sampled_bbox.set_xmin(0.f);
-    sampled_bbox.set_ymin(0.f);
-    sampled_bbox.set_xmax(1.f);
-    sampled_bbox.set_ymax(1.f);
-  }
   #else
   caffe_rng_uniform(1, 1.0f - jitter, 1.0f, &img_w);
 	caffe_rng_uniform(1, 1.0f - jitter, 1.0f, &img_h);
@@ -56,13 +45,15 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
 	sampled_bbox.set_ymin(off_y);
 	sampled_bbox.set_xmax(off_x + img_w);
 	sampled_bbox.set_ymax(off_y + img_h);
-	/*
-  sampled_bbox.set_xmin(0.f);
-  sampled_bbox.set_ymin(0.f);
-  sampled_bbox.set_xmax(1.f);
-  sampled_bbox.set_ymax(1.f);
-  */
   #endif
+  SampleConstraint min_object_coverage_Constraint;
+  min_object_coverage_Constraint.set_min_object_coverage(0.85);
+  if(!SatisfySampleConstraint(sampled_bbox, object_bboxes, min_object_coverage_Constraint)){
+    sampled_bbox.set_xmin(0.f);
+    sampled_bbox.set_ymin(0.f);
+    sampled_bbox.set_xmax(1.f);
+    sampled_bbox.set_ymax(1.f);
+  }
   sampled_bboxes->push_back(sampled_bbox);
 }
 
