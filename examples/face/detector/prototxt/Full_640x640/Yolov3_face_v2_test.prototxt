@@ -1,4 +1,4 @@
-name: "CenterGridface"
+name: "Yolov3face_v2"
 layer {
 	name: "data"
 	type: "AnnotatedData"

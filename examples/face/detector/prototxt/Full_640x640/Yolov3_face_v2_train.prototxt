@@ -40,10 +40,6 @@ layer {
 			saturation_upper: 1.5
 			random_order_prob: 0.0
 		}
-		expand_param {
-			prob: 0.5
-			max_expand_ratio: 2.0
-		}
 	}
 	data_param {
 		source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
