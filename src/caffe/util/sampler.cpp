@@ -500,7 +500,7 @@ void GenerateLFFDSample(const AnnotatedDatum& anno_datum,
 
     SampleConstraint min_object_coverage_Constraint;
     min_object_coverage_Constraint.set_min_object_coverage(0.85);
-    if(!SatisfySampleConstraint(*sampled_bbox, object_bboxes, min_object_coverage_Constraint)){
+    if(!SatisfySampleConstraint(sampled_bbox, object_bboxes, min_object_coverage_Constraint)){
       resized_anno_datum->CopyFrom(anno_datum);
       sampled_bbox.set_xmin(0.f);
       sampled_bbox.set_ymin(0.f);
