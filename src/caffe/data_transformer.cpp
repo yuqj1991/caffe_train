@@ -621,24 +621,7 @@ void DataTransformer<Dtype>::CropImage(const AnnotatedDatum& anno_datum,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::CropImage_anchor_Sampling(const AnnotatedDatum& anno_datum,
-														const NormalizedBBox& bbox,
-														AnnotatedDatum* cropped_anno_datum) {
-	// Crop the datum.
-	CropImageAnchor(anno_datum.datum(), bbox, cropped_anno_datum->mutable_datum());
-	cropped_anno_datum->set_type(anno_datum.type());
-	
-	// Transform the annotation according to crop_bbox.
-	const bool do_resize = false;
-	const bool do_mirror = false;
-	//NormalizedBBox crop_bbox;
-	//ClipBBox(bbox, &crop_bbox);
-	TransformAnnotation(anno_datum, do_resize, bbox, do_mirror,
-										cropped_anno_datum->mutable_annotation_group());
-}
-
-template<typename Dtype>
-void DataTransformer<Dtype>::CropImage_LFFD_Sampling(const AnnotatedDatum& anno_datum,
+void DataTransformer<Dtype>::CropImage_Sampling(const AnnotatedDatum& anno_datum,
 														const NormalizedBBox& bbox,
 														AnnotatedDatum* cropped_anno_datum) {
 	// Crop the datum.
