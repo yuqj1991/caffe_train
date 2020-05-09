@@ -315,8 +315,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         if (anno_data_param.has_anno_type()) {
           sampled_datum->set_type(anno_type_);
         } else {
-          CHECK_EQ(anno_type_, sampled_datum->type()) <<
-              "Different AnnotationType.";
+          CHECK_EQ(anno_type_, sampled_datum->type()) << "Different AnnotationType.";
         }
         // Transform datum and annotation_group at the same time
         transformed_anno_vec.clear();

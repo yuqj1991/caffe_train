@@ -223,6 +223,9 @@ int main(int argc, char** argv){
       transformed_anno_vec.clear();
       Blob<float> transformed_blob;
       vector<int> shape = data_transformer_.InferBlobShape(sampled_datum->datum());
+      for(unsigned int ii = 0; ii < shape.size(); ii++){
+        std::cout <<shape[ii]<<std::endl;
+      }
       transformed_blob.Reshape(shape);
       data_transformer_.Transform(*sampled_datum, &transformed_blob, &transformed_anno_vec);
       LOG(INFO)<<"SAMPEL SUCCESSFULLY";
