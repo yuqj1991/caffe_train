@@ -47,7 +47,6 @@ int main(int argc, char** argv){
   std::string srcTestfile = "../../img_test.txt";
   std::string save_folder = "../../anchorTestImage";
   std::vector<std::pair<string, string> > img_filenames;
-  std::map<int, std::vector<NormalizedBBox_S> >all_gt_bboxes;
   // anchor samples policy
   // anchor 的大概范围16, 32, 64, 128, 256, 512
   std::vector<int> Anchors;
