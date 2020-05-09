@@ -33,9 +33,9 @@ using boost::scoped_ptr;
 using namespace cv;
 using namespace std;
 
-#define TEST_CROP_BATCH 1
+#define TEST_CROP_BATCH 0
 #define TEST_CROP_BOX 0 
-#define TEST_CROP_ANCHOR 0
+#define TEST_CROP_ANCHOR 1
 #define TEST_CROP_JITTER 0
 
 
