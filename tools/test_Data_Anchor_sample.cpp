@@ -88,9 +88,9 @@ int main(int argc, char** argv){
     BatchSampler batch_sampler;
     batch_sampler.set_max_trials(50);
     batch_sampler.set_max_sample(1);
-    float overlap = (0.65 + ii * 0.1):(0.65 + ii * 0.1) <= 1 ? 1;
+    float overlap = (0.65 + ii * 0.1)?(0.65 + ii * 0.1) <= 1 : 1;
     batch_sampler.mutable_sample_constraint()->set_min_object_coverage(overlap);
-    float ratio = (0.3 + ii * 0.1):(0.3 + ii * 0.1) <= 1 ? 1;
+    float ratio = (0.3 + ii * 0.1)?(0.3 + ii * 0.1) <= 1 : 1;
     batch_sampler.mutable_sampler()->set_min_scale(ratio);
     batch_sampler.mutable_sampler()->set_max_scale(1.0);
     batch_sampler.mutable_sampler()->set_min_aspect_ratio(ratio);
