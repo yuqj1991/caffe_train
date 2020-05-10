@@ -19,7 +19,7 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
   float img_w,img_h,off_x,off_y;
   vector<NormalizedBBox> object_bboxes;
   GroupObjectBBoxes(anno_datum, &object_bboxes);
-  #if 0
+  #if 1
   float pleft, pright, ptop, pbottom;
 	caffe_rng_uniform(1, -jitter, jitter, &pleft);
   caffe_rng_uniform(1, -jitter, jitter, &pright);
