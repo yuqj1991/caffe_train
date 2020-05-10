@@ -12,6 +12,8 @@
 #include "caffe/util/benchmark.hpp"
 #include "caffe/util/sampler.hpp"
 
+#define BOOL_TEST_DATA 0 
+
 namespace caffe {
 
 template <typename Dtype>
@@ -338,10 +340,46 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         CHECK(sampled_datum->datum().has_label()) << "Cannot find any label.";
         top_label[item_id] = sampled_datum->datum().label();
       }
-    } else {
+    } 
+    else {
       this->data_transformer_->Transform(sampled_datum->datum(),
                                         &(this->transformed_data_));
     }
+    # if BOOL_TEST_DATA
+    cv::Mat cropImage;
+    std::string save_folder = "../../anchorTestImage";
+    std::string prefix_imgName = "crop_image";
+    int jj = 0;
+    std::string saved_img_name = save_folder + "/" + to_string(item_id) + "_" + to_string(jj) +".jpg";
+    const float* data = this->transformed_data_.cpu_data();
+    int Trans_Height = this->transformed_data_.height();
+    int Trans_Width = this->transformed_data_.width();
+    for(int row = 0; row < Trans_Height; row++){
+      unsigned char *ImgData = cropImage.ptr<uchar>(row);
+      for(int col = 0; col < Trans_Width; col++){
+        ImgData[3 * col + 0] = static_cast<uchar>(data[0 * Trans_Height * Trans_Width + row * Trans_Width + col]);
+        ImgData[3 * col + 1] = static_cast<uchar>(data[1 * Trans_Height * Trans_Width + row * Trans_Width + col]);
+        ImgData[3 * col + 2] = static_cast<uchar>(data[2 * Trans_Height * Trans_Width + row * Trans_Width + col]);
+      }
+    }
+    int Crop_Height = cropImage.rows;
+    int Crop_Width = cropImage.cols;
+    for (int g = 0; g < transformed_anno_vec.size(); ++g) {
+      const AnnotationGroup& anno_group = transformed_anno_vec[g];
+      for (int a = 0; a < anno_group.annotation_size(); ++a) {
+        const Annotation& anno = anno_group.annotation(a);
+        const NormalizedBBox& bbox = anno.bbox();
+        int xmin = int(bbox.xmin() * Crop_Width);
+        int ymin = int(bbox.ymin() * Crop_Height);
+        int xmax = int(bbox.xmax() * Crop_Width);
+        int ymax = int(bbox.ymax() * Crop_Height);
+        cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
+      }
+    }
+    jj ++ ;
+    cv::imwrite(saved_img_name, cropImage);
+    LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
+    #endif
     // clear memory
     if (has_sampled) {
       delete sampled_datum;

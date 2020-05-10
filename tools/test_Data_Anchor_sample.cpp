@@ -27,6 +27,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "caffe/common.hpp"
+#include "caffe/blob.hpp"
+#include "caffe/filler.hpp"
+#include "caffe/layers/annotated_data_layer.hpp"
+
 using namespace caffe;  // NOLINT(build/namespaces)
 using std::pair;
 using boost::scoped_ptr;
