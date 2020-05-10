@@ -218,7 +218,7 @@ int main(int argc, char** argv){
       sampled_datum->set_type(AnnotatedDatum_AnnotationType_BBOX);
       cv::Mat cropImage;
       std::string saved_img_name = save_folder + "/" + prefix_imgName + "_" + to_string(ii) + "_" + to_string(jj) +".jpg";
-      #if 0
+      #if 1
       vector<AnnotationGroup> transformed_anno_vec;
       transformed_anno_vec.clear();
       Blob<float> transformed_blob;
@@ -230,7 +230,7 @@ int main(int argc, char** argv){
       data_transformer_.Transform(*sampled_datum, &transformed_blob, &transformed_anno_vec);
       LOG(INFO)<<"SAMPEL SUCCESSFULLY";
       // 将Datum数据转换为原来图像的数据, 并保存成图像
-      cropImage(transformed_blob.height(), transformed_blob.width(), CV_8UC3);
+      cropImage = cv::Mat(transformed_blob.height(), transformed_blob.width(), CV_8UC3);
       const float* data = transformed_blob.cpu_data();
       int Trans_Height = transformed_blob.height();
       int Trans_Width = transformed_blob.width();
