@@ -34,7 +34,7 @@ using namespace cv;
 using namespace std;
 
 #define TEST_CROP_BATCH 0
-#define TEST_CROP_BOX 0 
+#define TEST_CROP_BOX 0
 #define TEST_CROP_ANCHOR 1
 #define TEST_CROP_JITTER 0
 
@@ -172,8 +172,6 @@ int main(int argc, char** argv){
 
       AnnotatedDatum& anno_datum = source_datum[rand_idx];
       AnnotatedDatum* sampled_datum = NULL;
-      int resized_height = transform_param.resize_param().height();
-      int resized_width = transform_param.resize_param().width();
       AnnotatedDatum* resized_anno_datum = NULL;
       bool do_resize = true;
       if(do_resize)
@@ -218,6 +216,9 @@ int main(int argc, char** argv){
       #endif
       CHECK(sampled_datum != NULL);
       sampled_datum->set_type(AnnotatedDatum_AnnotationType_BBOX);
+      cv::Mat cropImage;
+      std::string saved_img_name = save_folder + "/" + prefix_imgName + "_" + to_string(ii) + "_" + to_string(jj) +".jpg";
+      #if 0
       vector<AnnotationGroup> transformed_anno_vec;
       transformed_anno_vec.clear();
       Blob<float> transformed_blob;
@@ -229,8 +230,7 @@ int main(int argc, char** argv){
       data_transformer_.Transform(*sampled_datum, &transformed_blob, &transformed_anno_vec);
       LOG(INFO)<<"SAMPEL SUCCESSFULLY";
       // 将Datum数据转换为原来图像的数据, 并保存成图像
-      std::string saved_img_name = save_folder + "/" + prefix_imgName + "_" + to_string(ii) + "_" + to_string(jj) +".jpg";
-      cv::Mat cropImage(transformed_blob.height(), transformed_blob.width(), CV_8UC3);
+      cropImage(transformed_blob.height(), transformed_blob.width(), CV_8UC3);
       const float* data = transformed_blob.cpu_data();
       int Trans_Height = transformed_blob.height();
       int Trans_Width = transformed_blob.width();
@@ -256,6 +256,24 @@ int main(int argc, char** argv){
           cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
         }
       }
+      #else
+      cropImage= DecodeDatumToCVMatNative(sampled_datum->datum());
+      int Crop_Height = cropImage.rows;
+      int Crop_Width = cropImage.cols;
+      for (int g = 0; g < sampled_datum->annotation_group_size(); ++g) {
+			  const AnnotationGroup& anno_group = sampled_datum->annotation_group(g);
+        for (int a = 0; a < anno_group.annotation_size(); ++a) {
+          const Annotation& anno = anno_group.annotation(a);
+          const NormalizedBBox& bbox = anno.bbox();
+          int xmin = int(bbox.xmin() * Crop_Width);
+          int ymin = int(bbox.ymin() * Crop_Height);
+          int xmax = int(bbox.xmax() * Crop_Width);
+          int ymax = int(bbox.ymax() * Crop_Height);
+          cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
+        }
+      }
+      #endif
+      
       cv::imwrite(saved_img_name, cropImage);
       LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
       delete sampled_datum;
