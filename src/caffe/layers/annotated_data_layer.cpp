@@ -376,9 +376,12 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
       }
     }
-    jj ++ ;
     cv::imwrite(saved_img_name, cropImage);
     LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
+    jj ++ ;
+    if(jj == 1000){
+      LOG(FATAL)<<"We have completed 1000 times images crop testd!";
+    }
     #endif
     // clear memory
     if (has_sampled) {
