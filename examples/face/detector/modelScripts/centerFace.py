@@ -25,155 +25,7 @@ labelmapPath = "../labelmap.prototxt"
 resize_width = 640
 resize_height = 640
 resize = "{}x{}".format(resize_width, resize_height)
-batch_sampler = [
-    {
-        'sampler': {
-            'min_scale': 0.3,
-            'max_scale': 1.0,
-            'min_aspect_ratio': 0.3,
-            'max_aspect_ratio': 1.0,
-        },
-        'sample_constraint': {
-            'min_jaccard_overlap': 1.0,
-        },
-        'max_trials': 50,
-        'max_sample': 1,
-    },
-    {
-        'sampler': {
-            'min_scale': 0.4,
-            'max_scale': 1.0,
-            'min_aspect_ratio': 0.4,
-            'max_aspect_ratio': 1.0,
-        },
-        'sample_constraint': {
-            'min_jaccard_overlap': 1.0,
-        },
-        'max_trials': 50,
-        'max_sample': 1,
-    },
-    {
-        'sampler': {
-            'min_scale': 0.5,
-            'max_scale': 1.0,
-            'min_aspect_ratio': 0.5,
-            'max_aspect_ratio': 1.0,
-        },
-        'sample_constraint': {
-            'min_jaccard_overlap': 1.0,
-        },
-        'max_trials': 50,
-        'max_sample': 1,
-    },
-    {
-        'sampler': {
-            'min_scale': 0.6,
-            'max_scale': 1.0,
-            'min_aspect_ratio': 0.6,
-            'max_aspect_ratio': 1.0,
-        },
-        'sample_constraint': {
-            'min_jaccard_overlap': 1.0,
-            },
-        'max_trials': 50,
-        'max_sample': 1,
-    },
-    {
-        'sampler': {
-            'min_scale': 0.7,
-            'max_scale': 1.0,
-            'min_aspect_ratio': 0.7,
-            'max_aspect_ratio': 1.0,
-        },
-        'sample_constraint': {
-            'min_jaccard_overlap': 1.0,
-            },
-        'max_trials': 50,
-        'max_sample': 1,
-    },
-    {
-        'sampler': {
-            'min_scale': 0.8,
-            'max_scale': 1.0,
-            'min_aspect_ratio': 0.8,
-            'max_aspect_ratio': 1.0,
-        },
-        'sample_constraint': {
-            'max_jaccard_overlap': 1.0,
-        },
-        'max_trials': 50,
-        'max_sample': 1,
-    },
-    {
-        'sampler': {
-            'min_scale': 0.9,
-            'max_scale': 1.0,
-            'min_aspect_ratio': 0.9,
-            'max_aspect_ratio': 1.0,
-        },
-        'sample_constraint': {
-            'max_jaccard_overlap': 1.0,
-        },
-        'max_trials': 50,
-        'max_sample': 1,
-    },
-]
-scale = [16, 32, 64, 128, 256, 512]
-data_anchor_sampler = {
-        'scale': scale,
-        'sample_constraint': {
-            'min_object_coverage': 0.75
-        },
-        'max_sample': 1,
-        'max_trials': 50,
-}
-bbox = [
-    {
-      'bbox_small_scale': 10,
-      'bbox_large_scale': 15,
-      'ancher_stride': 4,
-    },
-    {
-      'bbox_small_scale': 15,
-      'bbox_large_scale': 20,
-      'ancher_stride': 4,
-    },
-    {
-      'bbox_small_scale': 20,
-      'bbox_large_scale': 40,
-      'ancher_stride': 8,
-    },
-    {
-      'bbox_small_scale': 40,
-      'bbox_large_scale': 70,
-      'ancher_stride': 8,
-    },
-    {
-      'bbox_small_scale': 70,
-      'bbox_large_scale': 110,
-      'ancher_stride': 16,
-    },
-    {
-      'bbox_small_scale': 110,
-      'bbox_large_scale': 250,
-      'ancher_stride': 32,
-    },
-    {
-      'bbox_small_scale': 250,
-      'bbox_large_scale': 400,
-      'ancher_stride': 32,
-    },
-    {
-      'bbox_small_scale': 400,
-      'bbox_large_scale': 560,
-      'ancher_stride': 32,
-    },
-]
-bbox_sampler = {
-    'box': bbox,
-    'max_sample': 1,
-    'max_trials': 50,
-}
+
 train_transform_param = {
     'mirror': True,
     'mean_value': [103.94, 116.78, 123.68],
@@ -222,8 +74,8 @@ test_transform_param = {
     },
 }
 base_learning_rate = 0.0005
-Job_Name = "CenterGrid{}_face_v3".format("Softmax")
-mdoel_name = "ResideoDeepFace"
+Job_Name = "Centerface_v2"
+mdoel_name = "ResideoCenterFace"
 save_dir = "../prototxt/Full_{}".format(resize)
 snapshot_dir = "../snapshot/{}".format(Job_Name)
 train_net_file = "{}/{}_train.prototxt".format(save_dir, Job_Name)
@@ -236,7 +88,7 @@ pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"
 gpus = "0"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
-batch_size = 6
+batch_size = 8
 accum_batch_size = 16
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
@@ -269,7 +121,7 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 30000, 50000, 70000, 90000],
+    'stepvalue': [10000, 50000, 70000, 90000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
@@ -304,19 +156,14 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
         crop_type = P.AnnotatedData.CROP_RANDOM, YoloForamte = True)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
-bias_scale = [620, 256, 128, 32]
-low_bbox_scale = [256, 128, 32, 6]
-up_bbox_scale = [620, 256, 128, 32]
+net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data')
+
 from_layers = []
-for idx, detect_output in enumerate(LayerList_Output):
-    from_layers.append(net[detect_output])
-    from_layers.append(net.label)
-    CenterGridObjectLoss(net=net, bias_scale= bias_scale[idx], 
-                            low_bbox_scale= low_bbox_scale[idx], 
-                            up_bbox_scale= up_bbox_scale[idx], 
-                            stageidx= idx, from_layers= from_layers)
-    from_layers = []
+from_layers.append(netbox_out])
+from_layers.append(net[class_out])
+from_layers.append(net.label)
+CenterFaceObjectLoss(net= net, stageidx= 0, from_layers= from_layers)
+
 with open(train_net_file, 'w') as f:
     print('name: "{}_train"'.format("CenterGridFace"), file=f)
     print(net.to_proto(), file=f)
@@ -327,16 +174,18 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
         train=False, output_label=True, label_map_file=labelmapPath,
         transform_param=test_transform_param)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, use_global_stats= True)
+net, class_out, box_out = CenterFaceMobilenetV2Body(net, from_layer = 'data', Use_BN= True, use_global_stats= True)
+
+Sigmoid_layer = "{}_Sigmoid".format(class_out)
+net[Sigmoid_layer] = L.Sigmoid(net[class_out], in_place= True)
+Pooling_Layer = "{}_Pooling".format(class_out)
+net[Pooling_Layer] = L.Pooling(net[Sigmoid_layer], pool=P.Pooling.MAX, kernel = 3, stride= 1, pad = 1, global_pooling=False, in_place = True)
+
 DetectListLayer = []
-DetectListScale = []
-DetectListDownRatio = []
-for idx, output in enumerate(LayerList_Output):
-    DetectListLayer.append(net[output])
-    DetectListScale.append(bias_scale[idx])
-    DetectListDownRatio.append(int(32 / math.pow(2, idx)))
-CenterGridObjectDetect(net, from_layers= DetectListLayer, 
-                            bias_scale= DetectListScale, down_ratio= DetectListDownRatio)
+DetectListLayer.append(net[Sigmoid_layer])
+DetectListLayer.append(net[Pooling_Layer])
+DetectListLayer.append(net[box_out])
+CenterFaceObjectDetect(net, from_layers = DetectListLayer)
 
 det_eval_param = {
     'num_classes': 2,

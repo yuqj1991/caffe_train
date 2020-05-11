@@ -9,7 +9,7 @@ try:
 except ImportError:
     logging.fatal("Cannot find caffe!")
 from caffe.model_libs import *
-from caffe.model_efficient_libs import *
+from caffe.mobilenetv2_lib import *
 from google.protobuf import text_format
 
 import math

@@ -4,7 +4,7 @@ try:
     sys.path.insert(0, caffe_root + 'python')
     import caffe
 except ImportError:
-    logging.fatal("model_efficient_libs.py Cannot find caffe!")
+    logging.fatal("mobilenetv2_lib.py Cannot find caffe!")
 from caffe import layers as L
 from caffe import params as P
 from caffe.proto import caffe_pb2
@@ -196,6 +196,161 @@ def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = 
     net.detection_out = L.CenterGridOutput(*from_layers, detection_output_param=det_out_param, 
                                                 include=dict(phase=caffe_pb2.Phase.Value('TEST')))
 
+def CenterFaceObjectDetect(net, from_layers = [],  num_classes = 2,
+                           ignore_thresh = 0.3,  keep_top_k = 200,
+                           share_location = True, confidence_threshold = 0.15):
+    det_out_param = {
+        'num_classes': num_classes,
+        'share_location': share_location,
+        'keep_top_k': keep_top_k,
+        'confidence_threshold': confidence_threshold,
+    }
+    net.detection_out = L.CenternetDetectionOutput(*from_layers, detection_output_param=det_out_param, 
+                                                include=dict(phase=caffe_pb2.Phase.Value('TEST')))
+
+
+def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.CenterObject.SMOOTH_L1,
+                         normalization_mode = P.Loss.VALID, num_classes= 1, loc_weight = 1.0, 
+                         share_location = True, ignore_thresh = 0.3, class_type = P.CenterObject.SOFTMAX):
+    center_object_loss_param = {
+        'loc_weight': loc_weight,
+        'num_class': num_classes,
+        'loc_loss_type': loc_loss_type,
+        'class_type': class_type,
+        'bias_num': 1,
+    }
+    loss_param = {
+        'normalization': normalization_mode,
+    }
+    name = 'CenterFaceLoss_{}'.format(stageidx)
+    net[name] = L.CenterObjectLoss(*from_layers, center_object_loss_param = center_object_loss_param,
+                                 loss_param=loss_param, include=dict(phase=caffe_pb2.Phase.Value('TRAIN')),
+                                 propagate_down=[True, True, False])
+
+
+def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= False, **bn_param):
+    assert from_layer in net.keys()
+    index = 0
+    feature_stride = [4, 8, 16, 32]
+    accum_stride = 1
+    pre_stride = 1
+    LayerList_Name = []
+    LayerList_Output = []
+    LayerFilters = []
+    out_layer = "conv_{}".format(index)
+    ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,
+                num_output= 32, kernel_size=3, pad=1, stride = 2, use_scale = True,
+                use_global_stats= use_global_stats,
+                **bn_param)
+    accum_stride *= 2
+    pre_channels= 32
+    Inverted_residual_setting = [[1, 16, 1, 1],
+                                 [6, 24, 2, 2],
+                                 [6, 32, 3, 2],
+                                 [6, 64, 4, 2],
+                                 [6, 96, 3, 1],
+                                 [6, 160, 3, 2],
+                                 [6, 320, 1, 1]]
+    for _, (t, c, n, s) in enumerate(Inverted_residual_setting):
+        accum_stride *= s
+        if n > 1:
+            if s == 2:
+                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels, Use_BN = True, 
+                                                        use_relu= True, use_swish= False,
+                                                        Use_scale = True, use_global_stats= use_global_stats, **bn_param)
+                out_layer = layer_name
+                pre_channels = c
+                strides = 1
+                for id in range(n - 1):
+                    layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, pre_channels, Use_BN = True, 
+                                                        use_relu= True, use_swish= False,
+                                                        Use_scale = True, use_global_stats= use_global_stats, **bn_param)
+                    out_layer = layer_name
+                    pre_channels = c
+            elif s == 1:
+                Project_Layer = out_layer
+                out_layer= "Conv_project_{}_{}".format(pre_channels, c)
+                ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
+                            use_swish= False,
+                            num_output= c, kernel_size= 3, pad= 1, stride= 1,
+                            lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+                pre_channels = c
+                for id in range(n):
+                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, pre_channels, Use_BN = True, 
+                                                        use_relu= True, use_swish= False,
+                                                        Use_scale = True, use_global_stats= use_global_stats, **bn_param)
+                    out_layer = layer_name
+                    pre_channels = c
+        elif n == 1:
+            assert s == 1
+            Project_Layer = out_layer
+            out_layer= "Conv_project_{}_{}".format(pre_channels, c)
+            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = False, 
+                        use_swish= False,
+                        num_output= c, kernel_size= 3, pad= 1, stride= 1,
+                        lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+            pre_channels = c
+            layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels,  Use_BN = True, 
+                                                        use_relu= True, use_swish= False,
+                                                        Use_scale = True,use_global_stats= use_global_stats, **bn_param)
+            pre_channels = c
+            out_layer = layer_name
+        if accum_stride in feature_stride:
+            if accum_stride != pre_stride:
+                LayerList_Name.append(out_layer)
+                LayerFilters.append(c)
+            elif accum_stride == pre_stride:
+                LayerList_Name[len(LayerList_Name) - 1] = out_layer
+                LayerFilters[len(LayerFilters) - 1] = c
+            pre_stride = accum_stride
+        index += 1
+    assert len(LayerList_Name) == len(feature_stride)
+    net_last_layer = net.keys()[-1]
+    out_layer = "conv_1_project/DepthWise"
+    ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
+                num_output= 320, kernel_size= 3, pad= 1, stride= 2, group= 320,
+                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+    net_last_layer = out_layer
+    out_layer = "conv_1_project/linear"
+    ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
+                num_output= 320, kernel_size= 1, pad= 0, stride= 1,
+                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+    fpn_out_channels = 24
+    for index in range(len(feature_stride) - 1):
+        #Deconv_layer scale up 2x2_s2
+        channel_stage = LayerFilters[len(LayerFilters) - index - 1]
+        net_last_layer = out_layer
+        Reconnect_layer_one = "Deconv_Scale_Up_Stage_{}".format(channel_stage)
+        ConvBNLayer(net, net_last_layer, Reconnect_layer_one, use_bn= True, use_relu = False, 
+            num_output= fpn_out_channels, kernel_size= 2, pad= 0, stride= 2,
+            lr_mult=1, Use_DeConv= True, use_scale= True, use_global_stats= use_global_stats)
+
+        Reconnect_layer_two = "{}_linear_Conv".format(index)
+        net_last_layer = LayerList_Name[len(LayerFilters) - index - 1 - 1]
+        ConvBNLayer(net, net_last_layer, Reconnect_layer_two, use_bn= True, 
+                use_swish= False, use_relu = False, 
+                num_output= fpn_out_channels, kernel_size= 1, pad= 0, stride= 1,
+                lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
+        
+        # eltwise_sum layer
+        _, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_global_stats=use_global_stats, output= 6,
+                                                    use_bn= False, use_relu=False, layerPrefix = "Dectction")
+        out_layer = detect_layer
+
+    ### class prediction layer
+    Class_out = "Class_out_1x1"
+    ConvBNLayer(net, out_layer, Class_out, use_bn= False, 
+                use_swish= False, use_relu = False, 
+                num_output= 1, kernel_size= 1, pad= 0, stride= 1,
+                lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
+
+    ### Box loc prediction layer
+    Box_out = "Box_out_1x1"
+    ConvBNLayer(net, out_layer, Box_out, use_bn= False, 
+                use_swish= False, use_relu = False, 
+                num_output= 4, kernel_size= 1, pad= 0, stride= 1,
+                lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
+    return net, Class_out, Box_out
 
 def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= False, **bn_param):
     assert from_layer in net.keys()
@@ -254,7 +409,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
             assert s == 1
             Project_Layer = out_layer
             out_layer= "Conv_project_{}_{}".format(pre_channels, c)
-            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
+            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = False, 
                         use_swish= False,
                         num_output= c, kernel_size= 3, pad= 1, stride= 1,
                         lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
@@ -379,6 +534,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
                                                         use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True, use_global_stats= use_global_stats, Use_SE=True,  **bn_param)
                 out_layer = layer_name
+                pre_channels= c
                 if k == 3:
                     pad = 1
                 elif k == 5:
@@ -395,6 +551,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
                     elif k == 5:
                         pad = 2
                     out_layer = layer_name
+                    pre_channels= c
                     layer_height, layer_width = get_layer_shape(False, current_height, current_width, k, pad, strides, "conv")
                     current_height, current_width= layer_height, layer_width
             elif s == 1:
@@ -404,7 +561,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
                                 use_relu=use_relu, use_swish= use_swish,
                                 num_output= c, kernel_size= 3, pad= 1, stride= 1,
                                 lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-                
+                pre_channels= c
                 layer_height, layer_width = get_layer_shape(False, current_height, current_width, 3, 1, 1, "conv")
                 current_height, current_width= layer_height, layer_width
                 for id in range(n):
@@ -412,7 +569,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
                                                         use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True, use_global_stats= use_global_stats, Use_SE=True, **bn_param)
                     out_layer = layer_name
-
+                    pre_channels= c
                     if k == 3:
                         pad = 1
                     elif k == 5:
@@ -425,17 +582,17 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
             Project_Layer = out_layer
             out_layer= "Conv_project_{}_{}".format(pre_channels, c)
             ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, 
-                        use_relu= use_relu, use_swish= use_swish,
+                        use_relu= False, use_swish= False,
                         num_output= c, kernel_size= 3, pad= 1, stride= 1,
                         lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-            
+            pre_channels= c
             layer_height, layer_width = get_layer_shape(False, current_height, current_width, 3, 1, 1, "conv")
             current_height, current_width= layer_height, layer_width
             layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels, kernel_size= k, Use_BN = True, 
                                                         use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True,use_global_stats= use_global_stats, Use_SE=True, **bn_param)
             out_layer = layer_name
-
+            pre_channels= c
             if k == 3:
                 pad = 1
             elif k == 5:
@@ -455,7 +612,6 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
                 LayerShapes[len(LayerShapes) - 1] = {'height': current_height, 'width': current_width, 'channel': c, 'layer': out_layer}
             pre_stride = accum_stride
         index += 1
-        pre_channels = c
     assert len(LayerList_Name) == len(feature_stride)
     return net, LayerShapes
 
