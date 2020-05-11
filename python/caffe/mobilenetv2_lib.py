@@ -328,8 +328,9 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                 lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
         
         # eltwise_sum layer
-        _, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_global_stats=use_global_stats, output= 6,
-                                                    use_bn= False, use_relu=False, layerPrefix = "Dectction")
+        _, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, 
+                                            use_global_stats=use_global_stats, output= fpn_out_channels,
+                                            use_bn= True, use_relu=True, layerPrefix = "Res_conv_linear")
         out_layer = detect_layer
 
     ### class prediction layer
