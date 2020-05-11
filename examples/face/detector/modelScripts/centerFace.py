@@ -152,9 +152,7 @@ make_if_not_exist(save_dir)
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
         train=True, output_label=True, label_map_file=labelmapPath,
-        transform_param=train_transform_param, batch_sampler=batch_sampler, 
-        data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
-        crop_type = P.AnnotatedData.CROP_RANDOM, YoloForamte = True)
+        transform_param=train_transform_param)
 
 net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data')
 
