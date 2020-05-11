@@ -284,10 +284,16 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         elif n == 1:
             assert s == 1
             Project_Layer = out_layer
-            out_layer= "Conv_project_{}_{}".format(pre_channels, c)
+            out_layer= "DepethWiseConv_{}_{}".format(pre_channels, c)
+            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
+                        use_swish= False, group= pre_channels,
+                        num_output= pre_channels, kernel_size= 3, pad= 1, stride= 1,
+                        lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+            Project_Layer = out_layer
+            out_layer= "PointWiseConv_{}_{}".format(pre_channels, c)
             ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = False, 
-                        use_swish= False,
-                        num_output= c, kernel_size= 3, pad= 1, stride= 1,
+                        use_swish= False, 
+                        num_output= pre_channels, kernel_size= 1, pad= 0, stride= 1,
                         lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
             pre_channels = c
             layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels,  Use_BN = True, 
