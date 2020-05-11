@@ -341,7 +341,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         net_last_layer = out_layer
         Reconnect_layer_one = "Deconv_Scale_Up_Stage_{}".format(channel_stage)
         ConvBNLayer(net, net_last_layer, Reconnect_layer_one, use_bn= True, use_relu = False, 
-            num_output= channel_stage, kernel_size= 2, pad= 0, stride= 2,
+            num_output= fpn_out_channels, kernel_size= 2, pad= 0, stride= 2,
             lr_mult=1, Use_DeConv= True, use_scale= True, use_global_stats= use_global_stats)
         
         if index != 3:
