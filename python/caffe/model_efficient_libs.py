@@ -191,12 +191,12 @@ def MobilenetV2Body(net, from_layer, Use_BN = True, **bn_param):
     return net
 
 
-def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx, use_global_stats):
+def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx, use_global_stats, output):
     res_name = "ResConnect_stage_{}".format(stage_idx)
     net[res_name] = L.Eltwise(net[from_layer_one], net[from_layer_two], operation = P.Eltwise.SUM)
     out_layer = "Dectction_stage_{}".format(stage_idx)
     ConvBNLayer(net, res_name, out_layer, use_bn = False, use_relu = False, 
-                num_output= 6, kernel_size=1, pad = 0, 
+                num_output= output, kernel_size=1, pad = 0, 
                 stride=1, use_scale = False, lr_mult=1, use_global_stats= use_global_stats)
     return res_name, out_layer
 
@@ -353,11 +353,11 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                 lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
             Res_Layer_two = LayerList_Name[len(feature_stride) - index - 1]
             _, Reconnect_layer_two = ResConnectBlock(net, Res_Layer_one, Res_Layer_two, 
-                                                        index, use_global_stats=use_global_stats)
+                                                        index, use_global_stats=use_global_stats, fpn_out_channels)
         else:
             Reconnect_layer_two= LayerList_Name[len(feature_stride) - index - 1]
         # eltwise_sum layer
-        out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_global_stats=use_global_stats)
+        out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_global_stats=use_global_stats, output= 6)
         LayerList_Output.append(detect_layer)
     return net, LayerList_Output
 
