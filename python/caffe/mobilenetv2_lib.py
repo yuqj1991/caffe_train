@@ -306,14 +306,9 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         index += 1
     assert len(LayerList_Name) == len(feature_stride)
     net_last_layer = net.keys()[-1]
-    out_layer = "conv_1_project/DepthWise"
-    ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
-                num_output= 320, kernel_size= 3, pad= 1, stride= 2, group= 320,
-                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-    net_last_layer = out_layer
     out_layer = "conv_1_project/linear"
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
-                num_output= 320, kernel_size= 1, pad= 0, stride= 1,
+                num_output= 128, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
     fpn_out_channels = 24
     for index in range(len(feature_stride) - 1):
