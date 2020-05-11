@@ -89,8 +89,11 @@ def BiFPNBlock(net, from_layers= [], image_size = 640, min_level = 3, max_level 
         
 
 
-def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor, kernel_size= 3,
-                        Use_BN = True, Use_scale = True, use_global_stats= False, Use_SE= False, use_relu = False, use_swish= False, **bn_param):
+def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, strides, expansion_factor,
+                        input_channels,
+                        kernel_size= 3, Use_BN = True, Use_scale = True, 
+                        use_global_stats= False, Use_SE= False, use_relu = False, 
+                        use_swish= False, **bn_param):
     if kernel_size == 3:
         pad = 1
     elif kernel_size == 5:
@@ -98,23 +101,23 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
     if strides == 1:
         out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
         ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
-                    num_output = fileter_channels * expansion_factor, kernel_size=1, 
+                    num_output = input_channels * expansion_factor, kernel_size=1, 
                     pad=0, stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         if Use_SE:
             out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
             ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = False, use_swish= False,
-                        num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=pad, 
-                        group= fileter_channels * expansion_factor,
+                        num_output = input_channels * expansion_factor, kernel_size=kernel_size, pad=pad, 
+                        group= input_channels * expansion_factor,
                         stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
             out_layer = out_layer_depthswise
-            out_layer = SEMoudleBlock(net, from_layer= out_layer, channels= fileter_channels * expansion_factor, 
+            out_layer = SEMoudleBlock(net, from_layer= out_layer, channels= input_channels * expansion_factor, 
                                         layerPrefix= 'SE_{}_{}/{}'.format(id, repeated_num, 'attention'), ratio = 0.25, 
                                         use_swish= use_swish) 
         else:
             out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
             ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
-                        num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=pad, 
-                        group= fileter_channels * expansion_factor,
+                        num_output = input_channels * expansion_factor, kernel_size=kernel_size, pad=pad, 
+                        group= input_channels * expansion_factor,
                         stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
             out_layer = out_layer_depthswise
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
@@ -127,68 +130,18 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
     elif strides == 2:
         out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
         ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
-                    num_output = fileter_channels * expansion_factor, kernel_size=1, pad=0, stride = 1, 
+                    num_output = input_channels * expansion_factor, kernel_size=1, pad=0, stride = 1, 
                     use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
         ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
-                    num_output = fileter_channels * expansion_factor, kernel_size=kernel_size, pad=pad, stride = strides, 
-                    group= fileter_channels * expansion_factor, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
+                    num_output = input_channels * expansion_factor, kernel_size=kernel_size, pad=pad, stride = strides, 
+                    group= input_channels * expansion_factor, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
         ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu = False, use_swish= False,
                     num_output = fileter_channels, kernel_size=1, pad=0, stride = 1, use_scale = Use_scale
                     , use_global_stats= use_global_stats,
                     **bn_param)
         return out_layer_projects
-
-
-def MobilenetV2Body(net, from_layer, Use_BN = True, **bn_param):
-    assert from_layer in net.keys()
-    index = 0
-    out_layer = "conv_{}".format(index)
-    ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,
-                num_output= 32, kernel_size=3, pad=1, stride = 2, use_scale = True,
-                **bn_param)
-    index += 1
-    ################################
-    # t c  n s
-    # - 32 1 2
-    # 1 16 1 1
-    # 6 24 2 2
-    # 6 32 3 2
-    # 6 64 4 2
-    # 6 96 3 1
-    # 6 160 3 2
-    # 6 320 1 1
-    ###############################
-    Inverted_residual_setting = [[1, 16, 1, 1],
-                                 [6, 24, 2, 2],
-                                 [6, 32, 3, 2],
-                                 [6, 64, 4, 2],
-                                 [6, 96, 3, 1],
-                                 [6, 160, 3, 2],
-                                 [6, 320, 1, 1]]
-    for _, (t, c, n, s) in enumerate(Inverted_residual_setting):
-        if n > 1:
-            if s == 2:
-                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
-                out_layer = layer_name
-                index += 1
-                strides = 1
-                for id in range(n - 1):
-                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, strides, t, Use_BN = True, Use_scale = True, **bn_param)
-                    out_layer = layer_name
-                    index += 1
-            elif s == 1:
-                for id in range(n):
-                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
-                    out_layer = layer_name
-                    index += 1
-        elif n == 1:
-            assert s == 1
-            layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, Use_scale = True, **bn_param)
-            out_layer = layer_name
-            index += 1
-    return net
 
 
 def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx, use_global_stats, output, use_bn, use_relu, layerPrefix):
@@ -271,12 +224,12 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         accum_stride *= s
         if n > 1:
             if s == 2:
-                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, 
+                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels, Use_BN = True, 
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                 out_layer = layer_name
                 strides = 1
                 for id in range(n - 1):
-                    layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, Use_BN = True, 
+                    layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, pre_channels, Use_BN = True, 
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
             elif s == 1:
@@ -286,7 +239,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                 num_output= c, kernel_size= 3, pad= 1, stride= 1,
                 lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
                 for id in range(n):
-                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, Use_BN = True, 
+                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, pre_channels, Use_BN = True, 
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
         elif n == 1:
@@ -296,7 +249,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
             ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
                         num_output= c, kernel_size= 3, pad= 1, stride= 1,
                         lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-            layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, Use_BN = True, 
+            layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels,  Use_BN = True, 
                                                         Use_scale = True,use_global_stats= use_global_stats, **bn_param)
             out_layer = layer_name
         if accum_stride in feature_stride:
@@ -411,7 +364,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
         
         if n > 1:
             if s == 2:
-                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, kernel_size= k, Use_BN = True, 
+                layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels,  kernel_size= k, Use_BN = True, 
                                                         use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True, use_global_stats= use_global_stats, Use_SE=True,  **bn_param)
                 out_layer = layer_name
@@ -423,7 +376,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
                 current_height, current_width= layer_height, layer_width
                 strides = 1
                 for id in range(n - 1):
-                    layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, kernel_size= k, Use_BN = True, 
+                    layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, pre_channels, kernel_size= k, Use_BN = True, 
                                                         use_relu=use_relu, use_swish= use_swish,
                                                         Use_scale = True, use_global_stats= use_global_stats, Use_SE=True, **bn_param)
                     if k == 3:
@@ -444,7 +397,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
                 layer_height, layer_width = get_layer_shape(False, current_height, current_width, 3, 1, 1, "conv")
                 current_height, current_width= layer_height, layer_width
                 for id in range(n):
-                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, kernel_size= k, Use_BN = True, 
+                    layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, pre_channels, kernel_size= k, Use_BN = True, 
                                                         use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True, use_global_stats= use_global_stats, Use_SE=True, **bn_param)
                     out_layer = layer_name
@@ -467,7 +420,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
             
             layer_height, layer_width = get_layer_shape(False, current_height, current_width, 3, 1, 1, "conv")
             current_height, current_width= layer_height, layer_width
-            layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, kernel_size= k, Use_BN = True, 
+            layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels, kernel_size= k, Use_BN = True, 
                                                         use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True,use_global_stats= use_global_stats, Use_SE=True, **bn_param)
             out_layer = layer_name
