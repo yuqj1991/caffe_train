@@ -4,7 +4,7 @@ try:
     sys.path.insert(0, caffe_root + 'python')
     import caffe
 except ImportError:
-    logging.fatal("Cannot find caffe!")
+    logging.fatal("model_efficient_libs.py Cannot find caffe!")
 from caffe import layers as L
 from caffe import params as P
 from caffe.proto import caffe_pb2
