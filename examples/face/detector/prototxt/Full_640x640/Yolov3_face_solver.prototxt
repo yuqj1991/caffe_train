@@ -24,4 +24,3 @@ iter_size: 2
 type: "RMSProp"
 eval_type: "detection"
 ap_version: "11point"
-
