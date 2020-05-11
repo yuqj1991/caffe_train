@@ -1,7 +1,7 @@
 from __future__ import division
 import os,sys,logging
 try:
-    caffe_root = '/home/stive/workspace/caffe_train/'
+    caffe_root = '../../../caffe_train/'
     sys.path.insert(0, caffe_root + 'python')
     import caffe
 except ImportError:
