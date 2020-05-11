@@ -30,109 +30,109 @@ AnnotatedDataLayer<Dtype>::~AnnotatedDataLayer() {
 template <typename Dtype>
 void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-  const int batch_size = this->layer_param_.data_param().batch_size();
-  const AnnotatedDataParameter& anno_data_param =
-      this->layer_param_.annotated_data_param();
-  for (int i = 0; i < anno_data_param.batch_sampler_size(); ++i) {
-    batch_samplers_.push_back(anno_data_param.batch_sampler(i));
-  }
-  if(anno_data_param.has_data_anchor_sampler()){
-    data_anchor_samplers_.push_back(anno_data_param.data_anchor_sampler());
-  }
-  if(anno_data_param.has_bbox_sampler()){
-    int num_scale = anno_data_param.bbox_sampler().box_size();
-    for(int i = 0; i < num_scale; i++){
-      bbox_large_scale_.push_back(anno_data_param.bbox_sampler().box(i).bbox_large_scale());
-      bbox_small_scale_.push_back(anno_data_param.bbox_sampler().box(i).bbox_small_scale());
-      anchor_stride_.push_back(anno_data_param.bbox_sampler().box(i).ancher_stride());
+    const int batch_size = this->layer_param_.data_param().batch_size();
+    const AnnotatedDataParameter& anno_data_param =
+        this->layer_param_.annotated_data_param();
+    for (int i = 0; i < anno_data_param.batch_sampler_size(); ++i) {
+        batch_samplers_.push_back(anno_data_param.batch_sampler(i));
     }
-  }
-  upProb_ = anno_data_param.up_prob();
-  lowProb_ = anno_data_param.low_prob();
-  label_map_file_ = anno_data_param.label_map_file();
-  // Make sure dimension is consistent within batch.
-  const TransformationParameter& transform_param =
-    this->layer_param_.transform_param();
-  if (transform_param.has_resize_param()) {
-    if (transform_param.resize_param().resize_mode() ==
-        ResizeParameter_Resize_mode_FIT_SMALL_SIZE) {
-      CHECK_EQ(batch_size, 1)
-        << "Only support batch size of 1 for FIT_SMALL_SIZE.";
+    if(anno_data_param.has_data_anchor_sampler()){
+        data_anchor_samplers_.push_back(anno_data_param.data_anchor_sampler());
     }
-  }
-  YoloFormat_ = anno_data_param.yoloformat();
-  crop_type_ = anno_data_param.crop_type();
-
-  // Read a data point, and use it to initialize the top blob.
-  AnnotatedDatum& anno_datum = *(reader_.full().peek());
-
-  // Use data_transformer to infer the expected blob shape from anno_datum.
-  vector<int> top_shape =
-      this->data_transformer_->InferBlobShape(anno_datum.datum());
-  this->transformed_data_.Reshape(top_shape);
-  // Reshape top[0] and prefetch_data according to the batch_size.
-  top_shape[0] = batch_size;
-  top[0]->Reshape(top_shape);
-  for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
-    this->prefetch_[i].data_.Reshape(top_shape);
-  }
-  LOG(INFO) << "output data size: " << top[0]->num() << ","
-      << top[0]->channels() << "," << top[0]->height() << ","
-      << top[0]->width();
-  // label
-  if (this->output_labels_) {
-    has_anno_type_ = anno_datum.has_type() || anno_data_param.has_anno_type();
-    vector<int> label_shape(4, 1);
-    if (has_anno_type_) {
-      anno_type_ = anno_datum.type();
-      if (anno_data_param.has_anno_type()) {
-        // If anno_type is provided in AnnotatedDataParameter, replace
-        // the type stored in each individual AnnotatedDatum.
-        LOG(WARNING) << "type stored in AnnotatedDatum is shadowed.";
-        anno_type_ = anno_data_param.anno_type();
-      }
-      // Infer the label shape from anno_datum.AnnotationGroup().
-      int num_bboxes = 0;
-      if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) {
-        // Since the number of bboxes can be different for each image,
-        // we store the bbox information in a specific format. In specific:
-        // All bboxes are stored in one spatial plane (num and channels are 1)
-        // And each row contains one and only one box in the following format:
-        // [item_id, group_label, instance_id, xmin, ymin, xmax, ymax, diff]
-        // Note: Refer to caffe.proto for details about group_label and
-        // instance_id.
-        for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
-          num_bboxes += anno_datum.annotation_group(g).annotation_size();
+    if(anno_data_param.has_bbox_sampler()){
+        int num_scale = anno_data_param.bbox_sampler().box_size();
+        for(int i = 0; i < num_scale; i++){
+        bbox_large_scale_.push_back(anno_data_param.bbox_sampler().box(i).bbox_large_scale());
+        bbox_small_scale_.push_back(anno_data_param.bbox_sampler().box(i).bbox_small_scale());
+        anchor_stride_.push_back(anno_data_param.bbox_sampler().box(i).ancher_stride());
         }
-        if(YoloFormat_){
-          label_shape[0] = batch_size;
-          label_shape[1] = 1;
-          // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
-          // cpu_data and gpu_data for consistent prefetch thread. Thus we make
-          // sure there is at least one bbox.
-          label_shape[2] = std::max(num_bboxes, 1);
-          label_shape[3] = 8;
-        }else{
-          label_shape[0] = 1;
-          label_shape[1] = 1;
-          // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
-          // cpu_data and gpu_data for consistent prefetch thread. Thus we make
-          // sure there is at least one bbox.
-          label_shape[2] = std::max(num_bboxes, 1);
-          label_shape[3] = 8;
-        }
-        
-      } else {
-        LOG(FATAL) << "Unknown annotation type.";
-      }
-    } else {
-      label_shape[0] = batch_size;
     }
-    top[1]->Reshape(label_shape);
+    upProb_ = anno_data_param.up_prob();
+    lowProb_ = anno_data_param.low_prob();
+    label_map_file_ = anno_data_param.label_map_file();
+    // Make sure dimension is consistent within batch.
+    const TransformationParameter& transform_param =
+        this->layer_param_.transform_param();
+    if (transform_param.has_resize_param()) {
+        if (transform_param.resize_param().resize_mode() ==
+            ResizeParameter_Resize_mode_FIT_SMALL_SIZE) {
+        CHECK_EQ(batch_size, 1)
+            << "Only support batch size of 1 for FIT_SMALL_SIZE.";
+        }
+    }
+    YoloFormat_ = anno_data_param.yoloformat();
+    crop_type_ = anno_data_param.crop_type();
+
+    // Read a data point, and use it to initialize the top blob.
+    AnnotatedDatum& anno_datum = *(reader_.full().peek());
+
+    // Use data_transformer to infer the expected blob shape from anno_datum.
+    vector<int> top_shape =
+        this->data_transformer_->InferBlobShape(anno_datum.datum());
+    this->transformed_data_.Reshape(top_shape);
+    // Reshape top[0] and prefetch_data according to the batch_size.
+    top_shape[0] = batch_size;
+    top[0]->Reshape(top_shape);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
-      this->prefetch_[i].label_.Reshape(label_shape);
+        this->prefetch_[i].data_.Reshape(top_shape);
     }
-  }
+    LOG(INFO) << "output data size: " << top[0]->num() << ","
+        << top[0]->channels() << "," << top[0]->height() << ","
+        << top[0]->width();
+    // label
+    if (this->output_labels_) {
+        has_anno_type_ = anno_datum.has_type() || anno_data_param.has_anno_type();
+        vector<int> label_shape(4, 1);
+        if (has_anno_type_) {
+        anno_type_ = anno_datum.type();
+        if (anno_data_param.has_anno_type()) {
+            // If anno_type is provided in AnnotatedDataParameter, replace
+            // the type stored in each individual AnnotatedDatum.
+            LOG(WARNING) << "type stored in AnnotatedDatum is shadowed.";
+            anno_type_ = anno_data_param.anno_type();
+        }
+        // Infer the label shape from anno_datum.AnnotationGroup().
+        int num_bboxes = 0;
+        if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) {
+            // Since the number of bboxes can be different for each image,
+            // we store the bbox information in a specific format. In specific:
+            // All bboxes are stored in one spatial plane (num and channels are 1)
+            // And each row contains one and only one box in the following format:
+            // [item_id, group_label, instance_id, xmin, ymin, xmax, ymax, diff]
+            // Note: Refer to caffe.proto for details about group_label and
+            // instance_id.
+            for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
+            num_bboxes += anno_datum.annotation_group(g).annotation_size();
+            }
+            if(YoloFormat_){
+            label_shape[0] = batch_size;
+            label_shape[1] = 1;
+            // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
+            // cpu_data and gpu_data for consistent prefetch thread. Thus we make
+            // sure there is at least one bbox.
+            label_shape[2] = std::max(num_bboxes, 1);
+            label_shape[3] = 8;
+            }else{
+            label_shape[0] = 1;
+            label_shape[1] = 1;
+            // BasePrefetchingDataLayer<Dtype>::LayerSetUp() requires to call
+            // cpu_data and gpu_data for consistent prefetch thread. Thus we make
+            // sure there is at least one bbox.
+            label_shape[2] = std::max(num_bboxes, 1);
+            label_shape[3] = 8;
+            }
+            
+        } else {
+            LOG(FATAL) << "Unknown annotation type.";
+        }
+        } else {
+        label_shape[0] = batch_size;
+        }
+        top[1]->Reshape(label_shape);
+        for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
+        this->prefetch_[i].label_.Reshape(label_shape);
+        }
+    }
 }
 
 // This function is called on prefetch thread
@@ -234,8 +234,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 CHECK_GT(resized_anno_datum->datum().channels(), 0);
                 sampled_datum = new AnnotatedDatum();
                 this->data_transformer_->CropImage_Sampling(*resized_anno_datum,
-                                                sampled_bboxes[0],
-                                                sampled_datum);
+                                                sampled_bboxes[0], sampled_datum);
                 has_sampled = true;
             } else {
                 sampled_datum = expand_datum;
@@ -254,8 +253,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                     CHECK_GT(resized_anno_datum->datum().channels(), 0);
                     sampled_datum = new AnnotatedDatum();
                     this->data_transformer_->CropImage_Sampling(*resized_anno_datum,
-                                                        sampled_bboxes[0],
-                                                        sampled_datum);
+                                                        sampled_bboxes[0], sampled_datum);
                     has_sampled = true;
                 } else {
                     sampled_datum = expand_datum;
