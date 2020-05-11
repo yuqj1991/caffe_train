@@ -222,7 +222,7 @@ test_transform_param = {
     },
 }
 base_learning_rate = 0.0005
-Job_Name = "CenterGrid{}_face_v2".format("Softmax")
+Job_Name = "CenterGrid{}_face_v3".format("Softmax")
 mdoel_name = "ResideoDeepFace"
 save_dir = "../prototxt/Full_{}".format(resize)
 snapshot_dir = "../snapshot/{}".format(Job_Name)
@@ -305,9 +305,9 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         crop_type = P.AnnotatedData.CROP_RANDOM, YoloForamte = True)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
-bias_scale = [512, 256, 128, 64]
-low_bbox_scale = [256, 128, 64, 8]
-up_bbox_scale = [512, 256, 128, 64]
+bias_scale = [620, 256, 128, 32]
+low_bbox_scale = [256, 128, 32, 6]
+up_bbox_scale = [620, 256, 128, 32]
 from_layers = []
 for idx, detect_output in enumerate(LayerList_Output):
     from_layers.append(net[detect_output])

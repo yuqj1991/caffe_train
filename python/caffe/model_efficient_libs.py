@@ -320,6 +320,21 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
                 num_output= 320, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+    
+    fpn_out_channels = 128
+    for idx, feature_layer in enumerate(LayerList_Name):
+        ConvLayer = "DepthWise_conv_{}_{}".format(idx, feature_layer)
+        channel_stage = LayerFilters[idx]
+        ConvBNLayer(net, feature_layer, ConvLayer, use_bn= True, use_relu = True, 
+            use_swish= False, group= channel_stage,
+            num_output= channel_stage, kernel_size= 3, pad= 1, stride= 1,
+            lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
+        PointLayer = "linear_conv_{}_{}".format(idx, feature_layer)
+        ConvBNLayer(net, ConvLayer, PointLayer, use_bn= True, use_relu = False, use_swish= False,
+            num_output= fpn_out_channels, kernel_size= 1, pad= 0, stride= 1,
+            lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
+        LayerList_Name[idx] = PointLayer
+
     for index in range(len(feature_stride)):
         #Deconv_layer scale up 2x2_s2
         channel_stage = LayerFilters[len(LayerFilters) - index - 1]
@@ -329,13 +344,18 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
             num_output= channel_stage, kernel_size= 2, pad= 0, stride= 2,
             lr_mult=1, Use_DeConv= True, use_scale= True, use_global_stats= use_global_stats)
         
-        # conv_layer linear 1x1
-        net_last_layer= LayerList_Name[len(feature_stride) - index - 1]
-        Reconnect_layer_two= "{}_linear".format(LayerList_Name[len(feature_stride) - index - 1])
-        ConvBNLayer(net, net_last_layer, Reconnect_layer_two, use_bn= True, use_relu = False, 
-            num_output= channel_stage, kernel_size= 1, pad= 0, stride= 1,
-            lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
-        
+        if index != 3:
+            Res_Layer_one = "FPN_con_{}".format(index)
+            net_last_layer = LayerList_Name[len(feature_stride) - index - 2]
+            ConvBNLayer(net, net_last_layer, Res_Layer_one, use_bn= True, 
+                use_swish= False, use_relu = False, 
+                num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 2,
+                lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
+            Res_Layer_two = LayerList_Name[len(feature_stride) - index - 1]
+            _, Reconnect_layer_two = ResConnectBlock(net, Res_Layer_one, Res_Layer_two, 
+                                                        fpn_out_channels, use_global_stats=use_global_stats)
+        else:
+            Reconnect_layer_two= LayerList_Name[len(feature_stride) - index - 1]
         # eltwise_sum layer
         out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_global_stats=use_global_stats)
         LayerList_Output.append(detect_layer)
