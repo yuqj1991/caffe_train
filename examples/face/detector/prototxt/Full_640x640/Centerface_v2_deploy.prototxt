@@ -78,19 +78,20 @@ layer {
   top: "conv_0"
 }
 layer {
-  name: "Conv_project_32_16"
+  name: "DepethWiseConv_32_16"
   type: "Convolution"
   bottom: "conv_0"
-  top: "Conv_project_32_16"
+  top: "DepethWiseConv_32_16"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 32
     bias_term: false
     pad: 1
     kernel_size: 3
+    group: 32
     stride: 1
     weight_filler {
       type: "msra"
@@ -98,10 +99,10 @@ layer {
   }
 }
 layer {
-  name: "Conv_project_32_16_bn"
+  name: "DepethWiseConv_32_16_bn"
   type: "BatchNorm"
-  bottom: "Conv_project_32_16"
-  top: "Conv_project_32_16"
+  bottom: "DepethWiseConv_32_16"
+  top: "DepethWiseConv_32_16"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -120,10 +121,81 @@ layer {
   }
 }
 layer {
-  name: "Conv_project_32_16_scale"
+  name: "DepethWiseConv_32_16_scale"
   type: "Scale"
-  bottom: "Conv_project_32_16"
-  top: "Conv_project_32_16"
+  bottom: "DepethWiseConv_32_16"
+  top: "DepethWiseConv_32_16"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "DepethWiseConv_32_16_relu6"
+  type: "ReLU6"
+  bottom: "DepethWiseConv_32_16"
+  top: "DepethWiseConv_32_16"
+}
+layer {
+  name: "PointWiseConv_32_16"
+  type: "Convolution"
+  bottom: "DepethWiseConv_32_16"
+  top: "PointWiseConv_32_16"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 16
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "PointWiseConv_32_16_bn"
+  type: "BatchNorm"
+  bottom: "PointWiseConv_32_16"
+  top: "PointWiseConv_32_16"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    use_global_stats: true
+    eps: 0.0010000000475
+  }
+}
+layer {
+  name: "PointWiseConv_32_16_scale"
+  type: "Scale"
+  bottom: "PointWiseConv_32_16"
+  top: "PointWiseConv_32_16"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -145,7 +217,7 @@ layer {
 layer {
   name: "conv_0_0/expand"
   type: "Convolution"
-  bottom: "Conv_project_32_16"
+  bottom: "PointWiseConv_32_16"
   top: "conv_0_0/expand"
   param {
     lr_mult: 1.0
@@ -353,7 +425,7 @@ layer {
 layer {
   name: "Res_Sum_0_0"
   type: "Eltwise"
-  bottom: "Conv_project_32_16"
+  bottom: "PointWiseConv_32_16"
   bottom: "conv_0_0/linear"
   top: "Res_Sum_0_0"
 }
@@ -3626,19 +3698,20 @@ layer {
   top: "Res_Sum_5_2"
 }
 layer {
-  name: "Conv_project_160_320"
+  name: "DepethWiseConv_160_320"
   type: "Convolution"
   bottom: "Res_Sum_5_2"
-  top: "Conv_project_160_320"
+  top: "DepethWiseConv_160_320"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 320
+    num_output: 160
     bias_term: false
     pad: 1
     kernel_size: 3
+    group: 160
     stride: 1
     weight_filler {
       type: "msra"
@@ -3646,10 +3719,10 @@ layer {
   }
 }
 layer {
-  name: "Conv_project_160_320_bn"
+  name: "DepethWiseConv_160_320_bn"
   type: "BatchNorm"
-  bottom: "Conv_project_160_320"
-  top: "Conv_project_160_320"
+  bottom: "DepethWiseConv_160_320"
+  top: "DepethWiseConv_160_320"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -3668,10 +3741,81 @@ layer {
   }
 }
 layer {
-  name: "Conv_project_160_320_scale"
+  name: "DepethWiseConv_160_320_scale"
   type: "Scale"
-  bottom: "Conv_project_160_320"
-  top: "Conv_project_160_320"
+  bottom: "DepethWiseConv_160_320"
+  top: "DepethWiseConv_160_320"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "DepethWiseConv_160_320_relu6"
+  type: "ReLU6"
+  bottom: "DepethWiseConv_160_320"
+  top: "DepethWiseConv_160_320"
+}
+layer {
+  name: "PointWiseConv_160_320"
+  type: "Convolution"
+  bottom: "DepethWiseConv_160_320"
+  top: "PointWiseConv_160_320"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 320
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "PointWiseConv_160_320_bn"
+  type: "BatchNorm"
+  bottom: "PointWiseConv_160_320"
+  top: "PointWiseConv_160_320"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    use_global_stats: true
+    eps: 0.0010000000475
+  }
+}
+layer {
+  name: "PointWiseConv_160_320_scale"
+  type: "Scale"
+  bottom: "PointWiseConv_160_320"
+  top: "PointWiseConv_160_320"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -3693,7 +3837,7 @@ layer {
 layer {
   name: "conv_6_0/expand"
   type: "Convolution"
-  bottom: "Conv_project_160_320"
+  bottom: "PointWiseConv_160_320"
   top: "conv_6_0/expand"
   param {
     lr_mult: 1.0
@@ -3901,7 +4045,7 @@ layer {
 layer {
   name: "Res_Sum_6_0"
   type: "Eltwise"
-  bottom: "Conv_project_160_320"
+  bottom: "PointWiseConv_160_320"
   bottom: "conv_6_0/linear"
   top: "Res_Sum_6_0"
 }
