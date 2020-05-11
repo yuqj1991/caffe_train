@@ -159,7 +159,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
 net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data')
 
 from_layers = []
-from_layers.append(netbox_out])
+from_layers.append(net[box_out])
 from_layers.append(net[class_out])
 from_layers.append(net.label)
 CenterFaceObjectLoss(net= net, stageidx= 0, from_layers= from_layers)
