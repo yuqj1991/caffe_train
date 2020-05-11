@@ -225,32 +225,44 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         if n > 1:
             if s == 2:
                 layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels, Use_BN = True, 
+                                                        use_relu= True, use_swish= False,
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                 out_layer = layer_name
+                pre_channels = c
                 strides = 1
                 for id in range(n - 1):
                     layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, pre_channels, Use_BN = True, 
+                                                        use_relu= True, use_swish= False,
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
+                    pre_channels = c
             elif s == 1:
                 Project_Layer = out_layer
                 out_layer= "Conv_project_{}_{}".format(pre_channels, c)
                 ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
-                num_output= c, kernel_size= 3, pad= 1, stride= 1,
-                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+                            use_swish= False,
+                            num_output= c, kernel_size= 3, pad= 1, stride= 1,
+                            lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+                pre_channels = c
                 for id in range(n):
                     layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, pre_channels, Use_BN = True, 
+                                                        use_relu= True, use_swish= False,
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
+                    pre_channels = c
         elif n == 1:
             assert s == 1
             Project_Layer = out_layer
             out_layer= "Conv_project_{}_{}".format(pre_channels, c)
             ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
+                        use_swish= False,
                         num_output= c, kernel_size= 3, pad= 1, stride= 1,
                         lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+            pre_channels = c
             layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels,  Use_BN = True, 
+                                                        use_relu= True, use_swish= False,
                                                         Use_scale = True,use_global_stats= use_global_stats, **bn_param)
+            pre_channels = c
             out_layer = layer_name
         if accum_stride in feature_stride:
             if accum_stride != pre_stride:
@@ -261,7 +273,6 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                 LayerFilters[len(LayerFilters) - 1] = c
             pre_stride = accum_stride
         index += 1
-        pre_channels = c
     assert len(LayerList_Name) == len(feature_stride)
     net_last_layer = net.keys()[-1]
     out_layer = "conv_1_project/DepthWise"
