@@ -354,7 +354,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
             Res_Layer_two = LayerList_Name[len(feature_stride) - index - 1]
             _, Reconnect_layer_two = ResConnectBlock(net, Res_Layer_one, Res_Layer_two, 
                                                         index, use_global_stats=use_global_stats, output= fpn_out_channels, use_bn= True,
-                                                        use_relu=True, layerPrefix = "FPN_linear_".format(index))
+                                                        use_relu=False, layerPrefix = "FPN_linear_".format(index))
         else:
             Reconnect_layer_two= LayerList_Name[len(feature_stride) - index - 1]
         # eltwise_sum layer
