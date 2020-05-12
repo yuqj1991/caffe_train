@@ -45,8 +45,6 @@ layer {
     }
   }
   annotated_data_param {
-    batch_sampler {
-    }
     label_map_file: "../labelmap.prototxt"
     up_prob: 0.699999988079
     low_prob: 0.40000000596
@@ -55,7 +53,7 @@ layer {
   }
   data_param {
     source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-    batch_size: 3
+    batch_size: 8
     backend: LMDB
   }
 }
