@@ -175,9 +175,10 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
 net, class_out, box_out = CenterFaceMobilenetV2Body(net, from_layer = 'data', Use_BN= True, use_global_stats= True)
 
 Sigmoid_layer = "{}_Sigmoid".format(class_out)
-net[Sigmoid_layer] = L.Sigmoid(net[class_out], in_place= True)
+net[Sigmoid_layer] = L.Sigmoid(net[class_out], in_place= False)
 Pooling_Layer = "{}_Pooling".format(class_out)
-net[Pooling_Layer] = L.Pooling(net[Sigmoid_layer], pool=P.Pooling.MAX, kernel_size = 3, stride= 1, pad = 1, global_pooling=False, in_place = True)
+net[Pooling_Layer] = L.Pooling(net[Sigmoid_layer], pool=P.Pooling.MAX, kernel_size = 3, stride= 1, pad = 1, 
+                                    global_pooling=False, in_place = False)
 
 DetectListLayer = []
 DetectListLayer.append(net[Sigmoid_layer])
