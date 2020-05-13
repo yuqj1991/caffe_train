@@ -202,8 +202,9 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         }
         AnnotatedDatum* sampled_datum = NULL;
         bool has_sampled = false;
-        vector<NormalizedBBox> sampled_bboxes;
         bool CropSample = false;
+        vector<NormalizedBBox> sampled_bboxes;
+        
         if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_BATCH){
             if (batch_samplers_.size() > 0) {
                 GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);

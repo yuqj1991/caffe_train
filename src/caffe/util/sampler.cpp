@@ -253,8 +253,8 @@ void GenerateSamples_Square(const AnnotatedDatum& anno_datum,
         // Determine if the sampled bbox is positive or negative by the constraint.
         if (SatisfySampleConstraint(sampled_bbox, object_bboxes,
                                     batch_sampler.sample_constraint())) {
-        ++found;
-        sampled_bboxes->push_back(sampled_bbox);
+            ++found;
+            sampled_bboxes->push_back(sampled_bbox);
         }
     }
 }
@@ -356,14 +356,14 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     float sample_bbox_size = std::sqrt(img_height *img_width * std::pow(scaleChoose, 2) / bbox_aera);
     if(sample_bbox_size < image_long_side){
         if(bbox_width <= sample_bbox_size){
-        caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
+            caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
         }else{
-        caffe_rng_uniform(1, xmin, xmin + bbox_width - sample_bbox_size, &w_off);
+            caffe_rng_uniform(1, xmin, xmin + bbox_width - sample_bbox_size, &w_off);
         }
         if(bbox_height <= sample_bbox_size){
-        caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
+            caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
         }else{
-        caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_bbox_size, &h_off);
+            caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_bbox_size, &h_off);
         }
     }else{
         caffe_rng_uniform(1, img_width - sample_bbox_size, 0.f, &w_off);
@@ -372,17 +372,7 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     sampled_bbox->set_xmin((float)w_off / img_width);
     sampled_bbox->set_ymin((float)h_off / img_height);
     sampled_bbox->set_xmax((float)(w_off + sample_bbox_size) / img_width);
-    sampled_bbox->set_ymax((float)(h_off + sample_bbox_size) / img_height);
-    #if 0
-        LOG(INFO)<<"CropImage Size: "<<sample_bbox_size <<
-                ", Original long side: "<<image_long_side<<
-                ", Scale Choose: "<<scaleChoose<<
-                ", Area Size: "<<std::pow(scaleChoose, 2)<<
-                ", Original Bbox Area: "<<bbox_aera;
-        LOG(INFO)<<"Original Bbox width: "<<bbox_width <<
-                ", Original Bbox height: "<<bbox_height;
-    #endif
-             
+    sampled_bbox->set_ymax((float)(h_off + sample_bbox_size) / img_height);             
 }
 
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
@@ -393,30 +383,31 @@ void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
     GroupObjectBBoxes(anno_datum, &object_bboxes);
     for (int i = 0; i < data_anchor_samplers.size(); ++i) {
         if (data_anchor_samplers[i].use_original_image()) {
-        int found = 0;
-        NormalizedBBox sampled_bbox;
-        for (int j = 0; j < data_anchor_samplers[i].max_trials(); ++j) {
-            if (data_anchor_samplers[i].has_max_sample() &&
-                found >= data_anchor_samplers[i].max_sample()) {
-            break;
+            int found = 0;
+            NormalizedBBox sampled_bbox;
+            for (int j = 0; j < data_anchor_samplers[i].max_trials(); ++j) {
+                if (data_anchor_samplers[i].has_max_sample() &&
+                    found >= data_anchor_samplers[i].max_sample()) {
+                break;
+                }
+                GenerateDataAnchorSample(anno_datum, data_anchor_samplers[i], object_bboxes, 
+                                        &sampled_bbox);
+                if (SatisfySampleConstraint(sampled_bbox, object_bboxes,
+                                            data_anchor_samplers[i].sample_constraint())){
+                    found++;
+                    sampled_bboxes->push_back(sampled_bbox);
+                }
+            }
+            if(found == 0){
+                sampled_bbox.set_xmin(0.f);
+                sampled_bbox.set_ymin(0.f);
+                sampled_bbox.set_xmax(1.f);
+                sampled_bbox.set_ymax(1.f);
+                sampled_bboxes->push_back(sampled_bbox);
             }
             
-            GenerateDataAnchorSample(anno_datum, data_anchor_samplers[i], object_bboxes, 
-                                    &sampled_bbox);
-            if (SatisfySampleConstraint(sampled_bbox, object_bboxes,
-                                        data_anchor_samplers[i].sample_constraint())){
-            found++;
-            }
-        }
-        if(found == 0){
-            sampled_bbox.set_xmin(0.f);
-            sampled_bbox.set_ymin(0.f);
-            sampled_bbox.set_xmax(1.f);
-            sampled_bbox.set_ymax(1.f);
-        }
-        sampled_bboxes->push_back(sampled_bbox);
         }else{
-        LOG(FATAL)<<"must use original_image";
+            LOG(FATAL)<<"must use original_image";
         }
     }
 }
@@ -500,11 +491,11 @@ void GenerateLFFDSample(const AnnotatedDatum& anno_datum,
         SampleConstraint min_object_coverage_Constraint;
         min_object_coverage_Constraint.set_min_object_coverage(0.85);
         if(!SatisfySampleConstraint(sampled_bbox, object_bboxes, min_object_coverage_Constraint)){
-        resized_anno_datum->CopyFrom(anno_datum);
-        sampled_bbox.set_xmin(0.f);
-        sampled_bbox.set_ymin(0.f);
-        sampled_bbox.set_xmax(1.f);
-        sampled_bbox.set_ymax(1.f);
+            resized_anno_datum->CopyFrom(anno_datum);
+            sampled_bbox.set_xmin(0.f);
+            sampled_bbox.set_ymin(0.f);
+            sampled_bbox.set_xmax(1.f);
+            sampled_bbox.set_ymax(1.f);
         }
         sampled_bboxes->push_back(sampled_bbox);
     }else{
@@ -522,23 +513,23 @@ void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized
     // image data
     if (datum.encoded()) {
     #ifdef USE_OPENCV
-            CHECK(!(trans_param.force_color() && trans_param.force_gray()))
-                    << "cannot set both force_color and force_gray";
-            cv::Mat cv_img;
-            if (trans_param.force_color() || trans_param.force_gray()) {
-                // If force_color then decode in color otherwise decode in gray.
-                cv_img = DecodeDatumToCVMat(datum, trans_param.force_color());
-            } else {
-                cv_img = DecodeDatumToCVMatNative(datum);
-            }
-            // Expand the image.
-            cv::Mat resized_img;
+        CHECK(!(trans_param.force_color() && trans_param.force_gray()))
+                << "cannot set both force_color and force_gray";
+        cv::Mat cv_img;
+        if (trans_param.force_color() || trans_param.force_gray()) {
+            // If force_color then decode in color otherwise decode in gray.
+            cv_img = DecodeDatumToCVMat(datum, trans_param.force_color());
+        } else {
+            cv_img = DecodeDatumToCVMatNative(datum);
+        }
+        // Expand the image.
+        cv::Mat resized_img;
         cv::resize(cv_img, resized_img, cv::Size(Resized_img_Width, Resized_img_Height), 0, 0,
                     cv::INTER_CUBIC);
-            EncodeCVMatToDatum(resized_img, "jpg", resized_anno_datum->mutable_datum());
-            resized_anno_datum->mutable_datum()->set_label(datum.label());
+        EncodeCVMatToDatum(resized_img, "jpg", resized_anno_datum->mutable_datum());
+        resized_anno_datum->mutable_datum()->set_label(datum.label());
     #else
-            LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
+        LOG(FATAL) << "Encoded datum requires OpenCV; compile with USE_OPENCV.";
     #endif
         } else {
             if (trans_param.force_color() || trans_param.force_gray()) {
@@ -549,7 +540,7 @@ void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized
     RepeatedPtrField<AnnotationGroup>* Resized_anno_group = resized_anno_datum->mutable_annotation_group();
     // labels trans
     if (anno_datum.type() == AnnotatedDatum_AnnotationType_BBOX) {
-            // Go through each AnnotationGroup.
+        // Go through each AnnotationGroup.
         for (int g = 0; g < anno_datum.annotation_group_size(); ++g) {
             const AnnotationGroup& anno_group = anno_datum.annotation_group(g);
             AnnotationGroup transformed_anno_group ;
