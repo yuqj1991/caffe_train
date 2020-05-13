@@ -388,5 +388,5 @@ with open(job_file, 'w') as f:
     f.write('   echo "error: {} does not exit." \n'.format(test_net_file))
     f.write('   echo "please generate your own model prototxt primarily." \n')
     f.write('   exit 1 \n')
-    f.write('../../../../build/tools/caffe train --solver="{} --gpu {}" \\\n'.format(solver_file, 1))
+    f.write('../../../../build/tools/caffe train --solver={} --gpu {} \\\n'.format(solver_file, 1))
     f.write(train_src_param)
