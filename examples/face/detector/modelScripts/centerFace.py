@@ -152,6 +152,7 @@ make_if_not_exist(save_dir)
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
         train=True, output_label=True, label_map_file=labelmapPath,
+        crop_type = P.AnnotatedData.CROP_ANCHOR,
         transform_param=train_transform_param)
 
 net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data')
@@ -163,7 +164,7 @@ from_layers.append(net.label)
 CenterFaceObjectLoss(net= net, stageidx= 0, from_layers= from_layers)
 
 with open(train_net_file, 'w') as f:
-    print('name: "{}_train"'.format("CenterGridFace"), file=f)
+    print('name: "{}_train"'.format("CenterFace"), file=f)
     print(net.to_proto(), file=f)
 
 # 创建test.prototxt
@@ -197,7 +198,7 @@ net.detection_eval = L.DetectionEvaluate(net.detection_out, net.label,
     include=dict(phase=caffe_pb2.Phase.Value('TEST')))
 
 with open(test_net_file, 'w') as f:
-    print('name: "{}_test"'.format('CenterGridFace'), file=f)
+    print('name: "{}_test"'.format('CenterFace'), file=f)
     print(net.to_proto(), file=f)
 
 #创建 deploy.prototxt, 移除数据层和最后一层评价层
@@ -207,7 +208,7 @@ with open(deploy_net_file, 'w') as f:
     # Remove the first (AnnotatedData) and last (DetectionEvaluate) layer from test net.
     del net_param.layer[0]
     del net_param.layer[-1]
-    net_param.name = '{}_deploy'.format('CenterGridFace')
+    net_param.name = '{}_deploy'.format('CenterFace')
     net_param.input.extend(['data'])
     net_param.input_shape.extend([
         caffe_pb2.BlobShape(dim=[1, 3, resize_height, resize_width])])

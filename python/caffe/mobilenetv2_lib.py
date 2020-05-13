@@ -124,9 +124,12 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
         ConvBNLayer(net, out_layer, out_layer_projects, use_bn=Use_BN, use_relu = False, use_swish= False,
                     num_output = fileter_channels, kernel_size=1, pad=0, stride = strides, 
                     use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
-        res_name = 'Res_Sum_{}_{}'.format(id, repeated_num)
-        net[res_name] = L.Eltwise(net[from_layer], net[out_layer_projects])
-        return res_name
+        if input_channels == fileter_channels:
+            res_name = 'Res_Sum_{}_{}'.format(id, repeated_num)
+            net[res_name] = L.Eltwise(net[from_layer], net[out_layer_projects])
+            return res_name
+        else:
+            return out_layer_projects
     elif strides == 2:
         out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
         ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
@@ -283,6 +286,7 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                     pre_channels = c
         elif n == 1:
             assert s == 1
+            '''
             Project_Layer = out_layer
             out_layer= "DepethWiseConv_{}_{}".format(pre_channels, c)
             ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
@@ -296,6 +300,7 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                         num_output= c, kernel_size= 1, pad= 0, stride= 1,
                         lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
             pre_channels = c
+            '''
             layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels,  Use_BN = True, 
                                                         use_relu= True, use_swish= False,
                                                         Use_scale = True,use_global_stats= use_global_stats, **bn_param)
