@@ -373,3 +373,20 @@ solver = caffe_pb2.SolverParameter(
         **solver_param)
 with open(solver_file, 'w') as f:
     print(solver, file=f)
+
+
+# Create job file.
+train_src_param = '# --snapshot={}_iter_{}.solverstate '.format(snapshot_dir, 5000)
+job_file = "../scripts/train_{}.sh".format(Job_Name)
+with open(job_file, 'w') as f:
+    f.write('#!/bin/sh \n')
+    f.write('if ! test -f {} ;then \n'.format(train_net_file))
+    f.write('   echo "error: {} does not exit." \n'.format(train_net_file))
+    f.write('   echo "please generate your own model prototxt primarily." \n')
+    f.write('   exit 1 \n')
+    f.write('if ! test -f {} ;then \n'.format(test_net_file))
+    f.write('   echo "error: {} does not exit." \n'.format(test_net_file))
+    f.write('   echo "please generate your own model prototxt primarily." \n')
+    f.write('   exit 1 \n')
+    f.write('../../../../build/tools/caffe train --solver="{} --gpu {}" \\\n'.format(solver_file, 1))
+    f.write(train_src_param)
