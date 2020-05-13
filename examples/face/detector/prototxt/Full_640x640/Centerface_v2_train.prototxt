@@ -45,8 +45,6 @@ layer {
     }
   }
   annotated_data_param {
-    batch_sampler {
-    }
     label_map_file: "../labelmap.prototxt"
     up_prob: 0.699999988079
     low_prob: 0.40000000596
@@ -4589,11 +4587,11 @@ layer {
     normalization: VALID
   }
   center_object_loss_param {
-    num_class: 1
-    loc_weight: 1.0
-    bias_num: 1
-    loc_loss_type: SMOOTH_L1
-    class_type: SOFTMAX
-  }
+		loc_loss_type: SMOOTH_L1
+		conf_loss_type: FOCALSIGMOID
+		loc_weight: 1.0
+		num_class: 1
+		share_location: true
+	}
 }
 

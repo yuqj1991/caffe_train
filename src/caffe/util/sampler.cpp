@@ -19,7 +19,7 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
     float img_w,img_h,off_x,off_y;
     vector<NormalizedBBox> object_bboxes;
     GroupObjectBBoxes(anno_datum, &object_bboxes);
-    #if 1
+    #if 0
     float pleft, pright, ptop, pbottom;
     caffe_rng_uniform(1, -jitter, jitter, &pleft);
     caffe_rng_uniform(1, -jitter, jitter, &pright);
@@ -41,10 +41,10 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
     caffe_rng_uniform(1, 0.0f, 1.0f - img_w, &off_x);
     caffe_rng_uniform(1, 0.0f, 1.0f - img_h, &off_y);
 
-    sampled_bbox.set_xmin(off_x);
-    sampled_bbox.set_ymin(off_y);
-    sampled_bbox.set_xmax(off_x + img_w);
-    sampled_bbox.set_ymax(off_y + img_h);
+    sampled_bbox.set_xmin(0.f);
+    sampled_bbox.set_ymin(0.f);
+    sampled_bbox.set_xmax(1.f);
+    sampled_bbox.set_ymax(1.f);
     #endif
     SampleConstraint min_object_coverage_Constraint;
     min_object_coverage_Constraint.set_min_object_coverage(0.85);
