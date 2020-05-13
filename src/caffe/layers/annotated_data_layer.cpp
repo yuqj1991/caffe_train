@@ -241,41 +241,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 sampled_datum = expand_datum;
             }
         }
-        else if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_RANDOM){
-            float anchor_prob = 0.0f;
-            caffe_rng_uniform(1, 0.0f, 1.0f, &anchor_prob);
-            if(anchor_prob > upProb_){
-                if (anno_data_param.has_bbox_sampler()>0) {
-                    resized_anno_datum = new AnnotatedDatum();
-                    do_resize = true;
-                    GenerateLFFDSample(*expand_datum, &sampled_bboxes, 
-                                        bbox_small_scale_, bbox_large_scale_, anchor_stride_,
-                                        resized_anno_datum, transform_param, do_resize);
-                    CHECK_GT(resized_anno_datum->datum().channels(), 0);
-                    sampled_datum = new AnnotatedDatum();
-                    this->data_transformer_->CropImage_Sampling(*resized_anno_datum,
-                                                        sampled_bboxes[0], sampled_datum);
-                    has_sampled = true;
-                } else {
-                    sampled_datum = expand_datum;
-                }
-            }
-            else if(anchor_prob > lowProb_ && anchor_prob <= upProb_){
-                if(data_anchor_samplers_.size() > 0){
-                    GenerateBatchDataAnchorSamples(*expand_datum, data_anchor_samplers_, &sampled_bboxes);
-                    CropSample = true;
-                }else{
-                    sampled_datum = expand_datum;
-                }
-            }
-            else if(anchor_prob <= lowProb_){
-                if (batch_samplers_.size() > 0) {
-                    GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
-                    CropSample = true;
-                } else {
-                    sampled_datum = expand_datum;
-                }
-            }
+        else{
+            LOG(FATAL)<<"unsuport crop method!";
         }
         if(CropSample){        
             if (sampled_bboxes.size() > 0) {

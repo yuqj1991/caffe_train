@@ -1188,7 +1188,6 @@ message AnnotatedDataParameter {
     CROP_JITTER = 1;
     CROP_ANCHOR = 2;
     CROP_GT_BBOX = 3;
-    CROP_RANDOM = 4;
   }
   optional CROP_TYPE  crop_type = 11 [default = CROP_BATCH];
 }

@@ -302,7 +302,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         train=True, output_label=True, label_map_file=labelmapPath,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
-        crop_type = P.AnnotatedData.CROP_RANDOM, YoloForamte = True)
+        crop_type = P.AnnotatedData.CROP_ANCHOR, YoloForamte = True)
 
 
 '''
