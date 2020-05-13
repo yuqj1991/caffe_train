@@ -130,7 +130,7 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, num_output,
     [stride_h, stride_w] = UnpackVariable(stride, 2)
     if kernel_h == kernel_w:
         if Use_DeConv:
-            net[conv_name] = L.Deconvolution(net[from_layer], param=[dict(lr_mult=0, decay_mult=0)],
+            net[conv_name] = L.Deconvolution(net[from_layer], param=[dict(lr_mult=lr_mult, decay_mult=1)],
                                             convolution_param=dict(
                                             bias_term=False, num_output=num_output, kernel_size=kernel_h,
                                             stride=stride_h, pad=pad_h, weight_filler=dict(type="msra")))

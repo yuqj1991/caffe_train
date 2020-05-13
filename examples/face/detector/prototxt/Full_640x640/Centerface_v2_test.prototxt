@@ -3866,8 +3866,8 @@ layer {
   bottom: "conv_1_project/linear"
   top: "Deconv_Scale_Up_Stage_320"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   convolution_param {
     num_output: 24
@@ -4077,8 +4077,8 @@ layer {
   bottom: "Res_conv_linear_stage_320"
   top: "Deconv_Scale_Up_Stage_96"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   convolution_param {
     num_output: 24
@@ -4288,8 +4288,8 @@ layer {
   bottom: "Res_conv_linear_stage_96"
   top: "Deconv_Scale_Up_Stage_32"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   convolution_param {
     num_output: 24
@@ -4502,19 +4502,15 @@ layer {
     lr_mult: 1.0
     decay_mult: 1.0
   }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
   convolution_param {
     num_output: 1
+    bias_term: false
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
       type: "msra"
     }
-    bias_term: false
   }
 }
 layer {
@@ -4526,19 +4522,15 @@ layer {
     lr_mult: 1.0
     decay_mult: 1.0
   }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
   convolution_param {
     num_output: 4
+    bias_term: false
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
       type: "msra"
     }
-    bias_term: false
   }
 }
 layer {
