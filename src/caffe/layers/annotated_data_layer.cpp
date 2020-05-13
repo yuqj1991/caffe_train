@@ -204,7 +204,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         bool has_sampled = false;
         bool CropSample = false;
         vector<NormalizedBBox> sampled_bboxes;
-        
+        sampled_bboxes.clear();
         if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_BATCH){
             if (batch_samplers_.size() > 0) {
                 GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
@@ -214,7 +214,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             }
         }
         else if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_JITTER){
-            GenerateJitterSamples(*expand_datum, 0.3, &sampled_bboxes);
+            GenerateJitterSamples(*expand_datum, 0.1, &sampled_bboxes);
             CropSample = true;
         }
         else if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_ANCHOR){
