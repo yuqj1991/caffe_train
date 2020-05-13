@@ -222,7 +222,7 @@ test_transform_param = {
     },
 }
 base_learning_rate = 0.0005
-Job_Name = "CenterGrid{}_face_v3".format("Softmax")
+Job_Name = "CenterGrid{}_face_v2".format("Softmax")
 mdoel_name = "ResideoDeepFace"
 save_dir = "../prototxt/Full_{}".format(resize)
 snapshot_dir = "../snapshot/{}".format(Job_Name)
