@@ -4537,10 +4537,7 @@ layer {
     weight_filler {
       type: "msra"
     }
-    bias_filler {
-      type: "constant"
-      value: 0.0
-    }
+    bias_term: false
   }
 }
 layer {
@@ -4564,10 +4561,7 @@ layer {
     weight_filler {
       type: "msra"
     }
-    bias_filler {
-      type: "constant"
-      value: 0.0
-    }
+    bias_term: false
   }
 }
 layer {
