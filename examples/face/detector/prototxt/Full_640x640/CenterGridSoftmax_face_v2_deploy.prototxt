@@ -4458,8 +4458,8 @@ layer {
   bottom: "conv_1_project/linear"
   top: "Deconv_Scale_Up_Stage_320"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   convolution_param {
     num_output: 128
@@ -4676,21 +4676,14 @@ layer {
     lr_mult: 1.0
     decay_mult: 1.0
   }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
   convolution_param {
     num_output: 6
+    bias_term: false
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
       type: "msra"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.0
     }
   }
 }
@@ -4700,8 +4693,8 @@ layer {
   bottom: "ResConnect_stage_320"
   top: "Deconv_Scale_Up_Stage_96"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   convolution_param {
     num_output: 128
@@ -4918,21 +4911,14 @@ layer {
     lr_mult: 1.0
     decay_mult: 1.0
   }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
   convolution_param {
     num_output: 6
+    bias_term: false
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
       type: "msra"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.0
     }
   }
 }
@@ -4942,8 +4928,8 @@ layer {
   bottom: "ResConnect_stage_96"
   top: "Deconv_Scale_Up_Stage_32"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   convolution_param {
     num_output: 128
@@ -5160,21 +5146,14 @@ layer {
     lr_mult: 1.0
     decay_mult: 1.0
   }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
   convolution_param {
     num_output: 6
+    bias_term: false
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
       type: "msra"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.0
     }
   }
 }
@@ -5184,8 +5163,8 @@ layer {
   bottom: "ResConnect_stage_32"
   top: "Deconv_Scale_Up_Stage_24"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   convolution_param {
     num_output: 128
@@ -5262,21 +5241,14 @@ layer {
     lr_mult: 1.0
     decay_mult: 1.0
   }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
   convolution_param {
     num_output: 6
+    bias_term: false
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
       type: "msra"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.0
     }
   }
 }
