@@ -588,6 +588,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
                     current_height, current_width= layer_height, layer_width
         elif n == 1:
             assert s == 1
+            '''
             Project_Layer = out_layer
             out_layer= "Conv_project_{}_{}".format(pre_channels, c)
             ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, 
@@ -597,6 +598,7 @@ def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_
             pre_channels= c
             layer_height, layer_width = get_layer_shape(False, current_height, current_width, 3, 1, 1, "conv")
             current_height, current_width= layer_height, layer_width
+            '''
             layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels, kernel_size= k, Use_BN = True, 
                                                         use_relu= use_relu, use_swish= use_swish,
                                                         Use_scale = True,use_global_stats= use_global_stats, Use_SE=True, **bn_param)
