@@ -49,8 +49,8 @@ int main(int argc, char** argv){
     int batch_size = 64;
     int Resized_Height = 640;
     int Resized_Width = 640;
-    std::string srcTestfile = "../../img_test.txt";
-    std::string save_folder = "../../anchorTestImage";
+    std::string srcTestfile = "../../testHistoryCase/img_test.txt";
+    std::string save_folder = "../../testHistoryCase/anchorTestImage";
     std::vector<std::pair<string, string> > img_filenames;
     // anchor samples policy
     // anchor 的大概范围16, 32, 64, 128, 256, 512
