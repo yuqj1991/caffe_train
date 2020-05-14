@@ -18,6 +18,12 @@ def make_parser():
     parser.add_argument('--model', type=str, required=True, help='.prototxt file for inference')
     parser.add_argument('--weights', type=str, required=True, help='.caffemodel file for inference')
     return parser
+    
+
+def parser_model_name(model):
+    assert model.endswith('prototxt')
+    name = model.split('/')[-1].split('.prototxt')[0]
+    return name
 
 bn_maps = {}
 def find_top_after_bn(layers, name, top):
@@ -119,10 +125,11 @@ def load_weights(net, nobn):
 if __name__ == '__main__':
     parser1 = make_parser()
     args = parser1.parse_args()
-    pre_process(args.model, "no_bn.prototxt")
+    name = parser_model_name(args.model)
+    pre_process(args.model, "{}_no_bn.prototxt".format(name))
 
     net = caffe.Net(args.model, args.weights, caffe.TEST)  
-    net2 = caffe.Net("no_bn.prototxt", caffe.TEST)
+    net2 = caffe.Net("{}_no_bn.prototxt".format(name), caffe.TEST)
 
     load_weights(net, net2)
-    net2.save("ssd_face_no_bn.caffemodel")
+    net2.save("{}_no_bn.caffemodel".format(name))
