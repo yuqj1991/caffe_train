@@ -4804,25 +4804,45 @@ layer {
   }
 }
 layer {
-  name: "Dectction_stage_320"
+  name: "Resconnection_stage_320"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_320"
   bottom: "FPN_linear__stage_0"
-  top: "Dectction_stage_320"
+  top: "Resconnection_stage_320"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "Dectction_stage_320/Relu6"
+  name: "Resconnection_stage_320/Relu6"
   type: "ReLU6"
-  bottom: "Dectction_stage_320"
-  top: "Dectction_stage_320"
+  bottom: "Resconnection_stage_320"
+  top: "Resconnection_stage_320"
+}
+layer {
+  name: "Dection_conv_out_320"
+  type: "Convolution"
+  bottom: "Resconnection_stage_320"
+  top: "Dection_conv_out_320"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
 }
 layer {
   name: "Deconv_Scale_Up_Stage_96"
   type: "Deconvolution"
-  bottom: "Dectction_stage_320"
+  bottom: "Resconnection_stage_320"
   top: "Deconv_Scale_Up_Stage_96"
   param {
     lr_mult: 1.0
@@ -4960,25 +4980,45 @@ layer {
   }
 }
 layer {
-  name: "Dectction_stage_96"
+  name: "Resconnection_stage_96"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_96"
   bottom: "FPN_linear__stage_1"
-  top: "Dectction_stage_96"
+  top: "Resconnection_stage_96"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "Dectction_stage_96/Relu6"
+  name: "Resconnection_stage_96/Relu6"
   type: "ReLU6"
-  bottom: "Dectction_stage_96"
-  top: "Dectction_stage_96"
+  bottom: "Resconnection_stage_96"
+  top: "Resconnection_stage_96"
+}
+layer {
+  name: "Dection_conv_out_96"
+  type: "Convolution"
+  bottom: "Resconnection_stage_96"
+  top: "Dection_conv_out_96"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
 }
 layer {
   name: "Deconv_Scale_Up_Stage_32"
   type: "Deconvolution"
-  bottom: "Dectction_stage_96"
+  bottom: "Resconnection_stage_96"
   top: "Deconv_Scale_Up_Stage_32"
   param {
     lr_mult: 1.0
@@ -5116,25 +5156,45 @@ layer {
   }
 }
 layer {
-  name: "Dectction_stage_32"
+  name: "Resconnection_stage_32"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_32"
   bottom: "FPN_linear__stage_2"
-  top: "Dectction_stage_32"
+  top: "Resconnection_stage_32"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "Dectction_stage_32/Relu6"
+  name: "Resconnection_stage_32/Relu6"
   type: "ReLU6"
-  bottom: "Dectction_stage_32"
-  top: "Dectction_stage_32"
+  bottom: "Resconnection_stage_32"
+  top: "Resconnection_stage_32"
+}
+layer {
+  name: "Dection_conv_out_32"
+  type: "Convolution"
+  bottom: "Resconnection_stage_32"
+  top: "Dection_conv_out_32"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
 }
 layer {
   name: "Deconv_Scale_Up_Stage_24"
   type: "Deconvolution"
-  bottom: "Dectction_stage_32"
+  bottom: "Resconnection_stage_32"
   top: "Deconv_Scale_Up_Stage_24"
   param {
     lr_mult: 1.0
@@ -5197,25 +5257,45 @@ layer {
   }
 }
 layer {
-  name: "Dectction_stage_24"
+  name: "Resconnection_stage_24"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_24"
   bottom: "linear_conv_0_Res_Sum_1_1"
-  top: "Dectction_stage_24"
+  top: "Resconnection_stage_24"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "Dectction_stage_24/Relu6"
+  name: "Resconnection_stage_24/Relu6"
   type: "ReLU6"
-  bottom: "Dectction_stage_24"
-  top: "Dectction_stage_24"
+  bottom: "Resconnection_stage_24"
+  top: "Resconnection_stage_24"
+}
+layer {
+  name: "Dection_conv_out_24"
+  type: "Convolution"
+  bottom: "Resconnection_stage_24"
+  top: "Dection_conv_out_24"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
 }
 layer {
   name: "CenterGridLoss_0"
   type: "CenterGridLoss"
-  bottom: "Dectction_stage_320"
+  bottom: "Dection_conv_out_320"
   bottom: "label"
   top: "CenterGridLoss_0"
   include {
@@ -5243,7 +5323,7 @@ layer {
 layer {
   name: "CenterGridLoss_1"
   type: "CenterGridLoss"
-  bottom: "Dectction_stage_96"
+  bottom: "Dection_conv_out_96"
   bottom: "label"
   top: "CenterGridLoss_1"
   include {
@@ -5271,7 +5351,7 @@ layer {
 layer {
   name: "CenterGridLoss_2"
   type: "CenterGridLoss"
-  bottom: "Dectction_stage_32"
+  bottom: "Dection_conv_out_32"
   bottom: "label"
   top: "CenterGridLoss_2"
   include {
@@ -5299,7 +5379,7 @@ layer {
 layer {
   name: "CenterGridLoss_3"
   type: "CenterGridLoss"
-  bottom: "Dectction_stage_24"
+  bottom: "Dection_conv_out_24"
   bottom: "label"
   top: "CenterGridLoss_3"
   include {

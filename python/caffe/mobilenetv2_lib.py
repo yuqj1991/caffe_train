@@ -487,8 +487,13 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         else:
             Reconnect_layer_two= LayerList_Name[len(feature_stride) - index - 1]
         # eltwise_sum layer
-        out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_relu=False, layerPrefix = "Dectction")
-        LayerList_Output.append(detect_layer)
+        out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_relu=True, layerPrefix = "Resconnection")
+        detection_conv_layer = "Dection_conv_out_{}".format(channel_stage)
+        ConvBNLayer(net, detect_layer, detection_conv_layer, use_bn= False, 
+                use_swish= False, use_relu = False, 
+                num_output= 6, kernel_size= 1, pad= 0, stride= 1,
+                lr_mult=1, use_scale= False, use_global_stats= False)
+        LayerList_Output.append(detection_conv_layer)
     return net, LayerList_Output
 
 
