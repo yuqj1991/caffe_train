@@ -25,7 +25,155 @@ labelmapPath = "../labelmap.prototxt"
 resize_width = 640
 resize_height = 640
 resize = "{}x{}".format(resize_width, resize_height)
-
+batch_sampler = [
+    {
+        'sampler': {
+            'min_scale': 0.3,
+            'max_scale': 1.0,
+            'min_aspect_ratio': 0.3,
+            'max_aspect_ratio': 1.0,
+        },
+        'sample_constraint': {
+            'min_jaccard_overlap': 1.0,
+        },
+        'max_trials': 50,
+        'max_sample': 1,
+    },
+    {
+        'sampler': {
+            'min_scale': 0.4,
+            'max_scale': 1.0,
+            'min_aspect_ratio': 0.4,
+            'max_aspect_ratio': 1.0,
+        },
+        'sample_constraint': {
+            'min_jaccard_overlap': 1.0,
+        },
+        'max_trials': 50,
+        'max_sample': 1,
+    },
+    {
+        'sampler': {
+            'min_scale': 0.5,
+            'max_scale': 1.0,
+            'min_aspect_ratio': 0.5,
+            'max_aspect_ratio': 1.0,
+        },
+        'sample_constraint': {
+            'min_jaccard_overlap': 1.0,
+        },
+        'max_trials': 50,
+        'max_sample': 1,
+    },
+    {
+        'sampler': {
+            'min_scale': 0.6,
+            'max_scale': 1.0,
+            'min_aspect_ratio': 0.6,
+            'max_aspect_ratio': 1.0,
+        },
+        'sample_constraint': {
+            'min_jaccard_overlap': 1.0,
+            },
+        'max_trials': 50,
+        'max_sample': 1,
+    },
+    {
+        'sampler': {
+            'min_scale': 0.7,
+            'max_scale': 1.0,
+            'min_aspect_ratio': 0.7,
+            'max_aspect_ratio': 1.0,
+        },
+        'sample_constraint': {
+            'min_jaccard_overlap': 1.0,
+            },
+        'max_trials': 50,
+        'max_sample': 1,
+    },
+    {
+        'sampler': {
+            'min_scale': 0.8,
+            'max_scale': 1.0,
+            'min_aspect_ratio': 0.8,
+            'max_aspect_ratio': 1.0,
+        },
+        'sample_constraint': {
+            'max_jaccard_overlap': 1.0,
+        },
+        'max_trials': 50,
+        'max_sample': 1,
+    },
+    {
+        'sampler': {
+            'min_scale': 0.9,
+            'max_scale': 1.0,
+            'min_aspect_ratio': 0.9,
+            'max_aspect_ratio': 1.0,
+        },
+        'sample_constraint': {
+            'max_jaccard_overlap': 1.0,
+        },
+        'max_trials': 50,
+        'max_sample': 1,
+    },
+]
+scale = [16, 32, 64, 128, 256, 512]
+data_anchor_sampler = {
+        'scale': scale,
+        'sample_constraint': {
+            'min_object_coverage': 0.75
+        },
+        'max_sample': 1,
+        'max_trials': 50,
+}
+bbox = [
+    {
+      'bbox_small_scale': 10,
+      'bbox_large_scale': 15,
+      'ancher_stride': 4,
+    },
+    {
+      'bbox_small_scale': 15,
+      'bbox_large_scale': 20,
+      'ancher_stride': 4,
+    },
+    {
+      'bbox_small_scale': 20,
+      'bbox_large_scale': 40,
+      'ancher_stride': 8,
+    },
+    {
+      'bbox_small_scale': 40,
+      'bbox_large_scale': 70,
+      'ancher_stride': 8,
+    },
+    {
+      'bbox_small_scale': 70,
+      'bbox_large_scale': 110,
+      'ancher_stride': 16,
+    },
+    {
+      'bbox_small_scale': 110,
+      'bbox_large_scale': 250,
+      'ancher_stride': 32,
+    },
+    {
+      'bbox_small_scale': 250,
+      'bbox_large_scale': 400,
+      'ancher_stride': 32,
+    },
+    {
+      'bbox_small_scale': 400,
+      'bbox_large_scale': 560,
+      'ancher_stride': 32,
+    },
+]
+bbox_sampler = {
+    'box': bbox,
+    'max_sample': 1,
+    'max_trials': 50,
+}
 train_transform_param = {
     'mirror': True,
     'mean_value': [103.94, 116.78, 123.68],
@@ -152,8 +300,9 @@ make_if_not_exist(save_dir)
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
         train=True, output_label=True, label_map_file=labelmapPath,
-        crop_type = P.AnnotatedData.CROP_JITTER,
-        transform_param=train_transform_param)
+        crop_type = P.AnnotatedData.CROP_BATCH,
+        transform_param=train_transform_param, batch_sampler=batch_sampler, 
+        data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler)
 
 net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data')
 
@@ -228,7 +377,7 @@ with open(solver_file, 'w') as f:
 
 # Create job file.
 train_src_param = '# --snapshot={}_iter_{}.solverstate '.format(snapshot_dir, 5000)
-job_file = "../scripts/train_{}.sh".format('center_face_v2')
+job_file = "../train_scripts/train_{}.sh".format('center_face_v2')
 with open(job_file, 'w') as f:
     f.write('#!/bin/sh \n')
     f.write('if ! test -f {} ;then \n'.format(train_net_file))

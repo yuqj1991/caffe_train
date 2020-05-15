@@ -129,7 +129,9 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
             net[res_name] = L.Eltwise(net[from_layer], net[out_layer_projects])
             return res_name
         else:
-            return out_layer_projects
+            Relu_layer = "conv_{}_{}/{}_relu6".format(id, repeated_num, "linear")
+            net[Relu_layer] = L.ReLU6(net[out_layer_projects], in_place = True)
+            return Relu_layer
     elif strides == 2:
         out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
         ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
@@ -148,12 +150,14 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
 
 
 def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx,  use_relu, layerPrefix):
-    res_name = "ResConnect_stage_{}".format(stage_idx)
+    res_name = "{}_stage_{}".format(layerPrefix, stage_idx)
     net[res_name] = L.Eltwise(net[from_layer_one], net[from_layer_two], operation = P.Eltwise.SUM)
-    out_layer = "{}_stage_{}".format(layerPrefix, stage_idx)
     if use_relu:
-        Relu_layer = L.ReLU6(net[out_layer], in_place = True)
+        Relu_layer = "{}_stage_{}/Relu6".format(layerPrefix, stage_idx)
+        net[Relu_layer] = L.ReLU6(net[res_name], in_place = True)
         out_layer = Relu_layer
+    else:
+        out_layer = res_name
     return res_name, out_layer
 
 

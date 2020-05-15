@@ -377,7 +377,7 @@ with open(solver_file, 'w') as f:
 
 # Create job file.
 train_src_param = '# --snapshot={}_iter_{}.solverstate '.format(snapshot_dir, 5000)
-job_file = "../scripts/train_{}.sh".format('centerGridSoftmax_face_v2')
+job_file = "../train_scripts/train_{}.sh".format('centerGridSoftmax_face_v2')
 with open(job_file, 'w') as f:
     f.write('#!/bin/sh \n')
     f.write('if ! test -f {} ;then \n'.format(train_net_file))

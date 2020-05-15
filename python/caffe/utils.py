@@ -14,7 +14,7 @@ import math
 import functools
 
 def UnpackVariable(var, num):
-  assert len > 0
+  assert var is not None
   if type(var) is list and len(var) == num:
     return var
   else:

@@ -8,9 +8,9 @@ layer {
     phase: TEST
   }
   transform_param {
-    mean_value: 103.940002441
-    mean_value: 116.779998779
-    mean_value: 123.680000305
+    mean_value: 103.94000244140625
+    mean_value: 116.77999877929688
+    mean_value: 123.68000030517578
     resize_param {
       prob: 1.0
       resize_mode: WARP
@@ -23,8 +23,8 @@ layer {
     batch_sampler {
     }
     label_map_file: "../labelmap.prototxt"
-    up_prob: 0.699999988079
-    low_prob: 0.40000000596
+    up_prob: 0.699999988079071
+    low_prob: 0.4000000059604645
     yoloformat: false
     crop_type: CROP_BATCH
   }
@@ -73,7 +73,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -144,7 +144,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -216,7 +216,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -287,7 +287,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -312,6 +312,12 @@ layer {
       value: 0.0
     }
   }
+}
+layer {
+  name: "conv_0_0/linear_relu6"
+  type: "ReLU6"
+  bottom: "conv_0_0/linear"
+  top: "conv_0_0/linear"
 }
 layer {
   name: "conv_1_0/expand"
@@ -352,7 +358,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -424,7 +430,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -495,7 +501,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -560,7 +566,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -632,7 +638,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -703,7 +709,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -775,7 +781,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -847,7 +853,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -918,7 +924,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -983,7 +989,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1055,7 +1061,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1126,7 +1132,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1198,7 +1204,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1270,7 +1276,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1341,7 +1347,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1413,7 +1419,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1485,7 +1491,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1556,7 +1562,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1621,7 +1627,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1693,7 +1699,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1764,7 +1770,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1836,7 +1842,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1908,7 +1914,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1979,7 +1985,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2051,7 +2057,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2123,7 +2129,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2194,7 +2200,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2266,7 +2272,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2337,7 +2343,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2409,7 +2415,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2480,7 +2486,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2552,7 +2558,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2624,7 +2630,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2695,7 +2701,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2767,7 +2773,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2839,7 +2845,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2910,7 +2916,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2982,7 +2988,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3054,7 +3060,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3125,7 +3131,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3190,7 +3196,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3262,7 +3268,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3333,7 +3339,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3405,7 +3411,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3477,7 +3483,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3548,7 +3554,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3620,7 +3626,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3692,7 +3698,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3763,7 +3769,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3788,6 +3794,12 @@ layer {
       value: 0.0
     }
   }
+}
+layer {
+  name: "conv_6_0/linear_relu6"
+  type: "ReLU6"
+  bottom: "conv_6_0/linear"
+  top: "conv_6_0/linear"
 }
 layer {
   name: "conv_1_project/linear"
@@ -3828,7 +3840,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3899,7 +3911,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3964,7 +3976,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3991,82 +4003,17 @@ layer {
   }
 }
 layer {
-  name: "ResConnect_stage_320"
+  name: "Res_conv_linear_stage_320"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_320"
   bottom: "0_linear_Conv"
-  top: "ResConnect_stage_320"
+  top: "Res_conv_linear_stage_320"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "Res_conv_linear_stage_320"
-  type: "Convolution"
-  bottom: "ResConnect_stage_320"
-  top: "Res_conv_linear_stage_320"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 24
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "Res_conv_linear_stage_320_bn"
-  type: "BatchNorm"
-  bottom: "Res_conv_linear_stage_320"
-  top: "Res_conv_linear_stage_320"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  batch_norm_param {
-    use_global_stats: true
-    eps: 0.0010000000475
-  }
-}
-layer {
-  name: "Res_conv_linear_stage_320_scale"
-  type: "Scale"
-  bottom: "Res_conv_linear_stage_320"
-  top: "Res_conv_linear_stage_320"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
-}
-layer {
-  name: "Res_conv_linear_stage_320_relu6"
+  name: "Res_conv_linear_stage_320/Relu6"
   type: "ReLU6"
   bottom: "Res_conv_linear_stage_320"
   top: "Res_conv_linear_stage_320"
@@ -4110,7 +4057,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4175,7 +4122,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4202,82 +4149,17 @@ layer {
   }
 }
 layer {
-  name: "ResConnect_stage_96"
+  name: "Res_conv_linear_stage_96"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_96"
   bottom: "1_linear_Conv"
-  top: "ResConnect_stage_96"
+  top: "Res_conv_linear_stage_96"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "Res_conv_linear_stage_96"
-  type: "Convolution"
-  bottom: "ResConnect_stage_96"
-  top: "Res_conv_linear_stage_96"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 24
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "Res_conv_linear_stage_96_bn"
-  type: "BatchNorm"
-  bottom: "Res_conv_linear_stage_96"
-  top: "Res_conv_linear_stage_96"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  batch_norm_param {
-    use_global_stats: true
-    eps: 0.0010000000475
-  }
-}
-layer {
-  name: "Res_conv_linear_stage_96_scale"
-  type: "Scale"
-  bottom: "Res_conv_linear_stage_96"
-  top: "Res_conv_linear_stage_96"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
-}
-layer {
-  name: "Res_conv_linear_stage_96_relu6"
+  name: "Res_conv_linear_stage_96/Relu6"
   type: "ReLU6"
   bottom: "Res_conv_linear_stage_96"
   top: "Res_conv_linear_stage_96"
@@ -4321,7 +4203,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4386,7 +4268,7 @@ layer {
   }
   batch_norm_param {
     use_global_stats: true
-    eps: 0.0010000000475
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4413,82 +4295,17 @@ layer {
   }
 }
 layer {
-  name: "ResConnect_stage_32"
+  name: "Res_conv_linear_stage_32"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_32"
   bottom: "2_linear_Conv"
-  top: "ResConnect_stage_32"
+  top: "Res_conv_linear_stage_32"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "Res_conv_linear_stage_32"
-  type: "Convolution"
-  bottom: "ResConnect_stage_32"
-  top: "Res_conv_linear_stage_32"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 24
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "Res_conv_linear_stage_32_bn"
-  type: "BatchNorm"
-  bottom: "Res_conv_linear_stage_32"
-  top: "Res_conv_linear_stage_32"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  batch_norm_param {
-    use_global_stats: true
-    eps: 0.0010000000475
-  }
-}
-layer {
-  name: "Res_conv_linear_stage_32_scale"
-  type: "Scale"
-  bottom: "Res_conv_linear_stage_32"
-  top: "Res_conv_linear_stage_32"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
-}
-layer {
-  name: "Res_conv_linear_stage_32_relu6"
+  name: "Res_conv_linear_stage_32/Relu6"
   type: "ReLU6"
   bottom: "Res_conv_linear_stage_32"
   top: "Res_conv_linear_stage_32"
@@ -4566,7 +4383,7 @@ layer {
     num_classes: 2
     share_location: true
     keep_top_k: 200
-    confidence_threshold: 0.15000000596
+    confidence_threshold: 0.15000000596046448
   }
 }
 layer {
@@ -4581,7 +4398,7 @@ layer {
   detection_evaluate_param {
     num_classes: 2
     background_label_id: 0
-    overlap_threshold: 0.15000000596
+    overlap_threshold: 0.15000000596046448
     evaluate_difficult_gt: false
   }
 }
