@@ -4633,6 +4633,12 @@ layer {
   }
 }
 layer {
+  name: "FPN_linear__stage_0/Relu6"
+  type: "ReLU6"
+  bottom: "FPN_linear__stage_0"
+  top: "FPN_linear__stage_0"
+}
+layer {
   name: "Dectction_stage_320"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_320"
@@ -4641,6 +4647,12 @@ layer {
   eltwise_param {
     operation: SUM
   }
+}
+layer {
+  name: "Dectction_stage_320/Relu6"
+  type: "ReLU6"
+  bottom: "Dectction_stage_320"
+  top: "Dectction_stage_320"
 }
 layer {
   name: "Deconv_Scale_Up_Stage_96"
@@ -4783,6 +4795,12 @@ layer {
   }
 }
 layer {
+  name: "FPN_linear__stage_1/Relu6"
+  type: "ReLU6"
+  bottom: "FPN_linear__stage_1"
+  top: "FPN_linear__stage_1"
+}
+layer {
   name: "Dectction_stage_96"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_96"
@@ -4791,6 +4809,12 @@ layer {
   eltwise_param {
     operation: SUM
   }
+}
+layer {
+  name: "Dectction_stage_96/Relu6"
+  type: "ReLU6"
+  bottom: "Dectction_stage_96"
+  top: "Dectction_stage_96"
 }
 layer {
   name: "Deconv_Scale_Up_Stage_32"
@@ -4933,6 +4957,12 @@ layer {
   }
 }
 layer {
+  name: "FPN_linear__stage_2/Relu6"
+  type: "ReLU6"
+  bottom: "FPN_linear__stage_2"
+  top: "FPN_linear__stage_2"
+}
+layer {
   name: "Dectction_stage_32"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_32"
@@ -4941,6 +4971,12 @@ layer {
   eltwise_param {
     operation: SUM
   }
+}
+layer {
+  name: "Dectction_stage_32/Relu6"
+  type: "ReLU6"
+  bottom: "Dectction_stage_32"
+  top: "Dectction_stage_32"
 }
 layer {
   name: "Deconv_Scale_Up_Stage_24"
@@ -5016,6 +5052,12 @@ layer {
   eltwise_param {
     operation: SUM
   }
+}
+layer {
+  name: "Dectction_stage_24/Relu6"
+  type: "ReLU6"
+  bottom: "Dectction_stage_24"
+  top: "Dectction_stage_24"
 }
 layer {
   name: "detection_out"
