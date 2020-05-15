@@ -4605,12 +4605,6 @@ layer {
   }
 }
 layer {
-  name: "FPN_linear__stage_0/Relu6"
-  type: "ReLU6"
-  bottom: "FPN_linear__stage_0"
-  top: "FPN_linear__stage_0"
-}
-layer {
   name: "Dectction_stage_320"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_320"
@@ -4767,12 +4761,6 @@ layer {
   }
 }
 layer {
-  name: "FPN_linear__stage_1/Relu6"
-  type: "ReLU6"
-  bottom: "FPN_linear__stage_1"
-  top: "FPN_linear__stage_1"
-}
-layer {
   name: "Dectction_stage_96"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_96"
@@ -4927,12 +4915,6 @@ layer {
   eltwise_param {
     operation: SUM
   }
-}
-layer {
-  name: "FPN_linear__stage_2/Relu6"
-  type: "ReLU6"
-  bottom: "FPN_linear__stage_2"
-  top: "FPN_linear__stage_2"
 }
 layer {
   name: "Dectction_stage_32"
