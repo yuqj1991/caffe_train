@@ -9,9 +9,9 @@ layer {
   }
   transform_param {
     mirror: true
-    mean_value: 103.940002441
-    mean_value: 116.779998779
-    mean_value: 123.680000305
+    mean_value: 103.94000244140625
+    mean_value: 116.77999877929688
+    mean_value: 123.68000030517578
     resize_param {
       prob: 1.0
       resize_mode: WARP
@@ -47,9 +47,9 @@ layer {
   annotated_data_param {
     batch_sampler {
       sampler {
-        min_scale: 0.300000011921
+        min_scale: 0.30000001192092896
         max_scale: 1.0
-        min_aspect_ratio: 0.300000011921
+        min_aspect_ratio: 0.30000001192092896
         max_aspect_ratio: 1.0
       }
       sample_constraint {
@@ -60,9 +60,9 @@ layer {
     }
     batch_sampler {
       sampler {
-        min_scale: 0.40000000596
+        min_scale: 0.4000000059604645
         max_scale: 1.0
-        min_aspect_ratio: 0.40000000596
+        min_aspect_ratio: 0.4000000059604645
         max_aspect_ratio: 1.0
       }
       sample_constraint {
@@ -86,9 +86,9 @@ layer {
     }
     batch_sampler {
       sampler {
-        min_scale: 0.600000023842
+        min_scale: 0.6000000238418579
         max_scale: 1.0
-        min_aspect_ratio: 0.600000023842
+        min_aspect_ratio: 0.6000000238418579
         max_aspect_ratio: 1.0
       }
       sample_constraint {
@@ -99,9 +99,9 @@ layer {
     }
     batch_sampler {
       sampler {
-        min_scale: 0.699999988079
+        min_scale: 0.699999988079071
         max_scale: 1.0
-        min_aspect_ratio: 0.699999988079
+        min_aspect_ratio: 0.699999988079071
         max_aspect_ratio: 1.0
       }
       sample_constraint {
@@ -112,9 +112,9 @@ layer {
     }
     batch_sampler {
       sampler {
-        min_scale: 0.800000011921
+        min_scale: 0.800000011920929
         max_scale: 1.0
-        min_aspect_ratio: 0.800000011921
+        min_aspect_ratio: 0.800000011920929
         max_aspect_ratio: 1.0
       }
       sample_constraint {
@@ -125,9 +125,9 @@ layer {
     }
     batch_sampler {
       sampler {
-        min_scale: 0.899999976158
+        min_scale: 0.8999999761581421
         max_scale: 1.0
-        min_aspect_ratio: 0.899999976158
+        min_aspect_ratio: 0.8999999761581421
         max_aspect_ratio: 1.0
       }
       sample_constraint {
@@ -150,7 +150,7 @@ layer {
       max_sample: 1
       max_trials: 50
     }
-    up_prob: 0.699999988079
+    up_prob: 0.699999988079071
     bbox_sampler {
       box {
         bbox_small_scale: 10
@@ -195,7 +195,7 @@ layer {
       max_sample: 1
       max_trials: 50
     }
-    low_prob: 0.40000000596
+    low_prob: 0.4000000059604645
     yoloformat: true
     crop_type: CROP_JITTER
   }
@@ -243,8 +243,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -314,8 +314,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -386,8 +386,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -457,8 +457,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -483,6 +483,12 @@ layer {
       value: 0.0
     }
   }
+}
+layer {
+  name: "conv_0_0/linear_relu6"
+  type: "ReLU6"
+  bottom: "conv_0_0/linear"
+  top: "conv_0_0/linear"
 }
 layer {
   name: "conv_1_0/expand"
@@ -522,8 +528,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -594,8 +600,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -665,8 +671,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -730,8 +736,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -802,8 +808,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -873,8 +879,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -945,8 +951,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1017,8 +1023,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1088,8 +1094,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1153,8 +1159,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1225,8 +1231,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1296,8 +1302,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1368,8 +1374,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1440,8 +1446,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1511,8 +1517,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1583,8 +1589,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1655,8 +1661,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1726,8 +1732,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1791,8 +1797,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1863,8 +1869,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -1934,8 +1940,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2006,8 +2012,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2078,8 +2084,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2149,8 +2155,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2221,8 +2227,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2293,8 +2299,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2364,8 +2370,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2436,8 +2442,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2507,8 +2513,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2579,8 +2585,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2650,8 +2656,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2722,8 +2728,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2794,8 +2800,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2865,8 +2871,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -2937,8 +2943,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3009,8 +3015,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3080,8 +3086,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3152,8 +3158,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3224,8 +3230,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3295,8 +3301,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3360,8 +3366,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3432,8 +3438,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3503,8 +3509,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3575,8 +3581,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3647,8 +3653,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3718,8 +3724,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3790,8 +3796,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3862,8 +3868,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3933,8 +3939,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -3959,6 +3965,12 @@ layer {
       value: 0.0
     }
   }
+}
+layer {
+  name: "conv_6_0/linear_relu6"
+  type: "ReLU6"
+  bottom: "conv_6_0/linear"
+  top: "conv_6_0/linear"
 }
 layer {
   name: "conv_1_project/DepthWise"
@@ -3999,8 +4011,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4070,8 +4082,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4142,8 +4154,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4213,8 +4225,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4279,8 +4291,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4350,8 +4362,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4416,8 +4428,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4487,8 +4499,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4515,10 +4527,10 @@ layer {
   }
 }
 layer {
-  name: "DepthWise_conv_3_conv_6_0/linear"
+  name: "DepthWise_conv_3_conv_6_0/linear_relu6"
   type: "Convolution"
   bottom: "conv_6_0/linear"
-  top: "DepthWise_conv_3_conv_6_0/linear"
+  top: "DepthWise_conv_3_conv_6_0/linear_relu6"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -4536,10 +4548,10 @@ layer {
   }
 }
 layer {
-  name: "DepthWise_conv_3_conv_6_0/linear_bn"
+  name: "DepthWise_conv_3_conv_6_0/linear_relu6_bn"
   type: "BatchNorm"
-  bottom: "DepthWise_conv_3_conv_6_0/linear"
-  top: "DepthWise_conv_3_conv_6_0/linear"
+  bottom: "DepthWise_conv_3_conv_6_0/linear_relu6"
+  top: "DepthWise_conv_3_conv_6_0/linear_relu6"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -4553,15 +4565,15 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
-  name: "DepthWise_conv_3_conv_6_0/linear_scale"
+  name: "DepthWise_conv_3_conv_6_0/linear_relu6_scale"
   type: "Scale"
-  bottom: "DepthWise_conv_3_conv_6_0/linear"
-  top: "DepthWise_conv_3_conv_6_0/linear"
+  bottom: "DepthWise_conv_3_conv_6_0/linear_relu6"
+  top: "DepthWise_conv_3_conv_6_0/linear_relu6"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -4581,16 +4593,16 @@ layer {
   }
 }
 layer {
-  name: "DepthWise_conv_3_conv_6_0/linear_relu6"
+  name: "DepthWise_conv_3_conv_6_0/linear_relu6_relu6"
   type: "ReLU6"
-  bottom: "DepthWise_conv_3_conv_6_0/linear"
-  top: "DepthWise_conv_3_conv_6_0/linear"
+  bottom: "DepthWise_conv_3_conv_6_0/linear_relu6"
+  top: "DepthWise_conv_3_conv_6_0/linear_relu6"
 }
 layer {
-  name: "linear_conv_3_conv_6_0/linear"
+  name: "linear_conv_3_conv_6_0/linear_relu6"
   type: "Convolution"
-  bottom: "DepthWise_conv_3_conv_6_0/linear"
-  top: "linear_conv_3_conv_6_0/linear"
+  bottom: "DepthWise_conv_3_conv_6_0/linear_relu6"
+  top: "linear_conv_3_conv_6_0/linear_relu6"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -4607,10 +4619,10 @@ layer {
   }
 }
 layer {
-  name: "linear_conv_3_conv_6_0/linear_bn"
+  name: "linear_conv_3_conv_6_0/linear_relu6_bn"
   type: "BatchNorm"
-  bottom: "linear_conv_3_conv_6_0/linear"
-  top: "linear_conv_3_conv_6_0/linear"
+  bottom: "linear_conv_3_conv_6_0/linear_relu6"
+  top: "linear_conv_3_conv_6_0/linear_relu6"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -4624,15 +4636,15 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
-  name: "linear_conv_3_conv_6_0/linear_scale"
+  name: "linear_conv_3_conv_6_0/linear_relu6_scale"
   type: "Scale"
-  bottom: "linear_conv_3_conv_6_0/linear"
-  top: "linear_conv_3_conv_6_0/linear"
+  bottom: "linear_conv_3_conv_6_0/linear_relu6"
+  top: "linear_conv_3_conv_6_0/linear_relu6"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -4689,8 +4701,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4754,8 +4766,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4782,114 +4794,29 @@ layer {
   }
 }
 layer {
-  name: "ResConnect_stage_0"
+  name: "FPN_linear__stage_0"
   type: "Eltwise"
   bottom: "FPN_con_0"
-  bottom: "linear_conv_3_conv_6_0/linear"
-  top: "ResConnect_stage_0"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "FPN_linear__stage_0"
-  type: "Convolution"
-  bottom: "ResConnect_stage_0"
+  bottom: "linear_conv_3_conv_6_0/linear_relu6"
   top: "FPN_linear__stage_0"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 128
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "FPN_linear__stage_0_bn"
-  type: "BatchNorm"
-  bottom: "FPN_linear__stage_0"
-  top: "FPN_linear__stage_0"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
-  }
-}
-layer {
-  name: "FPN_linear__stage_0_scale"
-  type: "Scale"
-  bottom: "FPN_linear__stage_0"
-  top: "FPN_linear__stage_0"
-  param {
-    lr_mult: 1.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
-}
-layer {
-  name: "ResConnect_stage_320"
-  type: "Eltwise"
-  bottom: "Deconv_Scale_Up_Stage_320"
-  bottom: "FPN_linear__stage_0"
-  top: "ResConnect_stage_320"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
   name: "Dectction_stage_320"
-  type: "Convolution"
-  bottom: "ResConnect_stage_320"
+  type: "Eltwise"
+  bottom: "Deconv_Scale_Up_Stage_320"
+  bottom: "FPN_linear__stage_0"
   top: "Dectction_stage_320"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 6
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "Deconv_Scale_Up_Stage_96"
   type: "Deconvolution"
-  bottom: "ResConnect_stage_320"
+  bottom: "Dectction_stage_320"
   top: "Deconv_Scale_Up_Stage_96"
   param {
     lr_mult: 1.0
@@ -4924,8 +4851,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -4989,8 +4916,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -5017,114 +4944,29 @@ layer {
   }
 }
 layer {
-  name: "ResConnect_stage_1"
+  name: "FPN_linear__stage_1"
   type: "Eltwise"
   bottom: "FPN_con_1"
   bottom: "linear_conv_2_Res_Sum_4_2"
-  top: "ResConnect_stage_1"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "FPN_linear__stage_1"
-  type: "Convolution"
-  bottom: "ResConnect_stage_1"
   top: "FPN_linear__stage_1"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 128
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "FPN_linear__stage_1_bn"
-  type: "BatchNorm"
-  bottom: "FPN_linear__stage_1"
-  top: "FPN_linear__stage_1"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
-  }
-}
-layer {
-  name: "FPN_linear__stage_1_scale"
-  type: "Scale"
-  bottom: "FPN_linear__stage_1"
-  top: "FPN_linear__stage_1"
-  param {
-    lr_mult: 1.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
-}
-layer {
-  name: "ResConnect_stage_96"
-  type: "Eltwise"
-  bottom: "Deconv_Scale_Up_Stage_96"
-  bottom: "FPN_linear__stage_1"
-  top: "ResConnect_stage_96"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
   name: "Dectction_stage_96"
-  type: "Convolution"
-  bottom: "ResConnect_stage_96"
+  type: "Eltwise"
+  bottom: "Deconv_Scale_Up_Stage_96"
+  bottom: "FPN_linear__stage_1"
   top: "Dectction_stage_96"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 6
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "Deconv_Scale_Up_Stage_32"
   type: "Deconvolution"
-  bottom: "ResConnect_stage_96"
+  bottom: "Dectction_stage_96"
   top: "Deconv_Scale_Up_Stage_32"
   param {
     lr_mult: 1.0
@@ -5159,8 +5001,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -5224,8 +5066,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -5252,114 +5094,29 @@ layer {
   }
 }
 layer {
-  name: "ResConnect_stage_2"
+  name: "FPN_linear__stage_2"
   type: "Eltwise"
   bottom: "FPN_con_2"
   bottom: "linear_conv_1_Res_Sum_2_2"
-  top: "ResConnect_stage_2"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "FPN_linear__stage_2"
-  type: "Convolution"
-  bottom: "ResConnect_stage_2"
   top: "FPN_linear__stage_2"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 128
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "FPN_linear__stage_2_bn"
-  type: "BatchNorm"
-  bottom: "FPN_linear__stage_2"
-  top: "FPN_linear__stage_2"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
-  }
-}
-layer {
-  name: "FPN_linear__stage_2_scale"
-  type: "Scale"
-  bottom: "FPN_linear__stage_2"
-  top: "FPN_linear__stage_2"
-  param {
-    lr_mult: 1.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
-}
-layer {
-  name: "ResConnect_stage_32"
-  type: "Eltwise"
-  bottom: "Deconv_Scale_Up_Stage_32"
-  bottom: "FPN_linear__stage_2"
-  top: "ResConnect_stage_32"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
   name: "Dectction_stage_32"
-  type: "Convolution"
-  bottom: "ResConnect_stage_32"
+  type: "Eltwise"
+  bottom: "Deconv_Scale_Up_Stage_32"
+  bottom: "FPN_linear__stage_2"
   top: "Dectction_stage_32"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 6
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
+  eltwise_param {
+    operation: SUM
   }
 }
 layer {
   name: "Deconv_Scale_Up_Stage_24"
   type: "Deconvolution"
-  bottom: "ResConnect_stage_32"
+  bottom: "Dectction_stage_32"
   top: "Deconv_Scale_Up_Stage_24"
   param {
     lr_mult: 1.0
@@ -5394,8 +5151,8 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.999000012875
-    eps: 0.0010000000475
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
   }
 }
 layer {
@@ -5422,33 +5179,13 @@ layer {
   }
 }
 layer {
-  name: "ResConnect_stage_24"
+  name: "Dectction_stage_24"
   type: "Eltwise"
   bottom: "Deconv_Scale_Up_Stage_24"
   bottom: "linear_conv_0_Res_Sum_1_1"
-  top: "ResConnect_stage_24"
+  top: "Dectction_stage_24"
   eltwise_param {
     operation: SUM
-  }
-}
-layer {
-  name: "Dectction_stage_24"
-  type: "Convolution"
-  bottom: "ResConnect_stage_24"
-  top: "Dectction_stage_24"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 6
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
   }
 }
 layer {
@@ -5473,7 +5210,7 @@ layer {
     bias_num: 1
     net_width: 640
     net_height: 640
-    ignore_thresh: 0.300000011921
+    ignore_thresh: 0.30000001192092896
     low_bbox_scale: 256
     up_bbox_scale: 620
     class_type: SOFTMAX
@@ -5501,7 +5238,7 @@ layer {
     bias_num: 1
     net_width: 640
     net_height: 640
-    ignore_thresh: 0.300000011921
+    ignore_thresh: 0.30000001192092896
     low_bbox_scale: 128
     up_bbox_scale: 256
     class_type: SOFTMAX
@@ -5529,7 +5266,7 @@ layer {
     bias_num: 1
     net_width: 640
     net_height: 640
-    ignore_thresh: 0.300000011921
+    ignore_thresh: 0.30000001192092896
     low_bbox_scale: 32
     up_bbox_scale: 128
     class_type: SOFTMAX
@@ -5557,7 +5294,7 @@ layer {
     bias_num: 1
     net_width: 640
     net_height: 640
-    ignore_thresh: 0.300000011921
+    ignore_thresh: 0.30000001192092896
     low_bbox_scale: 6
     up_bbox_scale: 32
     class_type: SOFTMAX
