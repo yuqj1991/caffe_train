@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -34,7 +34,7 @@
 
 #pragma once
 
-#include "deviceutil.cuh"
+#include "../device/deviceutil.cuh"
 
 namespace mgpu {
 
@@ -48,10 +48,10 @@ MGPU_DEVICE int SerialSetIntersection(const T* data, int aBegin, int aEnd,
 
 	const int MinIterations = VT / 2;
 	int commit = 0;
-
+	
 	#pragma unroll
 	for(int i = 0; i < VT; ++i) {
-		bool test = RangeCheck ?
+		bool test = RangeCheck ? 
 			((aBegin + bBegin < end) && (aBegin < aEnd) && (bBegin < bEnd)) :
 			(i < MinIterations || (aBegin + bBegin < end));
 
@@ -61,7 +61,7 @@ MGPU_DEVICE int SerialSetIntersection(const T* data, int aBegin, int aEnd,
 
 			bool pA = comp(aKey, bKey);
 			bool pB = comp(bKey, aKey);
-
+			
 			// The outputs must come from A by definition of set interection.
 			results[i] = aKey;
 			indices[i] = aBegin;
@@ -84,10 +84,10 @@ MGPU_DEVICE int SerialSetUnion(const T* data, int aBegin, int aEnd,
 
 	const int MinIterations = VT / 2;
 	int commit = 0;
-
+	
 	#pragma unroll
 	for(int i = 0; i < VT; ++i) {
-		bool test = RangeCheck ?
+		bool test = RangeCheck ? 
 			(aBegin + bBegin < end) :
 			(i < MinIterations || (aBegin + bBegin < end));
 
@@ -96,9 +96,9 @@ MGPU_DEVICE int SerialSetUnion(const T* data, int aBegin, int aEnd,
 			T bKey = data[bBegin];
 
 			bool pA = false, pB = false;
-			if(RangeCheck && aBegin >= aEnd)
+			if(RangeCheck && aBegin >= aEnd) 
 				pB = true;
-			else if(RangeCheck && bBegin >= bEnd)
+			else if(RangeCheck && bBegin >= bEnd) 
 				pA = true;
 			else {
 				// Both are in range.
@@ -122,15 +122,15 @@ MGPU_DEVICE int SerialSetUnion(const T* data, int aBegin, int aEnd,
 // Emit A if A < B.
 
 template<int VT, bool RangeCheck, typename T, typename Comp>
-MGPU_DEVICE int SerialSetDifference(const T* data, int aBegin, int aEnd,
-	int bBegin, int bEnd, int end, T* results, int* indices, Comp comp) {
+MGPU_DEVICE int SerialSetDifference(const T* data, int aBegin, int aEnd, 
+	int bBegin, int bEnd, int end, T* results, int* indices, Comp comp) { 
 
 	const int MinIterations = VT / 2;
 	int commit = 0;
-
+	
 	#pragma unroll
 	for(int i = 0; i < VT; ++i) {
-		bool test = RangeCheck ?
+		bool test = RangeCheck ? 
 			(aBegin + bBegin < end) :
 			(i < MinIterations || (aBegin + bBegin < end));
 		if(test) {
@@ -163,15 +163,15 @@ MGPU_DEVICE int SerialSetDifference(const T* data, int aBegin, int aEnd,
 // Emit A if A < B and emit B if B < A.
 
 template<int VT, bool RangeCheck, typename T, typename Comp>
-MGPU_DEVICE int SerialSetSymDiff(const T* data, int aBegin, int aEnd,
-	int bBegin, int bEnd, int end, T* results, int* indices, Comp comp) {
+MGPU_DEVICE int SerialSetSymDiff(const T* data, int aBegin, int aEnd, 
+	int bBegin, int bEnd, int end, T* results, int* indices, Comp comp) { 
 
 	const int MinIterations = VT / 2;
 	int commit = 0;
-
+	
 	#pragma unroll
 	for(int i = 0; i < VT; ++i) {
-		bool test = RangeCheck ?
+		bool test = RangeCheck ? 
 			(aBegin + bBegin < end) :
 			(i < MinIterations || (aBegin + bBegin < end));
 		if(test) {
@@ -204,7 +204,7 @@ MGPU_DEVICE int SerialSetSymDiff(const T* data, int aBegin, int aEnd,
 // above.
 
 template<int VT, bool RangeCheck, MgpuSetOp Op, typename T, typename Comp>
-MGPU_DEVICE int SerialSetOp(const T* data, int aBegin, int aEnd,
+MGPU_DEVICE int SerialSetOp(const T* data, int aBegin, int aEnd, 
 	int bBegin, int bEnd, int star, T* results, int* indices, Comp comp) {
 
 	int end = aBegin + bBegin + VT - star;
@@ -212,7 +212,7 @@ MGPU_DEVICE int SerialSetOp(const T* data, int aBegin, int aEnd,
 	int commit;
 	switch(Op) {
 		case MgpuSetOpIntersection:
-			commit = SerialSetIntersection<VT, RangeCheck>(data, aBegin,
+			commit = SerialSetIntersection<VT, RangeCheck>(data, aBegin, 
 				aEnd, bBegin, bEnd, end, results, indices, comp);
 			break;
 		case MgpuSetOpUnion:

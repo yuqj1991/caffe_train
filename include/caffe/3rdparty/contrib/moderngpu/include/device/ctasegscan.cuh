@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -34,7 +34,7 @@
 
 #pragma once
 
-#include "ctascan.cuh"
+#include "../device/ctascan.cuh"
 
 namespace mgpu {
 
@@ -51,14 +51,14 @@ MGPU_DEVICE int DeviceFindSegScanDelta(int tid, bool flag, int* delta_shared) {
 	uint warpMask = 0xffffffff>> (31 - lane);		// inclusive search
 	uint ctaMask = 0x7fffffff>> (31 - lane);		// exclusive search
 
-	uint warpBits = __ballot(flag);
+	uint warpBits = ballot(flag);
 	delta_shared[warp] = warpBits;
 	__syncthreads();
 
 	if(tid < NumWarps) {
-		uint ctaBits = __ballot(0 != delta_shared[tid]);
+		uint ctaBits = ballot(0 != delta_shared[tid]);
 		int warpSegment = 31 - clz(ctaMask & ctaBits);
-		int start = (-1 != warpSegment) ?
+		int start = (-1 != warpSegment) ? 
 			(31 - clz(delta_shared[warpSegment]) + 32 * warpSegment) : 0;
 		delta_shared[NumWarps + tid] = start;
 	}
@@ -73,7 +73,7 @@ MGPU_DEVICE int DeviceFindSegScanDelta(int tid, bool flag, int* delta_shared) {
 
 	return tid - start;
 }
-
+  
 ////////////////////////////////////////////////////////////////////////////////
 // CTASegScan
 
@@ -94,22 +94,22 @@ struct CTASegScan {
 	// Return the value init for the first thread.
 
 	// When scanning single elements per thread, interpret the flag as a BEGIN
-	// FLAG. If tid's flag is set, its value belongs to thread tid + 1, not
+	// FLAG. If tid's flag is set, its value belongs to thread tid + 1, not 
 	// thread tid.
 
 	// The function returns the reduction of the last segment in the CTA.
 
-	MGPU_DEVICE static T SegScanDelta(int tid, int tidDelta, T x,
+	MGPU_DEVICE static T SegScanDelta(int tid, int tidDelta, T x, 
 		Storage& storage, T* carryOut, T identity = (T)0, Op op = Op()) {
 
-		// Run an inclusive scan
+		// Run an inclusive scan 
 		int first = 0;
 		storage.values[first + tid] = x;
 		__syncthreads();
 
 		#pragma unroll
 		for(int offset = 1; offset < NT; offset += offset) {
-			if(tidDelta >= offset)
+			if(tidDelta >= offset) 
 				x = op(storage.values[first + tid - offset], x);
 			first = NT - first;
 			storage.values[first + tid] = x;
@@ -126,7 +126,7 @@ struct CTASegScan {
 	MGPU_DEVICE static T SegScan(int tid, T x, bool flag, Storage& storage,
 		T* carryOut, T identity = (T)0, Op op = Op()) {
 
-		// Find the left-most thread that covers the first segment of this
+		// Find the left-most thread that covers the first segment of this 
 		// thread.
 		int tidDelta = DeviceFindSegScanDelta<NT>(tid, flag, storage.delta);
 

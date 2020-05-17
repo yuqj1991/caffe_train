@@ -38,7 +38,7 @@ void ReverseTimeLayer<Dtype>::Forward_cpu(
   const Dtype* const src_max = src + bottom[0]->count();
   const Dtype* const dest_max = dest + top[0]->count();
 
-  const int count = top[0]->count();
+  //const int count = top[0]->count();
   const int copy_amount = top[0]->count(1);
   const int sub_iter_max = top[0]->shape(0);
 
@@ -97,7 +97,7 @@ void ReverseTimeLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   const Dtype* const src_max = src + top[0]->count();
   const Dtype* const dest_max = dest + bottom[0]->count();
 
-  const int count = top[0]->count();
+  //const int count = top[0]->count();
   const int copy_amount = top[0]->count(1);
   const int sub_iter_max = top[0]->shape(0);
 

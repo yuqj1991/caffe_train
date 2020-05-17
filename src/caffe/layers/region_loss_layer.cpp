@@ -215,29 +215,19 @@ namespace caffe {
 		int count = 0;
 		int class_count = 0;
 		const Dtype* input_data = bottom[0]->cpu_data();
-		//const Dtype* label_data = bottom[1]->cpu_data();
-		//Blob<Dtype> swap;
 		swap_.ReshapeLike(*bottom[0]);
 		Dtype* swap_data = swap_.mutable_cpu_data();
-		//LOG(INFO) << diff_.channels() << "," << diff_.height();
-		//LOG(INFO)<<bottom[0]->count(1)*bottom[0]->num();
-		//LOG(INFO) << bottom[0]->num()<<","<< bottom[0]->channels() << "," << bottom[0]->height() << "," << bottom[0]->width();
-		//int index = 0;
 		int len = coords_ + num_class_ + 1;
 		int stride = side_*side_;
-		//LOG(INFO)<<swap.count(1);
 		for (int b = 0; b < bottom[0]->num(); b++) {
 			for (int s = 0; s < side_*side_; s++) {
 				for (int n = 0; n < num_; n++) {
 					int index = n*len*stride + s + b*bottom[0]->count(1);
-					//LOG(INFO)<<index;
 					vector<Dtype> pred;
 					float best_iou = 0;
-					int best_class = -1;
 					vector<Dtype> best_truth;
 					for (int c = 0; c < len; ++c) {
 						int index2 = c*stride + index;
-						//LOG(INFO)<<index2;
 						if (c == 4) {
 							swap_data[index2] = logistic_activate(input_data[index2 + 0]);
 						}
@@ -246,10 +236,8 @@ namespace caffe {
 						}
 					}
 					softmax_region(swap_data + index + 5 * stride, num_class_, stride);
-					//LOG(INFO) << index + 5;
 					int y2 = s / side_;
 					int x2 = s % side_;
-					//LOG(INFO) << side_;
 					get_region_box(pred, swap_data, biases_, n, index, x2, y2, side_, side_, stride);
 					for (int t = 0; t < 300; ++t) {
 						vector<Dtype> truth;
@@ -267,13 +255,12 @@ namespace caffe {
 						truth.push_back(h);
 						Dtype iou = box_iou(pred, truth);
 						if (iou > best_iou) {
-							best_class = label_data[b * 300 * 5 + t * 5];
+							//int best_class = label_data[b * 300 * 5 + t * 5];
 							best_iou = iou;
 							best_truth = truth;
 						}
 					}
 					avg_anyobj += swap_data[index + 4 * stride];
-					//diff[index + 4] = (-1) * noobject_scale_* (0 - swap_data[index + 4]);
 					diff[index + 4 * stride] = (-1) * noobject_scale_ * (0 - swap_data[index + 4 * stride]) *logistic_gradient(swap_data[index + 4 * stride]);
 					if (best_iou > thresh_) {
 						diff[index + 4 * stride] = 0;
@@ -286,8 +273,6 @@ namespace caffe {
 						truth.push_back((y2 + .5) / (float)side_);
 						truth.push_back((biases_[2 * n]) / (float)side_); //anchor boxes
 						truth.push_back((biases_[2 * n + 1]) / (float)side_);
-						//LOG(INFO)<<truth[2]<<","<<truth[3];
-						//LOG(INFO)<<index;
 						delta_region_box(truth, swap_data, biases_, n, index, x2, y2, side_, side_, diff, .01, stride);
 					}
 				}
@@ -319,11 +304,8 @@ namespace caffe {
 				truth_shift.push_back(0);
 				truth_shift.push_back(w);
 				truth_shift.push_back(h);
-				//int size = coords_ + num_class_ + 1;
-
 				for (int n = 0; n < num_; ++n) {
-					int index2 = n*len*stride + pos + b * bottom[0]->count(1);
-					//LOG(INFO) << index2;
+					int index2 = n*len*stride + pos + b * bottom[0]->count(1);		
 					vector<Dtype> pred;
 					get_region_box(pred, swap_data, biases_, n, index2, i, j, side_, side_, stride);
 					if (bias_match_) {
@@ -356,11 +338,9 @@ namespace caffe {
 					diff[best_index + 4 * stride] = (-1.0)* object_scale_ * (iou - swap_data[best_index + 4 * stride])* logistic_gradient(swap_data[best_index + 4 * stride]);
 				}
 				else {
-					//LOG(INFO)<<"test";
+					
 					diff[best_index + 4 * stride] = (-1.0) * object_scale_ * (1 - swap_data[best_index + 4 * stride]) * logistic_gradient(swap_data[best_index + 4 * stride]);
 				}
-
-
 				delta_region_class(swap_data, diff, best_index + 5 * stride, class_label, num_class_, class_scale_, &avg_cat, stride); //softmax_tree_
 
 				++count;
@@ -372,14 +352,11 @@ namespace caffe {
 			loss += diff[i] * diff[i];
 		}
 		top[0]->mutable_cpu_data()[0] = loss / bottom[0]->num();
-		//LOG(INFO) << "avg_noobj: " << avg_anyobj / (side_ * side_ * num_ * bottom[0]->num());	
 		iter++;
-		//LOG(INFO) << "iter: " << iter <<" loss: " << loss;
 		if (!(iter % 10))
 		{
 			LOG(INFO) << "avg_noobj: " << score_.avg_anyobj / 10. << " avg_obj: " << score_.avg_obj / 10. <<
 				" avg_iou: " << score_.avg_iou / 10. << " avg_cat: " << score_.avg_cat / 10. << " recall: " << score_.recall / 10. << " recall75: " << score_.recall75 / 10.;
-			//LOG(INFO) << "avg_noobj: "<< avg_anyobj/(side_*side_*num_*bottom[0]->num()) << " avg_obj: " << avg_obj/count <<" avg_iou: " << avg_iou/count << " avg_cat: " << avg_cat/class_count << " recall: " << recall/count << " recall75: " << recall75 / count;
 			score_.avg_anyobj = score_.avg_obj = score_.avg_iou = score_.avg_cat = score_.recall = score_.recall75 = 0;
 		}
 		else {
@@ -419,6 +396,6 @@ namespace caffe {
 #endif
 
 	INSTANTIATE_CLASS(RegionLossLayer);
-	//REGISTER_LAYER_CLASS(RegionLoss);
+	REGISTER_LAYER_CLASS(RegionLoss);
 
 }  // namespace caffe

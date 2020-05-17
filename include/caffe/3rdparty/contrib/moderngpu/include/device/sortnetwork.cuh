@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -34,7 +34,7 @@
 
 #pragma once
 
-#include "deviceutil.cuh"
+#include "../device/deviceutil.cuh"
 
 namespace mgpu {
 
@@ -42,7 +42,7 @@ namespace mgpu {
 // Odd-even transposition sorting network. Sorts keys and values in-place in
 // register.
 // http://en.wikipedia.org/wiki/Odd%E2%80%93even_sort
-
+	
 // CUDA Compiler does not currently unroll these loops correctly. Write using
 // template loop unrolling.
 /*
@@ -64,7 +64,7 @@ MGPU_DEVICE void OddEvenTransposeSort(T* keys, V* values, Comp comp) {
 template<int I, int VT>
 struct OddEvenTransposeSortT {
 	// Sort segments marked by head flags. If the head flag between i and i + 1
-	// is set (so that (2<< i) & flags is true), the values belong to different
+	// is set (so that (2<< i) & flags is true), the values belong to different 
 	// segments and are not swapped.
 	template<typename K, typename V, typename Comp>
 	static MGPU_DEVICE void Sort(K* keys, V* values, int flags, Comp comp) {
@@ -87,7 +87,7 @@ MGPU_DEVICE void OddEvenTransposeSort(K* keys, V* values, Comp comp) {
 	OddEvenTransposeSortT<0, VT>::Sort(keys, values, 0, comp);
 }
 template<int VT, typename K, typename V, typename Comp>
-MGPU_DEVICE void OddEvenTransposeSortFlags(K* keys, V* values, int flags,
+MGPU_DEVICE void OddEvenTransposeSortFlags(K* keys, V* values, int flags, 
 	Comp comp) {
 	OddEvenTransposeSortT<0, VT>::Sort(keys, values, flags, comp);
 }
@@ -122,13 +122,13 @@ struct OddEvenMergesortT {
 			const int M = 2 * R;
 			OddEvenMerge<M, Low2>::Merge(keys, values, flags, comp);
 			OddEvenMerge<M, Low2 + R>::Merge(keys, values, flags, comp);
-
+		
 			#pragma unroll
 			for(int i = Low2 + R; i + R < Low2 + Width; i += M)
 				CompareAndSwap(keys, values, flags, i, i + R, comp);
 		}
 	};
-	template<int R, int Low2>
+	template<int R, int Low2> 
 	struct OddEvenMerge<R, Low2, false> {
 		template<typename K, typename V, typename Comp>
 		MGPU_DEVICE static void Merge(K* keys, V* values, int flags,
@@ -136,7 +136,7 @@ struct OddEvenMergesortT {
 			CompareAndSwap(keys, values, flags, Low2, Low2 + R, comp);
 		}
 	};
-
+	
 	template<typename K, typename V, typename Comp>
 	MGPU_DEVICE static void Sort(K* keys, V* values, int flags,
 		Comp comp) {

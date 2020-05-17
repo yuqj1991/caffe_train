@@ -51,64 +51,64 @@ layer {
 		backend: LMDB
   }
   annotated_data_param {
-    batch_sampler {
-      max_sample: 1
-      max_trials: 1
-    }
-		batch_sampler {
-			sampler {
-				min_scale: 0.1
-				max_scale: 1.0
-				min_aspect_ratio: 0.5
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.6
-			}
-			max_sample: 1
-			max_trials: 50
+	batch_sampler {
+		max_sample: 1
+		max_trials: 1
+	}
+	batch_sampler {
+		sampler {
+			min_scale: 0.1
+			max_scale: 1.0
+			min_aspect_ratio: 0.5
+			max_aspect_ratio: 1.0
 		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.1
-				max_scale: 1.0
-				min_aspect_ratio: 0.6
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.7
-			}
-			max_sample: 1
-			max_trials: 50
+		sample_constraint {
+			min_jaccard_overlap: 0.6
 		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.1
-				max_scale: 1.0
-				min_aspect_ratio: 0.7
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				min_jaccard_overlap: 0.9
-			}
-			max_sample: 1
-			max_trials: 50
+		max_sample: 1
+		max_trials: 50
+	}
+	batch_sampler {
+		sampler {
+			min_scale: 0.1
+			max_scale: 1.0
+			min_aspect_ratio: 0.6
+			max_aspect_ratio: 1.0
 		}
-		batch_sampler {
-			sampler {
-				min_scale: 0.1
-				max_scale: 1.0
-				min_aspect_ratio: 0.8
-				max_aspect_ratio: 1.0
-			}
-			sample_constraint {
-				max_jaccard_overlap: 1.0
-			}
-			max_sample: 1
-			max_trials: 50
+		sample_constraint {
+			min_jaccard_overlap: 0.7
 		}
+		max_sample: 1
+		max_trials: 50
+	}
+	batch_sampler {
+		sampler {
+			min_scale: 0.1
+			max_scale: 1.0
+			min_aspect_ratio: 0.7
+			max_aspect_ratio: 1.0
+		}
+		sample_constraint {
+			min_jaccard_overlap: 0.9
+		}
+		max_sample: 1
+		max_trials: 50
+	}
+	batch_sampler {
+		sampler {
+			min_scale: 0.1
+			max_scale: 1.0
+			min_aspect_ratio: 0.8
+			max_aspect_ratio: 1.0
+		}
+		sample_constraint {
+			max_jaccard_overlap: 1.0
+		}
+		max_sample: 1
+		max_trials: 50
+	}
     crop_type: CROP_BATCH
-		label_map_file: "../labelmap_lp.prototxt"
+	label_map_file: "../labelmap_lp.prototxt"
   }
 }
 layer {
@@ -3177,7 +3177,7 @@ layer {
     background_label_id: 0
     use_difficult_gt: true
     neg_pos_ratio: 3.0
-    neg_overlap: 0.5
+    neg_overlap: 0.35
     code_type: CENTER_SIZE
     ignore_cross_boundary_bbox: false
     mining_type: MAX_NEGATIVE

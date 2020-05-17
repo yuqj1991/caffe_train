@@ -25,9 +25,9 @@ chars = ["京", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "
 
 def make_parser():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--ssd_model_def', default= '{}examples/licensePlate/net/SSD_300X300/ssd_no_bn_640.prototxt'.format(caffe_root))
+	parser.add_argument('--ssd_model_def', default= '{}examples/licensePlate/net/SSD_Det/ssd_no_bn_640.prototxt'.format(caffe_root))
 	parser.add_argument('--ssd_image_resize', default=300, type=int)
-	parser.add_argument('--ssd_model_weights', default= '{}examples/licensePlate/net/SSD_300X300/ssd_no_bn_640.caffemodel'.format(caffe_root))
+	parser.add_argument('--ssd_model_weights', default= '{}examples/licensePlate/net/SSD_Det/ssd_no_bn_640.caffemodel'.format(caffe_root))
 	parser.add_argument('--recog_model_def', default='{}examples/licensePlate/net/LPR/deploy.prototxt'.format(caffe_root))
 	parser.add_argument('--recog_image_width', default=128, type=int)
 	parser.add_argument('--recog_image_height', default=32, type=int)

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -35,8 +35,8 @@
 #pragma once
 
 #include "../mgpuenums.h"
-#include "deviceutil.cuh"
-#include "intrinsics.cuh"
+#include "../device/deviceutil.cuh"
+#include "../device/intrinsics.cuh"
 
 namespace mgpu {
 
@@ -78,7 +78,7 @@ struct CTAReduce<NT, mgpu::plus<int> > {
 	enum { Size = NT, Capacity = WARP_SIZE };
 	struct Storage { int shared[Capacity]; };
 
-	MGPU_DEVICE static int Reduce(int tid, int x, Storage& storage,
+	MGPU_DEVICE static int Reduce(int tid, int x, Storage& storage, 
 		Op op = Op()) {
 
 		const int NumSections = WARP_SIZE;
@@ -87,7 +87,7 @@ struct CTAReduce<NT, mgpu::plus<int> > {
 		int sec = tid / SecSize;
 
 		// In the first phase, threads cooperatively find the reduction within
-		// their segment. The segments are SecSize threads (NT / WARP_SIZE)
+		// their segment. The segments are SecSize threads (NT / WARP_SIZE) 
 		// wide.
 		#pragma unroll
 		for(int offset = 1; offset < SecSize; offset *= 2)
@@ -98,7 +98,7 @@ struct CTAReduce<NT, mgpu::plus<int> > {
 		if(SecSize - 1 == lane) storage.shared[sec] = x;
 		__syncthreads();
 
-		// Reduce the totals of each input segment. The spine is WARP_SIZE
+		// Reduce the totals of each input segment. The spine is WARP_SIZE 
 		// threads wide.
 		if(tid < NumSections) {
 			x = storage.shared[tid];
@@ -122,7 +122,7 @@ struct CTAReduce<NT, mgpu::maximum<int> > {
 	enum { Size = NT, Capacity = WARP_SIZE };
 	struct Storage { int shared[Capacity]; };
 
-	MGPU_DEVICE static int Reduce(int tid, int x, Storage& storage,
+	MGPU_DEVICE static int Reduce(int tid, int x, Storage& storage, 
 		Op op = Op()) {
 
 		const int NumSections = WARP_SIZE;
@@ -181,7 +181,7 @@ struct CTAScan {
 		}
 		*total = storage.shared[first + NT - 1];
 
-		if(MgpuScanTypeExc == type)
+		if(MgpuScanTypeExc == type) 
 			x = tid ? storage.shared[first + tid - 1] : identity;
 
 		__syncthreads();
@@ -208,7 +208,7 @@ struct CTAScan<NT, mgpu::plus<int> > {
 
 	MGPU_DEVICE static int Scan(int tid, int x, Storage& storage, int* total,
 		MgpuScanType type = MgpuScanTypeExc, int identity = 0, Op op = Op()) {
-
+	
 		// Define WARP_SIZE segments that are NT / WARP_SIZE large.
 		// Each warp makes log(SegSize) shfl_add calls.
 		// The spine makes log(WARP_SIZE) shfl_add calls.
@@ -267,12 +267,12 @@ MGPU_DEVICE int CTABinaryScan(int tid, bool x, int* shared, int* total) {
 	int lane = (WARP_SIZE - 1);
 
 	// Store the bit totals for each warp.
-	uint bits = __ballot(x);
+	uint bits = ballot(x);
 	shared[warp] = popc(bits);
 	__syncthreads();
 
 #if __CUDA_ARCH__ >= 300
-	if(tid < NumWarps) {
+	if(tid < NumWarps) { 
 		int x = shared[tid];
 		int scan = x;
 		#pragma unroll
@@ -297,7 +297,7 @@ MGPU_DEVICE int CTABinaryScan(int tid, bool x, int* shared, int* total) {
 	__syncthreads();
 
 #endif // __CUDA_ARCH__ >= 300
-
+	
 	// Add the warp scan back into the partials.
 	int scan = shared[warp] + __popc(bfe(bits, 0, lane));
 	*total = shared[NumWarps];

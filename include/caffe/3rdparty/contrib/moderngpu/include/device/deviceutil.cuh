@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -34,7 +34,7 @@
 
 #pragma once
 
-#include "intrinsics.cuh"
+#include "../device/intrinsics.cuh"
 
 namespace mgpu {
 
@@ -44,7 +44,7 @@ MGPU_HOST_DEVICE ptrdiff_t PtrDiff(const void* a, const void* b) {
 }
 
 // Offset a pointer by i bytes.
-template<typename T>
+template<typename T> 
 MGPU_HOST_DEVICE const T* PtrOffset(const T* p, ptrdiff_t i) {
 	return (const T*)((const byte*)p + i);
 }
@@ -70,7 +70,7 @@ MGPU_HOST_DEVICE int2 ComputeTaskRange(int block, int2 task) {
 	return range;
 }
 
-MGPU_HOST_DEVICE int2 ComputeTaskRange(int block, int2 task, int blockSize,
+MGPU_HOST_DEVICE int2 ComputeTaskRange(int block, int2 task, int blockSize, 
 	int count) {
 	int2 range = ComputeTaskRange(block, task);
 	range.x *= blockSize;
@@ -83,7 +83,7 @@ MGPU_HOST_DEVICE int2 ComputeTaskRange(int block, int2 task, int blockSize,
 // Input array flags is a bit array with 32 head flags per word.
 // ExtractThreadHeadFlags returns numBits flags starting at bit index.
 
-MGPU_HOST_DEVICE uint DeviceExtractHeadFlags(const uint* flags, int index,
+MGPU_HOST_DEVICE uint DeviceExtractHeadFlags(const uint* flags, int index, 
 	int numBits) {
 
 	int index2 = index>> 5;
@@ -105,7 +105,7 @@ MGPU_HOST_DEVICE uint DeviceExtractHeadFlags(const uint* flags, int index,
 // return packed words.
 
 template<int NT, int VT>
-MGPU_DEVICE uint DevicePackHeadFlags(uint threadBits, int tid,
+MGPU_DEVICE uint DevicePackHeadFlags(uint threadBits, int tid, 
 	uint* flags_shared) {
 
 	const int WordCount = NT * VT / 32;
@@ -125,7 +125,7 @@ MGPU_DEVICE uint DevicePackHeadFlags(uint threadBits, int tid,
 		packed = flags_shared[first]>> rem;
 		bit = VT - rem;
 		++first;
-
+		
 		#pragma unroll
 		for(int i = 0; i < Items; ++i) {
 			if(i < Items - 1 || bit < 32) {

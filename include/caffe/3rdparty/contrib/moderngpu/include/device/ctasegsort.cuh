@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -34,10 +34,10 @@
 
 #pragma once
 
-#include "ctascan.cuh"
-#include "ctasearch.cuh"
-#include "loadstore.cuh"
-#include "sortnetwork.cuh"
+#include "../device/ctascan.cuh"
+#include "../device/ctasearch.cuh"
+#include "../device/loadstore.cuh"
+#include "../device/sortnetwork.cuh"
 
 namespace mgpu {
 
@@ -45,7 +45,7 @@ template<int VT, typename T, typename Comp>
 MGPU_DEVICE void SegmentedSerialMerge(const T* keys_shared, int aBegin,
 	int aEnd, int bBegin, int bEnd, T results[VT], int indices[VT],
 	int leftEnd, int rightStart, Comp comp, bool sync = true) {
-
+		
 	bEnd = min(rightStart, bEnd);
 	T aKey = keys_shared[aBegin];
 	T bKey = keys_shared[bBegin];
@@ -64,7 +64,7 @@ MGPU_DEVICE void SegmentedSerialMerge(const T* keys_shared, int aBegin,
 		else
 			// Emit the smaller element in the middle segment.
 			p = !comp(bKey, aKey);
-
+		
 		results[i] = p ? aKey : bKey;
 		indices[i] = p ? aBegin : bBegin;
 		if(p) aKey = keys_shared[++aBegin];
@@ -93,24 +93,24 @@ MGPU_DEVICE void CTASegsortPass(T* keys_shared, int* ranges_shared, int tid,
 	int siblingRange = ranges_shared[1 ^ list];
 	int siblingStart = 0x0000ffff & siblingRange;
 	int siblingEnd = siblingRange>> 16;
-
+	
 	// Create a new active range for the merge.
 	int leftEnd = listParity ? siblingEnd : activeRange.y;
 	int rightStart = listParity ? activeRange.x : siblingStart;
 	activeRange.x = min(activeRange.x, siblingStart);
 	activeRange.y = max(activeRange.y, siblingEnd);
 
-	int p = SegmentedMergePath(keys_shared, a0, listLen, b0, listLen, leftEnd,
+	int p = SegmentedMergePath(keys_shared, a0, listLen, b0, listLen, leftEnd, 
 		rightStart, diag, comp);
 
 	int a0tid = a0 + p;
 	int b0tid = b0 + diag - p;
-	SegmentedSerialMerge<VT>(keys_shared, a0tid, b0, b0tid, b0 + listLen,
+	SegmentedSerialMerge<VT>(keys_shared, a0tid, b0, b0tid, b0 + listLen, 
 		results, indices, leftEnd, rightStart, comp);
 
 	// Store the ranges to shared memory.
 	if(0 == diag)
-		ranges_shared[list>> 1] =
+		ranges_shared[list>> 1] = 
 			(int)bfi(activeRange.y, activeRange.x, 16, 16);
 }
 
@@ -119,8 +119,8 @@ MGPU_DEVICE void CTASegsortPass(T* keys_shared, int* ranges_shared, int tid,
 
 template<int NT, int VT, bool HasValues, typename KeyType, typename ValType,
 	typename Comp>
-MGPU_DEVICE int2 CTASegsortLoop(KeyType threadKeys[VT],
-	ValType threadValues[VT], KeyType* keys_shared, ValType* values_shared,
+MGPU_DEVICE int2 CTASegsortLoop(KeyType threadKeys[VT], 
+	ValType threadValues[VT], KeyType* keys_shared, ValType* values_shared, 
 	int* ranges_shared, int tid, int2 activeRange, Comp comp) {
 
 	const int NumPasses = sLogPow2<NT>::value;
@@ -133,7 +133,7 @@ MGPU_DEVICE int2 CTASegsortLoop(KeyType threadKeys[VT],
 		if(HasValues) {
 			// Exchange values through shared memory.
 			DeviceThreadToShared<VT>(threadValues, tid, values_shared);
-			DeviceGather<NT, VT>(NT * VT, values_shared, indices, tid,
+			DeviceGather<NT, VT>(NT * VT, values_shared, indices, tid, 
 				threadValues);
 		}
 
@@ -158,9 +158,9 @@ MGPU_DEVICE int2 CTASegsort(KeyType threadKeys[VT], ValType threadValues[VT],
 		// Odd-even transpose sort.
 		OddEvenTransposeSortFlags<VT>(threadKeys, threadValues, headFlags,
 			comp);
-	else
+	else 
 		// Batcher's odd-even mergesort.
-		OddEvenMergesortFlags<VT>(threadKeys, threadValues, headFlags, comp);
+		OddEvenMergesortFlags<VT>(threadKeys, threadValues, headFlags, comp);	
 
 	// Record the first and last occurrence of head flags in this segment.
 	int blockEnd = 31 - clz(headFlags);
@@ -176,7 +176,7 @@ MGPU_DEVICE int2 CTASegsort(KeyType threadKeys[VT], ValType threadValues[VT],
 	DeviceThreadToShared<VT>(threadKeys, tid, keys_shared);
 
 	int2 activeRange = CTASegsortLoop<NT, VT, HasValues>(threadKeys,
-		threadValues, keys_shared, values_shared, ranges_shared, tid,
+		threadValues, keys_shared, values_shared, ranges_shared, tid, 
 		make_int2(blockStart, blockEnd), comp);
 	return activeRange;
 }
@@ -187,36 +187,36 @@ MGPU_DEVICE int2 CTASegsortKeys(KeyType threadKeys[VT], int tid, int headFlags,
 	KeyType* keys_shared, int* ranges_shared, Comp comp) {
 
 	int valuesTemp[VT];
-	return CTASegsort<NT, VT, Stable, false>(threadKeys, valuesTemp, tid,
+	return CTASegsort<NT, VT, Stable, false>(threadKeys, valuesTemp, tid, 
 		headFlags, keys_shared, (int*)keys_shared, ranges_shared, comp);
 }
 
-template<int NT, int VT, bool Stable, typename KeyType, typename ValType,
+template<int NT, int VT, bool Stable, typename KeyType, typename ValType, 
 	typename Comp>
-MGPU_DEVICE int2 CTASegsortPairs(KeyType threadKeys[VT],
+MGPU_DEVICE int2 CTASegsortPairs(KeyType threadKeys[VT], 
 	ValType threadValues[VT], int tid, int headFlags, KeyType* keys_shared,
 	ValType* values_shared, int* ranges_shared, Comp comp) {
 
-	return CTASegsort<NT, VT, Stable, true>(threadKeys, threadValues, tid,
+	return CTASegsort<NT, VT, Stable, true>(threadKeys, threadValues, tid, 
 		headFlags, keys_shared, values_shared, ranges_shared, comp);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // DeviceSegBlocksort
 // Load keys and values from global memory, sort in shared memory, and store
-// back to global memory. Store the left-most and right-most encountered
+// back to global memory. Store the left-most and right-most encountered 
 // headflag locations to ranges_global to prepare for the next pass.
 // This function is factored out of the blocksort kernel to allow easier
 // customization of that kernel - we have two implementations currently:
 // sort over indices and sort over bitfield.
 
 template<int NT, int VT, bool Stable, bool HasValues, typename InputIt1,
-	typename InputIt2, typename KeyType, typename ValType, typename OutputIt1,
+	typename InputIt2, typename KeyType, typename ValType, typename OutputIt1, 
 	typename OutputIt2, typename Comp>
-MGPU_DEVICE void DeviceSegBlocksort(InputIt1 keys_global,
-	InputIt2 values_global, int count2, KeyType* keys_shared,
+MGPU_DEVICE void DeviceSegBlocksort(InputIt1 keys_global, 
+	InputIt2 values_global, int count2, KeyType* keys_shared, 
 	ValType* values_shared, int* ranges_shared, int headFlags, int tid,
-	int block, OutputIt1 keysDest_global, OutputIt2 valsDest_global,
+	int block, OutputIt1 keysDest_global, OutputIt2 valsDest_global, 
 	int* ranges_global, Comp comp) {
 
 	// Load keys into register in thread order.
@@ -228,7 +228,7 @@ MGPU_DEVICE void DeviceSegBlocksort(InputIt1 keys_global,
 	// Load the values from global memory and into register in thread order.
 	ValType threadValues[VT];
 	if(HasValues) {
-		DeviceGlobalToShared<NT, VT>(count2, values_global + gid, tid,
+		DeviceGlobalToShared<NT, VT>(count2, values_global + gid, tid, 
 			values_shared);
 		DeviceSharedToThread<VT>(values_shared, tid, threadValues);
 	}
@@ -239,7 +239,7 @@ MGPU_DEVICE void DeviceSegBlocksort(InputIt1 keys_global,
 		comp);
 
 	// Store the keys to global memory.
-	DeviceSharedToGlobal<NT, VT>(count2, keys_shared, tid,
+	DeviceSharedToGlobal<NT, VT>(count2, keys_shared, tid, 
 		 keysDest_global + gid);
 
 	if(HasValues) {
@@ -262,9 +262,9 @@ MGPU_DEVICE void DeviceSegBlocksort(InputIt1 keys_global,
 
 template<int NT, int VT>
 MGPU_DEVICE int DeviceIndicesToHeadFlags(const int* indices_global,
-	const int* partitions_global, int tid, int block, int count2,
+	const int* partitions_global, int tid, int block, int count2, 
 	int* words_shared, byte* flags_shared) {
-
+	
 	const int FlagWordsPerThread = MGPU_DIV_UP(VT, 4);
 	int gid = NT * VT * block;
 	int p0 = partitions_global[block];
@@ -273,7 +273,7 @@ MGPU_DEVICE int DeviceIndicesToHeadFlags(const int* indices_global,
 	int headFlags = 0;
 	if(p1 > p0 || count2 < NT * VT) {
 
-		// Clear the flag bytes, then loop through the indices and poke in flag
+		// Clear the flag bytes, then loop through the indices and poke in flag 
 		// values.
 		#pragma unroll
 		for(int i = 0; i < FlagWordsPerThread; ++i)
@@ -305,7 +305,7 @@ MGPU_DEVICE int DeviceIndicesToHeadFlags(const int* indices_global,
 			if(0x01000000 & x) headFlags |= 1<< (4 * i + 3);
 		}
 		__syncthreads();
-
+	
 		// Set head flags for out-of-range keys.
 		int outOfRange = min(VT, first + VT - count2);
 		if(outOfRange > 0)
@@ -323,7 +323,7 @@ MGPU_DEVICE int DeviceIndicesToHeadFlags(const int* indices_global,
 struct SegSortSupport {
 	int* ranges_global;
 	int2* ranges2_global;
-
+	
 	int4* mergeList_global;
 	int* copyList_global;
 	int2* queueCounters_global;
@@ -338,9 +338,9 @@ struct SegSortSupport {
 template<int NT, int VT, bool HasValues, typename KeyType, typename ValueType,
 	typename Comp>
 MGPU_DEVICE void DeviceSegSortMerge(const KeyType* keys_global,
-	const ValueType* values_global, int2 segmentRange, int tid,
-	int block, int4 range, int pass, KeyType* keys_shared,
-	int* indices_shared, KeyType* keysDest_global, ValueType* valsDest_global,
+	const ValueType* values_global, int2 segmentRange, int tid, 
+	int block, int4 range, int pass, KeyType* keys_shared, 
+	int* indices_shared, KeyType* keysDest_global, ValueType* valsDest_global, 
 	Comp comp) {
 
 	const int NV = NT * VT;
@@ -352,22 +352,22 @@ MGPU_DEVICE void DeviceSegSortMerge(const KeyType* keys_global,
 	int b0 = range.z;
 	int bCount = range.w - range.z;
 
-	DeviceLoad2ToShared<NT, VT, VT>(keys_global + a0, aCount, keys_global + b0,
+	DeviceLoad2ToShared<NT, VT, VT>(keys_global + a0, aCount, keys_global + b0, 
 		bCount, tid, keys_shared);
 
 	////////////////////////////////////////////////////////////////////////////
 	// Run a merge path to find the starting point for each thread to merge.
 	// If the entire warp fits into the already-sorted segments, we can skip
 	// sorting it and leave its keys in shared memory. Doing this on the warp
-	// level rather than thread level (also legal) gives slightly better
+	// level rather than thread level (also legal) gives slightly better 
 	// performance.
-
+	
 	int segStart = segmentRange.x;
 	int segEnd = segmentRange.y;
 	int listParity = 1 & (block>> pass);
 
 	int warpOffset = VT * (~31 & tid);
-	bool sortWarp = listParity ?
+	bool sortWarp = listParity ? 
 		// The spliced segment is to the left (segStart).
 		(warpOffset < segStart) :
 		// The spliced segment is to the right (segEnd).
@@ -385,12 +385,12 @@ MGPU_DEVICE void DeviceSegSortMerge(const KeyType* keys_global,
 		int b1tid = aCount + bCount;
 
 		// Serial merge into register. All threads in the CTA so we hoist the
-		// check for list parity outside the function call to simplify the
+		// check for list parity outside the function call to simplify the 
 		// logic. Unlike in the blocksort, this does not cause warp divergence.
 		SegmentedSerialMerge<VT>(keys_shared, a0tid, a1tid, b0tid, b1tid,
 			threadKeys, indices, listParity ? 0 : segEnd,
 			listParity ? segStart : NV, comp, false);
-	}
+	} 
 	__syncthreads();
 
 	// Store sorted data in register back to shared memory. Then copy to global.
@@ -398,7 +398,7 @@ MGPU_DEVICE void DeviceSegSortMerge(const KeyType* keys_global,
 		DeviceThreadToShared<VT>(threadKeys, tid, keys_shared, false);
 	__syncthreads();
 
-	DeviceSharedToGlobal<NT, VT>(aCount + bCount, keys_shared, tid,
+	DeviceSharedToGlobal<NT, VT>(aCount + bCount, keys_shared, tid, 
 		keysDest_global + gid);
 
 	////////////////////////////////////////////////////////////////////////////
@@ -407,7 +407,7 @@ MGPU_DEVICE void DeviceSegSortMerge(const KeyType* keys_global,
 
 	if(HasValues) {
 		// Transpose the gather indices to help coalesce loads.
-		if(sortWarp)
+		if(sortWarp) 
 			DeviceThreadToShared<VT>(indices, tid, indices_shared, false);
 		else {
 			#pragma unroll
@@ -416,8 +416,8 @@ MGPU_DEVICE void DeviceSegSortMerge(const KeyType* keys_global,
 		}
 		__syncthreads();
 
-		DeviceTransferMergeValuesShared<NT, VT>(aCount + bCount,
-			values_global + a0,  values_global + b0, aCount, indices_shared,
+		DeviceTransferMergeValuesShared<NT, VT>(aCount + bCount, 
+			values_global + a0,  values_global + b0, aCount, indices_shared, 
 			tid, valsDest_global + NV * block);
 	}
 }
@@ -433,7 +433,7 @@ MGPU_DEVICE void DeviceSegSortCopy(const KeyType* keys_global,
 	int gid = NT * VT * block;
 	int count2 = min(NT * VT, count - gid);
 
-	DeviceGlobalToGlobal<NT, VT>(count2, keys_global + gid, tid,
+	DeviceGlobalToGlobal<NT, VT>(count2, keys_global + gid, tid, 
 		keysDest_global + gid);
 	if(HasValues)
 		DeviceGlobalToGlobal<NT, VT>(count2, values_global + gid, tid,

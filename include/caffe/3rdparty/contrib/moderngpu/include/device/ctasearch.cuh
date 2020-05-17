@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -34,22 +34,22 @@
 
 #pragma once
 
-#include "deviceutil.cuh"
+#include "../device/deviceutil.cuh"
 #include "../mgpudevice.cuh"
 
 namespace mgpu {
 
-template<MgpuBounds Bounds, typename IntT, typename It, typename T,
+template<MgpuBounds Bounds, typename IntT, typename It, typename T, 
 	typename Comp>
-MGPU_HOST_DEVICE void BinarySearchIt(It data, int& begin, int& end, T key,
+MGPU_HOST_DEVICE void BinarySearchIt(It data, int& begin, int& end, T key, 
 	int shift, Comp comp) {
 
 	IntT scale = (1<< shift) - 1;
 	int mid = (int)((begin + scale * end)>> shift);
 
 	T key2 = data[mid];
-	bool pred = (MgpuBoundsUpper == Bounds) ?
-		!comp(key, key2) :
+	bool pred = (MgpuBoundsUpper == Bounds) ? 
+		!comp(key, key2) : 
 		comp(key2, key);
 	if(pred) begin = mid + 1;
 	else end = mid;
@@ -81,7 +81,7 @@ template<MgpuBounds Bounds, typename T, typename It, typename Comp>
 MGPU_HOST_DEVICE int BinarySearch(It data, int count, T key, Comp comp) {
 	int begin = 0;
 	int end = count;
-	while(begin < end)
+	while(begin < end) 
 		BinarySearchIt<Bounds, int>(data, begin, end, key, 1, comp);
 	return begin;
 }
@@ -101,8 +101,8 @@ MGPU_HOST_DEVICE int MergePath(It1 a, int aCount, It2 b, int bCount, int diag,
 		int mid = (begin + end)>> 1;
 		T aKey = a[mid];
 		T bKey = b[diag - 1 - mid];
-		bool pred = (MgpuBoundsUpper == Bounds) ?
-			comp(aKey, bKey) :
+		bool pred = (MgpuBoundsUpper == Bounds) ? 
+			comp(aKey, bKey) : 
 			!comp(bKey, aKey);
 		if(pred) begin = mid + 1;
 		else end = mid;
@@ -145,7 +145,7 @@ MGPU_HOST_DEVICE int SegmentedMergePath(InputIt keys, int aOffset, int aCount,
 ////////////////////////////////////////////////////////////////////////////////
 // BalancedPath search
 
-template<bool Duplicates, typename IntT, typename InputIt1, typename InputIt2,
+template<bool Duplicates, typename IntT, typename InputIt1, typename InputIt2, 
 	typename Comp>
 MGPU_HOST_DEVICE int2 BalancedPath(InputIt1 a, int aCount, InputIt2 b,
 	int bCount, int diag, int levels, Comp comp) {
@@ -162,13 +162,13 @@ MGPU_HOST_DEVICE int2 BalancedPath(InputIt1 a, int aCount, InputIt2 b,
 			T x = b[bIndex];
 
 			// Search for the beginning of the duplicate run in both A and B.
-			// Because
+			// Because 
 			int aStart = BiasedBinarySearch<MgpuBoundsLower, IntT>(a, aIndex, x,
 				levels, comp);
 			int bStart = BiasedBinarySearch<MgpuBoundsLower, IntT>(b, bIndex, x,
 				levels, comp);
 
-			// The distance between the merge path and the lower_bound is the
+			// The distance between the merge path and the lower_bound is the 
 			// 'run'. We add up the a- and b- runs and evenly distribute them to
 			// get a stairstep path.
 			int aRun = aIndex - aStart;
@@ -178,7 +178,7 @@ MGPU_HOST_DEVICE int2 BalancedPath(InputIt1 a, int aCount, InputIt2 b,
 			// Attempt to advance b and regress a.
 			int bAdvance = max(xCount>> 1, bRun);
 			int bEnd = min(bCount, bStart + bAdvance + 1);
-			int bRunEnd = BinarySearch<MgpuBoundsUpper>(b + bIndex,
+			int bRunEnd = BinarySearch<MgpuBoundsUpper>(b + bIndex, 
 				bEnd - bIndex, x, comp) + bIndex;
 			bRun = bRunEnd - bStart;
 

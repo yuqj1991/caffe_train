@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -34,18 +34,18 @@
 
 #pragma once
 
-#include "ctasearch.cuh"
-#include "loadstore.cuh"
-#include "sortnetwork.cuh"
+#include "../device/ctasearch.cuh"
+#include "../device/loadstore.cuh"
+#include "../device/sortnetwork.cuh"
 
 namespace mgpu {
 
 ////////////////////////////////////////////////////////////////////////////////
 // SerialMerge
-
+	
 template<int VT, bool RangeCheck, typename T, typename Comp>
 MGPU_DEVICE void SerialMerge(const T* keys_shared, int aBegin, int aEnd,
-	int bBegin, int bEnd, T* results, int* indices, Comp comp) {
+	int bBegin, int bEnd, T* results, int* indices, Comp comp) { 
 
 	T aKey = keys_shared[aBegin];
 	T bKey = keys_shared[bBegin];
@@ -53,7 +53,7 @@ MGPU_DEVICE void SerialMerge(const T* keys_shared, int aBegin, int aEnd,
 	#pragma unroll
 	for(int i = 0; i < VT; ++i) {
 		bool p;
-		if(RangeCheck)
+		if(RangeCheck) 
 			p = (bBegin >= bEnd) || ((aBegin < aEnd) && !comp(bKey, aKey));
 		else
 			p = !comp(bKey, aKey);
@@ -68,7 +68,7 @@ MGPU_DEVICE void SerialMerge(const T* keys_shared, int aBegin, int aEnd,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// FindMergeFrame and FindMergesortInterval help mergesort (both CTA and global
+// FindMergeFrame and FindMergesortInterval help mergesort (both CTA and global 
 // merge pass levels) locate lists within the single source array.
 
 // Returns (offset of a, offset of b, length of list).
@@ -91,7 +91,7 @@ MGPU_HOST_DEVICE int4 FindMergesortInterval(int3 frame, int coop, int block,
 	int a1 = min(count, frame.x + mp1);
 	int b0 = min(count, frame.y + diag - mp0);
 	int b1 = min(count, frame.y + diag + nv - mp1);
-
+	
 	// The end partition of the last block for each merge operation is computed
 	// and stored as the begin partition for the subsequent merge. i.e. it is
 	// the same partition but in the wrong coordinate system, so its 0 when it
@@ -107,7 +107,7 @@ MGPU_HOST_DEVICE int4 FindMergesortInterval(int3 frame, int coop, int block,
 ////////////////////////////////////////////////////////////////////////////////
 // ComputeMergeRange
 
-MGPU_HOST_DEVICE int4 ComputeMergeRange(int aCount, int bCount, int block,
+MGPU_HOST_DEVICE int4 ComputeMergeRange(int aCount, int bCount, int block, 
 	int coop, int NV, const int* mp_global) {
 
 	// Load the merge paths computed by the partitioning kernel.
@@ -119,7 +119,7 @@ MGPU_HOST_DEVICE int4 ComputeMergeRange(int aCount, int bCount, int block,
 	int4 range;
 	if(coop) {
 		int3 frame = FindMergesortFrame(coop, block, NV);
-		range = FindMergesortInterval(frame, coop, block, NV, aCount, mp0,
+		range = FindMergesortInterval(frame, coop, block, NV, aCount, mp0, 
 			mp1);
 	} else {
 		range.x = mp0;											// a0
@@ -147,14 +147,14 @@ MGPU_DEVICE void CTABlocksortPass(T* keys_shared, int tid, int count,
 	int p = MergePath<MgpuBoundsLower>(keys_shared + a0, b0 - a0,
 		keys_shared + b0, b1 - b0, diag, comp);
 
-	SerialMerge<VT, true>(keys_shared, a0 + p, b0, b0 + diag - p, b1, keys,
+	SerialMerge<VT, true>(keys_shared, a0 + p, b0, b0 + diag - p, b1, keys, 
 		indices, comp);
 }
 
 template<int NT, int VT, bool HasValues, typename KeyType, typename ValType,
 	typename Comp>
-MGPU_DEVICE void CTABlocksortLoop(ValType threadValues[VT],
-	KeyType* keys_shared, ValType* values_shared, int tid, int count,
+MGPU_DEVICE void CTABlocksortLoop(ValType threadValues[VT], 
+	KeyType* keys_shared, ValType* values_shared, int tid, int count, 
 	Comp comp) {
 
 	#pragma unroll
@@ -167,7 +167,7 @@ MGPU_DEVICE void CTABlocksortLoop(ValType threadValues[VT],
 		if(HasValues) {
 			// Exchange the values through shared memory.
 			DeviceThreadToShared<VT>(threadValues, tid, values_shared);
-			DeviceGather<NT, VT>(NT * VT, values_shared, indices, tid,
+			DeviceGather<NT, VT>(NT * VT, values_shared, indices, tid, 
 				threadValues);
 		}
 
@@ -181,10 +181,10 @@ MGPU_DEVICE void CTABlocksortLoop(ValType threadValues[VT],
 // Caller provides the keys in shared memory. This functions sorts the first
 // count elements.
 
-template<int NT, int VT, bool Stable, bool HasValues, typename KeyType,
+template<int NT, int VT, bool Stable, bool HasValues, typename KeyType, 
 	typename ValType, typename Comp>
 MGPU_DEVICE void CTAMergesort(KeyType threadKeys[VT], ValType threadValues[VT],
-	KeyType* keys_shared, ValType* values_shared, int count, int tid,
+	KeyType* keys_shared, ValType* values_shared, int count, int tid, 
 	Comp comp) {
 
 	// Stable sort the keys in the thread.
@@ -199,7 +199,7 @@ MGPU_DEVICE void CTAMergesort(KeyType threadKeys[VT], ValType threadValues[VT],
 	DeviceThreadToShared<VT>(threadKeys, tid, keys_shared);
 
 	// Recursively merge lists until the entire CTA is sorted.
-	CTABlocksortLoop<NT, VT, HasValues>(threadValues, keys_shared,
+	CTABlocksortLoop<NT, VT, HasValues>(threadValues, keys_shared, 
 		values_shared, tid, count, comp);
 }
 
@@ -212,10 +212,10 @@ MGPU_DEVICE void CTAMergesortKeys(KeyType threadKeys[VT],
 		(int*)keys_shared, count, tid, comp);
 }
 
-template<int NT, int VT, bool Stable, typename KeyType, typename ValType,
+template<int NT, int VT, bool Stable, typename KeyType, typename ValType, 
 	typename Comp>
 MGPU_DEVICE void CTAMergesortPairs(KeyType threadKeys[VT],
-	ValType threadValues[VT], KeyType* keys_shared, ValType* values_shared,
+	ValType threadValues[VT], KeyType* keys_shared, ValType* values_shared, 
 	int count, int tid, Comp comp) {
 
 	CTAMergesort<NT, VT, Stable, true>(threadKeys, threadValues, keys_shared,
@@ -225,7 +225,7 @@ MGPU_DEVICE void CTAMergesortPairs(KeyType threadKeys[VT],
 ////////////////////////////////////////////////////////////////////////////////
 // DeviceMergeKeysIndices
 
-template<int NT, int VT, bool LoadExtended, typename It1, typename It2,
+template<int NT, int VT, bool LoadExtended, typename It1, typename It2, 
 	typename T, typename Comp>
 MGPU_DEVICE void DeviceMergeKeysIndices(It1 a_global, int aCount, It2 b_global,
 	int bCount, int4 range, int tid, T* keys_shared, T* results, int* indices,
@@ -245,14 +245,14 @@ MGPU_DEVICE void DeviceMergeKeysIndices(It1 a_global, int aCount, It2 b_global,
 
 		// Load one element past the end of each input to avoid having to use
 		// range checking in the merge loop.
-		DeviceLoad2ToShared<NT, VT, VT + 1>(a_global + a0, aCount2,
+		DeviceLoad2ToShared<NT, VT, VT + 1>(a_global + a0, aCount2, 
 			b_global + b0, bCount2, tid, keys_shared);
 
 		// Run a Merge Path search for each thread's starting point.
 		int diag = VT * tid;
-		int mp = MergePath<MgpuBoundsLower>(keys_shared, aCount,
+		int mp = MergePath<MgpuBoundsLower>(keys_shared, aCount, 
 			keys_shared + aCount2, bCount, diag, comp);
-
+			
 		// Compute the ranges of the sources in shared memory.
 		int a0tid = mp;
 		int b0tid = aCount2 + diag - mp;
@@ -266,7 +266,7 @@ MGPU_DEVICE void DeviceMergeKeysIndices(It1 a_global, int aCount, It2 b_global,
 				results, indices, comp);
 		}
 	} else {
-		// Use the input intervals from the ranges between the merge path
+		// Use the input intervals from the ranges between the merge path 
 		// intersections.
 		aCount = a1 - a0;
 		bCount = b1 - b0;
@@ -298,17 +298,17 @@ MGPU_DEVICE void DeviceMergeKeysIndices(It1 a_global, int aCount, It2 b_global,
 // Merge pairs from global memory into global memory. Useful factorization to
 // enable calling from merge, mergesort, and locality sort.
 
-template<int NT, int VT, bool HasValues, bool LoadExtended, typename KeysIt1,
-	typename KeysIt2, typename KeysIt3, typename ValsIt1, typename ValsIt2,
+template<int NT, int VT, bool HasValues, bool LoadExtended, typename KeysIt1, 
+	typename KeysIt2, typename KeysIt3, typename ValsIt1, typename ValsIt2, 
 	typename KeyType, typename ValsIt3, typename Comp>
-MGPU_DEVICE void DeviceMerge(KeysIt1 aKeys_global, ValsIt1 aVals_global,
-	int aCount, KeysIt2 bKeys_global, ValsIt2 bVals_global, int bCount,
+MGPU_DEVICE void DeviceMerge(KeysIt1 aKeys_global, ValsIt1 aVals_global, 
+	int aCount, KeysIt2 bKeys_global, ValsIt2 bVals_global, int bCount, 
 	int tid, int block, int4 range, KeyType* keys_shared, int* indices_shared,
 	KeysIt3 keys_global, ValsIt3 vals_global, Comp comp) {
 
 	KeyType results[VT];
 	int indices[VT];
-	DeviceMergeKeysIndices<NT, VT, LoadExtended>(aKeys_global, aCount,
+	DeviceMergeKeysIndices<NT, VT, LoadExtended>(aKeys_global, aCount, 
 		bKeys_global, bCount, range, tid, keys_shared, results, indices, comp);
 
 	// Store merge results back to shared memory.
@@ -317,15 +317,15 @@ MGPU_DEVICE void DeviceMerge(KeysIt1 aKeys_global, ValsIt1 aVals_global,
 	// Store merged keys to global memory.
 	aCount = range.y - range.x;
 	bCount = range.w - range.z;
-	DeviceSharedToGlobal<NT, VT>(aCount + bCount, keys_shared, tid,
+	DeviceSharedToGlobal<NT, VT>(aCount + bCount, keys_shared, tid, 
 		keys_global + NT * VT * block);
 
 	// Copy the values.
 	if(HasValues) {
 		DeviceThreadToShared<VT>(indices, tid, indices_shared);
 
-		DeviceTransferMergeValuesShared<NT, VT>(aCount + bCount,
-			aVals_global + range.x, bVals_global + range.z, aCount,
+		DeviceTransferMergeValuesShared<NT, VT>(aCount + bCount, 
+			aVals_global + range.x, bVals_global + range.z, aCount, 
 			indices_shared, tid, vals_global + NT * VT * block);
 	}
 }

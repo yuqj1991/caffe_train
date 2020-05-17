@@ -17,6 +17,8 @@
 
 #define USE_HARD_SAMPLE_SIGMOID 0
 
+#define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
+
 int count_gt = 0;
 int count_one = 0;
 namespace caffe {
@@ -1254,7 +1256,9 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
   CHECK_EQ(num_channels, (4 + num_classes)) << "num_channels shoule be set to including bias_x, bias_y, width, height, classes";
   
   int postive = 0;
-  caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
+  // 将所有值设置为 -2 的原因为，排除掉iou>0.35的一些样本，也就是说
+  // 只采集那些iou<0.35的负样本
+  caffe_set(batch_size * dimScale, Dtype(-2.), class_label); 
   for(int b = 0; b < batch_size; b++){
     vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
     int count = 0;
@@ -1266,6 +1270,32 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                   + 5* dimScale + h * output_width + w;
         Dtype class_loss = SingleSoftmaxLoss(channel_pred_data[bg_index], channel_pred_data[face_index], Dtype(-1.));
         batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
+        #if 1
+        int class_index = b * dimScale +  h * output_width + w;
+        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+          const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+          const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+          const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+          const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+          const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+          const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+          int large_side = std::max(gt_bbox_height, gt_bbox_width);
+          if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+            NormalizedBBox anchor_bbox;
+            float an_xmin = GET_VALID_VALUE((float) w - (anchor_scale/downRatio) / 2 / output_width, 0.f, 1.f);
+            float an_ymin = GET_VALID_VALUE((float) h - (anchor_scale/downRatio) / 2 / output_height, 0.f, 1.f);
+            float an_xmax = GET_VALID_VALUE((float) w + (anchor_scale/downRatio) / 2 / output_width, 0.f, 1.f);
+            float an_ymax = GET_VALID_VALUE((float) h + (anchor_scale/downRatio) / 2 / output_height, 0.f, 1.f);
+            anchor_bbox.set_xmin(an_xmin);
+            anchor_bbox.set_xmax(an_xmax);
+            anchor_bbox.set_ymin(an_ymin);
+            anchor_bbox.set_ymax(an_ymax);
+            if(YoloBBoxIou(anchor_bbox, gt_bboxes[ii]) < 0.35){
+              class_label[class_index] = -1;
+            }
+          }
+        }
+        #endif
       }
     }
     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -1279,6 +1309,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
       if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
         for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
           for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+            int class_index = b * dimScale +  h * output_width + w;
             if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
               continue;
             if(h + (anchor_scale/downRatio) / 2 >= output_height - 1)
@@ -1289,6 +1320,17 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
               continue;
             if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
               continue;
+            
+            NormalizedBBox anchor_bbox;
+            float an_xmin = GET_VALID_VALUE((float) w - (anchor_scale/downRatio) / 2 / output_width, 0.f, 1.f);
+            float an_ymin = GET_VALID_VALUE((float) h - (anchor_scale/downRatio) / 2 / output_height, 0.f, 1.f);
+            float an_xmax = GET_VALID_VALUE((float) w + (anchor_scale/downRatio) / 2 / output_width, 0.f, 1.f);
+            float an_ymax = GET_VALID_VALUE((float) h + (anchor_scale/downRatio) / 2 / output_height, 0.f, 1.f);
+            anchor_bbox.set_xmin(an_xmin);
+            anchor_bbox.set_xmax(an_xmax);
+            anchor_bbox.set_ymin(an_ymin);
+            anchor_bbox.set_ymax(an_ymax);
+
             Dtype xmin_bias = (w - xmin) * downRatio * 2 / anchor_scale;
             Dtype ymin_bias = (h - ymin) * downRatio * 2 / anchor_scale;
             Dtype xmax_bias = (w - xmax) * downRatio * 2 / anchor_scale;
@@ -1313,7 +1355,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             bottom_diff[ymin_index] = ymin_diff;
             bottom_diff[xmax_index] = xmax_diff;
             bottom_diff[ymax_index] = ymax_diff;
-            int class_index = b * dimScale +  h * output_width + w;
             class_label[class_index] = 1;
             mask_Rf_anchor[h * output_width + w] = 1;
             count++;

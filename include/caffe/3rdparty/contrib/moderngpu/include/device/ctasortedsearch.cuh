@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -35,7 +35,7 @@
 #pragma once
 
 #include "../mgpudevice.cuh"
-#include "ctasearch.cuh"
+#include "../device/ctasearch.cuh"
 
 namespace mgpu {
 
@@ -45,7 +45,7 @@ namespace mgpu {
 
 template<int VT, MgpuBounds Bounds, bool RangeCheck, bool IndexA, bool MatchA,
 	bool IndexB, bool MatchB, typename T, typename Comp>
-MGPU_DEVICE int3 DeviceSerialSearch(const T* keys_shared, int aBegin,
+MGPU_DEVICE int3 DeviceSerialSearch(const T* keys_shared, int aBegin, 
 	int aEnd, int bBegin, int bEnd, int aOffset, int bOffset, int* indices,
 	Comp comp) {
 
@@ -67,11 +67,11 @@ MGPU_DEVICE int3 DeviceSerialSearch(const T* keys_shared, int aBegin,
 		if(RangeCheck && aBegin >= aEnd) p = false;
 		else if(RangeCheck && bBegin >= bEnd) p = true;
 		else p = (MgpuBoundsUpper == Bounds) ?
-			comp(aKey, bKey) :
+			comp(aKey, bKey) : 
 			!comp(bKey, aKey);
-
+	
 		if(p) {
-			// aKey is smaller than bKey, so it is inserted before bKey.
+			// aKey is smaller than bKey, so it is inserted before bKey. 
 			// Save bKey's index (bBegin + first) as the result of the search
 			// and advance to the next needle in A.
 			bool match = false;
@@ -83,8 +83,8 @@ MGPU_DEVICE int3 DeviceSerialSearch(const T* keys_shared, int aBegin,
 					// is in range and equal to aKey.
 					// The predicate test result !comp(aKey, bPrev) was
 					// established on the previous A-advancing iteration (it
-					// failed the comp(aKey, bKey) test to get us to this
-					// point). Check the other half of the equality condition
+					// failed the comp(aKey, bKey) test to get us to this 
+					// point). Check the other half of the equality condition 
 					// with a second comparison.
 					bool inRange = !RangeCheck || (bBegin > aEnd);
 					match = inRange && !comp(bPrev, aKey);
@@ -93,20 +93,20 @@ MGPU_DEVICE int3 DeviceSerialSearch(const T* keys_shared, int aBegin,
 					// is a match for aKey, it must be bKey. Check that bKey
 					// is in range and equal to aKey.
 					// The predicate test !comp(bKey, aKey) has established one
-					// half of the equality condition. We establish the other
+					// half of the equality condition. We establish the other 
 					// half with a second comparison.
 					bool inRange = !RangeCheck || (bBegin < bEnd);
 					match = inRange && !comp(aKey, bKey);
 				}
 			}
-
+			
 			int index = 0;
 		 	if(IndexA) index = bOffset + bBegin;
 			if(match) index |= FlagA;
 			if(IndexA || MatchA) indices[i] = index;
 			matchCountA += match;
 
-			// Mark the decision bit to indicate that this iteration has
+			// Mark the decision bit to indicate that this iteration has 
 			// progressed A (the needles).
 			decisions |= 1<< i;
 			aPrev = aKey;
@@ -121,21 +121,21 @@ MGPU_DEVICE int3 DeviceSerialSearch(const T* keys_shared, int aBegin,
 					// Upper Bound: aKey is not smaller than bKey. We advance to
 					// the next haystack element in B. If there is a match in A
 					// for bKey it must be aKey. By entering this branch we've
-					// verified that !comp(aKey, bKey). Making the reciprocal
+					// verified that !comp(aKey, bKey). Making the reciprocal 
 					// comparison !comp(bKey, aKey) establishes aKey == bKey.
-					bool inRange = !RangeCheck ||
+					bool inRange = !RangeCheck || 
 						((bBegin < bEnd) && (aBegin < aEnd));
 					match = inRange && !comp(bKey, aKey);
 				} else {
 					// Lower Bound: bKey is smaller than aKey. We advance to the
 					// next element in B. If there is a match for bKey, it must
 					// be aPrev. The previous A-advancing iteration proved that
-					// !comp(bKey, aPrev). We test !comp(aPrev, bKey) for the
+					// !comp(bKey, aPrev). We test !comp(aPrev, bKey) for the 
 					// other half of the equality condition.
-					bool inRange = !RangeCheck ||
+					bool inRange = !RangeCheck || 
 						((bBegin < bEnd) && (aBegin > 0));
 					match = inRange && !comp(aPrev, bKey);
-				}
+				}			
 			}
 
 			int index = 0;
@@ -143,7 +143,7 @@ MGPU_DEVICE int3 DeviceSerialSearch(const T* keys_shared, int aBegin,
 			if(match) index |= FlagB;
 			if(IndexB || MatchB) indices[i] = index;
 			matchCountB += match;
-
+			
 			// Keep the decision bit cleared to indicate that this iteration
 			// has progressed B (the haystack).
 			bPrev = bKey;
@@ -158,18 +158,18 @@ MGPU_DEVICE int3 DeviceSerialSearch(const T* keys_shared, int aBegin,
 // Take keys in shared memory and return indices and b-match flags in shared
 // memory.
 // NOTE: This function doesn't do any strided-to-thread order transposes so
-// using an even number of values per thread will incur no additional bank
+// using an even number of values per thread will incur no additional bank 
 // conflicts.
 
-template<int NT, int VT, MgpuBounds Bounds, bool IndexA, bool MatchA,
+template<int NT, int VT, MgpuBounds Bounds, bool IndexA, bool MatchA, 
 	bool IndexB, bool MatchB, typename T, typename Comp>
 MGPU_DEVICE int2 CTASortedSearch(T* keys_shared, int aStart, int aCount,
-	int aEnd, int a0, int bStart, int bCount, int bEnd, int b0, bool extended,
+	int aEnd, int a0, int bStart, int bCount, int bEnd, int b0, bool extended, 
 	int tid, int* indices_shared, Comp comp) {
 
 	// Run a merge path to find the start of the serial search for each thread.
 	int diag = VT * tid;
-	int mp = MergePath<Bounds>(keys_shared + aStart, aCount,
+	int mp = MergePath<Bounds>(keys_shared + aStart, aCount, 
 		keys_shared + bStart, bCount, diag, comp);
 	int a0tid = mp;
 	int b0tid = diag - mp;
@@ -179,11 +179,11 @@ MGPU_DEVICE int2 CTASortedSearch(T* keys_shared, int aStart, int aCount,
 	int indices[VT];
 	if(extended)
 		results = DeviceSerialSearch<VT, Bounds, false, IndexA, MatchA, IndexB,
-			MatchB>(keys_shared, a0tid + aStart, aEnd, b0tid + bStart, bEnd,
+			MatchB>(keys_shared, a0tid + aStart, aEnd, b0tid + bStart, bEnd, 
 			a0 - aStart, b0 - bStart, indices, comp);
 	else
-		results = DeviceSerialSearch<VT, Bounds, true, IndexA, MatchA, IndexB,
-			MatchB>(keys_shared, a0tid + aStart, aEnd, b0tid + bStart, bEnd,
+		results = DeviceSerialSearch<VT, Bounds, true, IndexA, MatchA, IndexB, 
+			MatchB>(keys_shared, a0tid + aStart, aEnd, b0tid + bStart, bEnd, 
 			a0 - aStart, b0 - bStart, indices, comp);
 	__syncthreads();
 

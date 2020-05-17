@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -11,10 +11,10 @@
  *     * Neither the name of the NVIDIA CORPORATION nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
  * ARE DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -32,12 +32,9 @@
  *
  ******************************************************************************/
 
-#include "devicetypes.cuh"
+#include "../device/devicetypes.cuh"
 
 #pragma once
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
 namespace mgpu {
 
@@ -83,7 +80,7 @@ MGPU_HOST_DEVICE int GetDoubleY(double d) {
 
 MGPU_DEVICE uint bfe_ptx(uint x, uint bit, uint numBits) {
 	uint result;
-	asm("bfe.u32 %0, %1, %2, %3;" :
+	asm("bfe.u32 %0, %1, %2, %3;" : 
 		"=r"(result) : "r"(x), "r"(bit), "r"(numBits));
 	return result;
 }
@@ -91,7 +88,7 @@ MGPU_DEVICE uint bfe_ptx(uint x, uint bit, uint numBits) {
 
 MGPU_DEVICE uint bfi_ptx(uint x, uint y, uint bit, uint numBits) {
 	uint result;
-	asm("bfi.b32 %0, %1, %2, %3, %4;" :
+	asm("bfi.b32 %0, %1, %2, %3, %4;" : 
 		"=r"(result) : "r"(x), "r"(y), "r"(bit), "r"(numBits));
 	return result;
 }
@@ -108,34 +105,78 @@ MGPU_DEVICE uint prmt_ptx(uint a, uint b, uint index) {
 ////////////////////////////////////////////////////////////////////////////////
 // shfl_up
 
-__device__ __forceinline__ float shfl_up(float var,
-	unsigned int delta, int width = 32) {
+#ifndef MEMBERMASK
+	#define MEMBERMASK 0xffffffff
+#endif
 
-#if __CUDA_ARCH__ >= 300
-	var = __shfl_up(var, delta, width);
+#if (__CUDACC_VER_MAJOR__ >= 9 && __CUDA_ARCH__ >= 300) && !defined(USE_SHFL_SYNC)
+  #define USE_SHFL_SYNC
+#endif
+
+__device__ __forceinline__ float shfl_up(float var, 
+	unsigned int delta, int width = 32, unsigned mask=MEMBERMASK) {
+
+#ifdef USE_SHFL_SYNC
+	var = __shfl_up_sync(mask, var, delta, width);
+#else 
+#if ( __CUDA_ARCH__ >= 300)
+  	var = __shfl_up(var, delta, width);
+#endif
+#endif	
+	return var;
+}
+
+__device__ __forceinline__ double shfl_up(double var, 
+	unsigned int delta, int width = 32, unsigned mask=MEMBERMASK) {
+
+#ifdef USE_SHFL_SYNC
+	int2 p = mgpu::double_as_int2(var);
+	p.x = __shfl_up_sync(mask, p.x, delta, width);
+	p.y = __shfl_up_sync(mask, p.y, delta, width);
+	var = mgpu::int2_as_double(p);
+#else
+#if ( __CUDA_ARCH__ >= 300)
+	int2 p = mgpu::double_as_int2(var);
+	p.x = __shfl_up(p.x, delta, width);
+        p.y = __shfl_up(p.y, delta, width);
+	var = mgpu::int2_as_double(p);
+#endif
 #endif
 	return var;
 }
 
-__device__ __forceinline__ double shfl_up(double var,
-	unsigned int delta, int width = 32) {
+////////////////////////////////////////////////////////////////////////////////
+// ballot
 
-#if __CUDA_ARCH__ >= 300
-	int2 p = mgpu::double_as_int2(var);
-	p.x = __shfl_up(p.x, delta, width);
-	p.y = __shfl_up(p.y, delta, width);
-	var = mgpu::int2_as_double(p);
+__device__ static __forceinline__
+	unsigned ballot(int predicate, unsigned mask=MEMBERMASK) {
+
+#ifdef USE_SHFL_SYNC
+	return __ballot_sync(mask, predicate);
+#else
+#if ( __CUDA_ARCH__ >= 300)
+	return __ballot(predicate);
 #endif
-
-	return var;
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // shfl_add
 
-MGPU_DEVICE int shfl_add(int x, int offset, int width = WARP_SIZE) {
+MGPU_DEVICE int shfl_add(int x, 
+		int offset, int width = WARP_SIZE, unsigned threadmask=MEMBERMASK) {
 	int result = 0;
-#if __CUDA_ARCH__ >= 300
+#ifdef USE_SHFL_SYNC
+	int mask = (WARP_SIZE - width)<< 8;
+	asm(
+		"{.reg .s32 r0;"
+		".reg .pred p;"
+		"shfl.sync.up.b32 r0|p, %1, %2, %3, %4;"
+		"@p add.s32 r0, r0, %5;"
+		"mov.s32 %0, r0; }"
+		: "=r"(result) : "r"(x), "r"(offset), "r"(mask), "r"(threadmask), "r"(x));
+#else
+#if ( __CUDA_ARCH__ >= 300)
 	int mask = (WARP_SIZE - width)<< 8;
 	asm(
 		"{.reg .s32 r0;"
@@ -145,12 +186,24 @@ MGPU_DEVICE int shfl_add(int x, int offset, int width = WARP_SIZE) {
 		"mov.s32 %0, r0; }"
 		: "=r"(result) : "r"(x), "r"(offset), "r"(mask), "r"(x));
 #endif
+#endif
 	return result;
 }
 
-MGPU_DEVICE int shfl_max(int x, int offset, int width = WARP_SIZE) {
+MGPU_DEVICE int shfl_max(int x, 
+		int offset, int width = WARP_SIZE, unsigned threadmask=MEMBERMASK) {
 	int result = 0;
-#if __CUDA_ARCH__ >= 300
+#ifdef USE_SHFL_SYNC
+	int mask = (WARP_SIZE - width)<< 8;
+	asm(
+		"{.reg .s32 r0;"
+		".reg .pred p;"
+		"shfl.sync.up.b32 r0|p, %1, %2, %3, %4;"
+		"@p max.s32 r0, r0, %5;"
+		"mov.s32 %0, r0; }"
+		: "=r"(result) : "r"(x), "r"(offset), "r"(mask), "r"(threadmask), "r"(x));
+#else
+#if ( __CUDA_ARCH__ >= 300)
 	int mask = (WARP_SIZE - width)<< 8;
 	asm(
 		"{.reg .s32 r0;"
@@ -160,6 +213,7 @@ MGPU_DEVICE int shfl_max(int x, int offset, int width = WARP_SIZE) {
 		"mov.s32 %0, r0; }"
 		: "=r"(result) : "r"(x), "r"(offset), "r"(mask), "r"(x));
 #endif
+#endif
 	return result;
 }
 
@@ -167,7 +221,7 @@ MGPU_DEVICE int shfl_max(int x, int offset, int width = WARP_SIZE) {
 // brev, popc, clz, bfe, bfi, prmt
 
 // Reverse the bits in an integer.
-MGPU_HOST_DEVICE uint brev(uint x) {
+MGPU_HOST_DEVICE uint brev(uint x) { 
 #if __CUDA_ARCH__ >= 200
 	uint y = __brev(x);
 #else
@@ -255,18 +309,18 @@ MGPU_HOST_DEVICE int FindLog2(int x, bool roundUp = false) {
 	int a = 31 - clz(x);
 	if(roundUp) a += !MGPU_IS_POW_2(x);
 	return a;
-}
+} 
 
 ////////////////////////////////////////////////////////////////////////////////
 // vset4
 
 #if __CUDA_ARCH__ >= 300
 
-// Performs four byte-wise comparisons and returns 1 for each byte that
+// Performs four byte-wise comparisons and returns 1 for each byte that 
 // satisfies the conditional, and zero otherwise.
 MGPU_DEVICE uint vset4_lt_add_ptx(uint a, uint b, uint c) {
 	uint result;
-	asm("vset4.u32.u32.lt.add %0, %1, %2, %3;" :
+	asm("vset4.u32.u32.lt.add %0, %1, %2, %3;" : 
 		"=r"(result) : "r"(a), "r"(b), "r"(c));
 	return result;
 }
@@ -323,7 +377,7 @@ MGPU_HOST_DEVICE uint umulhi(uint x, uint y) {
 // intrinsic for __CUDA_ARCH__ >= 320 && __CUDA_ARCH__ < 400 for types supported
 // by __ldg in sm_32_intrinsics.h
 
-template<typename T>
+template<typename T> 
 struct IsLdgType {
 	enum { value = false };
 };
@@ -338,7 +392,7 @@ struct LdgShim {
 };
 
 #if __CUDA_ARCH__ >= 320 && __CUDA_ARCH__ < 400
-
+	
 	// List of __ldg-compatible types from sm_32_intrinsics.h.
 	DEFINE_LDG_TYPE(char)
 	DEFINE_LDG_TYPE(short)
@@ -384,7 +438,7 @@ MGPU_DEVICE T ldg(const T* p) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// Fast division for 31-bit integers.
+// Fast division for 31-bit integers. 
 // Uses the method in Hacker's Delight (2nd edition) page 228.
 // Evaluates for denom > 1 and x < 2^31.
 struct FastDivide {
@@ -406,7 +460,5 @@ struct FastDivide {
 		shift = p - 32;
 	}
 };
-
-#pragma GCC diagnostic pop
 
 } // namespace mgpu
