@@ -20,7 +20,7 @@ public:
     CpuCTC(int alphabet_size, int minibatch, void* workspace, int num_threads,
            int blank_label) :
             alphabet_size_(alphabet_size), minibatch_(minibatch),
-            num_threads_(num_threads), workspace_(workspace),
+            workspace_(workspace), num_threads_(num_threads),
             blank_label_(blank_label) {
 #if defined(CTC_DISABLE_OMP) || defined(APPLE)
 #else
@@ -72,10 +72,9 @@ private:
 
     int alphabet_size_; // Number of characters plus blank
     int minibatch_;
+    void* workspace_;
     int num_threads_;
     int blank_label_;
-    void* workspace_;
-
     void softmax(const ProbT* const activations, ProbT* probs,
                  const int* const input_lengths);
 
