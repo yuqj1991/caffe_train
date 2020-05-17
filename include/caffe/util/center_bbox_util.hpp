@@ -13,10 +13,6 @@
 #include "caffe/caffe.hpp"
 
 namespace caffe {
-
-#define NMS_UNION 1
-#define NMS_MIN  2
-
 typedef struct _YoloScoreShow{
       float avg_iou;
       float recall;
@@ -28,8 +24,9 @@ typedef struct _YoloScoreShow{
       int class_count;
 }YoloScoreShow;
 
-template<typename Dtype>
-Dtype gaussian_radius(const Dtype heatmap_height, const Dtype heatmap_width, const Dtype min_overlap);
+
+#define NMS_UNION 1
+#define NMS_MIN  2
 
 template <typename Dtype>
 void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
@@ -41,12 +38,6 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
                                 const int output_height, 
                                 bool share_location, Dtype* bottom_diff, const int num_channels,
                                 std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
-template <typename Dtype>
-void _nms_heatmap(const Dtype* conf_data, Dtype* keep_max_data, const int output_height
-                  , const int output_width, const int channels, const int num_batch);
-
-void center_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, float nmsthreshold = 0.3,
-                              int type=NMS_UNION);
 
 template <typename Dtype>
 void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
@@ -54,18 +45,23 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                   , std::map<int, std::vector<CenterNetInfo > > * results
                   , const int loc_channels,  Dtype conf_thresh, Dtype nms_thresh);      
 
-template <typename Dtype>
-void transferCVMatToBlobData(std::vector<Dtype> heatmap, Dtype* buffer_heat);
 
 template <typename Dtype>
-std::vector<Dtype> gaussian2D(const int height, const int width, Dtype sigma);
-
-template <typename Dtype>
-void draw_umich_gaussian(std::vector<Dtype>& heatmap, int center_x, int center_y, float radius,const int height, const int width);
+void _nms_heatmap(const Dtype* conf_data, Dtype* keep_max_data, const int output_height
+                  , const int output_width, const int channels, const int num_batch);
 
 template <typename Dtype>
 void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, Dtype* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);
+
+
+void hard_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, float nmsthreshold = 0.3,
+                              int type=NMS_UNION);
+
+
+void soft_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* output, 
+                        float sigma=0.5, float Nt=0.5, 
+                        float threshold=0.001, unsigned int type=2);
 
 
 template <typename Dtype>

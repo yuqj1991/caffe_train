@@ -97,7 +97,7 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
     std::sort(iter->second.begin(), iter->second.end(), GridCompareScore);
     std::vector<CenterNetInfo> temp_result = iter->second;
     std::vector<CenterNetInfo> nms_result;
-    center_nms(temp_result, &nms_result, ignore_thresh_);
+    hard_nms(temp_result, &nms_result, ignore_thresh_);
     int num_det = nms_result.size();
     if(keep_top_k_ > 0 && num_det > keep_top_k_){
       std::sort(nms_result.begin(), nms_result.end(), GridCompareScore);

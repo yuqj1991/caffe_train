@@ -220,7 +220,12 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         else if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_ANCHOR){
             if(data_anchor_samplers_.size() > 0){
                 GenerateBatchDataAnchorSamples(*expand_datum, data_anchor_samplers_, &sampled_bboxes);
-                CropSample = true;
+                int rand_idx = caffe_rng_rand() % sampled_bboxes.size();
+                sampled_datum = new AnnotatedDatum();
+                this->data_transformer_->CropImage_Sampling(*expand_datum,
+                                                    sampled_bboxes[rand_idx],
+                                                    sampled_datum);
+                has_sampled = true;
             }else{
                 sampled_datum = expand_datum;
             }

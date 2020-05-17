@@ -211,7 +211,7 @@ def voc_ap(rec, prec):
     return ap
 
 
-def evaluation(pred, gt_path, all, iou_thresh=0.2):
+def evaluation(pred, gt_path, all, iou_thresh=0.4):
     pred = get_preds(pred)
     norm_score(pred)
     facebox_list, event_list, file_list, hard_gt_list, medium_gt_list, easy_gt_list = get_gt_boxes(gt_path)

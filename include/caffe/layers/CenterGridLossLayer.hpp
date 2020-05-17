@@ -10,6 +10,7 @@
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/bbox_util.hpp"
 #include "caffe/util/center_bbox_util.hpp"
+
 #include "caffe/layers/loss_layer.hpp"
 
 namespace caffe {
