@@ -178,7 +178,6 @@ template void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt
                               
                               
 int main(){
-	int batch_id = 1;
 	NormalizedBBox box_1 = {0.2, 0.2, 0.5, 0.4};
 	NormalizedBBox box_2 = {0.6, 0.5, 0.9, 0.9};
 	NormalizedBBox box_3 = {0.3, 0.3, 0.8, 0.5};

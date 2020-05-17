@@ -1330,7 +1330,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             anchor_bbox.set_xmax(an_xmax);
             anchor_bbox.set_ymin(an_ymin);
             anchor_bbox.set_ymax(an_ymax);
-
+            if(BBoxCoverage(gt_bboxes[ii], anchor_bbox) < 0.45)
+              continue;
             Dtype xmin_bias = (w - xmin) * downRatio * 2 / anchor_scale;
             Dtype ymin_bias = (h - ymin) * downRatio * 2 / anchor_scale;
             Dtype xmax_bias = (w - xmax) * downRatio * 2 / anchor_scale;
