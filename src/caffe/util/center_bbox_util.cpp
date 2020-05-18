@@ -1025,7 +1025,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
             for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                 for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
-                    int class_index = b * dimScale +  h * output_width + w;
                     if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
                         continue;
                     if(h + (anchor_scale/downRatio) / 2 >= output_height - 1)
@@ -1037,17 +1036,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                     if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                         continue;
                     
-                    NormalizedBBox anchor_bbox;
-                    float an_xmin = GET_VALID_VALUE((float) w - (anchor_scale/downRatio) / 2 / output_width, 0.f, 1.f);
-                    float an_ymin = GET_VALID_VALUE((float) h - (anchor_scale/downRatio) / 2 / output_height, 0.f, 1.f);
-                    float an_xmax = GET_VALID_VALUE((float) w + (anchor_scale/downRatio) / 2 / output_width, 0.f, 1.f);
-                    float an_ymax = GET_VALID_VALUE((float) h + (anchor_scale/downRatio) / 2 / output_height, 0.f, 1.f);
-                    anchor_bbox.set_xmin(an_xmin);
-                    anchor_bbox.set_xmax(an_xmax);
-                    anchor_bbox.set_ymin(an_ymin);
-                    anchor_bbox.set_ymax(an_ymax);
-                    if(BBoxCoverage(gt_bboxes[ii], anchor_bbox) < 0.40)
-                        continue;
                     Dtype xmin_bias = (w - xmin) * downRatio * 2 / anchor_scale;
                     Dtype ymin_bias = (h - ymin) * downRatio * 2 / anchor_scale;
                     Dtype xmax_bias = (w - xmax) * downRatio * 2 / anchor_scale;
@@ -1060,6 +1048,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                                 + 2* dimScale + h * output_width + w;
                     int ymax_index = b * num_channels * dimScale 
                                                 + 3* dimScale + h * output_width + w;
+                    int class_index = b * dimScale +  h * output_width + w;
                     Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
                     Dtype xmin_loss, ymin_loss, xmax_loss, ymax_loss, single_total_loss;
                     xmin_loss = L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
