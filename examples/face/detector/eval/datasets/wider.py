@@ -1,5 +1,5 @@
 from __future__ import print_function
-import cPickle
+import pickle
 import os
 import subprocess
 
@@ -52,7 +52,7 @@ class wider(imdb):
                     y1 = max(0, bbox[1])
                     self._fp_bbox_map[name].append([x1, y1, x1 + bbox[2], y1 + bbox[3]])
                 count += 1
-            self._image_paths = self._fp_bbox_map.keys()
+            self._image_paths = list(self._fp_bbox_map.keys())
         else:
             self._image_paths = []
             for path in annos:
