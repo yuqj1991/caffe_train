@@ -740,105 +740,105 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
     #endif
     for(int b = 0; b < batch_size; b++){
-    vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
-    std::vector<int> mask_Rf_anchor(dimScale, 0);
-    std::vector<Dtype> object_loss_temp(dimScale, Dtype(0.));
-    int count = 0;
-    for(int h = 0; h < output_height; h++){
-        for(int w = 0; w < output_width; w++){
-        int xmin_index = b * num_channels * dimScale
-                                    + 0* dimScale + h * output_width + w;
-        int ymin_index = b * num_channels * dimScale 
-                                    + 1* dimScale + h * output_width + w;
-        int xmax_index = b * num_channels * dimScale
-                                    + 2* dimScale + h * output_width + w;
-        int ymax_index = b * num_channels * dimScale 
-                                    + 3* dimScale + h * output_width + w;
-        int object_index = b * num_channels * dimScale 
-                                    + 4* dimScale + h * output_width + w;
-        NormalizedBBox predBox;
-        float bb_xmin = (w - channel_pred_data[xmin_index] * anchor_scale /(2*downRatio)) / output_width;
-        float bb_ymin = (h - channel_pred_data[ymin_index] * anchor_scale /(2*downRatio)) / output_height;
-        float bb_xmax = (w - channel_pred_data[xmax_index] * anchor_scale /(2*downRatio)) / output_width;
-        float bb_ymax = (h - channel_pred_data[ymax_index] * anchor_scale /(2*downRatio)) /output_height;
-        predBox.set_xmin(bb_xmin);
-        predBox.set_xmax(bb_xmax);
-        predBox.set_ymin(bb_ymin);
-        predBox.set_ymax(bb_ymax);
-        float best_iou = 0;
-        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-            float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
-            if (iou > best_iou) {
-                best_iou = iou;
+        vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+        std::vector<int> mask_Rf_anchor(dimScale, 0);
+        std::vector<Dtype> object_loss_temp(dimScale, Dtype(0.));
+        int count = 0;
+        for(int h = 0; h < output_height; h++){
+            for(int w = 0; w < output_width; w++){
+                int xmin_index = b * num_channels * dimScale
+                                            + 0* dimScale + h * output_width + w;
+                int ymin_index = b * num_channels * dimScale 
+                                            + 1* dimScale + h * output_width + w;
+                int xmax_index = b * num_channels * dimScale
+                                            + 2* dimScale + h * output_width + w;
+                int ymax_index = b * num_channels * dimScale 
+                                            + 3* dimScale + h * output_width + w;
+                int object_index = b * num_channels * dimScale 
+                                            + 4* dimScale + h * output_width + w;
+                NormalizedBBox predBox;
+                float bb_xmin = (w - channel_pred_data[xmin_index] * anchor_scale /(2*downRatio)) / output_width;
+                float bb_ymin = (h - channel_pred_data[ymin_index] * anchor_scale /(2*downRatio)) / output_height;
+                float bb_xmax = (w - channel_pred_data[xmax_index] * anchor_scale /(2*downRatio)) / output_width;
+                float bb_ymax = (h - channel_pred_data[ymax_index] * anchor_scale /(2*downRatio)) /output_height;
+                predBox.set_xmin(bb_xmin);
+                predBox.set_xmax(bb_xmax);
+                predBox.set_ymin(bb_ymin);
+                predBox.set_ymax(bb_ymax);
+                float best_iou = 0;
+                for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+                    float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+                    if (iou > best_iou) {
+                        best_iou = iou;
+                    }
+                }
+                Dtype object_value = (channel_pred_data[object_index] - 0.), object_diff;
+                if(best_iou > ignore_thresh){
+                    object_value = 0.;
+                }
+                object_loss_temp[h * output_width + w] = Object_L2_Loss(object_value, &object_diff);
+                bottom_diff[object_index] = object_diff;
             }
         }
-        Dtype object_value = (channel_pred_data[object_index] - 0.), object_diff;
-        if(best_iou > ignore_thresh){
-            object_value = 0.;
-        }
-        object_loss_temp[h * output_width + w] = Object_L2_Loss(object_value, &object_diff);
-        bottom_diff[object_index] = object_diff;
-        }
-    }
-    for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-        const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
-        const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
-        const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
-        const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
-        const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
-        const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
-        int large_side = std::max(gt_bbox_height, gt_bbox_width);
-        if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-            for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
-                for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
-                    if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
-                        continue;
-                    if(h + (anchor_scale/downRatio) / 2 >= output_height - 1)
-                        continue;
-                    if(w - (anchor_scale/downRatio) / 2 < 0)
-                        continue;
-                    if(h - (anchor_scale/downRatio) / 2 < 0)
-                        continue;
-                    if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
-                        continue;
-                    Dtype xmin_bias = (w - xmin) * downRatio *2 / anchor_scale;
-                    Dtype ymin_bias = (h - ymin) * downRatio *2 / anchor_scale;
-                    Dtype xmax_bias = (w - xmax) * downRatio *2 / anchor_scale;
-                    Dtype ymax_bias = (h - ymax) * downRatio *2 / anchor_scale;
-                    int xmin_index = b * num_channels * dimScale
-                                                + 0* dimScale + h * output_width + w;
-                    int ymin_index = b * num_channels * dimScale 
-                                                + 1* dimScale + h * output_width + w;
-                    int xmax_index = b * num_channels * dimScale
-                                                + 2* dimScale + h * output_width + w;
-                    int ymax_index = b * num_channels * dimScale 
-                                                + 3* dimScale + h * output_width + w;
-                    int object_index = b * num_channels * dimScale 
-                                                + 4* dimScale + h * output_width + w;
-                    Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff, object_diff;
-                    loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
-                    loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
-                    loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
-                    loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
-                    object_loss_temp[h * output_width + w] = Object_L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &object_diff);
+        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+            const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+            const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+            const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+            const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+            const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+            const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+            int large_side = std::max(gt_bbox_height, gt_bbox_width);
+            if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+                for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
+                    for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+                        if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
+                            continue;
+                        if(h + (anchor_scale/downRatio) / 2 >= output_height - 1)
+                            continue;
+                        if(w - (anchor_scale/downRatio) / 2 < 0)
+                            continue;
+                        if(h - (anchor_scale/downRatio) / 2 < 0)
+                            continue;
+                        if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
+                            continue;
+                        Dtype xmin_bias = (w - xmin) * downRatio *2 / anchor_scale;
+                        Dtype ymin_bias = (h - ymin) * downRatio *2 / anchor_scale;
+                        Dtype xmax_bias = (w - xmax) * downRatio *2 / anchor_scale;
+                        Dtype ymax_bias = (h - ymax) * downRatio *2 / anchor_scale;
+                        int xmin_index = b * num_channels * dimScale
+                                                    + 0* dimScale + h * output_width + w;
+                        int ymin_index = b * num_channels * dimScale 
+                                                    + 1* dimScale + h * output_width + w;
+                        int xmax_index = b * num_channels * dimScale
+                                                    + 2* dimScale + h * output_width + w;
+                        int ymax_index = b * num_channels * dimScale 
+                                                    + 3* dimScale + h * output_width + w;
+                        int object_index = b * num_channels * dimScale 
+                                                    + 4* dimScale + h * output_width + w;
+                        Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff, object_diff;
+                        loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+                        loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+                        loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+                        loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
+                        object_loss_temp[h * output_width + w] = Object_L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &object_diff);
 
-                    bottom_diff[xmin_index] = xmin_diff;
-                    bottom_diff[ymin_index] = ymin_diff;
-                    bottom_diff[xmax_index] = xmax_diff;
-                    bottom_diff[ymax_index] = ymax_diff;
-                    bottom_diff[object_index] = object_diff;
-                    // class score 
-                    // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
-                    int class_index = b * dimScale
-                                            +  h * output_width + w;
-                    class_label[class_index] = 1;
-                    
-                    mask_Rf_anchor[h * output_width + w] = 1;
-                    count++;
+                        bottom_diff[xmin_index] = xmin_diff;
+                        bottom_diff[ymin_index] = ymin_diff;
+                        bottom_diff[xmax_index] = xmax_diff;
+                        bottom_diff[ymax_index] = ymax_diff;
+                        bottom_diff[object_index] = object_diff;
+                        // class score 
+                        // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
+                        int class_index = b * dimScale
+                                                +  h * output_width + w;
+                        class_label[class_index] = 1;
+                        
+                        mask_Rf_anchor[h * output_width + w] = 1;
+                        count++;
+                    }
                 }
             }
         }
-    }
         for(unsigned ii = 0; ii < dimScale; ii++){
             loc_loss += object_loss_temp[ii];
         }
@@ -1046,7 +1046,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                     anchor_bbox.set_xmax(an_xmax);
                     anchor_bbox.set_ymin(an_ymin);
                     anchor_bbox.set_ymax(an_ymax);
-                    if(BBoxCoverage(gt_bboxes[ii], anchor_bbox) < 0.45)
+                    if(BBoxCoverage(gt_bboxes[ii], anchor_bbox) < 0.40)
                         continue;
                     Dtype xmin_bias = (w - xmin) * downRatio * 2 / anchor_scale;
                     Dtype ymin_bias = (h - ymin) * downRatio * 2 / anchor_scale;
