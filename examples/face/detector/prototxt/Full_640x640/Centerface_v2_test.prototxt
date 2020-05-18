@@ -20,8 +20,6 @@ layer {
     }
   }
   annotated_data_param {
-    batch_sampler {
-    }
     label_map_file: "../labelmap.prototxt"
     up_prob: 0.699999988079071
     low_prob: 0.4000000059604645
