@@ -17,7 +17,7 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
         this->layer_param_.add_propagate_down(true);
         this->layer_param_.add_propagate_down(false);
     }
-    const CenterObjectParameter& center_object_loss_param =
+    const CenterObjectLossParameter& center_object_loss_param =
         this->layer_param_.center_object_loss_param();
 
     num_classes_ = center_object_loss_param.num_class();
@@ -52,14 +52,14 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     loc_bottom_vec_.push_back(&loc_gt_);
     loc_loss_.Reshape(loss_shape);
     loc_top_vec_.push_back(&loc_loss_);
-    if (loc_loss_type_ == CenterObjectParameter_LocLossType_L2) {
+    if (loc_loss_type_ == CenterObjectLossParameter_LocLossType_L2) {
         LayerParameter layer_param;
         layer_param.set_name(this->layer_param_.name() + "_l2_loc");
         layer_param.set_type("EuclideanLoss");
         layer_param.add_loss_weight(loc_weight_);
         loc_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
         loc_loss_layer_->SetUp(loc_bottom_vec_, loc_top_vec_);
-    } else if (loc_loss_type_ == CenterObjectParameter_LocLossType_SMOOTH_L1) {
+    } else if (loc_loss_type_ == CenterObjectLossParameter_LocLossType_SMOOTH_L1) {
         LayerParameter layer_param;
         layer_param.set_name(this->layer_param_.name() + "_smooth_L1_loc");
         layer_param.set_type("SmoothL1Loss");
@@ -75,13 +75,12 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     conf_bottom_vec_.push_back(&conf_gt_);
     conf_loss_.Reshape(loss_shape);
     conf_top_vec_.push_back(&conf_loss_);
-    if (conf_loss_type_ == CenterObjectParameter_ConfLossType_FOCALSIGMOID) {
+    if (conf_loss_type_ == CenterObjectLossParameter_ConfLossType_FOCALSIGMOID) {
         LayerParameter layer_param;
         layer_param.set_name(this->layer_param_.name() + "_sigmoid_conf");
         layer_param.set_type("CenterNetfocalSigmoidWithLoss");
         layer_param.add_loss_weight(Dtype(1.));
-        layer_param.mutable_loss_param()->set_normalization(
-            LossParameter_NormalizationMode_NONE);
+        layer_param.mutable_loss_param()->set_normalization(LossParameter_NormalizationMode_NONE);
         // Fake reshape.
         vector<int> conf_shape(1, 1);
         conf_gt_.Reshape(conf_shape);
@@ -148,7 +147,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     }
 
     if (num_gt_ >= 1) {
-        if (conf_loss_type_ == CenterObjectParameter_ConfLossType_FOCALSIGMOID) {
+        if (conf_loss_type_ == CenterObjectLossParameter_ConfLossType_FOCALSIGMOID) {
             conf_gt_.ReshapeLike(*bottom[1]);
             conf_pred_.ReshapeLike(*bottom[1]);
             conf_pred_.CopyFrom(*bottom[1]);

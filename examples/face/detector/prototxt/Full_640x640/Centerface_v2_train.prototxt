@@ -4540,9 +4540,9 @@ layer {
   center_object_loss_param {
     num_class: 1
     share_location: true
-    loc_weight: 1.0
-    conf_loss_type: FOCALSIGMOID
     loc_loss_type: SMOOTH_L1
+    conf_loss_type: FOCALSIGMOID
+    loc_weight: 1.0
   }
 }
 

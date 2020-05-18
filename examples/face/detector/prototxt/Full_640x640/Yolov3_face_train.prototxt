@@ -4741,29 +4741,29 @@ layer{
 	propagate_down: false
 	center_object_loss_param {
 		bias_scale: 7.8
-    bias_scale: 12.7
-    bias_scale: 11.1
-    bias_scale: 20.9
-    bias_scale: 16.0
-    bias_scale: 32.1
-    bias_scale: 24.6
-    bias_scale: 23.6
-    bias_scale: 24.3
-    bias_scale: 46.2
-    bias_scale: 37.0
-    bias_scale: 61.9
-    bias_scale: 49.7
-    bias_scale: 101.4
-    bias_scale: 74.7
-    bias_scale: 70.0
-    bias_scale: 140.5
-    bias_scale: 191.1
-    bias_scale: 82.1
-    bias_scale: 148.2
-    bias_scale: 202.0
-    bias_scale: 304.7
-    bias_scale: 324.6
-    bias_scale: 408.2
+		bias_scale: 12.7
+		bias_scale: 11.1
+		bias_scale: 20.9
+		bias_scale: 16.0
+		bias_scale: 32.1
+		bias_scale: 24.6
+		bias_scale: 23.6
+		bias_scale: 24.3
+		bias_scale: 46.2
+		bias_scale: 37.0
+		bias_scale: 61.9
+		bias_scale: 49.7
+		bias_scale: 101.4
+		bias_scale: 74.7
+		bias_scale: 70.0
+		bias_scale: 140.5
+		bias_scale: 191.1
+		bias_scale: 82.1
+		bias_scale: 148.2
+		bias_scale: 202.0
+		bias_scale: 304.7
+		bias_scale: 324.6
+		bias_scale: 408.2
 
 		bias_num: 12
 
@@ -4773,7 +4773,7 @@ layer{
 
 		bias_mask_group_num: 1
 
-		ignore_thresh: 0.3
+		ignore_thresh: 0.5
 		net_width: 640
 		net_height: 640
 
@@ -4797,43 +4797,43 @@ layer {
 	propagate_down: false
 	center_object_loss_param {
 		bias_scale: 7.8
-    bias_scale: 12.7
-    bias_scale: 11.1
-    bias_scale: 20.9
-    bias_scale: 16.0
-    bias_scale: 32.1
-    bias_scale: 24.6
-    bias_scale: 23.6
-    bias_scale: 24.3
-    bias_scale: 46.2
-    bias_scale: 37.0
-    bias_scale: 61.9
-    bias_scale: 49.7
-    bias_scale: 101.4
-    bias_scale: 74.7
-    bias_scale: 70.0
-    bias_scale: 140.5
-    bias_scale: 191.1
-    bias_scale: 82.1
-    bias_scale: 148.2
-    bias_scale: 202.0
-    bias_scale: 304.7
-    bias_scale: 324.6
-    bias_scale: 408.2
-		
+		bias_scale: 12.7
+		bias_scale: 11.1
+		bias_scale: 20.9
+		bias_scale: 16.0
+		bias_scale: 32.1
+		bias_scale: 24.6
+		bias_scale: 23.6
+		bias_scale: 24.3
+		bias_scale: 46.2
+		bias_scale: 37.0
+		bias_scale: 61.9
+		bias_scale: 49.7
+		bias_scale: 101.4
+		bias_scale: 74.7
+		bias_scale: 70.0
+		bias_scale: 140.5
+		bias_scale: 191.1
+		bias_scale: 82.1
+		bias_scale: 148.2
+		bias_scale: 202.0
+		bias_scale: 304.7
+		bias_scale: 324.6
+		bias_scale: 408.2
+
 		bias_num: 12
 
 		bias_mask: 6
 		bias_mask: 7
 		bias_mask: 8
 
-		
+
 		bias_mask_group_num: 1
-		
-		ignore_thresh: 0.3
+
+		ignore_thresh: 0.5
 		net_width: 640
 		net_height: 640
-		
+
 		num_class: 1
 	}
 }
@@ -4854,42 +4854,42 @@ layer {
 	propagate_down: false
 	center_object_loss_param {
 		bias_scale: 7.8
-    bias_scale: 12.7
-    bias_scale: 11.1
-    bias_scale: 20.9
-    bias_scale: 16.0
-    bias_scale: 32.1
-    bias_scale: 24.6
-    bias_scale: 23.6
-    bias_scale: 24.3
-    bias_scale: 46.2
-    bias_scale: 37.0
-    bias_scale: 61.9
-    bias_scale: 49.7
-    bias_scale: 101.4
-    bias_scale: 74.7
-    bias_scale: 70.0
-    bias_scale: 140.5
-    bias_scale: 191.1
-    bias_scale: 82.1
-    bias_scale: 148.2
-    bias_scale: 202.0
-    bias_scale: 304.7
-    bias_scale: 324.6
-    bias_scale: 408.2
-		
+		bias_scale: 12.7
+		bias_scale: 11.1
+		bias_scale: 20.9
+		bias_scale: 16.0
+		bias_scale: 32.1
+		bias_scale: 24.6
+		bias_scale: 23.6
+		bias_scale: 24.3
+		bias_scale: 46.2
+		bias_scale: 37.0
+		bias_scale: 61.9
+		bias_scale: 49.7
+		bias_scale: 101.4
+		bias_scale: 74.7
+		bias_scale: 70.0
+		bias_scale: 140.5
+		bias_scale: 191.1
+		bias_scale: 82.1
+		bias_scale: 148.2
+		bias_scale: 202.0
+		bias_scale: 304.7
+		bias_scale: 324.6
+		bias_scale: 408.2
+
 		bias_num: 12
 
 		bias_mask: 3
 		bias_mask: 4
 		bias_mask: 5
-		
+
 		bias_mask_group_num: 1
-		
-		ignore_thresh: 0.3
+
+		ignore_thresh: 0.5
 		net_width: 640
 		net_height: 640
-		
+
 		num_class: 1
 	}
 }
@@ -4910,43 +4910,43 @@ layer {
 	propagate_down: true
 	propagate_down: false
 	center_object_loss_param {
-    bias_scale: 7.8
-    bias_scale: 12.7
-    bias_scale: 11.1
-    bias_scale: 20.9
-    bias_scale: 16.0
-    bias_scale: 32.1
-    bias_scale: 24.6
-    bias_scale: 23.6
-    bias_scale: 24.3
-    bias_scale: 46.2
-    bias_scale: 37.0
-    bias_scale: 61.9
-    bias_scale: 49.7
-    bias_scale: 101.4
-    bias_scale: 74.7
-    bias_scale: 70.0
-    bias_scale: 140.5
-    bias_scale: 191.1
-    bias_scale: 82.1
-    bias_scale: 148.2
-    bias_scale: 202.0
-    bias_scale: 304.7
-    bias_scale: 324.6
-    bias_scale: 408.2
+		bias_scale: 7.8
+		bias_scale: 12.7
+		bias_scale: 11.1
+		bias_scale: 20.9
+		bias_scale: 16.0
+		bias_scale: 32.1
+		bias_scale: 24.6
+		bias_scale: 23.6
+		bias_scale: 24.3
+		bias_scale: 46.2
+		bias_scale: 37.0
+		bias_scale: 61.9
+		bias_scale: 49.7
+		bias_scale: 101.4
+		bias_scale: 74.7
+		bias_scale: 70.0
+		bias_scale: 140.5
+		bias_scale: 191.1
+		bias_scale: 82.1
+		bias_scale: 148.2
+		bias_scale: 202.0
+		bias_scale: 304.7
+		bias_scale: 324.6
+		bias_scale: 408.2
 		
 		bias_num: 12
 
 		bias_mask: 0
 		bias_mask: 1
 		bias_mask: 2
-		
+
 		bias_mask_group_num: 1
-		
-		ignore_thresh: 0.3
+
+		ignore_thresh: 0.5
 		net_width: 640
 		net_height: 640
-		
+
 		num_class: 1
 	}
 }

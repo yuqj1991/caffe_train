@@ -76,7 +76,7 @@ class CenterGridOutputLayer : public Layer<Dtype> {
   std::map<int, std::vector<CenterNetInfo> > results_;
   int bottom_size_;
   std::vector<int> downRatio_;
-  float ignore_thresh_ ;
+  float nms_thresh_ ;
   DetectionOutputParameter_CLASS_TYPE class_type_;
 };
 

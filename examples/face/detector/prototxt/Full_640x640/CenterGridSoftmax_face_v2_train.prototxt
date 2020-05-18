@@ -5314,7 +5314,6 @@ layer {
     bias_num: 1
     net_width: 640
     net_height: 640
-    ignore_thresh: 0.30000001192092896
     low_bbox_scale: 256
     up_bbox_scale: 620
     class_type: SOFTMAX
@@ -5342,7 +5341,6 @@ layer {
     bias_num: 1
     net_width: 640
     net_height: 640
-    ignore_thresh: 0.30000001192092896
     low_bbox_scale: 128
     up_bbox_scale: 256
     class_type: SOFTMAX
@@ -5370,7 +5368,6 @@ layer {
     bias_num: 1
     net_width: 640
     net_height: 640
-    ignore_thresh: 0.30000001192092896
     low_bbox_scale: 32
     up_bbox_scale: 128
     class_type: SOFTMAX
@@ -5398,7 +5395,6 @@ layer {
     bias_num: 1
     net_width: 640
     net_height: 640
-    ignore_thresh: 0.30000001192092896
     low_bbox_scale: 6
     up_bbox_scale: 32
     class_type: SOFTMAX

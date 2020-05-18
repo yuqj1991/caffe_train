@@ -164,14 +164,13 @@ def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx,  use_relu, l
 def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale, 
                          stageidx, from_layers = [], net_height = 640, net_width = 640,
                          normalization_mode = P.Loss.VALID, num_classes= 2, loc_weight = 1.0, 
-                         share_location = True, ignore_thresh = 0.3, class_type = P.CenterObject.SOFTMAX):
+                         share_location = True, class_type = P.CenterObjectLoss.SOFTMAX):
     center_object_loss_param = {
         'loc_weight': loc_weight,
         'num_class': num_classes,
         'share_location': share_location,
         'net_height': net_height,
         'net_width': net_width,
-        'ignore_thresh': ignore_thresh,
         'bias_scale': bias_scale,
         'low_bbox_scale': low_bbox_scale,
         'up_bbox_scale': up_bbox_scale,
@@ -188,9 +187,9 @@ def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale,
 
 
 def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = [], num_classes = 2,
-                           ignore_thresh = 0.3,  keep_top_k = 200,
+                           nms_thresh = 0.4,  keep_top_k = 400,
                            class_type = P.DetectionOutput.SOFTMAX, 
-                           share_location = True, confidence_threshold = 0.15):
+                           share_location = True, confidence_threshold = 0.11):
     det_out_param = {
         'num_classes': num_classes,
         'share_location': share_location,
@@ -199,26 +198,28 @@ def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = 
         'class_type': class_type,
         'bias_scale': bias_scale,
         'down_ratio': down_ratio,
+        'nms_thresh': nms_thresh,
     }
     net.detection_out = L.CenterGridOutput(*from_layers, detection_output_param=det_out_param, 
                                                 include=dict(phase=caffe_pb2.Phase.Value('TEST')))
 
 def CenterFaceObjectDetect(net, from_layers = [],  num_classes = 2,
-                           ignore_thresh = 0.3,  keep_top_k = 200,
-                           share_location = True, confidence_threshold = 0.15):
+                           keep_top_k = 400, nms_thresh = 0.4,
+                           share_location = True, confidence_threshold = 0.11):
     det_out_param = {
         'num_classes': num_classes,
         'share_location': share_location,
         'keep_top_k': keep_top_k,
         'confidence_threshold': confidence_threshold,
+        'nms_thresh': nms_thresh,
     }
     net.detection_out = L.CenternetDetectionOutput(*from_layers, detection_output_param=det_out_param, 
                                                 include=dict(phase=caffe_pb2.Phase.Value('TEST')))
 
 
-def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.CenterObject.SMOOTH_L1,
+def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.CenterObjectLoss.SMOOTH_L1,
                          normalization_mode = P.Loss.VALID, num_classes= 1, loc_weight = 1.0, 
-                         share_location = True, ignore_thresh = 0.3, class_type = P.CenterObject.FOCALSIGMOID):
+                         share_location = True, class_type = P.CenterObjectLoss.FOCALSIGMOID):
     center_object_loss_param = {
         'loc_weight': loc_weight,
         'num_class': num_classes,
@@ -242,7 +243,6 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
     accum_stride = 1
     pre_stride = 1
     LayerList_Name = []
-    LayerList_Output = []
     LayerFilters = []
     out_layer = "conv_{}".format(index)
     ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,

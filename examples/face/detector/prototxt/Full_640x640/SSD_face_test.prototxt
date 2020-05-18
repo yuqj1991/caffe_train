@@ -5164,12 +5164,12 @@ layer {
 		share_location: true
 		background_label_id: 0
 		nms_param {
-			nms_threshold: 0.3
-			top_k: 200
+			nms_threshold: 0.4
+			top_k: 400
 		}
 		code_type: CENTER_SIZE
-		keep_top_k: 200
-		confidence_threshold: 0.15
+		keep_top_k: 400
+		confidence_threshold: 0.11
 	}
 }
 layer {
@@ -5184,7 +5184,7 @@ layer {
 	detection_evaluate_param {
 		num_classes: 2
 		background_label_id: 0
-		overlap_threshold: 0.15
+		overlap_threshold: 0.11
 		evaluate_difficult_gt: false
 	}
 }

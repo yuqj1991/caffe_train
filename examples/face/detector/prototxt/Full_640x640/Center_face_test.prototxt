@@ -4242,9 +4242,9 @@ layer {
 	detection_output_param {
 		num_classes: 2
 		share_location: true
-		keep_top_k: 200
-		confidence_threshold: 0.1
-		ignore_thresh: 0.3
+		keep_top_k: 400
+		confidence_threshold: 0.11
+		nms_thresh: 0.4
 	}
 }
 layer {
@@ -4260,7 +4260,7 @@ layer {
 	
 		num_classes: 2
 		background_label_id: 0
-		overlap_threshold: 0.15
+		overlap_threshold: 0.11
 		evaluate_difficult_gt: false
 	}
 }

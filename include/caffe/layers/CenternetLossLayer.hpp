@@ -48,7 +48,7 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
 
   // The internal localization offset loss layer.
   shared_ptr<Layer<Dtype> > loc_loss_layer_;
-  CenterObjectParameter_LocLossType loc_loss_type_;
+  CenterObjectLossParameter_LocLossType loc_loss_type_;
   float loc_weight_;
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> loc_bottom_vec_;
@@ -64,7 +64,7 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
 #if 0
   // The internal  object scale loss layer.
   shared_ptr<Layer<Dtype> > wh_loss_layer_;
-  CenterObjectParameter_LocLossType wh_loss_type_;
+  CenterObjectLossParameter_LocLossType wh_loss_type_;
   float wh_weight_;
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> wh_bottom_vec_;
@@ -79,7 +79,7 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
 #endif
   // The internal confidence loss layer.
   shared_ptr<Layer<Dtype> > conf_loss_layer_;
-  CenterObjectParameter_ConfLossType conf_loss_type_;
+  CenterObjectLossParameter_ConfLossType conf_loss_type_;
   // bottom vector holder used in Forward function.
   vector<Blob<Dtype>*> conf_bottom_vec_;
   // top vector holder used in Forward function.

@@ -61,7 +61,7 @@ class CenterGridLossLayer : public LossLayer<Dtype> {
   Dtype ignore_thresh_;
   Blob<Dtype> label_data_;
   int count_postive_;
-  CenterObjectParameter_CLASS_TYPE class_type_;
+  CenterObjectLossParameter_CLASS_TYPE class_type_;
 };
 
 }  // namespace caffe

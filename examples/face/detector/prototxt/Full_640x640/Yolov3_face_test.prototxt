@@ -4704,53 +4704,53 @@ layer {
 	bottom: "dectction_moudle_one_out"
 	bottom: "dectction_moudle_two_out"
 	bottom: "dectction_moudle_three_out"
-  bottom: "dectction_moudle_four_out"
+ 	bottom: "dectction_moudle_four_out"
 	top: "detection_out"
 	yolov3_detection_output_param {
-		confidence_threshold: 0.15
-		nms_threshold: 0.3
+		confidence_threshold: 0.11
+		nms_threshold: 0.4
 		num_classes: 1
 		biases: 7.8
-    biases: 12.7
-    biases: 11.1
-    biases: 20.9
-    biases: 16.0
-    biases: 32.1
-    biases: 24.6
-    biases: 23.6
-    biases: 24.3
-    biases: 46.2
-    biases: 37.0
-    biases: 61.9
-    biases: 49.7
-    biases: 101.4
-    biases: 74.7
-    biases: 70.0
-    biases: 140.5
-    biases: 191.1
-    biases: 82.1
-    biases: 148.2
-    biases: 202.0
-    biases: 304.7
-    biases: 324.6
-    biases: 408.2
+		biases: 12.7
+		biases: 11.1
+		biases: 20.9
+		biases: 16.0
+		biases: 32.1
+		biases: 24.6
+		biases: 23.6
+		biases: 24.3
+		biases: 46.2
+		biases: 37.0
+		biases: 61.9
+		biases: 49.7
+		biases: 101.4
+		biases: 74.7
+		biases: 70.0
+		biases: 140.5
+		biases: 191.1
+		biases: 82.1
+		biases: 148.2
+		biases: 202.0
+		biases: 304.7
+		biases: 324.6
+		biases: 408.2
 
-    mask:9
+		mask:9
 		mask:10
 		mask:11
-    mask:6
+		mask:6
 		mask:7
 		mask:8
-    mask:3
+		mask:3
 		mask:4
 		mask:5
-    mask:0
+		mask:0
 		mask:1
 		mask:2
 		anchors_scale:32
 		anchors_scale:16
 		anchors_scale:8
-    anchors_scale:4
+		anchors_scale:4
 		mask_group_num:4
 	}
 }
@@ -4764,7 +4764,7 @@ layer {
 	detection_evaluate_param {
 		num_classes: 2
 		background_label_id: 0
-		overlap_threshold: 0.15
+		overlap_threshold: 0.11
 		evaluate_difficult_gt: false
 	}
 }

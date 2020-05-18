@@ -5135,8 +5135,8 @@ layer {
   detection_output_param {
     num_classes: 2
     share_location: true
-    keep_top_k: 200
-    confidence_threshold: 0.15000000596046448
+    keep_top_k: 400
+    confidence_threshold: 0.10999999940395355
     bias_scale: 620
     bias_scale: 256
     bias_scale: 128
@@ -5145,6 +5145,7 @@ layer {
     down_ratio: 16
     down_ratio: 8
     down_ratio: 4
+    nms_thresh: 0.4000000059604645
     class_type: SOFTMAX
   }
 }
@@ -5160,7 +5161,7 @@ layer {
   detection_evaluate_param {
     num_classes: 2
     background_label_id: 0
-    overlap_threshold: 0.15000000596046448
+    overlap_threshold: 0.10999999940395355
     evaluate_difficult_gt: false
   }
 }

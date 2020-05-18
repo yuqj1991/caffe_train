@@ -16,7 +16,7 @@ void CenterGridLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     this->layer_param_.add_propagate_down(true);
     this->layer_param_.add_propagate_down(false);
   }
-  const CenterObjectParameter& center_object_loss_param =
+  const CenterObjectLossParameter& center_object_loss_param =
       this->layer_param_.center_object_loss_param();
   
   // bias_mask_
@@ -49,15 +49,17 @@ void CenterGridLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   class_type_ = center_object_loss_param.class_type();
   num_classes_ = center_object_loss_param.num_class();
   CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
-  if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
+  if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SIGMOID){
     CHECK_EQ((4 + 1 + num_classes_) *1, bottom[0]->channels()) 
               << "num_classes must be equal to prediction classes";
-  }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
+  }else if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SOFTMAX){
     CHECK_EQ((4  + num_classes_) *1, bottom[0]->channels()) 
               << "softmax num_classes must be equal to contain background";
   }else{
     LOG(FATAL)<<"unknown class type";
   }
+
+  CHECK_EQ(center_object_loss_param.share_location(), true);
 }
 
 template <typename Dtype>
@@ -109,7 +111,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.);
   if (num_groundtruth_ >= 1) {
     const int downRatio = net_height_ / output_height;
-    if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
+    if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SIGMOID){
       class_score = EncodeCenterGridObjectSigmoidLoss(num_, num_channels, num_classes_, output_width, output_height, 
                           downRatio,
                           channel_pred_data,  anchor_scale_, 
@@ -117,13 +119,13 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
                           ignore_thresh_, &count_postive_, &sum_squre);
       
-    }else if(class_type_ == CenterObjectParameter_CLASS_TYPE_SOFTMAX){
+    }else if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SOFTMAX){
       class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
                           downRatio, postive_batch_, batch_sample_loss_, mask_Rf_anchor_,
                           channel_pred_data,  anchor_scale_, 
                           bbox_range_scale_,
                           all_gt_bboxes, label_muti_data, bottom_diff, 
-                          ignore_thresh_, &count_postive_, &sum_squre);
+                          &count_postive_, &sum_squre);
     }
     loc_loss = sum_squre / num_;
     score_loss = class_score / num_;
@@ -154,7 +156,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   if (propagate_down[0]) {
     Dtype loss_weight = Dtype(0.);
     loss_weight = top[0]->cpu_diff()[0] / num_;   
-    if(class_type_ == CenterObjectParameter_CLASS_TYPE_SIGMOID){
+    if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SIGMOID){
       const int output_height = bottom[0]->height();
       const int output_width = bottom[0]->width();
       const int num_channels = bottom[0]->channels();

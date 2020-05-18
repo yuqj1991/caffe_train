@@ -341,7 +341,7 @@ CenterGridObjectDetect(net, from_layers= DetectListLayer,
 det_eval_param = {
     'num_classes': 2,
     'background_label_id': 0,
-    'overlap_threshold': 0.15,
+    'overlap_threshold': 0.11,
     'evaluate_difficult_gt': False,
 }
 net.detection_eval = L.DetectionEvaluate(net.detection_out, net.label,

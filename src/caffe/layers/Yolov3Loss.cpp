@@ -16,7 +16,7 @@ void Yolov3LossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     this->layer_param_.add_propagate_down(true);
     this->layer_param_.add_propagate_down(false);
   }
-  const CenterObjectParameter& center_object_loss_param =
+  const CenterObjectLossParameter& center_object_loss_param =
       this->layer_param_.center_object_loss_param();
   
   // bias_mask_

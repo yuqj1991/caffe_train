@@ -29,7 +29,7 @@ void CenternetDetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>
   keep_top_k_ = detection_output_param.keep_top_k();
   confidence_threshold_ = detection_output_param.has_confidence_threshold() ?
       detection_output_param.confidence_threshold() : -FLT_MAX;
-  nms_thresh_ = detection_output_param.ignore_thresh();
+  nms_thresh_ = detection_output_param.nms_thresh();
 }
 
 template <typename Dtype>
@@ -63,7 +63,8 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
   _nms_heatmap(conf_data, keep_max_data, output_height, output_width, classes, num_);
   const Dtype* keep_data = bottom[1]->cpu_data();
   results_.clear();
-  get_topK(keep_data, loc_data, output_height, output_width, classes, num_, &results_, 4, confidence_threshold_, nms_thresh_);
+  get_topK(keep_data, loc_data, output_height, output_width, classes, num_, &results_, 4, 
+                      confidence_threshold_, nms_thresh_);
 
   int num_kept = 0;
 

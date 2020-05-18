@@ -35,7 +35,7 @@ void CenterGridOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   keep_top_k_ = detection_output_param.keep_top_k();
   confidence_threshold_ = detection_output_param.has_confidence_threshold() ?
       detection_output_param.confidence_threshold() : -FLT_MAX;
-  ignore_thresh_ = detection_output_param.ignore_thresh();
+  nms_thresh_ = detection_output_param.nms_thresh();
   class_type_ = detection_output_param.class_type();
 }
 
@@ -97,7 +97,7 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
     std::sort(iter->second.begin(), iter->second.end(), GridCompareScore);
     std::vector<CenterNetInfo> temp_result = iter->second;
     std::vector<CenterNetInfo> nms_result;
-    hard_nms(temp_result, &nms_result, ignore_thresh_);
+    hard_nms(temp_result, &nms_result, nms_thresh_);
     int num_det = nms_result.size();
     if(keep_top_k_ > 0 && num_det > keep_top_k_){
       std::sort(nms_result.begin(), nms_result.end(), GridCompareScore);
