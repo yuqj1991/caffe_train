@@ -20,6 +20,8 @@ layer {
     }
   }
   annotated_data_param {
+    batch_sampler {
+    }
     label_map_file: "../labelmap.prototxt"
     up_prob: 0.699999988079071
     low_prob: 0.4000000059604645
@@ -3809,7 +3811,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 24
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4309,9 +4311,80 @@ layer {
   top: "Res_conv_linear_stage_32"
 }
 layer {
-  name: "Class_out_1x1"
+  name: "last_conv_3x3_layer"
   type: "Convolution"
   bottom: "Res_conv_linear_stage_32"
+  top: "last_conv_3x3_layer"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 24
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "last_conv_3x3_layer_bn"
+  type: "BatchNorm"
+  bottom: "last_conv_3x3_layer"
+  top: "last_conv_3x3_layer"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    use_global_stats: true
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "last_conv_3x3_layer_scale"
+  type: "Scale"
+  bottom: "last_conv_3x3_layer"
+  top: "last_conv_3x3_layer"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "last_conv_3x3_layer_relu6"
+  type: "ReLU6"
+  bottom: "last_conv_3x3_layer"
+  top: "last_conv_3x3_layer"
+}
+layer {
+  name: "Class_out_1x1"
+  type: "Convolution"
+  bottom: "last_conv_3x3_layer"
   top: "Class_out_1x1"
   param {
     lr_mult: 1.0
@@ -4331,7 +4404,7 @@ layer {
 layer {
   name: "Box_out_1x1"
   type: "Convolution"
-  bottom: "Res_conv_linear_stage_32"
+  bottom: "last_conv_3x3_layer"
   top: "Box_out_1x1"
   param {
     lr_mult: 1.0
