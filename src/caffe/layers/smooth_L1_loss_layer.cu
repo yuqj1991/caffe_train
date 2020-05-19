@@ -43,7 +43,7 @@ void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 
     Dtype loss;
     if(channel_sum_weights_){
-        caffe_mul(
+        caffe_gpu_mul(
             errors_.count(),
             bottom[2]->gpu_data(),
             errors_.gpu_data(),
@@ -87,7 +87,7 @@ void SmoothL1LossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
                 Dtype(0),                        // beta
                 bottom[i]->mutable_gpu_diff());  // y
                 if(channel_sum_weights_){
-                    caffe_mul(
+                    caffe_gpu_mul(
                     errors_.count(),
                     bottom[2]->gpu_data(),
                     bottom[i]->gpu_diff(),
