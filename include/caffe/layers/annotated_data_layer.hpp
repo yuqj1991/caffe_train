@@ -18,32 +18,30 @@ namespace caffe {
 template <typename Dtype>
 class AnnotatedDataLayer : public BasePrefetchingDataLayer<Dtype> {
  public:
-  explicit AnnotatedDataLayer(const LayerParameter& param);
-  virtual ~AnnotatedDataLayer();
-  virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  // AnnotatedDataLayer uses DataReader instead for sharing for parallelism
-  virtual inline bool ShareInParallel() const { return false; }
-  virtual inline const char* type() const { return "AnnotatedData"; }
-  virtual inline int ExactNumBottomBlobs() const { return 0; }
-  virtual inline int MinTopBlobs() const { return 1; }
+    explicit AnnotatedDataLayer(const LayerParameter& param);
+    virtual ~AnnotatedDataLayer();
+    virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
+        const vector<Blob<Dtype>*>& top);
+    // AnnotatedDataLayer uses DataReader instead for sharing for parallelism
+    virtual inline bool ShareInParallel() const { return false; }
+    virtual inline const char* type() const { return "AnnotatedData"; }
+    virtual inline int ExactNumBottomBlobs() const { return 0; }
+    virtual inline int MinTopBlobs() const { return 1; }
 
  protected:
-  virtual void load_batch(Batch<Dtype>* batch);
+    virtual void load_batch(Batch<Dtype>* batch);
 
-  DataReader<AnnotatedDatum> reader_;
-  bool has_anno_type_;
-  AnnotatedDatum_AnnotationType anno_type_;
-  vector<BatchSampler> batch_samplers_;
-  vector<DataAnchorSampler> data_anchor_samplers_;
-  vector<int> bbox_small_scale_;
-  vector<int> bbox_large_scale_;
-  vector<int> anchor_stride_;
-  float upProb_;
-  float lowProb_;
-  string label_map_file_;
-  bool YoloFormat_;
-  AnnotatedDataParameter_CROP_TYPE crop_type_ ;
+    DataReader<AnnotatedDatum> reader_;
+    bool has_anno_type_;
+    AnnotatedDatum_AnnotationType anno_type_;
+    vector<BatchSampler> batch_samplers_;
+    vector<DataAnchorSampler> data_anchor_samplers_;
+    vector<int> bbox_small_scale_;
+    vector<int> bbox_large_scale_;
+    vector<int> anchor_stride_;
+    string label_map_file_;
+    bool YoloFormat_;
+    AnnotatedDataParameter_CROP_TYPE crop_type_;
 };
 
 }  // namespace caffe

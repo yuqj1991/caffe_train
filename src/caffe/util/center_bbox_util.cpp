@@ -107,99 +107,99 @@ void soft_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* out
     float x1,x2,y1,y2, s,tx1,tx2,ty1,ty2,ts,area,weight,ov;
 
     for(int ii = 0; ii < numBoxes; ii++){
-    maxscore = input[ii].score();
-    maxpos = ii;
-    tx1 = input[ii].xmin();
-    ty1 = input[ii].ymin();
-    tx2 = input[ii].xmax();
-    ty2 = input[ii].ymax();
-    ts = input[ii].score();
+        maxscore = input[ii].score();
+        maxpos = ii;
+        tx1 = input[ii].xmin();
+        ty1 = input[ii].ymin();
+        tx2 = input[ii].xmax();
+        ty2 = input[ii].ymax();
+        ts = input[ii].score();
 
-    pos = ii + 1;
+        pos = ii + 1;
 
-    while(pos < numBoxes){
-        if(maxscore < input[pos].score()){
-            maxscore = input[pos].score();
-            maxpos = pos;
+        while(pos < numBoxes){
+            if(maxscore < input[pos].score()){
+                maxscore = input[pos].score();
+                maxpos = pos;
+            }
+            pos = pos + 1;
         }
-        pos = pos + 1;
-    }
 
-    // add max box as a detection 
+        // add max box as a detection 
 
-    input[ii].set_xmin(input[maxpos].xmin());
-    input[ii].set_xmax(input[maxpos].xmax());
-    input[ii].set_ymin(input[maxpos].ymin());
-    input[ii].set_ymax(input[maxpos].ymax());
-    input[ii].set_score(input[maxpos].score());
+        input[ii].set_xmin(input[maxpos].xmin());
+        input[ii].set_xmax(input[maxpos].xmax());
+        input[ii].set_ymin(input[maxpos].ymin());
+        input[ii].set_ymax(input[maxpos].ymax());
+        input[ii].set_score(input[maxpos].score());
 
-    input[maxpos].set_xmin(tx1);
-    input[maxpos].set_xmax(tx2);
-    input[maxpos].set_ymin(ty1);
-    input[maxpos].set_ymax(ty2);
-    input[maxpos].set_score(ts);
+        input[maxpos].set_xmin(tx1);
+        input[maxpos].set_xmax(tx2);
+        input[maxpos].set_ymin(ty1);
+        input[maxpos].set_ymax(ty2);
+        input[maxpos].set_score(ts);
 
-    tx1 = input[ii].xmin();
-    ty1 = input[ii].ymin();
-    tx2 = input[ii].xmax();
-    ty2 = input[ii].ymax();
-    ts = input[ii].score();
+        tx1 = input[ii].xmin();
+        ty1 = input[ii].ymin();
+        tx2 = input[ii].xmax();
+        ty2 = input[ii].ymax();
+        ts = input[ii].score();
 
-    pos = ii + 1;
-    // NMS iterations, note that N changes if detection boxes fall below threshold
-    while(pos < numBoxes){
-        x1 = input[pos].xmin();
-        y1 = input[pos].ymin();
-        x2 = input[pos].xmax();
-        y2 = input[pos].ymax();
-        s = input[pos].score();
-        area = (x2 - x1 + 1) * (y2 - y1 + 1);
-        iw = (std::min(tx2, x2) - std::max(tx1, x1) + 1);
-        if(iw > 0){
-            ih = (std::min(ty2, y2) - std::max(ty1, y1) + 1);
-            if(ih > 0){
-                ua = float((tx2 - tx1 + 1) * (ty2 - ty1 + 1) + area - iw * ih);
-                ov = (float) iw * ih / ua  ;//  iou between max box and detection box
+        pos = ii + 1;
+        // NMS iterations, note that N changes if detection boxes fall below threshold
+        while(pos < numBoxes){
+            x1 = input[pos].xmin();
+            y1 = input[pos].ymin();
+            x2 = input[pos].xmax();
+            y2 = input[pos].ymax();
+            s = input[pos].score();
+            area = (x2 - x1 + 1) * (y2 - y1 + 1);
+            iw = (std::min(tx2, x2) - std::max(tx1, x1) + 1);
+            if(iw > 0){
+                ih = (std::min(ty2, y2) - std::max(ty1, y1) + 1);
+                if(ih > 0){
+                    ua = float((tx2 - tx1 + 1) * (ty2 - ty1 + 1) + area - iw * ih);
+                    ov = (float) iw * ih / ua  ;//  iou between max box and detection box
 
-                if(type == 1) {// linear
-                if(ov > Nt)
-                    weight = 1 - ov;
-                else
-                    weight = 1;
-                }
-                else if(type == 2) // gaussian
-                    weight = std::exp( -1 * (float)(ov * ov)/sigma);
-                else{
-                if(ov > Nt) 
-                    weight = 0;
-                else
-                    weight = 1;
-                }
-                input[pos].set_score(weight * input[pos].score()); 
-                //if box score falls below threshold, discard the box by swapping with last box
-                // update numBoxes
-                if(input[pos].score() < threshold){
-                    input[pos].set_xmin(input[numBoxes - 1].xmin());
-                    input[pos].set_xmax(input[numBoxes - 1].xmax());
-                    input[pos].set_ymin(input[numBoxes - 1].ymin());
-                    input[pos].set_ymax(input[numBoxes - 1].ymax());
-                    input[pos].set_score(input[numBoxes - 1].score());
-                    numBoxes = numBoxes - 1;
-                    pos = pos - 1;
+                    if(type == 1) {// linear
+                        if(ov > Nt)
+                            weight = 1 - ov;
+                        else
+                            weight = 1;
+                    }
+                    else if(type == 2) // gaussian
+                        weight = std::exp( -1 * (float)(ov * ov)/sigma);
+                    else{
+                        if(ov > Nt) 
+                            weight = 0;
+                        else
+                            weight = 1;
+                    }
+                    input[pos].set_score(weight * input[pos].score()); 
+                    //if box score falls below threshold, discard the box by swapping with last box
+                    // update numBoxes
+                    if(input[pos].score() < threshold){
+                        input[pos].set_xmin(input[numBoxes - 1].xmin());
+                        input[pos].set_xmax(input[numBoxes - 1].xmax());
+                        input[pos].set_ymin(input[numBoxes - 1].ymin());
+                        input[pos].set_ymax(input[numBoxes - 1].ymax());
+                        input[pos].set_score(input[numBoxes - 1].score());
+                        numBoxes = numBoxes - 1;
+                        pos = pos - 1;
+                    }
                 }
             }
+            pos = pos + 1;
         }
-        pos = pos + 1;
-    }
     }
     for(int ii = 0; ii < numBoxes; ii++){
-    output->push_back(input[ii]);
+        output->push_back(input[ii]);
     }
 }
 
 
 template <typename Dtype>
-void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
+void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const Dtype* channel_loc_data,
                                 const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
@@ -255,11 +255,11 @@ void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_da
         }
     }
 }
-template void EncodeCenteGroundTruthAndPredictions(float* gt_loc_data, float* pred_loc_data,
+template void EncodeTruthAndPredictions(float* gt_loc_data, float* pred_loc_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const float* channel_loc_data,
                                 const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
-template void EncodeCenteGroundTruthAndPredictions(double* gt_loc_data, double* pred_loc_data,
+template void EncodeTruthAndPredictions(double* gt_loc_data, double* pred_loc_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const double* channel_loc_data,
                                 const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);                              
@@ -333,27 +333,27 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                 for(int w = 0; w < output_width; w++){
                     int index = i * dim + c * dimScale + h * output_width + w;
                     if(keep_max_data[index] > conf_thresh && keep_max_data[index] < 1){
-                    int x_loc_index = i * loc_channels * dimScale + h * output_width + w;
-                    int y_loc_index = i * loc_channels * dimScale + dimScale + h * output_width + w;
-                    int width_loc_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
-                    int height_loc_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
-                    Dtype center_x = (w + loc_data[x_loc_index]) * 4;
-                    Dtype center_y = (h + loc_data[y_loc_index]) * 4;
-                    Dtype width = std::exp(loc_data[width_loc_index]) * 4 ;
-                    Dtype height = std::exp(loc_data[height_loc_index]) * 4 ;
-                    Dtype xmin = std::min(std::max(center_x - Dtype(width / 2), Dtype(0.f)), Dtype(4 * output_width));
-                    Dtype xmax = std::min(std::max(center_x + Dtype(width / 2), Dtype(0.f)), Dtype(4 * output_width));
-                    Dtype ymin = std::min(std::max(center_y - Dtype(height / 2), Dtype(0.f)), Dtype(4 * output_height));
-                    Dtype ymax = std::min(std::max(center_y + Dtype(height / 2), Dtype(0.f)), Dtype(4 * output_height));
-                    CenterNetInfo temp_result;
-                    temp_result.set_class_id(c);
-                    temp_result.set_score(keep_max_data[index]);
-                    temp_result.set_xmin(xmin);
-                    temp_result.set_xmax(xmax);
-                    temp_result.set_ymin(ymin);
-                    temp_result.set_ymax(ymax);
-                    temp_result.set_area(width * height);
-                    batch_temp.push_back(temp_result);
+                        int x_loc_index = i * loc_channels * dimScale + h * output_width + w;
+                        int y_loc_index = i * loc_channels * dimScale + dimScale + h * output_width + w;
+                        int width_loc_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
+                        int height_loc_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
+                        Dtype center_x = (w + loc_data[x_loc_index]) * 4;
+                        Dtype center_y = (h + loc_data[y_loc_index]) * 4;
+                        Dtype width = std::exp(loc_data[width_loc_index]) * 4 ;
+                        Dtype height = std::exp(loc_data[height_loc_index]) * 4 ;
+                        Dtype xmin = GET_VALID_VALUE((center_x - Dtype(width / 2)), Dtype(0.f), Dtype(4 * output_width));
+                        Dtype xmax = GET_VALID_VALUE((center_x + Dtype(width / 2)), Dtype(0.f), Dtype(4 * output_width));
+                        Dtype ymin = GET_VALID_VALUE((center_y - Dtype(height / 2)), Dtype(0.f), Dtype(4 * output_height));
+                        Dtype ymax = GET_VALID_VALUE((center_y + Dtype(height / 2)), Dtype(0.f), Dtype(4 * output_height));
+                        CenterNetInfo temp_result;
+                        temp_result.set_class_id(c);
+                        temp_result.set_score(keep_max_data[index]);
+                        temp_result.set_xmin(xmin);
+                        temp_result.set_xmax(xmax);
+                        temp_result.set_ymin(ymin);
+                        temp_result.set_ymax(ymax);
+                        temp_result.set_area(width * height);
+                        batch_temp.push_back(temp_result);
                     } 
                 }
             }

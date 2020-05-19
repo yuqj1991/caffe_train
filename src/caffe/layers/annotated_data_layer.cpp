@@ -24,7 +24,7 @@ AnnotatedDataLayer<Dtype>::AnnotatedDataLayer(const LayerParameter& param)
 
 template <typename Dtype>
 AnnotatedDataLayer<Dtype>::~AnnotatedDataLayer() {
-  this->StopInternalThread();
+    this->StopInternalThread();
 }
 
 template <typename Dtype>
@@ -47,8 +47,6 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
         anchor_stride_.push_back(anno_data_param.bbox_sampler().box(i).ancher_stride());
         }
     }
-    upProb_ = anno_data_param.up_prob();
-    lowProb_ = anno_data_param.low_prob();
     label_map_file_ = anno_data_param.label_map_file();
     // Make sure dimension is consistent within batch.
     const TransformationParameter& transform_param =

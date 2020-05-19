@@ -48,8 +48,10 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     loc_shape.push_back(4);
     loc_pred_.Reshape(loc_shape);
     loc_gt_.Reshape(loc_shape);
+    loc_channel_gt_.Reshape(loc_shape);
     loc_bottom_vec_.push_back(&loc_pred_);
     loc_bottom_vec_.push_back(&loc_gt_);
+    loc_bottom_vec_.push_back(&loc_channel_gt_);
     loc_loss_.Reshape(loss_shape);
     loc_top_vec_.push_back(&loc_loss_);
     if (loc_loss_type_ == CenterObjectLossParameter_LocLossType_L2) {
@@ -124,7 +126,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
         num_groundtruth += gt_boxes.size();
     }
-  CHECK_EQ(num_gt_, num_groundtruth);
+    CHECK_EQ(num_gt_, num_groundtruth);
   
     if (num_gt_ >= 1) {
         // Form data to pass on to loc_loss_layer_.
@@ -136,7 +138,12 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         Dtype* loc_pred_data = loc_pred_.mutable_cpu_data();
         Dtype* loc_gt_data = loc_gt_.mutable_cpu_data();
 
-        EncodeCenteGroundTruthAndPredictions(loc_gt_data, loc_pred_data, 
+        Dtype* loc_channel_gt_data = loc_channel_gt_.mutable_cpu_data();
+        for(int ii = 0; ii < 4; ii++){
+            loc_channel_gt_data[ii] = Dtype((ii < 2)? 1.f : 0.1f);
+        }
+
+        EncodeTruthAndPredictions(loc_gt_data, loc_pred_data, 
                                             output_width, output_height, share_location_,
                                             loc_data, num_channels, all_gt_bboxes);
         loc_loss_layer_->Reshape(loc_bottom_vec_, loc_top_vec_);
@@ -168,7 +175,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, num_gt_, num_gt_);
         top[0]->mutable_cpu_data()[0] +=
-            loc_weight_ * loc_loss_.cpu_data()[0] / normalizer;
+            loc_weight_ * loc_loss_.cpu_data()[0];
     }
     if (this->layer_param_.propagate_down(1)) {
         top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0];
@@ -178,7 +185,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, num_gt_, num_gt_);
         LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
-                <<", loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
+                <<", loc loss: "<<loc_loss_.cpu_data()[0]
                 <<", conf loss: "<< conf_loss_.cpu_data()[0]
                 <<", normalizer: "<< normalizer
                 <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
@@ -208,6 +215,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             vector<bool> loc_propagate_down;
             // Only back propagate on prediction, not ground truth.
             loc_propagate_down.push_back(true);
+            loc_propagate_down.push_back(false);
             loc_propagate_down.push_back(false);
             loc_loss_layer_->Backward(loc_top_vec_, loc_propagate_down,
                                         loc_bottom_vec_);

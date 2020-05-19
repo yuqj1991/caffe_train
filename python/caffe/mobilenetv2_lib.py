@@ -99,10 +99,13 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
     elif kernel_size == 5:
         pad = 2
     if strides == 1:
-        out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
-        ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
-                    num_output = input_channels * expansion_factor, kernel_size=1, 
-                    pad=0, stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
+        if expansion_factor != 1:
+            out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
+            ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
+                        num_output = input_channels * expansion_factor, kernel_size=1, 
+                        pad=0, stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
+        else:
+            out_layer_expand = from_layer
         if Use_SE:
             out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
             ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = False, use_swish= False,
@@ -321,15 +324,15 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         index += 1
     assert len(LayerList_Name) == len(feature_stride)
     net_last_layer = net.keys()[-1]
+    fpn_out_channels = 24
     out_layer = "conv_1_project/linear"
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
-                num_output= 128, kernel_size= 1, pad= 0, stride= 1,
+                num_output= fpn_out_channels, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-    fpn_out_channels = 24
+    net_last_layer = out_layer
     for index in range(len(feature_stride) - 1):
         #Deconv_layer scale up 2x2_s2
         channel_stage = LayerFilters[len(LayerFilters) - index - 1]
-        net_last_layer = out_layer
         Reconnect_layer_one = "Deconv_Scale_Up_Stage_{}".format(channel_stage)
         ConvBNLayer(net, net_last_layer, Reconnect_layer_one, use_bn= True, use_relu = False, 
             num_output= fpn_out_channels, kernel_size= 2, pad= 0, stride= 2,
@@ -345,18 +348,23 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         # eltwise_sum layer
         _, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, 
                                             use_relu=True, layerPrefix = "Res_conv_linear")
-        out_layer = detect_layer
+        net_last_layer = detect_layer
 
+    last_conv_layer = "last_conv_3x3_layer"
+    ConvBNLayer(net, net_last_layer, last_conv_layer, use_bn = True, use_relu = True, 
+                num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 1,
+                lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
+    net_last_layer = last_conv_layer
     ### class prediction layer
     Class_out = "Class_out_1x1"
-    ConvBNLayer(net, out_layer, Class_out, use_bn= False, 
+    ConvBNLayer(net, net_last_layer, Class_out, use_bn= False, 
                 use_swish= False, use_relu = False, 
                 num_output= 1, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
 
     ### Box loc prediction layer
     Box_out = "Box_out_1x1"
-    ConvBNLayer(net, out_layer, Box_out, use_bn= False, 
+    ConvBNLayer(net, net_last_layer, Box_out, use_bn= False, 
                 use_swish= False, use_relu = False, 
                 num_output= 4, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale= False, use_global_stats= use_global_stats)

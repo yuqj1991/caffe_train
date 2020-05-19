@@ -29,7 +29,7 @@ typedef struct _YoloScoreShow{
 #define NMS_MIN  2
 
 template <typename Dtype>
-void EncodeCenteGroundTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
+void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const Dtype* channel_loc_data,
                                 const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);

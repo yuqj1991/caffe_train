@@ -58,6 +58,8 @@ class CenterObjectLossLayer : public LossLayer<Dtype> {
   Blob<Dtype> loc_pred_;
   // blob which stores the corresponding matched ground truth.
   Blob<Dtype> loc_gt_;
+  // blob loc_loss_channel with weight
+  Blob<Dtype> loc_channel_gt_;
   // localization loss.
   Blob<Dtype> loc_loss_;
 

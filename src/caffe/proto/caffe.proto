@@ -1110,10 +1110,6 @@ message AnnotatedDataParameter {
   // If provided, it will replace the AnnotationType stored in each
   // AnnotatedDatum.
   optional AnnotatedDatum.AnnotationType anno_type = 3;
-  optional float up_prob = 7[default = 0.7];
-  optional float low_prob = 9[default = 0.3];
-  optional int32 yolo_data_type = 4 [default = 0];
-  optional float yolo_data_jitter = 5 [default = 0.3];
   optional DataAnchorSampler data_anchor_sampler =6;
   optional LFFDSampler bbox_sampler = 8;
   optional bool yoloformat = 10[default = false];
