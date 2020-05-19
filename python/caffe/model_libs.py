@@ -114,8 +114,6 @@ def CreateAnnotatedDataLayer(source, batch_size=32, backend=P.Data.LMDB,
         'batch_sampler': batch_sampler,
         'data_anchor_sampler': data_anchor_sampler,
         'bbox_sampler': bbox_sampler,
-        'up_prob': 0.7,
-        'low_prob': 0.4,
         'crop_type': crop_type,
         'yoloformat': YoloForamte,
         }

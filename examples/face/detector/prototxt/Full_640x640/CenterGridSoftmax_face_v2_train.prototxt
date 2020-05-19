@@ -150,7 +150,6 @@ layer {
       max_sample: 1
       max_trials: 50
     }
-    up_prob: 0.699999988079071
     bbox_sampler {
       box {
         bbox_small_scale: 10
@@ -195,7 +194,6 @@ layer {
       max_sample: 1
       max_trials: 50
     }
-    low_prob: 0.4000000059604645
     yoloformat: true
     crop_type: CROP_JITTER
   }
