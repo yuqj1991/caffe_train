@@ -95,10 +95,10 @@ void SmoothL1LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                 bottom[i]->mutable_cpu_diff());   // b
             if(channel_sum_weights_){
                 caffe_mul(
-                errors_.count(),
-                bottom[2]->cpu_data(),
-                bottom[i]->cpu_diff(),
-                bottom[i]->mutable_cpu_diff());
+                    bottom[i]->count(),
+                    bottom[2]->cpu_data(),
+                    bottom[i]->cpu_diff(),
+                    bottom[i]->mutable_cpu_diff());
             }
         }
     }

@@ -31,6 +31,7 @@ __global__ void SmoothL1Forward(const int n, const Dtype* in, Dtype* out) {
 template <typename Dtype>
 void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
+    #if 0
     int count = bottom[0]->count();
     caffe_gpu_sub(
         count,
@@ -43,14 +44,14 @@ void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 
     Dtype loss;
     if(channel_sum_weights_){
-        caffe_gpu_mul(
-            errors_.count(),
-            bottom[2]->gpu_data(),
-            errors_.gpu_data(),
-            errors_.mutable_gpu_data());
+        caffe_gpu_mul(errors_.count(), bottom[2]->gpu_data(), errors_.gpu_data(),
+                        errors_.mutable_gpu_data());
     }
     caffe_gpu_asum(count, errors_.gpu_data(), &loss);
     top[0]->mutable_gpu_data()[0] = loss / bottom[0]->num();
+    #else
+    this->Forward_cpu(bottom, top);
+    #endif
 }
 
 template <typename Dtype>
@@ -71,6 +72,7 @@ __global__ void SmoothL1Backward(const int n, const Dtype* in, Dtype* out) {
 template <typename Dtype>
 void SmoothL1LossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
+    #if 0
     int count = diff_.count();
     // NOLINT_NEXT_LINE(whitespace/operators)
     SmoothL1Backward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
@@ -88,13 +90,16 @@ void SmoothL1LossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
                 bottom[i]->mutable_gpu_diff());  // y
                 if(channel_sum_weights_){
                     caffe_gpu_mul(
-                    errors_.count(),
-                    bottom[2]->gpu_data(),
-                    bottom[i]->gpu_diff(),
-                    bottom[i]->mutable_gpu_diff());
+                        bottom[i]->count(),
+                        bottom[2]->gpu_data(),
+                        bottom[i]->gpu_diff(),
+                        bottom[i]->mutable_gpu_diff());
                 }
         }
     }
+    #else
+    this->Backward_cpu(top, propagate_down, bottom);
+    #endif
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(SmoothL1LossLayer);

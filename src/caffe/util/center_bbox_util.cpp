@@ -246,12 +246,6 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
             pred_loc_data[count * num_channels + 2] = channel_loc_data[width_loc_index];
             pred_loc_data[count * num_channels + 3] = channel_loc_data[height_loc_index];
             ++count;
-            #if 0
-            LOG(INFO)<<"diff_x: "<<diff_x <<", diff_y: "<<diff_y <<", bbox width : "<<std::log(width)<<", bbox height: "<<std::log(height);
-            LOG(INFO)<<"##pred diff_x: "<<loc_data[x_loc_index]<<", pred diff_y: "<<loc_data[y_loc_index]
-                                        <<", wh_data_w: "<<wh_data[width_loc_index]<<", wh_data_h: "<<wh_data[height_loc_index];
-            LOG(INFO)<<"...";
-            #endif
         }
     }
 }
