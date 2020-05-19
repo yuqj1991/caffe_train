@@ -60,8 +60,7 @@ class SmoothL1LossLayer : public LossLayer<Dtype> {
 
   Blob<Dtype> diff_;
   Blob<Dtype> errors_;
-  bool has_weights_;
-  bool channel_weights_;
+  bool channel_sum_weights_;
 };
 
 }  // namespace caffe

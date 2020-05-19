@@ -50,11 +50,12 @@ void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     CUDA_POST_KERNEL_CHECK;
 
     Dtype loss;
-    if(channel_weights_){
-        const Dtype* weight_data = bottom[2]->gpu_data();
-        for(int ii = 0; ii < bottom[2]->count(); ii++){
-            caffe_scal(errors_.count(), weight_data[ii], errors_.mutable_gpu_data());
-        }
+    if(channel_sum_weights_){
+        caffe_mul(
+            errors_.count(),
+            bottom[2]->gpu_data(),
+            errors_.gpu_data(),
+            errors_.mutable_gpu_data());
     }
     caffe_gpu_asum(count, errors_.gpu_data(), &loss);
     top[0]->mutable_gpu_data()[0] = loss / bottom[0]->num();
@@ -93,11 +94,12 @@ void SmoothL1LossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
                 diff_.gpu_data(),                // x
                 Dtype(0),                        // beta
                 bottom[i]->mutable_gpu_diff());  // y
-                if(channel_weights_){
-                    const Dtype* weight_data = bottom[2]->gpu_data();
-                    for(int ii = 0; ii < bottom[2]->count(); ii++){
-                        caffe_scal(bottom[i]->count(), weight_data[ii], bottom[i]->mutable_gpu_data());
-                    }
+                if(channel_sum_weights_){
+                    caffe_mul(
+                    errors_.count(),
+                    bottom[2]->gpu_data(),
+                    bottom[i]->gpu_diff(),
+                    bottom[i]->mutable_gpu_diff());
                 }
         }
     }

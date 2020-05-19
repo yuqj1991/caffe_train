@@ -135,12 +135,14 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         loc_shape[1] = num_gt_ * 4;
         loc_pred_.Reshape(loc_shape);
         loc_gt_.Reshape(loc_shape);
+        loc_channel_gt_.Reshape(loc_shape);
         Dtype* loc_pred_data = loc_pred_.mutable_cpu_data();
         Dtype* loc_gt_data = loc_gt_.mutable_cpu_data();
 
         Dtype* loc_channel_gt_data = loc_channel_gt_.mutable_cpu_data();
-        for(int ii = 0; ii < 4; ii++){
-            loc_channel_gt_data[ii] = Dtype((ii < 2)? 1.f : 0.1f);
+        for(int ii = 0; ii < num_gt_ * 4; ii++){
+            int idx = ii % 4;
+            loc_channel_gt_data[ii] = Dtype((idx < 2)? 1.f : 0.1f);
         }
 
         EncodeTruthAndPredictions(loc_gt_data, loc_pred_data, 
