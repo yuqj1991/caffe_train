@@ -1218,54 +1218,54 @@ Dtype EncodeOverlapObjectSigmoidLoss(const int batch_size, const int num_channel
     // 采用focal loss 使用所有的负样本，作为训练
     caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
     for(int b = 0; b < batch_size; b++){
-    vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
-    std::vector<int> mask_Rf_anchor(dimScale, 0);
-    std::vector<Dtype> object_loss_temp(dimScale, Dtype(0.));
-    int count = 0;
-    for(int h = 0; h < output_height; h++){
-        for(int w = 0; w < output_width; w++){
-        int xmin_index = b * num_channels * dimScale
-                                    + 0* dimScale + h * output_width + w;
-        int ymin_index = b * num_channels * dimScale 
-                                    + 1* dimScale + h * output_width + w;
-        int xmax_index = b * num_channels * dimScale
-                                    + 2* dimScale + h * output_width + w;
-        int ymax_index = b * num_channels * dimScale 
-                                    + 3* dimScale + h * output_width + w;
-        int object_index = b * num_channels * dimScale 
-                                    + 4* dimScale + h * output_width + w;
-        NormalizedBBox predBox;
-        Dtype center_x = (w + 0.5 - channel_pred_data[xmin_index] * anchor_scale /(2*downRatio)) / output_width;
-        Dtype center_y = (h + 0.5 - channel_pred_data[ymin_index] * anchor_scale /(2*downRatio)) / output_height;
-        Dtype pred_width = (std::exp(channel_pred_data[xmax_index]) * anchor_scale / downRatio) / output_width;
-        Dtype pred_height = (std::exp(channel_pred_data[ymax_index]) * anchor_scale / downRatio) /output_height;
-        predBox.set_xmin(center_x - pred_width / 2);
-        predBox.set_xmax(center_x + pred_width / 2);
-        predBox.set_ymin(center_y - pred_height / 2);
-        predBox.set_ymax(center_y + pred_height / 2);
-        float best_iou = 0;
-        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-            const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
-            const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
-            const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
-            const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
-            const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
-            const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
-            int large_side = std::max(gt_bbox_height, gt_bbox_width);
-            if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-            float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
-            if (iou > best_iou) {
-                best_iou = iou;
+        vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+        std::vector<int> mask_Rf_anchor(dimScale, 0);
+        std::vector<Dtype> object_loss_temp(dimScale, Dtype(0.));
+        int count = 0;
+        for(int h = 0; h < output_height; h++){
+            for(int w = 0; w < output_width; w++){
+            int xmin_index = b * num_channels * dimScale
+                                        + 0* dimScale + h * output_width + w;
+            int ymin_index = b * num_channels * dimScale 
+                                        + 1* dimScale + h * output_width + w;
+            int xmax_index = b * num_channels * dimScale
+                                        + 2* dimScale + h * output_width + w;
+            int ymax_index = b * num_channels * dimScale 
+                                        + 3* dimScale + h * output_width + w;
+            int object_index = b * num_channels * dimScale 
+                                        + 4* dimScale + h * output_width + w;
+            NormalizedBBox predBox;
+            Dtype center_x = (w + 0.5 - channel_pred_data[xmin_index] * anchor_scale /(2*downRatio)) / output_width;
+            Dtype center_y = (h + 0.5 - channel_pred_data[ymin_index] * anchor_scale /(2*downRatio)) / output_height;
+            Dtype pred_width = (std::exp(channel_pred_data[xmax_index]) * anchor_scale / downRatio) / output_width;
+            Dtype pred_height = (std::exp(channel_pred_data[ymax_index]) * anchor_scale / downRatio) /output_height;
+            predBox.set_xmin(center_x - pred_width / 2);
+            predBox.set_xmax(center_x + pred_width / 2);
+            predBox.set_ymin(center_y - pred_height / 2);
+            predBox.set_ymax(center_y + pred_height / 2);
+            float best_iou = 0;
+            for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+                const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
+                const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
+                const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
+                const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+                const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+                const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+                int large_side = std::max(gt_bbox_height, gt_bbox_width);
+                if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+                    float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+                    if (iou > best_iou) {
+                        best_iou = iou;
+                    }
+                }
             }
+            Dtype object_value = (channel_pred_data[object_index] - 0.);
+            if(best_iou > ignore_thresh){
+                object_value = 0.;
+            }
+            object_loss_temp[h * output_width + w] = Object_L2_Loss(object_value, &(bottom_diff[object_index]));
             }
         }
-        Dtype object_value = (channel_pred_data[object_index] - 0.);
-        if(best_iou > ignore_thresh){
-            object_value = 0.;
-        }
-        object_loss_temp[h * output_width + w] = Object_L2_Loss(object_value, &(bottom_diff[object_index]));
-        }
-    }
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
             const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
             const Dtype ymin = gt_bboxes[ii].ymin() * output_height;

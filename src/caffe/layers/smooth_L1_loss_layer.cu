@@ -51,7 +51,8 @@ void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     }
     caffe_gpu_asum(count, errors_.gpu_data(), &loss);
     printf("**************, loss: %f, num: %d, loss value: %f \n",loss, bottom[0]->num(), loss / bottom[0]->num());
-    top[0]->mutable_gpu_data()[0] = loss / bottom[0]->num();
+    Dtype* loss_data = top[0]->mutable_gpu_data();
+    loss_data[0] = loss / bottom[0]->num();
     printf("^^^^^^^^^^^^^^\n");
 }
 
@@ -73,7 +74,6 @@ __global__ void SmoothL1Backward(const int n, const Dtype* in, Dtype* out) {
 template <typename Dtype>
 void SmoothL1LossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-    #if 1
     int count = diff_.count();
     // NOLINT_NEXT_LINE(whitespace/operators)
     SmoothL1Backward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
@@ -98,9 +98,6 @@ void SmoothL1LossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
                 }
         }
     }
-    #else
-    this->Backward_cpu(top, propagate_down, bottom);
-    #endif
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(SmoothL1LossLayer);

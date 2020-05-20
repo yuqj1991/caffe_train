@@ -270,7 +270,7 @@ void MultiBoxSSDLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, num_, num_priors_, num_matches_);
     top[0]->mutable_cpu_data()[0] +=
-        loc_weight_ * loc_loss_.cpu_data()[0];
+        loc_weight_ * Dtype(loc_loss_.cpu_data()[0] / normalizer);
   }
   if (this->layer_param_.propagate_down(1)) {
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
@@ -323,10 +323,10 @@ void MultiBoxSSDLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       loc_loss_layer_->Backward(loc_top_vec_, loc_propagate_down,
                                 loc_bottom_vec_);
       // Scale gradient.
-      //Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-      //    normalization_, num_, num_priors_, num_matches_);
-      //Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
-      //caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
+      Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+          normalization_, num_, num_priors_, num_matches_);
+      Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+      caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
       // Copy gradient back to bottom[0].
       const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
       int count = 0;
