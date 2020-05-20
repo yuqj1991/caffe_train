@@ -43,7 +43,7 @@ void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     CUDA_POST_KERNEL_CHECK;
 
     Dtype loss;
-    if(channel_sum_weights_){
+    if(!channel_sum_weights_){
         caffe_gpu_mul(
             count, 
             bottom[2]->gpu_data(), 
