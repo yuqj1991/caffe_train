@@ -130,8 +130,8 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         /*if(count_postive_ > 0){
             loc_loss = sum_squre / count_postive_;
             score_loss = class_score / count_postive_;
-        }*/
-        else{
+        }
+        else*/{
             loc_loss = sum_squre / 1;
             score_loss = class_score / 1;
         }
@@ -163,8 +163,8 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         Dtype loss_weight = Dtype(0.);
         /*if(count_postive_ > 0){
             loss_weight = top[0]->cpu_diff()[0] / count_postive_;
-        }*/
-        else{
+        }
+        else*/{
             loss_weight = top[0]->cpu_diff()[0] / 1;
         }
         if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SIGMOID){
