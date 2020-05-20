@@ -54,8 +54,9 @@ void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     }
     printf("@@@@@@@@@@@@@\n");
     caffe_gpu_asum(count, errors_.gpu_data(), &loss);
-    printf("**************\n");
+    printf("**************, %d\n", bottom[0]->num());
     top[0]->mutable_gpu_data()[0] = loss / bottom[0]->num();
+    printf("^^^^^^^^^^^^^^\n");
     #else
     this->Forward_cpu(bottom, top);
     #endif
