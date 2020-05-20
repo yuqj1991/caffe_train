@@ -5038,10 +5038,10 @@ layer {
     share_location: true
     keep_top_k: 400
     confidence_threshold: 0.10999999940395355
-    bias_scale: 620
-    bias_scale: 256
-    bias_scale: 128
-    bias_scale: 32
+    bias_scale: 438
+    bias_scale: 192
+    bias_scale: 80
+    bias_scale: 19
     down_ratio: 32
     down_ratio: 16
     down_ratio: 8
