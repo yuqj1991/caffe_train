@@ -305,7 +305,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         crop_type = P.AnnotatedData.CROP_JITTER, YoloForamte = True)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
-bias_scale = [620, 256, 128, 32]
+bias_scale = [438, 192, 80, 19]
 low_bbox_scale = [256, 128, 32, 6]
 up_bbox_scale = [620, 256, 128, 32]
 from_layers = []
