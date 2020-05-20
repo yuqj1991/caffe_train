@@ -298,7 +298,7 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
         for(int h = 0; h < output_height; h++){
             for(int w = 0; w < output_width; w++){
                 Dtype label_value = Dtype(label_data[b * dimScale + h * output_width + w]);
-                if(label_value == Dtype(-1.) || label_value == Dtype(-2.)){
+                if(label_value < 0.f){
                     continue;
                 }else{
                     int label_idx = 0;
