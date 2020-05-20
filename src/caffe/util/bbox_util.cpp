@@ -351,7 +351,7 @@ bool MeetEmitConstraint(const NormalizedBBox& src_bbox,
     } else {
         LOG(FATAL) << "Unknown emit type.";
         return false;
-    }s
+    }
 }
 
 void EncodeBBox(
