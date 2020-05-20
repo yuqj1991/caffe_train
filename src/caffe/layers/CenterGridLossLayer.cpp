@@ -128,14 +128,8 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                             all_gt_bboxes, label_muti_data, bottom_diff, 
                             &count_postive_, &sum_squre, &num_gt_match);
         }
-        /*if(count_postive_ > 0){
-            loc_loss = sum_squre / count_postive_;
-            score_loss = class_score / count_postive_;
-        }
-        else*/{
-            loc_loss = sum_squre;
-            score_loss = class_score;
-        }
+        loc_loss = sum_squre / num_;
+        score_loss = class_score / num_;
         top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
     } else {
         top[0]->mutable_cpu_data()[0] = 0;
@@ -164,12 +158,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     }
     if (propagate_down[0]) {
         Dtype loss_weight = Dtype(0.);
-        /*if(count_postive_ > 0){
-            loss_weight = top[0]->cpu_diff()[0] / count_postive_;
-        }
-        else*/{
-            loss_weight = top[0]->cpu_diff()[0];
-        }
+        loss_weight = top[0]->cpu_diff()[0] / num_;
         if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SIGMOID){
             const int output_height = bottom[0]->height();
             const int output_width = bottom[0]->width();

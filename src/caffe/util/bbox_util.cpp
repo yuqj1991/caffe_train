@@ -321,165 +321,165 @@ template float JaccardOverlap(const float* bbox1, const float* bbox2);
 template double JaccardOverlap(const double* bbox1, const double* bbox2);
 
 float BBoxCoverage(const NormalizedBBox& bbox1, const NormalizedBBox& bbox2) {
-  NormalizedBBox intersect_bbox;
-  IntersectBBox(bbox1, bbox2, &intersect_bbox);
-  float intersect_size = BBoxSize(intersect_bbox);
-  if (intersect_size > 0) {
-    float bbox1_size = BBoxSize(bbox1);
-    return intersect_size / bbox1_size;
-  } else {
-    return 0.;
-  }
+    NormalizedBBox intersect_bbox;
+    IntersectBBox(bbox1, bbox2, &intersect_bbox);
+    float intersect_size = BBoxSize(intersect_bbox);
+    if (intersect_size > 0) {
+        float bbox1_size = BBoxSize(bbox1);
+        return intersect_size / bbox1_size;
+    } else {
+        return 0.;
+    }
 }
 
 bool MeetEmitConstraint(const NormalizedBBox& src_bbox,
                         const NormalizedBBox& bbox,
                         const EmitConstraint& emit_constraint) {
-  EmitType emit_type = emit_constraint.emit_type();
-  if (emit_type == EmitConstraint_EmitType_CENTER) {
-    float x_center = (bbox.xmin() + bbox.xmax()) / 2;
-    float y_center = (bbox.ymin() + bbox.ymax()) / 2;
-    if (x_center >= src_bbox.xmin() && x_center <= src_bbox.xmax() &&
-        y_center >= src_bbox.ymin() && y_center <= src_bbox.ymax()) {
-      return true;
+    EmitType emit_type = emit_constraint.emit_type();
+    if (emit_type == EmitConstraint_EmitType_CENTER) {
+        float x_center = (bbox.xmin() + bbox.xmax()) / 2;
+        float y_center = (bbox.ymin() + bbox.ymax()) / 2;
+        if (x_center >= src_bbox.xmin() && x_center <= src_bbox.xmax() &&
+            y_center >= src_bbox.ymin() && y_center <= src_bbox.ymax()) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (emit_type == EmitConstraint_EmitType_MIN_OVERLAP) {
+        float bbox_coverage = BBoxCoverage(bbox, src_bbox);
+        return bbox_coverage > emit_constraint.emit_overlap();
     } else {
-      return false;
-    }
-  } else if (emit_type == EmitConstraint_EmitType_MIN_OVERLAP) {
-    float bbox_coverage = BBoxCoverage(bbox, src_bbox);
-    return bbox_coverage > emit_constraint.emit_overlap();
-  } else {
-    LOG(FATAL) << "Unknown emit type.";
-    return false;
-  }
+        LOG(FATAL) << "Unknown emit type.";
+        return false;
+    }s
 }
 
 void EncodeBBox(
     const NormalizedBBox& prior_bbox, const vector<float>& prior_variance,
     const CodeType code_type, const bool encode_variance_in_target,
     const NormalizedBBox& bbox, NormalizedBBox* encode_bbox) {
-  if (code_type == PriorBoxParameter_CodeType_CORNER) {
-    if (encode_variance_in_target) {
-      encode_bbox->set_xmin(bbox.xmin() - prior_bbox.xmin());
-      encode_bbox->set_ymin(bbox.ymin() - prior_bbox.ymin());
-      encode_bbox->set_xmax(bbox.xmax() - prior_bbox.xmax());
-      encode_bbox->set_ymax(bbox.ymax() - prior_bbox.ymax());
-    } else {
-      // Encode variance in bbox.
-      CHECK_EQ(prior_variance.size(), 4);
-      for (int i = 0; i < prior_variance.size(); ++i) {
-        CHECK_GT(prior_variance[i], 0);
-      }
-      encode_bbox->set_xmin(
-          (bbox.xmin() - prior_bbox.xmin()) / prior_variance[0]);
-      encode_bbox->set_ymin(
-          (bbox.ymin() - prior_bbox.ymin()) / prior_variance[1]);
-      encode_bbox->set_xmax(
-          (bbox.xmax() - prior_bbox.xmax()) / prior_variance[2]);
-      encode_bbox->set_ymax(
-          (bbox.ymax() - prior_bbox.ymax()) / prior_variance[3]);
-    }
-  } else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {
-    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
-    CHECK_GT(prior_width, 0);
-    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
-    CHECK_GT(prior_height, 0);
-    float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
-    float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
+    if (code_type == PriorBoxParameter_CodeType_CORNER) {
+        if (encode_variance_in_target) {
+        encode_bbox->set_xmin(bbox.xmin() - prior_bbox.xmin());
+        encode_bbox->set_ymin(bbox.ymin() - prior_bbox.ymin());
+        encode_bbox->set_xmax(bbox.xmax() - prior_bbox.xmax());
+        encode_bbox->set_ymax(bbox.ymax() - prior_bbox.ymax());
+        } else {
+        // Encode variance in bbox.
+        CHECK_EQ(prior_variance.size(), 4);
+        for (int i = 0; i < prior_variance.size(); ++i) {
+            CHECK_GT(prior_variance[i], 0);
+        }
+        encode_bbox->set_xmin(
+            (bbox.xmin() - prior_bbox.xmin()) / prior_variance[0]);
+        encode_bbox->set_ymin(
+            (bbox.ymin() - prior_bbox.ymin()) / prior_variance[1]);
+        encode_bbox->set_xmax(
+            (bbox.xmax() - prior_bbox.xmax()) / prior_variance[2]);
+        encode_bbox->set_ymax(
+            (bbox.ymax() - prior_bbox.ymax()) / prior_variance[3]);
+        }
+    } else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {
+        float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+        CHECK_GT(prior_width, 0);
+        float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+        CHECK_GT(prior_height, 0);
+        float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
+        float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
 
-    float bbox_width = bbox.xmax() - bbox.xmin();
-    CHECK_GT(bbox_width, 0);
-    float bbox_height = bbox.ymax() - bbox.ymin();
-    CHECK_GT(bbox_height, 0);
-    float bbox_center_x = (bbox.xmin() + bbox.xmax()) / 2.;
-    float bbox_center_y = (bbox.ymin() + bbox.ymax()) / 2.;
+        float bbox_width = bbox.xmax() - bbox.xmin();
+        CHECK_GT(bbox_width, 0);
+        float bbox_height = bbox.ymax() - bbox.ymin();
+        CHECK_GT(bbox_height, 0);
+        float bbox_center_x = (bbox.xmin() + bbox.xmax()) / 2.;
+        float bbox_center_y = (bbox.ymin() + bbox.ymax()) / 2.;
 
-    if (encode_variance_in_target) {
-      encode_bbox->set_xmin((bbox_center_x - prior_center_x) / prior_width);
-      encode_bbox->set_ymin((bbox_center_y - prior_center_y) / prior_height);
-      encode_bbox->set_xmax(log(bbox_width / prior_width));
-      encode_bbox->set_ymax(log(bbox_height / prior_height));
+        if (encode_variance_in_target) {
+        encode_bbox->set_xmin((bbox_center_x - prior_center_x) / prior_width);
+        encode_bbox->set_ymin((bbox_center_y - prior_center_y) / prior_height);
+        encode_bbox->set_xmax(log(bbox_width / prior_width));
+        encode_bbox->set_ymax(log(bbox_height / prior_height));
+        } else {
+        // Encode variance in bbox.
+        encode_bbox->set_xmin(
+            (bbox_center_x - prior_center_x) / prior_width / prior_variance[0]);
+        encode_bbox->set_ymin(
+            (bbox_center_y - prior_center_y) / prior_height / prior_variance[1]);
+        encode_bbox->set_xmax(
+            log(bbox_width / prior_width) / prior_variance[2]);
+        encode_bbox->set_ymax(
+            log(bbox_height / prior_height) / prior_variance[3]);
+        }
+    } else if (code_type == PriorBoxParameter_CodeType_CORNER_SIZE) {
+        float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+        CHECK_GT(prior_width, 0);
+        float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+        CHECK_GT(prior_height, 0);
+        if (encode_variance_in_target) {
+            encode_bbox->set_xmin((bbox.xmin() - prior_bbox.xmin()) / prior_width);
+            encode_bbox->set_ymin((bbox.ymin() - prior_bbox.ymin()) / prior_height);
+            encode_bbox->set_xmax((bbox.xmax() - prior_bbox.xmax()) / prior_width);
+            encode_bbox->set_ymax((bbox.ymax() - prior_bbox.ymax()) / prior_height);
+        } else {
+        // Encode variance in bbox.
+        CHECK_EQ(prior_variance.size(), 4);
+        for (int i = 0; i < prior_variance.size(); ++i) {
+            CHECK_GT(prior_variance[i], 0);
+        }
+        encode_bbox->set_xmin(
+            (bbox.xmin() - prior_bbox.xmin()) / prior_width / prior_variance[0]);
+        encode_bbox->set_ymin(
+            (bbox.ymin() - prior_bbox.ymin()) / prior_height / prior_variance[1]);
+        encode_bbox->set_xmax(
+            (bbox.xmax() - prior_bbox.xmax()) / prior_width / prior_variance[2]);
+        encode_bbox->set_ymax(
+            (bbox.ymax() - prior_bbox.ymax()) / prior_height / prior_variance[3]);
+        }
+    }else if (code_type == PriorBoxParameter_CodeType_RECEPTIVE_CENTER) {
+        float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+        CHECK_GT(prior_width, 0);
+        float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+        CHECK_GT(prior_height, 0);
+        float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
+        float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
+        if (encode_variance_in_target) {
+            encode_bbox->set_xmin((prior_center_x - bbox.xmin()) / prior_width);
+            encode_bbox->set_ymin((prior_center_y - bbox.ymin()) / prior_height);
+            encode_bbox->set_xmax((prior_center_x - bbox.xmax()) / prior_width);
+            encode_bbox->set_ymax((prior_center_y - bbox.ymax()) / prior_height);
+        } else {
+            encode_bbox->set_xmin((prior_center_x - bbox.xmin()) / prior_width / prior_variance[0]);
+            encode_bbox->set_ymin((prior_center_y -bbox.ymin()) / prior_height / prior_variance[1]);
+            encode_bbox->set_xmax(
+                (prior_center_x - bbox.xmax()) / prior_width / prior_variance[2]);
+            encode_bbox->set_ymax(
+                (prior_center_y - bbox.ymax()) / prior_height / prior_variance[3]);
+        }
+    } else if (code_type == PriorBoxParameter_CodeType_CORNNER_CENTER){
+        float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+        CHECK_GT(prior_width, 0);
+        float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+        CHECK_GT(prior_height, 0);
+        float bbox_width = bbox.xmax() - bbox.xmin();
+        CHECK_GT(bbox_width, 0);
+        float bbox_height = bbox.ymax() - bbox.ymin();
+        CHECK_GT(bbox_height, 0);
+        if (encode_variance_in_target) {
+            encode_bbox->set_xmin((prior_bbox.xmin() - bbox.xmin()) / prior_width);
+            encode_bbox->set_ymin((prior_bbox.ymin() - bbox.ymin()) / prior_height);
+            encode_bbox->set_xmax(log(bbox_width / prior_width) / prior_width);
+            encode_bbox->set_ymax(log(bbox_height / prior_height) / prior_height);
+        } else {
+            encode_bbox->set_xmin((prior_bbox.xmin() - bbox.xmin()) / prior_width / prior_variance[0]);
+            encode_bbox->set_ymin((prior_bbox.ymin() -bbox.ymin()) / prior_height / prior_variance[1]);
+            encode_bbox->set_xmax(
+                log(bbox_width / prior_width) / prior_width / prior_variance[2]);
+            encode_bbox->set_ymax(
+                log(bbox_height / prior_height) / prior_height / prior_variance[3]);
+        }
     } else {
-      // Encode variance in bbox.
-      encode_bbox->set_xmin(
-          (bbox_center_x - prior_center_x) / prior_width / prior_variance[0]);
-      encode_bbox->set_ymin(
-          (bbox_center_y - prior_center_y) / prior_height / prior_variance[1]);
-      encode_bbox->set_xmax(
-          log(bbox_width / prior_width) / prior_variance[2]);
-      encode_bbox->set_ymax(
-          log(bbox_height / prior_height) / prior_variance[3]);
+        LOG(FATAL) << "Unknown encode type.";
     }
-  } else if (code_type == PriorBoxParameter_CodeType_CORNER_SIZE) {
-    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
-    CHECK_GT(prior_width, 0);
-    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
-    CHECK_GT(prior_height, 0);
-    if (encode_variance_in_target) {
-      encode_bbox->set_xmin((bbox.xmin() - prior_bbox.xmin()) / prior_width);
-      encode_bbox->set_ymin((bbox.ymin() - prior_bbox.ymin()) / prior_height);
-      encode_bbox->set_xmax((bbox.xmax() - prior_bbox.xmax()) / prior_width);
-      encode_bbox->set_ymax((bbox.ymax() - prior_bbox.ymax()) / prior_height);
-    } else {
-      // Encode variance in bbox.
-      CHECK_EQ(prior_variance.size(), 4);
-      for (int i = 0; i < prior_variance.size(); ++i) {
-        CHECK_GT(prior_variance[i], 0);
-      }
-      encode_bbox->set_xmin(
-          (bbox.xmin() - prior_bbox.xmin()) / prior_width / prior_variance[0]);
-      encode_bbox->set_ymin(
-          (bbox.ymin() - prior_bbox.ymin()) / prior_height / prior_variance[1]);
-      encode_bbox->set_xmax(
-          (bbox.xmax() - prior_bbox.xmax()) / prior_width / prior_variance[2]);
-      encode_bbox->set_ymax(
-          (bbox.ymax() - prior_bbox.ymax()) / prior_height / prior_variance[3]);
-    }
-  }else if (code_type == PriorBoxParameter_CodeType_RECEPTIVE_CENTER) {
-    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
-    CHECK_GT(prior_width, 0);
-    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
-    CHECK_GT(prior_height, 0);
-    float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
-    float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
-    if (encode_variance_in_target) {
-      encode_bbox->set_xmin((prior_center_x - bbox.xmin()) / prior_width);
-      encode_bbox->set_ymin((prior_center_y - bbox.ymin()) / prior_height);
-      encode_bbox->set_xmax((prior_center_x - bbox.xmax()) / prior_width);
-      encode_bbox->set_ymax((prior_center_y - bbox.ymax()) / prior_height);
-    } else {
-      encode_bbox->set_xmin((prior_center_x - bbox.xmin()) / prior_width / prior_variance[0]);
-      encode_bbox->set_ymin((prior_center_y -bbox.ymin()) / prior_height / prior_variance[1]);
-      encode_bbox->set_xmax(
-          (prior_center_x - bbox.xmax()) / prior_width / prior_variance[2]);
-      encode_bbox->set_ymax(
-          (prior_center_y - bbox.ymax()) / prior_height / prior_variance[3]);
-    }
-  } else if (code_type == PriorBoxParameter_CodeType_CORNNER_CENTER){
-    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
-    CHECK_GT(prior_width, 0);
-    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
-    CHECK_GT(prior_height, 0);
-    float bbox_width = bbox.xmax() - bbox.xmin();
-    CHECK_GT(bbox_width, 0);
-    float bbox_height = bbox.ymax() - bbox.ymin();
-    CHECK_GT(bbox_height, 0);
-    if (encode_variance_in_target) {
-      encode_bbox->set_xmin((prior_bbox.xmin() - bbox.xmin()) / prior_width);
-      encode_bbox->set_ymin((prior_bbox.ymin() - bbox.ymin()) / prior_height);
-      encode_bbox->set_xmax(log(bbox_width / prior_width) / prior_width);
-      encode_bbox->set_ymax(log(bbox_height / prior_height) / prior_height);
-    } else {
-      encode_bbox->set_xmin((prior_bbox.xmin() - bbox.xmin()) / prior_width / prior_variance[0]);
-      encode_bbox->set_ymin((prior_bbox.ymin() -bbox.ymin()) / prior_height / prior_variance[1]);
-      encode_bbox->set_xmax(
-          log(bbox_width / prior_width) / prior_width / prior_variance[2]);
-      encode_bbox->set_ymax(
-          log(bbox_height / prior_height) / prior_height / prior_variance[3]);
-    }
-  } else {
-    LOG(FATAL) << "Unknown encode type.";
-  }
 }
 
 void DecodeBBox(
@@ -487,148 +487,148 @@ void DecodeBBox(
     const CodeType code_type, const bool variance_encoded_in_target,
     const bool clip_bbox, const NormalizedBBox& bbox,
     NormalizedBBox* decode_bbox) {
-  if (code_type == PriorBoxParameter_CodeType_CORNER) {
-    if (variance_encoded_in_target) {
-      // variance is encoded in target, we simply need to add the offset
-      // predictions.
-      decode_bbox->set_xmin(prior_bbox.xmin() + bbox.xmin());
-      decode_bbox->set_ymin(prior_bbox.ymin() + bbox.ymin());
-      decode_bbox->set_xmax(prior_bbox.xmax() + bbox.xmax());
-      decode_bbox->set_ymax(prior_bbox.ymax() + bbox.ymax());
+    if (code_type == PriorBoxParameter_CodeType_CORNER) {
+        if (variance_encoded_in_target) {
+            // variance is encoded in target, we simply need to add the offset
+            // predictions.
+            decode_bbox->set_xmin(prior_bbox.xmin() + bbox.xmin());
+            decode_bbox->set_ymin(prior_bbox.ymin() + bbox.ymin());
+            decode_bbox->set_xmax(prior_bbox.xmax() + bbox.xmax());
+            decode_bbox->set_ymax(prior_bbox.ymax() + bbox.ymax());
+        } else {
+            // variance is encoded in bbox, we need to scale the offset accordingly.
+            decode_bbox->set_xmin(
+                prior_bbox.xmin() + prior_variance[0] * bbox.xmin());
+            decode_bbox->set_ymin(
+                prior_bbox.ymin() + prior_variance[1] * bbox.ymin());
+            decode_bbox->set_xmax(
+                prior_bbox.xmax() + prior_variance[2] * bbox.xmax());
+            decode_bbox->set_ymax(
+                prior_bbox.ymax() + prior_variance[3] * bbox.ymax());
+        }
+    } else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {
+        float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+        CHECK_GT(prior_width, 0);
+        float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+        CHECK_GT(prior_height, 0);
+        float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
+        float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
+
+        float decode_bbox_center_x, decode_bbox_center_y;
+        float decode_bbox_width, decode_bbox_height;
+        if (variance_encoded_in_target) {
+            // variance is encoded in target, we simply need to retore the offset
+            // predictions.
+            decode_bbox_center_x = bbox.xmin() * prior_width + prior_center_x;
+            decode_bbox_center_y = bbox.ymin() * prior_height + prior_center_y;
+            decode_bbox_width = exp(bbox.xmax()) * prior_width;
+            decode_bbox_height = exp(bbox.ymax()) * prior_height;
+        } else {
+            // variance is encoded in bbox, we need to scale the offset accordingly.
+            decode_bbox_center_x =
+                prior_variance[0] * bbox.xmin() * prior_width + prior_center_x;
+            decode_bbox_center_y =
+                prior_variance[1] * bbox.ymin() * prior_height + prior_center_y;
+            decode_bbox_width =
+                exp(prior_variance[2] * bbox.xmax()) * prior_width;
+            decode_bbox_height =
+                exp(prior_variance[3] * bbox.ymax()) * prior_height;
+        }
+
+        decode_bbox->set_xmin(decode_bbox_center_x - decode_bbox_width / 2.);
+        decode_bbox->set_ymin(decode_bbox_center_y - decode_bbox_height / 2.);
+        decode_bbox->set_xmax(decode_bbox_center_x + decode_bbox_width / 2.);
+        decode_bbox->set_ymax(decode_bbox_center_y + decode_bbox_height / 2.);
+    } else if (code_type == PriorBoxParameter_CodeType_CORNER_SIZE) {
+        float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+        CHECK_GT(prior_width, 0);
+        float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+        CHECK_GT(prior_height, 0);
+        if (variance_encoded_in_target) {
+        // variance is encoded in target, we simply need to add the offset
+        // predictions.
+        decode_bbox->set_xmin(prior_bbox.xmin() + bbox.xmin() * prior_width);
+        decode_bbox->set_ymin(prior_bbox.ymin() + bbox.ymin() * prior_height);
+        decode_bbox->set_xmax(prior_bbox.xmax() + bbox.xmax() * prior_width);
+        decode_bbox->set_ymax(prior_bbox.ymax() + bbox.ymax() * prior_height);
+        } else {
+        // variance is encoded in bbox, we need to scale the offset accordingly.
+        decode_bbox->set_xmin(
+            prior_bbox.xmin() + prior_variance[0] * bbox.xmin() * prior_width);
+        decode_bbox->set_ymin(
+            prior_bbox.ymin() + prior_variance[1] * bbox.ymin() * prior_height);
+        decode_bbox->set_xmax(
+            prior_bbox.xmax() + prior_variance[2] * bbox.xmax() * prior_width);
+        decode_bbox->set_ymax(
+            prior_bbox.ymax() + prior_variance[3] * bbox.ymax() * prior_height);
+        }
+    } else if (code_type == PriorBoxParameter_CodeType_RECEPTIVE_CENTER) {
+        float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+        CHECK_GT(prior_width, 0);
+        float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+        CHECK_GT(prior_height, 0);
+        float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
+        float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
+
+        float bbox_xmin, bbox_xmax, bbox_ymin, bbox_ymax;
+        if (variance_encoded_in_target) {
+            // variance is encoded in target, we simply need to retore the offset
+            // predictions.
+            bbox_xmin = prior_center_x - bbox.xmin() * prior_width;
+            bbox_ymin = prior_center_y - bbox.ymin() * prior_height;
+            bbox_xmax = prior_center_x - bbox.xmax() * prior_width;
+            bbox_ymax = prior_center_y - bbox.ymax() * prior_height;
+        } else {
+            // variance is encoded in bbox, we need to scale the offset accordingly.
+            bbox_xmin = prior_center_x - bbox.xmin() * prior_width * prior_variance[0];
+            bbox_ymin = prior_center_y - bbox.ymin() * prior_height * prior_variance[1];
+            bbox_xmax = prior_center_x - bbox.xmax() * prior_width * prior_variance[2];
+            bbox_ymax = prior_center_y - bbox.ymax() * prior_height * prior_variance[3];
+        }
+
+        decode_bbox->set_xmin(bbox_xmin);
+        decode_bbox->set_ymin(bbox_ymin);
+        decode_bbox->set_xmax(bbox_xmax);
+        decode_bbox->set_ymax(bbox_ymax);
+    } else if (code_type == PriorBoxParameter_CodeType_CORNNER_CENTER) {
+        float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
+        CHECK_GT(prior_width, 0);
+        float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
+        CHECK_GT(prior_height, 0);
+
+        float bbox_xmin, bbox_ymin;
+        float decode_bbox_width, decode_bbox_height;
+        if (variance_encoded_in_target) {
+            // variance is encoded in target, we simply need to retore the offset
+            // predictions.
+            bbox_xmin = -bbox.xmin() * prior_width + prior_bbox.xmin();
+            bbox_ymin = -bbox.ymin() * prior_height + prior_bbox.ymin();
+            decode_bbox_width = exp(bbox.xmax()) * prior_width;
+            decode_bbox_height = exp(bbox.ymax()) * prior_height;
+        } else {
+            // variance is encoded in bbox, we need to scale the offset accordingly.
+            bbox_xmin =
+                -prior_variance[0] * bbox.xmin() * prior_width + prior_bbox.xmin();
+            bbox_ymin =
+                -prior_variance[1] * bbox.ymin() * prior_height + prior_bbox.ymin();
+            decode_bbox_width =
+                exp(prior_variance[2] * bbox.xmax()) * prior_width;
+            decode_bbox_height =
+                exp(prior_variance[3] * bbox.ymax()) * prior_height;
+        }
+
+        decode_bbox->set_xmin(bbox_xmin);
+        decode_bbox->set_ymin(bbox_ymin);
+        decode_bbox->set_xmax(bbox_xmin + decode_bbox_width);
+        decode_bbox->set_ymax(bbox_ymin + decode_bbox_height);
     } else {
-      // variance is encoded in bbox, we need to scale the offset accordingly.
-      decode_bbox->set_xmin(
-          prior_bbox.xmin() + prior_variance[0] * bbox.xmin());
-      decode_bbox->set_ymin(
-          prior_bbox.ymin() + prior_variance[1] * bbox.ymin());
-      decode_bbox->set_xmax(
-          prior_bbox.xmax() + prior_variance[2] * bbox.xmax());
-      decode_bbox->set_ymax(
-          prior_bbox.ymax() + prior_variance[3] * bbox.ymax());
+        LOG(FATAL) << "Unknown LocLossType.";
     }
-  } else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {
-    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
-    CHECK_GT(prior_width, 0);
-    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
-    CHECK_GT(prior_height, 0);
-    float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
-    float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
-
-    float decode_bbox_center_x, decode_bbox_center_y;
-    float decode_bbox_width, decode_bbox_height;
-    if (variance_encoded_in_target) {
-      // variance is encoded in target, we simply need to retore the offset
-      // predictions.
-      decode_bbox_center_x = bbox.xmin() * prior_width + prior_center_x;
-      decode_bbox_center_y = bbox.ymin() * prior_height + prior_center_y;
-      decode_bbox_width = exp(bbox.xmax()) * prior_width;
-      decode_bbox_height = exp(bbox.ymax()) * prior_height;
-    } else {
-      // variance is encoded in bbox, we need to scale the offset accordingly.
-      decode_bbox_center_x =
-          prior_variance[0] * bbox.xmin() * prior_width + prior_center_x;
-      decode_bbox_center_y =
-          prior_variance[1] * bbox.ymin() * prior_height + prior_center_y;
-      decode_bbox_width =
-          exp(prior_variance[2] * bbox.xmax()) * prior_width;
-      decode_bbox_height =
-          exp(prior_variance[3] * bbox.ymax()) * prior_height;
+    float bbox_size = BBoxSize(*decode_bbox);
+    decode_bbox->set_size(bbox_size);
+    if (clip_bbox) {
+        ClipBBox(*decode_bbox, decode_bbox);
     }
-
-    decode_bbox->set_xmin(decode_bbox_center_x - decode_bbox_width / 2.);
-    decode_bbox->set_ymin(decode_bbox_center_y - decode_bbox_height / 2.);
-    decode_bbox->set_xmax(decode_bbox_center_x + decode_bbox_width / 2.);
-    decode_bbox->set_ymax(decode_bbox_center_y + decode_bbox_height / 2.);
-  } else if (code_type == PriorBoxParameter_CodeType_CORNER_SIZE) {
-    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
-    CHECK_GT(prior_width, 0);
-    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
-    CHECK_GT(prior_height, 0);
-    if (variance_encoded_in_target) {
-      // variance is encoded in target, we simply need to add the offset
-      // predictions.
-      decode_bbox->set_xmin(prior_bbox.xmin() + bbox.xmin() * prior_width);
-      decode_bbox->set_ymin(prior_bbox.ymin() + bbox.ymin() * prior_height);
-      decode_bbox->set_xmax(prior_bbox.xmax() + bbox.xmax() * prior_width);
-      decode_bbox->set_ymax(prior_bbox.ymax() + bbox.ymax() * prior_height);
-    } else {
-      // variance is encoded in bbox, we need to scale the offset accordingly.
-      decode_bbox->set_xmin(
-          prior_bbox.xmin() + prior_variance[0] * bbox.xmin() * prior_width);
-      decode_bbox->set_ymin(
-          prior_bbox.ymin() + prior_variance[1] * bbox.ymin() * prior_height);
-      decode_bbox->set_xmax(
-          prior_bbox.xmax() + prior_variance[2] * bbox.xmax() * prior_width);
-      decode_bbox->set_ymax(
-          prior_bbox.ymax() + prior_variance[3] * bbox.ymax() * prior_height);
-    }
-  } else if (code_type == PriorBoxParameter_CodeType_RECEPTIVE_CENTER) {
-    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
-    CHECK_GT(prior_width, 0);
-    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
-    CHECK_GT(prior_height, 0);
-    float prior_center_x = (prior_bbox.xmin() + prior_bbox.xmax()) / 2.;
-    float prior_center_y = (prior_bbox.ymin() + prior_bbox.ymax()) / 2.;
-
-    float bbox_xmin, bbox_xmax, bbox_ymin, bbox_ymax;
-    if (variance_encoded_in_target) {
-      // variance is encoded in target, we simply need to retore the offset
-      // predictions.
-      bbox_xmin = prior_center_x - bbox.xmin() * prior_width;
-      bbox_ymin = prior_center_y - bbox.ymin() * prior_height;
-      bbox_xmax = prior_center_x - bbox.xmax() * prior_width;
-      bbox_ymax = prior_center_y - bbox.ymax() * prior_height;
-    } else {
-      // variance is encoded in bbox, we need to scale the offset accordingly.
-      bbox_xmin = prior_center_x - bbox.xmin() * prior_width * prior_variance[0];
-      bbox_ymin = prior_center_y - bbox.ymin() * prior_height * prior_variance[1];
-      bbox_xmax = prior_center_x - bbox.xmax() * prior_width * prior_variance[2];
-      bbox_ymax = prior_center_y - bbox.ymax() * prior_height * prior_variance[3];
-    }
-
-    decode_bbox->set_xmin(bbox_xmin);
-    decode_bbox->set_ymin(bbox_ymin);
-    decode_bbox->set_xmax(bbox_xmax);
-    decode_bbox->set_ymax(bbox_ymax);
-  } else if (code_type == PriorBoxParameter_CodeType_CORNNER_CENTER) {
-    float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
-    CHECK_GT(prior_width, 0);
-    float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
-    CHECK_GT(prior_height, 0);
-
-    float bbox_xmin, bbox_ymin;
-    float decode_bbox_width, decode_bbox_height;
-    if (variance_encoded_in_target) {
-      // variance is encoded in target, we simply need to retore the offset
-      // predictions.
-      bbox_xmin = -bbox.xmin() * prior_width + prior_bbox.xmin();
-      bbox_ymin = -bbox.ymin() * prior_height + prior_bbox.ymin();
-      decode_bbox_width = exp(bbox.xmax()) * prior_width;
-      decode_bbox_height = exp(bbox.ymax()) * prior_height;
-    } else {
-      // variance is encoded in bbox, we need to scale the offset accordingly.
-      bbox_xmin =
-          -prior_variance[0] * bbox.xmin() * prior_width + prior_bbox.xmin();
-      bbox_ymin =
-          -prior_variance[1] * bbox.ymin() * prior_height + prior_bbox.ymin();
-      decode_bbox_width =
-          exp(prior_variance[2] * bbox.xmax()) * prior_width;
-      decode_bbox_height =
-          exp(prior_variance[3] * bbox.ymax()) * prior_height;
-    }
-
-    decode_bbox->set_xmin(bbox_xmin);
-    decode_bbox->set_ymin(bbox_ymin);
-    decode_bbox->set_xmax(bbox_xmin + decode_bbox_width);
-    decode_bbox->set_ymax(bbox_ymin + decode_bbox_height);
-  } else {
-    LOG(FATAL) << "Unknown LocLossType.";
-  }
-  float bbox_size = BBoxSize(*decode_bbox);
-  decode_bbox->set_size(bbox_size);
-  if (clip_bbox) {
-    ClipBBox(*decode_bbox, decode_bbox);
-  }
 }
 
 void DecodeBBoxes(
@@ -637,19 +637,19 @@ void DecodeBBoxes(
     const CodeType code_type, const bool variance_encoded_in_target,
     const bool clip_bbox, const vector<NormalizedBBox>& bboxes,
     vector<NormalizedBBox>* decode_bboxes) {
-  CHECK_EQ(prior_bboxes.size(), prior_variances.size());
-  CHECK_EQ(prior_bboxes.size(), bboxes.size());
-  int num_bboxes = prior_bboxes.size();
-  if (num_bboxes >= 1) {
-    CHECK_EQ(prior_variances[0].size(), 4);
-  }
-  decode_bboxes->clear();
-  for (int i = 0; i < num_bboxes; ++i) {
-    NormalizedBBox decode_bbox;
-    DecodeBBox(prior_bboxes[i], prior_variances[i], code_type,
-               variance_encoded_in_target, clip_bbox, bboxes[i], &decode_bbox);
-    decode_bboxes->push_back(decode_bbox);
-  }
+    CHECK_EQ(prior_bboxes.size(), prior_variances.size());
+    CHECK_EQ(prior_bboxes.size(), bboxes.size());
+    int num_bboxes = prior_bboxes.size();
+    if (num_bboxes >= 1) {
+        CHECK_EQ(prior_variances[0].size(), 4);
+    }
+    decode_bboxes->clear();
+    for (int i = 0; i < num_bboxes; ++i) {
+        NormalizedBBox decode_bbox;
+        DecodeBBox(prior_bboxes[i], prior_variances[i], code_type,
+                variance_encoded_in_target, clip_bbox, bboxes[i], &decode_bbox);
+        decode_bboxes->push_back(decode_bbox);
+    }
 }
 
 void DecodeBBoxesAll(const vector<LabelBBox>& all_loc_preds,
@@ -659,29 +659,29 @@ void DecodeBBoxesAll(const vector<LabelBBox>& all_loc_preds,
     const int num_loc_classes, const int background_label_id,
     const CodeType code_type, const bool variance_encoded_in_target,
     const bool clip, vector<LabelBBox>* all_decode_bboxes) {
-  CHECK_EQ(all_loc_preds.size(), num);
-  all_decode_bboxes->clear();
-  all_decode_bboxes->resize(num);
-  for (int i = 0; i < num; ++i) {
-    // Decode predictions into bboxes.
-    LabelBBox& decode_bboxes = (*all_decode_bboxes)[i];
-    for (int c = 0; c < num_loc_classes; ++c) {
-      int label = share_location ? -1 : c;
-      if (label == background_label_id) {
-        // Ignore background class.
-        continue;
-      }
-      if (all_loc_preds[i].find(label) == all_loc_preds[i].end()) {
-        // Something bad happened if there are no predictions for current label.
-        LOG(FATAL) << "Could not find location predictions for label " << label;
-      }
-      const vector<NormalizedBBox>& label_loc_preds =
-          all_loc_preds[i].find(label)->second;
-      DecodeBBoxes(prior_bboxes, prior_variances,
-                   code_type, variance_encoded_in_target, clip,
-                   label_loc_preds, &(decode_bboxes[label]));
+    CHECK_EQ(all_loc_preds.size(), num);
+    all_decode_bboxes->clear();
+    all_decode_bboxes->resize(num);
+    for (int i = 0; i < num; ++i) {
+        // Decode predictions into bboxes.
+        LabelBBox& decode_bboxes = (*all_decode_bboxes)[i];
+        for (int c = 0; c < num_loc_classes; ++c) {
+            int label = share_location ? -1 : c;
+            if (label == background_label_id) {
+                // Ignore background class.
+                continue;
+            }
+            if (all_loc_preds[i].find(label) == all_loc_preds[i].end()) {
+                // Something bad happened if there are no predictions for current label.
+                LOG(FATAL) << "Could not find location predictions for label " << label;
+            }
+            const vector<NormalizedBBox>& label_loc_preds =
+                all_loc_preds[i].find(label)->second;
+            DecodeBBoxes(prior_bboxes, prior_variances,
+                        code_type, variance_encoded_in_target, clip,
+                        label_loc_preds, &(decode_bboxes[label]));
+        }
     }
-  }
 }
 
 
