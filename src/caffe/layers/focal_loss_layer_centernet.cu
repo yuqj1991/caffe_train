@@ -37,7 +37,6 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-  #if 0
     sigmoid_layer_->Forward(sigmoid_bottom_vec_, sigmoid_top_vec_);
     const Dtype* prob_data = prob_.gpu_data();
     const Dtype* label = bottom[1]->gpu_data();
@@ -63,9 +62,6 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
       printf("\033[1m\033[45;33m batch_: %d, num_class_: %d, width: %d, height: %d, valid_count: %f, loss: %f, final_loss: %f \33[0m\n", 
                                 batch_, num_class_, width_, height_, valid_count, loss, top[0]->mutable_cpu_data()[0]);
     count_iter++;
-  #else
-  Forward_cpu(bottom, top);
-  #endif
 }
 
 template <typename Dtype>
@@ -73,7 +69,7 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
           const Dtype* label, const Dtype* prob_data, Dtype* bottom_diff, 
           const int batch, const int channels, const int height,
           const int width, Dtype* counts, float gamma, float alpha) {
-  CUDA_KERNEL_LOOP(index, nthreads) {
+    CUDA_KERNEL_LOOP(index, nthreads) {
     const int fw = index % width;
     const int fh = (index / width) % height;
     const int fc = (index / width / height) % channels;
@@ -98,40 +94,34 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-  #if 0
-  if (propagate_down[1]) {
-    LOG(FATAL) << this->type()
-                <<
-                 " Layer cannot backpropagate to label inputs.";
-  }
-  if (propagate_down[0]) {
-    Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
-    const Dtype* prob_data = prob_.gpu_data();
-    const Dtype* label = bottom[1]->gpu_data();
-    const int nthreads = bottom[0]->count();
-    Dtype* counts = prob_.mutable_gpu_diff();
-    batch_ = bottom[0]->num();
-    num_class_ = bottom[0]->channels();
-    width_ = bottom[0]->width();
-    height_ = bottom[0]->height();
-    Dtype diff_sum;
-    focalSigmoidLossBackwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
-        CAFFE_CUDA_NUM_THREADS>>>(nthreads, label, prob_data, bottom_diff,
-          batch_, num_class_, height_, width_, counts, gamma_, alpha_);
-   
-    Dtype valid_count;
-    caffe_gpu_asum(nthreads, counts, &valid_count);
-    const Dtype loss_weight = top[0]->cpu_diff()[0] / valid_count;
-    caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
+    if (propagate_down[1]) {
+        LOG(FATAL) << this->type()
+                    <<
+                    " Layer cannot backpropagate to label inputs.";
+    }
+    if (propagate_down[0]) {
+        Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
+        const Dtype* prob_data = prob_.gpu_data();
+        const Dtype* label = bottom[1]->gpu_data();
+        const int nthreads = bottom[0]->count();
+        Dtype* counts = prob_.mutable_gpu_diff();
+        batch_ = bottom[0]->num();
+        num_class_ = bottom[0]->channels();
+        width_ = bottom[0]->width();
+        height_ = bottom[0]->height();
+        Dtype diff_sum;
+        focalSigmoidLossBackwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
+            CAFFE_CUDA_NUM_THREADS>>>(nthreads, label, prob_data, bottom_diff,
+            batch_, num_class_, height_, width_, counts, gamma_, alpha_);
     
-    caffe_gpu_asum(nthreads, bottom_diff, &diff_sum);
-    if(count_iter % 1000 == 0)
-      printf("\033[1m\033[45;33m cuda diff_sumarize_a: %f, count: %f  \33[0m\n", diff_sum, valid_count);
-  
-  }
-  #else
-  Backward_cpu(top,propagate_down, bottom);
-  #endif
+        Dtype valid_count;
+        caffe_gpu_asum(nthreads, counts, &valid_count);
+        const Dtype loss_weight = top[0]->cpu_diff()[0] / valid_count;
+        caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
+        
+        caffe_gpu_asum(nthreads, bottom_diff, &diff_sum);
+    
+    }
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(CenterNetfocalSigmoidWithLossLayer);
