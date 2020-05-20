@@ -911,10 +911,10 @@ void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channe
                 float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /(2*downRatio)) *downRatio;
                 float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /(2*downRatio)) *downRatio;
                 
-                float xmin = std::min(std::max(bb_xmin, (0.f)), float(downRatio * output_width));
-                float ymin = std::min(std::max(bb_ymin, (0.f)), float(downRatio * output_height));
-                float xmax = std::min(std::max(bb_xmax, (0.f)), float(downRatio * output_width));
-                float ymax = std::min(std::max(bb_ymax, (0.f)), float(downRatio * output_height));
+                float xmin = GET_VALID_VALUE(bb_xmin, (0.f), float(downRatio * output_width));
+                float ymin = GET_VALID_VALUE(bb_ymin, (0.f), float(downRatio * output_height));
+                float xmax = GET_VALID_VALUE(bb_xmax, (0.f), float(downRatio * output_width));
+                float ymax = GET_VALID_VALUE(bb_ymax, (0.f), float(downRatio * output_height));
 
                 if((xmax - xmin) <= 0 || (ymax - ymin) <= 0)
                     continue;                                     
@@ -1397,10 +1397,10 @@ void GetCenterOverlapResultSigmoid(const int batch_size, const int num_channels,
                 Dtype pred_height = (std::exp(channel_pred_data[height_index]) * anchor_scale / downRatio) * downRatio;
 
                         
-                Dtype xmin = std::min(std::max(center_x - pred_width / 2, Dtype(0.f)), Dtype(downRatio * output_width));
-                Dtype ymin = std::min(std::max(center_y - pred_height / 2, Dtype(0.f)), Dtype(downRatio * output_height));
-                Dtype xmax = std::min(std::max(center_x + pred_width / 2, Dtype(0.f)), Dtype(downRatio * output_width));
-                Dtype ymax = std::min(std::max(center_y + pred_height / 2, Dtype(0.f)), Dtype(downRatio * output_height));
+                Dtype xmin = GET_VALID_VALUE(center_x - pred_width / 2, Dtype(0.f), Dtype(downRatio * output_width));
+                Dtype ymin = GET_VALID_VALUE(center_y - pred_height / 2, Dtype(0.f), Dtype(downRatio * output_height));
+                Dtype xmax = GET_VALID_VALUE(center_x + pred_width / 2, Dtype(0.f), Dtype(downRatio * output_width));
+                Dtype ymax = GET_VALID_VALUE(center_y + pred_height / 2, Dtype(0.f), Dtype(downRatio * output_height));
 
                 if((xmax - xmin) <= 0 || (ymax - ymin) <= 0)
                     continue;                                     
