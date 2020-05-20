@@ -40,6 +40,7 @@ void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         diff_.mutable_gpu_data());    // d := b0 - b1
     SmoothL1Forward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
         count, diff_.gpu_data(), errors_.mutable_gpu_data());
+    printf("~~~~~~~~~~~~~~\n");
     CUDA_POST_KERNEL_CHECK;
 
     Dtype loss;
