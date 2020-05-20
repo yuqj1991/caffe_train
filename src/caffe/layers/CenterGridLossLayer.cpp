@@ -147,7 +147,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                 <<", loc loss: "<< loc_loss
                 <<", class loss: "<< score_loss 
                 <<", count: "<< count_postive_
-                <<", all gt_boxes: "<<all_gt_bboxes.size()
+                <<", all gt_boxes: "<<num_groundtruth_
                 <<", this match nums: "<<num_gt_match;
     }
     iterations_++;
