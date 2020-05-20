@@ -814,7 +814,8 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                         loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
                         loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
                         loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
-                        object_loss_temp[h * output_width + w] = Object_L2_Loss(Dtype(channel_pred_data[object_index] - 1.), &object_diff);
+                        object_loss_temp[h * output_width + w] = Object_L2_Loss(Dtype(channel_pred_data[object_index] - 1.), 
+                                                                    &object_diff);
 
                         bottom_diff[xmin_index] = xmin_diff;
                         bottom_diff[ymin_index] = ymin_diff;
