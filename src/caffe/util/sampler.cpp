@@ -90,42 +90,42 @@ bool SatisfySampleConstraint(const NormalizedBBox& sampled_bbox,
         const NormalizedBBox& object_bbox = object_bboxes[i];
         // Test jaccard overlap.
         if (has_jaccard_overlap) {
-        const float jaccard_overlap = JaccardOverlap(sampled_bbox, object_bbox);
-        if (sample_constraint.has_min_jaccard_overlap() &&
-            jaccard_overlap < sample_constraint.min_jaccard_overlap()) {
-            continue;
-        }
-        if (sample_constraint.has_max_jaccard_overlap() &&
-            jaccard_overlap > sample_constraint.max_jaccard_overlap()) {
-            continue;
-        }
-        found = true;
+            const float jaccard_overlap = JaccardOverlap(sampled_bbox, object_bbox);
+            if (sample_constraint.has_min_jaccard_overlap() &&
+                jaccard_overlap < sample_constraint.min_jaccard_overlap()) {
+                continue;
+            }
+            if (sample_constraint.has_max_jaccard_overlap() &&
+                jaccard_overlap > sample_constraint.max_jaccard_overlap()) {
+                continue;
+            }
+            found = true;
         }
         // Test sample coverage.
         if (has_sample_coverage) {
-        const float sample_coverage = BBoxCoverage(sampled_bbox, object_bbox);
-        if (sample_constraint.has_min_sample_coverage() &&
-            sample_coverage < sample_constraint.min_sample_coverage()) {
-            continue;
-        }
-        if (sample_constraint.has_max_sample_coverage() &&
-            sample_coverage > sample_constraint.max_sample_coverage()) {
-            continue;
-        }
-        found = true;
+            const float sample_coverage = BBoxCoverage(sampled_bbox, object_bbox);
+            if (sample_constraint.has_min_sample_coverage() &&
+                sample_coverage < sample_constraint.min_sample_coverage()) {
+                continue;
+            }
+            if (sample_constraint.has_max_sample_coverage() &&
+                sample_coverage > sample_constraint.max_sample_coverage()) {
+                continue;
+            }
+            found = true;
         }
         // Test object coverage.
         if (has_object_coverage) {
-        const float object_coverage = BBoxCoverage(object_bbox, sampled_bbox);
-        if (sample_constraint.has_min_object_coverage() &&
-            object_coverage < sample_constraint.min_object_coverage()) {
-            continue;
-        }
-        if (sample_constraint.has_max_object_coverage() &&
-            object_coverage > sample_constraint.max_object_coverage()) {
-            continue;
-        }
-        found = true;
+            const float object_coverage = BBoxCoverage(object_bbox, sampled_bbox);
+            if (sample_constraint.has_min_object_coverage() &&
+                object_coverage < sample_constraint.min_object_coverage()) {
+                continue;
+            }
+            if (sample_constraint.has_max_object_coverage() &&
+                object_coverage > sample_constraint.max_object_coverage()) {
+                continue;
+            }
+            found = true;
         }
         if (found) {
         return true;

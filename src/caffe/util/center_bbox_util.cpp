@@ -1042,7 +1042,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         anchor_bbox.set_xmax(an_xmax);
                         anchor_bbox.set_ymin(an_ymin);
                         anchor_bbox.set_ymax(an_ymax);
-                        if(BBoxCoverage(anchor_bbox, gt_bboxes[ii]) < 0.35){
+                        if(BBoxCoverage(gt_bboxes[ii], anchor_bbox) < 0.35){
                             continue;
                         }
                         #endif
