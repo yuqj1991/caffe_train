@@ -306,6 +306,9 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
                         label_idx = 0;
                     else if(label_value == 1.)
                         label_idx = 1;
+                    else{
+                        LOG(FATAL)<<"no valid label value";
+                    }
                     int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
                     Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
                     Dtype sumValue = Dtype(0.f);
