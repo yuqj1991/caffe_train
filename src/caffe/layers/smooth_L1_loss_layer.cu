@@ -31,7 +31,6 @@ __global__ void SmoothL1Forward(const int n, const Dtype* in, Dtype* out) {
 template <typename Dtype>
 void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-    #if 1
     int count = bottom[0]->count();
     caffe_gpu_sub(
         count,
@@ -40,9 +39,7 @@ void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         diff_.mutable_gpu_data());    // d := b0 - b1
     SmoothL1Forward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
         count, diff_.gpu_data(), errors_.mutable_gpu_data());
-    printf("~~~~~~~~~~~~~~\n");
     CUDA_POST_KERNEL_CHECK;
-    printf("&&&&&&&&&&&&&&\n");
     Dtype loss;
     
     if(channel_sum_weights_){
@@ -52,14 +49,10 @@ void SmoothL1LossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             errors_.gpu_data(),
             errors_.mutable_gpu_data());
     }
-    printf("@@@@@@@@@@@@@\n");
     caffe_gpu_asum(count, errors_.gpu_data(), &loss);
-    printf("**************, loss: %f, num: %d\n",loss, bottom[0]->num());
+    printf("**************, loss: %f, num: %d, loss value: %f \n",loss, bottom[0]->num(), loss / bottom[0]->num());
     top[0]->mutable_gpu_data()[0] = loss / bottom[0]->num();
     printf("^^^^^^^^^^^^^^\n");
-    #else
-    this->Forward_cpu(bottom, top);
-    #endif
 }
 
 template <typename Dtype>
