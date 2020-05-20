@@ -109,7 +109,6 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
         num_class_ = bottom[0]->channels();
         width_ = bottom[0]->width();
         height_ = bottom[0]->height();
-        Dtype diff_sum;
         focalSigmoidLossBackwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
             CAFFE_CUDA_NUM_THREADS>>>(nthreads, label, prob_data, bottom_diff,
             batch_, num_class_, height_, width_, counts, gamma_, alpha_);
@@ -118,9 +117,6 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
         caffe_gpu_asum(nthreads, counts, &valid_count);
         const Dtype loss_weight = top[0]->cpu_diff()[0] / valid_count;
         caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
-        
-        caffe_gpu_asum(nthreads, bottom_diff, &diff_sum);
-    
     }
 }
 
