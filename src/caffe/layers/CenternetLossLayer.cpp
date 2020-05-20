@@ -177,7 +177,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, num_gt_, num_gt_);
         top[0]->mutable_cpu_data()[0] +=
-            loc_weight_ * loc_loss_.cpu_data()[0];
+            loc_weight_ * Dtype(loc_loss_.cpu_data()[0] / normalizer) ;
     }
     if (this->layer_param_.propagate_down(1)) {
         top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0];
@@ -187,7 +187,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, num_gt_, num_gt_);
         LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
-                <<", loc loss: "<<loc_loss_.cpu_data()[0]
+                <<", loc loss: "<<loc_loss_.cpu_data()[0] / normalizer
                 <<", conf loss: "<< conf_loss_.cpu_data()[0]
                 <<", normalizer: "<< normalizer
                 <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
@@ -221,12 +221,10 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             loc_propagate_down.push_back(false);
             loc_loss_layer_->Backward(loc_top_vec_, loc_propagate_down,
                                         loc_bottom_vec_);
-            // Scale gradient.
-            // Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-            //    normalization_, num_, num_gt_, num_gt_);
-            // Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
-            // caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
-            // Copy gradient back to bottom[0].
+            Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+                normalization_, num_, num_gt_, num_gt_);
+            Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+            caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
             const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
             CopyDiffToBottom(loc_pred_diff, output_width, output_height, 
                                 share_location_, loc_bottom_diff, num_channels,
