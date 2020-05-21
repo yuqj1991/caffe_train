@@ -209,6 +209,9 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     }
 
     // Back propagate on location offset prediction.
+
+    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+            normalization_, num_, 1, num_gt_);
     if (propagate_down[0]) {
         Dtype* loc_bottom_diff = bottom[0]->mutable_cpu_diff();
         caffe_set(bottom[0]->count(), Dtype(0), loc_bottom_diff);
@@ -220,8 +223,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             //loc_propagate_down.push_back(false);
             loc_loss_layer_->Backward(loc_top_vec_, loc_propagate_down,
                                         loc_bottom_vec_);
-            Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-            normalization_, num_, 1, num_gt_);
+            
             Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
             caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
             const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
@@ -240,8 +242,6 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             conf_propagate_down.push_back(false);
             conf_loss_layer_->Backward(conf_top_vec_, conf_propagate_down,
                                         conf_bottom_vec_);
-            Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-            normalization_, num_, 1, num_gt_);
             Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
             caffe_scal(conf_pred_.count(), loss_weight, conf_pred_.mutable_cpu_diff());
             bottom[1]->ShareDiff(conf_pred_);
