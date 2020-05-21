@@ -3927,7 +3927,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4064,7 +4064,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4201,7 +4201,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4338,7 +4338,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4403,7 +4403,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 0
     kernel_size: 2
@@ -4468,7 +4468,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -4544,6 +4544,12 @@ layer {
   }
 }
 layer {
+  name: "Resconnection_stage_320/Relu6"
+  type: "ReLU6"
+  bottom: "Resconnection_stage_320"
+  top: "Resconnection_stage_320"
+}
+layer {
   name: "Dection_conv_out_320"
   type: "Convolution"
   bottom: "Resconnection_stage_320"
@@ -4573,7 +4579,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 0
     kernel_size: 2
@@ -4638,7 +4644,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -4714,6 +4720,12 @@ layer {
   }
 }
 layer {
+  name: "Resconnection_stage_96/Relu6"
+  type: "ReLU6"
+  bottom: "Resconnection_stage_96"
+  top: "Resconnection_stage_96"
+}
+layer {
   name: "Dection_conv_out_96"
   type: "Convolution"
   bottom: "Resconnection_stage_96"
@@ -4743,7 +4755,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 0
     kernel_size: 2
@@ -4808,7 +4820,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -4884,6 +4896,12 @@ layer {
   }
 }
 layer {
+  name: "Resconnection_stage_32/Relu6"
+  type: "ReLU6"
+  bottom: "Resconnection_stage_32"
+  top: "Resconnection_stage_32"
+}
+layer {
   name: "Dection_conv_out_32"
   type: "Convolution"
   bottom: "Resconnection_stage_32"
@@ -4913,7 +4931,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     bias_term: false
     pad: 0
     kernel_size: 2
@@ -4977,6 +4995,12 @@ layer {
   eltwise_param {
     operation: SUM
   }
+}
+layer {
+  name: "Resconnection_stage_24/Relu6"
+  type: "ReLU6"
+  bottom: "Resconnection_stage_24"
+  top: "Resconnection_stage_24"
 }
 layer {
   name: "Dection_conv_out_24"

@@ -3940,6 +3940,12 @@ layer {
   }
 }
 layer {
+  name: "Res_conv_linear_stage_320/Relu6"
+  type: "ReLU6"
+  bottom: "Res_conv_linear_stage_320"
+  top: "Res_conv_linear_stage_320"
+}
+layer {
   name: "Deconv_Scale_Up_Stage_96"
   type: "Deconvolution"
   bottom: "Res_conv_linear_stage_320"
@@ -4080,6 +4086,12 @@ layer {
   }
 }
 layer {
+  name: "Res_conv_linear_stage_96/Relu6"
+  type: "ReLU6"
+  bottom: "Res_conv_linear_stage_96"
+  top: "Res_conv_linear_stage_96"
+}
+layer {
   name: "Deconv_Scale_Up_Stage_32"
   type: "Deconvolution"
   bottom: "Res_conv_linear_stage_96"
@@ -4218,6 +4230,12 @@ layer {
   eltwise_param {
     operation: SUM
   }
+}
+layer {
+  name: "Res_conv_linear_stage_32/Relu6"
+  type: "ReLU6"
+  bottom: "Res_conv_linear_stage_32"
+  top: "Res_conv_linear_stage_32"
 }
 layer {
   name: "last_conv_3x3_layer"

@@ -347,7 +347,7 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         
         # eltwise_sum layer
         _, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, 
-                                            use_relu=False, layerPrefix = "Res_conv_linear")
+                                            use_relu=True, layerPrefix = "Res_conv_linear")
         net_last_layer = detect_layer
 
     last_conv_layer = "last_conv_3x3_layer"
@@ -460,7 +460,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                 num_output= 320, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
     
-    fpn_out_channels = 128
+    fpn_out_channels = 64
     for idx, feature_layer in enumerate(LayerList_Name):
         ConvLayer = "DepthWise_conv_{}_{}".format(idx, feature_layer)
         channel_stage = LayerFilters[idx]
@@ -495,7 +495,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
         else:
             Reconnect_layer_two= LayerList_Name[len(feature_stride) - index - 1]
         # eltwise_sum layer
-        out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_relu=False, layerPrefix = "Resconnection")
+        out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_relu=True, layerPrefix = "Resconnection")
         detection_conv_layer = "Dection_conv_out_{}".format(channel_stage)
         ConvBNLayer(net, detect_layer, detection_conv_layer, use_bn= False, 
                 use_swish= False, use_relu = False, 
