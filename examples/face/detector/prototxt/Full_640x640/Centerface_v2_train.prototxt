@@ -4533,7 +4533,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: FULL
   }
   center_object_loss_param {
     num_class: 1
