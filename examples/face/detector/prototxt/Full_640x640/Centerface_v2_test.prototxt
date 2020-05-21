@@ -3940,12 +3940,6 @@ layer {
   }
 }
 layer {
-  name: "Res_conv_linear_stage_320/Relu6"
-  type: "ReLU6"
-  bottom: "Res_conv_linear_stage_320"
-  top: "Res_conv_linear_stage_320"
-}
-layer {
   name: "Deconv_Scale_Up_Stage_96"
   type: "Deconvolution"
   bottom: "Res_conv_linear_stage_320"
@@ -4086,12 +4080,6 @@ layer {
   }
 }
 layer {
-  name: "Res_conv_linear_stage_96/Relu6"
-  type: "ReLU6"
-  bottom: "Res_conv_linear_stage_96"
-  top: "Res_conv_linear_stage_96"
-}
-layer {
   name: "Deconv_Scale_Up_Stage_32"
   type: "Deconvolution"
   bottom: "Res_conv_linear_stage_96"
@@ -4230,12 +4218,6 @@ layer {
   eltwise_param {
     operation: SUM
   }
-}
-layer {
-  name: "Res_conv_linear_stage_32/Relu6"
-  type: "ReLU6"
-  bottom: "Res_conv_linear_stage_32"
-  top: "Res_conv_linear_stage_32"
 }
 layer {
   name: "last_conv_3x3_layer"
@@ -4380,9 +4362,9 @@ layer {
   detection_output_param {
     num_classes: 2
     share_location: true
-    keep_top_k: 400
-    confidence_threshold: 0.10999999940395355
-    nms_thresh: 0.4000000059604645
+    keep_top_k: 250
+    confidence_threshold: 0.15000000596046448
+    nms_thresh: 0.30000001192092896
   }
 }
 layer {

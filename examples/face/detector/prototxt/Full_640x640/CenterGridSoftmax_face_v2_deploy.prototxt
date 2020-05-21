@@ -4544,12 +4544,6 @@ layer {
   }
 }
 layer {
-  name: "Resconnection_stage_320/Relu6"
-  type: "ReLU6"
-  bottom: "Resconnection_stage_320"
-  top: "Resconnection_stage_320"
-}
-layer {
   name: "Dection_conv_out_320"
   type: "Convolution"
   bottom: "Resconnection_stage_320"
@@ -4718,12 +4712,6 @@ layer {
   eltwise_param {
     operation: SUM
   }
-}
-layer {
-  name: "Resconnection_stage_96/Relu6"
-  type: "ReLU6"
-  bottom: "Resconnection_stage_96"
-  top: "Resconnection_stage_96"
 }
 layer {
   name: "Dection_conv_out_96"
@@ -4896,12 +4884,6 @@ layer {
   }
 }
 layer {
-  name: "Resconnection_stage_32/Relu6"
-  type: "ReLU6"
-  bottom: "Resconnection_stage_32"
-  top: "Resconnection_stage_32"
-}
-layer {
   name: "Dection_conv_out_32"
   type: "Convolution"
   bottom: "Resconnection_stage_32"
@@ -4995,12 +4977,6 @@ layer {
   eltwise_param {
     operation: SUM
   }
-}
-layer {
-  name: "Resconnection_stage_24/Relu6"
-  type: "ReLU6"
-  bottom: "Resconnection_stage_24"
-  top: "Resconnection_stage_24"
 }
 layer {
   name: "Dection_conv_out_24"

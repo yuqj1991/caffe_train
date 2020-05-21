@@ -48,10 +48,10 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     loc_shape.push_back(4);
     loc_pred_.Reshape(loc_shape);
     loc_gt_.Reshape(loc_shape);
-    loc_channel_gt_.Reshape(loc_shape);
+    //loc_channel_gt_.Reshape(loc_shape);
     loc_bottom_vec_.push_back(&loc_pred_);
     loc_bottom_vec_.push_back(&loc_gt_);
-    loc_bottom_vec_.push_back(&loc_channel_gt_);
+    //loc_bottom_vec_.push_back(&loc_channel_gt_);
     loc_loss_.Reshape(loss_shape);
     loc_top_vec_.push_back(&loc_loss_);
     if (loc_loss_type_ == CenterObjectLossParameter_LocLossType_L2) {
@@ -135,16 +135,16 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         loc_shape[1] = num_gt_ * 4;
         loc_pred_.Reshape(loc_shape);
         loc_gt_.Reshape(loc_shape);
-        loc_channel_gt_.Reshape(loc_shape);
+        //loc_channel_gt_.Reshape(loc_shape);
         Dtype* loc_pred_data = loc_pred_.mutable_cpu_data();
         Dtype* loc_gt_data = loc_gt_.mutable_cpu_data();
-
+        /*
         Dtype* loc_channel_gt_data = loc_channel_gt_.mutable_cpu_data();
         for(int ii = 0; ii < num_gt_ * 4; ii++){
             int idx = ii % 4;
             loc_channel_gt_data[ii] = Dtype((idx < 2)? 1.f : 0.1f);
         }
-
+        */
         EncodeTruthAndPredictions(loc_gt_data, loc_pred_data, 
                                             output_width, output_height, share_location_,
                                             loc_data, num_channels, all_gt_bboxes);
@@ -218,7 +218,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             // Only back propagate on prediction, not ground truth.
             loc_propagate_down.push_back(true);
             loc_propagate_down.push_back(false);
-            loc_propagate_down.push_back(false);
+            //loc_propagate_down.push_back(false);
             loc_loss_layer_->Backward(loc_top_vec_, loc_propagate_down,
                                         loc_bottom_vec_);
             Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
