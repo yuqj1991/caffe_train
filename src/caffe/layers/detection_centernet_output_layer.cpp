@@ -111,11 +111,13 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
         top_data[count * 7 + 4] = result_temp[j].ymin();
         top_data[count * 7 + 5] = result_temp[j].xmax();
         top_data[count * 7 + 6] = result_temp[j].ymax();
+        #if 0
         LOG(INFO)<<"confidence: " << result_temp[j].score()
                  <<", center_x: " << (result_temp[j].xmin() + result_temp[j].xmax()) * 4 * 160 / 2
                  <<", center_y: " << (result_temp[j].ymin() + result_temp[j].ymax()) * 4 * 160 / 2
                  <<", width: " << (result_temp[j].xmax() - result_temp[j].xmin()) * 4 * 160
                  <<", height: " << (result_temp[j].ymax() - result_temp[j].ymin()) * 4 * 160;
+        #endif
         ++count;
       }
     }

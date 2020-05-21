@@ -143,11 +143,13 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
                 top_data[count * 7 + 4] = result_temp[j].ymin() / net_height_;
                 top_data[count * 7 + 5] = result_temp[j].xmax() / net_width_;
                 top_data[count * 7 + 6] = result_temp[j].ymax() / net_height_;
+                #if 0
                 LOG(INFO)<<"class: "<<top_data[count * 7 + 1]<<", score: "<< result_temp[j].score()
                         <<", center_x: "<< (result_temp[j].xmin() + result_temp[j].xmax()) / 2
                         <<", center_y: "<< (result_temp[j].ymin() + result_temp[j].ymax()) / 2
                         <<", width: "<< result_temp[j].xmax() - result_temp[j].xmin()
                         <<", height: "<< result_temp[j].ymax() - result_temp[j].ymin();
+                #endif
                 ++count;
             }
         }

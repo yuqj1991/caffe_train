@@ -300,7 +300,7 @@ make_if_not_exist(save_dir)
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
         train=True, output_label=True, label_map_file=labelmapPath,
-        crop_type = P.AnnotatedData.CROP_BATCH,
+        crop_type = P.AnnotatedData.CROP_JITTER,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler)
 
