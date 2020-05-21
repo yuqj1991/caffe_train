@@ -199,7 +199,7 @@ layer {
   }
   data_param {
     source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-    batch_size: 6
+    batch_size: 8
     backend: LMDB
   }
 }
