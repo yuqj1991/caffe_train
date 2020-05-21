@@ -5,7 +5,6 @@
 #include "caffe/layers/focal_loss_layer_centernet.hpp"
 #include "caffe/util/math_functions.hpp"
 
-int count_iter = 0;
 namespace caffe {
 
 template <typename Dtype>
@@ -52,16 +51,16 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
         batch_, num_class_, height_, width_, counts, gamma_, alpha_);
     Dtype loss;
     caffe_gpu_asum(nthreads, loss_data, &loss);
-    Dtype valid_count;
-    caffe_gpu_asum(nthreads, counts, &valid_count);
-    top[0]->mutable_cpu_data()[0] = loss / valid_count;
+    Dtype valid_count = -1;
+    if (normalization_ == LossParameter_NormalizationMode_VALID) {
+        caffe_gpu_asum(nthreads, counts, &valid_count);
+    }
+    Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+        normalization_, 1, 1, valid_count);
+    top[0]->mutable_cpu_data()[0] = loss / normalizer;
     if (top.size() == 2) {
       top[1]->ShareData(prob_);
     }
-    if(count_iter % 1000 == 0)
-      printf("\033[1m\033[45;33m batch_: %d, num_class_: %d, width: %d, height: %d, valid_count: %f, loss: %f, final_loss: %f \33[0m\n", 
-                                batch_, num_class_, width_, height_, valid_count, loss, top[0]->mutable_cpu_data()[0]);
-    count_iter++;
 }
 
 template <typename Dtype>
@@ -70,25 +69,25 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
           const int batch, const int channels, const int height,
           const int width, Dtype* counts, float gamma, float alpha) {
     CUDA_KERNEL_LOOP(index, nthreads) {
-    const int fw = index % width;
-    const int fh = (index / width) % height;
-    const int fc = (index / width / height) % channels;
-    const int fn = (index / width / height) / channels;
-    const int dim = (fn * channels + fc) * height * width;
-    const Dtype* label_slice = label + dim;
-    const Dtype* prob_slice = prob_data + dim;
-    const Dtype label_a = label_slice[fh * width + fw];
-    const Dtype prob_a = prob_slice[fh * width + fw];
-    if(label_a == Dtype(1)){
-      bottom_diff[index] = powf(1 - prob_a, alpha) * 
-                                        (alpha * prob_a * log(max(prob_a, Dtype(FLT_MIN))) - (1 - prob_a));
-      counts[index] = 1;
-    }else if(label_a < Dtype(1)){
-      bottom_diff[index] = powf(1 - label_a, gamma) * powf(prob_a, alpha) * 
-                                        ( prob_a - alpha* (1 - prob_a) * log(max(1 - prob_a, Dtype(FLT_MIN))));
-      counts[index] = 0;
+        const int fw = index % width;
+        const int fh = (index / width) % height;
+        const int fc = (index / width / height) % channels;
+        const int fn = (index / width / height) / channels;
+        const int dim = (fn * channels + fc) * height * width;
+        const Dtype* label_slice = label + dim;
+        const Dtype* prob_slice = prob_data + dim;
+        const Dtype label_a = label_slice[fh * width + fw];
+        const Dtype prob_a = prob_slice[fh * width + fw];
+        if(label_a == Dtype(1)){
+            bottom_diff[index] = powf(1 - prob_a, alpha) * 
+                                            (alpha * prob_a * log(max(prob_a, Dtype(FLT_MIN))) - (1 - prob_a));
+            counts[index] = 1;
+        }else if(label_a < Dtype(1)){
+            bottom_diff[index] = powf(1 - label_a, gamma) * powf(prob_a, alpha) * 
+                                            ( prob_a - alpha* (1 - prob_a) * log(max(1 - prob_a, Dtype(FLT_MIN))));
+            counts[index] = 0;
+        }
     }
-  }
 }
 
 template <typename Dtype>
@@ -113,9 +112,13 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_gpu(const vector<Blob<D
             CAFFE_CUDA_NUM_THREADS>>>(nthreads, label, prob_data, bottom_diff,
             batch_, num_class_, height_, width_, counts, gamma_, alpha_);
     
-        Dtype valid_count;
-        caffe_gpu_asum(nthreads, counts, &valid_count);
-        const Dtype loss_weight = top[0]->cpu_diff()[0] / valid_count;
+        Dtype valid_count = -1;
+        if (normalization_ == LossParameter_NormalizationMode_VALID) {
+            caffe_gpu_asum(nthreads, counts, &valid_count);
+        }
+        Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+            normalization_, 1, 1, valid_count);
+        const Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
         caffe_gpu_scal(prob_.count(), loss_weight , bottom_diff);
     }
 }

@@ -174,13 +174,15 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
 
     top[0]->mutable_cpu_data()[0] = 0;
     if (this->layer_param_.propagate_down(0)) {
-        Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-            normalization_, num_, num_gt_, num_gt_);
+        /*Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+            normalization_, num_, num_gt_, num_gt_);*/
         top[0]->mutable_cpu_data()[0] +=
-            loc_weight_ * Dtype(loc_loss_.cpu_data()[0] / normalizer) ;
+            loc_weight_ * Dtype(loc_loss_.cpu_data()[0] /*/ normalizer*/) ;
     }
     if (this->layer_param_.propagate_down(1)) {
-        top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0];
+        /*Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+            normalization_, num_, num_gt_, num_gt_);*/
+        top[0]->mutable_cpu_data()[0] += conf_loss_.cpu_data()[0]/*/ normalizer*/;
     }
     #if 1 
     if(iterations_ % 100 == 0){
@@ -221,9 +223,9 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             //loc_propagate_down.push_back(false);
             loc_loss_layer_->Backward(loc_top_vec_, loc_propagate_down,
                                         loc_bottom_vec_);
-            Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-                normalization_, num_, num_gt_, num_gt_);
-            Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer;
+            /*Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+            normalization_, num_, num_gt_, num_gt_);*/
+            Dtype loss_weight = top[0]->cpu_diff()[0] /*/ normalizer*/;
             caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
             const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
             CopyDiffToBottom(loc_pred_diff, output_width, output_height, 
@@ -242,6 +244,10 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             conf_propagate_down.push_back(false);
             conf_loss_layer_->Backward(conf_top_vec_, conf_propagate_down,
                                         conf_bottom_vec_);
+            /*Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+            normalization_, num_, num_gt_, num_gt_);*/
+            Dtype loss_weight = top[0]->cpu_diff()[0] /*/ normalizer*/;
+            caffe_scal(conf_pred_.count(), loss_weight, conf_pred_.mutable_cpu_diff());
             bottom[1]->ShareDiff(conf_pred_);
         }
     }
