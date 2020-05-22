@@ -8,6 +8,7 @@ layer {
     phase: TEST
   }
   transform_param {
+    scale: 0.007842999882996082
     mean_value: 103.94000244140625
     mean_value: 116.77999877929688
     mean_value: 123.68000030517578
