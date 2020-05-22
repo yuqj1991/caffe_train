@@ -8,6 +8,7 @@ layer {
     phase: TRAIN
   }
   transform_param {
+    scale: 0.007842999882996082
     mirror: true
     mean_value: 103.94000244140625
     mean_value: 116.77999877929688

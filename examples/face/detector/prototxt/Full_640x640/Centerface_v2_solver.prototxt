@@ -17,6 +17,7 @@ snapshot_after_train: true
 test_initialization: false
 average_loss: 10
 stepvalue: 10000
+stepvalue: 30000
 stepvalue: 50000
 stepvalue: 70000
 stepvalue: 90000

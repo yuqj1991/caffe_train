@@ -177,6 +177,7 @@ bbox_sampler = {
 train_transform_param = {
     'mirror': True,
     'mean_value': [103.94, 116.78, 123.68],
+    'scale': 0.007843,
     'resize_param': {
         'prob': 1,
         'resize_mode': P.Resize.WARP,
@@ -269,7 +270,7 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 50000, 70000, 90000],
+    'stepvalue': [10000, 30000, 50000, 70000, 90000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,

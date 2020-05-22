@@ -221,7 +221,7 @@ def CenterFaceObjectDetect(net, from_layers = [],  num_classes = 2,
 
 
 def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.CenterObjectLoss.SMOOTH_L1,
-                         normalization_mode = P.Loss.VALID, num_classes= 1, loc_weight = 1.0, 
+                         normalization_mode = P.Loss.BATCH_SIZE, num_classes= 1, loc_weight = 1.0, 
                          share_location = True, class_type = P.CenterObjectLoss.FOCALSIGMOID):
     center_object_loss_param = {
         'loc_weight': loc_weight,

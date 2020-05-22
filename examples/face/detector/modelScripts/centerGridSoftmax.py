@@ -177,6 +177,7 @@ bbox_sampler = {
 train_transform_param = {
     'mirror': True,
     'mean_value': [103.94, 116.78, 123.68],
+    'scale': 0.007843,
     'resize_param': {
         'prob': 1,
         'resize_mode': P.Resize.WARP,
