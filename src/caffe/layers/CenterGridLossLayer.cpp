@@ -108,7 +108,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     Dtype class_score = Dtype(0.);
     Dtype sum_squre = Dtype(0.);
     caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
-    Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.);
+    Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.), normalizer = Dtype(0.);
     int num_gt_match = 0;
     if (num_groundtruth_ >= 1) {
         const int downRatio = net_height_ / output_height;
@@ -128,8 +128,10 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                             all_gt_bboxes, label_muti_data, bottom_diff, 
                             &count_postive_, &sum_squre, &num_gt_match);
         }
-        loc_loss = sum_squre / num_;
-        score_loss = class_score / num_;
+        normalizer = LossLayer<Dtype>::GetNormalizer(
+            normalization_, num_, 1, count_postive_);
+        loc_loss = sum_squre / normalizer;
+        score_loss = class_score / normalizer;
         top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
     } else {
         top[0]->mutable_cpu_data()[0] = 0;
@@ -139,7 +141,8 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         LOG(INFO)<<"Region "<<output_width
                 <<": total loss: "<<top[0]->mutable_cpu_data()[0]
                 <<", loc loss: "<< loc_loss
-                <<", class loss: "<< score_loss 
+                <<", class loss: "<< score_loss
+                <<", normalizer: "<<normalizer
                 <<", count: "<< count_postive_
                 <<", all gt_boxes: "<<num_groundtruth_
                 <<", this match nums: "<<num_gt_match;
@@ -158,7 +161,9 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     }
     if (propagate_down[0]) {
         Dtype loss_weight = Dtype(0.);
-        loss_weight = top[0]->cpu_diff()[0] / num_;
+        Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
+            normalization_, num_, 1, count_postive_);
+        loss_weight = top[0]->cpu_diff()[0] / normalizer;
         if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SIGMOID){
             const int output_height = bottom[0]->height();
             const int output_width = bottom[0]->width();
