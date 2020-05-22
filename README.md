@@ -8,7 +8,7 @@ facenet tripletloss by caffe
 centernet face + nms version  
 widerface val set  
 hard mid easy  
-72% 84% 85%  
+74% 84% 85%  
 mobilenet-v2 face vggface val accuray  
 99.42%  
 face landmarks + face attributes gender (99.4%)+ bool glasses(99.5%)  
