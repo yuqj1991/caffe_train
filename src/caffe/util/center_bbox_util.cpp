@@ -177,7 +177,7 @@ void soft_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* out
                     }
                     input[pos].set_score(weight * input[pos].score()); 
                     //if box score falls below threshold, discard the box by swapping with last box
-                    // update numBoxes
+                    //update numBoxes
                     if(input[pos].score() < threshold){
                         input[pos].set_xmin(input[numBoxes - 1].xmin());
                         input[pos].set_xmax(input[numBoxes - 1].xmax());
