@@ -196,7 +196,7 @@ layer {
       max_trials: 50
     }
     yoloformat: true
-    crop_type: CROP_JITTER
+    crop_type: CROP_ANCHOR
   }
   data_param {
     source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
@@ -5232,7 +5232,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2
@@ -5259,7 +5259,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2
@@ -5286,7 +5286,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2
@@ -5313,7 +5313,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2

@@ -166,7 +166,7 @@ def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx,  use_relu, l
 
 def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale, 
                          stageidx, from_layers = [], net_height = 640, net_width = 640,
-                         normalization_mode = P.Loss.BATCH_SIZE, num_classes= 2, loc_weight = 1.0, 
+                         normalization_mode = P.Loss.VALID, num_classes= 2, loc_weight = 1.0, 
                          share_location = True, class_type = P.CenterObjectLoss.SOFTMAX):
     center_object_loss_param = {
         'loc_weight': loc_weight,
@@ -190,7 +190,7 @@ def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale,
 
 
 def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = [], num_classes = 2,
-                           nms_thresh = 0.3,  keep_top_k = 250,
+                           nms_thresh = 0.3,  keep_top_k = 200,
                            class_type = P.DetectionOutput.SOFTMAX, 
                            share_location = True, confidence_threshold = 0.15):
     det_out_param = {
@@ -207,7 +207,7 @@ def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = 
                                                 include=dict(phase=caffe_pb2.Phase.Value('TEST')))
 
 def CenterFaceObjectDetect(net, from_layers = [],  num_classes = 2,
-                           keep_top_k = 250, nms_thresh = 0.3,
+                           keep_top_k = 200, nms_thresh = 0.3,
                            share_location = True, confidence_threshold = 0.15):
     det_out_param = {
         'num_classes': num_classes,
@@ -221,7 +221,7 @@ def CenterFaceObjectDetect(net, from_layers = [],  num_classes = 2,
 
 
 def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.CenterObjectLoss.SMOOTH_L1,
-                         normalization_mode = P.Loss.BATCH_SIZE, num_classes= 1, loc_weight = 1.0, 
+                         normalization_mode = P.Loss.VALID, num_classes= 1, loc_weight = 1.0, 
                          share_location = True, class_type = P.CenterObjectLoss.FOCALSIGMOID):
     center_object_loss_param = {
         'loc_weight': loc_weight,

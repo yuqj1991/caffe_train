@@ -5063,7 +5063,7 @@ layer {
   detection_output_param {
     num_classes: 2
     share_location: true
-    keep_top_k: 250
+    keep_top_k: 200
     confidence_threshold: 0.15000000596046448
     bias_scale: 438
     bias_scale: 192

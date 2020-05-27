@@ -75,6 +75,10 @@ void SelectHardSampleSigmoid(Dtype *label_data, Dtype *pred_data, const int nega
 template <typename Dtype> 
 Dtype FocalLossSigmoid(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bottom_diff);
 
+template <typename Dtype>
+Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 
+                Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2);
+
 }  // namespace caffe
 
 #endif  

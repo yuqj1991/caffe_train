@@ -418,6 +418,45 @@ template void SelectHardSampleSoftMax(double *label_data, std::vector<double> ba
                           const int num_channels, const int batch_size);
 
 
+template <typename Dtype>
+Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 
+                Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2){
+
+    Dtype p_xmin = predict_box.xmin();
+    Dtype p_xmax = predict_box.xmax();
+    Dtype p_ymin = predict_box.ymin();
+    Dtype p_ymax = predict_box.ymax();
+    Dtype p_area = (p_xmax - p_xmin) *(p_ymax - p_ymin);
+
+    Dtype gt_xmin = gt_bbox.xmin();
+    Dtype gt_xmax = gt_bbox.xmax();
+    Dtype gt_ymin = gt_bbox.ymin();
+    Dtype gt_ymax = gt_bbox.ymax();
+    Dtype gt_area = (gt_xmax - gt_xmin) *(gt_ymax - gt_ymin);
+
+    Dtype iou_xmin = std::max(p_xmin, gt_xmin), iou_xmax = std::min(p_xmax, gt_xmax);
+    Dtype iou_ymin = std::max(p_ymin, gt_ymin), iou_ymax = std::min(p_ymax, gt_ymax);
+    Dtype iou_height = (iou_ymax >= iou_ymin)?(iou_ymax - iou_ymin) : 0;
+    Dtype iou_width = (iou_xmax >= iou_xmin)?(iou_xmax - iou_xmin) : 0;
+    Dtype iou_area = iou_height * iou_width;
+
+    Dtype Iou = Dtype(iou_area/(p_area + gt_area - iou_area));
+
+    Dtype c_xmin = std::min(p_xmin, gt_xmin), c_xmax = std::max(p_xmax, gt_xmax);
+    Dtype c_ymin = std::min(p_ymin, gt_ymin), c_ymax = std::max(p_ymax, gt_ymax);
+    Dtype c_area = (c_xmax - c_xmin) * (c_ymax - c_ymin);
+
+    Dtype GIou = Iou - Dtype((c_area - (p_area + gt_area - iou_area)) / c_area);
+
+    diff_x1 = 0.;
+
+    return GIou;
+}
+
+template float GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, float* diff_x1, 
+                float* diff_x2, float* diff_y1, float* diff_y2);
+template double GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, double* diff_x1, 
+                double* diff_x2, double* diff_y1, double* diff_y2);
 
 
 }  // namespace caffe

@@ -260,7 +260,7 @@ elif normalization_mode == P.Loss.FULL:
     base_learning_rate *= 2000.
 
 # Evaluate on whole test set.
-num_test_image = 5000
+num_test_image = 3219
 test_batch_size = 1
 # Ideally test_batch_size should be divisible by num_test_image,
 # otherwise mAP will be slightly off the true value.
@@ -279,7 +279,7 @@ solver_param = {
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
-    'type': "RMSProp",
+    'type': "Adam",
     'solver_mode': "GPU",
     'device_id': 0,
     'debug_info': False,
@@ -304,7 +304,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         train=True, output_label=True, label_map_file=labelmapPath,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
-        crop_type = P.AnnotatedData.CROP_JITTER, YoloForamte = True)
+        crop_type = P.AnnotatedData.CROP_ANCHOR, YoloForamte = True)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
 bias_scale = [438, 192, 80, 19]
