@@ -448,7 +448,7 @@ Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x
 
     Dtype GIou = Iou - Dtype((c_area - (p_area + gt_area - iou_area)) / c_area);
 
-    diff_x1 = 0.;
+    //diff_x1 = 0.;
 
     return GIou;
 }
