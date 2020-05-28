@@ -380,7 +380,7 @@ with open(solver_file, 'w') as f:
 #创建 train_center_face.sh
 
 # Create job file.
-train_src_param = '# --snapshot={}_iter_{}.solverstate '.format(snapshot_dir, 5000)
+train_src_param = '# --snapshot={}_0_iter_{}.solverstate '.format(snapshot_dir, 5000)
 job_file = "../train_scripts/train_{}.sh".format('center_face_v2')
 with open(job_file, 'w') as f:
     f.write('#!/bin/sh \n')

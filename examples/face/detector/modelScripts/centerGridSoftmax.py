@@ -304,7 +304,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         train=True, output_label=True, label_map_file=labelmapPath,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
-        crop_type = P.AnnotatedData.CROP_ANCHOR, YoloForamte = True)
+        crop_type = P.AnnotatedData.CROP_JITTER, YoloForamte = True)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
 bias_scale = [438, 192, 80, 19]
@@ -378,7 +378,7 @@ with open(solver_file, 'w') as f:
 
 
 # Create job file.
-train_src_param = '# --snapshot={}_iter_{}.solverstate '.format(snapshot_dir, 5000)
+train_src_param = '# --snapshot={}_0_iter_{}.solverstate '.format(snapshot_dir, 5000)
 job_file = "../train_scripts/train_{}.sh".format('centerGridSoftmax_face_v2')
 with open(job_file, 'w') as f:
     f.write('#!/bin/sh \n')
