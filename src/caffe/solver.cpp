@@ -760,8 +760,8 @@ void Solver<Dtype>::CheckSnapshotWritePermissions() {
 
 template <typename Dtype>
 string Solver<Dtype>::SnapshotFilename(const string extension) {
-    return param_.snapshot_prefix() + "_iter_" + caffe::format_int(iter_)
-        + caffe::format_int(int(max_mAP * 100))
+    return param_.snapshot_prefix() + "_" + caffe::format_int(int(current_mAP * 100))
+        + "_iter_" + caffe::format_int(iter_)
         + extension;
 }
 

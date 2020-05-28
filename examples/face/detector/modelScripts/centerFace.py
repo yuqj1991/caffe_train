@@ -262,7 +262,7 @@ elif normalization_mode == P.Loss.FULL:
 refine_learning_rate = 1.25e-4
 
 # Evaluate on whole test set.
-num_test_image = 5000
+num_test_image = 3219
 test_batch_size = 1
 # Ideally test_batch_size should be divisible by num_test_image,
 # otherwise mAP will be slightly off the true value.
