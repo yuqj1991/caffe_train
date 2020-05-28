@@ -204,10 +204,6 @@ train_transform_param = {
         'saturation_upper': 1.5,
         'random_order_prob': 0.0,
     },
-    'expand_param': {
-        'prob': 0.5,
-        'max_expand_ratio': 2.0,
-    },
     'emit_constraint': {
         'emit_type': caffe_pb2.EmitConstraint.CENTER,
     }
