@@ -102,7 +102,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
   for(int i = 0; i < num_; i++){
     if(results_.find(i) != results_.end()){
       std::vector<CenterNetInfo > result_temp = results_.find(i)->second;
-      LOG(INFO)<<"batch_id "<<i << " detection results: "<<result_temp.size();
+      // LOG(INFO)<<"batch_id "<<i << " detection results: "<<result_temp.size();
       for(unsigned j = 0; j < result_temp.size(); ++j){
         top_data[count * 7] = i;
         top_data[count * 7 + 1] = result_temp[j].class_id() + 1;
