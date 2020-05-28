@@ -275,7 +275,7 @@ solver_param = {
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
-    'type': "Adam",
+    'type': "RMSProp",
     'solver_mode': "GPU",
     'device_id': 0,
     'debug_info': False,

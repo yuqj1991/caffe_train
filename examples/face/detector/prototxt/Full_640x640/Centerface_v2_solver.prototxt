@@ -22,7 +22,7 @@ stepvalue: 50000
 stepvalue: 70000
 stepvalue: 90000
 iter_size: 2
-type: "Adam"
+type: "RMSProp"
 eval_type: "detection"
 ap_version: "11point"
 

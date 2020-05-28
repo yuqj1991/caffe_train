@@ -164,95 +164,95 @@ void CopyLayers(caffe::Solver<float>* solver, const std::string& model_list) {
 // corresponding enumeration.
 caffe::SolverAction::Enum GetRequestedAction(
     const std::string& flag_value) {
-  if (flag_value == "stop") {
-    return caffe::SolverAction::STOP;
-  }
-  if (flag_value == "snapshot") {
-    return caffe::SolverAction::SNAPSHOT;
-  }
-  if (flag_value == "none") {
-    return caffe::SolverAction::NONE;
-  }
-  LOG(FATAL) << "Invalid signal effect \""<< flag_value << "\" was specified";
+    if (flag_value == "stop") {
+        return caffe::SolverAction::STOP;
+    }
+    if (flag_value == "snapshot") {
+        return caffe::SolverAction::SNAPSHOT;
+    }
+    if (flag_value == "none") {
+        return caffe::SolverAction::NONE;
+    }
+    LOG(FATAL) << "Invalid signal effect \""<< flag_value << "\" was specified";
 }
 
 // Train / Finetune a model.
 int train() {
-  CHECK_GT(FLAGS_solver.size(), 0) << "Need a solver definition to train.";
-  CHECK(!FLAGS_snapshot.size() || !FLAGS_weights.size())
-      << "Give a snapshot to resume training or weights to finetune "
-      "but not both.";
-  vector<string> stages = get_stages_from_flags();
+    CHECK_GT(FLAGS_solver.size(), 0) << "Need a solver definition to train.";
+    CHECK(!FLAGS_snapshot.size() || !FLAGS_weights.size())
+        << "Give a snapshot to resume training or weights to finetune "
+        "but not both.";
+    vector<string> stages = get_stages_from_flags();
 
-  caffe::SolverParameter solver_param;
-  caffe::ReadSolverParamsFromTextFileOrDie(FLAGS_solver, &solver_param);
+    caffe::SolverParameter solver_param;
+    caffe::ReadSolverParamsFromTextFileOrDie(FLAGS_solver, &solver_param);
 
-  solver_param.mutable_train_state()->set_level(FLAGS_level);
-  for (int i = 0; i < stages.size(); i++) {
-    solver_param.mutable_train_state()->add_stage(stages[i]);
-  }
-
-  // If the gpus flag is not provided, allow the mode and device to be set
-  // in the solver prototxt.
-  if (FLAGS_gpu.size() == 0
-      && solver_param.solver_mode() == caffe::SolverParameter_SolverMode_GPU) {
-      if (solver_param.has_device_id()) {
-          FLAGS_gpu = "" +
-              boost::lexical_cast<string>(solver_param.device_id());
-      } else {  // Set default GPU if unspecified
-          FLAGS_gpu = "" + boost::lexical_cast<string>(0);
-      }
-  }
-
-  vector<int> gpus;
-  get_gpus(&gpus);
-  if (gpus.size() == 0) {
-    LOG(INFO) << "Use CPU.";
-    Caffe::set_mode(Caffe::CPU);
-  } else {
-    ostringstream s;
-    for (int i = 0; i < gpus.size(); ++i) {
-      s << (i ? ", " : "") << gpus[i];
+    solver_param.mutable_train_state()->set_level(FLAGS_level);
+    for (int i = 0; i < stages.size(); i++) {
+        solver_param.mutable_train_state()->add_stage(stages[i]);
     }
-    LOG(INFO) << "Using GPUs " << s.str();
-#ifndef CPU_ONLY
-    cudaDeviceProp device_prop;
-    for (int i = 0; i < gpus.size(); ++i) {
-      cudaGetDeviceProperties(&device_prop, gpus[i]);
-      LOG(INFO) << "GPU " << gpus[i] << ": " << device_prop.name;
+
+    // If the gpus flag is not provided, allow the mode and device to be set
+    // in the solver prototxt.
+    if (FLAGS_gpu.size() == 0
+        && solver_param.solver_mode() == caffe::SolverParameter_SolverMode_GPU) {
+        if (solver_param.has_device_id()) {
+            FLAGS_gpu = "" +
+                boost::lexical_cast<string>(solver_param.device_id());
+        } else {  // Set default GPU if unspecified
+            FLAGS_gpu = "" + boost::lexical_cast<string>(0);
+        }
     }
-#endif
-    solver_param.set_device_id(gpus[0]);
-    Caffe::SetDevice(gpus[0]);
-    Caffe::set_mode(Caffe::GPU);
-    Caffe::set_solver_count(gpus.size());
-  }
 
-  caffe::SignalHandler signal_handler(
-        GetRequestedAction(FLAGS_sigint_effect),
-        GetRequestedAction(FLAGS_sighup_effect));
+    vector<int> gpus;
+    get_gpus(&gpus);
+    if (gpus.size() == 0) {
+        LOG(INFO) << "Use CPU.";
+        Caffe::set_mode(Caffe::CPU);
+    } else {
+        ostringstream s;
+        for (int i = 0; i < gpus.size(); ++i) {
+        s << (i ? ", " : "") << gpus[i];
+        }
+        LOG(INFO) << "Using GPUs " << s.str();
+    #ifndef CPU_ONLY
+        cudaDeviceProp device_prop;
+        for (int i = 0; i < gpus.size(); ++i) {
+        cudaGetDeviceProperties(&device_prop, gpus[i]);
+        LOG(INFO) << "GPU " << gpus[i] << ": " << device_prop.name;
+        }
+    #endif
+        solver_param.set_device_id(gpus[0]);
+        Caffe::SetDevice(gpus[0]);
+        Caffe::set_mode(Caffe::GPU);
+        Caffe::set_solver_count(gpus.size());
+    }
 
-  shared_ptr<caffe::Solver<float> >
-      solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
+    caffe::SignalHandler signal_handler(
+            GetRequestedAction(FLAGS_sigint_effect),
+            GetRequestedAction(FLAGS_sighup_effect));
 
-  solver->SetActionFunction(signal_handler.GetActionFunction());
+    shared_ptr<caffe::Solver<float> >
+        solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
 
-  if (FLAGS_snapshot.size()) {
-    LOG(INFO) << "Resuming from " << FLAGS_snapshot;
-    solver->Restore(FLAGS_snapshot.c_str());
-  } else if (FLAGS_weights.size()) {
-    CopyLayers(solver.get(), FLAGS_weights);
-  }
+    solver->SetActionFunction(signal_handler.GetActionFunction());
 
-  if (gpus.size() > 1) {
-    caffe::P2PSync<float> sync(solver, NULL, solver->param());
-    sync.Run(gpus);
-  } else {
-    LOG(INFO) << "Starting Optimization";
-    solver->Solve();
-  }
-  LOG(INFO) << "Optimization Done.";
-  return 0;
+    if (FLAGS_snapshot.size()) {
+        LOG(INFO) << "Resuming from " << FLAGS_snapshot;
+        solver->Restore(FLAGS_snapshot.c_str());
+    } else if (FLAGS_weights.size()) {
+        CopyLayers(solver.get(), FLAGS_weights);
+    }
+
+    if (gpus.size() > 1) {
+        caffe::P2PSync<float> sync(solver, NULL, solver->param());
+        sync.Run(gpus);
+    } else {
+        LOG(INFO) << "Starting Optimization";
+        solver->Solve();
+    }
+    LOG(INFO) << "Optimization Done.";
+    return 0;
 }
 RegisterBrewFunction(train);
 
