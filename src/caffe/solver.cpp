@@ -435,7 +435,7 @@ void Solver<Dtype>::TestClassification(const int test_net_id) {
 }
 template <typename Dtype>
 void Solver<Dtype>::TestDetection(const int test_net_id) {
-  CHECK(Caffe::root_solver());
+    CHECK(Caffe::root_solver());
     LOG(INFO) << "Iteration " << iter_
                 << ", Testing net (#" << test_net_id << ")";
     CHECK_NOTNULL(test_nets_[test_net_id].get())->

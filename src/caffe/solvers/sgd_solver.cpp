@@ -291,22 +291,24 @@ void SGDSolver<Dtype>::SnapshotSolverState(const string& model_filename) {
 template <typename Dtype>
 void SGDSolver<Dtype>::SnapshotSolverStateToBinaryProto(
     const string& model_filename) {
-  SolverState state;
-  state.set_iter(this->iter_);
-  state.set_learned_net(model_filename);
-  state.set_current_step(this->current_step_);
-  state.set_iter_last_event(this->iter_last_event_);
-  state.set_minimum_loss(this->minimum_loss_);
-  state.clear_history();
-  for (int i = 0; i < history_.size(); ++i) {
-    // Add history
-    BlobProto* history_blob = state.add_history();
-    history_[i]->ToProto(history_blob);
-  }
-  string snapshot_filename = Solver<Dtype>::SnapshotFilename(".solverstate");
-  LOG(INFO)
-    << "Snapshotting solver state to binary proto file " << snapshot_filename;
-  WriteProtoToBinaryFile(state, snapshot_filename.c_str());
+    SolverState state;
+    state.set_iter(this->iter_);
+    state.set_learned_net(model_filename);
+    state.set_current_step(this->current_step_);
+    state.set_iter_last_event(this->iter_last_event_);
+    state.set_minimum_loss(this->minimum_loss_);
+    state.set_current_accuracy(this->current_accuracy_);
+    state.set_max_accuracy(this->max_accuracy_);
+    state.clear_history();
+    for (int i = 0; i < history_.size(); ++i) {
+        // Add history
+        BlobProto* history_blob = state.add_history();
+        history_[i]->ToProto(history_blob);
+    }
+    string snapshot_filename = Solver<Dtype>::SnapshotFilename(".solverstate");
+    LOG(INFO)
+        << "Snapshotting solver state to binary proto file " << snapshot_filename;
+    WriteProtoToBinaryFile(state, snapshot_filename.c_str());
 }
 
 template <typename Dtype>
@@ -340,53 +342,53 @@ void SGDSolver<Dtype>::SnapshotSolverStateToHDF5(
 template <typename Dtype>
 void SGDSolver<Dtype>::RestoreSolverStateFromBinaryProto(
     const string& state_file) {
-  SolverState state;
-  ReadProtoFromBinaryFile(state_file, &state);
-  this->iter_ = state.iter();
-  this->max_accuracy_ = state.max_accuracy();
-  this->current_accuracy_ = state.current_accuracy();
-  if (state.has_learned_net()) {
-    NetParameter net_param;
-    ReadNetParamsFromBinaryFileOrDie(state.learned_net().c_str(), &net_param);
-    this->net_->CopyTrainedLayersFrom(net_param);
-  }
-  this->current_step_ = state.current_step();
-  this->iter_last_event_ = state.iter_last_event();
-  this->minimum_loss_ = state.minimum_loss();
-  CHECK_EQ(state.history_size(), history_.size())
-      << "Incorrect length of history blobs.";
-  LOG(INFO) <<"SGDSolver: restoring history"<<", current_accuracy: "<<this->current_accuracy_
-            <<", max_accuracy: "<<this->max_accuracy_;
-  for (int i = 0; i < history_.size(); ++i) {
-    history_[i]->FromProto(state.history(i));
-  }
+    SolverState state;
+    ReadProtoFromBinaryFile(state_file, &state);
+    this->iter_ = state.iter();
+    this->max_accuracy_ = state.max_accuracy();
+    this->current_accuracy_ = state.current_accuracy();
+    if (state.has_learned_net()) {
+        NetParameter net_param;
+        ReadNetParamsFromBinaryFileOrDie(state.learned_net().c_str(), &net_param);
+        this->net_->CopyTrainedLayersFrom(net_param);
+    }
+    this->current_step_ = state.current_step();
+    this->iter_last_event_ = state.iter_last_event();
+    this->minimum_loss_ = state.minimum_loss();
+    CHECK_EQ(state.history_size(), history_.size())
+        << "Incorrect length of history blobs.";
+    LOG(INFO) <<"SGDSolver: restoring history"<<", current_accuracy: "<<this->current_accuracy_
+                <<", max_accuracy: "<<this->max_accuracy_;
+    for (int i = 0; i < history_.size(); ++i) {
+        history_[i]->FromProto(state.history(i));
+    }
 }
 
 template <typename Dtype>
 void SGDSolver<Dtype>::RestoreSolverStateFromHDF5(const string& state_file) {
-  hid_t file_hid = H5Fopen(state_file.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-  CHECK_GE(file_hid, 0) << "Couldn't open solver state file " << state_file;
-  this->iter_ = hdf5_load_int(file_hid, "iter");
-  if (H5LTfind_dataset(file_hid, "learned_net")) {
-    string learned_net = hdf5_load_string(file_hid, "learned_net");
-    this->net_->CopyTrainedLayersFrom(learned_net);
-  }
-  this->current_step_ = hdf5_load_int(file_hid, "current_step");
-  this->iter_last_event_ = hdf5_load_int(file_hid, "iter_last_event");
-  this->minimum_loss_ = hdf5_load_float<Dtype>(file_hid, "minimum_loss");
-  hid_t history_hid = H5Gopen2(file_hid, "history", H5P_DEFAULT);
-  CHECK_GE(history_hid, 0) << "Error reading history from " << state_file;
-  int state_history_size = hdf5_get_num_links(history_hid);
-  CHECK_EQ(state_history_size, history_.size())
-      << "Incorrect length of history blobs.";
-  for (int i = 0; i < history_.size(); ++i) {
-    ostringstream oss;
-    oss << i;
-    hdf5_load_nd_dataset<Dtype>(history_hid, oss.str().c_str(), 0,
-                                kMaxBlobAxes, history_[i].get());
-  }
-  H5Gclose(history_hid);
-  H5Fclose(file_hid);
+    hid_t file_hid = H5Fopen(state_file.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+    CHECK_GE(file_hid, 0) << "Couldn't open solver state file " << state_file;
+    this->iter_ = hdf5_load_int(file_hid, "iter");
+    if (H5LTfind_dataset(file_hid, "learned_net")) {
+        string learned_net = hdf5_load_string(file_hid, "learned_net");
+        this->net_->CopyTrainedLayersFrom(learned_net);
+    }
+    this->current_step_ = hdf5_load_int(file_hid, "current_step");
+    this->iter_last_event_ = hdf5_load_int(file_hid, "iter_last_event");
+    this->minimum_loss_ = hdf5_load_float<Dtype>(file_hid, "minimum_loss");
+    hid_t history_hid = H5Gopen2(file_hid, "history", H5P_DEFAULT);
+    CHECK_GE(history_hid, 0) << "Error reading history from " << state_file;
+    int state_history_size = hdf5_get_num_links(history_hid);
+    CHECK_EQ(state_history_size, history_.size())
+        << "Incorrect length of history blobs.";
+    for (int i = 0; i < history_.size(); ++i) {
+        ostringstream oss;
+        oss << i;
+        hdf5_load_nd_dataset<Dtype>(history_hid, oss.str().c_str(), 0,
+                                    kMaxBlobAxes, history_[i].get());
+    }
+    H5Gclose(history_hid);
+    H5Fclose(file_hid);
 }
 
 INSTANTIATE_CLASS(SGDSolver);
