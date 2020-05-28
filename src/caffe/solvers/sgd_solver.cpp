@@ -132,45 +132,45 @@ void SGDSolver<Dtype>::ClipGradients() {
 
 template <typename Dtype>
 void SGDSolver<Dtype>::ApplyUpdate() {
-  CHECK(Caffe::root_solver());
-  Dtype rate = GetLearningRate();
-  if (this->param_.display() && this->iter_ % this->param_.display() == 0) {
-    LOG(INFO) << "Iteration " << this->iter_ << ", lr = " << rate;
-  }
-  ClipGradients();
-  for (int param_id = 0; param_id < this->net_->learnable_params().size();
-       ++param_id) {
-    Normalize(param_id);
-    Regularize(param_id);
-    ComputeUpdateValue(param_id, rate);
-  }
-  this->net_->Update();
+    CHECK(Caffe::root_solver());
+    Dtype rate = GetLearningRate();
+    if (this->param_.display() && this->iter_ % this->param_.display() == 0) {
+        LOG(INFO) << "Iteration " << this->iter_ << ", lr = " << rate;
+    }
+    ClipGradients();
+    for (int param_id = 0; param_id < this->net_->learnable_params().size();
+        ++param_id) {
+        Normalize(param_id);
+        Regularize(param_id);
+        ComputeUpdateValue(param_id, rate);
+    }
+    this->net_->Update();
 }
 
 template <typename Dtype>
 void SGDSolver<Dtype>::Normalize(int param_id) {
-  if (this->param_.iter_size() == 1) { return; }
-  // Scale gradient to counterbalance accumulation.
-  const vector<Blob<Dtype>*>& net_params = this->net_->learnable_params();
-  const Dtype accum_normalization = Dtype(1.) / this->param_.iter_size();
-  switch (Caffe::mode()) {
-  case Caffe::CPU: {
-    caffe_scal(net_params[param_id]->count(), accum_normalization,
-        net_params[param_id]->mutable_cpu_diff());
-    break;
-  }
-  case Caffe::GPU: {
-#ifndef CPU_ONLY
-    caffe_gpu_scal(net_params[param_id]->count(), accum_normalization,
-        net_params[param_id]->mutable_gpu_diff());
-#else
-    NO_GPU;
-#endif
-    break;
-  }
-  default:
-    LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
-  }
+    if (this->param_.iter_size() == 1) { return; }
+    // Scale gradient to counterbalance accumulation.
+    const vector<Blob<Dtype>*>& net_params = this->net_->learnable_params();
+    const Dtype accum_normalization = Dtype(1.) / this->param_.iter_size();
+    switch (Caffe::mode()) {
+    case Caffe::CPU: {
+        caffe_scal(net_params[param_id]->count(), accum_normalization,
+            net_params[param_id]->mutable_cpu_diff());
+        break;
+    }
+    case Caffe::GPU: {
+    #ifndef CPU_ONLY
+        caffe_gpu_scal(net_params[param_id]->count(), accum_normalization,
+            net_params[param_id]->mutable_gpu_diff());
+    #else
+        NO_GPU;
+    #endif
+        break;
+    }
+    default:
+        LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
+    }
 }
 
 template <typename Dtype>
@@ -243,35 +243,35 @@ void sgd_update_gpu(int N, Dtype* g, Dtype* h, Dtype momentum,
 
 template <typename Dtype>
 void SGDSolver<Dtype>::ComputeUpdateValue(int param_id, Dtype rate) {
-  const vector<Blob<Dtype>*>& net_params = this->net_->learnable_params();
-  const vector<float>& net_params_lr = this->net_->params_lr();
-  Dtype momentum = this->param_.momentum();
-  Dtype local_rate = rate * net_params_lr[param_id];
-  // Compute the update to history, then copy it to the parameter diff.
-  switch (Caffe::mode()) {
-  case Caffe::CPU: {
-    caffe_cpu_axpby(net_params[param_id]->count(), local_rate,
-              net_params[param_id]->cpu_diff(), momentum,
-              history_[param_id]->mutable_cpu_data());
-    caffe_copy(net_params[param_id]->count(),
-        history_[param_id]->cpu_data(),
-        net_params[param_id]->mutable_cpu_diff());
-    break;
-  }
-  case Caffe::GPU: {
-#ifndef CPU_ONLY
-    sgd_update_gpu(net_params[param_id]->count(),
-        net_params[param_id]->mutable_gpu_diff(),
-        history_[param_id]->mutable_gpu_data(),
-        momentum, local_rate);
-#else
-    NO_GPU;
-#endif
-    break;
-  }
-  default:
-    LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
-  }
+    const vector<Blob<Dtype>*>& net_params = this->net_->learnable_params();
+    const vector<float>& net_params_lr = this->net_->params_lr();
+    Dtype momentum = this->param_.momentum();
+    Dtype local_rate = rate * net_params_lr[param_id];
+    // Compute the update to history, then copy it to the parameter diff.
+    switch (Caffe::mode()) {
+        case Caffe::CPU: {
+            caffe_cpu_axpby(net_params[param_id]->count(), local_rate,
+                    net_params[param_id]->cpu_diff(), momentum,
+                    history_[param_id]->mutable_cpu_data());
+            caffe_copy(net_params[param_id]->count(),
+                history_[param_id]->cpu_data(),
+                net_params[param_id]->mutable_cpu_diff());
+            break;
+        }
+        case Caffe::GPU: {
+        #ifndef CPU_ONLY
+            sgd_update_gpu(net_params[param_id]->count(),
+                net_params[param_id]->mutable_gpu_diff(),
+                history_[param_id]->mutable_gpu_data(),
+                momentum, local_rate);
+        #else
+            NO_GPU;
+        #endif
+            break;
+        }
+        default:
+            LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
+    }
 }
 
 template <typename Dtype>
@@ -314,29 +314,29 @@ void SGDSolver<Dtype>::SnapshotSolverStateToBinaryProto(
 template <typename Dtype>
 void SGDSolver<Dtype>::SnapshotSolverStateToHDF5(
     const string& model_filename) {
-  string snapshot_filename =
-      Solver<Dtype>::SnapshotFilename(".solverstate.h5");
-  LOG(INFO) << "Snapshotting solver state to HDF5 file " << snapshot_filename;
-  hid_t file_hid = H5Fcreate(snapshot_filename.c_str(), H5F_ACC_TRUNC,
-      H5P_DEFAULT, H5P_DEFAULT);
-  CHECK_GE(file_hid, 0)
-      << "Couldn't open " << snapshot_filename << " to save solver state.";
-  hdf5_save_int(file_hid, "iter", this->iter_);
-  hdf5_save_string(file_hid, "learned_net", model_filename);
-  hdf5_save_int(file_hid, "current_step", this->current_step_);
-  hdf5_save_int(file_hid, "iter_last_event", this->iter_last_event_);
-  hdf5_save_float<Dtype>(file_hid, "minimum_loss", this->minimum_loss_);
-  hid_t history_hid = H5Gcreate2(file_hid, "history", H5P_DEFAULT, H5P_DEFAULT,
-      H5P_DEFAULT);
-  CHECK_GE(history_hid, 0)
-      << "Error saving solver state to " << snapshot_filename << ".";
-  for (int i = 0; i < history_.size(); ++i) {
-    ostringstream oss;
-    oss << i;
-    hdf5_save_nd_dataset<Dtype>(history_hid, oss.str(), *history_[i]);
-  }
-  H5Gclose(history_hid);
-  H5Fclose(file_hid);
+    string snapshot_filename =
+        Solver<Dtype>::SnapshotFilename(".solverstate.h5");
+    LOG(INFO) << "Snapshotting solver state to HDF5 file " << snapshot_filename;
+    hid_t file_hid = H5Fcreate(snapshot_filename.c_str(), H5F_ACC_TRUNC,
+        H5P_DEFAULT, H5P_DEFAULT);
+    CHECK_GE(file_hid, 0)
+        << "Couldn't open " << snapshot_filename << " to save solver state.";
+    hdf5_save_int(file_hid, "iter", this->iter_);
+    hdf5_save_string(file_hid, "learned_net", model_filename);
+    hdf5_save_int(file_hid, "current_step", this->current_step_);
+    hdf5_save_int(file_hid, "iter_last_event", this->iter_last_event_);
+    hdf5_save_float<Dtype>(file_hid, "minimum_loss", this->minimum_loss_);
+    hid_t history_hid = H5Gcreate2(file_hid, "history", H5P_DEFAULT, H5P_DEFAULT,
+        H5P_DEFAULT);
+    CHECK_GE(history_hid, 0)
+        << "Error saving solver state to " << snapshot_filename << ".";
+    for (int i = 0; i < history_.size(); ++i) {
+        ostringstream oss;
+        oss << i;
+        hdf5_save_nd_dataset<Dtype>(history_hid, oss.str(), *history_[i]);
+    }
+    H5Gclose(history_hid);
+    H5Fclose(file_hid);
 }
 
 template <typename Dtype>
