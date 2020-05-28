@@ -22,8 +22,8 @@ import subprocess
 trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
 valDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
 labelmapPath = "../labelmap.prototxt"
-resize_width = 800
-resize_height = 800
+resize_width = 640
+resize_height = 640
 resize = "{}x{}".format(resize_width, resize_height)
 batch_sampler = [
     {
@@ -270,7 +270,7 @@ test_iter = int(math.ceil(float(num_test_image) / test_batch_size))
 
 solver_param = {
     # Train parameters
-    'base_lr': refine_learning_rate,
+    'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
     'stepvalue': [10000, 30000, 50000, 70000, 90000],

@@ -4534,7 +4534,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 1
