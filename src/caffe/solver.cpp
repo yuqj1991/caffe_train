@@ -270,7 +270,7 @@ void Solver<Dtype>::Step(int iters) {
         SolverAction::Enum request = GetRequestedAction();
 
         // Save a snapshot if needed.
-        if ((param_.snapshot()
+        if ((param_.snapshot() && iter_ != 0
             && iter_ % param_.snapshot() == 0
             && Caffe::root_solver()) ||
             (request == SolverAction::SNAPSHOT)) {
