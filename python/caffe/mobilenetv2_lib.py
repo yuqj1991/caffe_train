@@ -166,7 +166,7 @@ def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx,  use_relu, l
 
 def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale, 
                          stageidx, from_layers = [], net_height = 640, net_width = 640,
-                         normalization_mode = P.Loss.VALID, num_classes= 2, loc_weight = 1.0, 
+                         normalization_mode = P.Loss.BATCH_SIZE, num_classes= 2, loc_weight = 1.0, 
                          share_location = True, class_type = P.CenterObjectLoss.SOFTMAX):
     center_object_loss_param = {
         'loc_weight': loc_weight,
