@@ -82,8 +82,8 @@ bool ReadProtoFromBinaryFile(const char* filename, Message* proto) {
 }
 
 void WriteProtoToBinaryFile(const Message& proto, const char* filename) {
-  fstream output(filename, ios::out | ios::trunc | ios::binary);
-  CHECK(proto.SerializeToOstream(&output));
+    fstream output(filename, ios::out | ios::trunc | ios::binary);
+    CHECK(proto.SerializeToOstream(&output));
 }
 
 #ifdef USE_OPENCV
@@ -274,75 +274,6 @@ bool ReadRichFaceAttributeToAnnotatedDatum(const string& filename,
   }
 }
 
-bool ReadRichFaceContourToAnnotatedDatum(const string& filename,
-    const string& labelfile, const int height, const int width,
-    const int min_dim, const int max_dim, const bool is_color,
-    const string& encoding, const AnnoFaceContourDatum_AnnoType type,
-    const string& labeltype, AnnoFaceContourDatum* anno_datum){
-  // Read image to datum.
-  bool status = ReadImageToDatum(filename, -1, height, width,
-                                 min_dim, max_dim, is_color, encoding,
-                                 anno_datum->mutable_datum());
-  if (status == false) {
-    return status;
-  }
-  anno_datum->clear_facecontour();
-  if (!boost::filesystem::exists(labelfile)) {
-    return true;
-  }
-  // annno type bbox or attributes
-  switch (type) {
-    case AnnoFaceContourDatum_AnnoType_FACECONTOUR:
-      int ori_height, ori_width;
-      GetImageSize(filename, &ori_height, &ori_width);
-      if (labeltype == "txt") {
-        return ReadFaceContourTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                       anno_datum);
-      } else {
-        LOG(FATAL) << "Unknown label file type.";
-        return false;
-      }
-      break;
-    default:
-      LOG(FATAL) << "Unknown annotation type.";
-      return false;
-  }
-}
-
-bool ReadRichFaceAngleToAnnotatedDatum(const string& filename,
-    const string& labelfile, const int height, const int width,
-    const int min_dim, const int max_dim, const bool is_color,
-    const string& encoding, const AnnoFaceAngleDatum_AnnoType type,
-    const string& labeltype, AnnoFaceAngleDatum* anno_datum){
-  // Read image to datum.
-  bool status = ReadImageToDatum(filename, -1, height, width,
-                                 min_dim, max_dim, is_color, encoding,
-                                 anno_datum->mutable_datum());
-  if (status == false) {
-    return status;
-  }
-  anno_datum->clear_faceangle();
-  if (!boost::filesystem::exists(labelfile)) {
-    return true;
-  }
-  // annno type bbox or attributes
-  switch (type) {
-    case AnnoFaceAngleDatum_AnnoType_FACEANGLE:
-      int ori_height, ori_width;
-      GetImageSize(filename, &ori_height, &ori_width);
-      if (labeltype == "txt") {
-        return ReadFaceAngleTxtToAnnotatedDatum(labelfile, ori_height, ori_width,
-                                       anno_datum);
-      } else {
-        LOG(FATAL) << "Unknown label file type.";
-        return false;
-      }
-      break;
-    default:
-      LOG(FATAL) << "Unknown annotation type.";
-      return false;
-  }
-}
 
 bool ReadRichCcpdToAnnotatedDatum(const string& filename,
     const string& labelfile, const int height, const int width,
@@ -791,63 +722,6 @@ bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
   return true;
 }
 
-// Parse plain txt detection annotation: label_id, xmin, ymin, xmax, ymax.
-bool ReadFaceContourTxtToAnnotatedDatum(const string& labelfile, const int height,
-    const int width, AnnoFaceContourDatum* anno_datum) {
-  std::ifstream infile(labelfile.c_str());
-  std::string lineStr ;
-  std::stringstream sstr ;
-  if (!infile.good()) {
-    LOG(INFO) << "Cannot open " << labelfile;
-    return false;
-  }
-  float x1, x2, x3, x4, x5; 
-  float y1, y2, y3, y4, y5;
-  while (std::getline(infile, lineStr )) {
-    sstr << lineStr;
-    sstr >> x1 >> x2 >> x3 >> x4 >> x5 >> y1 >> y2 >> y3 >> y4 >> y5;
-    // Store the normalized bounding box.
-    AnnoFaceLandmarks* landface = anno_datum->mutable_facecontour();
-    landface->mutable_lefteye()->set_x(float(x1/width));
-    landface->mutable_lefteye()->set_y(float(y1/height));
-    landface->mutable_righteye()->set_x(float(x2/width));
-    landface->mutable_righteye()->set_y(float(y2/height));
-    landface->mutable_nose()->set_x(float(x3/width));
-    landface->mutable_nose()->set_y(float(y3/height));
-    landface->mutable_leftmouth()->set_x(float(x4/width));
-    landface->mutable_leftmouth()->set_y(float(y4/height));
-    landface->mutable_rightmouth()->set_x(float(x5/width));
-    landface->mutable_rightmouth()->set_y(float(y5/height));
-    sstr.clear();
-  }
-  infile.close();
-  return true;
-}
-
-// Parse plain txt detection annotation: label_id, xmin, ymin, xmax, ymax.
-bool ReadFaceAngleTxtToAnnotatedDatum(const string& labelfile, const int height,
-    const int width, AnnoFaceAngleDatum* anno_datum) {
-  std::ifstream infile(labelfile.c_str());
-  std::string lineStr ;
-  std::stringstream sstr ;
-  if (!infile.good()) {
-    LOG(INFO) << "Cannot open " << labelfile;
-    return false;
-  }
-  float yaw, pitch, roll;
-  while (std::getline(infile, lineStr )) {
-    sstr << lineStr;
-    sstr >> yaw >> pitch >> roll;
-    LOG(INFO)<< " "<< yaw <<" "<< pitch <<" "<< roll;
-    AnnoFaceOritation* faceOri = anno_datum->mutable_faceangle();
-    faceOri->set_yaw(float(yaw));
-    faceOri->set_pitch(float(pitch));
-    faceOri->set_roll(float(roll));
-    sstr.clear();
-  }
-  infile.close();
-  return true;
-}
 
 bool ReadLabelFileToLabelMap(const string& filename, bool include_background,
     const string& delimiter, LabelMap* map) {

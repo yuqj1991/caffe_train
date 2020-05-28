@@ -251,25 +251,6 @@ message AnnoFaceAttributeDatum{
   optional AnnoFaceAttribute faceattri =3;
 }
 
-// AnnofaceDataum with datum, and facepoints contour
-message AnnoFaceContourDatum{
-  enum AnnoType{
-    FACECONTOUR =0;
-  }
-  optional Datum datum =1;
-  optional AnnoType type =2;
-  optional AnnoFaceLandmarks facecontour =3;
-}
-
-// AnnofaceDataum with datum, and faceangle
-message AnnoFaceAngleDatum{
-  enum AnnoType{
-    FACEANGLE =0;
-  }
-  optional Datum datum =1;
-  optional AnnoType type =2;
-  optional AnnoFaceOritation faceangle =3;
-}
 
 message FillerParameter {
   // The filler type.
@@ -1681,276 +1662,253 @@ message MemoryDataParameter {
 
 // Message that store parameters used by MultiBoxLossLayer
 message MultiBoxLossParameter {
-  // Localization loss type.
-  enum LocLossType {
-    L2 = 0;
-    SMOOTH_L1 = 1;
-  }
-  optional LocLossType loc_loss_type = 1 [default = SMOOTH_L1];
-  // Confidence loss type.
-  enum ConfLossType {
-    SOFTMAX = 0;
-    LOGISTIC = 1;
-    FOCALSOFTMAX = 2;
-  }
-  optional ConfLossType conf_loss_type = 2 [default = SOFTMAX];
-  // Weight for localization loss.
-  optional float loc_weight = 3 [default = 1.0];
-  // Number of classes to be predicted. Required!
-  optional uint32 num_classes = 4;
-  // If true, bounding box are shared among different classes.
-  optional bool share_location = 5 [default = true];
-  // Matching method during training.
-  enum MatchType {
-    BIPARTITE = 0;
-    PER_PREDICTION = 1;
-  }
-  optional MatchType match_type = 6 [default = PER_PREDICTION];
-  // If match_type is PER_PREDICTION, use overlap_threshold to
-  // determine the extra matching bboxes.
-  optional float overlap_threshold = 7 [default = 0.5];
-  // Use prior for matching.
-  optional bool use_prior_for_matching = 8 [default = true];
-  // Background label id.
-  optional uint32 background_label_id = 9 [default = 0];
-  // If true, also consider difficult ground truth.
-  optional bool use_difficult_gt = 10 [default = true];
-  // If true, perform negative mining.
-  // DEPRECATED: use mining_type instead.
-  optional bool do_neg_mining = 11;
-  // The negative/positive ratio.
-  optional float neg_pos_ratio = 12 [default = 3.0];
-  // The negative overlap upperbound for the unmatched predictions.
-  optional float neg_overlap = 13 [default = 0.5];
-  // Type of coding method for bbox.
-  optional PriorBoxParameter.CodeType code_type = 14 [default = CORNER];
-  // If true, encode the variance of prior box in the loc loss target instead of
-  // in bbox.
-  optional bool encode_variance_in_target = 16 [default = false];
-  // If true, map all object classes to agnostic class. It is useful for learning
-  // objectness detector.
-  optional bool map_object_to_agnostic = 17 [default = false];
-  // If true, ignore cross boundary bbox during matching.
-  // Cross boundary bbox is a bbox who is outside of the image region.
-  optional bool ignore_cross_boundary_bbox = 18 [default = false];
-  // If true, only backpropagate on corners which are inside of the image
-  // region when encode_type is CORNER or CORNER_SIZE.
-  optional bool bp_inside = 19 [default = false];
-  // Mining type during training.
-  //   NONE : use all negatives.
-  //   MAX_NEGATIVE : select negatives based on the score.
-  //   HARD_EXAMPLE : select hard examples based on "Training Region-based Object Detectors with Online Hard Example Mining", Shrivastava et.al.
-  enum MiningType {
-    NONE = 0;
-    MAX_NEGATIVE = 1;
-    HARD_EXAMPLE = 2;
-  }
-  optional MiningType mining_type = 20 [default = MAX_NEGATIVE];
-  // Parameters used for non maximum suppression durig hard example mining.
-  optional NonMaximumSuppressionParameter nms_param = 21;
-  optional int32 sample_size = 22 [default = 64];
-  optional bool use_prior_for_nms = 23 [default = false];
-  optional bool use_tiny_box_match = 25 [default = false];
-  optional bool use_center_locate_match = 27 [default = false];
-  optional uint32 num_chinese = 28;
-  optional ConfLossType chineselp_loss_type = 29;
-  optional uint32 num_english = 30;
-  optional ConfLossType englishlp_loss_type = 31;
-  optional uint32 num_letter = 32;
-  optional ConfLossType letter_lp_loss_type = 33;
+    // Localization loss type.
+    enum LocLossType {
+        L2 = 0;
+        SMOOTH_L1 = 1;
+    }
+    optional LocLossType loc_loss_type = 1 [default = SMOOTH_L1];
+    // Confidence loss type.
+    enum ConfLossType {
+        SOFTMAX = 0;
+        LOGISTIC = 1;
+        FOCALSOFTMAX = 2;
+    }
+    optional ConfLossType conf_loss_type = 2 [default = SOFTMAX];
+    // Weight for localization loss.
+    optional float loc_weight = 3 [default = 1.0];
+    // Number of classes to be predicted. Required!
+    optional uint32 num_classes = 4;
+    // If true, bounding box are shared among different classes.
+    optional bool share_location = 5 [default = true];
+    // Matching method during training.
+    enum MatchType {
+        BIPARTITE = 0;
+        PER_PREDICTION = 1;
+    }
+    optional MatchType match_type = 6 [default = PER_PREDICTION];
+    // If match_type is PER_PREDICTION, use overlap_threshold to
+    // determine the extra matching bboxes.
+    optional float overlap_threshold = 7 [default = 0.5];
+    // Use prior for matching.
+    optional bool use_prior_for_matching = 8 [default = true];
+    // Background label id.
+    optional uint32 background_label_id = 9 [default = 0];
+    // If true, also consider difficult ground truth.
+    optional bool use_difficult_gt = 10 [default = true];
+    // If true, perform negative mining.
+    // DEPRECATED: use mining_type instead.
+    optional bool do_neg_mining = 11;
+    // The negative/positive ratio.
+    optional float neg_pos_ratio = 12 [default = 3.0];
+    // The negative overlap upperbound for the unmatched predictions.
+    optional float neg_overlap = 13 [default = 0.5];
+    // Type of coding method for bbox.
+    optional PriorBoxParameter.CodeType code_type = 14 [default = CORNER];
+    // If true, encode the variance of prior box in the loc loss target instead of
+    // in bbox.
+    optional bool encode_variance_in_target = 16 [default = false];
+    // If true, map all object classes to agnostic class. It is useful for learning
+    // objectness detector.
+    optional bool map_object_to_agnostic = 17 [default = false];
+    // If true, ignore cross boundary bbox during matching.
+    // Cross boundary bbox is a bbox who is outside of the image region.
+    optional bool ignore_cross_boundary_bbox = 18 [default = false];
+    // If true, only backpropagate on corners which are inside of the image
+    // region when encode_type is CORNER or CORNER_SIZE.
+    optional bool bp_inside = 19 [default = false];
+    // Mining type during training.
+    //   NONE : use all negatives.
+    //   MAX_NEGATIVE : select negatives based on the score.
+    //   HARD_EXAMPLE : select hard examples based on "Training Region-based Object Detectors with Online Hard Example Mining", Shrivastava et.al.
+    enum MiningType {
+        NONE = 0;
+        MAX_NEGATIVE = 1;
+        HARD_EXAMPLE = 2;
+    }
+    optional MiningType mining_type = 20 [default = MAX_NEGATIVE];
+    // Parameters used for non maximum suppression durig hard example mining.
+    optional NonMaximumSuppressionParameter nms_param = 21;
+    optional int32 sample_size = 22 [default = 64];
+    optional bool use_prior_for_nms = 23 [default = false];
+    optional bool use_tiny_box_match = 25 [default = false];
+    optional bool use_center_locate_match = 27 [default = false];
+    optional uint32 num_chinese = 28;
+    optional ConfLossType chineselp_loss_type = 29;
+    optional uint32 num_english = 30;
+    optional ConfLossType englishlp_loss_type = 31;
+    optional uint32 num_letter = 32;
+    optional ConfLossType letter_lp_loss_type = 33;
 
-  repeated uint32 bbox_small_list = 34;
-  repeated uint32 bbox_large_list = 35;
-  repeated uint32 receptive_field_list = 36;
-  optional uint32 num_output_scales = 37;
-  optional uint32 net_input_height = 38;
-  optional uint32 net_input_width = 39;
+    repeated uint32 bbox_small_list = 34;
+    repeated uint32 bbox_large_list = 35;
+    repeated uint32 receptive_field_list = 36;
+    optional uint32 num_output_scales = 37;
+    optional uint32 net_input_height = 38;
+    optional uint32 net_input_width = 39;
 }
 
 // Message that store parameters used by MultiBoxLossLayer
 message MultiFaceAttriLossParameter {
-  // Localization loss type.
-  enum MarkLossType {
-    L2 = 0;
-    SMOOTH_L1 = 1;
-  }
-  optional MarkLossType mark_loss_type = 2 [default = SMOOTH_L1];
-  optional MarkLossType angle_loss_type = 9 [default = SMOOTH_L1];
-  // Confidence loss type.
-  enum AttriLossType {
-    SOFTMAX = 0;
-    LOGISTIC = 1;
-  }
-  optional float mark_weight = 3 [default = 1.0];
-  // Number of classes to be predicted. Required!
-  optional uint32 num_gender = 4;
-  // If match_type is PER_PREDICTION, use overlap_threshold to
-  // determine the extra matching bboxes.
-  optional uint32 num_glasses = 5;
-  // gender loss types
-  optional AttriLossType conf_gender_loss_type = 7 [default = SOFTMAX];
-  // glass conf loss types
-  optional AttriLossType conf_glasses_loss_type = 8 [default = SOFTMAX];
-  optional float gender_weight = 10 [default = 1.0];
-  optional float glass_weight = 11 [default = 1.0];
-  optional float angle_weight = 12;
-}
-
-// Message that store parameters used by MultiBoxLossLayer
-message MultiFaceContourLossParameter {
-  enum AttriLossType {
-    LOGISTIC = 0;
-    SMOOTH_L1 = 1;
-    L2 = 2;
-  }
-  optional float contour_weights = 1 [default = 1.0];
-  // facecontour loss types
-  optional AttriLossType regs_face_contour_loss_type = 2 [default = SMOOTH_L1];
-}
-// Message that store parameters used by MultiBoxLossLayer
-message MultiFaceAngleLossParameter {
-  enum AttriLossType {
-    LOGISTIC = 0;
-    SMOOTH_L1 = 1;
-    L2 = 2;
-  }
-  optional float angle_weights = 1 [default = 1.0];
-  // facepose loss types
-  optional AttriLossType regs_face_pose_loss_type = 2 [default = SMOOTH_L1];
+    // Localization loss type.
+    enum MarkLossType {
+        L2 = 0;
+        SMOOTH_L1 = 1;
+    }
+    optional MarkLossType mark_loss_type = 2 [default = SMOOTH_L1];
+    optional MarkLossType angle_loss_type = 9 [default = SMOOTH_L1];
+    // Confidence loss type.
+    enum AttriLossType {
+        SOFTMAX = 0;
+        LOGISTIC = 1;
+    }
+    optional float mark_weight = 3 [default = 1.0];
+    // Number of classes to be predicted. Required!
+    optional uint32 num_gender = 4;
+    // If match_type is PER_PREDICTION, use overlap_threshold to
+    // determine the extra matching bboxes.
+    optional uint32 num_glasses = 5;
+    // gender loss types
+    optional AttriLossType conf_gender_loss_type = 7 [default = SOFTMAX];
+    // glass conf loss types
+    optional AttriLossType conf_glasses_loss_type = 8 [default = SOFTMAX];
+    optional float gender_weight = 10 [default = 1.0];
+    optional float glass_weight = 11 [default = 1.0];
+    optional float angle_weight = 12;
 }
 
 
 message MVNParameter {
-  // This parameter can be set to false to normalize mean only
-  optional bool normalize_variance = 1 [default = true];
+    // This parameter can be set to false to normalize mean only
+    optional bool normalize_variance = 1 [default = true];
 
-  // This parameter can be set to true to perform DNN-like MVN
-  optional bool across_channels = 2 [default = false];
+    // This parameter can be set to true to perform DNN-like MVN
+    optional bool across_channels = 2 [default = false];
 
-  // Epsilon for not dividing by zero while normalizing variance
-  optional float eps = 3 [default = 1e-9];
+    // Epsilon for not dividing by zero while normalizing variance
+    optional float eps = 3 [default = 1e-9];
 }
 
 message NormalizeParameter {
-  optional string normalize_type = 1 [default = "L2"];
-  optional bool fix_gradient = 2 [default = false];
-  optional bool bp_norm = 3 [default = false];
+    optional string normalize_type = 1 [default = "L2"];
+    optional bool fix_gradient = 2 [default = false];
+    optional bool bp_norm = 3 [default = false];
 }
 
 // Message that stores parameters used by NormalizeLayer
 message ChannelNormalizeParameter {
-  optional bool across_spatial = 1 [default = true];
-  // Initial value of scale. Default is 1.0 for all
-  optional FillerParameter scale_filler = 2;
-  // Whether or not scale parameters are shared across channels.
-  optional bool channel_shared = 3 [default = true];
-  // Epsilon for not dividing by zero while normalizing variance
-  optional float eps = 4 [default = 1e-10];
+    optional bool across_spatial = 1 [default = true];
+    // Initial value of scale. Default is 1.0 for all
+    optional FillerParameter scale_filler = 2;
+    // Whether or not scale parameters are shared across channels.
+    optional bool channel_shared = 3 [default = true];
+    // Epsilon for not dividing by zero while normalizing variance
+    optional float eps = 4 [default = 1e-10];
 }
 
 message ParameterParameter {
-  optional BlobShape shape = 1;
+    optional BlobShape shape = 1;
 }
 
 message PermuteParameter {
-  // The new orders of the axes of data. Notice it should be with
-  // in the same range as the input data, and it starts from 0.
-  // Do not provide repeated order.
-  repeated uint32 order = 1;
+    // The new orders of the axes of data. Notice it should be with
+    // in the same range as the input data, and it starts from 0.
+    // Do not provide repeated order.
+    repeated uint32 order = 1;
 }
 
 message cosinLossParameter{
-  optional uint32 num_output = 1; // The number of outpSuts for the layer
-  optional FillerParameter cosin_filler = 2; // The filler for the centers 
-  optional int32 axis = 3 [default = 1]; //axis 
-  optional float scale = 4[default = 64.0];
-  optional float margin = 6[default = -0.35];
+    optional uint32 num_output = 1; // The number of outpSuts for the layer
+    optional FillerParameter cosin_filler = 2; // The filler for the centers 
+    optional int32 axis = 3 [default = 1]; //axis 
+    optional float scale = 4[default = 64.0];
+    optional float margin = 6[default = -0.35];
 }
 
 message PoolingParameter {
-  enum PoolMethod {
-    MAX = 0;
-    AVE = 1;
-    STOCHASTIC = 2;
-  }
-  optional PoolMethod pool = 1 [default = MAX]; // The pooling method
-  // Pad, kernel size, and stride are all given as a single value for equal
-  // dimensions in height and width or as Y, X pairs.
-  optional uint32 pad = 4 [default = 0]; // The padding size (equal in Y, X)
-  optional uint32 pad_h = 9 [default = 0]; // The padding height
-  optional uint32 pad_w = 10 [default = 0]; // The padding width
-  optional uint32 kernel_size = 2; // The kernel size (square)
-  optional uint32 kernel_h = 5; // The kernel height
-  optional uint32 kernel_w = 6; // The kernel width
-  optional uint32 stride = 3 [default = 1]; // The stride (equal in Y, X)
-  optional uint32 stride_h = 7; // The stride height
-  optional uint32 stride_w = 8; // The stride width
-  enum Engine {
-    DEFAULT = 0;
-    CAFFE = 1;
-    CUDNN = 2;
-  }
-  optional Engine engine = 11 [default = DEFAULT];
-  // If global_pooling then it will pool over the size of the bottom by doing
-  // kernel_h = bottom->height and kernel_w = bottom->width
-  optional bool global_pooling = 12 [default = false];
+    enum PoolMethod {
+        MAX = 0;
+        AVE = 1;
+        STOCHASTIC = 2;
+    }
+    optional PoolMethod pool = 1 [default = MAX]; // The pooling method
+    // Pad, kernel size, and stride are all given as a single value for equal
+    // dimensions in height and width or as Y, X pairs.
+    optional uint32 pad = 4 [default = 0]; // The padding size (equal in Y, X)
+    optional uint32 pad_h = 9 [default = 0]; // The padding height
+    optional uint32 pad_w = 10 [default = 0]; // The padding width
+    optional uint32 kernel_size = 2; // The kernel size (square)
+    optional uint32 kernel_h = 5; // The kernel height
+    optional uint32 kernel_w = 6; // The kernel width
+    optional uint32 stride = 3 [default = 1]; // The stride (equal in Y, X)
+    optional uint32 stride_h = 7; // The stride height
+    optional uint32 stride_w = 8; // The stride width
+    enum Engine {
+        DEFAULT = 0;
+        CAFFE = 1;
+        CUDNN = 2;
+    }
+    optional Engine engine = 11 [default = DEFAULT];
+    // If global_pooling then it will pool over the size of the bottom by doing
+    // kernel_h = bottom->height and kernel_w = bottom->width
+    optional bool global_pooling = 12 [default = false];
 }
 
 message PowerParameter {
-  // PowerLayer computes outputs y = (shift + scale * x) ^ power.
-  optional float power = 1 [default = 1.0];
-  optional float scale = 2 [default = 1.0];
-  optional float shift = 3 [default = 0.0];
+    // PowerLayer computes outputs y = (shift + scale * x) ^ power.
+    optional float power = 1 [default = 1.0];
+    optional float scale = 2 [default = 1.0];
+    optional float shift = 3 [default = 0.0];
 }
 
 // Message that store parameters used by PriorBoxLayer
 message PriorBoxParameter {
-  // Encode/decode type.
-  enum CodeType {
-    CORNER = 1;
-    CENTER_SIZE = 2;
-    CORNER_SIZE = 3;
-    RECEPTIVE_CENTER = 4;
-    CORNNER_CENTER = 5;
-  }
-  // Minimum box size (in pixels). Required!
-  repeated float min_size = 1;
-  // Maximum box size (in pixels). Required!
-  repeated float max_size = 2;
-  // Various of aspect ratios. Duplicate ratios will be ignored.
-  // If none is provided, we use default ratio 1.
-  repeated float aspect_ratio = 3;
-  // If true, will flip each aspect ratio.
-  // For example, if there is aspect ratio "r",
-  // we will generate aspect ratio "1.0/r" as well.
-  optional bool flip = 4 [default = true];
-  // If true, will clip the prior so that it is within [0, 1]
-  optional bool clip = 5 [default = false];
-  // Variance for adjusting the prior bboxes.
-  repeated float variance = 6;
-  // By default, we calculate img_height, img_width, step_x, step_y based on
-  // bottom[0] (feat) and bottom[1] (img). Unless these values are explicitely
-  // provided.
-  // Explicitly provide the img_size.
-  optional uint32 img_size = 7;
-  // Either img_size or img_h/img_w should be specified; not both.
-  optional uint32 img_h = 8;
-  optional uint32 img_w = 9;
+    // Encode/decode type.
+    enum CodeType {
+        CORNER = 1;
+        CENTER_SIZE = 2;
+        CORNER_SIZE = 3;
+        RECEPTIVE_CENTER = 4;
+        CORNNER_CENTER = 5;
+    }
+    // Minimum box size (in pixels). Required!
+    repeated float min_size = 1;
+    // Maximum box size (in pixels). Required!
+    repeated float max_size = 2;
+    // Various of aspect ratios. Duplicate ratios will be ignored.
+    // If none is provided, we use default ratio 1.
+    repeated float aspect_ratio = 3;
+    // If true, will flip each aspect ratio.
+    // For example, if there is aspect ratio "r",
+    // we will generate aspect ratio "1.0/r" as well.
+    optional bool flip = 4 [default = true];
+    // If true, will clip the prior so that it is within [0, 1]
+    optional bool clip = 5 [default = false];
+    // Variance for adjusting the prior bboxes.
+    repeated float variance = 6;
+    // By default, we calculate img_height, img_width, step_x, step_y based on
+    // bottom[0] (feat) and bottom[1] (img). Unless these values are explicitely
+    // provided.
+    // Explicitly provide the img_size.
+    optional uint32 img_size = 7;
+    // Either img_size or img_h/img_w should be specified; not both.
+    optional uint32 img_h = 8;
+    optional uint32 img_w = 9;
 
-  // Explicitly provide the step size.
-  optional float step = 10;
-  // Either step or step_h/step_w should be specified; not both.
-  optional float step_h = 11;
-  optional float step_w = 12;
+    // Explicitly provide the step size.
+    optional float step = 10;
+    // Either step or step_h/step_w should be specified; not both.
+    optional float step_h = 11;
+    optional float step_w = 12;
 
-  // Offset to the top left corner of each cell.
-  optional float offset = 13 [default = 0.5];
-  repeated float fixed_size = 14;
-  repeated float fixed_ratio = 15;
-  repeated float density = 16;
-  repeated float default_size = 17;
-  repeated float default_ratio = 18;
-  repeated anchorBox anchor = 19;
+    // Offset to the top left corner of each cell.
+    optional float offset = 13 [default = 0.5];
+    repeated float fixed_size = 14;
+    repeated float fixed_ratio = 15;
+    repeated float density = 16;
+    repeated float default_size = 17;
+    repeated float default_ratio = 18;
+    repeated anchorBox anchor = 19;
 }
 
 message ReceptiveFieldBoxParameter {

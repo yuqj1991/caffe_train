@@ -89,8 +89,6 @@ int main(int argc, char** argv) {
   const string anno_type = FLAGS_anno_type;
   AnnotatedDatum_AnnotationType type;
   AnnoFaceAttributeDatum_AnnoType anno_face;
-  AnnoFaceContourDatum_AnnoType anno_facecontour_type;
-  AnnoFaceAngleDatum_AnnoType anno_faceangle_type;
   AnnotatedCCpdDatum_AnnotationType anno_ccpd_type;
   const string label_type = FLAGS_label_type;
   const string label_map_file = FLAGS_label_map_file;
@@ -118,16 +116,6 @@ int main(int argc, char** argv) {
     }
   } else if(anno_type == "faceattributes") {
 		anno_face = AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE;
-    while (infile >> filename >> labelname) {
-      lines.push_back(std::make_pair(filename, labelname));
-    }
-	}else if(anno_type == "facecontour") {
-		anno_facecontour_type = AnnoFaceContourDatum_AnnoType_FACECONTOUR;
-    while (infile >> filename >> labelname) {
-      lines.push_back(std::make_pair(filename, labelname));
-    }
-	} else if(anno_type == "faceangle") {
-		anno_faceangle_type = AnnoFaceAngleDatum_AnnoType_FACEANGLE;
     while (infile >> filename >> labelname) {
       lines.push_back(std::make_pair(filename, labelname));
     }
@@ -167,8 +155,6 @@ int main(int argc, char** argv) {
   AnnotatedDatum anno_datum;
   Datum* datum = anno_datum.mutable_datum();
   AnnoFaceAttributeDatum anno_faceAttriDatum;
-  AnnoFaceContourDatum anno_faceContourDatum;
-  AnnoFaceAngleDatum anno_faceAngleDatum;
   AnnotatedCCpdDatum anno_ccpdDatum;
 
   int count = 0;
@@ -204,18 +190,6 @@ int main(int argc, char** argv) {
           labelname, resize_height, resize_width, min_dim, max_dim, is_color,
           enc, anno_face, label_type, &anno_faceAttriDatum);
       anno_faceAttriDatum.set_type(AnnoFaceAttributeDatum_AnnoType_FACEATTRIBUTE);
-	  }else if(anno_type == "facecontour") {
-      labelname = boost::get<std::string>(lines[line_id].second); // lines contain imagename & label.txt
-		  status = ReadRichFaceContourToAnnotatedDatum(filename,
-          labelname, resize_height, resize_width, min_dim, max_dim, is_color,
-          enc, anno_facecontour_type, label_type, &anno_faceContourDatum);
-      anno_faceContourDatum.set_type(AnnoFaceContourDatum_AnnoType_FACECONTOUR);
-	  }else if(anno_type == "faceangle") {
-      labelname = boost::get<std::string>(lines[line_id].second); // lines contain imagename & label.txt
-		  status = ReadRichFaceAngleToAnnotatedDatum(filename,
-          labelname, resize_height, resize_width, min_dim, max_dim, is_color,
-          enc, anno_faceangle_type, label_type, &anno_faceAngleDatum);
-      anno_faceAngleDatum.set_type(AnnoFaceAngleDatum_AnnoType_FACEANGLE);
 	  }else if (anno_type == "Rec_ccpd") {
       labelname = boost::get<std::string>(lines[line_id].second);
       status = ReadRichCcpdToAnnotatedDatum(filename, labelname, resize_height,
@@ -248,12 +222,6 @@ int main(int argc, char** argv) {
       txn->Put(key_str, out);
     }else if(anno_type == "faceattributes") {
       CHECK(anno_faceAttriDatum.SerializeToString(&out));
-      txn->Put(key_str, out);
-    }else if(anno_type == "facecontour") {
-      CHECK(anno_faceContourDatum.SerializeToString(&out));
-      txn->Put(key_str, out);
-    }else if(anno_type == "faceangle") {
-      CHECK(anno_faceAngleDatum.SerializeToString(&out));
       txn->Put(key_str, out);
     }else if(anno_type == "Rec_ccpd") {
       CHECK(anno_ccpdDatum.SerializeToString(&out));

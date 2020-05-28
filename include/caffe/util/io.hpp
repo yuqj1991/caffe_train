@@ -221,37 +221,6 @@ inline bool ReadRichFaceAttributeToAnnotatedDatum(const string& filename,
                       anno_datum);
 }
 
-bool ReadRichFaceContourToAnnotatedDatum(const string& filename,
-    const string& labelfile, const int height, const int width,
-    const int min_dim, const int max_dim, const bool is_color,
-    const string& encoding, const AnnoFaceContourDatum_AnnoType type,
-    const string& labeltype, AnnoFaceContourDatum* anno_datum);
-
-inline bool ReadRichFaceContourToAnnotatedDatum(const string& filename,
-    const string& labelname, const int height, const int width,
-    const bool is_color, const std::string & encoding,
-    const AnnoFaceContourDatum_AnnoType type, const string& labeltype,
-    AnnoFaceContourDatum* anno_datum) {
-  return ReadRichFaceContourToAnnotatedDatum(filename, labelname, height, width, 0, 0,
-                      is_color, encoding, type, labeltype, 
-                      anno_datum);
-}
-
-bool ReadRichFaceAngleToAnnotatedDatum(const string& filename,
-    const string& labelfile, const int height, const int width,
-    const int min_dim, const int max_dim, const bool is_color,
-    const string& encoding, const AnnoFaceAngleDatum_AnnoType type,
-    const string& labeltype, AnnoFaceAngleDatum* anno_datum);
-
-inline bool ReadRichFaceAngleToAnnotatedDatum(const string& filename,
-    const string& labelname, const int height, const int width,
-    const bool is_color, const std::string & encoding,
-    const AnnoFaceAngleDatum_AnnoType type, const string& labeltype,
-    AnnoFaceAngleDatum* anno_datum) {
-  return ReadRichFaceAngleToAnnotatedDatum(filename, labelname, height, width, 0, 0,
-                      is_color, encoding, type, labeltype, 
-                      anno_datum);
-}
 
 bool ReadRichCcpdToAnnotatedDatum(const string& filename,
     const string& labelfile, const int height, const int width,
@@ -291,11 +260,6 @@ bool ReadccpdTxtToAnnotatedDatum(const string& labelfile, const int height,
 bool ReadumdfaceTxtToAnnotatedDatum(const string& labelfile, const int height,
     const int width, AnnoFaceAttributeDatum* anno_datum);
 
-bool ReadFaceContourTxtToAnnotatedDatum(const string& labelfile, const int height,
-    const int width, AnnoFaceContourDatum* anno_datum);
-
-bool ReadFaceAngleTxtToAnnotatedDatum(const string& labelfile, const int height,
-    const int width, AnnoFaceAngleDatum* anno_datum);
 
 bool ReadLabelFileToLabelMap(const string& filename, bool include_background,
     const string& delimiter, LabelMap* map);

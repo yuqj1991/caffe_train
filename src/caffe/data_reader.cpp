@@ -30,14 +30,6 @@ map<const string, weak_ptr<DataReader<AnnoFaceAttributeDatum>::Body> >
   = map<const string, weak_ptr<DataReader<AnnoFaceAttributeDatum>::Body> >();
 
 template <>
-map<const string, weak_ptr<DataReader<AnnoFaceContourDatum>::Body> >
-  DataReader<AnnoFaceContourDatum>::bodies_
-  = map<const string, weak_ptr<DataReader<AnnoFaceContourDatum>::Body> >();
-template <>
-map<const string, weak_ptr<DataReader<AnnoFaceAngleDatum>::Body> >
-  DataReader<AnnoFaceAngleDatum>::bodies_
-  = map<const string, weak_ptr<DataReader<AnnoFaceAngleDatum>::Body> >();
-template <>
 map<const string, weak_ptr<DataReader<AnnotatedCCpdDatum>::Body> >
   DataReader<AnnotatedCCpdDatum>::bodies_
   = map<const string, weak_ptr<DataReader<AnnotatedCCpdDatum>::Body> >();
@@ -92,67 +84,65 @@ template <typename T>
 DataReader<T>::Body::Body(const LayerParameter& param)
     : param_(param),
       new_queue_pairs_() {
-  StartInternalThread();
+    StartInternalThread();
 }
 
 template <typename T>
 DataReader<T>::Body::~Body() {
-  StopInternalThread();
+    StopInternalThread();
 }
 
 template <typename T>
 void DataReader<T>::Body::InternalThreadEntry() {
-  shared_ptr<db::DB> db(db::GetDB(param_.data_param().backend()));
-  db->Open(param_.data_param().source(), db::READ);
-  shared_ptr<db::Cursor> cursor(db->NewCursor());
-  vector<shared_ptr<QueuePair> > qps;
-  try {
-    int solver_count = param_.phase() == TRAIN ? Caffe::solver_count() : 1;
+    shared_ptr<db::DB> db(db::GetDB(param_.data_param().backend()));
+    db->Open(param_.data_param().source(), db::READ);
+    shared_ptr<db::Cursor> cursor(db->NewCursor());
+    vector<shared_ptr<QueuePair> > qps;
+    try {
+        int solver_count = param_.phase() == TRAIN ? Caffe::solver_count() : 1;
 
-    // To ensure deterministic runs, only start running once all solvers
-    // are ready. But solvers need to peek on one item during initialization,
-    // so read one item, then wait for the next solver.
-    for (int i = 0; i < solver_count; ++i) {
-      shared_ptr<QueuePair> qp(new_queue_pairs_.pop());
-      read_one(cursor.get(), qp.get());
-      qps.push_back(qp);
+        // To ensure deterministic runs, only start running once all solvers
+        // are ready. But solvers need to peek on one item during initialization,
+        // so read one item, then wait for the next solver.
+        for (int i = 0; i < solver_count; ++i) {
+            shared_ptr<QueuePair> qp(new_queue_pairs_.pop());
+            read_one(cursor.get(), qp.get());
+            qps.push_back(qp);
+        }
+        // Main loop
+        while (!must_stop()) {
+            for (int i = 0; i < solver_count; ++i) {
+                read_one(cursor.get(), qps[i].get());
+            }
+            // Check no additional readers have been created. This can happen if
+            // more than one net is trained at a time per process, whether single
+            // or multi solver. It might also happen if two data layers have same
+            // name and same source.
+            CHECK_EQ(new_queue_pairs_.size(), 0);
+        }
+    } catch (boost::thread_interrupted&) {
+        // Interrupted exception is expected on shutdown
     }
-    // Main loop
-    while (!must_stop()) {
-      for (int i = 0; i < solver_count; ++i) {
-        read_one(cursor.get(), qps[i].get());
-      }
-      // Check no additional readers have been created. This can happen if
-      // more than one net is trained at a time per process, whether single
-      // or multi solver. It might also happen if two data layers have same
-      // name and same source.
-      CHECK_EQ(new_queue_pairs_.size(), 0);
-    }
-  } catch (boost::thread_interrupted&) {
-    // Interrupted exception is expected on shutdown
-  }
 }
 
 template <typename T>
 void DataReader<T>::Body::read_one(db::Cursor* cursor, QueuePair* qp) {
-  T* t = qp->free_.pop();
-  // TODO deserialize in-place instead of copy?
-  t->ParseFromString(cursor->value());
-  qp->full_.push(t);
+    T* t = qp->free_.pop();
+    // TODO deserialize in-place instead of copy?
+    t->ParseFromString(cursor->value());
+    qp->full_.push(t);
 
-  // go to the next iter
-  cursor->Next();
-  if (!cursor->valid()) {
-    DLOG(INFO) << "Restarting data prefetching from start.";
-    cursor->SeekToFirst();
-  }
+    // go to the next iter
+    cursor->Next();
+    if (!cursor->valid()) {
+        DLOG(INFO) << "Restarting data prefetching from start.";
+        cursor->SeekToFirst();
+    }
 }
 
 // Instance class
 template class DataReader<Datum>;
 template class DataReader<AnnotatedDatum>;
 template class DataReader<AnnoFaceAttributeDatum>;
-template class DataReader<AnnoFaceContourDatum>;
-template class DataReader<AnnoFaceAngleDatum>;
 template class DataReader<AnnotatedCCpdDatum>;
 }  // namespace caffe
