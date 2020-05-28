@@ -123,6 +123,8 @@ class Solver {
   vector<Callback*> callbacks_;
   vector<Dtype> losses_;
   Dtype smoothed_loss_;
+    Dtype max_accuracy_ = 0.f;
+    Dtype current_accuracy_ = 0.f;
 
   // The root solver that holds root nets (actually containing shared layers)
   // in data parallelism

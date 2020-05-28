@@ -343,6 +343,8 @@ void SGDSolver<Dtype>::RestoreSolverStateFromBinaryProto(
   SolverState state;
   ReadProtoFromBinaryFile(state_file, &state);
   this->iter_ = state.iter();
+  this->max_accuracy_ = state.max_accuracy();
+  this->current_accuracy_ = state.current_accuracy();
   if (state.has_learned_net()) {
     NetParameter net_param;
     ReadNetParamsFromBinaryFileOrDie(state.learned_net().c_str(), &net_param);
@@ -353,7 +355,8 @@ void SGDSolver<Dtype>::RestoreSolverStateFromBinaryProto(
   this->minimum_loss_ = state.minimum_loss();
   CHECK_EQ(state.history_size(), history_.size())
       << "Incorrect length of history blobs.";
-  LOG(INFO) << "SGDSolver: restoring history";
+  LOG(INFO) <<"SGDSolver: restoring history"<<", current_accuracy: "<<this->current_accuracy_
+            <<", max_accuracy: "<<this->max_accuracy_;
   for (int i = 0; i < history_.size(); ++i) {
     history_[i]->FromProto(state.history(i));
   }

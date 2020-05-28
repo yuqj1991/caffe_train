@@ -492,12 +492,14 @@ message SolverParameter {
 
 // A message that stores the solver snapshots
 message SolverState {
-  optional int32 iter = 1; // The current iteration
-  optional string learned_net = 2; // The file that stores the learned net.
-  repeated BlobProto history = 3; // The history for sgd solvers
-  optional int32 current_step = 4 [default = 0]; // The current step for learning rate
-  optional float minimum_loss = 5 [default = 1E38]; // Historical minimum loss
-  optional int32 iter_last_event = 6 [default = 0]; // The iteration when last lr-update or min_loss-update happend
+    optional int32 iter = 1; // The current iteration
+    optional string learned_net = 2; // The file that stores the learned net.
+    repeated BlobProto history = 3; // The history for sgd solvers
+    optional int32 current_step = 4 [default = 0]; // The current step for learning rate
+    optional float minimum_loss = 5 [default = 1E38]; // Historical minimum loss
+    optional int32 iter_last_event = 6 [default = 0]; // The iteration when last lr-update or min_loss-update happend
+    optional float max_accuracy = 7[default = 0.];
+    optional float current_accuracy = 8[default = 0.];
 }
 
 enum Phase {
