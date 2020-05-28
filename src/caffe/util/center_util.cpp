@@ -420,7 +420,8 @@ template void SelectHardSampleSoftMax(double *label_data, std::vector<double> ba
 
 template <typename Dtype>
 Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 
-                Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2){
+                Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2, const int anchor_scale,
+                const int downRatio, const int layer_scale){
 
     Dtype p_xmin = predict_box.xmin();
     Dtype p_xmax = predict_box.xmax();
@@ -436,27 +437,83 @@ Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x
 
     Dtype iou_xmin = std::max(p_xmin, gt_xmin), iou_xmax = std::min(p_xmax, gt_xmax);
     Dtype iou_ymin = std::max(p_ymin, gt_ymin), iou_ymax = std::min(p_ymax, gt_ymax);
-    Dtype iou_height = (iou_ymax >= iou_ymin)?(iou_ymax - iou_ymin) : 0;
-    Dtype iou_width = (iou_xmax >= iou_xmin)?(iou_xmax - iou_xmin) : 0;
+    Dtype iou_height = (iou_ymax - iou_ymin);
+    Dtype iou_width = (iou_xmax - iou_xmin);
     Dtype iou_area = iou_height * iou_width;
-
-    Dtype Iou = Dtype(iou_area/(p_area + gt_area - iou_area));
+    Dtype Union = p_area + gt_area - iou_area;
+    Dtype Iou = Dtype(iou_area / Union);
 
     Dtype c_xmin = std::min(p_xmin, gt_xmin), c_xmax = std::max(p_xmax, gt_xmax);
     Dtype c_ymin = std::min(p_ymin, gt_ymin), c_ymax = std::max(p_ymax, gt_ymax);
-    Dtype c_area = (c_xmax - c_xmin) * (c_ymax - c_ymin);
+    Dtype C = (c_xmax - c_xmin) * (c_ymax - c_ymin);
 
-    Dtype GIou = Iou - Dtype((c_area - (p_area + gt_area - iou_area)) / c_area);
+    Dtype GIou = Iou - Dtype((C - Union) / C);
 
-    //diff_x1 = 0.;
+    // cal diff float IoU = I / U;
+    // Partial Derivatives, derivatives
+    Dtype dp_aera_wrt_xmin = -1 * (p_ymax - p_ymin);
+    Dtype dp_aera_wrt_xmax = (p_ymax - p_ymin);
+    Dtype dp_aera_wrt_ymin = -1 * (p_xmax - p_xmin);
+    Dtype dp_aera_wrt_ymax = (p_xmax - p_xmin);
 
-    return GIou;
+    // gradient of I min/max in IoU calc (prediction)
+    Dtype dI_wrt_xmin = p_xmin > gt_xmin ? (-1 * iou_height) : 0;
+    Dtype dI_wrt_xmax = p_xmax < gt_xmax ? iou_height : 0;
+    Dtype dI_wrt_ymin = p_ymin > gt_ymin ? (-1 * iou_width) : 0;
+    Dtype dI_wrt_ymax = p_ymax < gt_ymax ? iou_width : 0;
+
+    // derivative of U with regard to x
+    Dtype dU_wrt_ymin = dp_aera_wrt_ymin - dI_wrt_ymin;
+    Dtype dU_wrt_ymax = dp_aera_wrt_ymax - dI_wrt_ymax;
+    Dtype dU_wrt_xmin = dp_aera_wrt_xmin - dI_wrt_xmin;
+    Dtype dU_wrt_xmax = dp_aera_wrt_xmax - dI_wrt_xmax;
+    // gradient of C min/max in IoU calc (prediction)
+    Dtype dC_wrt_ymin = p_ymin < gt_ymin ? (-1 * (c_xmax - c_xmin)) : 0;
+    Dtype dC_wrt_ymax = p_ymax > gt_ymax ? (c_xmax - c_xmin) : 0;
+    Dtype dC_wrt_xmin = p_xmin < gt_xmin ? (-1 * (c_ymax - c_ymin)) : 0;
+    Dtype dC_wrt_xmax = p_xmax > gt_ymax ? (c_ymax - c_ymin) : 0;
+
+    Dtype p_dt = Dtype(0.);
+    Dtype p_db = Dtype(0.);
+    Dtype p_dl = Dtype(0.);
+    Dtype p_dr = Dtype(0.);
+    if (Union > 0) {
+      p_dt = ((Union * dI_wrt_ymin) - (iou_area * dU_wrt_ymin)) / (Union * Union);
+      p_db = ((Union * dI_wrt_ymax) - (iou_area * dU_wrt_ymax)) / (Union * Union);
+      p_dl = ((Union * dI_wrt_xmin) - (iou_area * dU_wrt_xmin)) / (Union * Union);
+      p_dr = ((Union * dI_wrt_xmax) - (iou_area * dU_wrt_xmax)) / (Union * Union);
+    }
+    if (C > 0) {
+        // apply "C" term from gIOU
+        p_dt += ((C * dU_wrt_ymin) - (Union * dC_wrt_ymin)) / (C * C);
+        p_db += ((C * dU_wrt_ymax) - (Union * dC_wrt_ymax)) / (C * C);
+        p_dl += ((C * dU_wrt_xmin) - (Union * dC_wrt_xmin)) / (C * C);
+        p_dr += ((C * dU_wrt_xmax) - (Union * dC_wrt_xmax)) / (C * C);
+    }
+
+    Dtype di_y1 = p_ymin < p_ymax ? p_dt : p_db;
+    Dtype di_y2 = p_ymin < p_ymax ? p_db : p_dt;
+    Dtype di_x1 = p_xmin < p_xmax ? p_dl : p_dr;
+    Dtype di_x2 = p_xmin < p_xmax ? p_dr : p_dl;
+
+    *diff_x1 = di_x1 * (-1) * Dtype(anchor_scale / (2 * downRatio * layer_scale));
+    *diff_y1 = di_y1 * (-1) * Dtype(anchor_scale / (2 * downRatio * layer_scale));
+    *diff_x2 = di_x2 * (-1) * Dtype(anchor_scale / (2 * downRatio * layer_scale));
+    *diff_y2 = di_y2 * (-1) * Dtype(anchor_scale / (2 * downRatio * layer_scale));
+    return (1 - GIou);
 }
 
 template float GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, float* diff_x1, 
-                float* diff_x2, float* diff_y1, float* diff_y2);
+                float* diff_x2, float* diff_y1, float* diff_y2, const int anchor_scale,
+                const int downRatio, const int layer_scale);
 template double GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, double* diff_x1, 
-                double* diff_x2, double* diff_y1, double* diff_y2);
+                double* diff_x2, double* diff_y1, double* diff_y2, const int anchor_scale,
+                const int downRatio, const int layer_scale);
 
 
+template <typename Dtype>
+Dtype DIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 
+                Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2){
+    NOT_IMPLEMENTED;
+}
 }  // namespace caffe
