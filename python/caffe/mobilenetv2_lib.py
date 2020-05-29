@@ -575,7 +575,9 @@ def CenterGridMobilenetV3Body(net, from_layer, Use_BN = True, use_global_stats= 
             pre_stride = accum_stride
         index += 1
     assert len(LayerList_Name) == len(feature_stride)
-    net_last_layer = net.keys()[-1]
+    out_layer = net.keys()[-1]
+    
+    '''
     out_layer = "conv_1_project/DepthWise"
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
                 num_output= 320, kernel_size= 3, pad= 1, stride= 2, group= 320,
@@ -585,7 +587,8 @@ def CenterGridMobilenetV3Body(net, from_layer, Use_BN = True, use_global_stats= 
     ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
                 num_output= 320, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-    
+    '''
+
     for idx, feature_layer in enumerate(LayerList_Name):
         channel_stage = LayerFilters[idx]
         PointLayer = "linear_conv_{}_{}".format(idx, feature_layer)
@@ -597,12 +600,14 @@ def CenterGridMobilenetV3Body(net, from_layer, Use_BN = True, use_global_stats= 
     for index in range(len(feature_stride)):
         #Deconv_layer scale up 2x2_s2
         channel_stage = LayerFilters[len(LayerFilters) - index - 1]
-        net_last_layer = out_layer
-        Reconnect_layer_one = "Deconv_Scale_Up_Stage_{}".format(channel_stage)
-        ConvBNLayer(net, net_last_layer, Reconnect_layer_one, use_bn= True, use_relu = False, 
-            num_output= channel_stage, kernel_size= 2, pad= 0, stride= 2,
-            lr_mult=1, Use_DeConv= True, use_scale= True, use_global_stats= use_global_stats)
-        
+        Reconnect_layer_one = LayerList_Name[len(feature_stride) - index - 1]          
+        if channel_stage != 320:
+            net_last_layer = out_layer
+            Reconnect_layer_one = "Deconv_Scale_Up_Stage_{}".format(channel_stage)
+            ConvBNLayer(net, net_last_layer, Reconnect_layer_one, use_bn= True, use_relu = False, 
+                num_output= channel_stage, kernel_size= 2, pad= 0, stride= 2,
+                lr_mult=1, Use_DeConv= True, use_scale= True, use_global_stats= use_global_stats)
+        print("channel_stage: ", channel_stage)
         if index != 3:
             Res_Layer_one = "FPN_con_{}".format(index)
             net_last_layer = LayerList_Name[len(feature_stride) - index - 2]
