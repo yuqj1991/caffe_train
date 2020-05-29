@@ -354,7 +354,6 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
         }
         #if 1
         hard_nms(batch_temp, &batch_result, nms_thresh);
-        //soft_nms(batch_temp, &batch_result, 0.5f, nms_thresh);
         for(unsigned j = 0 ; j < batch_result.size(); j++){
             batch_result[j].set_xmin(batch_result[j].xmin() / (4 * output_width));
             batch_result[j].set_xmax(batch_result[j].xmax() / (4 * output_width));

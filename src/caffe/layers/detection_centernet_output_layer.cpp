@@ -39,13 +39,8 @@ void CenternetDetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& b
     CHECK_EQ(bottom[0]->num(), bottom[1]->num());
     CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
     CHECK_EQ(bottom[2]->channels(), 4);
-    // num() and channels() are 1.
     vector<int> top_shape(2, 1);
-    // Since the number of bboxes to be kept is unknown before nms, we manually
-    // set it to (fake) 1.
     top_shape.push_back(1);
-    // Each row is a 7 dimension vector, which stores
-    // [image_id, label, confidence, xmin, ymin, xmax, ymax]
     top_shape.push_back(7);
     top[0]->Reshape(top_shape);
 }
