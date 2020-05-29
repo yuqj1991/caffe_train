@@ -247,6 +247,27 @@ bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
     }
 }
 
+bool ProjectfacemarksBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
+                 AnnoFaceLandmarks* marks) {
+    if (bbox.xmin() >= src_bbox.xmax() || bbox.xmax() <= src_bbox.xmin() ||
+        bbox.ymin() >= src_bbox.ymax() || bbox.ymax() <= src_bbox.ymin()) {
+        return false;
+    }
+    float src_width = src_bbox.xmax() - src_bbox.xmin();
+    float src_height = src_bbox.ymax() - src_bbox.ymin();
+    marks->mutable_lefteye()->set_x((marks->lefteye().x() - src_bbox.xmin()) / src_width);
+    marks->mutable_lefteye()->set_y((marks->lefteye().y() - src_bbox.xmin()) / src_height);
+    marks->mutable_righteye()->set_x((marks->righteye().x() - src_bbox.xmin()) / src_width);
+    marks->mutable_righteye()->set_y((marks->righteye().y() - src_bbox.xmin()) / src_height);
+    marks->mutable_nose()->set_x((marks->nose().x() - src_bbox.xmin()) / src_width);
+    marks->mutable_nose()->set_y((marks->nose().y() - src_bbox.xmin()) / src_height);
+    marks->mutable_leftmouth()->set_x((marks->leftmouth().x() - src_bbox.xmin()) / src_width);
+    marks->mutable_leftmouth()->set_y((marks->leftmouth().y() - src_bbox.xmin()) / src_height);
+    marks->mutable_rightmouth()->set_x((marks->rightmouth().x() - src_bbox.xmin()) / src_width);
+    marks->mutable_rightmouth()->set_y((marks->rightmouth().y() - src_bbox.xmin()) / src_height);
+    return true;
+}
+
 void ExtrapolateBBox(const ResizeParameter& param, const int height,
     const int width, const NormalizedBBox& crop_bbox, NormalizedBBox* bbox) {
     float height_scale = param.height_scale();

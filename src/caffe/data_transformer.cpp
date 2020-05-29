@@ -306,11 +306,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 					CHECK_GT(img_width, 0);
 					UpdateBBoxByResizePolicy(param_.resize_param(), img_width, img_height,
 																		&resize_bbox);
-                    if(has_lm){
-                        UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
-											img_width, img_height,
-											&resize_lmarks);
-                    }
+                    
                     
 				}
 				if (param_.has_emit_constraint() &&
@@ -319,7 +315,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 					continue;
 				}
 				NormalizedBBox proj_bbox;
-                AnnoFaceLandmarks project_facemark;
+                AnnoFaceLandmarks project_facemark = resize_lmarks;
 				if (ProjectBBox(crop_bbox, resize_bbox, &proj_bbox)) {
 					has_valid_annotation = true;
 					Annotation* transformed_anno =
@@ -336,40 +332,26 @@ void DataTransformer<Dtype>::TransformAnnotation(
 						ExtrapolateBBox(param_.resize_param(), img_height, img_width,
 								crop_bbox, transformed_bbox);
 					}
-                    if(has_lm && ){
+                    if(has_lm && ProjectfacemarksBBox(crop_bbox, resize_bbox, &project_facemark)){
+                        NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
                         project_facemark.CopyFrom(src_facemark);
                         point lefteye = src_facemark.lefteye();
                         point righteye = src_facemark.righteye();
                         point nose = src_facemark.nose();
                         point leftmouth = src_facemark.leftmouth();
                         point rightmouth = src_facemark.rightmouth();
+
+                        if(has_lm){
+                            UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
+											img_width, img_height,
+											&resize_lmarks);
+                        }
                         if(do_mirror){
                             project_facemark.mutable_lefteye()->set_x(1-lefteye.x());
                             project_facemark.mutable_righteye()->set_x(1-righteye.x());
                             project_facemark.mutable_nose()->set_x(1-nose.x());
                             project_facemark.mutable_leftmouth()->set_x(1-leftmouth.x());
                             project_facemark.mutable_rightmouth()->set_x(1-rightmouth.x());
-                            transformed_annoface_all->mutable_faceoritation()->set_yaw(-src_annoface.faceoritation().yaw());
-                            transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
-                            transformed_annoface_all->mutable_faceoritation()->set_roll(-src_annoface.faceoritation().roll());
-                        }else{
-                            transformed_annoface_all->mutable_faceoritation()->set_yaw(src_annoface.faceoritation().yaw());
-                            transformed_annoface_all->mutable_faceoritation()->set_pitch(src_annoface.faceoritation().pitch());
-                            transformed_annoface_all->mutable_faceoritation()->set_roll(src_annoface.faceoritation().roll());
-                        }
-                        if(do_expand){
-                            float src_width = crop_bbox.xmax() - crop_bbox.xmin();
-                            float src_height = crop_bbox.ymax() - crop_bbox.ymin();
-                            project_facemark.mutable_lefteye()->set_x((lefteye.x()-crop_bbox.xmin())/src_width);
-                            project_facemark.mutable_lefteye()->set_y((lefteye.y()-crop_bbox.ymin())/src_height);
-                            project_facemark.mutable_righteye()->set_x((righteye.x()-crop_bbox.xmin())/src_width);
-                            project_facemark.mutable_righteye()->set_y((righteye.y()-crop_bbox.ymin())/src_height);
-                            project_facemark.mutable_nose()->set_x((nose.x()-crop_bbox.xmin())/src_width);
-                            project_facemark.mutable_nose()->set_y((nose.y()-crop_bbox.ymin())/src_height);
-                            project_facemark.mutable_leftmouth()->set_x((leftmouth.x()-crop_bbox.xmin())/src_width);
-                            project_facemark.mutable_leftmouth()->set_y((leftmouth.y()-crop_bbox.ymin())/src_height);
-                            project_facemark.mutable_rightmouth()->set_x((rightmouth.x()-crop_bbox.xmin())/src_width);
-                            project_facemark.mutable_rightmouth()->set_y((rightmouth.y()-crop_bbox.ymin())/src_height);
                         }
                         transformed_annoface_all->mutable_landmark()->CopyFrom(project_facemark);
                     }
