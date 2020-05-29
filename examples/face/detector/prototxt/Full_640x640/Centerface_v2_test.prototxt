@@ -4356,23 +4356,9 @@ layer {
   top: "Class_out_1x1_Sigmoid"
 }
 layer {
-  name: "Class_out_1x1_Pooling"
-  type: "Pooling"
-  bottom: "Class_out_1x1_Sigmoid"
-  top: "Class_out_1x1_Pooling"
-  pooling_param {
-    pool: MAX
-    kernel_size: 3
-    stride: 1
-    pad: 1
-    global_pooling: false
-  }
-}
-layer {
   name: "detection_out"
   type: "CenternetDetectionOutput"
   bottom: "Class_out_1x1_Sigmoid"
-  bottom: "Class_out_1x1_Pooling"
   bottom: "Box_out_1x1"
   top: "detection_out"
   include {

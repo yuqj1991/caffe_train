@@ -157,142 +157,142 @@ void ScaleBBox(const NormalizedBBox& bbox, const int height, const int width,
 void OutputBBox(const NormalizedBBox& bbox, const pair<int, int>& img_size,
                 const bool has_resize, const ResizeParameter& resize_param,
                 NormalizedBBox* out_bbox) {
-  const int height = img_size.first;
-  const int width = img_size.second;
-  NormalizedBBox temp_bbox = bbox;
-  if (has_resize && resize_param.resize_mode()) {
-    float resize_height = resize_param.height();
-    CHECK_GT(resize_height, 0);
-    float resize_width = resize_param.width();
-    CHECK_GT(resize_width, 0);
-    float resize_aspect = resize_width / resize_height;
-    int height_scale = resize_param.height_scale();
-    int width_scale = resize_param.width_scale();
-    float aspect = static_cast<float>(width) / height;
+    const int height = img_size.first;
+    const int width = img_size.second;
+    NormalizedBBox temp_bbox = bbox;
+    if (has_resize && resize_param.resize_mode()) {
+        float resize_height = resize_param.height();
+        CHECK_GT(resize_height, 0);
+        float resize_width = resize_param.width();
+        CHECK_GT(resize_width, 0);
+        float resize_aspect = resize_width / resize_height;
+        int height_scale = resize_param.height_scale();
+        int width_scale = resize_param.width_scale();
+        float aspect = static_cast<float>(width) / height;
 
-    float padding;
-    NormalizedBBox source_bbox;
-    switch (resize_param.resize_mode()) {
-      case ResizeParameter_Resize_mode_WARP:
-        ClipBBox(temp_bbox, &temp_bbox);
-        ScaleBBox(temp_bbox, height, width, out_bbox);
-        break;
-      case ResizeParameter_Resize_mode_FIT_LARGE_SIZE_AND_PAD:
-        if (aspect > resize_aspect) {
-          padding = (resize_height - resize_width / aspect) / 2;
-          source_bbox.set_xmin(0.);
-          source_bbox.set_ymin(padding / resize_height);
-          source_bbox.set_xmax(1.);
-          source_bbox.set_ymax(1. - padding / resize_height);
-        } else {
-          padding = (resize_width - resize_height * aspect) / 2;
-          source_bbox.set_xmin(padding / resize_width);
-          source_bbox.set_ymin(0.);
-          source_bbox.set_xmax(1. - padding / resize_width);
-          source_bbox.set_ymax(1.);
+        float padding;
+        NormalizedBBox source_bbox;
+        switch (resize_param.resize_mode()) {
+        case ResizeParameter_Resize_mode_WARP:
+            ClipBBox(temp_bbox, &temp_bbox);
+            ScaleBBox(temp_bbox, height, width, out_bbox);
+            break;
+        case ResizeParameter_Resize_mode_FIT_LARGE_SIZE_AND_PAD:
+            if (aspect > resize_aspect) {
+                padding = (resize_height - resize_width / aspect) / 2;
+                source_bbox.set_xmin(0.);
+                source_bbox.set_ymin(padding / resize_height);
+                source_bbox.set_xmax(1.);
+                source_bbox.set_ymax(1. - padding / resize_height);
+            } else {
+                padding = (resize_width - resize_height * aspect) / 2;
+                source_bbox.set_xmin(padding / resize_width);
+                source_bbox.set_ymin(0.);
+                source_bbox.set_xmax(1. - padding / resize_width);
+                source_bbox.set_ymax(1.);
+            }
+            ProjectBBox(source_bbox, bbox, &temp_bbox);
+            ClipBBox(temp_bbox, &temp_bbox);
+            ScaleBBox(temp_bbox, height, width, out_bbox);
+            break;
+        case ResizeParameter_Resize_mode_FIT_SMALL_SIZE:
+            if (height_scale == 0 || width_scale == 0) {
+                ClipBBox(temp_bbox, &temp_bbox);
+                ScaleBBox(temp_bbox, height, width, out_bbox);
+            } else {
+                ScaleBBox(temp_bbox, height_scale, width_scale, out_bbox);
+                ClipBBox(*out_bbox, height, width, out_bbox);
+            }
+            break;
+        default:
+            LOG(FATAL) << "Unknown resize mode.";
         }
-        ProjectBBox(source_bbox, bbox, &temp_bbox);
+    } else {
+        // Clip the normalized bbox first.
         ClipBBox(temp_bbox, &temp_bbox);
+        // Scale the bbox according to the original image size.
         ScaleBBox(temp_bbox, height, width, out_bbox);
-        break;
-      case ResizeParameter_Resize_mode_FIT_SMALL_SIZE:
-        if (height_scale == 0 || width_scale == 0) {
-          ClipBBox(temp_bbox, &temp_bbox);
-          ScaleBBox(temp_bbox, height, width, out_bbox);
-        } else {
-          ScaleBBox(temp_bbox, height_scale, width_scale, out_bbox);
-          ClipBBox(*out_bbox, height, width, out_bbox);
-        }
-        break;
-      default:
-        LOG(FATAL) << "Unknown resize mode.";
     }
-  } else {
-    // Clip the normalized bbox first.
-    ClipBBox(temp_bbox, &temp_bbox);
-    // Scale the bbox according to the original image size.
-    ScaleBBox(temp_bbox, height, width, out_bbox);
-  }
 }
 
 void LocateBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
                 NormalizedBBox* loc_bbox) {
-  float src_width = src_bbox.xmax() - src_bbox.xmin();
-  float src_height = src_bbox.ymax() - src_bbox.ymin();
-  loc_bbox->set_xmin(src_bbox.xmin() + bbox.xmin() * src_width);
-  loc_bbox->set_ymin(src_bbox.ymin() + bbox.ymin() * src_height);
-  loc_bbox->set_xmax(src_bbox.xmin() + bbox.xmax() * src_width);
-  loc_bbox->set_ymax(src_bbox.ymin() + bbox.ymax() * src_height);
-  loc_bbox->set_difficult(bbox.difficult());
+    float src_width = src_bbox.xmax() - src_bbox.xmin();
+    float src_height = src_bbox.ymax() - src_bbox.ymin();
+    loc_bbox->set_xmin(src_bbox.xmin() + bbox.xmin() * src_width);
+    loc_bbox->set_ymin(src_bbox.ymin() + bbox.ymin() * src_height);
+    loc_bbox->set_xmax(src_bbox.xmin() + bbox.xmax() * src_width);
+    loc_bbox->set_ymax(src_bbox.ymin() + bbox.ymax() * src_height);
+    loc_bbox->set_difficult(bbox.difficult());
 }
 
 bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
                  NormalizedBBox* proj_bbox) {
-  if (bbox.xmin() >= src_bbox.xmax() || bbox.xmax() <= src_bbox.xmin() ||
-      bbox.ymin() >= src_bbox.ymax() || bbox.ymax() <= src_bbox.ymin()) {
-    return false;
-  }
-  float src_width = src_bbox.xmax() - src_bbox.xmin();
-  float src_height = src_bbox.ymax() - src_bbox.ymin();
-  proj_bbox->set_xmin((bbox.xmin() - src_bbox.xmin()) / src_width);
-  proj_bbox->set_ymin((bbox.ymin() - src_bbox.ymin()) / src_height);
-  proj_bbox->set_xmax((bbox.xmax() - src_bbox.xmin()) / src_width);
-  proj_bbox->set_ymax((bbox.ymax() - src_bbox.ymin()) / src_height);
-  proj_bbox->set_difficult(bbox.difficult());
-  ClipBBox(*proj_bbox, proj_bbox);
-  if (BBoxSize(*proj_bbox) > 0) {
-    return true;
-  } else {
-    return false;
-  }
+    if (bbox.xmin() >= src_bbox.xmax() || bbox.xmax() <= src_bbox.xmin() ||
+        bbox.ymin() >= src_bbox.ymax() || bbox.ymax() <= src_bbox.ymin()) {
+        return false;
+    }
+    float src_width = src_bbox.xmax() - src_bbox.xmin();
+    float src_height = src_bbox.ymax() - src_bbox.ymin();
+    proj_bbox->set_xmin((bbox.xmin() - src_bbox.xmin()) / src_width);
+    proj_bbox->set_ymin((bbox.ymin() - src_bbox.ymin()) / src_height);
+    proj_bbox->set_xmax((bbox.xmax() - src_bbox.xmin()) / src_width);
+    proj_bbox->set_ymax((bbox.ymax() - src_bbox.ymin()) / src_height);
+    proj_bbox->set_difficult(bbox.difficult());
+    ClipBBox(*proj_bbox, proj_bbox);
+    if (BBoxSize(*proj_bbox) > 0) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void ExtrapolateBBox(const ResizeParameter& param, const int height,
     const int width, const NormalizedBBox& crop_bbox, NormalizedBBox* bbox) {
-  float height_scale = param.height_scale();
-  float width_scale = param.width_scale();
-  if (height_scale > 0 && width_scale > 0 &&
-      param.resize_mode() == ResizeParameter_Resize_mode_FIT_SMALL_SIZE) {
-    float orig_aspect = static_cast<float>(width) / height;
-    float resize_height = param.height();
-    float resize_width = param.width();
-    float resize_aspect = resize_width / resize_height;
-    if (orig_aspect < resize_aspect) {
-      resize_height = resize_width / orig_aspect;
-    } else {
-      resize_width = resize_height * orig_aspect;
+    float height_scale = param.height_scale();
+    float width_scale = param.width_scale();
+    if (height_scale > 0 && width_scale > 0 &&
+        param.resize_mode() == ResizeParameter_Resize_mode_FIT_SMALL_SIZE) {
+        float orig_aspect = static_cast<float>(width) / height;
+        float resize_height = param.height();
+        float resize_width = param.width();
+        float resize_aspect = resize_width / resize_height;
+        if (orig_aspect < resize_aspect) {
+        resize_height = resize_width / orig_aspect;
+        } else {
+        resize_width = resize_height * orig_aspect;
+        }
+        float crop_height = resize_height * (crop_bbox.ymax() - crop_bbox.ymin());
+        float crop_width = resize_width * (crop_bbox.xmax() - crop_bbox.xmin());
+        CHECK_GE(crop_width, width_scale);
+        CHECK_GE(crop_height, height_scale);
+        bbox->set_xmin(bbox->xmin() * crop_width / width_scale);
+        bbox->set_xmax(bbox->xmax() * crop_width / width_scale);
+        bbox->set_ymin(bbox->ymin() * crop_height / height_scale);
+        bbox->set_ymax(bbox->ymax() * crop_height / height_scale);
     }
-    float crop_height = resize_height * (crop_bbox.ymax() - crop_bbox.ymin());
-    float crop_width = resize_width * (crop_bbox.xmax() - crop_bbox.xmin());
-    CHECK_GE(crop_width, width_scale);
-    CHECK_GE(crop_height, height_scale);
-    bbox->set_xmin(bbox->xmin() * crop_width / width_scale);
-    bbox->set_xmax(bbox->xmax() * crop_width / width_scale);
-    bbox->set_ymin(bbox->ymin() * crop_height / height_scale);
-    bbox->set_ymax(bbox->ymax() * crop_height / height_scale);
-  }
 }
 
 float JaccardOverlap(const NormalizedBBox& bbox1, const NormalizedBBox& bbox2,
                      const bool normalized) {
-  NormalizedBBox intersect_bbox;
-  IntersectBBox(bbox1, bbox2, &intersect_bbox);
-  float intersect_width, intersect_height;
-  if (normalized) {
-    intersect_width = intersect_bbox.xmax() - intersect_bbox.xmin();
-    intersect_height = intersect_bbox.ymax() - intersect_bbox.ymin();
-  } else {
-    intersect_width = intersect_bbox.xmax() - intersect_bbox.xmin() + 1;
-    intersect_height = intersect_bbox.ymax() - intersect_bbox.ymin() + 1;
-  }
-  if (intersect_width > 0 && intersect_height > 0) {
-    float intersect_size = intersect_width * intersect_height;
-    float bbox1_size = BBoxSize(bbox1);
-    float bbox2_size = BBoxSize(bbox2);
-    return intersect_size / (bbox1_size + bbox2_size - intersect_size);
-  } else {
-    return 0.;
-  }
+    NormalizedBBox intersect_bbox;
+    IntersectBBox(bbox1, bbox2, &intersect_bbox);
+    float intersect_width, intersect_height;
+    if (normalized) {
+        intersect_width = intersect_bbox.xmax() - intersect_bbox.xmin();
+        intersect_height = intersect_bbox.ymax() - intersect_bbox.ymin();
+    } else {
+        intersect_width = intersect_bbox.xmax() - intersect_bbox.xmin() + 1;
+        intersect_height = intersect_bbox.ymax() - intersect_bbox.ymin() + 1;
+    }
+    if (intersect_width > 0 && intersect_height > 0) {
+        float intersect_size = intersect_width * intersect_height;
+        float bbox1_size = BBoxSize(bbox1);
+        float bbox2_size = BBoxSize(bbox2);
+        return intersect_size / (bbox1_size + bbox2_size - intersect_size);
+    } else {
+        return 0.;
+    }
 }
 
 template <typename Dtype>

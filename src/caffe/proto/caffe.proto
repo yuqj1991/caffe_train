@@ -152,14 +152,14 @@ message AnnotatedCCpdDatum {
 
 // The normalized bounding box [0, 1] w.r.t. the input image size.
 message NormalizedBBox {
-  optional float xmin = 1;
-  optional float ymin = 2;
-  optional float xmax = 3;
-  optional float ymax = 4;
-  optional int32 label = 5;
-  optional bool difficult = 6;
-  optional float score = 7;
-  optional float size = 8;
+    optional float xmin = 1;
+    optional float ymin = 2;
+    optional float xmax = 3;
+    optional float ymax = 4;
+    optional int32 label = 5;
+    optional bool difficult = 6;
+    optional float score = 7;
+    optional float size = 8;
 }
 
 message CenterNetInfo{
@@ -173,104 +173,106 @@ message CenterNetInfo{
 }
 
 message BboxSampler {
-  optional int32 bbox_small_scale = 1;
-  optional int32 bbox_large_scale = 2;
-  optional int32 ancher_stride = 3;
+    optional int32 bbox_small_scale = 1;
+    optional int32 bbox_large_scale = 2;
+    optional int32 ancher_stride = 3;
 }
 
 message LFFDSampler {
-  repeated BboxSampler box = 1;
-  optional uint32 max_sample = 2 [default = 1];
-	// Maximum number of trials for sampling to avoid infinite loop.
-	optional uint32 max_trials = 3 [default = 50];
+    repeated BboxSampler box = 1;
+    optional uint32 max_sample = 2 [default = 1];
+    // Maximum number of trials for sampling to avoid infinite loop.
+    optional uint32 max_trials = 3 [default = 50];
 }
 
 // Annotation for each object instance.
 message Annotation {
-  optional int32 instance_id = 1 [default = 0];
-  optional NormalizedBBox bbox = 2;
+    optional int32 instance_id = 1 [default = 0];
+    optional NormalizedBBox bbox = 2;
+    optional bool has_lm = 3[default=false];
+    optional AnnoFaceLandmarks face_lm = 4;
 }
 
 // Group of annotations for a particular label.
 message AnnotationGroup {
-  optional int32 group_label = 1;
-  repeated Annotation annotation = 2;
+    optional int32 group_label = 1;
+    repeated Annotation annotation = 2;
 }
 
 // An extension of Datum which contains "rich" annotations.
 message AnnotatedDatum {
-  enum AnnotationType {
-    BBOX = 0;
-  }
-  optional Datum datum = 1;
-  // If there are "rich" annotations, specify the type of annotation.
-  // Currently it only supports bounding box.
-  // If there are no "rich" annotations, use label in datum instead.
-  optional AnnotationType type = 2;
-  // Each group contains annotation for a particular class.
-  repeated AnnotationGroup annotation_group = 4;
+    enum AnnotationType {
+        BBOX = 0;
+    }
+    optional Datum datum = 1;
+    // If there are "rich" annotations, specify the type of annotation.
+    // Currently it only supports bounding box.
+    // If there are no "rich" annotations, use label in datum instead.
+    optional AnnotationType type = 2;
+    // Each group contains annotation for a particular class.
+    repeated AnnotationGroup annotation_group = 4;
 }
 
 
 // the anno point has been normolizsed!
 message point{
-  optional float x = 1;
-  optional float y = 2;
+    optional float x = 1[default = -1.0];
+    optional float y = 2[default = -1.0];
 }
 
 // Annotation for face 21 points(coordinate for x and y)
 message AnnoFaceLandmarks{
-  optional point lefteye = 1;
-  optional point righteye = 2;
-  optional point nose = 3;
-  optional point leftmouth = 4;
-  optional point rightmouth = 5;
+    optional point lefteye = 1;
+    optional point righteye = 2;
+    optional point nose = 3;
+    optional point leftmouth = 4;
+    optional point rightmouth = 5;
 }
 
 // Annotation for face headpose contain yaw, roll, pitch 
 message AnnoFaceOritation{
-  optional float yaw = 1;
-  optional float pitch = 2;
-  optional float roll = 3;
+    optional float yaw = 1;
+    optional float pitch = 2;
+    optional float roll = 3;
 }
 // Annotation for face headpose contain yaw, roll, pitch
 message AnnoFaceAttribute{
-  optional AnnoFaceOritation faceoritation = 1;
-  optional AnnoFaceLandmarks landmark=2;
-  optional int32 gender = 3 ;
-  optional int32 glass = 4;
+    optional AnnoFaceOritation faceoritation = 1;
+    optional AnnoFaceLandmarks landmark=2;
+    optional int32 gender = 3 ;
+    optional int32 glass = 4;
 }
 
 // AnnofaceDataum with datum, and facepoints & AnnoFaceAttribute
 message AnnoFaceAttributeDatum{
-  enum AnnoType{
-    FACEATTRIBUTE =0;
-  }
-  optional Datum datum =1;
-  optional AnnoType type =2;
-  optional AnnoFaceAttribute faceattri =3;
+    enum AnnoType{
+        FACEATTRIBUTE =0;
+    }
+    optional Datum datum =1;
+    optional AnnoType type =2;
+    optional AnnoFaceAttribute faceattri =3;
 }
 
 
 message FillerParameter {
-  // The filler type.
-  optional string type = 1 [default = 'constant'];
-  optional float value = 2 [default = 0]; // the value in constant filler
-  optional float min = 3 [default = 0]; // the min value in uniform filler
-  optional float max = 4 [default = 1]; // the max value in uniform filler
-  optional float mean = 5 [default = 0]; // the mean value in Gaussian filler
-  optional float std = 6 [default = 1]; // the std value in Gaussian filler
-  // The expected number of non-zero output weights for a given input in
-  // Gaussian filler -- the default -1 means don't perform sparsification.
-  optional int32 sparse = 7 [default = -1];
-  // Normalize the filler variance by fan_in, fan_out, or their average.
-  // Applies to 'xavier' and 'msra' fillers.
-  enum VarianceNorm {
-    FAN_IN = 0;
-    FAN_OUT = 1;
-    AVERAGE = 2;
-  }
-  optional VarianceNorm variance_norm = 8 [default = FAN_IN];
+    // The filler type.
+    optional string type = 1 [default = 'constant'];
+    optional float value = 2 [default = 0]; // the value in constant filler
+    optional float min = 3 [default = 0]; // the min value in uniform filler
+    optional float max = 4 [default = 1]; // the max value in uniform filler
+    optional float mean = 5 [default = 0]; // the mean value in Gaussian filler
+    optional float std = 6 [default = 1]; // the std value in Gaussian filler
+    // The expected number of non-zero output weights for a given input in
+    // Gaussian filler -- the default -1 means don't perform sparsification.
+    optional int32 sparse = 7 [default = -1];
+    // Normalize the filler variance by fan_in, fan_out, or their average.
+    // Applies to 'xavier' and 'msra' fillers.
+    enum VarianceNorm {
+        FAN_IN = 0;
+        FAN_OUT = 1;
+        AVERAGE = 2;
+    }
+    optional VarianceNorm variance_norm = 8 [default = FAN_IN];
 }
 
 message NetParameter {
@@ -1086,23 +1088,25 @@ message AccuracyParameter {
 }
 
 message AnnotatedDataParameter {
-  // Define the sampler.
-  repeated BatchSampler batch_sampler = 1;
-  // Store label name and label id in LabelMap format.
-  optional string label_map_file = 2;
-  // If provided, it will replace the AnnotationType stored in each
-  // AnnotatedDatum.
-  optional AnnotatedDatum.AnnotationType anno_type = 3;
-  optional DataAnchorSampler data_anchor_sampler =6;
-  optional LFFDSampler bbox_sampler = 8;
-  optional bool yoloformat = 10[default = false];
-  enum CROP_TYPE {
-    CROP_BATCH = 0;
-    CROP_JITTER = 1;
-    CROP_ANCHOR = 2;
-    CROP_GT_BBOX = 3;
-  }
-  optional CROP_TYPE  crop_type = 11 [default = CROP_BATCH];
+    // Define the sampler.
+    repeated BatchSampler batch_sampler = 1;
+    // Store label name and label id in LabelMap format.
+    optional string label_map_file = 2;
+    // If provided, it will replace the AnnotationType stored in each
+    // AnnotatedDatum.
+    optional AnnotatedDatum.AnnotationType anno_type = 3;
+    optional DataAnchorSampler data_anchor_sampler =6;
+    optional LFFDSampler bbox_sampler = 8;
+    optional bool yoloformat = 10[default = false];
+    enum CROP_TYPE {
+        CROP_BATCH = 0;
+        CROP_JITTER = 1;
+        CROP_ANCHOR = 2;
+        CROP_GT_BBOX = 3;
+        CROP_DEFAULT = 4;
+    }
+    optional CROP_TYPE  crop_type = 11 [default = CROP_DEFAULT];
+    optional bool has_landmarks = 12[default = false];
 }
 
 message ArgMaxParameter {

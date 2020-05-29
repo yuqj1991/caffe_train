@@ -11,11 +11,10 @@ convert2vocformat = True
 
 # 最小取20大小的脸，并且补齐
 minsize2select = 10
-cropsize2select = 60
 usepadding = True
 
 datasetprefix = "../../../dataset/facedata/wider_face"
-use_blur_occlu_attri = False 
+
 
 classflyFile = "./wider_face_classfly_distance_data.txt"
 
@@ -36,11 +35,6 @@ def convertimgset(img_set="train"):
         os.mkdir(rootdir + '/wider_face/' + "/ImageSets")
     if not os.path.exists(rootdir + '/wider_face/' + "/ImageSets/Main"):
         os.mkdir(rootdir + '/wider_face/' + "/ImageSets/Main")
-    if use_blur_occlu_attri:
-        if not os.path.exists(croplabelsdir):
-            os.mkdir(croplabelsdir)
-        if not os.path.exists(cropImgsDir):
-            os.mkdir(cropImgsDir)
 
     if convert2vocformat:
         if not os.path.exists(vocannotationdir):
@@ -48,15 +42,13 @@ def convertimgset(img_set="train"):
     index = 0
 
     f_set = open(rootdir + '/wider_face/' + "/ImageSets/Main/" + img_set + ".txt", 'w')
-    if use_blur_occlu_attri:
-        f_set_crop = open(rootdir + '/wider_face/' + "/ImageSets/Main/crop_" + img_set + ".txt", 'w')
     classfly_file = open(classflyFile, 'a+')
     
     with open(gtfilepath, 'r') as gtfile:
         while (True):  # and len(faces)<10
             filename = gtfile.readline()[:-1]
             if (filename == ""):
-                break;
+                break
             sys.stdout.write("\r" + str(index) + ":" + imgdir + "/" + filename + "\n")
             sys.stdout.flush()
             imgpath = imgdir + "/" + filename
@@ -64,8 +56,7 @@ def convertimgset(img_set="train"):
             img_width = img.shape[1]
             img_height = img.shape[0]
             if not img.data:
-                break;
-
+                break
             saveimg = img.copy()
             showimg = saveimg.copy()
             numbbox = int(gtfile.readline())
@@ -86,7 +77,6 @@ def convertimgset(img_set="train"):
                 bbox = (x, y, width, height)
                 x2 = x + width
                 y2 = y + height
-                # face=img[x:x2,y:y2]
                 if width >= minsize2select and height >= minsize2select:
                     bboxes.append(bbox)
                     occlus.append(occlu)
@@ -96,20 +86,6 @@ def convertimgset(img_set="train"):
                     label_file = open(LableFileName, 'a+')
                     label_file.writelines(content)
                     label_file.close()
-                    if use_blur_occlu_attri and width >= cropsize2select and height >= cropsize2select:
-                        cropImgFileName = cropImgsDir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i) + '.jpg'
-                        cropLableFileName = croplabelsdir + '/' + filename.replace("/", "_").split('.jpg')[0] + '_crop_' + str(i)
-                        x11 = np.maximum(x - 0/2, 0)
-                        y11 = np.maximum(y - 0/2, 0)
-                        x22 = np.minimum(x2 + 0/2, img.shape[1])
-                        y22 = np.minimum(y2 + 0/2, img.shape[0])
-                        cropImg = img[int(y11):int(y22),int(x11):int(x22),:]
-                        cv2.imwrite(cropImgFileName, cropImg)
-                        croplabel_file = open(cropLableFileName, 'w')
-                        txtline = str(blur) + ' ' + str(occlu) + '\n'
-                        croplabel_file.write(txtline)
-                        croplabel_file.close()
-                        f_set_crop.write(os.path.abspath(cropImgFileName).split('.jpg')[0] + '\n')
                     cv2.rectangle(showimg, (x, y), (x2, y2), (0, 255, 0))
                 else:
                     saveimg[y:y2, x:x2, :] = (104,117,123)
@@ -120,7 +96,6 @@ def convertimgset(img_set="train"):
                 continue
             cv2.imwrite(imagesdir + "/" + filename, saveimg)
             # generate filelist
-            imgfilepath = filename[:-4]
             f_set.write(os.path.abspath(imagesdir + "/" + filename).split('.jpg')[0] + '\n')
             if convet2yoloformat:
                 height = saveimg.shape[0]
@@ -202,13 +177,6 @@ def convertimgset(img_set="train"):
                     truncated = doc.createElement('truncated')
                     truncated.appendChild(doc.createTextNode('1'))
                     objects.appendChild(truncated)
-                    if use_blur_occlu_attri:
-                        blur_node = doc.createElement('blur')
-                        blur_node.appendChild(doc.createTextNode(str(blur)))
-                        objects.appendChild(blur_node)
-                        occlusion_node = doc.createElement('occlusion')
-                        occlusion_node.appendChild(doc.createTextNode(str(occlu)))
-                        objects.appendChild(occlusion_node)
                     difficult = doc.createElement('difficult')
                     difficult.appendChild(doc.createTextNode('0'))
                     objects.appendChild(difficult)
@@ -240,48 +208,9 @@ def convertimgset(img_set="train"):
                 f = open(xmlpath, "w")
                 f.write(doc.toprettyxml(indent=''))
                 f.close()
-                # cv2.imshow("img",showimg)
-            # cv2.waitKey()
             index = index + 1
     classfly_file.close()
     f_set.close()
-
-def generatetxt(img_set="train"):
-    gtfilepath = rootdir + "/wider_face_split/wider_face_" + img_set + "_bbx_gt.txt"
-    f = open(rootdir + "/" + img_set + ".txt", "w")
-    with open(gtfilepath, 'r') as gtfile:
-        while (True):
-            filename = gtfile.readline()[:-1]
-            if (filename == ""):
-                break;
-            filename = filename.replace("/", "_")
-            imgfilepath = datasetprefix + "/images/" + filename
-            f.write(imgfilepath + '\n')
-            numbbox = int(gtfile.readline())
-            for i in range(numbbox):
-                line = gtfile.readline()
-    f.close()
-
-
-def generatevocsets(img_set="train"):
-    if not os.path.exists(rootdir + "/ImageSets"):
-        os.mkdir(rootdir + "/ImageSets")
-    if not os.path.exists(rootdir + "/ImageSets/Main"):
-        os.mkdir(rootdir + "/ImageSets/Main")
-    gtfilepath = rootdir + "/wider_face_split/wider_face_" + img_set + "_bbx_gt.txt"
-    f = open(rootdir + "/ImageSets/Main/" + img_set + ".txt", 'w')
-    with open(gtfilepath, 'r') as gtfile:
-        while (True):
-            filename = gtfile.readline()[:-1]
-            if (filename == ""):
-                break;
-            filename = filename.replace("/", "_")
-            imgfilepath = filename[:-4]
-            f.write(imgfilepath + '\n')
-            numbbox = int(gtfile.readline())
-            for i in range(numbbox):
-                line = gtfile.readline()
-    f.close()
 
 
 def convertdataset():

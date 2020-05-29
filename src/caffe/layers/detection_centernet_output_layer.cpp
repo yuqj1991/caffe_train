@@ -36,8 +36,9 @@ template <typename Dtype>
 void CenternetDetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   
-    CHECK_EQ(bottom[0]->num(), bottom[1]->num());
-    CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
+    //CHECK_EQ(bottom[0]->num(), bottom[1]->num());
+    //CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
+    CHECK_EQ(bottom[0]->channels() , num_classes_ - 1);
     CHECK_EQ(bottom[2]->channels(), 4);
     vector<int> top_shape(2, 1);
     top_shape.push_back(1);

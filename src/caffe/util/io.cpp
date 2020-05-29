@@ -336,123 +336,163 @@ bool ReadFileToDatum(const string& filename, const int label,
 bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
     const int img_width, const std::map<string, int>& name_to_label,
     AnnotatedDatum* anno_datum) {
-  ptree pt;
-  read_xml(labelfile, pt);
+    ptree pt;
+    read_xml(labelfile, pt);
 
-  // Parse annotation.
-  int width = 0, height = 0;
-  try {
-    height = pt.get<int>("annotation.size.height");
-    width = pt.get<int>("annotation.size.width");
-  } catch (const ptree_error &e) {
-    LOG(WARNING) << "When parsing " << labelfile << ": " << e.what();
-    height = img_height;
-    width = img_width;
-  }
-  LOG_IF(WARNING, height != img_height) << labelfile <<
-      " inconsistent image height.";
-  LOG_IF(WARNING, width != img_width) << labelfile <<
-      " inconsistent image width.";
-  CHECK(width != 0 && height != 0) << labelfile <<
-      " no valid image width/height.";
-  int instance_id = 0;
-  BOOST_FOREACH(ptree::value_type &v1, pt.get_child("annotation")) {
-    ptree pt1 = v1.second;
-    if (v1.first == "object") {
-      Annotation* anno = NULL;
-      bool difficult = false;
-      ptree object = v1.second;
-      BOOST_FOREACH(ptree::value_type &v2, object.get_child("")) {
-        ptree pt2 = v2.second;
-        if (v2.first == "name") {
-          string name = pt2.data();
-          if (name_to_label.find(name) == name_to_label.end()) {
-            LOG(FATAL) << "Unknown name: " << name;
-          }
-          int label = name_to_label.find(name)->second;
-          bool found_group = false;
-          for (int g = 0; g < anno_datum->annotation_group_size(); ++g) {
-            AnnotationGroup* anno_group =
-                anno_datum->mutable_annotation_group(g);
-            if (label == anno_group->group_label()) {
-              if (anno_group->annotation_size() == 0) {
-                instance_id = 0;
-              } else {
-                instance_id = anno_group->annotation(
-                    anno_group->annotation_size() - 1).instance_id() + 1;
-              }
-              anno = anno_group->add_annotation();
-              found_group = true;
+    // Parse annotation.
+    int width = 0, height = 0;
+    try {
+        height = pt.get<int>("annotation.size.height");
+        width = pt.get<int>("annotation.size.width");
+    } catch (const ptree_error &e) {
+        LOG(WARNING) << "When parsing " << labelfile << ": " << e.what();
+        height = img_height;
+        width = img_width;
+    }
+    LOG_IF(WARNING, height != img_height) << labelfile <<
+        " inconsistent image height.";
+    LOG_IF(WARNING, width != img_width) << labelfile <<
+        " inconsistent image width.";
+    CHECK(width != 0 && height != 0) << labelfile <<
+        " no valid image width/height.";
+    int instance_id = 0;
+    BOOST_FOREACH(ptree::value_type &v1, pt.get_child("annotation")) {
+        ptree pt1 = v1.second;
+        if (v1.first == "object") {
+            Annotation* anno = NULL;
+            bool difficult = false;
+            bool has_lm = false;
+            float lm_x1 = -1.0, lm_y1 = -1.0, lm_x2 = -1.0, lm_y2 = -1.0,
+            lm_x3 = -1.0, lm_y3 = -1.0, lm_x4 = -1.0, lm_y4 = -1.0, 
+            lm_x5 = -1.0, lm_y5 = -1.0;
+            ptree object = v1.second;
+            BOOST_FOREACH(ptree::value_type &v2, object.get_child("")) {
+                ptree pt2 = v2.second;
+                if (v2.first == "name") {
+                    string name = pt2.data();
+                    if (name_to_label.find(name) == name_to_label.end()) {
+                        LOG(FATAL) << "Unknown name: " << name;
+                    }
+                    int label = name_to_label.find(name)->second;
+                    bool found_group = false;
+                    for (int g = 0; g < anno_datum->annotation_group_size(); ++g) {
+                        AnnotationGroup* anno_group =
+                            anno_datum->mutable_annotation_group(g);
+                        if (label == anno_group->group_label()) {
+                            if (anno_group->annotation_size() == 0) {
+                                instance_id = 0;
+                            } else {
+                                instance_id = anno_group->annotation(
+                                    anno_group->annotation_size() - 1).instance_id() + 1;
+                            }
+                            anno = anno_group->add_annotation();
+                            found_group = true;
+                        }
+                    }
+                    if (!found_group) {
+                        // If there is no such annotation_group, create a new one.
+                        AnnotationGroup* anno_group = anno_datum->add_annotation_group();
+                        anno_group->set_group_label(label);
+                        anno = anno_group->add_annotation();
+                        instance_id = 0;
+                    }
+                    anno->set_instance_id(instance_id++);
+                } else if (v2.first == "difficult") {
+                    difficult = pt2.data() == "1";
+                }else if (v2.first == "bndbox") {
+                    int xmin = pt2.get("xmin", 0);
+                    int ymin = pt2.get("ymin", 0);
+                    int xmax = pt2.get("xmax", 0);
+                    int ymax = pt2.get("ymax", 0);
+                    CHECK_NOTNULL(anno);
+                    LOG_IF(WARNING, xmin > width) << labelfile <<
+                        " bounding box exceeds image boundary.";
+                    LOG_IF(WARNING, ymin > height) << labelfile <<
+                        " bounding box exceeds image boundary.";
+                    LOG_IF(WARNING, xmax > width) << labelfile <<
+                        " bounding box exceeds image boundary.";
+                    LOG_IF(WARNING, ymax > height) << labelfile <<
+                        " bounding box exceeds image boundary.";
+                    LOG_IF(WARNING, xmin < 0) << labelfile <<
+                        " bounding box exceeds image boundary.";
+                    LOG_IF(WARNING, ymin < 0) << labelfile <<
+                        " bounding box exceeds image boundary.";
+                    LOG_IF(WARNING, xmax < 0) << labelfile <<
+                        " bounding box exceeds image boundary.";
+                    LOG_IF(WARNING, ymax < 0) << labelfile <<
+                        " bounding box exceeds image boundary.";
+                    LOG_IF(WARNING, xmin > xmax) << labelfile <<
+                        " bounding box irregular.";
+                    LOG_IF(WARNING, ymin > ymax) << labelfile <<
+                        " bounding box irregular.";
+                    // Store the normalized bounding box.
+                    NormalizedBBox* bbox = anno->mutable_bbox();
+                    bbox->set_xmin(static_cast<float>(xmin) / width);
+                    bbox->set_ymin(static_cast<float>(ymin) / height);
+                    bbox->set_xmax(static_cast<float>(xmax) / width);
+                    bbox->set_ymax(static_cast<float>(ymax) / height);
+                    bbox->set_difficult(difficult);
+                }else if (v2.first == "lm"){
+                    lm_x1 = pt2.get<float>("x1", 0);
+                    lm_y1 = pt2.get<float>("y1", 0);
+                    lm_x2 = pt2.get<float>("x2", 0);
+                    lm_y2 = pt2.get<float>("y2", 0);
+                    lm_x3 = pt2.get<float>("x3", 0);
+                    lm_y3 = pt2.get<float>("y3", 0);
+                    lm_x4 = pt2.get<float>("x4", 0);
+                    lm_y4 = pt2.get<float>("y4", 0);
+                    lm_x5 = pt2.get<float>("x5", 0);
+                    lm_y5 = pt2.get<float>("y5", 0);
+                    CHECK_NOTNULL(anno);
+                    AnnoFaceLandmarks* lmarks = anno->mutable_face_lm();
+                    lmarks->mutable_lefteye()->set_x(static_cast<float>(lm_x1 / width));
+                    lmarks->mutable_lefteye()->set_y(static_cast<float>(lm_y1 / height));
+                    lmarks->mutable_righteye()->set_x(static_cast<float>(lm_x2 / width));
+                    lmarks->mutable_righteye()->set_y(static_cast<float>(lm_y2 / height));
+                    lmarks->mutable_nose()->set_x(static_cast<float>(lm_x3 / width));
+                    lmarks->mutable_nose()->set_y(static_cast<float>(lm_y3 / height));
+                    lmarks->mutable_leftmouth()->set_x(static_cast<float>(lm_x4 / width));
+                    lmarks->mutable_leftmouth()->set_y(static_cast<float>(lm_y4 / height));
+                    lmarks->mutable_rightmouth()->set_x(static_cast<float>(lm_x5 / width));
+                    lmarks->mutable_rightmouth()->set_y(static_cast<float>(lm_y5 / height));
+                }else if (v2.first == "has_lm"){
+                    has_lm = pt2.data() == "1";
+                    anno->set_has_lm(has_lm);
+                }
             }
-          }
-          if (!found_group) {
-            // If there is no such annotation_group, create a new one.
-            AnnotationGroup* anno_group = anno_datum->add_annotation_group();
-            anno_group->set_group_label(label);
-            anno = anno_group->add_annotation();
-            instance_id = 0;
-          }
-          anno->set_instance_id(instance_id++);
-        } else if (v2.first == "difficult") {
-          difficult = pt2.data() == "1";
-        }else if (v2.first == "bndbox") {
-          int xmin = pt2.get("xmin", 0);
-          int ymin = pt2.get("ymin", 0);
-          int xmax = pt2.get("xmax", 0);
-          int ymax = pt2.get("ymax", 0);
-          CHECK_NOTNULL(anno);
-          LOG_IF(WARNING, xmin > width) << labelfile <<
-              " bounding box exceeds image boundary.";
-          LOG_IF(WARNING, ymin > height) << labelfile <<
-              " bounding box exceeds image boundary.";
-          LOG_IF(WARNING, xmax > width) << labelfile <<
-              " bounding box exceeds image boundary.";
-          LOG_IF(WARNING, ymax > height) << labelfile <<
-              " bounding box exceeds image boundary.";
-          LOG_IF(WARNING, xmin < 0) << labelfile <<
-              " bounding box exceeds image boundary.";
-          LOG_IF(WARNING, ymin < 0) << labelfile <<
-              " bounding box exceeds image boundary.";
-          LOG_IF(WARNING, xmax < 0) << labelfile <<
-              " bounding box exceeds image boundary.";
-          LOG_IF(WARNING, ymax < 0) << labelfile <<
-              " bounding box exceeds image boundary.";
-          LOG_IF(WARNING, xmin > xmax) << labelfile <<
-              " bounding box irregular.";
-          LOG_IF(WARNING, ymin > ymax) << labelfile <<
-              " bounding box irregular.";
-          // Store the normalized bounding box.
-          NormalizedBBox* bbox = anno->mutable_bbox();
-          bbox->set_xmin(static_cast<float>(xmin) / width);
-          bbox->set_ymin(static_cast<float>(ymin) / height);
-          bbox->set_xmax(static_cast<float>(xmax) / width);
-          bbox->set_ymax(static_cast<float>(ymax) / height);
-          bbox->set_difficult(difficult);
         }
-      }
     }
-  }
-#if 1
-  int group_size = anno_datum->annotation_group_size();
-  LOG(INFO)<<"group_size: "<<group_size;
-  for(int nn = 0; nn< group_size; nn++)
-  {
-    const AnnotationGroup anno_group = anno_datum->annotation_group(nn);
-    LOG(INFO) << "=============================";
-    LOG(INFO) <<"anno_group label: "<<anno_group.group_label();
-    int anno_size = anno_group.annotation_size();
-    for(int jj=0; jj<anno_size; jj++)
+    #if 1
+    int group_size = anno_datum->annotation_group_size();
+    LOG(INFO)<<"group_size: "<<group_size;
+    for(int nn = 0; nn< group_size; nn++)
     {
-      const Annotation anno = anno_group.annotation(jj);
-      LOG(INFO)<< "anno_instance_id: "<<anno.instance_id();
-      NormalizedBBox bbox = anno.bbox();
-      LOG(INFO) << "bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
-                <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
-                <<" bbox->label: "<<bbox.label();
+        const AnnotationGroup anno_group = anno_datum->annotation_group(nn);
+        LOG(INFO) << "=============================";
+        LOG(INFO) <<"anno_group label: "<<anno_group.group_label();
+        int anno_size = anno_group.annotation_size();
+        for(int jj=0; jj<anno_size; jj++)
+        {
+            const Annotation anno = anno_group.annotation(jj);
+            LOG(INFO)<< "anno_instance_id: "<<anno.instance_id();
+            NormalizedBBox bbox = anno.bbox();
+            LOG(INFO) << "bbox->xmin: "<<bbox.xmin()<<" bbox->ymin: "<<bbox.ymin()
+                        <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
+                        <<" bbox->label: "<<bbox.label();
+
+            bool has_lm = anno.has_lm();
+            if(has_lm){
+                AnnoFaceLandmarks lm = anno.face_lm();
+                LOG(INFO) <<"lefteye: "<<lm.lefteye().x()<<", "<<lm.lefteye().y()
+                          <<" righteye: "<<lm.righteye().x()<<", "<<lm.righteye().y()
+                          <<" nose: "<<lm.nose().x()<<", "<<lm.nose().y()
+                          <<" leftmouth: "<<lm.leftmouth().x()<<", "<<lm.leftmouth().y()
+                          <<" rightmouth: "<<lm.rightmouth().x()<<", "<<lm.rightmouth().y();
+            }
+        }
     }
-  }
-#endif
-  return true;
+    #endif
+    return true;
 }
 
 // Parse MSCOCO detection annotation.

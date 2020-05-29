@@ -12,7 +12,6 @@ if not os.path.exists(rootdir):
 retinaface_gt_file_path = "../../../dataset/facedata/retinaface_labels/"
 convet2yoloformat = False
 convert2vocformat = True
-resized_dim = (48, 48)
 
 minsize2select = 10  # min face size
 usepadding = True
@@ -43,10 +42,11 @@ def convertimgset(img_set="train"):
 
     f_set = open(rootdir + "/ImageSets/Main/" + img_set + ".txt", 'w')
     current_filename = ""
+    previous_filename = ""
     bboxes = []
     lms = []
     with open(gtfilepath, 'r') as gtfile:
-        while True:  # and len(faces)<10
+        while True:
             line = gtfile.readline().strip()
             if line == "":
                 if len(bboxes) != 0:
@@ -59,13 +59,14 @@ def convertimgset(img_set="train"):
             if line.startswith("#"):
                 if index != 0 and convert2vocformat:
                     if len(bboxes) != 0:
+                        #cv2.imshow("img", showimg)
+                        #cv2.waitKey(0)
                         method_name(bboxes, filename, saveimg, vocannotationdir, lms, img_set)
                         cv2.imwrite(imagesdir + "/" + filename, saveimg)
                         imgfilepath = filename[:-4]
                         f_set.write(os.path.abspath(imagesdir + "/" + filename).split('.jpg')[0] + '\n')
                     else:
                         print("no face")
-
                 current_filename = filename = line[1:].strip()
                 print(("\r" + str(index) + ":" + filename + "\t\t\t"))
                 index = index + 1
@@ -73,22 +74,24 @@ def convertimgset(img_set="train"):
                 lms = []
                 continue
             else:
-                imgpath = imgdir + "/" + current_filename
-                img = cv2.imread(imgpath)
-                if not img.data:
-                    break
-                saveimg = img.copy()
-                showimg = saveimg.copy()
+                if previous_filename != current_filename:
+                    previous_filename = current_filename
+                    imgpath = imgdir + "/" + current_filename
+                    img = cv2.imread(imgpath)
+                    if not img.data:
+                        break
+                    saveimg = img.copy()
+                    showimg = saveimg.copy()
                 line = [float(x) for x in line.strip().split()]
                 if int(line[3]) <= 0 or int(line[2]) <= 0:
                     continue
-                x = int(line[0])
-                y = int(line[1])
+                x1 = int(line[0])
+                y1 = int(line[1])
                 width = int(line[2])
                 height = int(line[3])
-                bbox = (x, y, width, height)
-                x2 = x + width
-                y2 = y + height
+                bbox = (x1, y1, width, height)
+                x2 = x1 + width
+                y2 = y1 + height
                 if width >= minsize2select and height >= minsize2select:
                     bboxes.append(bbox)
                     if img_set == "train":
@@ -97,16 +100,17 @@ def convertimgset(img_set="train"):
                         else:
                             lm = []
                             for i in range(5):
-                                x = line[4 + 3 * i]
-                                y = line[4 + 3 * i + 1]
-                                lm.append((x, y))
+                                x_lm = (line[4 + 3 * i])
+                                y_lm = (line[4 + 3 * i + 1])
+                                lm.append((x_lm, y_lm))
+                                cv2.circle(showimg, (int(x_lm), int(y_lm)), 3, (0,0,213), -1)
                             lm.append(int(line[4 + 3 * i + 2]))
                             lm.append(line[19])
                             lms.append(lm)
-                    cv2.rectangle(showimg, (int(x), int(y)), (int(x2), int(y2)), (0, 255, 0))
+                    cv2.rectangle(showimg, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0))
                 else:
-                    saveimg[y:y2, x:x2, :] = (104, 117, 123)
-                    cv2.rectangle(showimg, (x, y), (x2, y2), (0, 0, 255))
+                    saveimg[y1:y2, x1:x2, :] = (104, 117, 123)
+                    cv2.rectangle(showimg, (x1, y1), (x2, y2), (0, 0, 255))
                 filename = filename.replace("/", "_")
 
                 if convet2yoloformat:

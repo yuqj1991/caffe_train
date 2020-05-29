@@ -17,7 +17,7 @@ namespace caffe {
 
 template <typename Dtype>
 class AnnotatedDataLayer : public BasePrefetchingDataLayer<Dtype> {
- public:
+public:
     explicit AnnotatedDataLayer(const LayerParameter& param);
     virtual ~AnnotatedDataLayer();
     virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
@@ -28,7 +28,7 @@ class AnnotatedDataLayer : public BasePrefetchingDataLayer<Dtype> {
     virtual inline int ExactNumBottomBlobs() const { return 0; }
     virtual inline int MinTopBlobs() const { return 1; }
 
- protected:
+protected:
     virtual void load_batch(Batch<Dtype>* batch);
 
     DataReader<AnnotatedDatum> reader_;
@@ -42,6 +42,7 @@ class AnnotatedDataLayer : public BasePrefetchingDataLayer<Dtype> {
     string label_map_file_;
     bool YoloFormat_;
     AnnotatedDataParameter_CROP_TYPE crop_type_;
+    bool has_landmarks_;
 };
 
 }  // namespace caffe
