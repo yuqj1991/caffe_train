@@ -200,63 +200,118 @@ void soft_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* out
 
 template <typename Dtype>
 void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
+                                Dtype* gt_lm_data, Dtype* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const Dtype* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes){
-    std::map<int, vector<NormalizedBBox> > ::iterator iter;
-    int count = 0;
-    CHECK_EQ(num_channels, 4);
-    CHECK_EQ(share_location, true);
-    int dimScale = output_height * output_width;
-    for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
-        int batch_id = iter->first;
-        vector<NormalizedBBox> gt_bboxes = iter->second;
-        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-            const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
-            const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
-            const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
-            const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
-            Dtype center_x = Dtype((xmin + xmax) / 2);
-            Dtype center_y = Dtype((ymin + ymax) / 2);
-            int inter_center_x = static_cast<int> (center_x);
-            int inter_center_y = static_cast<int> (center_y);
-            Dtype diff_x = center_x - inter_center_x;
-            Dtype diff_y = center_y - inter_center_y;
-            Dtype width = xmax - xmin;
-            Dtype height = ymax - ymin;
+                                const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                                bool has_lm){
+    std::map<int, vector<NormalizedBBox, AnnoFaceLandmarks> > ::iterator iter;
+    if(has_lm){
+        int count = 0;
+        int lm_count = 0;
+        CHECK_EQ(num_channels, 4);
+        CHECK_EQ(share_location, true);
+        int dimScale = output_height * output_width;
+        for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+            int batch_id = iter->first;
+            vector<NormalizedBBox, AnnoFaceLandmarks> gt_bboxes = iter->second;
+            for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+                const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
+                const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
+                const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
+                const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
+                
+                Dtype center_x = Dtype((xmin + xmax) / 2);
+                Dtype center_y = Dtype((ymin + ymax) / 2);
+                int inter_center_x = static_cast<int> (center_x);
+                int inter_center_y = static_cast<int> (center_y);
+                Dtype diff_x = center_x - inter_center_x;
+                Dtype diff_y = center_y - inter_center_y;
+                Dtype width = xmax - xmin;
+                Dtype height = ymax - ymin;
 
-            int x_loc_index = batch_id * num_channels * dimScale
-                                    + 0 * dimScale
-                                    + inter_center_y * output_width + inter_center_x;
-            int y_loc_index = batch_id * num_channels * dimScale 
-                                    + 1 * dimScale
-                                    + inter_center_y * output_width + inter_center_x;
-            int width_loc_index = batch_id * num_channels * dimScale
-                                    + 2 * dimScale
-                                    + inter_center_y * output_width + inter_center_x;
-            int height_loc_index = batch_id * num_channels * dimScale 
-                                    + 3 * dimScale
-                                    + inter_center_y * output_width + inter_center_x;
-            gt_loc_data[count * num_channels + 0] = diff_x;
-            gt_loc_data[count * num_channels + 1] = diff_y;
-            gt_loc_data[count * num_channels + 2] = std::log(width);
-            gt_loc_data[count * num_channels + 3] = std::log(height);
-            pred_loc_data[count * num_channels + 0] = channel_loc_data[x_loc_index];
-            pred_loc_data[count * num_channels + 1] = channel_loc_data[y_loc_index];
-            pred_loc_data[count * num_channels + 2] = channel_loc_data[width_loc_index];
-            pred_loc_data[count * num_channels + 3] = channel_loc_data[height_loc_index];
-            ++count;
+                int x_loc_index = batch_id * num_channels * dimScale
+                                        + 0 * dimScale
+                                        + inter_center_y * output_width + inter_center_x;
+                int y_loc_index = batch_id * num_channels * dimScale 
+                                        + 1 * dimScale
+                                        + inter_center_y * output_width + inter_center_x;
+                int width_loc_index = batch_id * num_channels * dimScale
+                                        + 2 * dimScale
+                                        + inter_center_y * output_width + inter_center_x;
+                int height_loc_index = batch_id * num_channels * dimScale 
+                                        + 3 * dimScale
+                                        + inter_center_y * output_width + inter_center_x;
+                gt_loc_data[count * num_channels + 0] = diff_x;
+                gt_loc_data[count * num_channels + 1] = diff_y;
+                gt_loc_data[count * num_channels + 2] = std::log(width);
+                gt_loc_data[count * num_channels + 3] = std::log(height);
+                pred_loc_data[count * num_channels + 0] = channel_loc_data[x_loc_index];
+                pred_loc_data[count * num_channels + 1] = channel_loc_data[y_loc_index];
+                pred_loc_data[count * num_channels + 2] = channel_loc_data[width_loc_index];
+                pred_loc_data[count * num_channels + 3] = channel_loc_data[height_loc_index];
+                ++count;
+            }
+        }
+    }else{
+        int count = 0;
+        CHECK_EQ(num_channels, 4);
+        CHECK_EQ(share_location, true);
+        int dimScale = output_height * output_width;
+        for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+            int batch_id = iter->first;
+            vector<NormalizedBBox, AnnoFaceLandmarks> gt_bboxes = iter->second;
+            for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+                const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
+                const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
+                const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
+                const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
+                Dtype center_x = Dtype((xmin + xmax) / 2);
+                Dtype center_y = Dtype((ymin + ymax) / 2);
+                int inter_center_x = static_cast<int> (center_x);
+                int inter_center_y = static_cast<int> (center_y);
+                Dtype diff_x = center_x - inter_center_x;
+                Dtype diff_y = center_y - inter_center_y;
+                Dtype width = xmax - xmin;
+                Dtype height = ymax - ymin;
+
+                int x_loc_index = batch_id * num_channels * dimScale
+                                        + 0 * dimScale
+                                        + inter_center_y * output_width + inter_center_x;
+                int y_loc_index = batch_id * num_channels * dimScale 
+                                        + 1 * dimScale
+                                        + inter_center_y * output_width + inter_center_x;
+                int width_loc_index = batch_id * num_channels * dimScale
+                                        + 2 * dimScale
+                                        + inter_center_y * output_width + inter_center_x;
+                int height_loc_index = batch_id * num_channels * dimScale 
+                                        + 3 * dimScale
+                                        + inter_center_y * output_width + inter_center_x;
+                gt_loc_data[count * num_channels + 0] = diff_x;
+                gt_loc_data[count * num_channels + 1] = diff_y;
+                gt_loc_data[count * num_channels + 2] = std::log(width);
+                gt_loc_data[count * num_channels + 3] = std::log(height);
+                pred_loc_data[count * num_channels + 0] = channel_loc_data[x_loc_index];
+                pred_loc_data[count * num_channels + 1] = channel_loc_data[y_loc_index];
+                pred_loc_data[count * num_channels + 2] = channel_loc_data[width_loc_index];
+                pred_loc_data[count * num_channels + 3] = channel_loc_data[height_loc_index];
+                ++count;
+            }
         }
     }
 }
 template void EncodeTruthAndPredictions(float* gt_loc_data, float* pred_loc_data,
+                                float* gt_lm_data, float* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const float* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+                                const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, 
+                                bool has_lm);
 template void EncodeTruthAndPredictions(double* gt_loc_data, double* pred_loc_data,
+                                double* gt_lm_data, double* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const double* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);                              
+                                const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                                bool has_lm);                              
 
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 

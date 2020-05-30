@@ -279,9 +279,9 @@ void ExtrapolateBBox(const ResizeParameter& param, const int height,
         float resize_width = param.width();
         float resize_aspect = resize_width / resize_height;
         if (orig_aspect < resize_aspect) {
-        resize_height = resize_width / orig_aspect;
+            resize_height = resize_width / orig_aspect;
         } else {
-        resize_width = resize_height * orig_aspect;
+            resize_width = resize_height * orig_aspect;
         }
         float crop_height = resize_height * (crop_bbox.ymax() - crop_bbox.ymin());
         float crop_width = resize_width * (crop_bbox.xmax() - crop_bbox.xmin());
@@ -1338,6 +1338,87 @@ template void MineHardExamples(const Blob<double>& conf_blob,
     int* num_matches, int* num_negs,
     vector<map<int, vector<int> > >* all_match_indices,
     vector<vector<int> >* all_neg_indices);
+
+
+template <typename Dtype>
+void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
+      const int background_label_id, const bool use_difficult_gt,
+      map<int, vector<std::pair<NormalizedBBox,AnnoFaceLandmarks> > >* all_gt_bboxes, bool has_lm) {
+    all_gt_bboxes->clear();
+    for (int i = 0; i < num_gt; ++i) {
+        if(has_lm){
+            int start_idx = i * 19;
+            int item_id = gt_data[start_idx];
+            if (item_id == -1) {
+                continue;
+            }
+            int label = gt_data[start_idx + 1];
+            CHECK_NE(background_label_id, label)
+                << "Found background label in the dataset.";
+            bool difficult = static_cast<bool>(gt_data[start_idx + 18]);
+            if (!use_difficult_gt && difficult) {
+                // Skip reading difficult ground truth.
+                continue;
+            }
+            NormalizedBBox bbox;
+            bbox.set_label(label);
+            bbox.set_xmin(gt_data[start_idx + 3]);
+            bbox.set_ymin(gt_data[start_idx + 4]);
+            bbox.set_xmax(gt_data[start_idx + 5]);
+            bbox.set_ymax(gt_data[start_idx + 6]);
+            bbox.set_difficult(difficult);
+            float bbox_size = BBoxSize(bbox);
+            bbox.set_size(bbox_size);
+            AnnoFaceLandmarks lmarks;
+            bool bbox_has_lm = gt_data[start_idx + 7];
+            if(bbox_has_lm){
+                lmarks.mutable_lefteye()->set_x(gt_data[start_idx + 8]);
+                lmarks.mutable_lefteye()->set_y(gt_data[start_idx + 9]);
+                lmarks.mutable_righteye()->set_x(gt_data[start_idx + 10]);
+                lmarks.mutable_righteye()->set_y(gt_data[start_idx + 11]);
+                lmarks.mutable_nose()->set_x(gt_data[start_idx + 12]);
+                lmarks.mutable_nose()->set_y(gt_data[start_idx + 13]);
+                lmarks.mutable_leftmouth()->set_x(gt_data[start_idx + 14]);
+                lmarks.mutable_leftmouth()->set_y(gt_data[start_idx + 15]);
+                lmarks.mutable_rightmouth()->set_x(gt_data[start_idx + 16]);
+                lmarks.mutable_rightmouth()->set_y(gt_data[start_idx + 17]);
+            }
+            (*all_gt_bboxes)[item_id].push_back(std::make_pair(bbox, lmarks));
+        }else{
+            int start_idx = i * 8;
+            int item_id = gt_data[start_idx];
+            if (item_id == -1) {
+                continue;
+            }
+            int label = gt_data[start_idx + 1];
+            CHECK_NE(background_label_id, label)
+                << "Found background label in the dataset.";
+            bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
+            if (!use_difficult_gt && difficult) {
+                // Skip reading difficult ground truth.
+                continue;
+            }
+            NormalizedBBox bbox;
+            bbox.set_label(label);
+            bbox.set_xmin(gt_data[start_idx + 3]);
+            bbox.set_ymin(gt_data[start_idx + 4]);
+            bbox.set_xmax(gt_data[start_idx + 5]);
+            bbox.set_ymax(gt_data[start_idx + 6]);
+            bbox.set_difficult(difficult);
+            float bbox_size = BBoxSize(bbox);
+            bbox.set_size(bbox_size);
+            AnnoFaceLandmarks lmarks;
+            (*all_gt_bboxes)[item_id].push_back(std::make_pair(bbox, lmarks));
+        }
+    }
+}
+
+template void GetCenternetGroundTruth(const float* gt_data, const int num_gt,
+      const int background_label_id, const bool use_difficult_gt,
+      map<int, vector<std::pair<NormalizedBBox,AnnoFaceLandmarks> > >* all_gt_bboxes, bool has_lm);
+template void GetCenternetGroundTruth(const double* gt_data, const int num_gt,
+      const int background_label_id, const bool use_difficult_gt,
+      map<int, vector<std::pair<NormalizedBBox,AnnoFaceLandmarks> > >* all_gt_bboxes, bool has_lm);
 
 template <typename Dtype>
 void GetGroundTruth(const Dtype* gt_data, const int num_gt,

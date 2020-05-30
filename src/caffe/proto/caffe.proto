@@ -907,42 +907,42 @@ message CPMTransformationParameter {
 
 // Message that stores parameters used by data transformer for resize policy
 message ResizeParameter {
-  //Probability of using this resize policy
-  optional float prob = 1 [default = 1];
+    //Probability of using this resize policy
+    optional float prob = 1 [default = 1];
 
-  enum Resize_mode {
-    WARP = 1;
-    FIT_SMALL_SIZE = 2;
-    FIT_LARGE_SIZE_AND_PAD = 3;
-  }
-  optional Resize_mode resize_mode = 2 [default = WARP];
-  optional uint32 height = 3 [default = 0];
-  optional uint32 width = 4 [default = 0];
-  // A parameter used to update bbox in FIT_SMALL_SIZE mode.
-  optional uint32 height_scale = 8 [default = 0];
-  optional uint32 width_scale = 9 [default = 0];
+    enum Resize_mode {
+        WARP = 1;
+        FIT_SMALL_SIZE = 2;
+        FIT_LARGE_SIZE_AND_PAD = 3;
+    }
+    optional Resize_mode resize_mode = 2 [default = WARP];
+    optional uint32 height = 3 [default = 0];
+    optional uint32 width = 4 [default = 0];
+    // A parameter used to update bbox in FIT_SMALL_SIZE mode.
+    optional uint32 height_scale = 8 [default = 0];
+    optional uint32 width_scale = 9 [default = 0];
 
-  enum Pad_mode {
-    CONSTANT = 1;
-    MIRRORED = 2;
-    REPEAT_NEAREST = 3;
-  }
-  // Padding mode for BE_SMALL_SIZE_AND_PAD mode and object centering
-  optional Pad_mode pad_mode = 5 [default = CONSTANT];
-  // if specified can be repeated once (would fill all the channels)
-  // or can be repeated the same number of times as channels
-  // (would use it them to the corresponding channel)
-  repeated float pad_value = 6;
+    enum Pad_mode {
+        CONSTANT = 1;
+        MIRRORED = 2;
+        REPEAT_NEAREST = 3;
+    }
+    // Padding mode for BE_SMALL_SIZE_AND_PAD mode and object centering
+    optional Pad_mode pad_mode = 5 [default = CONSTANT];
+    // if specified can be repeated once (would fill all the channels)
+    // or can be repeated the same number of times as channels
+    // (would use it them to the corresponding channel)
+    repeated float pad_value = 6;
 
-  enum Interp_mode { //Same as in OpenCV
-    LINEAR = 1;
-    AREA = 2;
-    NEAREST = 3;
-    CUBIC = 4;
-    LANCZOS4 = 5;
-  }
-  //interpolation for for resizing
-  repeated Interp_mode interp_mode = 7;
+    enum Interp_mode { //Same as in OpenCV
+        LINEAR = 1;
+        AREA = 2;
+        NEAREST = 3;
+        CUBIC = 4;
+        LANCZOS4 = 5;
+    }
+    //interpolation for for resizing
+    repeated Interp_mode interp_mode = 7;
 }
 
 message SaltPepperParameter {
@@ -2186,6 +2186,8 @@ message CenterObjectLossParameter {
         SOFTMAX = 1;
     }
     optional CLASS_TYPE class_type = 16[default = SIGMOID];
+    optional bool has_lm = 17[default = false];
+    optional LocLossType lm_loss_type = 18[default = SMOOTH_L1];
 }
 
 message SliceParameter {

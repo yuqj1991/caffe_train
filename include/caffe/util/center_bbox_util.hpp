@@ -30,9 +30,10 @@ typedef struct _YoloScoreShow{
 
 template <typename Dtype>
 void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
+                                Dtype* gt_lm_data, Dtype* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const Dtype* channel_loc_data,
-                                const int num_channels, std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+                                const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, bool has_lm);
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
                                 const int output_height, 

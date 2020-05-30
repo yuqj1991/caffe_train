@@ -24,91 +24,90 @@ namespace caffe {
  */
 template <typename Dtype>
 class CenterObjectLossLayer : public LossLayer<Dtype> {
- public:
-  explicit CenterObjectLossLayer(const LayerParameter& param)
-      : LossLayer<Dtype>(param) {}
-  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
+public:
+    explicit CenterObjectLossLayer(const LayerParameter& param)
+        : LossLayer<Dtype>(param) {}
+    virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+        const vector<Blob<Dtype>*>& top);
+    virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+        const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "CenterObjectLoss"; }
-  // bottom[0] stores the location predictions.
-  // bottom[1] stores the confidence predictions.
-  // bottom[2] stores the prior bounding boxes.
-  // bottom[3] stores the ground truth bounding boxes.
-  virtual inline int ExactNumBottomBlobs() const { return 3; }
-  virtual inline int ExactNumTopBlobs() const { return 1; }
+    virtual inline const char* type() const { return "CenterObjectLoss"; }
+    // bottom[0] stores the location predictions.
+    // bottom[1] stores the confidence predictions.
+    // bottom[2] stores the prior bounding boxes.
+    // bottom[3] stores the ground truth bounding boxes.
+    virtual inline int MinNumBottomBlobs() const { return 3; }
+    virtual inline int ExactNumTopBlobs() const { return 1; }
 
- protected:
-  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+protected:
+    virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+        const vector<Blob<Dtype>*>& top);
+    virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+        const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
-  // The internal localization offset loss layer.
-  shared_ptr<Layer<Dtype> > loc_loss_layer_;
-  CenterObjectLossParameter_LocLossType loc_loss_type_;
-  float loc_weight_;
-  // bottom vector holder used in Forward function.
-  vector<Blob<Dtype>*> loc_bottom_vec_;
-  // top vector holder used in Forward function.
-  vector<Blob<Dtype>*> loc_top_vec_;
-  // blob which stores the matched location prediction.
-  Blob<Dtype> loc_pred_;
-  // blob which stores the corresponding matched ground truth.
-  Blob<Dtype> loc_gt_;
-  // blob loc_loss_channel with weight
-  Blob<Dtype> loc_channel_gt_;
-  // localization loss.
-  Blob<Dtype> loc_loss_;
+    // The internal localization offset loss layer.
+    shared_ptr<Layer<Dtype> > loc_loss_layer_;
+    CenterObjectLossParameter_LocLossType loc_loss_type_;
+    float loc_weight_;
+    // bottom vector holder used in Forward function.
+    vector<Blob<Dtype>*> loc_bottom_vec_;
+    // top vector holder used in Forward function.
+    vector<Blob<Dtype>*> loc_top_vec_;
+    // blob which stores the matched location prediction.
+    Blob<Dtype> loc_pred_;
+    // blob which stores the corresponding matched ground truth.
+    Blob<Dtype> loc_gt_;
+    // blob loc_loss_channel with weight
+    Blob<Dtype> loc_channel_gt_;
+    // localization loss.
+    Blob<Dtype> loc_loss_;
 
-#if 0
-  // The internal  object scale loss layer.
-  shared_ptr<Layer<Dtype> > wh_loss_layer_;
-  CenterObjectLossParameter_LocLossType wh_loss_type_;
-  float wh_weight_;
-  // bottom vector holder used in Forward function.
-  vector<Blob<Dtype>*> wh_bottom_vec_;
-  // top vector holder used in Forward function.
-  vector<Blob<Dtype>*> wh_top_vec_;
-  // blob which stores the matched location prediction.
-  Blob<Dtype> wh_pred_;
-  // blob which stores the corresponding matched ground truth.
-  Blob<Dtype> wh_gt_;
-  // localization loss.
-  Blob<Dtype> wh_loss_;
-#endif
-  // The internal confidence loss layer.
-  shared_ptr<Layer<Dtype> > conf_loss_layer_;
-  CenterObjectLossParameter_ConfLossType conf_loss_type_;
-  // bottom vector holder used in Forward function.
-  vector<Blob<Dtype>*> conf_bottom_vec_;
-  // top vector holder used in Forward function.
-  vector<Blob<Dtype>*> conf_top_vec_;
-  // blob which stores the confidence prediction.
-  Blob<Dtype> conf_pred_;
-  // blob which stores the corresponding ground truth label.
-  Blob<Dtype> conf_gt_;
-  // confidence loss.
-  Blob<Dtype> conf_loss_;
+    // The internal  landmarks scale loss layer.
+    shared_ptr<Layer<Dtype> > lm_loss_layer_;
+    CenterObjectLossParameter_LocLossType lm_loss_type_;
+    float lm_weight_;
+    // bottom vector holder used in Forward function.
+    vector<Blob<Dtype>*> lm_bottom_vec_;
+    // top vector holder used in Forward function.
+    vector<Blob<Dtype>*> lm_top_vec_;
+    // blob which stores the matched location prediction.
+    Blob<Dtype> lm_pred_;
+    // blob which stores the corresponding matched ground truth.
+    Blob<Dtype> lm_gt_;
+    // localization loss.
+    Blob<Dtype> lm_loss_;
 
-  int num_classes_;
-  bool share_location_;
+    // The internal confidence loss layer.
+    shared_ptr<Layer<Dtype> > conf_loss_layer_;
+    CenterObjectLossParameter_ConfLossType conf_loss_type_;
+    // bottom vector holder used in Forward function.
+    vector<Blob<Dtype>*> conf_bottom_vec_;
+    // top vector holder used in Forward function.
+    vector<Blob<Dtype>*> conf_top_vec_;
+    // blob which stores the confidence prediction.
+    Blob<Dtype> conf_pred_;
+    // blob which stores the corresponding ground truth label.
+    Blob<Dtype> conf_gt_;
+    // confidence loss.
+    Blob<Dtype> conf_loss_;
 
-  CodeType code_type_;
+    int num_classes_;
+    bool share_location_;
 
-  int loc_classes_;
-  int num_gt_;
-  int num_;
+    CodeType code_type_;
 
+    int loc_classes_;
+    int num_gt_;
+    int num_;
 
-  std::map<int, vector<NormalizedBBox> > all_gt_bboxes;
+    std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes;
 
-  int iterations_;
+    int iterations_;
 
-  // How to normalize the loss.
-  LossParameter_NormalizationMode normalization_;
+    // How to normalize the loss.
+    LossParameter_NormalizationMode normalization_;
+    bool has_lm_;
 };
 
 }  // namespace caffe

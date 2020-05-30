@@ -290,6 +290,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 			AnnotationGroup transformed_anno_group;
 			// Go through each Annotation.
 			bool has_valid_annotation = false;
+            bool has_valid_lm = false;
 			for (int a = 0; a < anno_group.annotation_size(); ++a) {
 				const Annotation& anno = anno_group.annotation(a);
 				const NormalizedBBox& bbox = anno.bbox();
@@ -306,8 +307,11 @@ void DataTransformer<Dtype>::TransformAnnotation(
 					CHECK_GT(img_width, 0);
 					UpdateBBoxByResizePolicy(param_.resize_param(), img_width, img_height,
 																		&resize_bbox);
-                    
-                    
+                    if(has_lm){
+                        UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
+											img_width, img_height,
+											&resize_lmarks);
+                    }
 				}
 				if (param_.has_emit_constraint() &&
 						!MeetEmitConstraint(crop_bbox, resize_bbox,
@@ -332,20 +336,16 @@ void DataTransformer<Dtype>::TransformAnnotation(
 						ExtrapolateBBox(param_.resize_param(), img_height, img_width,
 								crop_bbox, transformed_bbox);
 					}
-                    if(has_lm && ProjectfacemarksBBox(crop_bbox, resize_bbox, &project_facemark)){
-                        NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
-                        project_facemark.CopyFrom(src_facemark);
-                        point lefteye = src_facemark.lefteye();
-                        point righteye = src_facemark.righteye();
-                        point nose = src_facemark.nose();
-                        point leftmouth = src_facemark.leftmouth();
-                        point rightmouth = src_facemark.rightmouth();
+                    transformed_anno->set_has_lm(has_lm);
+                    if(has_lm && ProjectfacemarksBBox(crop_bbox, transformed_bbox, &project_facemark)){
+                        has_valid_lm = true;
+                        AnnoFaceLandmarks* trans_lm = transformed_anno->mutable_face_lm();
+                        point lefteye = project_facemark.lefteye();
+                        point righteye = project_facemark.righteye();
+                        point nose = project_facemark.nose();
+                        point leftmouth = project_facemark.leftmouth();
+                        point rightmouth = project_facemark.rightmouth();
 
-                        if(has_lm){
-                            UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
-											img_width, img_height,
-											&resize_lmarks);
-                        }
                         if(do_mirror){
                             project_facemark.mutable_lefteye()->set_x(1-lefteye.x());
                             project_facemark.mutable_righteye()->set_x(1-righteye.x());
@@ -353,7 +353,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
                             project_facemark.mutable_leftmouth()->set_x(1-leftmouth.x());
                             project_facemark.mutable_rightmouth()->set_x(1-rightmouth.x());
                         }
-                        transformed_annoface_all->mutable_landmark()->CopyFrom(project_facemark);
+                        trans_lm->CopyFrom(project_facemark);
                     }
                     
 				}
