@@ -257,16 +257,16 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
                    gt_bboxes[ii].second.nose().x() > 0 && gt_bboxes[ii].second.nose().y() > 0 &&
                    gt_bboxes[ii].second.leftmouth().x() > 0 && gt_bboxes[ii].second.leftmouth().y() > 0 &&
                    gt_bboxes[ii].second.rightmouth().x() > 0 && gt_bboxes[ii].second.rightmouth().y() > 0){
-                    gt_lm_data[lm_count * 10 + 0] = gt_bboxes[ii].second.lefteye().x() * output_width - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 1] = gt_bboxes[ii].second.lefteye().y() * output_height - inter_center_y;
-                    gt_lm_data[lm_count * 10 + 2] = gt_bboxes[ii].second.righteye().x() * output_width - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 3] = gt_bboxes[ii].second.righteye().y() * output_height - inter_center_y;
-                    gt_lm_data[lm_count * 10 + 4] = gt_bboxes[ii].second.nose().x() * output_width - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 5] = gt_bboxes[ii].second.nose().y() * output_height - inter_center_y;
-                    gt_lm_data[lm_count * 10 + 6] = gt_bboxes[ii].second.leftmouth().x() * output_width - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 7] = gt_bboxes[ii].second.leftmouth().y() * output_height - inter_center_y;
-                    gt_lm_data[lm_count * 10 + 8] = gt_bboxes[ii].second.rightmouth().x() * output_width - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 9] = gt_bboxes[ii].second.rightmouth().y() * output_height - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 0] = Dtype((gt_bboxes[ii].second.lefteye().x() * output_width - inter_center_x) / width);
+                    gt_lm_data[lm_count * 10 + 1] = Dtype((gt_bboxes[ii].second.lefteye().y() * output_height - inter_center_y) / height);
+                    gt_lm_data[lm_count * 10 + 2] = Dtype((gt_bboxes[ii].second.righteye().x() * output_width - inter_center_x) / width);
+                    gt_lm_data[lm_count * 10 + 3] = Dtype((gt_bboxes[ii].second.righteye().y() * output_height - inter_center_y) / height);
+                    gt_lm_data[lm_count * 10 + 4] = Dtype((gt_bboxes[ii].second.nose().x() * output_width - inter_center_x) / width);
+                    gt_lm_data[lm_count * 10 + 5] = Dtype((gt_bboxes[ii].second.nose().y() * output_height - inter_center_y) / height);
+                    gt_lm_data[lm_count * 10 + 6] = Dtype((gt_bboxes[ii].second.leftmouth().x() * output_width - inter_center_x) / width);
+                    gt_lm_data[lm_count * 10 + 7] = Dtype((gt_bboxes[ii].second.leftmouth().y() * output_height - inter_center_y) / height);
+                    gt_lm_data[lm_count * 10 + 8] = Dtype((gt_bboxes[ii].second.rightmouth().x() * output_width - inter_center_x) / width);
+                    gt_lm_data[lm_count * 10 + 9] = Dtype((gt_bboxes[ii].second.rightmouth().y() * output_height - inter_center_y) / height);
 
                     int le_x_index = batch_id * num_channels * dimScale
                                         + 4 * dimScale + inter_center_y * output_width + inter_center_x;
@@ -511,14 +511,14 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                             int y_index = i * loc_channels * dimScale + 1 * dimScale + h * output_width + w;
                             int w_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
                             int h_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
-                            Dtype center_x = (w + loc_data[x_index]) * 4;
-                            Dtype center_y = (h + loc_data[y_index]) * 4;
-                            Dtype width = std::exp(loc_data[w_index]) * 4 ;
-                            Dtype height = std::exp(loc_data[h_index]) * 4 ;
-                            Dtype xmin = GET_VALID_VALUE((center_x - Dtype(width / 2)), Dtype(0.f), Dtype(4 * output_width));
-                            Dtype xmax = GET_VALID_VALUE((center_x + Dtype(width / 2)), Dtype(0.f), Dtype(4 * output_width));
-                            Dtype ymin = GET_VALID_VALUE((center_y - Dtype(height / 2)), Dtype(0.f), Dtype(4 * output_height));
-                            Dtype ymax = GET_VALID_VALUE((center_y + Dtype(height / 2)), Dtype(0.f), Dtype(4 * output_height));
+                            Dtype center_x = (w + loc_data[x_index]);
+                            Dtype center_y = (h + loc_data[y_index]);
+                            Dtype width = std::exp(loc_data[w_index]);
+                            Dtype height = std::exp(loc_data[h_index]);
+                            Dtype xmin = GET_VALID_VALUE((center_x - Dtype(width / 2)) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype xmax = GET_VALID_VALUE((center_x + Dtype(width / 2)) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype ymin = GET_VALID_VALUE((center_y - Dtype(height / 2)) * 4, Dtype(0.f), Dtype(4 * output_height));
+                            Dtype ymax = GET_VALID_VALUE((center_y + Dtype(height / 2)) * 4, Dtype(0.f), Dtype(4 * output_height));
 
                             int le_x_index =  i * loc_channels * dimScale + 4 * dimScale + h * output_width + w;
                             int le_y_index =  i * loc_channels * dimScale + 5 * dimScale + h * output_width + w;
@@ -531,16 +531,19 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                             int rm_x_index =  i * loc_channels * dimScale + 12 * dimScale + h * output_width + w;
                             int rm_y_index =  i * loc_channels * dimScale + 13 * dimScale + h * output_width + w;
 
-                            Dtype le_x = GET_VALID_VALUE((w + loc_data[le_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype le_y = GET_VALID_VALUE((h + loc_data[le_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
-                            Dtype re_x = GET_VALID_VALUE((w + loc_data[re_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype re_y = GET_VALID_VALUE((h + loc_data[re_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
-                            Dtype no_x = GET_VALID_VALUE((w + loc_data[no_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype no_y = GET_VALID_VALUE((h + loc_data[no_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
-                            Dtype lm_x = GET_VALID_VALUE((w + loc_data[lm_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype lm_y = GET_VALID_VALUE((h + loc_data[lm_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
-                            Dtype rm_x = GET_VALID_VALUE((w + loc_data[rm_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype rm_y = GET_VALID_VALUE((h + loc_data[rm_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
+                            Dtype bbox_width = xmax - xmin;
+                            Dtype bbox_height = ymax - ymin;
+
+                            Dtype le_x = GET_VALID_VALUE((center_x + loc_data[le_x_index] * bbox_width) * 4, xmin, xmax);
+                            Dtype le_y = GET_VALID_VALUE((center_y + loc_data[le_y_index] * bbox_height) * 4, ymin, ymax);
+                            Dtype re_x = GET_VALID_VALUE((center_x + loc_data[re_x_index] * bbox_width) * 4, xmin, xmax);
+                            Dtype re_y = GET_VALID_VALUE((center_y + loc_data[re_y_index] * bbox_height) * 4, ymin, ymax);
+                            Dtype no_x = GET_VALID_VALUE((center_x + loc_data[no_x_index] * bbox_width) * 4, xmin, xmax);
+                            Dtype no_y = GET_VALID_VALUE((center_y + loc_data[no_y_index] * bbox_height) * 4, ymin, ymax);
+                            Dtype lm_x = GET_VALID_VALUE((center_x + loc_data[lm_x_index] * bbox_width) * 4, xmin, xmax);
+                            Dtype lm_y = GET_VALID_VALUE((center_y + loc_data[lm_y_index] * bbox_height) * 4, ymin, ymax);
+                            Dtype rm_x = GET_VALID_VALUE((center_x + loc_data[rm_x_index] * bbox_width) * 4, xmin, xmax);
+                            Dtype rm_y = GET_VALID_VALUE((center_y + loc_data[rm_y_index] * bbox_height) * 4, ymin, ymax);
 
                             CenterNetInfo temp_result;
                             temp_result.set_class_id(c);
