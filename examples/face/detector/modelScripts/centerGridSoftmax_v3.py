@@ -19,8 +19,8 @@ import stat
 import subprocess
 
 
-trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-valDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
+trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
+valDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lm_lmdb/"
 labelmapPath = "../labelmap.prototxt"
 resize_width = 640
 resize_height = 640

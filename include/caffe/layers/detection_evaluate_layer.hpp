@@ -63,6 +63,7 @@ class DetectionEvaluateLayer : public Layer<Dtype> {
   bool use_normalized_bbox_;
   bool has_resize_;
   ResizeParameter resize_param_;
+  bool has_lm_;
 };
 
 }  // namespace caffe

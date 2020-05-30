@@ -409,6 +409,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                                     top_label[idx++] = bbox.ymin();
                                     top_label[idx++] = bbox.xmax();
                                     top_label[idx++] = bbox.ymax();
+                                    top_label[idx++] = bbox.difficult();
                                     const AnnoFaceLandmarks& lm = anno.face_lm();
                                     top_label[idx++] = anno.has_lm();
                                     top_label[idx++] = lm.lefteye().x();
@@ -421,7 +422,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                                     top_label[idx++] = lm.leftmouth().y();
                                     top_label[idx++] = lm.rightmouth().x();
                                     top_label[idx++] = lm.rightmouth().y();
-                                    top_label[idx++] = bbox.difficult();
                                 }
                             }
                         }

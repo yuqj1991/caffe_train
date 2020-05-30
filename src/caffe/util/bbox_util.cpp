@@ -1375,7 +1375,7 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
             int label = gt_data[start_idx + 1];
             CHECK_NE(background_label_id, label)
                 << "Found background label in the dataset.";
-            bool difficult = static_cast<bool>(gt_data[start_idx + 18]);
+            bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
             if (!use_difficult_gt && difficult) {
                 // Skip reading difficult ground truth.
                 continue;
@@ -1390,18 +1390,18 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
             float bbox_size = BBoxSize(bbox);
             bbox.set_size(bbox_size);
             AnnoFaceLandmarks lmarks;
-            bool bbox_has_lm = gt_data[start_idx + 7];
+            bool bbox_has_lm = gt_data[start_idx + 8];
             if(bbox_has_lm){
-                lmarks.mutable_lefteye()->set_x(gt_data[start_idx + 8]);
-                lmarks.mutable_lefteye()->set_y(gt_data[start_idx + 9]);
-                lmarks.mutable_righteye()->set_x(gt_data[start_idx + 10]);
-                lmarks.mutable_righteye()->set_y(gt_data[start_idx + 11]);
-                lmarks.mutable_nose()->set_x(gt_data[start_idx + 12]);
-                lmarks.mutable_nose()->set_y(gt_data[start_idx + 13]);
-                lmarks.mutable_leftmouth()->set_x(gt_data[start_idx + 14]);
-                lmarks.mutable_leftmouth()->set_y(gt_data[start_idx + 15]);
-                lmarks.mutable_rightmouth()->set_x(gt_data[start_idx + 16]);
-                lmarks.mutable_rightmouth()->set_y(gt_data[start_idx + 17]);
+                lmarks.mutable_lefteye()->set_x(gt_data[start_idx + 9]);
+                lmarks.mutable_lefteye()->set_y(gt_data[start_idx + 10]);
+                lmarks.mutable_righteye()->set_x(gt_data[start_idx + 11]);
+                lmarks.mutable_righteye()->set_y(gt_data[start_idx + 12]);
+                lmarks.mutable_nose()->set_x(gt_data[start_idx + 13]);
+                lmarks.mutable_nose()->set_y(gt_data[start_idx + 14]);
+                lmarks.mutable_leftmouth()->set_x(gt_data[start_idx + 15]);
+                lmarks.mutable_leftmouth()->set_y(gt_data[start_idx + 16]);
+                lmarks.mutable_rightmouth()->set_x(gt_data[start_idx + 17]);
+                lmarks.mutable_rightmouth()->set_y(gt_data[start_idx + 18]);
             }else{
                 lmarks.mutable_lefteye()->set_x(-1.);
                 lmarks.mutable_lefteye()->set_y(-1.);
@@ -1494,41 +1494,44 @@ template void GetGroundTruth(const double* gt_data, const int num_gt,
 template <typename Dtype>
 void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, LabelBBox>* all_gt_bboxes) {
-  all_gt_bboxes->clear();
-  for (int i = 0; i < num_gt; ++i) {
-    int start_idx = i * 8;
-    int item_id = gt_data[start_idx];
-    if (item_id == -1) {
-      break;
+      map<int, LabelBBox>* all_gt_bboxes, bool has_lm) {
+    all_gt_bboxes->clear();
+    for (int i = 0; i < num_gt; ++i) {
+        int start_idx = 0;
+        if(has_lm)
+            start_idx = i * 19;
+        else
+            start_idx = i * 8;
+        int item_id = gt_data[start_idx];
+        if (item_id == -1) {
+            break;
+        }
+        NormalizedBBox bbox;
+        int label = gt_data[start_idx + 1];
+        CHECK_NE(background_label_id, label) << "Found background label in the dataset.";
+        bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
+        if (!use_difficult_gt && difficult) {
+        // Skip reading difficult ground truth.
+            continue;
+        }
+        bbox.set_xmin(gt_data[start_idx + 3]);
+        bbox.set_ymin(gt_data[start_idx + 4]);
+        bbox.set_xmax(gt_data[start_idx + 5]);
+        bbox.set_ymax(gt_data[start_idx + 6]);
+        bbox.set_difficult(difficult);
+        float bbox_size = BBoxSize(bbox);
+        bbox.set_size(bbox_size);
+        (*all_gt_bboxes)[item_id][label].push_back(bbox);
     }
-    NormalizedBBox bbox;
-    int label = gt_data[start_idx + 1];
-    CHECK_NE(background_label_id, label)
-        << "Found background label in the dataset.";
-    bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
-    if (!use_difficult_gt && difficult) {
-      // Skip reading difficult ground truth.
-      continue;
-    }
-    bbox.set_xmin(gt_data[start_idx + 3]);
-    bbox.set_ymin(gt_data[start_idx + 4]);
-    bbox.set_xmax(gt_data[start_idx + 5]);
-    bbox.set_ymax(gt_data[start_idx + 6]);
-    bbox.set_difficult(difficult);
-    float bbox_size = BBoxSize(bbox);
-    bbox.set_size(bbox_size);
-    (*all_gt_bboxes)[item_id][label].push_back(bbox);
-  }
 }
 
 // Explicit initialization.
 template void GetGroundTruth(const float* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, LabelBBox>* all_gt_bboxes);
+      map<int, LabelBBox>* all_gt_bboxes, bool has_lm);
 template void GetGroundTruth(const double* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, LabelBBox>* all_gt_bboxes);
+      map<int, LabelBBox>* all_gt_bboxes, bool has_lm);
 
 template <typename Dtype>
 void GetLocPredictions(const Dtype* loc_data, const int num,
@@ -2126,36 +2129,39 @@ template void GetPriorBBoxes(const double* prior_data, const int num_priors,
 template <typename Dtype>
 void GetDetectionResults(const Dtype* det_data, const int num_det,
       const int background_label_id,
-      map<int, map<int, vector<NormalizedBBox> > >* all_detections) {
-  all_detections->clear();
-  for (int i = 0; i < num_det; ++i) {
-    int start_idx = i * 7;
-    int item_id = det_data[start_idx];
-    if (item_id == -1) {
-      continue;
+      map<int, map<int, vector<NormalizedBBox> > >* all_detections, bool has_lm) {
+    all_detections->clear();
+    for (int i = 0; i < num_det; ++i) {
+        int start_idx = i * 7;
+        if(has_lm){
+            start_idx = i * 17;
+        }
+        int item_id = det_data[start_idx];
+        if (item_id == -1) {
+            continue;
+        }
+        int label = det_data[start_idx + 1];
+        CHECK_NE(background_label_id, label)
+            << "Found background label in the detection results.";
+        NormalizedBBox bbox;
+        bbox.set_score(det_data[start_idx + 2]);
+        bbox.set_xmin(det_data[start_idx + 3]);
+        bbox.set_ymin(det_data[start_idx + 4]);
+        bbox.set_xmax(det_data[start_idx + 5]);
+        bbox.set_ymax(det_data[start_idx + 6]);
+        float bbox_size = BBoxSize(bbox);
+        bbox.set_size(bbox_size);
+        (*all_detections)[item_id][label].push_back(bbox);
     }
-    int label = det_data[start_idx + 1];
-    CHECK_NE(background_label_id, label)
-        << "Found background label in the detection results.";
-    NormalizedBBox bbox;
-    bbox.set_score(det_data[start_idx + 2]);
-    bbox.set_xmin(det_data[start_idx + 3]);
-    bbox.set_ymin(det_data[start_idx + 4]);
-    bbox.set_xmax(det_data[start_idx + 5]);
-    bbox.set_ymax(det_data[start_idx + 6]);
-    float bbox_size = BBoxSize(bbox);
-    bbox.set_size(bbox_size);
-    (*all_detections)[item_id][label].push_back(bbox);
-  }
 }
 
 // Explicit initialization.
 template void GetDetectionResults(const float* det_data, const int num_det,
       const int background_label_id,
-      map<int, map<int, vector<NormalizedBBox> > >* all_detections);
+      map<int, map<int, vector<NormalizedBBox> > >* all_detections, bool has_lm);
 template void GetDetectionResults(const double* det_data, const int num_det,
       const int background_label_id,
-      map<int, map<int, vector<NormalizedBBox> > >* all_detections);
+      map<int, map<int, vector<NormalizedBBox> > >* all_detections, bool has_lm);
 
 void GetTopKScoreIndex(const vector<float>& scores, const vector<int>& indices,
       const int top_k, vector<pair<float, int> >* score_index_vec) {

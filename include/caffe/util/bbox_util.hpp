@@ -213,6 +213,11 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
       map<int, LabelBBox>* all_gt_bboxes);
 
+template <typename Dtype>
+void GetfaceGroundTruth(const Dtype* gt_data, const int num_gt,
+      const int background_label_id, const bool use_difficult_gt,
+      map<int, LabelBBox>* all_gt_bboxes, bool has_lm = false);
+
 
 template <typename Dtype>
 void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
@@ -389,7 +394,7 @@ void GetPriorBBoxes(const Dtype* prior_data, const int num_priors,
 template <typename Dtype>
 void GetDetectionResults(const Dtype* det_data, const int num_det,
       const int background_label_id,
-      map<int, LabelBBox>* all_detections);
+      map<int, LabelBBox>* all_detections, bool has_lm = false);
 
 // Get top_k scores with corresponding indices.
 //    scores: a set of scores.
