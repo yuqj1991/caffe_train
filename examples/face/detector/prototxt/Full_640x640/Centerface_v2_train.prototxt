@@ -193,6 +193,7 @@ layer {
     }
     yoloformat: false
     crop_type: CROP_JITTER
+    has_landmarks: false
   }
   data_param {
     source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
@@ -4538,6 +4539,8 @@ layer {
     loc_loss_type: SMOOTH_L1
     conf_loss_type: FOCALSIGMOID
     loc_weight: 1.0
+    has_lm: false
+    lm_loss_type: SMOOTH_L1
   }
 }
 
