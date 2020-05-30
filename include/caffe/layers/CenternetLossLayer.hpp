@@ -37,7 +37,7 @@ public:
     // bottom[1] stores the confidence predictions.
     // bottom[2] stores the prior bounding boxes.
     // bottom[3] stores the ground truth bounding boxes.
-    virtual inline int MinNumBottomBlobs() const { return 3; }
+    virtual inline int ExactNumBottomBlobs() const { return 3; }
     virtual inline int ExactNumTopBlobs() const { return 1; }
 
 protected:
@@ -45,23 +45,26 @@ protected:
         const vector<Blob<Dtype>*>& top);
     virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
         const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-
+    
     // The internal localization offset loss layer.
-    shared_ptr<Layer<Dtype> > loc_loss_layer_;
-    CenterObjectLossParameter_LocLossType loc_loss_type_;
-    float loc_weight_;
-    // bottom vector holder used in Forward function.
-    vector<Blob<Dtype>*> loc_bottom_vec_;
-    // top vector holder used in Forward function.
-    vector<Blob<Dtype>*> loc_top_vec_;
-    // blob which stores the matched location prediction.
-    Blob<Dtype> loc_pred_;
-    // blob which stores the corresponding matched ground truth.
-    Blob<Dtype> loc_gt_;
-    // blob loc_loss_channel with weight
-    Blob<Dtype> loc_channel_gt_;
-    // localization loss.
-    Blob<Dtype> loc_loss_;
+    shared_ptr<Layer<Dtype> > loc_offset_loss_layer_;
+    CenterObjectLossParameter_LocLossType loc_offset_loss_type_;
+    float loc_offset_weight_;
+    vector<Blob<Dtype>*> loc_offset_bottom_vec_;
+    vector<Blob<Dtype>*> loc_offset_top_vec_;
+    Blob<Dtype> loc_offset_pred_;
+    Blob<Dtype> loc_offset_gt_;
+    Blob<Dtype> loc_offset_loss_;
+
+    shared_ptr<Layer<Dtype> > loc_wh_loss_layer_;
+    CenterObjectLossParameter_LocLossType loc_wh_loss_type_;
+    float loc_wh_weight_;
+    vector<Blob<Dtype>*> loc_wh_bottom_vec_;
+    vector<Blob<Dtype>*> loc_wh_top_vec_;
+    Blob<Dtype> loc_wh_pred_;
+    Blob<Dtype> loc_wh_gt_;
+    Blob<Dtype> loc_wh_loss_;
+
 
     // The internal  landmarks scale loss layer.
     shared_ptr<Layer<Dtype> > lm_loss_layer_;

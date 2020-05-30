@@ -15,24 +15,18 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     if (this->layer_param_.propagate_down_size() == 0) {
         this->layer_param_.add_propagate_down(true);
         this->layer_param_.add_propagate_down(true);
-        if (bottom.size() == 4){
-            this->layer_param_.add_propagate_down(true);
-            this->layer_param_.add_propagate_down(false);
-        }else{
-            this->layer_param_.add_propagate_down(false);
-        }
+        this->layer_param_.add_propagate_down(false);
     }
     const CenterObjectLossParameter& center_object_loss_param =
         this->layer_param_.center_object_loss_param();
     
     has_lm_ = center_object_loss_param.has_lm();
     if(has_lm_){
-        CHECK_EQ(bottom.size(), 4);
+        CHECK_EQ(bottom[0]->channels(), 14);
     }else{
-        CHECK_EQ(bottom.size(), 3);
+        CHECK_EQ(bottom[0]->channels(), 4);
     }
     
-
     num_classes_ = center_object_loss_param.num_class();
     CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
     CHECK_EQ(num_classes_, bottom[1]->channels()) << "num_classes must be equal to prediction classes";
@@ -54,37 +48,68 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
 
     vector<int> loss_shape(1, 1);
     // Set up loc offset & wh scale loss layer.
-    loc_weight_ = center_object_loss_param.loc_weight();
-    loc_loss_type_ = center_object_loss_param.loc_loss_type();
+    loc_offset_weight_ = center_object_loss_param.loc_weight();
+    loc_offset_loss_type_ = center_object_loss_param.loc_loss_type();
     // fake shape.
-    vector<int> loc_shape(1, 1);
-    loc_shape.push_back(4);
-    loc_pred_.Reshape(loc_shape);
-    loc_gt_.Reshape(loc_shape);
+    vector<int> loc_offset_shape(1, 1);
+    loc_offset_shape.push_back(2);
+    loc_offset_pred_.Reshape(loc_offset_shape);
+    loc_offset_gt_.Reshape(loc_offset_shape);
     //loc_channel_gt_.Reshape(loc_shape);
-    loc_bottom_vec_.push_back(&loc_pred_);
-    loc_bottom_vec_.push_back(&loc_gt_);
+    loc_offset_bottom_vec_.push_back(&loc_offset_pred_);
+    loc_offset_bottom_vec_.push_back(&loc_offset_gt_);
     //loc_bottom_vec_.push_back(&loc_channel_gt_);
-    loc_loss_.Reshape(loss_shape);
-    loc_top_vec_.push_back(&loc_loss_);
-    if (loc_loss_type_ == CenterObjectLossParameter_LocLossType_L2) {
+    loc_offset_loss_.Reshape(loss_shape);
+    loc_offset_top_vec_.push_back(&loc_offset_loss_);
+    if (loc_offset_loss_type_ == CenterObjectLossParameter_LocLossType_L2) {
         LayerParameter layer_param;
         layer_param.set_name(this->layer_param_.name() + "_l2_loc");
         layer_param.set_type("EuclideanLoss");
-        layer_param.add_loss_weight(loc_weight_);
-        loc_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
-        loc_loss_layer_->SetUp(loc_bottom_vec_, loc_top_vec_);
-    } else if (loc_loss_type_ == CenterObjectLossParameter_LocLossType_SMOOTH_L1) {
+        layer_param.add_loss_weight(loc_offset_weight_);
+        loc_offset_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+        loc_offset_loss_layer_->SetUp(loc_offset_bottom_vec_, loc_offset_top_vec_);
+    } else if (loc_offset_loss_type_ == CenterObjectLossParameter_LocLossType_SMOOTH_L1) {
         LayerParameter layer_param;
         layer_param.set_name(this->layer_param_.name() + "_smooth_L1_loc");
         layer_param.set_type("SmoothL1Loss");
-        layer_param.add_loss_weight(loc_weight_);
-        loc_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
-        loc_loss_layer_->SetUp(loc_bottom_vec_, loc_top_vec_);
+        layer_param.add_loss_weight(loc_offset_weight_);
+        loc_offset_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+        loc_offset_loss_layer_->SetUp(loc_offset_bottom_vec_, loc_offset_top_vec_);
     } else {
         LOG(FATAL) << "Unknown loc loss type.";
     }
-    // Set up loc offset & wh scale loss layer.
+
+    loc_wh_weight_ = center_object_loss_param.loc_weight();
+    loc_wh_loss_type_ = center_object_loss_param.loc_loss_type();
+    // fake shape.
+    vector<int> loc_wh_shape(1, 1);
+    loc_wh_shape.push_back(2);
+    loc_wh_pred_.Reshape(loc_wh_shape);
+    loc_wh_gt_.Reshape(loc_wh_shape);
+    //loc_channel_gt_.Reshape(loc_shape);
+    loc_wh_bottom_vec_.push_back(&loc_wh_pred_);
+    loc_wh_bottom_vec_.push_back(&loc_wh_gt_);
+    //loc_bottom_vec_.push_back(&loc_channel_gt_);
+    loc_wh_loss_.Reshape(loss_shape);
+    loc_wh_top_vec_.push_back(&loc_wh_loss_);
+    if (loc_wh_loss_type_ == CenterObjectLossParameter_LocLossType_L2) {
+        LayerParameter layer_param;
+        layer_param.set_name(this->layer_param_.name() + "_l2_loc");
+        layer_param.set_type("EuclideanLoss");
+        layer_param.add_loss_weight(loc_wh_weight_);
+        loc_wh_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+        loc_wh_loss_layer_->SetUp(loc_wh_bottom_vec_, loc_wh_top_vec_);
+    } else if (loc_wh_loss_type_ == CenterObjectLossParameter_LocLossType_SMOOTH_L1) {
+        LayerParameter layer_param;
+        layer_param.set_name(this->layer_param_.name() + "_smooth_L1_loc");
+        layer_param.set_type("SmoothL1Loss");
+        layer_param.add_loss_weight(loc_wh_weight_);
+        loc_wh_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
+        loc_wh_loss_layer_->SetUp(loc_wh_bottom_vec_, loc_wh_top_vec_);
+    } else {
+        LOG(FATAL) << "Unknown loc loss type.";
+    }
+    // Set up landmark loss layer.
     if(has_lm_){
         lm_weight_ = center_object_loss_param.loc_weight();
         lm_loss_type_ = center_object_loss_param.lm_loss_type();
@@ -186,33 +211,34 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         // Form data to pass on to loc_loss_layer_.
         vector<int> loc_shape(2);
         loc_shape[0] = 1;
-        loc_shape[1] = num_gt_ * 4;
-        loc_pred_.Reshape(loc_shape);
-        loc_gt_.Reshape(loc_shape);
-        //loc_channel_gt_.Reshape(loc_shape);
-        Dtype* loc_pred_data = loc_pred_.mutable_cpu_data();
-        Dtype* loc_gt_data = loc_gt_.mutable_cpu_data();
-        /*
-        Dtype* loc_channel_gt_data = loc_channel_gt_.mutable_cpu_data();
-        for(int ii = 0; ii < num_gt_ * 4; ii++){
-            int idx = ii % 4;
-            loc_channel_gt_data[ii] = Dtype((idx < 2)? 1.f : 0.1f);
-        }
-        */
-       if(has_lm_){
+        loc_shape[1] = num_gt_ * 2;
+        loc_offset_pred_.Reshape(loc_shape);
+        loc_offset_gt_.Reshape(loc_shape);
+        Dtype* loc_offset_pred_data = loc_offset_pred_.mutable_cpu_data();
+        Dtype* loc_offset_gt_data = loc_offset_gt_.mutable_cpu_data();
+        
+        loc_wh_pred_.Reshape(loc_shape);
+        loc_wh_gt_.Reshape(loc_shape);
+        Dtype* loc_wh_pred_data = loc_wh_pred_.mutable_cpu_data();
+        Dtype* loc_wh_gt_data = loc_wh_gt_.mutable_cpu_data();
+        if(has_lm_){
             loc_shape[0] = 1;
             loc_shape[1] = num_lm_ * 10;
             lm_pred_.Reshape(loc_shape);
             lm_gt_.Reshape(loc_shape);
-       }
+        }
         Dtype* lm_pred_data = lm_pred_.mutable_cpu_data();
         Dtype* lm_gt_data = lm_gt_.mutable_cpu_data();
-        EncodeTruthAndPredictions(loc_gt_data, loc_pred_data, 
-                                            lm_gt_data, lm_pred_data,
-                                            output_width, output_height, share_location_,
-                                            loc_data, num_channels, all_gt_bboxes, has_lm_);
-        loc_loss_layer_->Reshape(loc_bottom_vec_, loc_top_vec_);
-        loc_loss_layer_->Forward(loc_bottom_vec_, loc_top_vec_);
+        EncodeTruthAndPredictions(loc_offset_gt_data, loc_offset_pred_data,
+                                    loc_wh_gt_data, loc_wh_pred_data,
+                                    lm_gt_data, lm_pred_data,
+                                    output_width, output_height, share_location_,
+                                    loc_data, num_channels, all_gt_bboxes, has_lm_);
+        loc_offset_loss_layer_->Reshape(loc_offset_bottom_vec_, loc_offset_top_vec_);
+        loc_offset_loss_layer_->Forward(loc_offset_bottom_vec_, loc_offset_top_vec_);
+
+        loc_wh_loss_layer_->Reshape(loc_wh_bottom_vec_, loc_wh_top_vec_);
+        loc_wh_loss_layer_->Forward(loc_wh_bottom_vec_, loc_wh_top_vec_);
 
         if(has_lm_){
             lm_loss_layer_->Reshape(lm_bottom_vec_, lm_top_vec_);
@@ -220,7 +246,8 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         }
 
     } else {
-        loc_loss_.mutable_cpu_data()[0] = 0;
+        loc_offset_loss_.mutable_cpu_data()[0] = 0;
+        loc_wh_loss_.mutable_cpu_data()[0] = 0;
     }
 
     if (num_gt_ >= 1) {
@@ -241,39 +268,44 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     }
 
     top[0]->mutable_cpu_data()[0] = 0;
-    Dtype loc_loss = Dtype(0.), cls_loss = Dtype(0.), lm_loss = Dtype(0.);
+    Dtype loc_offset_loss = Dtype(0.), loc_wh_loss = Dtype(0.), cls_loss = Dtype(0.), lm_loss = Dtype(0.);
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, 1, num_gt_);
 
     Dtype lm_normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, 1, num_lm_);
 
+    normalizer = normalizer > 0 ? normalizer : num_;
+    lm_normalizer = lm_normalizer > 0 ? 0.1 * lm_normalizer : 0.1 * num_;
+
     if (this->layer_param_.propagate_down(0)) {
-        loc_loss = loc_weight_ * Dtype(loc_loss_.cpu_data()[0] / normalizer) ;
+        loc_offset_loss = 1. * Dtype(loc_offset_loss_.cpu_data()[0] / normalizer);
+        loc_wh_loss = 0.1 * Dtype(loc_wh_loss_.cpu_data()[0] / normalizer);
+        
         if(has_lm_){
-            if(lm_normalizer > 0){
-                lm_loss = 0.1 * Dtype(lm_loss_.cpu_data()[0] / lm_normalizer);
-            }else{
-                lm_loss = 0.1 * Dtype(lm_loss_.cpu_data()[0] / num_);
-            }
+            lm_loss = 0.1 * Dtype(lm_loss_.cpu_data()[0] / lm_normalizer);
         }
     }
     if (this->layer_param_.propagate_down(1)) {
-        cls_loss = Dtype(conf_loss_.cpu_data()[0] / normalizer);
+        cls_loss = 1. * Dtype(conf_loss_.cpu_data()[0] / normalizer);
     }
     if(has_lm_){
-        top[0]->mutable_cpu_data()[0] = cls_loss + loc_loss + lm_loss;
+        top[0]->mutable_cpu_data()[0] = cls_loss + loc_offset_loss + loc_wh_loss + lm_loss;
     }else{
-        top[0]->mutable_cpu_data()[0] = cls_loss + loc_loss;
+        top[0]->mutable_cpu_data()[0] = cls_loss + loc_offset_loss + loc_wh_loss;
     }
 
     #if 1 
     if(iterations_ % 100 == 0){
         LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
-                <<", loc loss: "<<loc_loss
+                <<", loc offset loss: "<<loc_offset_loss
+                <<", loc wh loss: "<<loc_wh_loss
                 <<", conf loss: "<< cls_loss
-                <<", normalizer: "<< normalizer
-                <<", num_classes: "<<num_classes_<<", output_width: "<<output_width
+                <<", lm loss: "<< lm_loss;
+        LOG(INFO)<<"normalizer: "<< normalizer
+                <<", lm_normalizer: "<<lm_normalizer
+                <<", num_classes: "<<num_classes_
+                <<", output_width: "<<output_width
                 <<", output_height: "<<output_height;
     }
     iterations_++;
@@ -297,6 +329,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             normalization_, num_, 1, num_gt_);
     Dtype lm_normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, 1, num_lm_);
+    normalizer = normalizer > 0 ? normalizer : num_;
     lm_normalizer = lm_normalizer > 0 ? 0.1 * lm_normalizer : 0.1 * num_;
     if (propagate_down[0]) {
         Dtype* loc_bottom_diff = bottom[0]->mutable_cpu_diff();
@@ -305,12 +338,18 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             vector<bool> loc_propagate_down;
             loc_propagate_down.push_back(true);
             loc_propagate_down.push_back(false);
-            //loc_propagate_down.push_back(false);
-            loc_loss_layer_->Backward(loc_top_vec_, loc_propagate_down,
-                                        loc_bottom_vec_);
-            Dtype loss_weight = loc_weight_ * top[0]->cpu_diff()[0] / normalizer;
-            caffe_scal(loc_pred_.count(), loss_weight, loc_pred_.mutable_cpu_diff());
-            const Dtype* loc_pred_diff = loc_pred_.cpu_diff();
+            // diff of offset
+            loc_offset_loss_layer_->Backward(loc_offset_top_vec_, loc_propagate_down,
+                                        loc_offset_bottom_vec_);
+            Dtype loss_offset_weight = 1 * top[0]->cpu_diff()[0] / normalizer;
+            caffe_scal(loc_offset_pred_.count(), loss_offset_weight, loc_offset_pred_.mutable_cpu_diff());
+            const Dtype* loc_offset_pred_diff = loc_offset_pred_.cpu_diff();
+            // diff of wh
+            loc_wh_loss_layer_->Backward(loc_wh_top_vec_, loc_propagate_down,
+                                        loc_wh_bottom_vec_);
+            Dtype loss_wh_weight = 0.1 * top[0]->cpu_diff()[0] / normalizer;
+            caffe_scal(loc_wh_pred_.count(), loss_wh_weight, loc_wh_pred_.mutable_cpu_diff());
+            const Dtype* loc_wh_pred_diff = loc_wh_pred_.cpu_diff();
 
             if(has_lm_){
                 lm_loss_layer_->Backward(lm_top_vec_, loc_propagate_down,
@@ -319,7 +358,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                 caffe_scal(lm_pred_.count(), lm_weight, lm_pred_.mutable_cpu_diff());
             }
             const Dtype* lm_pred_diff = lm_pred_.cpu_diff();
-            CopyDiffToBottom(loc_pred_diff, output_width, output_height, has_lm_,
+            CopyDiffToBottom(loc_offset_pred_diff, loc_wh_pred_diff, output_width, output_height, has_lm_,
                                 lm_pred_diff,
                                 share_location_, loc_bottom_diff, num_channels,
                                 all_gt_bboxes);

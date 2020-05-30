@@ -92,7 +92,7 @@ void LocateBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
 bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
                  NormalizedBBox* proj_bbox);
 
-bool ProjectfacemarksBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
+bool ProjectfacemarksBBox(const NormalizedBBox& src_bbox,
                  AnnoFaceLandmarks* marks);
 
 // Extrapolate the transformed bbox if height_scale and width_scale is

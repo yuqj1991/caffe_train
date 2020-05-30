@@ -247,11 +247,18 @@ bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
     }
 }
 
-bool ProjectfacemarksBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
-                 AnnoFaceLandmarks* marks) {
-    if (bbox.xmin() >= src_bbox.xmax() || bbox.xmax() <= src_bbox.xmin() ||
-      bbox.ymin() >= src_bbox.ymax() || bbox.ymax() <= src_bbox.ymin()) {
-      return false;
+bool ProjectfacemarksBBox(const NormalizedBBox& src_bbox, AnnoFaceLandmarks* marks) {
+    if((marks->lefteye().x() >= src_bbox.xmax() || marks->lefteye().x() <= src_bbox.xmin()) ||
+       (marks->lefteye().y() >= src_bbox.ymax() || marks->lefteye().y() <= src_bbox.ymin()) ||
+       (marks->righteye().x() >= src_bbox.xmax() || marks->righteye().x() <= src_bbox.xmin())  ||
+       (marks->righteye().y() >= src_bbox.ymax() || marks->righteye().y() <= src_bbox.ymin()) ||
+       (marks->nose().x() >= src_bbox.xmax() || marks->nose().x() <= src_bbox.xmin())  ||
+       (marks->nose().y() >= src_bbox.ymax() || marks->nose().y() <= src_bbox.ymin()) ||
+       (marks->leftmouth().x() >= src_bbox.xmax() || marks->leftmouth().x() <= src_bbox.xmin())  ||
+       (marks->leftmouth().y() >= src_bbox.ymax() || marks->leftmouth().y() <= src_bbox.ymin()) ||
+       (marks->rightmouth().x() >= src_bbox.xmax() || marks->rightmouth().x() <= src_bbox.xmin())  ||
+       (marks->rightmouth().y() >= src_bbox.ymax() || marks->rightmouth().y() <= src_bbox.ymin())){
+         return false;
     }
     float src_width = src_bbox.xmax() - src_bbox.xmin();
     float src_height = src_bbox.ymax() - src_bbox.ymin();
@@ -265,11 +272,16 @@ bool ProjectfacemarksBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& 
     marks->mutable_leftmouth()->set_y((marks->leftmouth().y() - src_bbox.xmin()) / src_height);
     marks->mutable_rightmouth()->set_x((marks->rightmouth().x() - src_bbox.xmin()) / src_width);
     marks->mutable_rightmouth()->set_y((marks->rightmouth().y() - src_bbox.xmin()) / src_height);
-    if(marks->lefteye().x() > 0  && marks->lefteye().y() > 0 &&
-      marks->righteye().x() > 0  && marks->righteye().y() > 0 &&
-      marks->nose().x() > 0  && marks->nose().y() > 0 &&
-      marks->leftmouth().x() > 0  && marks->leftmouth().y() > 0 &&
-      marks->rightmouth().x() > 0  && marks->rightmouth().y() > 0){
+    if(marks->lefteye().x() > 0 && marks->lefteye().x() <= 1.0 &&
+      marks->lefteye().y() > 0 && marks->lefteye().y() <= 1.0 &&
+      marks->righteye().x() > 0 && marks->righteye().x() <= 1.0 &&
+      marks->righteye().y() > 0 && marks->righteye().y() <= 1.0 &&
+      marks->nose().x() > 0 && marks->nose().x() <= 1.0 &&
+      marks->nose().y() > 0 && marks->nose().y() <= 1.0 &&
+      marks->leftmouth().x() > 0 && marks->leftmouth().x() <= 1.0 &&
+      marks->leftmouth().y() > 0 && marks->leftmouth().y() <= 1.0 &&
+      marks->rightmouth().x() > 0 && marks->rightmouth().x() <= 1.0 &&
+      marks->rightmouth().y() > 0 && marks->rightmouth().y() <= 1.0){
       return true;
     }else{
       return false;
@@ -1390,6 +1402,17 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
                 lmarks.mutable_leftmouth()->set_y(gt_data[start_idx + 15]);
                 lmarks.mutable_rightmouth()->set_x(gt_data[start_idx + 16]);
                 lmarks.mutable_rightmouth()->set_y(gt_data[start_idx + 17]);
+            }else{
+                lmarks.mutable_lefteye()->set_x(-1.);
+                lmarks.mutable_lefteye()->set_y(-1.);
+                lmarks.mutable_righteye()->set_x(-1.);
+                lmarks.mutable_righteye()->set_y(-1.);
+                lmarks.mutable_nose()->set_x(-1.);
+                lmarks.mutable_nose()->set_y(-1.);
+                lmarks.mutable_leftmouth()->set_x(-1.);
+                lmarks.mutable_leftmouth()->set_y(-1.);
+                lmarks.mutable_rightmouth()->set_x(-1.);
+                lmarks.mutable_rightmouth()->set_y(-1.);
             }
             (*all_gt_bboxes)[item_id].push_back(std::make_pair(bbox, lmarks));
         }else{

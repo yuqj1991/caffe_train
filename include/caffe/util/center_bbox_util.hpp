@@ -29,13 +29,14 @@ typedef struct _YoloScoreShow{
 #define NMS_MIN  2
 
 template <typename Dtype>
-void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
+void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest_data,
+                                Dtype* gt_loc_wh_data, Dtype* pred_loc_wh_data,
                                 Dtype* gt_lm_data, Dtype* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const Dtype* channel_loc_data,
                                 const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, bool has_lm);
 template <typename Dtype>
-void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
+void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, const int output_width, 
                                 const int output_height, bool has_lm, const Dtype* lm_pre_diff,
                                 bool share_location, Dtype* bottom_diff, const int num_channels,
                                 std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes);

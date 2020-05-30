@@ -335,11 +335,9 @@ void DataTransformer<Dtype>::TransformAnnotation(
 					if (do_resize && param_.has_resize_param()) {
 						ExtrapolateBBox(param_.resize_param(), img_height, img_width,
 								crop_bbox, transformed_bbox);
-					}
-                    transformed_anno->set_has_lm(has_lm);
-                    if(has_lm && ProjectfacemarksBBox(crop_bbox, *transformed_bbox, &project_facemark)){
+					}    
+                    if(has_lm && ProjectfacemarksBBox(crop_bbox, &project_facemark)){
                         has_valid_lm = true;
-                        AnnoFaceLandmarks* trans_lm = transformed_anno->mutable_face_lm();
                         point lefteye = project_facemark.lefteye();
                         point righteye = project_facemark.righteye();
                         point nose = project_facemark.nose();
@@ -353,9 +351,24 @@ void DataTransformer<Dtype>::TransformAnnotation(
                             project_facemark.mutable_leftmouth()->set_x(1-leftmouth.x());
                             project_facemark.mutable_rightmouth()->set_x(1-rightmouth.x());
                         }
-                        trans_lm->CopyFrom(project_facemark);
                     }
-                    
+					if(has_valid_lm){
+						transformed_anno->set_has_lm(has_lm);
+					}else{
+						transformed_anno->set_has_lm(false);
+						project_facemark.mutable_lefteye()->set_x(-1.);
+						project_facemark.mutable_righteye()->set_x(-1.);
+						project_facemark.mutable_nose()->set_x(-1.);
+						project_facemark.mutable_leftmouth()->set_x(-1.);
+						project_facemark.mutable_rightmouth()->set_x(-1.);
+						project_facemark.mutable_lefteye()->set_y(-1.);
+						project_facemark.mutable_righteye()->set_y(-1.);
+						project_facemark.mutable_nose()->set_y(-1.);
+						project_facemark.mutable_leftmouth()->set_y(-1.);
+						project_facemark.mutable_rightmouth()->set_y(-1.);
+					}
+					AnnoFaceLandmarks* trans_lm = transformed_anno->mutable_face_lm();
+					trans_lm->CopyFrom(project_facemark);                  
 				}
 			}
 			// Save for output.

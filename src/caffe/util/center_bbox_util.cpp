@@ -104,7 +104,7 @@ void soft_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* out
     int pos = 0;
     float maxscore = 0;
     int maxpos = 0;
-    float x1,x2,y1,y2, s,tx1,tx2,ty1,ty2,ts,area,weight,ov;
+    float x1,x2,y1,y2,tx1,tx2,ty1,ty2,ts,area,weight,ov;
 
     for(int ii = 0; ii < numBoxes; ii++){
         maxscore = input[ii].score();
@@ -152,7 +152,7 @@ void soft_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* out
             y1 = input[pos].ymin();
             x2 = input[pos].xmax();
             y2 = input[pos].ymax();
-            s = input[pos].score();
+            //s = input[pos].score();
             area = (x2 - x1 + 1) * (y2 - y1 + 1);
             iw = (std::min(tx2, x2) - std::max(tx1, x1) + 1);
             if(iw > 0){
@@ -199,7 +199,8 @@ void soft_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* out
 
 
 template <typename Dtype>
-void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
+void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest_data,
+                                Dtype* gt_loc_wh_data, Dtype* pred_loc_wh_data,
                                 Dtype* gt_lm_data, Dtype* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const Dtype* channel_loc_data,
@@ -241,14 +242,14 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                 int height_loc_index = batch_id * num_channels * dimScale 
                                         + 3 * dimScale
                                         + inter_center_y * output_width + inter_center_x;
-                gt_loc_data[count * 4 + 0] = diff_x;
-                gt_loc_data[count * 4 + 1] = diff_y;
-                gt_loc_data[count * 4 + 2] = std::log(width);
-                gt_loc_data[count * 4 + 3] = std::log(height);
-                pred_loc_data[count * 4 + 0] = channel_loc_data[x_loc_index];
-                pred_loc_data[count * 4 + 1] = channel_loc_data[y_loc_index];
-                pred_loc_data[count * 4 + 2] = channel_loc_data[width_loc_index];
-                pred_loc_data[count * 4 + 3] = channel_loc_data[height_loc_index];
+                gt_loc_offest_data[count * 2 + 0] = diff_x;
+                gt_loc_offest_data[count * 2 + 1] = diff_y;
+                gt_loc_wh_data[count * 2 + 0] = std::log(width);
+                gt_loc_wh_data[count * 2 + 1] = std::log(height);
+                pred_loc_offest_data[count * 2 + 0] = channel_loc_data[x_loc_index];
+                pred_loc_offest_data[count * 2 + 1] = channel_loc_data[y_loc_index];
+                pred_loc_wh_data[count * 2 + 0] = channel_loc_data[width_loc_index];
+                pred_loc_wh_data[count * 2 + 1] = channel_loc_data[height_loc_index];
                 ++count;
                 //lm_gt_datas, & lm_pred_datas
                 if(gt_bboxes[ii].second.lefteye().x() > 0 && gt_bboxes[ii].second.lefteye().y() > 0 &&
@@ -256,16 +257,16 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                    gt_bboxes[ii].second.nose().x() > 0 && gt_bboxes[ii].second.nose().y() > 0 &&
                    gt_bboxes[ii].second.leftmouth().x() > 0 && gt_bboxes[ii].second.leftmouth().y() > 0 &&
                    gt_bboxes[ii].second.rightmouth().x() > 0 && gt_bboxes[ii].second.rightmouth().y() > 0){
-                    gt_lm_data[lm_count * 10 + 0] = gt_bboxes[ii].second.lefteye().x() - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 1] = gt_bboxes[ii].second.lefteye().y() - inter_center_y;
-                    gt_lm_data[lm_count * 10 + 2] = gt_bboxes[ii].second.righteye().x() - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 3] = gt_bboxes[ii].second.righteye().y() - inter_center_y;
-                    gt_lm_data[lm_count * 10 + 4] = gt_bboxes[ii].second.nose().x() - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 5] = gt_bboxes[ii].second.nose().y() - inter_center_y;
-                    gt_lm_data[lm_count * 10 + 6] = gt_bboxes[ii].second.leftmouth().x() - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 7] = gt_bboxes[ii].second.leftmouth().y() - inter_center_y;
-                    gt_lm_data[lm_count * 10 + 8] = gt_bboxes[ii].second.rightmouth().x() - inter_center_x;
-                    gt_lm_data[lm_count * 10 + 9] = gt_bboxes[ii].second.rightmouth().y() - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 0] = gt_bboxes[ii].second.lefteye().x() * output_width - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 1] = gt_bboxes[ii].second.lefteye().y() * output_height - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 2] = gt_bboxes[ii].second.righteye().x() * output_width - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 3] = gt_bboxes[ii].second.righteye().y() * output_height - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 4] = gt_bboxes[ii].second.nose().x() * output_width - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 5] = gt_bboxes[ii].second.nose().y() * output_height - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 6] = gt_bboxes[ii].second.leftmouth().x() * output_width - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 7] = gt_bboxes[ii].second.leftmouth().y() * output_height - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 8] = gt_bboxes[ii].second.rightmouth().x() * output_width - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 9] = gt_bboxes[ii].second.rightmouth().y() * output_height - inter_center_y;
 
                     int le_x_index = batch_id * num_channels * dimScale
                                         + 4 * dimScale + inter_center_y * output_width + inter_center_x;
@@ -334,26 +335,28 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                 int height_loc_index = batch_id * num_channels * dimScale 
                                         + 3 * dimScale
                                         + inter_center_y * output_width + inter_center_x;
-                gt_loc_data[count * num_channels + 0] = diff_x;
-                gt_loc_data[count * num_channels + 1] = diff_y;
-                gt_loc_data[count * num_channels + 2] = std::log(width);
-                gt_loc_data[count * num_channels + 3] = std::log(height);
-                pred_loc_data[count * num_channels + 0] = channel_loc_data[x_loc_index];
-                pred_loc_data[count * num_channels + 1] = channel_loc_data[y_loc_index];
-                pred_loc_data[count * num_channels + 2] = channel_loc_data[width_loc_index];
-                pred_loc_data[count * num_channels + 3] = channel_loc_data[height_loc_index];
+                gt_loc_offest_data[count * 2 + 0] = diff_x;
+                gt_loc_offest_data[count * 2 + 1] = diff_y;
+                gt_loc_wh_data[count * 2 + 0] = std::log(width);
+                gt_loc_wh_data[count * 2 + 1] = std::log(height);
+                pred_loc_offest_data[count * 2 + 0] = channel_loc_data[x_loc_index];
+                pred_loc_offest_data[count * 2 + 1] = channel_loc_data[y_loc_index];
+                pred_loc_wh_data[count * 2 + 0] = channel_loc_data[width_loc_index];
+                pred_loc_wh_data[count * 2 + 1] = channel_loc_data[height_loc_index];
                 ++count;
             }
         }
     }
 }
-template void EncodeTruthAndPredictions(float* gt_loc_data, float* pred_loc_data,
+template void EncodeTruthAndPredictions(float* gt_loc_offest_data, float* pred_loc_offest_data,
+                                float* gt_loc_wh_data, float* pred_loc_wh_data,
                                 float* gt_lm_data, float* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const float* channel_loc_data,
                                 const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, 
                                 bool has_lm);
-template void EncodeTruthAndPredictions(double* gt_loc_data, double* pred_loc_data,
+template void EncodeTruthAndPredictions(double* gt_loc_offest_data, double* pred_loc_offest_data,
+                                double* gt_loc_wh_data, double* pred_loc_wh_data,
                                 double* gt_lm_data, double* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const double* channel_loc_data,
@@ -361,7 +364,7 @@ template void EncodeTruthAndPredictions(double* gt_loc_data, double* pred_loc_da
                                 bool has_lm);                              
 
 template <typename Dtype>
-void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
+void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, const int output_width, 
                                 const int output_height, bool has_lm, const Dtype* lm_pre_diff,
                                 bool share_location, Dtype* bottom_diff, const int num_channels,
                                 std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes){
@@ -392,10 +395,10 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
                                         + 2 * dimScale + inter_center_y * output_width + inter_center_x;
                 int height_loc_index = batch_id * num_channels * dimScale 
                                         + 3 * dimScale + inter_center_y * output_width + inter_center_x;
-                bottom_diff[x_loc_index] = pre_diff[count * 4 + 0];
-                bottom_diff[y_loc_index] = pre_diff[count * 4 + 1];
-                bottom_diff[width_loc_index] = pre_diff[count * 4 + 2];
-                bottom_diff[height_loc_index] = pre_diff[count * 4 + 3];
+                bottom_diff[x_loc_index] = pre_offset_diff[count * 2 + 0];
+                bottom_diff[y_loc_index] = pre_offset_diff[count * 2 + 1];
+                bottom_diff[width_loc_index] = pre_wh_diff[count * 2 + 0];
+                bottom_diff[height_loc_index] = pre_wh_diff[count * 2 + 1];
                 ++count;
 
                 //lm_gt_datas, & lm_pred_datas
@@ -467,20 +470,20 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
                 int height_loc_index = batch_id * num_channels * dimScale 
                                         + 3 * dimScale
                                         + inter_center_y * output_width + inter_center_x;
-                bottom_diff[x_loc_index] = pre_diff[count * num_channels + 0];
-                bottom_diff[y_loc_index] = pre_diff[count * num_channels + 1];
-                bottom_diff[width_loc_index] = pre_diff[count * num_channels + 2];
-                bottom_diff[height_loc_index] = pre_diff[count * num_channels + 3];
+                bottom_diff[x_loc_index] = pre_offset_diff[count * 2 + 0];
+                bottom_diff[y_loc_index] = pre_offset_diff[count * 2 + 1];
+                bottom_diff[width_loc_index] = pre_wh_diff[count * 2 + 0];
+                bottom_diff[height_loc_index] = pre_wh_diff[count * 2 + 1];
                 ++count;
             }
         }
     }
 }
-template void CopyDiffToBottom(const float* pre_diff, const int output_width, 
+template void CopyDiffToBottom(const float* pre_offset_diff, const float* pre_wh_diff, const int output_width, 
                                 const int output_height, bool has_lm, const float* lm_pre_diff,
                                 bool share_location, float* bottom_diff, const int num_channels,
                                 std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes);
-template void CopyDiffToBottom(const double* pre_diff, const int output_width, 
+template void CopyDiffToBottom(const double* pre_offset_diff, const double* pre_wh_diff,const int output_width, 
                                 const int output_height, bool has_lm, const double* lm_pre_diff,
                                 bool share_location, double* bottom_diff, const int num_channels,
                                 std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes);
