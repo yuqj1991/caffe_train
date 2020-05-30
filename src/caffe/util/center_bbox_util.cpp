@@ -241,14 +241,14 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                 int height_loc_index = batch_id * num_channels * dimScale 
                                         + 3 * dimScale
                                         + inter_center_y * output_width + inter_center_x;
-                gt_loc_data[count * num_channels + 0] = diff_x;
-                gt_loc_data[count * num_channels + 1] = diff_y;
-                gt_loc_data[count * num_channels + 2] = std::log(width);
-                gt_loc_data[count * num_channels + 3] = std::log(height);
-                pred_loc_data[count * num_channels + 0] = channel_loc_data[x_loc_index];
-                pred_loc_data[count * num_channels + 1] = channel_loc_data[y_loc_index];
-                pred_loc_data[count * num_channels + 2] = channel_loc_data[width_loc_index];
-                pred_loc_data[count * num_channels + 3] = channel_loc_data[height_loc_index];
+                gt_loc_data[count * 4 + 0] = diff_x;
+                gt_loc_data[count * 4 + 1] = diff_y;
+                gt_loc_data[count * 4 + 2] = std::log(width);
+                gt_loc_data[count * 4 + 3] = std::log(height);
+                pred_loc_data[count * 4 + 0] = channel_loc_data[x_loc_index];
+                pred_loc_data[count * 4 + 1] = channel_loc_data[y_loc_index];
+                pred_loc_data[count * 4 + 2] = channel_loc_data[width_loc_index];
+                pred_loc_data[count * 4 + 3] = channel_loc_data[height_loc_index];
                 ++count;
                 //lm_gt_datas, & lm_pred_datas
                 if(gt_bboxes[ii].second.lefteye().x() > 0 && gt_bboxes[ii].second.lefteye().y() > 0 &&
@@ -256,16 +256,16 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                    gt_bboxes[ii].second.nose().x() > 0 && gt_bboxes[ii].second.nose().y() > 0 &&
                    gt_bboxes[ii].second.leftmouth().x() > 0 && gt_bboxes[ii].second.leftmouth().y() > 0 &&
                    gt_bboxes[ii].second.rightmouth().x() > 0 && gt_bboxes[ii].second.rightmouth().y() > 0){
-                    gt_lm_data[lm_count * 10 + 0] = gt_bboxes[ii].second.lefteye().x();
-                    gt_lm_data[lm_count * 10 + 1] = gt_bboxes[ii].second.lefteye().y();
-                    gt_lm_data[lm_count * 10 + 2] = gt_bboxes[ii].second.righteye().x();
-                    gt_lm_data[lm_count * 10 + 3] = gt_bboxes[ii].second.righteye().y();
-                    gt_lm_data[lm_count * 10 + 4] = gt_bboxes[ii].second.nose().x();
-                    gt_lm_data[lm_count * 10 + 5] = gt_bboxes[ii].second.nose().y();
-                    gt_lm_data[lm_count * 10 + 6] = gt_bboxes[ii].second.leftmouth().x();
-                    gt_lm_data[lm_count * 10 + 7] = gt_bboxes[ii].second.leftmouth().y();
-                    gt_lm_data[lm_count * 10 + 8] = gt_bboxes[ii].second.rightmouth().x();
-                    gt_lm_data[lm_count * 10 + 9] = gt_bboxes[ii].second.rightmouth().y();
+                    gt_lm_data[lm_count * 10 + 0] = gt_bboxes[ii].second.lefteye().x() - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 1] = gt_bboxes[ii].second.lefteye().y() - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 2] = gt_bboxes[ii].second.righteye().x() - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 3] = gt_bboxes[ii].second.righteye().y() - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 4] = gt_bboxes[ii].second.nose().x() - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 5] = gt_bboxes[ii].second.nose().y() - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 6] = gt_bboxes[ii].second.leftmouth().x() - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 7] = gt_bboxes[ii].second.leftmouth().y() - inter_center_y;
+                    gt_lm_data[lm_count * 10 + 8] = gt_bboxes[ii].second.rightmouth().x() - inter_center_x;
+                    gt_lm_data[lm_count * 10 + 9] = gt_bboxes[ii].second.rightmouth().y() - inter_center_y;
 
                     int le_x_index = batch_id * num_channels * dimScale
                                         + 4 * dimScale + inter_center_y * output_width + inter_center_x;
@@ -392,10 +392,10 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
                                         + 2 * dimScale + inter_center_y * output_width + inter_center_x;
                 int height_loc_index = batch_id * num_channels * dimScale 
                                         + 3 * dimScale + inter_center_y * output_width + inter_center_x;
-                bottom_diff[x_loc_index] = pre_diff[count * num_channels + 0];
-                bottom_diff[y_loc_index] = pre_diff[count * num_channels + 1];
-                bottom_diff[width_loc_index] = pre_diff[count * num_channels + 2];
-                bottom_diff[height_loc_index] = pre_diff[count * num_channels + 3];
+                bottom_diff[x_loc_index] = pre_diff[count * 4 + 0];
+                bottom_diff[y_loc_index] = pre_diff[count * 4 + 1];
+                bottom_diff[width_loc_index] = pre_diff[count * 4 + 2];
+                bottom_diff[height_loc_index] = pre_diff[count * 4 + 3];
                 ++count;
 
                 //lm_gt_datas, & lm_pred_datas
@@ -426,16 +426,16 @@ void CopyDiffToBottom(const Dtype* pre_diff, const int output_width,
                     int rm_y_index = batch_id * num_channels * dimScale 
                                         + 13 * dimScale + inter_center_y * output_width + inter_center_x;
 
-                    bottom_diff[le_x_index] = lm_pre_diff[lm_count * num_channels + 0];
-                    bottom_diff[le_y_index] = lm_pre_diff[lm_count * num_channels + 1];
-                    bottom_diff[re_x_index] = lm_pre_diff[lm_count * num_channels + 2];
-                    bottom_diff[re_y_index] = lm_pre_diff[lm_count * num_channels + 3];
-                    bottom_diff[no_x_index] = lm_pre_diff[lm_count * num_channels + 4];
-                    bottom_diff[no_y_index] = lm_pre_diff[lm_count * num_channels + 5];
-                    bottom_diff[lm_x_index] = lm_pre_diff[lm_count * num_channels + 6];
-                    bottom_diff[lm_y_index] = lm_pre_diff[lm_count * num_channels + 7];
-                    bottom_diff[rm_x_index] = lm_pre_diff[lm_count * num_channels + 8];
-                    bottom_diff[rm_y_index] = lm_pre_diff[lm_count * num_channels + 9];
+                    bottom_diff[le_x_index] = lm_pre_diff[lm_count * 10 + 0];
+                    bottom_diff[le_y_index] = lm_pre_diff[lm_count * 10 + 1];
+                    bottom_diff[re_x_index] = lm_pre_diff[lm_count * 10 + 2];
+                    bottom_diff[re_y_index] = lm_pre_diff[lm_count * 10 + 3];
+                    bottom_diff[no_x_index] = lm_pre_diff[lm_count * 10 + 4];
+                    bottom_diff[no_y_index] = lm_pre_diff[lm_count * 10 + 5];
+                    bottom_diff[lm_x_index] = lm_pre_diff[lm_count * 10 + 6];
+                    bottom_diff[lm_y_index] = lm_pre_diff[lm_count * 10 + 7];
+                    bottom_diff[rm_x_index] = lm_pre_diff[lm_count * 10 + 8];
+                    bottom_diff[rm_y_index] = lm_pre_diff[lm_count * 10 + 9];
 
                     lm_count++;
                 }
@@ -528,16 +528,16 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                             int rm_x_index =  i * loc_channels * dimScale + 12 * dimScale + h * output_width + w;
                             int rm_y_index =  i * loc_channels * dimScale + 13 * dimScale + h * output_width + w;
 
-                            Dtype le_x = GET_VALID_VALUE(loc_data[le_x_index] * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype le_y = GET_VALID_VALUE(loc_data[le_y_index] * 4, Dtype(0.f), Dtype(4 * output_height));
-                            Dtype re_x = GET_VALID_VALUE(loc_data[re_x_index] * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype re_y = GET_VALID_VALUE(loc_data[re_y_index] * 4, Dtype(0.f), Dtype(4 * output_height));
-                            Dtype no_x = GET_VALID_VALUE(loc_data[no_x_index] * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype no_y = GET_VALID_VALUE(loc_data[no_y_index] * 4, Dtype(0.f), Dtype(4 * output_height));
-                            Dtype lm_x = GET_VALID_VALUE(loc_data[lm_x_index] * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype lm_y = GET_VALID_VALUE(loc_data[lm_y_index] * 4, Dtype(0.f), Dtype(4 * output_height));
-                            Dtype rm_x = GET_VALID_VALUE(loc_data[rm_x_index] * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype rm_y = GET_VALID_VALUE(loc_data[rm_y_index] * 4, Dtype(0.f), Dtype(4 * output_height));
+                            Dtype le_x = GET_VALID_VALUE((w + loc_data[le_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype le_y = GET_VALID_VALUE((h + loc_data[le_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
+                            Dtype re_x = GET_VALID_VALUE((w + loc_data[re_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype re_y = GET_VALID_VALUE((h + loc_data[re_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
+                            Dtype no_x = GET_VALID_VALUE((w + loc_data[no_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype no_y = GET_VALID_VALUE((h + loc_data[no_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
+                            Dtype lm_x = GET_VALID_VALUE((w + loc_data[lm_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype lm_y = GET_VALID_VALUE((h + loc_data[lm_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
+                            Dtype rm_x = GET_VALID_VALUE((w + loc_data[rm_x_index]) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype rm_y = GET_VALID_VALUE((h + loc_data[rm_y_index]) * 4, Dtype(0.f), Dtype(4 * output_height));
 
                             CenterNetInfo temp_result;
                             temp_result.set_class_id(c);
