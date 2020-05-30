@@ -337,7 +337,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 								crop_bbox, transformed_bbox);
 					}
                     transformed_anno->set_has_lm(has_lm);
-                    if(has_lm && ProjectfacemarksBBox(crop_bbox, transformed_bbox, &project_facemark)){
+                    if(has_lm && ProjectfacemarksBBox(crop_bbox, *transformed_bbox, &project_facemark)){
                         has_valid_lm = true;
                         AnnoFaceLandmarks* trans_lm = transformed_anno->mutable_face_lm();
                         point lefteye = project_facemark.lefteye();

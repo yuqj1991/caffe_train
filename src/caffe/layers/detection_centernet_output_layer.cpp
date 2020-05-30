@@ -30,6 +30,7 @@ void CenternetDetectionOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>
     confidence_threshold_ = detection_output_param.has_confidence_threshold() ?
         detection_output_param.confidence_threshold() : -FLT_MAX;
     nms_thresh_ = detection_output_param.nms_thresh();
+    has_lm_ = detection_output_param.has_lm();
 }
 
 template <typename Dtype>
@@ -38,30 +39,41 @@ void CenternetDetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& b
   
     //CHECK_EQ(bottom[0]->num(), bottom[1]->num());
     //CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
-    CHECK_EQ(bottom[0]->channels() , num_classes_ - 1);
-    CHECK_EQ(bottom[2]->channels(), 4);
-    vector<int> top_shape(2, 1);
-    top_shape.push_back(1);
-    top_shape.push_back(7);
-    top[0]->Reshape(top_shape);
+    CHECK_EQ(bottom[1]->channels() , num_classes_ - 1); // add background to classes
+    if(has_lm_){
+        CHECK_EQ(bottom[2]->channels(), 14);
+        vector<int> top_shape(2, 1);
+        top_shape.push_back(1);
+        top_shape.push_back(17);
+        top[0]->Reshape(top_shape);
+    }else{
+        CHECK_EQ(bottom[2]->channels(), 4);
+        vector<int> top_shape(2, 1);
+        top_shape.push_back(1);
+        top_shape.push_back(7);
+        top[0]->Reshape(top_shape);
+    }
 }
 
 template <typename Dtype>
 void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-    const Dtype* conf_data = bottom[0]->cpu_data();
-    const Dtype* loc_data = bottom[2]->cpu_data();
+    const Dtype* loc_data = bottom[0]->cpu_data();
     const int output_height = bottom[0]->height();
     const int output_width = bottom[0]->width();
-    const int classes = bottom[0]->channels();
     num_ =  bottom[0]->num();
+    int loc_channels = bottom[0]->channels();
+    const Dtype* conf_data = bottom[1]->cpu_data();
+    const int classes = bottom[1]->channels();
+    
     /*
-    Dtype* keep_max_data = bottom[1]->mutable_cpu_data();
+    Dtype* keep_max_data = bottom[2]->mutable_cpu_data();
     _nms_heatmap(conf_data, keep_max_data, output_height, output_width, classes, num_);
-    const Dtype* keep_data = bottom[1]->cpu_data();
+    const Dtype* keep_data = bottom[2]->cpu_data();
     */
     results_.clear();
-    get_topK(conf_data, loc_data, output_height, output_width, classes, num_, &results_, 4, 
+    get_topK(conf_data, loc_data, output_height, output_width, classes, num_, &results_, loc_channels,
+                        has_lm_,
                         confidence_threshold_, nms_thresh_);
 
     int num_kept = 0;
@@ -100,13 +112,33 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
         if(results_.find(i) != results_.end()){
             std::vector<CenterNetInfo > result_temp = results_.find(i)->second;
             for(unsigned j = 0; j < result_temp.size(); ++j){
-                top_data[count * 7] = i;
-                top_data[count * 7 + 1] = result_temp[j].class_id() + 1;
-                top_data[count * 7 + 2] = result_temp[j].score();
-                top_data[count * 7 + 3] = result_temp[j].xmin();
-                top_data[count * 7 + 4] = result_temp[j].ymin();
-                top_data[count * 7 + 5] = result_temp[j].xmax();
-                top_data[count * 7 + 6] = result_temp[j].ymax();
+                if(has_lm_){
+                    top_data[count * 17] = i;
+                    top_data[count * 17 + 1] = result_temp[j].class_id() + 1;
+                    top_data[count * 17 + 2] = result_temp[j].score();
+                    top_data[count * 17 + 3] = result_temp[j].xmin();
+                    top_data[count * 17 + 4] = result_temp[j].ymin();
+                    top_data[count * 17 + 5] = result_temp[j].xmax();
+                    top_data[count * 17 + 6] = result_temp[j].ymax();
+                    top_data[count * 17 + 7] = result_temp[j].marks().lefteye().x();
+                    top_data[count * 17 + 8] = result_temp[j].marks().lefteye().y();
+                    top_data[count * 17 + 9] = result_temp[j].marks().righteye().x();
+                    top_data[count * 17 + 10] = result_temp[j].marks().righteye().y();
+                    top_data[count * 17 + 11] = result_temp[j].marks().nose().x();
+                    top_data[count * 17 + 12] = result_temp[j].marks().nose().y();
+                    top_data[count * 17 + 13] = result_temp[j].marks().leftmouth().x();
+                    top_data[count * 17 + 14] = result_temp[j].marks().leftmouth().y();
+                    top_data[count * 17 + 15] = result_temp[j].marks().rightmouth().x();
+                    top_data[count * 17 + 16] = result_temp[j].marks().rightmouth().y();
+                }else{
+                    top_data[count * 7] = i;
+                    top_data[count * 7 + 1] = result_temp[j].class_id() + 1;
+                    top_data[count * 7 + 2] = result_temp[j].score();
+                    top_data[count * 7 + 3] = result_temp[j].xmin();
+                    top_data[count * 7 + 4] = result_temp[j].ymin();
+                    top_data[count * 7 + 5] = result_temp[j].xmax();
+                    top_data[count * 7 + 6] = result_temp[j].ymax();
+                }
                 ++count;
             }
         }

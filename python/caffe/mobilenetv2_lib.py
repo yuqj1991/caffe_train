@@ -208,13 +208,15 @@ def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = 
 
 def CenterFaceObjectDetect(net, from_layers = [],  num_classes = 2,
                            keep_top_k = 200, nms_thresh = 0.3,
-                           share_location = True, confidence_threshold = 0.15):
+                           share_location = True, confidence_threshold = 0.15,
+                           has_lm = False):
     det_out_param = {
         'num_classes': num_classes,
         'share_location': share_location,
         'keep_top_k': keep_top_k,
         'confidence_threshold': confidence_threshold,
         'nms_thresh': nms_thresh,
+        'has_lm': has_lm,
     }
     net.detection_out = L.CenternetDetectionOutput(*from_layers, detection_output_param=det_out_param, 
                                                 include=dict(phase=caffe_pb2.Phase.Value('TEST')))
@@ -222,13 +224,16 @@ def CenterFaceObjectDetect(net, from_layers = [],  num_classes = 2,
 
 def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.CenterObjectLoss.SMOOTH_L1,
                          normalization_mode = P.Loss.VALID, num_classes= 1, loc_weight = 1.0, 
-                         share_location = True, class_type = P.CenterObjectLoss.FOCALSIGMOID):
+                         share_location = True, class_type = P.CenterObjectLoss.FOCALSIGMOID, has_lm = False,
+                         lm_loss_type = P.CenterObjectLoss.SMOOTH_L1,):
     center_object_loss_param = {
         'loc_weight': loc_weight,
         'num_class': num_classes,
         'loc_loss_type': loc_loss_type,
         'conf_loss_type': class_type,
-        'share_location': share_location
+        'share_location': share_location,
+        'has_lm': has_lm,
+        'lm_loss_type': lm_loss_type,
     }
     loss_param = {
         'normalization': normalization_mode,
@@ -239,7 +244,7 @@ def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.Cent
                                  propagate_down=[True, True, False])
 
 
-def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= False, **bn_param):
+def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= False, detect_num=4, num_class= 1, **bn_param):
     assert from_layer in net.keys()
     index = 0
     feature_stride = [4, 8, 16, 32]
@@ -359,14 +364,14 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
     Class_out = "Class_out_1x1"
     ConvBNLayer(net, net_last_layer, Class_out, use_bn= False, 
                 use_swish= False, use_relu = False, 
-                num_output= 1, kernel_size= 1, pad= 0, stride= 1,
+                num_output= num_class, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
 
     ### Box loc prediction layer
     Box_out = "Box_out_1x1"
     ConvBNLayer(net, net_last_layer, Box_out, use_bn= False, 
                 use_swish= False, use_relu = False, 
-                num_output= 4, kernel_size= 1, pad= 0, stride= 1,
+                num_output= detect_num, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
     return net, Class_out, Box_out
 

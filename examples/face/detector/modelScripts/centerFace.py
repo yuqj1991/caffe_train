@@ -331,9 +331,9 @@ net[Sigmoid_layer] = L.Sigmoid(net[class_out], in_place= False)
 #                                    global_pooling=False, in_place = False)
 
 DetectListLayer = []
-DetectListLayer.append(net[Sigmoid_layer])
 #DetectListLayer.append(net[Pooling_Layer])
 DetectListLayer.append(net[box_out])
+DetectListLayer.append(net[Sigmoid_layer])
 CenterFaceObjectDetect(net, from_layers = DetectListLayer)
 
 det_eval_param = {

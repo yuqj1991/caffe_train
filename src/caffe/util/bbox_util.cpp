@@ -250,8 +250,8 @@ bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
 bool ProjectfacemarksBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
                  AnnoFaceLandmarks* marks) {
     if (bbox.xmin() >= src_bbox.xmax() || bbox.xmax() <= src_bbox.xmin() ||
-        bbox.ymin() >= src_bbox.ymax() || bbox.ymax() <= src_bbox.ymin()) {
-        return false;
+      bbox.ymin() >= src_bbox.ymax() || bbox.ymax() <= src_bbox.ymin()) {
+      return false;
     }
     float src_width = src_bbox.xmax() - src_bbox.xmin();
     float src_height = src_bbox.ymax() - src_bbox.ymin();
@@ -265,7 +265,15 @@ bool ProjectfacemarksBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& 
     marks->mutable_leftmouth()->set_y((marks->leftmouth().y() - src_bbox.xmin()) / src_height);
     marks->mutable_rightmouth()->set_x((marks->rightmouth().x() - src_bbox.xmin()) / src_width);
     marks->mutable_rightmouth()->set_y((marks->rightmouth().y() - src_bbox.xmin()) / src_height);
-    return true;
+    if(marks->lefteye().x() > 0  && marks->lefteye().y() > 0 &&
+      marks->righteye().x() > 0  && marks->righteye().y() > 0 &&
+      marks->nose().x() > 0  && marks->nose().y() > 0 &&
+      marks->leftmouth().x() > 0  && marks->leftmouth().y() > 0 &&
+      marks->rightmouth().x() > 0  && marks->rightmouth().y() > 0){
+      return true;
+    }else{
+      return false;
+    }
 }
 
 void ExtrapolateBBox(const ResizeParameter& param, const int height,

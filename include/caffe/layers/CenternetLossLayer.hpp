@@ -108,6 +108,7 @@ protected:
     // How to normalize the loss.
     LossParameter_NormalizationMode normalization_;
     bool has_lm_;
+    int num_lm_;
 };
 
 }  // namespace caffe

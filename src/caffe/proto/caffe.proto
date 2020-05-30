@@ -170,6 +170,7 @@ message CenterNetInfo{
   optional float xmax = 5;
   optional float ymax = 6;
   optional float area = 7;
+  optional AnnoFaceLandmarks marks = 8;
 }
 
 message BboxSampler {
@@ -1412,6 +1413,7 @@ message DetectionOutputParameter {
     SOFTMAX = 1;
   }
   optional CLASS_TYPE class_type = 21[default = SIGMOID];
+  optional bool has_lm = 22[default = false]; 
 }
 
 message Yolov3DetectionOutputParameter {

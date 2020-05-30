@@ -36,15 +36,15 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_data, Dtype* pred_loc_data,
                                 const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, bool has_lm);
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_diff, const int output_width, 
-                                const int output_height, 
+                                const int output_height, bool has_lm, const Dtype* lm_pre_diff,
                                 bool share_location, Dtype* bottom_diff, const int num_channels,
-                                std::map<int, vector<NormalizedBBox> > all_gt_bboxes);
+                                std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes);
 
 template <typename Dtype>
 void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int output_height
                   , const int output_width, const int channels, const int num_batch
                   , std::map<int, std::vector<CenterNetInfo > > * results
-                  , const int loc_channels,  Dtype conf_thresh, Dtype nms_thresh);      
+                  , const int loc_channels, bool has_lm,  Dtype conf_thresh, Dtype nms_thresh);      
 
 
 template <typename Dtype>
@@ -52,7 +52,7 @@ void _nms_heatmap(const Dtype* conf_data, Dtype* keep_max_data, const int output
                   , const int output_width, const int channels, const int num_batch);
 
 template <typename Dtype>
-void GenerateBatchHeatmap(std::map<int, vector<NormalizedBBox> > all_gt_bboxes, Dtype* gt_heatmap, 
+void GenerateBatchHeatmap(std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, Dtype* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);
 
 

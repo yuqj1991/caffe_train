@@ -75,6 +75,7 @@ class CenternetDetectionOutputLayer : public Layer<Dtype> {
     int num_;
     std::map<int, std::vector<CenterNetInfo> > results_;
     Dtype nms_thresh_;
+    bool has_lm_;
 };
 
 }  // namespace caffe
