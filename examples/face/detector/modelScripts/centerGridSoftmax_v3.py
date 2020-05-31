@@ -289,10 +289,10 @@ solver_param = {
 }
 
 Inverted_residual_setting = [[1, 16, 1, 1],
-                             [6, 24, 2, 2],
-                             [6, 32, 2, 2], 
-                             [6, 64, 2, 2],  
-                             [6, 128, 3, 2]]
+                             [6, 32, 2, 2],
+                             [6, 64, 2, 2], 
+                             [6, 128, 2, 2],  
+                             [6, 196, 3, 2]]
 
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
