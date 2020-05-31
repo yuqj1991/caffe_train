@@ -297,6 +297,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
                 const AnnoFaceLandmarks& lmarks = anno.face_lm();
                 const int has_lm = anno.has_lm();
                 if(has_lm>0){
+                    CHECK_GT(has_lm, 0.f);
                     CHECK_GT(lmarks.righteye().x() , 0.f);
                 }
 				// Adjust bounding box annotation.
