@@ -205,7 +205,6 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         }
     }
     CHECK_EQ(num_gt_, num_groundtruth);
-    LOG(INFO)<<"num_lm_: "<<num_lm_;
     if (num_gt_ >= 1) {
         // Form data to pass on to loc_loss_layer_.
         vector<int> loc_shape(2);
@@ -308,6 +307,8 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
                 <<", lm loss: "<< lm_loss;
         LOG(INFO)<<"normalizer: "<< normalizer
                 <<", lm_normalizer: "<<lm_normalizer
+                <<", num_lm_: "<<num_lm_
+                <<", num_gt_box_: "<<num_gt_
                 <<", num_classes: "<<num_classes_
                 <<", output_width: "<<output_width
                 <<", output_height: "<<output_height;
