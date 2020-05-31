@@ -193,9 +193,10 @@ layer {
     }
     yoloformat: true
     crop_type: CROP_JITTER
+    has_landmarks: false
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
     batch_size: 8
     backend: LMDB
   }
@@ -3978,7 +3979,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 320
+    num_output: 64
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4121,7 +4122,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4186,11 +4187,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 32
+    num_output: 24
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
+    group: 24
     stride: 1
     weight_filler {
       type: "msra"
@@ -4258,7 +4259,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4323,11 +4324,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 96
+    num_output: 24
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 96
+    group: 24
     stride: 1
     weight_filler {
       type: "msra"
@@ -4395,7 +4396,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4460,11 +4461,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 320
+    num_output: 24
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 320
+    group: 24
     stride: 1
     weight_filler {
       type: "msra"
@@ -4532,7 +4533,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4597,7 +4598,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 0
     kernel_size: 2
@@ -4662,7 +4663,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -4773,7 +4774,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 0
     kernel_size: 2
@@ -4838,7 +4839,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -4949,7 +4950,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 0
     kernel_size: 2
@@ -5014,7 +5015,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 1
     kernel_size: 3
@@ -5125,7 +5126,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 64
+    num_output: 24
     bias_term: false
     pad: 0
     kernel_size: 2

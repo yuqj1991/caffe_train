@@ -29,7 +29,7 @@ layer {
     has_landmarks: false
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lm_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
     batch_size: 1
     backend: LMDB
   }
@@ -5067,9 +5067,9 @@ layer {
     keep_top_k: 200
     confidence_threshold: 0.15000000596046448
     bias_scale: 438
-    bias_scale: 192
-    bias_scale: 80
-    bias_scale: 19
+    bias_scale: 363
+    bias_scale: 91
+    bias_scale: 35
     down_ratio: 32
     down_ratio: 16
     down_ratio: 8
