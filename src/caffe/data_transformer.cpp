@@ -295,7 +295,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 				const Annotation& anno = anno_group.annotation(a);
 				const NormalizedBBox& bbox = anno.bbox();
                 const AnnoFaceLandmarks& lmarks = anno.face_lm();
-                const int32 has_lm = anno.has_lm();
+                const int has_lm = anno.has_lm();
                 if(has_lm>0){
                     CHECK_GT(lmarks.righteye().x() , 0.f);
                 }
