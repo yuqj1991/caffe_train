@@ -203,7 +203,6 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
             }
         }
     }
-    LOG(INFO)<<"num_gt_: "<<num_gt_<<", num_lm: "<<num_lm_;
     CHECK_EQ(num_gt_, num_groundtruth);
   
     if (num_gt_ >= 1) {
@@ -220,9 +219,14 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         loc_wh_gt_.Reshape(loc_shape);
         Dtype* loc_wh_pred_data = loc_wh_pred_.mutable_cpu_data();
         Dtype* loc_wh_gt_data = loc_wh_gt_.mutable_cpu_data();
-        if(has_lm_){
+        if(num_lm_){
             loc_shape[0] = 1;
             loc_shape[1] = num_lm_ * 10;
+            lm_pred_.Reshape(loc_shape);
+            lm_gt_.Reshape(loc_shape);
+        }else{
+            loc_shape[0] = 1;
+            loc_shape[1] = 10;
             lm_pred_.Reshape(loc_shape);
             lm_gt_.Reshape(loc_shape);
         }
