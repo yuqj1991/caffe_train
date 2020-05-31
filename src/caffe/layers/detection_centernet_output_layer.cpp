@@ -92,7 +92,10 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
     }
     vector<int> top_shape(2, 1);
     top_shape.push_back(num_kept);
-    top_shape.push_back(7);
+    if(has_lm_)
+        top_shape.push_back(17);
+    else
+        top_shape.push_back(7);
     Dtype* top_data;
     if (num_kept == 0) {
         top_shape[2] = num_;
@@ -101,7 +104,10 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
         caffe_set<Dtype>(top[0]->count(), -1, top_data);
         for (int i = 0; i < num_; ++i) {
             top_data[0] = i;
-            top_data += 7;
+            if(has_lm_)
+                top_data += 17;
+            else
+                top_data += 7;
         }
     } else {
         top[0]->Reshape(top_shape);
