@@ -455,14 +455,12 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
                     lmarks->mutable_leftmouth()->set_y(static_cast<float>(lm_y4 / height));
                     lmarks->mutable_rightmouth()->set_x(static_cast<float>(lm_x5 / width));
                     lmarks->mutable_rightmouth()->set_y(static_cast<float>(lm_y5 / height));
+                    anno->set_has_lm(1);
                 }else if (v2.first == "has_lm"){
-                    has_lm = pt2.data() == "1";
+                    has_lm = pt2.data() == "0";
                     if(has_lm){
-                        anno->set_has_lm(1);
-                    }else{
                         anno->set_has_lm(0);
                     }
-                    
                 }
             }
         }
