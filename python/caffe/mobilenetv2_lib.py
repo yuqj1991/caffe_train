@@ -379,11 +379,11 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
 								use_global_stats= False, Inverted_residual_setting = [[1, 16, 1, 1],
                                  [6, 24, 2, 2], [6, 32, 3, 2], [6, 64, 4, 2],[6, 96, 3, 1], 
                                  [6, 160, 3, 2], [6, 320, 1, 1]],
+                                 feature_stride = [4, 8, 16, 32],
                                  Fpn= True, biFpn = True, fpn_out_channels = 24,
                                  top_out_channels = 320, **bn_param):
     assert from_layer in net.keys()
     index = 0
-    feature_stride = [4, 8, 16, 32]
     accum_stride = 1
     pre_stride = 1
     LayerList_Name = []
@@ -500,10 +500,10 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
                     Reconnect_layer_two= LayerList_Name[len(feature_stride) - index - 1]
             else:
                 net_last_layer = LayerList_Name[len(feature_stride) - index - 1]
-                Reconnect_layer_two="linear_conv_fpn_{}".format(channel_stage)
+                Reconnect_layer_two="conv_fpn_{}".format(channel_stage)
                 ConvBNLayer(net, net_last_layer, Reconnect_layer_two, use_bn= True, 
                     use_swish= False, use_relu = False, 
-                    num_output= fpn_out_channels, kernel_size= 1, pad= 0, stride= 1,
+                    num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 1,
                     lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
                 
             # eltwise_sum layer

@@ -271,7 +271,7 @@ solver_param = {
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 100000,
+    'max_iter': 60000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,

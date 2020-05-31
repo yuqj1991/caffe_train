@@ -267,11 +267,11 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 30000, 50000, 70000, 90000],
+    'stepvalue': [10000, 20000, 30000, 40000, 50000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 100000,
+    'max_iter': 60000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
@@ -289,10 +289,10 @@ solver_param = {
 }
 
 Inverted_residual_setting = [[1, 16, 1, 1],
-                             [6, 32, 2, 2],
-                             [6, 64, 2, 2], 
-                             [6, 128, 2, 2],  
-                             [6, 196, 3, 2]]
+                             [6, 24, 3, 2],
+                             [6, 32, 3, 2],
+                             [6, 64, 5, 2],
+                             [6, 128, 3, 2]]
 
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
@@ -311,9 +311,9 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False,
                                                     Inverted_residual_setting= Inverted_residual_setting,
                                                     top_out_channels= Inverted_residual_setting[4][1])
-bias_scale = [438, 363, 91, 35]
-low_bbox_scale = [256, 128, 32, 6]
-up_bbox_scale = [620, 256, 128, 32]
+bias_scale = [438, 243, 96, 35]
+low_bbox_scale = [360, 128, 64, 6]
+up_bbox_scale = [620, 360, 128, 64]
 from_layers = []
 for idx, detect_output in enumerate(LayerList_Output):
     from_layers.append(net[detect_output])
