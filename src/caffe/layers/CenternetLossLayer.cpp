@@ -219,7 +219,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         loc_wh_gt_.Reshape(loc_shape);
         Dtype* loc_wh_pred_data = loc_wh_pred_.mutable_cpu_data();
         Dtype* loc_wh_gt_data = loc_wh_gt_.mutable_cpu_data();
-        if(num_lm_){
+        if(num_lm_ >0 && has_lm_){
             loc_shape[0] = 1;
             loc_shape[1] = num_lm_ * 10;
             lm_pred_.Reshape(loc_shape);
@@ -243,9 +243,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         loc_wh_loss_layer_->Reshape(loc_wh_bottom_vec_, loc_wh_top_vec_);
         loc_wh_loss_layer_->Forward(loc_wh_bottom_vec_, loc_wh_top_vec_);
 
-        LOG(INFO)<<"!!!!!!!!!";
-
-        if(has_lm_){
+        if(has_lm_ && num_lm_ >0){
             lm_loss_layer_->Reshape(lm_bottom_vec_, lm_top_vec_);
             lm_loss_layer_->Forward(lm_bottom_vec_, lm_top_vec_);
         }
@@ -287,14 +285,14 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         loc_offset_loss = 1. * Dtype(loc_offset_loss_.cpu_data()[0] / normalizer);
         loc_wh_loss = 0.1 * Dtype(loc_wh_loss_.cpu_data()[0] / normalizer);
         
-        if(has_lm_){
+        if(has_lm_ && num_lm_ >0){
             lm_loss = 0.1 * Dtype(lm_loss_.cpu_data()[0] / lm_normalizer);
         }
     }
     if (this->layer_param_.propagate_down(1)) {
         cls_loss = 1. * Dtype(conf_loss_.cpu_data()[0] / normalizer);
     }
-    if(has_lm_){
+    if(has_lm_ && num_lm_ >0){
         top[0]->mutable_cpu_data()[0] = cls_loss + loc_offset_loss + loc_wh_loss + lm_loss;
     }else{
         top[0]->mutable_cpu_data()[0] = cls_loss + loc_offset_loss + loc_wh_loss;
@@ -356,7 +354,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             caffe_scal(loc_wh_pred_.count(), loss_wh_weight, loc_wh_pred_.mutable_cpu_diff());
             const Dtype* loc_wh_pred_diff = loc_wh_pred_.cpu_diff();
 
-            if(has_lm_){
+            if(has_lm_ && num_lm_ >0){
                 lm_loss_layer_->Backward(lm_top_vec_, loc_propagate_down,
                                         lm_bottom_vec_);
                 Dtype lm_weight = top[0]->cpu_diff()[0] / lm_normalizer;
