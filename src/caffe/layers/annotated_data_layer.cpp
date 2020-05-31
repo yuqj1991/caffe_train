@@ -505,9 +505,12 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                                     top_label[idx++] = lm.rightmouth().x();
                                     top_label[idx++] = lm.rightmouth().y();
                                     top_label[idx++] = bbox.difficult();
-                                    
+
                                     LOG(INFO)<<"le x: "<<lm.lefteye().x() <<", le y: "<<lm.lefteye().y()
-                                            <<"re x: "<<lm.righteye().x() <<", re y: "<<lm.righteye().y();
+                                            <<"re x: "<<lm.righteye().x() <<", re y: "<<lm.righteye().y()
+                                            <<"no x: "<<lm.nose().x() <<", no y: "<<lm.nose().y()
+                                            <<"lm x: "<<lm.leftmouth().x() <<", lm y: "<<lm.leftmouth().y()
+                                            <<"rm x: "<<lm.rightmouth().x() <<", rm y: "<<lm.rightmouth().y();
                                 }
                             }
                         }
