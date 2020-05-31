@@ -190,7 +190,7 @@ message LFFDSampler {
 message Annotation {
     optional int32 instance_id = 1 [default = 0];
     optional NormalizedBBox bbox = 2;
-    optional bool has_lm = 3[default=false];
+    optional int32 has_lm = 3[default=0];
     optional AnnoFaceLandmarks face_lm = 4;
 }
 

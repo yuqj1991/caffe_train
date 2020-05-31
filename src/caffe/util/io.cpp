@@ -457,7 +457,12 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
                     lmarks->mutable_rightmouth()->set_y(static_cast<float>(lm_y5 / height));
                 }else if (v2.first == "has_lm"){
                     has_lm = pt2.data() == "1";
-                    anno->set_has_lm(has_lm);
+                    if(has_lm){
+                        anno->set_has_lm(1);
+                    }else{
+                        anno->set_has_lm(0);
+                    }
+                    
                 }
             }
         }
@@ -480,8 +485,8 @@ bool ReadXMLToAnnotatedDatum(const string& labelfile, const int img_height,
                         <<" bbox->xmax: "<<bbox.xmax()<<" bbox->ymax: "<<bbox.ymax()
                         <<" bbox->label: "<<bbox.label();
 
-            bool has_lm = anno.has_lm();
-            if(has_lm){
+            int has_lm = anno.has_lm();
+            if(has_lm >0){
                 AnnoFaceLandmarks lm = anno.face_lm();
                 LOG(INFO) <<"lefteye: "<<lm.lefteye().x()<<", "<<lm.lefteye().y()
                           <<" righteye: "<<lm.righteye().x()<<", "<<lm.righteye().y()
