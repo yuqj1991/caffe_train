@@ -1390,7 +1390,7 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
             float bbox_size = BBoxSize(bbox);
             bbox.set_size(bbox_size);
             AnnoFaceLandmarks lmarks;
-            bool bbox_has_lm = gt_data[start_idx + 8];
+            Dtype bbox_has_lm = gt_data[start_idx + 8];
             if(bbox_has_lm > 0){
                 lmarks.mutable_lefteye()->set_x(gt_data[start_idx + 9]);
                 lmarks.mutable_lefteye()->set_y(gt_data[start_idx + 10]);
