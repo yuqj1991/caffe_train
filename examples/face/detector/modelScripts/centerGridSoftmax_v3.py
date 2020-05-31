@@ -289,10 +289,10 @@ solver_param = {
 }
 
 Inverted_residual_setting = [[1, 16, 1, 1],
-                             [6, 32, 2, 2],
-                             [6, 64, 2, 2], 
-                             [6, 128, 2, 2],  
-                             [6, 192, 3, 2]]
+                             [6, 24, 2, 2],
+                             [6, 32, 2, 2], 
+                             [6, 64, 2, 2],  
+                             [6, 128, 3, 2]]
 
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
@@ -310,7 +310,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False,
                                                     Inverted_residual_setting= Inverted_residual_setting,
-                                                    top_out_channels= 192)
+                                                    top_out_channels= Inverted_residual_setting[4][1])
 bias_scale = [438, 363, 91, 35]
 low_bbox_scale = [256, 128, 32, 6]
 up_bbox_scale = [620, 256, 128, 32]
@@ -337,7 +337,7 @@ net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_
                                                     biFpn= False,
                                                     use_global_stats= True,
                                                     Inverted_residual_setting= Inverted_residual_setting, 
-                                                    top_out_channels= 192)
+                                                    top_out_channels= Inverted_residual_setting[4][1])
 DetectListLayer = []
 DetectListScale = []
 DetectListDownRatio = []
