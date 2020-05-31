@@ -211,7 +211,7 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
 template <typename Dtype>
 void GetGroundTruth(const Dtype* gt_data, const int num_gt,
       const int background_label_id, const bool use_difficult_gt,
-      map<int, LabelBBox>* all_gt_bboxes);
+      map<int, LabelBBox>* all_gt_bboxes, bool has_lm);
 
 template <typename Dtype>
 void GetfaceGroundTruth(const Dtype* gt_data, const int num_gt,

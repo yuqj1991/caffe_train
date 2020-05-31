@@ -341,6 +341,7 @@ det_eval_param = {
     'background_label_id': 0,
     'overlap_threshold': 0.15,
     'evaluate_difficult_gt': False,
+	'has_lm': True
 }
 net.detection_eval = L.DetectionEvaluate(net.detection_out, net.label,
     detection_evaluate_param=det_eval_param,
