@@ -353,9 +353,9 @@ void DataTransformer<Dtype>::TransformAnnotation(
                         }
                     }
 					if(has_valid_lm){
-						transformed_anno->set_has_lm(has_lm);
+						transformed_anno->set_has_lm(1.f);
 					}else{
-						transformed_anno->set_has_lm(false);
+						transformed_anno->set_has_lm(0.f);
 						project_facemark.mutable_lefteye()->set_x(-1.);
 						project_facemark.mutable_righteye()->set_x(-1.);
 						project_facemark.mutable_nose()->set_x(-1.);
