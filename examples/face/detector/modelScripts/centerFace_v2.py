@@ -220,7 +220,7 @@ test_transform_param = {
     },
 }
 base_learning_rate = 0.0005
-Job_Name = "Centerface_v3"
+Job_Name = "Centerface_v2"
 mdoel_name = "ResideoCenterFace"
 save_dir = "../prototxt/Full_{}".format(resize)
 snapshot_dir = "../snapshot/{}".format(Job_Name)
@@ -269,11 +269,11 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 30000, 50000, 70000, 90000],
+    'stepvalue': [10000, 20000, 30000, 40000, 50000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 100000,
+    'max_iter': 60000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
@@ -378,7 +378,7 @@ with open(solver_file, 'w') as f:
 
 # Create job file.
 train_src_param = '# --snapshot={}_0_iter_{}.solverstate '.format(snapshot_dir, 5000)
-job_file = "../train_scripts/train_{}.sh".format('center_face_v3')
+job_file = "../train_scripts/train_{}.sh".format('center_face_v2')
 with open(job_file, 'w') as f:
     f.write('#!/bin/sh \n')
     f.write('if ! test -f {} ;then \n'.format(train_net_file))

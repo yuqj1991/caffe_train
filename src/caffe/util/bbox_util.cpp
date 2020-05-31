@@ -1402,11 +1402,6 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
                 lmarks.mutable_leftmouth()->set_y(gt_data[start_idx + 16]);
                 lmarks.mutable_rightmouth()->set_x(gt_data[start_idx + 17]);
                 lmarks.mutable_rightmouth()->set_y(gt_data[start_idx + 18]);
-                /*
-                LOG(INFO)<<"~~~~~~~~~~~~~ bbox_has_lm: "<<bbox_has_lm <<", "
-                <<gt_data[start_idx + 9]<<", "<<gt_data[start_idx + 10]<<", "
-                <<gt_data[start_idx + 11]<<", "<<gt_data[start_idx + 12];
-                */
             }else{
                 lmarks.mutable_lefteye()->set_x(-1.);
                 lmarks.mutable_lefteye()->set_y(-1.);

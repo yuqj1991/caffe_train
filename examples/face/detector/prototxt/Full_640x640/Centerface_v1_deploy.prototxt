@@ -4312,7 +4312,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 14
+    num_output: 4
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4343,7 +4343,7 @@ layer {
     keep_top_k: 200
     confidence_threshold: 0.15000000596046448
     nms_thresh: 0.30000001192092896
-    has_lm: true
+    has_lm: false
   }
 }
 

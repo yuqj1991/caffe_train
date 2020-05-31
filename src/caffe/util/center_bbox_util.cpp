@@ -568,7 +568,6 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                     }
                 }
             }
-            #if 1
             hard_nms(batch_temp, &batch_result, nms_thresh);
             for(unsigned j = 0 ; j < batch_result.size(); j++){
                 batch_result[j].set_xmin(batch_result[j].xmin() / (4 * output_width));
@@ -586,18 +585,6 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                 batch_result[j].mutable_marks()->mutable_rightmouth()->set_x(batch_result[j].marks().rightmouth().x());
                 batch_result[j].mutable_marks()->mutable_rightmouth()->set_y(batch_result[j].marks().rightmouth().y());
             }
-            #else
-            for(unsigned j = 0 ; j < batch_temp.size(); j++){
-                CenterNetInfo temp_result;
-                temp_result.set_class_id(batch_temp[j].class_id());
-                temp_result.set_score(batch_temp[j].score());
-                temp_result.set_xmin(batch_temp[j].xmin() / (4 * output_width));
-                temp_result.set_xmax(batch_temp[j].xmax() / (4 * output_width));
-                temp_result.set_ymin(batch_temp[j].ymin() / (4 * output_height));
-                temp_result.set_ymax(batch_temp[j].ymax() / (4 * output_height));
-                batch_result.push_back(temp_result);
-            }
-            #endif
             if(batch_result.size() > 0){
                 if(results->find(i) == results->end()){
                     results->insert(std::make_pair(i, batch_result));
@@ -641,7 +628,6 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                     }
                 }
             }
-            #if 1
             hard_nms(batch_temp, &batch_result, nms_thresh);
             for(unsigned j = 0 ; j < batch_result.size(); j++){
                 batch_result[j].set_xmin(batch_result[j].xmin() / (4 * output_width));
@@ -649,18 +635,6 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                 batch_result[j].set_ymin(batch_result[j].ymin() / (4 * output_height));
                 batch_result[j].set_ymax(batch_result[j].ymax() / (4 * output_height));
             }
-            #else
-            for(unsigned j = 0 ; j < batch_temp.size(); j++){
-                CenterNetInfo temp_result;
-                temp_result.set_class_id(batch_temp[j].class_id());
-                temp_result.set_score(batch_temp[j].score());
-                temp_result.set_xmin(batch_temp[j].xmin() / (4 * output_width));
-                temp_result.set_xmax(batch_temp[j].xmax() / (4 * output_width));
-                temp_result.set_ymin(batch_temp[j].ymin() / (4 * output_height));
-                temp_result.set_ymax(batch_temp[j].ymax() / (4 * output_height));
-                batch_result.push_back(temp_result);
-            }
-            #endif
             if(batch_result.size() > 0){
                 if(results->find(i) == results->end()){
                     results->insert(std::make_pair(i, batch_result));

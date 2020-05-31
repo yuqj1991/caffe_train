@@ -1,15 +1,14 @@
-name: "CenterFace_train"
+name: "CenterFace_test"
 layer {
   name: "data"
   type: "AnnotatedData"
   top: "data"
   top: "label"
   include {
-    phase: TRAIN
+    phase: TEST
   }
   transform_param {
     scale: 0.007842999882996082
-    mirror: true
     mean_value: 103.94000244140625
     mean_value: 116.77999877929688
     mean_value: 123.68000030517578
@@ -19,185 +18,19 @@ layer {
       height: 640
       width: 640
       interp_mode: LINEAR
-      interp_mode: AREA
-      interp_mode: NEAREST
-      interp_mode: CUBIC
-      interp_mode: LANCZOS4
-    }
-    emit_constraint {
-      emit_type: CENTER
-    }
-    distort_param {
-      brightness_prob: 0.5
-      brightness_delta: 32.0
-      contrast_prob: 0.5
-      contrast_lower: 0.5
-      contrast_upper: 1.5
-      hue_prob: 0.5
-      hue_delta: 18.0
-      saturation_prob: 0.5
-      saturation_lower: 0.5
-      saturation_upper: 1.5
-      random_order_prob: 0.0
     }
   }
   annotated_data_param {
     batch_sampler {
-      sampler {
-        min_scale: 0.30000001192092896
-        max_scale: 1.0
-        min_aspect_ratio: 0.30000001192092896
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.4000000059604645
-        max_scale: 1.0
-        min_aspect_ratio: 0.4000000059604645
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.5
-        max_scale: 1.0
-        min_aspect_ratio: 0.5
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.6000000238418579
-        max_scale: 1.0
-        min_aspect_ratio: 0.6000000238418579
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.699999988079071
-        max_scale: 1.0
-        min_aspect_ratio: 0.699999988079071
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        min_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.800000011920929
-        max_scale: 1.0
-        min_aspect_ratio: 0.800000011920929
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        max_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    batch_sampler {
-      sampler {
-        min_scale: 0.8999999761581421
-        max_scale: 1.0
-        min_aspect_ratio: 0.8999999761581421
-        max_aspect_ratio: 1.0
-      }
-      sample_constraint {
-        max_jaccard_overlap: 1.0
-      }
-      max_sample: 1
-      max_trials: 50
     }
     label_map_file: "../labelmap.prototxt"
-    data_anchor_sampler {
-      scale: 16
-      scale: 32
-      scale: 64
-      scale: 128
-      scale: 256
-      scale: 512
-      sample_constraint {
-        min_object_coverage: 0.75
-      }
-      max_sample: 1
-      max_trials: 50
-    }
-    bbox_sampler {
-      box {
-        bbox_small_scale: 10
-        bbox_large_scale: 15
-        ancher_stride: 4
-      }
-      box {
-        bbox_small_scale: 15
-        bbox_large_scale: 20
-        ancher_stride: 4
-      }
-      box {
-        bbox_small_scale: 20
-        bbox_large_scale: 40
-        ancher_stride: 8
-      }
-      box {
-        bbox_small_scale: 40
-        bbox_large_scale: 70
-        ancher_stride: 8
-      }
-      box {
-        bbox_small_scale: 70
-        bbox_large_scale: 110
-        ancher_stride: 16
-      }
-      box {
-        bbox_small_scale: 110
-        bbox_large_scale: 250
-        ancher_stride: 32
-      }
-      box {
-        bbox_small_scale: 250
-        bbox_large_scale: 400
-        ancher_stride: 32
-      }
-      box {
-        bbox_small_scale: 400
-        bbox_large_scale: 560
-        ancher_stride: 32
-      }
-      max_sample: 1
-      max_trials: 50
-    }
     yoloformat: false
-    crop_type: CROP_JITTER
-    has_landmarks: true
+    crop_type: CROP_BATCH
+    has_landmarks: false
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
-    batch_size: 8
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
+    batch_size: 1
     backend: LMDB
   }
 }
@@ -239,7 +72,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -249,11 +82,11 @@ layer {
   bottom: "conv_0"
   top: "conv_0"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -311,7 +144,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -321,11 +154,11 @@ layer {
   bottom: "conv_0_0/depthwise"
   top: "conv_0_0/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -382,7 +215,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -392,11 +225,11 @@ layer {
   bottom: "conv_0_0/linear"
   top: "conv_0_0/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -453,7 +286,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -463,11 +296,11 @@ layer {
   bottom: "conv_1_0/expand"
   top: "conv_1_0/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -525,7 +358,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -535,11 +368,11 @@ layer {
   bottom: "conv_1_0/depthwise"
   top: "conv_1_0/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -596,7 +429,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -606,11 +439,11 @@ layer {
   bottom: "conv_1_0/linear"
   top: "conv_1_0/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -661,7 +494,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -671,11 +504,11 @@ layer {
   bottom: "conv_1_1/expand"
   top: "conv_1_1/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -733,7 +566,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -743,11 +576,11 @@ layer {
   bottom: "conv_1_1/depthwise"
   top: "conv_1_1/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -804,7 +637,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -814,11 +647,11 @@ layer {
   bottom: "conv_1_1/linear"
   top: "conv_1_1/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -876,7 +709,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -886,11 +719,11 @@ layer {
   bottom: "conv_2_0/expand"
   top: "conv_2_0/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -948,7 +781,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -958,11 +791,11 @@ layer {
   bottom: "conv_2_0/depthwise"
   top: "conv_2_0/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1019,7 +852,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1029,11 +862,11 @@ layer {
   bottom: "conv_2_0/linear"
   top: "conv_2_0/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1084,7 +917,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1094,11 +927,11 @@ layer {
   bottom: "conv_2_1/expand"
   top: "conv_2_1/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1156,7 +989,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1166,11 +999,11 @@ layer {
   bottom: "conv_2_1/depthwise"
   top: "conv_2_1/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1227,7 +1060,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1237,11 +1070,11 @@ layer {
   bottom: "conv_2_1/linear"
   top: "conv_2_1/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1299,7 +1132,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1309,11 +1142,11 @@ layer {
   bottom: "conv_2_2/expand"
   top: "conv_2_2/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1371,7 +1204,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1381,11 +1214,11 @@ layer {
   bottom: "conv_2_2/depthwise"
   top: "conv_2_2/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1442,7 +1275,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1452,11 +1285,11 @@ layer {
   bottom: "conv_2_2/linear"
   top: "conv_2_2/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1514,7 +1347,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1524,11 +1357,11 @@ layer {
   bottom: "conv_3_0/expand"
   top: "conv_3_0/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1586,7 +1419,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1596,11 +1429,11 @@ layer {
   bottom: "conv_3_0/depthwise"
   top: "conv_3_0/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1657,7 +1490,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1667,11 +1500,11 @@ layer {
   bottom: "conv_3_0/linear"
   top: "conv_3_0/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1722,7 +1555,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1732,11 +1565,11 @@ layer {
   bottom: "conv_3_1/expand"
   top: "conv_3_1/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1794,7 +1627,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1804,11 +1637,11 @@ layer {
   bottom: "conv_3_1/depthwise"
   top: "conv_3_1/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1865,7 +1698,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1875,11 +1708,11 @@ layer {
   bottom: "conv_3_1/linear"
   top: "conv_3_1/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -1937,7 +1770,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -1947,11 +1780,11 @@ layer {
   bottom: "conv_3_2/expand"
   top: "conv_3_2/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2009,7 +1842,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2019,11 +1852,11 @@ layer {
   bottom: "conv_3_2/depthwise"
   top: "conv_3_2/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2080,7 +1913,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2090,11 +1923,11 @@ layer {
   bottom: "conv_3_2/linear"
   top: "conv_3_2/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2152,7 +1985,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2162,11 +1995,11 @@ layer {
   bottom: "conv_3_3/expand"
   top: "conv_3_3/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2224,7 +2057,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2234,11 +2067,11 @@ layer {
   bottom: "conv_3_3/depthwise"
   top: "conv_3_3/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2295,7 +2128,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2305,11 +2138,11 @@ layer {
   bottom: "conv_3_3/linear"
   top: "conv_3_3/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2367,7 +2200,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2377,11 +2210,11 @@ layer {
   bottom: "Conv_project_64_96"
   top: "Conv_project_64_96"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2438,7 +2271,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2448,11 +2281,11 @@ layer {
   bottom: "conv_4_0/expand"
   top: "conv_4_0/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2510,7 +2343,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2520,11 +2353,11 @@ layer {
   bottom: "conv_4_0/depthwise"
   top: "conv_4_0/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2581,7 +2414,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2591,11 +2424,11 @@ layer {
   bottom: "conv_4_0/linear"
   top: "conv_4_0/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2653,7 +2486,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2663,11 +2496,11 @@ layer {
   bottom: "conv_4_1/expand"
   top: "conv_4_1/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2725,7 +2558,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2735,11 +2568,11 @@ layer {
   bottom: "conv_4_1/depthwise"
   top: "conv_4_1/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2796,7 +2629,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2806,11 +2639,11 @@ layer {
   bottom: "conv_4_1/linear"
   top: "conv_4_1/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2868,7 +2701,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2878,11 +2711,11 @@ layer {
   bottom: "conv_4_2/expand"
   top: "conv_4_2/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -2940,7 +2773,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -2950,11 +2783,11 @@ layer {
   bottom: "conv_4_2/depthwise"
   top: "conv_4_2/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3011,7 +2844,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3021,11 +2854,11 @@ layer {
   bottom: "conv_4_2/linear"
   top: "conv_4_2/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3083,7 +2916,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3093,11 +2926,11 @@ layer {
   bottom: "conv_5_0/expand"
   top: "conv_5_0/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3155,7 +2988,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3165,11 +2998,11 @@ layer {
   bottom: "conv_5_0/depthwise"
   top: "conv_5_0/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3226,7 +3059,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3236,11 +3069,11 @@ layer {
   bottom: "conv_5_0/linear"
   top: "conv_5_0/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3291,7 +3124,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3301,11 +3134,11 @@ layer {
   bottom: "conv_5_1/expand"
   top: "conv_5_1/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3363,7 +3196,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3373,11 +3206,11 @@ layer {
   bottom: "conv_5_1/depthwise"
   top: "conv_5_1/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3434,7 +3267,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3444,11 +3277,11 @@ layer {
   bottom: "conv_5_1/linear"
   top: "conv_5_1/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3506,7 +3339,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3516,11 +3349,11 @@ layer {
   bottom: "conv_5_2/expand"
   top: "conv_5_2/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3578,7 +3411,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3588,11 +3421,11 @@ layer {
   bottom: "conv_5_2/depthwise"
   top: "conv_5_2/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3649,7 +3482,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3659,11 +3492,11 @@ layer {
   bottom: "conv_5_2/linear"
   top: "conv_5_2/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3721,7 +3554,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3731,11 +3564,11 @@ layer {
   bottom: "conv_6_0/expand"
   top: "conv_6_0/expand"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3793,7 +3626,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3803,11 +3636,11 @@ layer {
   bottom: "conv_6_0/depthwise"
   top: "conv_6_0/depthwise"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3864,7 +3697,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3874,11 +3707,11 @@ layer {
   bottom: "conv_6_0/linear"
   top: "conv_6_0/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -3935,7 +3768,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -3945,11 +3778,11 @@ layer {
   bottom: "conv_1_project/linear"
   top: "conv_1_project/linear"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -4006,7 +3839,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -4016,11 +3849,11 @@ layer {
   bottom: "Deconv_Scale_Up_Stage_320"
   top: "Deconv_Scale_Up_Stage_320"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -4071,7 +3904,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -4081,11 +3914,11 @@ layer {
   bottom: "0_linear_Conv"
   top: "0_linear_Conv"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -4152,7 +3985,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -4162,11 +3995,11 @@ layer {
   bottom: "Deconv_Scale_Up_Stage_96"
   top: "Deconv_Scale_Up_Stage_96"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -4217,7 +4050,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -4227,11 +4060,11 @@ layer {
   bottom: "1_linear_Conv"
   top: "1_linear_Conv"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -4298,7 +4131,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -4308,11 +4141,11 @@ layer {
   bottom: "Deconv_Scale_Up_Stage_32"
   top: "Deconv_Scale_Up_Stage_32"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -4363,7 +4196,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -4373,11 +4206,11 @@ layer {
   bottom: "2_linear_Conv"
   top: "2_linear_Conv"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -4444,7 +4277,7 @@ layer {
     decay_mult: 0.0
   }
   batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
+    use_global_stats: true
     eps: 0.0010000000474974513
   }
 }
@@ -4454,11 +4287,11 @@ layer {
   bottom: "last_conv_3x3_layer"
   top: "last_conv_3x3_layer"
   param {
-    lr_mult: 1.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 0.0
     decay_mult: 0.0
   }
   scale_param {
@@ -4507,7 +4340,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 14
+    num_output: 4
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4518,29 +4351,43 @@ layer {
   }
 }
 layer {
-  name: "CenterFaceLoss_0"
-  type: "CenterObjectLoss"
-  bottom: "Box_out_1x1"
+  name: "Class_out_1x1_Sigmoid"
+  type: "Sigmoid"
   bottom: "Class_out_1x1"
-  bottom: "label"
-  top: "CenterFaceLoss_0"
+  top: "Class_out_1x1_Sigmoid"
+}
+layer {
+  name: "detection_out"
+  type: "CenternetDetectionOutput"
+  bottom: "Box_out_1x1"
+  bottom: "Class_out_1x1_Sigmoid"
+  top: "detection_out"
   include {
-    phase: TRAIN
+    phase: TEST
   }
-  propagate_down: true
-  propagate_down: true
-  propagate_down: false
-  loss_param {
-    normalization: VALID
-  }
-  center_object_loss_param {
-    num_class: 1
+  detection_output_param {
+    num_classes: 2
     share_location: true
-    loc_loss_type: SMOOTH_L1
-    conf_loss_type: FOCALSIGMOID
-    loc_weight: 1.0
-    has_lm: true
-    lm_loss_type: SMOOTH_L1
+    keep_top_k: 200
+    confidence_threshold: 0.15000000596046448
+    nms_thresh: 0.30000001192092896
+    has_lm: false
+  }
+}
+layer {
+  name: "detection_eval"
+  type: "DetectionEvaluate"
+  bottom: "detection_out"
+  bottom: "label"
+  top: "detection_eval"
+  include {
+    phase: TEST
+  }
+  detection_evaluate_param {
+    num_classes: 2
+    background_label_id: 0
+    overlap_threshold: 0.15000000596046448
+    evaluate_difficult_gt: false
   }
 }
 

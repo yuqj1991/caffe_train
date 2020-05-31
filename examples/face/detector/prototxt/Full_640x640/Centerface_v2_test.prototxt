@@ -26,10 +26,10 @@ layer {
     label_map_file: "../labelmap.prototxt"
     yoloformat: false
     crop_type: CROP_BATCH
-    has_landmarks: false
+    has_landmarks: true
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lm_lmdb/"
     batch_size: 1
     backend: LMDB
   }
@@ -4340,7 +4340,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 4
+    num_output: 14
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4371,7 +4371,7 @@ layer {
     keep_top_k: 200
     confidence_threshold: 0.15000000596046448
     nms_thresh: 0.30000001192092896
-    has_lm: false
+    has_lm: true
   }
 }
 layer {
@@ -4388,6 +4388,7 @@ layer {
     background_label_id: 0
     overlap_threshold: 0.15000000596046448
     evaluate_difficult_gt: false
+    has_lm: true
   }
 }
 
