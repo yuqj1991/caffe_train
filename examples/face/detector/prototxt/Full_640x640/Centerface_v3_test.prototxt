@@ -29,7 +29,7 @@ layer {
     has_landmarks: true
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lm_lmdb/"
     batch_size: 1
     backend: LMDB
   }
