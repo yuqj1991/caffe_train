@@ -190,6 +190,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     GetCenternetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
                     &all_gt_bboxes, has_lm_);
     int num_groundtruth = 0;
+    num_lm_ = 0;
     for(int i = 0; i < all_gt_bboxes.size(); i++){
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_boxes = all_gt_bboxes[i];
         num_groundtruth += gt_boxes.size();
@@ -204,7 +205,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         }
     }
     CHECK_EQ(num_gt_, num_groundtruth);
-  
+    LOG(INFO)<<"num_lm_: "<<num_lm_;
     if (num_gt_ >= 1) {
         // Form data to pass on to loc_loss_layer_.
         vector<int> loc_shape(2);
