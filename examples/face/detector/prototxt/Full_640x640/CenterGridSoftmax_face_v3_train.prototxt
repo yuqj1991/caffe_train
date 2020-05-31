@@ -2332,11 +2332,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 128
+    num_output: 192
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 128
+    group: 192
     stride: 2
     weight_filler {
       type: "msra"
