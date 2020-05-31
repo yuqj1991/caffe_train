@@ -290,11 +290,11 @@ void DataTransformer<Dtype>::TransformAnnotation(
 			AnnotationGroup transformed_anno_group;
 			// Go through each Annotation.
 			bool has_valid_annotation = false;
-            bool has_valid_lm = false;
 			for (int a = 0; a < anno_group.annotation_size(); ++a) {
 				const Annotation& anno = anno_group.annotation(a);
 				const NormalizedBBox& bbox = anno.bbox();
                 const AnnoFaceLandmarks& lmarks = anno.face_lm();
+                bool has_valid_lm = false;
                 const int has_lm = anno.has_lm();
                 LOG(INFO)<<"here you go";
                 if(has_lm > 0){
@@ -356,7 +356,8 @@ void DataTransformer<Dtype>::TransformAnnotation(
                     }
 					if(has_valid_lm){
 						transformed_anno->set_has_lm(1);
-					}else{
+					}
+                    else{
 						transformed_anno->set_has_lm(0);
 						project_facemark.mutable_lefteye()->set_x(-1.);
 						project_facemark.mutable_righteye()->set_x(-1.);
