@@ -220,7 +220,7 @@ test_transform_param = {
     },
 }
 base_learning_rate = 0.0005
-Job_Name = "CenterGrid{}_face_v1".format("Softmax")
+Job_Name = "CenterGrid{}_face_v3".format("Softmax")
 mdoel_name = "ResideoDeepFace"
 save_dir = "../prototxt/Full_{}".format(resize)
 snapshot_dir = "../snapshot/{}".format(Job_Name)
@@ -288,6 +288,12 @@ solver_param = {
     'test_initialization': False,
 }
 
+Inverted_residual_setting = [[1, 16, 1, 1],
+                             [6, 32, 2, 2],
+                             [6, 64, 2, 2], 
+                             [6, 128, 2, 2],  
+                             [6, 192, 3, 2]]
+
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
@@ -302,7 +308,9 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
         crop_type = P.AnnotatedData.CROP_JITTER, YoloForamte = True)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
+net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False,
+                                                    Inverted_residual_setting= Inverted_residual_setting,
+                                                    top_out_channels= 128)
 bias_scale = [438, 363, 91, 35]
 low_bbox_scale = [256, 128, 32, 6]
 up_bbox_scale = [620, 256, 128, 32]
@@ -325,7 +333,11 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
         train=False, output_label=True, label_map_file=labelmapPath,
         transform_param=test_transform_param)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, use_global_stats= True)
+net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, 
+                                                    biFpn= False,
+                                                    use_global_stats= True,
+                                                    Inverted_residual_setting= Inverted_residual_setting, 
+                                                    top_out_channels= 128)
 DetectListLayer = []
 DetectListScale = []
 DetectListDownRatio = []
@@ -375,7 +387,7 @@ with open(solver_file, 'w') as f:
 
 # Create job file.
 train_src_param = '# --snapshot={}_0_iter_{}.solverstate '.format(snapshot_dir, 5000)
-job_file = "../train_scripts/train_{}.sh".format('centerGridSoftmax_face_v1')
+job_file = "../train_scripts/train_{}.sh".format('centerGridSoftmax_face_v3')
 with open(job_file, 'w') as f:
     f.write('#!/bin/sh \n')
     f.write('if ! test -f {} ;then \n'.format(train_net_file))
