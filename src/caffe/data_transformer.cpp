@@ -295,8 +295,8 @@ void DataTransformer<Dtype>::TransformAnnotation(
 				const Annotation& anno = anno_group.annotation(a);
 				const NormalizedBBox& bbox = anno.bbox();
                 const AnnoFaceLandmarks& lmarks = anno.face_lm();
-                const bool has_lm = anno.has_lm();
-                if(has_lm){
+                const int32 has_lm = anno.has_lm();
+                if(has_lm>0){
                     CHECK_GT(lmarks.righteye().x() , 0.f);
                 }
 				// Adjust bounding box annotation.
@@ -307,7 +307,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 					CHECK_GT(img_width, 0);
 					UpdateBBoxByResizePolicy(param_.resize_param(), img_width, img_height,
 																		&resize_bbox);
-                    if(has_lm){
+                    if(has_lm>0){
                         UpdateLandmarkFacePoseByResizePolicy(param_.resize_param(),
 											img_width, img_height,
 											&resize_lmarks);
@@ -336,7 +336,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
 						ExtrapolateBBox(param_.resize_param(), img_height, img_width,
 								crop_bbox, transformed_bbox);
 					}    
-                    if(has_lm && ProjectfacemarksBBox(crop_bbox, &project_facemark)){
+                    if(has_lm>0 && ProjectfacemarksBBox(crop_bbox, &project_facemark)){
                         has_valid_lm = true;
                         point lefteye = project_facemark.lefteye();
                         point righteye = project_facemark.righteye();
@@ -353,9 +353,9 @@ void DataTransformer<Dtype>::TransformAnnotation(
                         }
                     }
 					if(has_valid_lm){
-						transformed_anno->set_has_lm(1.f);
+						transformed_anno->set_has_lm(1);
 					}else{
-						transformed_anno->set_has_lm(0.f);
+						transformed_anno->set_has_lm(0);
 						project_facemark.mutable_lefteye()->set_x(-1.);
 						project_facemark.mutable_righteye()->set_x(-1.);
 						project_facemark.mutable_nose()->set_x(-1.);
