@@ -780,7 +780,7 @@ void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
         for (int i = 0; i < num_gt; ++i) {
             int start_idx = b * num_gt * 8 +  i * 8;
             if(has_lm){
-                int start_idx = b * num_gt * 19 +  i * 19;
+                start_idx = b * num_gt * 19 +  i * 19;
             }
             int item_id = gt_data[start_idx];
             if (item_id == -1) {
