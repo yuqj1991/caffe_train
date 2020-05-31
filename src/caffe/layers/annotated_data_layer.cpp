@@ -304,19 +304,19 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) {
                     // Count the number of bboxes.
                     for (int g = 0; g < transformed_anno_vec.size(); ++g) {
-                    num_bboxes += transformed_anno_vec[g].annotation_size();
+                        num_bboxes += transformed_anno_vec[g].annotation_size();
                     }
                 } else {
                     LOG(FATAL) << "Unknown annotation type.";
                 }
                 all_anno[item_id] = transformed_anno_vec;
-                } else {
-                    this->data_transformer_->Transform(sampled_datum->datum(),
-                                                        &(this->transformed_data_));
-                    // Otherwise, store the label from datum.
-                    CHECK(sampled_datum->datum().has_label()) << "Cannot find any label.";
-                    top_label[item_id] = sampled_datum->datum().label();
-                }
+            } else {
+                this->data_transformer_->Transform(sampled_datum->datum(),
+                                                    &(this->transformed_data_));
+                // Otherwise, store the label from datum.
+                CHECK(sampled_datum->datum().has_label()) << "Cannot find any label.";
+                top_label[item_id] = sampled_datum->datum().label();
+            }
         } 
         else {
             this->data_transformer_->Transform(sampled_datum->datum(),
@@ -385,7 +385,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                 if(has_landmarks_){
                     label_shape[3] = 8 + 10 + 1;
                     if (num_bboxes == 0) {
-                        // Store all -1 in the label.
                         label_shape[2] = 1;
                         batch->label_.Reshape(label_shape);
                         caffe_set<Dtype>(19, -1, batch->label_.mutable_cpu_data());
