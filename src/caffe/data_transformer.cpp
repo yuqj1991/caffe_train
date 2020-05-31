@@ -297,7 +297,6 @@ void DataTransformer<Dtype>::TransformAnnotation(
                 const AnnoFaceLandmarks& lmarks = anno.face_lm();
                 const bool has_lm = anno.has_lm();
                 if(has_lm){
-                    LOG(INFO)<<"!!!!!!!!!!!!~~~~~~~~~~";
                     CHECK_GT(lmarks.righteye().x() , 0.f);
                 }
 				// Adjust bounding box annotation.
@@ -338,7 +337,6 @@ void DataTransformer<Dtype>::TransformAnnotation(
 								crop_bbox, transformed_bbox);
 					}    
                     if(has_lm && ProjectfacemarksBBox(crop_bbox, &project_facemark)){
-                        LOG(INFO)<<"ssssssssssssssssssssssss";
                         has_valid_lm = true;
                         point lefteye = project_facemark.lefteye();
                         point righteye = project_facemark.righteye();
