@@ -41,13 +41,13 @@ void CenternetDetectionOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& b
     //CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
     CHECK_EQ(bottom[1]->channels() , num_classes_ - 1); // add background to classes
     if(has_lm_){
-        CHECK_EQ(bottom[2]->channels(), 14);
+        CHECK_EQ(bottom[0]->channels(), 14);
         vector<int> top_shape(2, 1);
         top_shape.push_back(1);
         top_shape.push_back(17);
         top[0]->Reshape(top_shape);
     }else{
-        CHECK_EQ(bottom[2]->channels(), 4);
+        CHECK_EQ(bottom[0]->channels(), 4);
         vector<int> top_shape(2, 1);
         top_shape.push_back(1);
         top_shape.push_back(7);
