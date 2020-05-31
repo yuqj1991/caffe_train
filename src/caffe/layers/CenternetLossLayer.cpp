@@ -63,14 +63,14 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     loc_offset_top_vec_.push_back(&loc_offset_loss_);
     if (loc_offset_loss_type_ == CenterObjectLossParameter_LocLossType_L2) {
         LayerParameter layer_param;
-        layer_param.set_name(this->layer_param_.name() + "_l2_loc");
+        layer_param.set_name(this->layer_param_.name() + "_offset_l2_loc");
         layer_param.set_type("EuclideanLoss");
         layer_param.add_loss_weight(loc_offset_weight_);
         loc_offset_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
         loc_offset_loss_layer_->SetUp(loc_offset_bottom_vec_, loc_offset_top_vec_);
     } else if (loc_offset_loss_type_ == CenterObjectLossParameter_LocLossType_SMOOTH_L1) {
         LayerParameter layer_param;
-        layer_param.set_name(this->layer_param_.name() + "_smooth_L1_loc");
+        layer_param.set_name(this->layer_param_.name() + "_offset_smooth_L1_loc");
         layer_param.set_type("SmoothL1Loss");
         layer_param.add_loss_weight(loc_offset_weight_);
         loc_offset_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
@@ -86,22 +86,20 @@ void CenterObjectLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     loc_wh_shape.push_back(2);
     loc_wh_pred_.Reshape(loc_wh_shape);
     loc_wh_gt_.Reshape(loc_wh_shape);
-    //loc_channel_gt_.Reshape(loc_shape);
     loc_wh_bottom_vec_.push_back(&loc_wh_pred_);
     loc_wh_bottom_vec_.push_back(&loc_wh_gt_);
-    //loc_bottom_vec_.push_back(&loc_channel_gt_);
     loc_wh_loss_.Reshape(loss_shape);
     loc_wh_top_vec_.push_back(&loc_wh_loss_);
     if (loc_wh_loss_type_ == CenterObjectLossParameter_LocLossType_L2) {
         LayerParameter layer_param;
-        layer_param.set_name(this->layer_param_.name() + "_l2_loc");
+        layer_param.set_name(this->layer_param_.name() + "_wh_l2_loc");
         layer_param.set_type("EuclideanLoss");
         layer_param.add_loss_weight(loc_wh_weight_);
         loc_wh_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
         loc_wh_loss_layer_->SetUp(loc_wh_bottom_vec_, loc_wh_top_vec_);
     } else if (loc_wh_loss_type_ == CenterObjectLossParameter_LocLossType_SMOOTH_L1) {
         LayerParameter layer_param;
-        layer_param.set_name(this->layer_param_.name() + "_smooth_L1_loc");
+        layer_param.set_name(this->layer_param_.name() + "_wh_smooth_L1_loc");
         layer_param.set_type("SmoothL1Loss");
         layer_param.add_loss_weight(loc_wh_weight_);
         loc_wh_loss_layer_ = LayerRegistry<Dtype>::CreateLayer(layer_param);
@@ -205,6 +203,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
             }
         }
     }
+    LOG(INFO)<<"num_gt_: "<<num_gt_<<", num_lm: "<<num_lm_;
     CHECK_EQ(num_gt_, num_groundtruth);
   
     if (num_gt_ >= 1) {
@@ -239,6 +238,8 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
 
         loc_wh_loss_layer_->Reshape(loc_wh_bottom_vec_, loc_wh_top_vec_);
         loc_wh_loss_layer_->Forward(loc_wh_bottom_vec_, loc_wh_top_vec_);
+
+        LOG(INFO)<<"!!!!!!!!!";
 
         if(has_lm_){
             lm_loss_layer_->Reshape(lm_bottom_vec_, lm_top_vec_);
