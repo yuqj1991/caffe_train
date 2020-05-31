@@ -263,15 +263,15 @@ bool ProjectfacemarksBBox(const NormalizedBBox& src_bbox, AnnoFaceLandmarks* mar
     float src_width = src_bbox.xmax() - src_bbox.xmin();
     float src_height = src_bbox.ymax() - src_bbox.ymin();
     marks->mutable_lefteye()->set_x((marks->lefteye().x() - src_bbox.xmin()) / src_width);
-    marks->mutable_lefteye()->set_y((marks->lefteye().y() - src_bbox.xmin()) / src_height);
+    marks->mutable_lefteye()->set_y((marks->lefteye().y() - src_bbox.ymin()) / src_height);
     marks->mutable_righteye()->set_x((marks->righteye().x() - src_bbox.xmin()) / src_width);
-    marks->mutable_righteye()->set_y((marks->righteye().y() - src_bbox.xmin()) / src_height);
+    marks->mutable_righteye()->set_y((marks->righteye().y() - src_bbox.ymin()) / src_height);
     marks->mutable_nose()->set_x((marks->nose().x() - src_bbox.xmin()) / src_width);
-    marks->mutable_nose()->set_y((marks->nose().y() - src_bbox.xmin()) / src_height);
+    marks->mutable_nose()->set_y((marks->nose().y() - src_bbox.ymin()) / src_height);
     marks->mutable_leftmouth()->set_x((marks->leftmouth().x() - src_bbox.xmin()) / src_width);
-    marks->mutable_leftmouth()->set_y((marks->leftmouth().y() - src_bbox.xmin()) / src_height);
+    marks->mutable_leftmouth()->set_y((marks->leftmouth().y() - src_bbox.ymin()) / src_height);
     marks->mutable_rightmouth()->set_x((marks->rightmouth().x() - src_bbox.xmin()) / src_width);
-    marks->mutable_rightmouth()->set_y((marks->rightmouth().y() - src_bbox.xmin()) / src_height);
+    marks->mutable_rightmouth()->set_y((marks->rightmouth().y() - src_bbox.ymin()) / src_height);
     if(marks->lefteye().x() > 0 && marks->lefteye().x() <= 1.0 &&
       marks->lefteye().y() > 0 && marks->lefteye().y() <= 1.0 &&
       marks->righteye().x() > 0 && marks->righteye().x() <= 1.0 &&
