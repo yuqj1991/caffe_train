@@ -309,7 +309,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
                 <<", lm_normalizer: "<<lm_normalizer
                 <<", num_lm_: "<<num_lm_
                 <<", num_gt_box_: "<<num_gt_
-                <<", num_classes: "<<num_classes_
+                <<", num_class: "<<num_classes_
                 <<", output_width: "<<output_width
                 <<", output_height: "<<output_height;
     }
