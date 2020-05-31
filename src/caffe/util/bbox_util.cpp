@@ -1391,8 +1391,7 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
             bbox.set_size(bbox_size);
             AnnoFaceLandmarks lmarks;
             bool bbox_has_lm = gt_data[start_idx + 8];
-            LOG(INFO)<<"~~~~~~~~~~~~~ bbox_has_lm: "<<bbox_has_lm;
-            if(bbox_has_lm){
+            if(bbox_has_lm > 0){
                 lmarks.mutable_lefteye()->set_x(gt_data[start_idx + 9]);
                 lmarks.mutable_lefteye()->set_y(gt_data[start_idx + 10]);
                 lmarks.mutable_righteye()->set_x(gt_data[start_idx + 11]);
@@ -1403,6 +1402,9 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
                 lmarks.mutable_leftmouth()->set_y(gt_data[start_idx + 16]);
                 lmarks.mutable_rightmouth()->set_x(gt_data[start_idx + 17]);
                 lmarks.mutable_rightmouth()->set_y(gt_data[start_idx + 18]);
+                LOG(INFO)<<"~~~~~~~~~~~~~ bbox_has_lm: "<<bbox_has_lm <<", "
+                <<gt_data[start_idx + 9]<<", "<<gt_data[start_idx + 10]<<", "
+                <<gt_data[start_idx + 11]<<", "<<gt_data[start_idx + 12];
             }else{
                 lmarks.mutable_lefteye()->set_x(-1.);
                 lmarks.mutable_lefteye()->set_y(-1.);
