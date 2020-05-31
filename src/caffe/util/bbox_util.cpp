@@ -1366,30 +1366,32 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
       map<int, vector<std::pair<NormalizedBBox,AnnoFaceLandmarks> > >* all_gt_bboxes, bool has_lm) {
     all_gt_bboxes->clear();
     for (int i = 0; i < num_gt; ++i) {
+        int start_idx = i * 8;
         if(has_lm){
-            int start_idx = i * 19;
-            int item_id = gt_data[start_idx];
-            if (item_id == -1) {
-                continue;
-            }
-            int label = gt_data[start_idx + 1];
-            CHECK_NE(background_label_id, label)
-                << "Found background label in the dataset.";
-            bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
-            if (!use_difficult_gt && difficult) {
-                // Skip reading difficult ground truth.
-                continue;
-            }
-            NormalizedBBox bbox;
-            bbox.set_label(label);
-            bbox.set_xmin(gt_data[start_idx + 3]);
-            bbox.set_ymin(gt_data[start_idx + 4]);
-            bbox.set_xmax(gt_data[start_idx + 5]);
-            bbox.set_ymax(gt_data[start_idx + 6]);
-            bbox.set_difficult(difficult);
-            float bbox_size = BBoxSize(bbox);
-            bbox.set_size(bbox_size);
-            AnnoFaceLandmarks lmarks;
+            start_idx = i * 19;
+        }
+        int item_id = gt_data[start_idx];
+        if (item_id == -1) {
+            continue;
+        }
+        int label = gt_data[start_idx + 1];
+        CHECK_NE(background_label_id, label)
+            << "Found background label in the dataset.";
+        bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
+        if (!use_difficult_gt && difficult) {
+            continue;
+        }
+        NormalizedBBox bbox;
+        bbox.set_label(label);
+        bbox.set_xmin(gt_data[start_idx + 3]);
+        bbox.set_ymin(gt_data[start_idx + 4]);
+        bbox.set_xmax(gt_data[start_idx + 5]);
+        bbox.set_ymax(gt_data[start_idx + 6]);
+        bbox.set_difficult(difficult);
+        float bbox_size = BBoxSize(bbox);
+        bbox.set_size(bbox_size);
+        AnnoFaceLandmarks lmarks;
+        if(has_lm){
             Dtype bbox_has_lm = gt_data[start_idx + 8];
             if(bbox_has_lm > 0){
                 lmarks.mutable_lefteye()->set_x(gt_data[start_idx + 9]);
@@ -1414,33 +1416,8 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
                 lmarks.mutable_rightmouth()->set_x(-1.);
                 lmarks.mutable_rightmouth()->set_y(-1.);
             }
-            (*all_gt_bboxes)[item_id].push_back(std::make_pair(bbox, lmarks));
-        }else{
-            int start_idx = i * 8;
-            int item_id = gt_data[start_idx];
-            if (item_id == -1) {
-                continue;
-            }
-            int label = gt_data[start_idx + 1];
-            CHECK_NE(background_label_id, label)
-                << "Found background label in the dataset.";
-            bool difficult = static_cast<bool>(gt_data[start_idx + 7]);
-            if (!use_difficult_gt && difficult) {
-                // Skip reading difficult ground truth.
-                continue;
-            }
-            NormalizedBBox bbox;
-            bbox.set_label(label);
-            bbox.set_xmin(gt_data[start_idx + 3]);
-            bbox.set_ymin(gt_data[start_idx + 4]);
-            bbox.set_xmax(gt_data[start_idx + 5]);
-            bbox.set_ymax(gt_data[start_idx + 6]);
-            bbox.set_difficult(difficult);
-            float bbox_size = BBoxSize(bbox);
-            bbox.set_size(bbox_size);
-            AnnoFaceLandmarks lmarks;
-            (*all_gt_bboxes)[item_id].push_back(std::make_pair(bbox, lmarks));
         }
+        (*all_gt_bboxes)[item_id].push_back(std::make_pair(bbox, lmarks));
     }
 }
 

@@ -56,18 +56,18 @@ template <typename Dtype>
 void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_loss,
                           const int negative_ratio, std::vector<int> postive, 
                           const int output_height, const int output_width,
-                          const int num_channels, const int batch_size);
+                          const int num_channels, const int batch_size, bool has_lm);
 
 template <typename Dtype>
 void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
             const int label_channel, const int num_channels,
-            const int outheight, const int outwidth);
+            const int outheight, const int outwidth, bool has_lm);
 
 template <typename Dtype>
 Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, Dtype *bottom_diff, 
-                            const int num_channels);
+                            const int num_channels, bool has_lm);
 template <typename Dtype>
 void SelectHardSampleSigmoid(Dtype *label_data, Dtype *pred_data, const int negative_ratio, const int num_postive, 
                           const int output_height, const int output_width, const int num_channels);

@@ -77,14 +77,14 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           const int output_width, const int output_height, 
                           const int net_width, const int net_height,
                           Dtype* channel_pred_data,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           std::vector<int> mask_bias, std::vector<std::pair<Dtype, Dtype> >bias_scale, 
                           Dtype* bottom_diff, Dtype ignore_thresh, YoloScoreShow *Score);
 
 template <typename Dtype>
 void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
-      const int background_label_id, const bool use_difficult_gt,
-      std::map<int, vector<NormalizedBBox> >* all_gt_bboxes, int batch_size);
+      const int background_label_id, const bool use_difficult_gt, bool has_lm,
+      std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >* all_gt_bboxes, int batch_size);
 
 template <typename Dtype>
 Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_channels, const int num_classes,
@@ -92,7 +92,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
                           Dtype ignore_thresh, int *count_postive, Dtype *loc_loss_value);
 
@@ -110,16 +110,16 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                           std::vector<Dtype> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
-                          int *count_postive, Dtype *loc_loss_value, int *match_num_gt_box);
+                          int *count_postive, Dtype *loc_loss_value, int *match_num_gt_box, bool has_lm, Dtype* lm_loss_value);
 
 template <typename Dtype> 
 void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
-                          std::map<int, std::vector<CenterNetInfo > >* results);
+                          std::map<int, std::vector<CenterNetInfo > >* results, bool has_lm);
 
 template <typename Dtype> 
 Dtype EncodeOverlapObjectSigmoidLoss(const int batch_size, const int num_channels, const int num_classes,

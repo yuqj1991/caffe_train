@@ -47,7 +47,7 @@ class CenterGridLossLayer : public LossLayer<Dtype> {
   int num_groundtruth_;
 
 
-  std::map<int, vector<NormalizedBBox> > all_gt_bboxes;
+  std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes;
 
   int iterations_;
 
@@ -62,6 +62,8 @@ class CenterGridLossLayer : public LossLayer<Dtype> {
   Blob<Dtype> label_data_;
   int count_postive_;
   CenterObjectLossParameter_CLASS_TYPE class_type_;
+  bool has_lm_;
+  int num_lm_;
 };
 
 }  // namespace caffe

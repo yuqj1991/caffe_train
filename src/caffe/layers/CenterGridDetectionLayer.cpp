@@ -37,6 +37,7 @@ void CenterGridOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
         detection_output_param.confidence_threshold() : -FLT_MAX;
     nms_thresh_ = detection_output_param.nms_thresh();
     class_type_ = detection_output_param.class_type();
+    has_lm_ = detection_output_param.has_lm();
 }
 
 template <typename Dtype>
@@ -46,16 +47,23 @@ void CenterGridOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     CHECK_EQ(bottom[0]->num(), bottom[1]->num());
     CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
     CHECK_EQ(bottom[0]->channels(), bottom[2]->channels());
-    CHECK_GE(bottom[0]->channels(), 4 + num_classes_);
     // num() and channels() are 1.
     vector<int> top_shape(2, 1);
     // Since the number of bboxes to be kept is unknown before nms, we manually
     // set it to (fake) 1.
     top_shape.push_back(1);
-    // Each row is a 7 dimension vector, which stores
-    // [image_id, label, confidence, xmin, ymin, xmax, ymax]
-    top_shape.push_back(7);
-    top[0]->Reshape(top_shape);
+    if(has_lm_){
+        CHECK_GE(bottom[0]->channels(), 14 + num_classes_);
+        top_shape.push_back(17);
+        top[0]->Reshape(top_shape);
+    }else{
+        CHECK_GE(bottom[0]->channels(), 4 + num_classes_);
+        // Each row is a 7 dimension vector, which stores
+        // [image_id, label, confidence, xmin, ymin, xmax, ymax]
+        top_shape.push_back(7);
+        top[0]->Reshape(top_shape);
+    }
+    
 }
 
 template <typename Dtype>
@@ -83,7 +91,7 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
             GetCenterGridObjectResultSoftMax(num_, num_channels, num_classes_,
                             output_width, output_height, 
                             downRatio_[t],
-                            channel_pred_data, anchor_scale_[t], confidence_threshold_, &results_);
+                            channel_pred_data, anchor_scale_[t], confidence_threshold_, &results_, has_lm_);
         }else {
             LOG(FATAL)<<"unknown class type";
         }
@@ -136,13 +144,33 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
         if(results_.find(i) != results_.end()){
             std::vector<CenterNetInfo > result_temp = results_.find(i)->second;
             for(unsigned j = 0; j < result_temp.size(); ++j){
-                top_data[count * 7] = i;
-                top_data[count * 7 + 1] = result_temp[j].class_id() + 1;
-                top_data[count * 7 + 2] = result_temp[j].score();
-                top_data[count * 7 + 3] = result_temp[j].xmin() / net_width_;
-                top_data[count * 7 + 4] = result_temp[j].ymin() / net_height_;
-                top_data[count * 7 + 5] = result_temp[j].xmax() / net_width_;
-                top_data[count * 7 + 6] = result_temp[j].ymax() / net_height_;
+                if(has_lm_){
+                    top_data[count * 17] = i;
+                    top_data[count * 17 + 1] = result_temp[j].class_id() + 1;
+                    top_data[count * 17 + 2] = result_temp[j].score();
+                    top_data[count * 17 + 3] = result_temp[j].xmin() / net_width_;
+                    top_data[count * 17 + 4] = result_temp[j].ymin() / net_height_;
+                    top_data[count * 17 + 5] = result_temp[j].xmax() / net_width_;
+                    top_data[count * 17 + 6] = result_temp[j].ymax() / net_height_;
+                    top_data[count * 17 + 7] = result_temp[j].marks().lefteye().x() / net_width_;
+                    top_data[count * 17 + 8] = result_temp[j].marks().lefteye().y() / net_height_;
+                    top_data[count * 17 + 9] = result_temp[j].marks().righteye().x() / net_width_;
+                    top_data[count * 17 + 10] = result_temp[j].marks().righteye().y() / net_height_;
+                    top_data[count * 17 + 11] = result_temp[j].marks().nose().x() / net_width_;
+                    top_data[count * 17 + 12] = result_temp[j].marks().nose().y() / net_height_;
+                    top_data[count * 17 + 13] = result_temp[j].marks().leftmouth().x() / net_width_;
+                    top_data[count * 17 + 14] = result_temp[j].marks().leftmouth().y() / net_height_;
+                    top_data[count * 17 + 15] = result_temp[j].marks().rightmouth().x() / net_width_;
+                    top_data[count * 17 + 16] = result_temp[j].marks().rightmouth().y() / net_height_;
+                }else{
+                    top_data[count * 7] = i;
+                    top_data[count * 7 + 1] = result_temp[j].class_id() + 1;
+                    top_data[count * 7 + 2] = result_temp[j].score();
+                    top_data[count * 7 + 3] = result_temp[j].xmin() / net_width_;
+                    top_data[count * 7 + 4] = result_temp[j].ymin() / net_height_;
+                    top_data[count * 7 + 5] = result_temp[j].xmax() / net_width_;
+                    top_data[count * 7 + 6] = result_temp[j].ymax() / net_height_;
+                }
                 ++count;
             }
         }

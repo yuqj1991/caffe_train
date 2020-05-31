@@ -46,7 +46,7 @@ class Yolov3LossLayer : public LossLayer<Dtype> {
   int num_groundtruth_;
 
 
-  std::map<int, vector<NormalizedBBox> > all_gt_bboxes;
+  std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes;
 
   int iterations_;
 

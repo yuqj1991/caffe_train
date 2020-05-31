@@ -70,11 +70,11 @@ void Yolov3LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   num_ = bottom[0]->num();
   all_gt_bboxes.clear();
   
-  GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
+  GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_, false,
                  &all_gt_bboxes, num_);
   num_groundtruth_ = 0;
   for(int i = 0; i < all_gt_bboxes.size(); i++){
-    vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
+    vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_boxes = all_gt_bboxes[i];
     num_groundtruth_ += gt_boxes.size();
   }
   // prediction data

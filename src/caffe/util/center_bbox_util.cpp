@@ -210,47 +210,51 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
     CHECK_EQ(share_location, true);
     int dimScale = output_height * output_width;
     int count = 0;
+    int lm_count = 0;
     if(has_lm){
-        int lm_count = 0;
         CHECK_EQ(num_channels, 14);
-        for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
-            int batch_id = iter->first;
-            vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
-            for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-                const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
-                const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
-                const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
-                const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;    
-                Dtype center_x = Dtype((xmin + xmax) / 2);
-                Dtype center_y = Dtype((ymin + ymax) / 2);
-                int inter_center_x = static_cast<int> (center_x);
-                int inter_center_y = static_cast<int> (center_y);
-                Dtype diff_x = center_x - inter_center_x;
-                Dtype diff_y = center_y - inter_center_y;
-                Dtype width = xmax - xmin;
-                Dtype height = ymax - ymin;
+    }else{
+        CHECK_EQ(num_channels, 4);
+    }
+    for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+        int batch_id = iter->first;
+        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
+        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+            const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
+            const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
+            const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
+            const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
+            Dtype center_x = Dtype((xmin + xmax) / 2);
+            Dtype center_y = Dtype((ymin + ymax) / 2);
+            int inter_center_x = static_cast<int> (center_x);
+            int inter_center_y = static_cast<int> (center_y);
+            Dtype diff_x = center_x - inter_center_x;
+            Dtype diff_y = center_y - inter_center_y;
+            Dtype width = xmax - xmin;
+            Dtype height = ymax - ymin;
 
-                int x_loc_index = batch_id * num_channels * dimScale
-                                        + 0 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                int y_loc_index = batch_id * num_channels * dimScale 
-                                        + 1 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                int width_loc_index = batch_id * num_channels * dimScale
-                                        + 2 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                int height_loc_index = batch_id * num_channels * dimScale 
-                                        + 3 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                gt_loc_offest_data[count * 2 + 0] = diff_x;
-                gt_loc_offest_data[count * 2 + 1] = diff_y;
-                gt_loc_wh_data[count * 2 + 0] = std::log(width);
-                gt_loc_wh_data[count * 2 + 1] = std::log(height);
-                pred_loc_offest_data[count * 2 + 0] = channel_loc_data[x_loc_index];
-                pred_loc_offest_data[count * 2 + 1] = channel_loc_data[y_loc_index];
-                pred_loc_wh_data[count * 2 + 0] = channel_loc_data[width_loc_index];
-                pred_loc_wh_data[count * 2 + 1] = channel_loc_data[height_loc_index];
-                ++count;
+            int x_loc_index = batch_id * num_channels * dimScale
+                                    + 0 * dimScale
+                                    + inter_center_y * output_width + inter_center_x;
+            int y_loc_index = batch_id * num_channels * dimScale 
+                                    + 1 * dimScale
+                                    + inter_center_y * output_width + inter_center_x;
+            int width_loc_index = batch_id * num_channels * dimScale
+                                    + 2 * dimScale
+                                    + inter_center_y * output_width + inter_center_x;
+            int height_loc_index = batch_id * num_channels * dimScale 
+                                    + 3 * dimScale
+                                    + inter_center_y * output_width + inter_center_x;
+            gt_loc_offest_data[count * 2 + 0] = diff_x;
+            gt_loc_offest_data[count * 2 + 1] = diff_y;
+            gt_loc_wh_data[count * 2 + 0] = std::log(width);
+            gt_loc_wh_data[count * 2 + 1] = std::log(height);
+            pred_loc_offest_data[count * 2 + 0] = channel_loc_data[x_loc_index];
+            pred_loc_offest_data[count * 2 + 1] = channel_loc_data[y_loc_index];
+            pred_loc_wh_data[count * 2 + 0] = channel_loc_data[width_loc_index];
+            pred_loc_wh_data[count * 2 + 1] = channel_loc_data[height_loc_index];
+            ++count;
+            if(has_lm){
                 //lm_gt_datas, & lm_pred_datas
                 if(gt_bboxes[ii].second.lefteye().x() > 0 && gt_bboxes[ii].second.lefteye().y() > 0 &&
                    gt_bboxes[ii].second.righteye().x() > 0 && gt_bboxes[ii].second.righteye().y() > 0 && 
@@ -304,48 +308,6 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
                 }
             }
         }
-    }else{
-        CHECK_EQ(num_channels, 4);
-        for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
-            int batch_id = iter->first;
-            vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
-            for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-                const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
-                const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
-                const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
-                const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
-                Dtype center_x = Dtype((xmin + xmax) / 2);
-                Dtype center_y = Dtype((ymin + ymax) / 2);
-                int inter_center_x = static_cast<int> (center_x);
-                int inter_center_y = static_cast<int> (center_y);
-                Dtype diff_x = center_x - inter_center_x;
-                Dtype diff_y = center_y - inter_center_y;
-                Dtype width = xmax - xmin;
-                Dtype height = ymax - ymin;
-
-                int x_loc_index = batch_id * num_channels * dimScale
-                                        + 0 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                int y_loc_index = batch_id * num_channels * dimScale 
-                                        + 1 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                int width_loc_index = batch_id * num_channels * dimScale
-                                        + 2 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                int height_loc_index = batch_id * num_channels * dimScale 
-                                        + 3 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                gt_loc_offest_data[count * 2 + 0] = diff_x;
-                gt_loc_offest_data[count * 2 + 1] = diff_y;
-                gt_loc_wh_data[count * 2 + 0] = std::log(width);
-                gt_loc_wh_data[count * 2 + 1] = std::log(height);
-                pred_loc_offest_data[count * 2 + 0] = channel_loc_data[x_loc_index];
-                pred_loc_offest_data[count * 2 + 1] = channel_loc_data[y_loc_index];
-                pred_loc_wh_data[count * 2 + 0] = channel_loc_data[width_loc_index];
-                pred_loc_wh_data[count * 2 + 1] = channel_loc_data[height_loc_index];
-                ++count;
-            }
-        }
     }
 }
 template void EncodeTruthAndPredictions(float* gt_loc_offest_data, float* pred_loc_offest_data,
@@ -370,37 +332,41 @@ void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, co
                                 std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes){
     std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > ::iterator iter;
     int count = 0;
+    int lm_count = 0;
     CHECK_EQ(share_location, true);
     int dimScale = output_height * output_width;
     if(has_lm){
         CHECK_EQ(num_channels, 14);
-        int lm_count = 0;
-        for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
-            int batch_id = iter->first;
-            vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
-            for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-                const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
-                const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
-                const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
-                const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
-                Dtype center_x = Dtype((xmin + xmax) / 2);
-                Dtype center_y = Dtype((ymin + ymax) / 2);
-                int inter_center_x = static_cast<int> (center_x);
-                int inter_center_y = static_cast<int> (center_y);
-                int x_loc_index = batch_id * num_channels * dimScale
-                                        + 0 * dimScale + inter_center_y * output_width + inter_center_x;
-                int y_loc_index = batch_id * num_channels * dimScale 
-                                        + 1 * dimScale + inter_center_y * output_width + inter_center_x;
-                int width_loc_index = batch_id * num_channels * dimScale
-                                        + 2 * dimScale + inter_center_y * output_width + inter_center_x;
-                int height_loc_index = batch_id * num_channels * dimScale 
-                                        + 3 * dimScale + inter_center_y * output_width + inter_center_x;
-                bottom_diff[x_loc_index] = pre_offset_diff[count * 2 + 0];
-                bottom_diff[y_loc_index] = pre_offset_diff[count * 2 + 1];
-                bottom_diff[width_loc_index] = pre_wh_diff[count * 2 + 0];
-                bottom_diff[height_loc_index] = pre_wh_diff[count * 2 + 1];
-                ++count;
+    }else{
+        CHECK_EQ(num_channels, 4);
+    }
 
+    for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+        int batch_id = iter->first;
+        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
+        for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+            const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
+            const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
+            const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
+            const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
+            Dtype center_x = Dtype((xmin + xmax) / 2);
+            Dtype center_y = Dtype((ymin + ymax) / 2);
+            int inter_center_x = static_cast<int> (center_x);
+            int inter_center_y = static_cast<int> (center_y);
+            int x_loc_index = batch_id * num_channels * dimScale
+                                    + 0 * dimScale + inter_center_y * output_width + inter_center_x;
+            int y_loc_index = batch_id * num_channels * dimScale 
+                                    + 1 * dimScale + inter_center_y * output_width + inter_center_x;
+            int width_loc_index = batch_id * num_channels * dimScale
+                                    + 2 * dimScale + inter_center_y * output_width + inter_center_x;
+            int height_loc_index = batch_id * num_channels * dimScale 
+                                    + 3 * dimScale + inter_center_y * output_width + inter_center_x;
+            bottom_diff[x_loc_index] = pre_offset_diff[count * 2 + 0];
+            bottom_diff[y_loc_index] = pre_offset_diff[count * 2 + 1];
+            bottom_diff[width_loc_index] = pre_wh_diff[count * 2 + 0];
+            bottom_diff[height_loc_index] = pre_wh_diff[count * 2 + 1];
+            ++count;
+            if(has_lm){
                 //lm_gt_datas, & lm_pred_datas
                 if(gt_bboxes[ii].second.lefteye().x() > 0 && gt_bboxes[ii].second.lefteye().y() > 0 &&
                    gt_bboxes[ii].second.righteye().x() > 0 && gt_bboxes[ii].second.righteye().y() > 0 && 
@@ -439,42 +405,8 @@ void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, co
                     bottom_diff[lm_y_index] = lm_pre_diff[lm_count * 10 + 7];
                     bottom_diff[rm_x_index] = lm_pre_diff[lm_count * 10 + 8];
                     bottom_diff[rm_y_index] = lm_pre_diff[lm_count * 10 + 9];
-
                     lm_count++;
                 }
-            }
-        }
-    }else{
-        CHECK_EQ(num_channels, 4);
-        for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
-            int batch_id = iter->first;
-            vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
-            for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-                const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
-                const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
-                const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
-                const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
-                Dtype center_x = Dtype((xmin + xmax) / 2);
-                Dtype center_y = Dtype((ymin + ymax) / 2);
-                int inter_center_x = static_cast<int> (center_x);
-                int inter_center_y = static_cast<int> (center_y);
-                int x_loc_index = batch_id * num_channels * dimScale
-                                        + 0 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                int y_loc_index = batch_id * num_channels * dimScale 
-                                        + 1 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                int width_loc_index = batch_id * num_channels * dimScale
-                                        + 2 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                int height_loc_index = batch_id * num_channels * dimScale 
-                                        + 3 * dimScale
-                                        + inter_center_y * output_width + inter_center_x;
-                bottom_diff[x_loc_index] = pre_offset_diff[count * 2 + 0];
-                bottom_diff[y_loc_index] = pre_offset_diff[count * 2 + 1];
-                bottom_diff[width_loc_index] = pre_wh_diff[count * 2 + 0];
-                bottom_diff[height_loc_index] = pre_wh_diff[count * 2 + 1];
-                ++count;
             }
         }
     }
@@ -499,27 +431,40 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
     int dimScale = output_width * output_height;
     if(has_lm){
         CHECK_EQ(loc_channels, 14);
-        for(int i = 0; i < num_batch; i++){
-            std::vector<CenterNetInfo > batch_temp;
-            batch_result.clear();
-            for(int c = 0 ; c < classes; c++){
-                for(int h = 0; h < output_height; h++){
-                    for(int w = 0; w < output_width; w++){
-                        int index = i * dim + c * dimScale + h * output_width + w;
-                        if(keep_max_data[index] > conf_thresh && keep_max_data[index] < 1){
-                            int x_index = i * loc_channels * dimScale + h * output_width + w;
-                            int y_index = i * loc_channels * dimScale + 1 * dimScale + h * output_width + w;
-                            int w_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
-                            int h_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
-                            Dtype center_x = (w + loc_data[x_index]);
-                            Dtype center_y = (h + loc_data[y_index]);
-                            Dtype width = std::exp(loc_data[w_index]);
-                            Dtype height = std::exp(loc_data[h_index]);
-                            Dtype xmin = GET_VALID_VALUE((center_x - Dtype(width / 2)) * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype xmax = GET_VALID_VALUE((center_x + Dtype(width / 2)) * 4, Dtype(0.f), Dtype(4 * output_width));
-                            Dtype ymin = GET_VALID_VALUE((center_y - Dtype(height / 2)) * 4, Dtype(0.f), Dtype(4 * output_height));
-                            Dtype ymax = GET_VALID_VALUE((center_y + Dtype(height / 2)) * 4, Dtype(0.f), Dtype(4 * output_height));
+    }else{
+        CHECK_EQ(loc_channels, 4);
+    }
+    for(int i = 0; i < num_batch; i++){
+        std::vector<CenterNetInfo > batch_temp;
+        batch_result.clear();
+        for(int c = 0 ; c < classes; c++){
+            for(int h = 0; h < output_height; h++){
+                for(int w = 0; w < output_width; w++){
+                    int index = i * dim + c * dimScale + h * output_width + w;
+                    if(keep_max_data[index] > conf_thresh && keep_max_data[index] < 1){
+                        int x_index = i * loc_channels * dimScale + h * output_width + w;
+                        int y_index = i * loc_channels * dimScale + 1 * dimScale + h * output_width + w;
+                        int w_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
+                        int h_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
+                        Dtype center_x = (w + loc_data[x_index]) * 4;
+                        Dtype center_y = (h + loc_data[y_index]) * 4;
+                        Dtype width = std::exp(loc_data[w_index]) * 4 ;
+                        Dtype height = std::exp(loc_data[h_index]) * 4 ;
+                        Dtype xmin = GET_VALID_VALUE((center_x - Dtype(width / 2)), Dtype(0.f), Dtype(4 * output_width));
+                        Dtype xmax = GET_VALID_VALUE((center_x + Dtype(width / 2)), Dtype(0.f), Dtype(4 * output_width));
+                        Dtype ymin = GET_VALID_VALUE((center_y - Dtype(height / 2)), Dtype(0.f), Dtype(4 * output_height));
+                        Dtype ymax = GET_VALID_VALUE((center_y + Dtype(height / 2)), Dtype(0.f), Dtype(4 * output_height));
 
+                        CenterNetInfo temp_result;
+                        temp_result.set_class_id(c);
+                        temp_result.set_score(keep_max_data[index]);
+                        temp_result.set_xmin(xmin);
+                        temp_result.set_xmax(xmax);
+                        temp_result.set_ymin(ymin);
+                        temp_result.set_ymax(ymax);
+                        temp_result.set_area(width * height);
+
+                        if(has_lm){
                             int le_x_index =  i * loc_channels * dimScale + 4 * dimScale + h * output_width + w;
                             int le_y_index =  i * loc_channels * dimScale + 5 * dimScale + h * output_width + w;
                             int re_x_index =  i * loc_channels * dimScale + 6 * dimScale + h * output_width + w;
@@ -534,25 +479,17 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                             Dtype bbox_width = xmax - xmin;
                             Dtype bbox_height = ymax - ymin;
 
-                            Dtype le_x = GET_VALID_VALUE((center_x + loc_data[le_x_index] * bbox_width) * 4, xmin, xmax);
-                            Dtype le_y = GET_VALID_VALUE((center_y + loc_data[le_y_index] * bbox_height) * 4, ymin, ymax);
-                            Dtype re_x = GET_VALID_VALUE((center_x + loc_data[re_x_index] * bbox_width) * 4, xmin, xmax);
-                            Dtype re_y = GET_VALID_VALUE((center_y + loc_data[re_y_index] * bbox_height) * 4, ymin, ymax);
-                            Dtype no_x = GET_VALID_VALUE((center_x + loc_data[no_x_index] * bbox_width) * 4, xmin, xmax);
-                            Dtype no_y = GET_VALID_VALUE((center_y + loc_data[no_y_index] * bbox_height) * 4, ymin, ymax);
-                            Dtype lm_x = GET_VALID_VALUE((center_x + loc_data[lm_x_index] * bbox_width) * 4, xmin, xmax);
-                            Dtype lm_y = GET_VALID_VALUE((center_y + loc_data[lm_y_index] * bbox_height) * 4, ymin, ymax);
-                            Dtype rm_x = GET_VALID_VALUE((center_x + loc_data[rm_x_index] * bbox_width) * 4, xmin, xmax);
-                            Dtype rm_y = GET_VALID_VALUE((center_y + loc_data[rm_y_index] * bbox_height) * 4, ymin, ymax);
+                            Dtype le_x = GET_VALID_VALUE((center_x + loc_data[le_x_index] * bbox_width) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype le_y = GET_VALID_VALUE((center_y + loc_data[le_y_index] * bbox_height) * 4, Dtype(0.f),Dtype(4 * output_height));
+                            Dtype re_x = GET_VALID_VALUE((center_x + loc_data[re_x_index] * bbox_width) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype re_y = GET_VALID_VALUE((center_y + loc_data[re_y_index] * bbox_height) * 4, Dtype(0.f),Dtype(4 * output_height));
+                            Dtype no_x = GET_VALID_VALUE((center_x + loc_data[no_x_index] * bbox_width) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype no_y = GET_VALID_VALUE((center_y + loc_data[no_y_index] * bbox_height) * 4, Dtype(0.f),Dtype(4 * output_height));
+                            Dtype lm_x = GET_VALID_VALUE((center_x + loc_data[lm_x_index] * bbox_width) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype lm_y = GET_VALID_VALUE((center_y + loc_data[lm_y_index] * bbox_height) * 4, Dtype(0.f),Dtype(4 * output_height));
+                            Dtype rm_x = GET_VALID_VALUE((center_x + loc_data[rm_x_index] * bbox_width) * 4, Dtype(0.f), Dtype(4 * output_width));
+                            Dtype rm_y = GET_VALID_VALUE((center_y + loc_data[rm_y_index] * bbox_height) * 4, Dtype(0.f),Dtype(4 * output_height));
 
-                            CenterNetInfo temp_result;
-                            temp_result.set_class_id(c);
-                            temp_result.set_score(keep_max_data[index]);
-                            temp_result.set_xmin(xmin);
-                            temp_result.set_xmax(xmax);
-                            temp_result.set_ymin(ymin);
-                            temp_result.set_ymax(ymax);
-                            temp_result.set_area(width * height);
                             temp_result.mutable_marks()->mutable_lefteye()->set_x(le_x);
                             temp_result.mutable_marks()->mutable_lefteye()->set_y(le_y);
                             temp_result.mutable_marks()->mutable_righteye()->set_x(re_x);
@@ -563,84 +500,24 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                             temp_result.mutable_marks()->mutable_leftmouth()->set_y(lm_y);
                             temp_result.mutable_marks()->mutable_rightmouth()->set_x(rm_x);
                             temp_result.mutable_marks()->mutable_rightmouth()->set_y(rm_y);
-                            batch_temp.push_back(temp_result);
-                        } 
-                    }
-                }
-            }
-            hard_nms(batch_temp, &batch_result, nms_thresh);
-            for(unsigned j = 0 ; j < batch_result.size(); j++){
-                batch_result[j].set_xmin(batch_result[j].xmin() / (4 * output_width));
-                batch_result[j].set_xmax(batch_result[j].xmax() / (4 * output_width));
-                batch_result[j].set_ymin(batch_result[j].ymin() / (4 * output_height));
-                batch_result[j].set_ymax(batch_result[j].ymax() / (4 * output_height));
-                batch_result[j].mutable_marks()->mutable_lefteye()->set_x(batch_result[j].marks().lefteye().x());
-                batch_result[j].mutable_marks()->mutable_lefteye()->set_y(batch_result[j].marks().lefteye().y());
-                batch_result[j].mutable_marks()->mutable_righteye()->set_x(batch_result[j].marks().righteye().x());
-                batch_result[j].mutable_marks()->mutable_righteye()->set_y(batch_result[j].marks().righteye().y());
-                batch_result[j].mutable_marks()->mutable_nose()->set_x(batch_result[j].marks().nose().x());
-                batch_result[j].mutable_marks()->mutable_nose()->set_y(batch_result[j].marks().nose().y());
-                batch_result[j].mutable_marks()->mutable_leftmouth()->set_x(batch_result[j].marks().leftmouth().x());
-                batch_result[j].mutable_marks()->mutable_leftmouth()->set_y(batch_result[j].marks().leftmouth().y());
-                batch_result[j].mutable_marks()->mutable_rightmouth()->set_x(batch_result[j].marks().rightmouth().x());
-                batch_result[j].mutable_marks()->mutable_rightmouth()->set_y(batch_result[j].marks().rightmouth().y());
-            }
-            if(batch_result.size() > 0){
-                if(results->find(i) == results->end()){
-                    results->insert(std::make_pair(i, batch_result));
-                }else{
-
+                        }
+                        batch_temp.push_back(temp_result);
+                    } 
                 }
             }
         }
-    }else{
-        CHECK_EQ(loc_channels, 4);
-        for(int i = 0; i < num_batch; i++){
-            std::vector<CenterNetInfo > batch_temp;
-            batch_result.clear();
-            for(int c = 0 ; c < classes; c++){
-                for(int h = 0; h < output_height; h++){
-                    for(int w = 0; w < output_width; w++){
-                        int index = i * dim + c * dimScale + h * output_width + w;
-                        if(keep_max_data[index] > conf_thresh && keep_max_data[index] < 1){
-                            int x_index = i * loc_channels * dimScale + h * output_width + w;
-                            int y_index = i * loc_channels * dimScale + 1 * dimScale + h * output_width + w;
-                            int w_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
-                            int h_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
-                            Dtype center_x = (w + loc_data[x_index]) * 4;
-                            Dtype center_y = (h + loc_data[y_index]) * 4;
-                            Dtype width = std::exp(loc_data[w_index]) * 4 ;
-                            Dtype height = std::exp(loc_data[h_index]) * 4 ;
-                            Dtype xmin = GET_VALID_VALUE((center_x - Dtype(width / 2)), Dtype(0.f), Dtype(4 * output_width));
-                            Dtype xmax = GET_VALID_VALUE((center_x + Dtype(width / 2)), Dtype(0.f), Dtype(4 * output_width));
-                            Dtype ymin = GET_VALID_VALUE((center_y - Dtype(height / 2)), Dtype(0.f), Dtype(4 * output_height));
-                            Dtype ymax = GET_VALID_VALUE((center_y + Dtype(height / 2)), Dtype(0.f), Dtype(4 * output_height));
-                            CenterNetInfo temp_result;
-                            temp_result.set_class_id(c);
-                            temp_result.set_score(keep_max_data[index]);
-                            temp_result.set_xmin(xmin);
-                            temp_result.set_xmax(xmax);
-                            temp_result.set_ymin(ymin);
-                            temp_result.set_ymax(ymax);
-                            temp_result.set_area(width * height);
-                            batch_temp.push_back(temp_result);
-                        } 
-                    }
-                }
-            }
-            hard_nms(batch_temp, &batch_result, nms_thresh);
-            for(unsigned j = 0 ; j < batch_result.size(); j++){
-                batch_result[j].set_xmin(batch_result[j].xmin() / (4 * output_width));
-                batch_result[j].set_xmax(batch_result[j].xmax() / (4 * output_width));
-                batch_result[j].set_ymin(batch_result[j].ymin() / (4 * output_height));
-                batch_result[j].set_ymax(batch_result[j].ymax() / (4 * output_height));
-            }
-            if(batch_result.size() > 0){
-                if(results->find(i) == results->end()){
-                    results->insert(std::make_pair(i, batch_result));
-                }else{
+        hard_nms(batch_temp, &batch_result, nms_thresh);
+        for(unsigned j = 0 ; j < batch_result.size(); j++){
+            batch_result[j].set_xmin(batch_result[j].xmin() / (4 * output_width));
+            batch_result[j].set_xmax(batch_result[j].xmax() / (4 * output_width));
+            batch_result[j].set_ymin(batch_result[j].ymin() / (4 * output_height));
+            batch_result[j].set_ymax(batch_result[j].ymax() / (4 * output_height));
+        }
+        if(batch_result.size() > 0){
+            if(results->find(i) == results->end()){
+                results->insert(std::make_pair(i, batch_result));
+            }else{
 
-                }
             }
         }
     }
@@ -685,27 +562,6 @@ void GenerateBatchHeatmap(std::map<int, vector<std::pair<NormalizedBBox, AnnoFac
             count_gt++;
         }
     }
-    #if 0
-    count_one = 0;
-    int count_no_one = 0;
-    for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
-        int batch_id = iter->first;
-        vector<NormalizedBBox> gt_bboxes = iter->second;
-        for(int c = 0; c < num_classes_; c++){
-            for(int h = 0 ; h < output_height; h++){
-                for(int w = 0; w < output_width; w++){
-                    int index = batch_id * num_classes_ * output_height * output_width + c * output_height * output_width + h * output_width + w;  
-                    if(gt_heatmap[index] == 1.f){
-                    count_one++;
-                    }else{
-                    count_no_one++;
-                    }
-                }
-            }
-        }
-    }
-    LOG(INFO)<<"count_no_one: "<<count_no_one<<", count_one: "<<count_one<<", count_gt: "<<count_gt;
-    #endif
 }
 template void GenerateBatchHeatmap(std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, float* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);
@@ -718,7 +574,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           const int output_width, const int output_height, 
                           const int net_width, const int net_height,
                           Dtype* channel_pred_data,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           std::vector<int> mask_bias, std::vector<std::pair<Dtype, Dtype> >bias_scale, 
                           Dtype* bottom_diff, Dtype ignore_thresh, YoloScoreShow *Score){
     CHECK_EQ(net_height, net_width);
@@ -749,7 +605,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
         }
     }
     for(int b = 0; b < batch_size; b++){
-        vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = all_gt_bboxes.find(b)->second;
         for(int h = 0; h < output_height; h++){
             for(int w = 0; w < output_width; w++){
                 for(unsigned m = 0; m < mask_bias.size(); m++){
@@ -776,7 +632,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                     predBox.set_ymax(bb_center_y + bb_height / 2);
                     float best_iou = 0;
                     for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-                        float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+                        float iou = YoloBBoxIou(predBox, gt_bboxes[ii].first);
                         if (iou > best_iou) {
                             best_iou = iou;
                         }
@@ -790,10 +646,10 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
             }
         }
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-            const Dtype xmin = gt_bboxes[ii].xmin();
-            const Dtype ymin = gt_bboxes[ii].ymin();
-            const Dtype xmax = gt_bboxes[ii].xmax();
-            const Dtype ymax = gt_bboxes[ii].ymax();
+            const Dtype xmin = gt_bboxes[ii].first.xmin();
+            const Dtype ymin = gt_bboxes[ii].first.ymin();
+            const Dtype xmax = gt_bboxes[ii].first.xmax();
+            const Dtype ymax = gt_bboxes[ii].first.ymax();
             float best_iou = 0.f;
             int best_mask_scale = 0;
             for(unsigned m = 0; m < bias_scale.size(); m++){
@@ -853,7 +709,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                 avg_obj +=  channel_pred_data[object_index];
                 // class score
                 // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标,所以减一
-                int class_lable = gt_bboxes[ii].label() - 1; 
+                int class_lable = gt_bboxes[ii].first.label() - 1; 
                 int class_index = b * num_channels * dimScale + (mask_n * stride_channel + 5)* dimScale
                                             + inter_center_y * output_width + inter_center_x;
                 if ( bottom_diff[class_index]){
@@ -880,7 +736,7 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                 predBox.set_xmax(bb_center_x + bb_width / 2);
                 predBox.set_ymin(bb_center_y - bb_height / 2);
                 predBox.set_ymax(bb_center_y + bb_height / 2);
-                float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+                float iou = YoloBBoxIou(predBox, gt_bboxes[ii].first);
                 if(iou > .5) recall += 1;
                 if(iou > .75) recall75 += 1;
                 avg_iou += iou;
@@ -901,14 +757,14 @@ template void EncodeYoloObject(const int batch_size, const int num_channels, con
                               const int output_width, const int output_height, 
                               const int net_width, const int net_height,
                               float* channel_pred_data,
-                              std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                              std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                               std::vector<int> mask_bias, std::vector<std::pair<float, float> >bias_scale, 
                               float* bottom_diff, float ignore_thresh, YoloScoreShow *Score);
 template void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
                               const int output_width, const int output_height, 
                               const int net_width, const int net_height,
                               double* channel_pred_data,
-                              std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                              std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                               std::vector<int> mask_bias, std::vector<std::pair<double, double> >bias_scale, 
                               double* bottom_diff, double ignore_thresh, YoloScoreShow *Score);
 
@@ -916,12 +772,16 @@ template void EncodeYoloObject(const int batch_size, const int num_channels, con
 
 template <typename Dtype>
 void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
-      const int background_label_id, const bool use_difficult_gt,
-      std::map<int, vector<NormalizedBBox> >* all_gt_bboxes, int batch_size){
+      const int background_label_id, const bool use_difficult_gt, bool has_lm,
+      std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >* all_gt_bboxes, int batch_size){
     all_gt_bboxes->clear();
+
     for(int b = 0; b < batch_size; b++){
         for (int i = 0; i < num_gt; ++i) {
             int start_idx = b * num_gt * 8 +  i * 8;
+            if(has_lm){
+                int start_idx = b * num_gt * 19 +  i * 19;
+            }
             int item_id = gt_data[start_idx];
             if (item_id == -1) {
                 continue;
@@ -943,17 +803,44 @@ void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
             bbox.set_difficult(difficult);
             float bbox_size = BBoxSize(bbox);
             bbox.set_size(bbox_size);
-            (*all_gt_bboxes)[item_id].push_back(bbox);
+            AnnoFaceLandmarks lmarks;
+            if(has_lm){
+                Dtype bbox_has_lm = gt_data[start_idx + 8];
+                if(bbox_has_lm > 0){
+                    lmarks.mutable_lefteye()->set_x(gt_data[start_idx + 9]);
+                    lmarks.mutable_lefteye()->set_y(gt_data[start_idx + 10]);
+                    lmarks.mutable_righteye()->set_x(gt_data[start_idx + 11]);
+                    lmarks.mutable_righteye()->set_y(gt_data[start_idx + 12]);
+                    lmarks.mutable_nose()->set_x(gt_data[start_idx + 13]);
+                    lmarks.mutable_nose()->set_y(gt_data[start_idx + 14]);
+                    lmarks.mutable_leftmouth()->set_x(gt_data[start_idx + 15]);
+                    lmarks.mutable_leftmouth()->set_y(gt_data[start_idx + 16]);
+                    lmarks.mutable_rightmouth()->set_x(gt_data[start_idx + 17]);
+                    lmarks.mutable_rightmouth()->set_y(gt_data[start_idx + 18]);
+                }else{
+                    lmarks.mutable_lefteye()->set_x(-1.);
+                    lmarks.mutable_lefteye()->set_y(-1.);
+                    lmarks.mutable_righteye()->set_x(-1.);
+                    lmarks.mutable_righteye()->set_y(-1.);
+                    lmarks.mutable_nose()->set_x(-1.);
+                    lmarks.mutable_nose()->set_y(-1.);
+                    lmarks.mutable_leftmouth()->set_x(-1.);
+                    lmarks.mutable_leftmouth()->set_y(-1.);
+                    lmarks.mutable_rightmouth()->set_x(-1.);
+                    lmarks.mutable_rightmouth()->set_y(-1.);
+                }
+            }
+            (*all_gt_bboxes)[item_id].push_back(std::make_pair(bbox, lmarks));
         }
     }
 }
 template void GetYoloGroundTruth(const float* gt_data, int num_gt,
-      const int background_label_id, const bool use_difficult_gt,
-      std::map<int, vector<NormalizedBBox> >* all_gt_bboxes, int batch_size);
+      const int background_label_id, const bool use_difficult_gt, bool has_lm,
+      std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >* all_gt_bboxes, int batch_size);
 
 template void GetYoloGroundTruth(const double* gt_data, const int num_gt,
-      const int background_label_id, const bool use_difficult_gt,
-      std::map<int, vector<NormalizedBBox> >* all_gt_bboxes, int batch_size);
+      const int background_label_id, const bool use_difficult_gt, bool has_lm,
+      std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >* all_gt_bboxes, int batch_size);
 
 
 // 每一层使用感受野作为anchor,此anchor只匹配相对应大小范围的gt_boxes, 
@@ -970,7 +857,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
                           Dtype ignore_thresh, int *count_postive, Dtype *loc_loss_value){
     CHECK_EQ(num_classes, 1);
@@ -992,7 +879,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
     #endif
     for(int b = 0; b < batch_size; b++){
-        vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = all_gt_bboxes.find(b)->second;
         std::vector<int> mask_Rf_anchor(dimScale, 0);
         std::vector<Dtype> object_loss_temp(dimScale, Dtype(0.));
         int count = 0;
@@ -1019,7 +906,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                 predBox.set_ymax(bb_ymax);
                 float best_iou = 0;
                 for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-                    float iou = YoloBBoxIou(predBox, gt_bboxes[ii]);
+                    float iou = YoloBBoxIou(predBox, gt_bboxes[ii].first);
                     if (iou > best_iou) {
                         best_iou = iou;
                     }
@@ -1033,10 +920,10 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             }
         }
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-            const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
-            const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
-            const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
-            const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+            const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
+            const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
+            const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
+            const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
             const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
             const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
@@ -1119,7 +1006,7 @@ template float EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int
                           const int downRatio,
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           float* class_label, float* bottom_diff, 
                           float ignore_thresh, int *count_postive, float *loc_loss_value);
 
@@ -1128,7 +1015,7 @@ template double EncodeCenterGridObjectSigmoidLoss(const int batch_size, const in
                           const int downRatio,
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           double* class_label, double* bottom_diff, 
                           double ignore_thresh, int *count_postive, double *loc_loss_value);
 
@@ -1216,13 +1103,18 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                           std::vector<Dtype> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
-                          int *count_postive, Dtype *loc_loss_value, int *match_num_gt_box){
+                          int *count_postive, Dtype *loc_loss_value, int *match_num_gt_box, bool has_lm, Dtype* lm_loss_value){
     CHECK_EQ(num_classes, 2) << "the current version is just classfly bg_0 and face_1, two class";
     int dimScale = output_height * output_width;
-    Dtype score_loss = Dtype(0.), loc_loss = Dtype(0.);
-    CHECK_EQ(num_channels, (4 + num_classes)) << "num_channels shoule be set to including bias_x, bias_y, width, height, classes";
+    Dtype score_loss = Dtype(0.), loc_loss = Dtype(0.), lm_loss = Dtype(0.);
+    if(has_lm)
+        CHECK_EQ(num_channels, (4 + num_classes)) 
+            << "num_channels shoule be set to including bias_x, bias_y, width, height, classes";
+    else
+        CHECK_EQ(num_channels, (14 + num_classes)) 
+            << "num_channels shoule be set to including 4 points landmarks, &classes";
 
     int postive = 0;
     int gt_match_box = 0;
@@ -1230,7 +1122,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     // 只采集那些iou<0.35的负样本
     caffe_set(batch_size * dimScale, Dtype(-2.), class_label); 
     for(int b = 0; b < batch_size; b++){
-        vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = all_gt_bboxes.find(b)->second;
         int count = 0;
         for(int h = 0; h < output_height; h++){
             for(int w = 0; w < output_width; w++){
@@ -1243,10 +1135,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 #if 1
                 int class_index = b * dimScale +  h * output_width + w;
                 for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-                    const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
-                    const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
-                    const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
-                    const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+                    const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
+                    const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
+                    const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
+                    const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
                     const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
                     const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
                     int large_side = std::max(gt_bbox_height, gt_bbox_width);
@@ -1260,7 +1152,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         anchor_bbox.set_xmax(an_xmax);
                         anchor_bbox.set_ymin(an_ymin);
                         anchor_bbox.set_ymax(an_ymax);
-                        if(YoloBBoxIou(anchor_bbox, gt_bboxes[ii]) < 0.35){
+                        if(YoloBBoxIou(anchor_bbox, gt_bboxes[ii].first) < 0.35){
                             class_label[class_index] = -1;
                         }
                     }
@@ -1269,10 +1161,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             }
         }
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-            const Dtype xmin = gt_bboxes[ii].xmin() * output_width;
-            const Dtype ymin = gt_bboxes[ii].ymin() * output_height;
-            const Dtype xmax = gt_bboxes[ii].xmax() * output_width;
-            const Dtype ymax = gt_bboxes[ii].ymax() * output_height;
+            const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
+            const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
+            const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
+            const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
             const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
             const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
@@ -1290,7 +1182,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
 
-                        #if 0
+                        #if 1
                         NormalizedBBox anchor_bbox;
                         float an_xmin = GET_VALID_VALUE((float)(w - float(anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
                         float an_ymin = GET_VALID_VALUE((float)(h - float(anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
@@ -1300,7 +1192,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         anchor_bbox.set_xmax(an_xmax);
                         anchor_bbox.set_ymin(an_ymin);
                         anchor_bbox.set_ymax(an_ymax);
-                        if(BBoxCoverage(gt_bboxes[ii], anchor_bbox) < 0.5){
+                        if(BBoxCoverage(gt_bboxes[ii].first, anchor_bbox) < 0.35){
                             continue;
                         }
                         #endif
@@ -1326,17 +1218,85 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         ymax_loss = smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
                         single_total_loss = xmin_loss + ymin_loss + xmax_loss + ymax_loss;
                         loc_loss += single_total_loss;
+
                         bottom_diff[xmin_index] = xmin_diff;
                         bottom_diff[ymin_index] = ymin_diff;
                         bottom_diff[xmax_index] = xmax_diff;
                         bottom_diff[ymax_index] = ymax_diff;
+                        if(has_lm){
+                            int le_x_index = b * num_channels * dimScale + 4* dimScale + h * output_width + w;
+                            int le_y_index = b * num_channels * dimScale + 5* dimScale + h * output_width + w;
+                            int re_x_index = b * num_channels * dimScale + 6* dimScale + h * output_width + w;
+                            int re_y_index = b * num_channels * dimScale + 7* dimScale + h * output_width + w;
+                            int no_x_index = b * num_channels * dimScale + 8* dimScale + h * output_width + w;
+                            int no_y_index = b * num_channels * dimScale + 9* dimScale + h * output_width + w;
+                            int lm_x_index = b * num_channels * dimScale + 10* dimScale + h * output_width + w;
+                            int lm_y_index = b * num_channels * dimScale + 11* dimScale + h * output_width + w;
+                            int rm_x_index = b * num_channels * dimScale + 12* dimScale + h * output_width + w;
+                            int rm_y_index = b * num_channels * dimScale + 13* dimScale + h * output_width + w;
+
+                            Dtype le_x_bias = (w - gt_bboxes[ii].second.lefteye().x() * output_width) * downRatio * 2 / anchor_scale;
+                            Dtype le_y_bias = (h - gt_bboxes[ii].second.lefteye().y() * output_height) * downRatio * 2 / anchor_scale;
+
+                            Dtype re_x_bias = (w - gt_bboxes[ii].second.righteye().x() * output_width) * downRatio * 2 / anchor_scale;
+                            Dtype re_y_bias = (h - gt_bboxes[ii].second.righteye().y() * output_height) * downRatio * 2 / anchor_scale;
+
+                            Dtype no_x_bias = (w - gt_bboxes[ii].second.nose().x() * output_width) * downRatio * 2 / anchor_scale;
+                            Dtype no_y_bias = (h - gt_bboxes[ii].second.nose().y() * output_height) * downRatio * 2 / anchor_scale;
+
+                            Dtype lm_x_bias = (w - gt_bboxes[ii].second.leftmouth().x() * output_width) * downRatio * 2 / anchor_scale;
+                            Dtype lm_y_bias = (h - gt_bboxes[ii].second.leftmouth().y() * output_height) * downRatio * 2 / anchor_scale;
+
+                            Dtype rm_x_bias = (w - gt_bboxes[ii].second.rightmouth().x() * output_width) * downRatio * 2 / anchor_scale;
+                            Dtype rm_y_bias = (h - gt_bboxes[ii].second.rightmouth().y() * output_height) * downRatio * 2 / anchor_scale;
+
+                            Dtype le_x_diff, le_y_diff, re_x_diff, re_y_diff, no_x_diff, no_y_diff, lm_x_diff, lm_y_diff, rm_x_diff, rm_y_diff;
+                            Dtype le_x_loss, le_y_loss, re_x_loss, re_y_loss, no_x_loss, no_y_loss, lm_x_loss, lm_y_loss, rm_x_loss, rm_y_loss;
+
+                            le_x_loss = smoothL1_Loss(Dtype(channel_pred_data[le_x_index] - le_x_bias), &le_x_diff);
+                            le_y_loss = smoothL1_Loss(Dtype(channel_pred_data[le_y_index] - le_y_bias), &le_y_diff);
+
+                            re_x_loss = smoothL1_Loss(Dtype(channel_pred_data[re_x_index] - re_x_bias), &re_x_diff);
+                            re_y_loss = smoothL1_Loss(Dtype(channel_pred_data[re_y_index] - re_y_bias), &re_y_diff);
+
+                            no_x_loss = smoothL1_Loss(Dtype(channel_pred_data[no_x_index] - no_x_bias), &no_x_diff);
+                            no_y_loss = smoothL1_Loss(Dtype(channel_pred_data[no_y_index] - no_y_bias), &no_y_diff);
+
+                            lm_x_loss = smoothL1_Loss(Dtype(channel_pred_data[lm_x_index] - lm_x_bias), &lm_x_diff);
+                            lm_y_loss = smoothL1_Loss(Dtype(channel_pred_data[lm_y_index] - lm_y_bias), &lm_y_diff);
+
+                            rm_x_loss = smoothL1_Loss(Dtype(channel_pred_data[rm_x_index] - rm_x_bias), &rm_x_diff);
+                            rm_y_loss = smoothL1_Loss(Dtype(channel_pred_data[rm_y_index] - rm_y_bias), &rm_y_diff);
+
+                            lm_loss += (le_x_loss + le_y_loss + re_x_loss + re_y_loss
+                                            + no_x_loss + no_y_loss + lm_x_loss + lm_y_loss
+                                            + rm_x_loss + rm_y_loss);
+
+                            bottom_diff[le_x_index] = le_x_diff;
+                            bottom_diff[le_y_index] = le_y_diff;
+                            bottom_diff[re_x_index] = re_x_diff;
+                            bottom_diff[re_y_index] = re_y_diff;
+                            bottom_diff[no_x_index] = no_x_diff;
+                            bottom_diff[no_y_index] = no_y_diff;
+                            bottom_diff[lm_x_index] = lm_x_diff;
+                            bottom_diff[lm_y_index] = lm_y_diff;
+                            bottom_diff[rm_x_index] = rm_x_diff;
+                            bottom_diff[rm_y_index] = rm_y_diff;
+                        }
                         class_label[class_index] = 1;
                         mask_Rf_anchor[h * output_width + w] = 1;
                         count++;
+
                         int bg_index = b * num_channels * dimScale 
                                                     + 4* dimScale + h * output_width + w;
                         int face_index = b * num_channels * dimScale 
                                                     + 5* dimScale + h * output_width + w;
+                        if(has_lm){
+                            bg_index = b * num_channels * dimScale 
+                                                    + 14* dimScale + h * output_width + w;
+                            face_index = b * num_channels * dimScale 
+                                                    + 15* dimScale + h * output_width + w;
+                        }
                         Dtype class_loss = SingleSoftmaxLoss(channel_pred_data[bg_index], channel_pred_data[face_index], Dtype(1.0));
                         batch_sample_loss[b * dimScale + h * output_width + w] = single_total_loss + class_loss;
                     }
@@ -1349,11 +1309,12 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     }
     // 计算softMax loss value 
     SelectHardSampleSoftMax(class_label, batch_sample_loss, 3, postive_batch, 
-                                        output_height, output_width, num_channels, batch_size);
+                                        output_height, output_width, num_channels, batch_size, has_lm);
     score_loss = SoftmaxLossEntropy(class_label, channel_pred_data, batch_size, output_height,
-                                    output_width, bottom_diff, num_channels);
+                                    output_width, bottom_diff, num_channels, has_lm);
     *count_postive = postive;
     *loc_loss_value = loc_loss;
+    *lm_loss_value = lm_loss;
     *match_num_gt_box = gt_match_box;
     return score_loss;
 }
@@ -1364,9 +1325,9 @@ template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int
                           std::vector<float> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           float* class_label, float* bottom_diff, 
-                          int *count_postive, float *loc_loss_value, int *match_num_gt_box);
+                          int *count_postive, float *loc_loss_value, int *match_num_gt_box, bool has_lm, float * lm_loss_value);
 
 template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
@@ -1374,21 +1335,26 @@ template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const in
                           std::vector<double> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           double* class_label, double* bottom_diff, 
-                          int *count_postive, double *loc_loss_value, int *match_num_gt_box);
+                          int *count_postive, double *loc_loss_value, int *match_num_gt_box, bool has_lm, double * lm_loss_value);
 
 template <typename Dtype>
 void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
-                          std::map<int, std::vector<CenterNetInfo > >* results){
+                          std::map<int, std::vector<CenterNetInfo > >* results, bool has_lm){
     // face class 人脸类型 包括背景 + face人脸，两类
     CHECK_EQ(num_classes, 2);
-    CHECK_EQ(num_channels, 4 + num_classes);
+    if(has_lm){
+        CHECK_EQ(num_channels, 14 + num_classes);
+    }else{
+        CHECK_EQ(num_channels, 4 + num_classes);
+    }
+    
     int dimScale = output_height * output_width;
-    SoftmaxCenterGrid(channel_pred_data, batch_size, num_classes, num_channels, output_height, output_width);
+    SoftmaxCenterGrid(channel_pred_data, batch_size, num_classes, num_channels, output_height, output_width, has_lm);
 
     for(int b = 0; b < batch_size; b++){
         for(int h = 0; h < output_height; h++){
@@ -1401,8 +1367,7 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                                             + 2* dimScale + h * output_width + w;
                 int height_index = b * num_channels * dimScale 
                                             + 3* dimScale + h * output_width + w;        
-                int class_index = b * num_channels * dimScale
-                                            + 5* dimScale + h * output_width + w;
+                
 
                 float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /(2 * downRatio)) *downRatio;
                 float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /(2 * downRatio)) *downRatio;
@@ -1414,9 +1379,53 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                 float xmax = GET_VALID_VALUE(bb_xmax, (0.f), float(downRatio * output_width));
                 float ymax = GET_VALID_VALUE(bb_ymax, (0.f), float(downRatio * output_height));
 
+                float le_x = 0.f, le_y = 0.f, re_x = 0.f, re_y = 0.f, no_x = 0.f, no_y = 0.f, lm_x = 0.f, lm_y = 0.f, rm_x = 0.f, rm_y = 0.f;
+                if(has_lm){
+                    int le_x_index = b * num_channels * dimScale + 4* dimScale + h * output_width + w;
+                    int le_y_index = b * num_channels * dimScale + 5* dimScale + h * output_width + w;
+                    int re_x_index = b * num_channels * dimScale + 6* dimScale + h * output_width + w;
+                    int re_y_index = b * num_channels * dimScale + 7* dimScale + h * output_width + w;
+                    int no_x_index = b * num_channels * dimScale + 8* dimScale + h * output_width + w;
+                    int no_y_index = b * num_channels * dimScale + 9* dimScale + h * output_width + w;
+                    int lm_x_index = b * num_channels * dimScale + 10* dimScale + h * output_width + w;
+                    int lm_y_index = b * num_channels * dimScale + 11* dimScale + h * output_width + w;
+                    int rm_x_index = b * num_channels * dimScale + 12* dimScale + h * output_width + w;
+                    int rm_y_index = b * num_channels * dimScale + 13* dimScale + h * output_width + w;
+                    le_x = (w - channel_pred_data[le_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    le_y = (w - channel_pred_data[le_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    le_x = GET_VALID_VALUE(le_x, (0.f), float(downRatio * output_width));
+                    le_y = GET_VALID_VALUE(le_y, (0.f), float(downRatio * output_height));
+
+                    re_x = (w - channel_pred_data[re_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    re_y = (w - channel_pred_data[re_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    re_x = GET_VALID_VALUE(re_x, (0.f), float(downRatio * output_width));
+                    re_y = GET_VALID_VALUE(re_y, (0.f), float(downRatio * output_height));
+
+                    no_x = (w - channel_pred_data[no_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    no_y = (w - channel_pred_data[no_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    no_x = GET_VALID_VALUE(no_x, (0.f), float(downRatio * output_width));
+                    no_y = GET_VALID_VALUE(no_y, (0.f), float(downRatio * output_height));
+
+                    lm_x = (w - channel_pred_data[lm_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    lm_y = (w - channel_pred_data[lm_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    lm_x = GET_VALID_VALUE(lm_x, (0.f), float(downRatio * output_width));
+                    lm_y = GET_VALID_VALUE(lm_y, (0.f), float(downRatio * output_height));
+
+                    rm_x = (w - channel_pred_data[rm_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    rm_y = (w - channel_pred_data[rm_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    rm_x = GET_VALID_VALUE(rm_x, (0.f), float(downRatio * output_width));
+                    rm_y = GET_VALID_VALUE(rm_y, (0.f), float(downRatio * output_height));
+                }
+
                 if((xmax - xmin) <= 0 || (ymax - ymin) <= 0)
                     continue;                                     
                 
+                int class_index = b * num_channels * dimScale
+                                            + 5* dimScale + h * output_width + w;
+                if(has_lm){
+                    class_index = b * num_channels * dimScale
+                                            + 15* dimScale + h * output_width + w;
+                }
                 Dtype label_score = channel_pred_data[class_index];
                 
                 if(label_score >= conf_thresh){
@@ -1428,6 +1437,18 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                     temp_result.set_ymin(ymin);
                     temp_result.set_ymax(ymax);
                     temp_result.set_area((xmax - xmin) * (ymax - ymin));
+                    if(has_lm){
+                        temp_result.mutable_marks()->mutable_lefteye()->set_x(le_x);
+                        temp_result.mutable_marks()->mutable_lefteye()->set_y(le_y);
+                        temp_result.mutable_marks()->mutable_righteye()->set_x(re_x);
+                        temp_result.mutable_marks()->mutable_righteye()->set_y(re_y);
+                        temp_result.mutable_marks()->mutable_nose()->set_x(no_x);
+                        temp_result.mutable_marks()->mutable_nose()->set_y(no_y);
+                        temp_result.mutable_marks()->mutable_leftmouth()->set_x(lm_x);
+                        temp_result.mutable_marks()->mutable_leftmouth()->set_y(lm_y);
+                        temp_result.mutable_marks()->mutable_rightmouth()->set_x(rm_x);
+                        temp_result.mutable_marks()->mutable_rightmouth()->set_y(rm_y);
+                    }
                     (*results)[b].push_back(temp_result);
                 }
             }
@@ -1439,13 +1460,13 @@ template void GetCenterGridObjectResultSoftMax(const int batch_size, const int n
                           const int output_width, const int output_height, 
                           const int downRatio,
                           float* channel_pred_data, const int anchor_scale, float conf_thresh, 
-                          std::map<int, std::vector<CenterNetInfo > >* results);
+                          std::map<int, std::vector<CenterNetInfo > >* results, bool has_lm);
 
 template void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const int downRatio,
                           double* channel_pred_data, const int anchor_scale, double conf_thresh, 
-                          std::map<int, std::vector<CenterNetInfo > >* results);
+                          std::map<int, std::vector<CenterNetInfo > >* results, bool has_lm);
 
 // OHEM 样本难例挖掘， 只记录具体思路
 // 1. 通过IOU 或者中心点的方式，确定正样本，也就是说，对于位置回归来说，确定回归的损失函数(loc loss), 通过样本框真实值确定样本分类

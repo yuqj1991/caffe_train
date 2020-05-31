@@ -33,6 +33,8 @@ void CenterGridLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     net_height_ = center_object_loss_param.net_height();
     net_width_ = center_object_loss_param.net_width();
     ignore_thresh_ = center_object_loss_param.ignore_thresh();
+
+    has_lm_ = center_object_loss_param.has_lm();
     
     if (!this->layer_param_.loss_param().has_normalization() &&
         this->layer_param_.loss_param().has_normalize()) {
@@ -80,12 +82,21 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     num_ = bottom[0]->num();
     all_gt_bboxes.clear();
     
-    GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
+    GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_, has_lm_,
                     &all_gt_bboxes, num_);
     num_groundtruth_ = 0;
     for(int i = 0; i < all_gt_bboxes.size(); i++){
-        vector<NormalizedBBox> gt_boxes = all_gt_bboxes[i];
+        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_boxes = all_gt_bboxes[i];
         num_groundtruth_ += gt_boxes.size();
+        for(unsigned ii = 0;  ii < gt_boxes.size(); ii++){
+            if(gt_boxes[ii].second.lefteye().x() > 0 && gt_boxes[ii].second.lefteye().y() > 0 &&
+                   gt_boxes[ii].second.righteye().x() > 0 && gt_boxes[ii].second.righteye().y() > 0 && 
+                   gt_boxes[ii].second.nose().x() > 0 && gt_boxes[ii].second.nose().y() > 0 &&
+                   gt_boxes[ii].second.leftmouth().x() > 0 && gt_boxes[ii].second.leftmouth().y() > 0 &&
+                   gt_boxes[ii].second.rightmouth().x() > 0 && gt_boxes[ii].second.rightmouth().y() > 0){
+                num_lm_++;
+            }
+        }
     }
     // prediction data
     Dtype* channel_pred_data = bottom[0]->mutable_cpu_data();
@@ -107,8 +118,9 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     Dtype *label_muti_data = label_data_.mutable_cpu_data();
     Dtype class_score = Dtype(0.);
     Dtype sum_squre = Dtype(0.);
+    Dtype lm_loss_origin = Dtype(0.);
     caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
-    Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.), normalizer = Dtype(0.);
+    Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.), normalizer = Dtype(0.), lm_loss = Dtype(0.);
     int num_gt_match = 0;
     if (num_groundtruth_ >= 1) {
         const int downRatio = net_height_ / output_height;
@@ -126,13 +138,17 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                             channel_pred_data,  anchor_scale_, 
                             bbox_range_scale_,
                             all_gt_bboxes, label_muti_data, bottom_diff, 
-                            &count_postive_, &sum_squre, &num_gt_match);
+                            &count_postive_, &sum_squre, &num_gt_match, has_lm_, &lm_loss_origin);
         }
         normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, 1, count_postive_);
         loc_loss = sum_squre / normalizer;
         score_loss = class_score / normalizer;
         top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
+        if(has_lm_ && num_lm_ > 0){
+            lm_loss = lm_loss_origin / normalizer;
+            top[0]->mutable_cpu_data()[0] += lm_loss;
+        }
     } else {
         top[0]->mutable_cpu_data()[0] = 0;
     }
@@ -141,9 +157,11 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         LOG(INFO)<<"Region "<<output_width
                 <<": total loss: "<<top[0]->mutable_cpu_data()[0]
                 <<", loc loss: "<< loc_loss
+                <<", lm_loss: "<<lm_loss
                 <<", class loss: "<< score_loss
                 <<", normalizer: "<<normalizer
                 <<", count: "<< count_postive_
+                <<", num_landmarks: "<<num_lm_
                 <<", all gt_boxes: "<<num_groundtruth_
                 <<", this match nums: "<<num_gt_match;
     }

@@ -291,7 +291,7 @@ template <typename Dtype>
 Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, Dtype *bottom_diff, 
-                            const int num_channels){
+                            const int num_channels, bool has_lm){
     Dtype loss = Dtype(0.f);
     int dimScale = output_height * output_width;
     for(int b = 0; b < batch_size; b++){
@@ -310,6 +310,9 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
                         LOG(FATAL)<<"no valid label value";
                     }
                     int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
+                    if(has_lm){
+                        bg_index = b * num_channels * dimScale + 14 * dimScale + h * output_width + w;
+                    }
                     Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
                     Dtype sumValue = Dtype(0.f);
                     // 求出每组的最大值, 计算出概率值
@@ -334,22 +337,25 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
 template float SoftmaxLossEntropy(float* label_data, float* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, float *bottom_diff, 
-                            const int num_channels);
+                            const int num_channels, bool has_lm);
 template double SoftmaxLossEntropy(double* label_data, double* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, double *bottom_diff, 
-                            const int num_channels);
+                            const int num_channels, bool has_lm);
 
 template <typename Dtype>
 void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
             const int label_channel, const int num_channels,
-            const int outheight, const int outwidth){
-    CHECK_EQ(label_channel, 2);
+            const int outheight, const int outwidth, bool has_lm){
     int dimScale = outheight * outwidth;
     for(int b = 0; b < batch_size; b ++){
         for(int h = 0; h < outheight; h++){
             for(int w = 0; w < outwidth; w++){
                 int class_index = b * num_channels * dimScale + 4 * dimScale +  h * outwidth + w;
+                if(has_lm)
+                {
+                    class_index = b * num_channels * dimScale + 14 * dimScale +  h * outwidth + w;
+                }
                 Dtype MaxVaule = pred_data[class_index + 0 * dimScale];
                 Dtype sumValue = Dtype(0.f);
                 // 求出每组的最大值
@@ -372,10 +378,10 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
 
 template void SoftmaxCenterGrid(float * pred_data, const int batch_size,
             const int label_channel, const int num_channels,
-            const int outheight, const int outwidth);
+            const int outheight, const int outwidth, bool has_lm);
 template void SoftmaxCenterGrid(double * pred_data, const int batch_size,
             const int label_channel, const int num_channels,
-            const int outheight, const int outwidth);
+            const int outheight, const int outwidth, bool has_lm);
 // hard sampling mine postive : negative 1: 5 softmax
 // 按理来说是需要重新统计负样本的编号，以及获取到他的数值
 // label_data : K x H x W
@@ -383,8 +389,12 @@ template <typename Dtype>
 void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_loss,
                           const int negative_ratio, std::vector<int> postive, 
                           const int output_height, const int output_width,
-                          const int num_channels, const int batch_size){
-    CHECK_EQ(num_channels, 4 + 2) << "x, y, width, height + label classes containing background + face";
+                          const int num_channels, const int batch_size, bool has_lm){
+    if(has_lm){
+        CHECK_EQ(num_channels, 14 + 2) << "x, y, width, height, landmarks + label classes containing background + face";
+    }else{
+        CHECK_EQ(num_channels, 4 + 2) << "x, y, width, height + label classes containing background + face";
+    }
     int dimScale = output_height * output_width;
     std::vector<std::pair<int, float> > loss_value_indices;
     for(int b = 0; b < batch_size; b ++){
@@ -411,11 +421,11 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
 template void SelectHardSampleSoftMax(float *label_data, std::vector<float> batch_sample_loss, 
                           const int negative_ratio, std::vector<int> postive, 
                           const int output_height, const int output_width,
-                          const int num_channels, const int batch_size);
+                          const int num_channels, const int batch_size, bool has_lm);
 template void SelectHardSampleSoftMax(double *label_data, std::vector<double> batch_sample_loss, 
                           const int negative_ratio, std::vector<int> postive, 
                           const int output_height, const int output_width,
-                          const int num_channels, const int batch_size);
+                          const int num_channels, const int batch_size, bool has_lm);
 
 
 template <typename Dtype>
