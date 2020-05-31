@@ -421,7 +421,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                                     top_label[idx++] = lm.leftmouth().y();
                                     top_label[idx++] = lm.rightmouth().x();
                                     top_label[idx++] = lm.rightmouth().y();
-                                    #if 1
+                                    #if 0
                                     LOG(INFO)<<"bool has lm: "<<anno.has_lm()
                                             <<", le x: "<<lm.lefteye().x() <<", le y: "<<lm.lefteye().y()
                                             <<", re x: "<<lm.righteye().x() <<", re y: "<<lm.righteye().y()
@@ -510,7 +510,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                                     top_label[idx++] = lm.rightmouth().x();
                                     top_label[idx++] = lm.rightmouth().y();
                                     top_label[idx++] = bbox.difficult();
-                                    #if 1
+                                    #if 0
                                     LOG(INFO)<<"anno has lm: "<<anno.has_lm()
                                             <<", le x: "<<lm.lefteye().x() <<", le y: "<<lm.lefteye().y()
                                             <<", re x: "<<lm.righteye().x() <<", re y: "<<lm.righteye().y()

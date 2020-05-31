@@ -296,7 +296,6 @@ void DataTransformer<Dtype>::TransformAnnotation(
                 const AnnoFaceLandmarks& lmarks = anno.face_lm();
                 bool has_valid_lm = false;
                 const int has_lm = anno.has_lm();
-                LOG(INFO)<<"here you go";
                 if(has_lm > 0){
                     CHECK_EQ(has_lm, 1);
                     CHECK_GT(lmarks.righteye().x() , 0.f);
