@@ -267,11 +267,11 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 30000, 50000, 70000, 90000],
+    'stepvalue': [10000, 20000, 30000, 40000, 50000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 100000,
+    'max_iter': 60000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
@@ -302,7 +302,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
         crop_type = P.AnnotatedData.CROP_JITTER, YoloForamte = True)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data')
+net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False)
 bias_scale = [438, 363, 91, 35]
 low_bbox_scale = [256, 128, 32, 6]
 up_bbox_scale = [620, 256, 128, 32]
@@ -325,7 +325,8 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
         train=False, output_label=True, label_map_file=labelmapPath,
         transform_param=test_transform_param)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, use_global_stats= True)
+net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, 
+                                                    use_global_stats= True, biFpn= False)
 DetectListLayer = []
 DetectListScale = []
 DetectListDownRatio = []
