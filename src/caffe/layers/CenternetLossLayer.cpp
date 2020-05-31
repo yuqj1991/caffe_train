@@ -283,10 +283,10 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
 
     if (this->layer_param_.propagate_down(0)) {
         loc_offset_loss = 1. * Dtype(loc_offset_loss_.cpu_data()[0] / normalizer);
-        loc_wh_loss = 0.1 * Dtype(loc_wh_loss_.cpu_data()[0] / normalizer);
+        loc_wh_loss = Dtype(loc_wh_loss_.cpu_data()[0] / normalizer);
         
         if(has_lm_ && num_lm_ >0){
-            lm_loss = 0.1 * Dtype(lm_loss_.cpu_data()[0] / lm_normalizer);
+            lm_loss = Dtype(lm_loss_.cpu_data()[0] / lm_normalizer);
         }
     }
     if (this->layer_param_.propagate_down(1)) {
@@ -352,14 +352,14 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             // diff of wh
             loc_wh_loss_layer_->Backward(loc_wh_top_vec_, loc_propagate_down,
                                         loc_wh_bottom_vec_);
-            Dtype loss_wh_weight = 0.1 * top[0]->cpu_diff()[0] / normalizer;
+            Dtype loss_wh_weight = top[0]->cpu_diff()[0] / normalizer;
             caffe_scal(loc_wh_pred_.count(), loss_wh_weight, loc_wh_pred_.mutable_cpu_diff());
             const Dtype* loc_wh_pred_diff = loc_wh_pred_.cpu_diff();
 
             if(has_lm_ && num_lm_ >0){
                 lm_loss_layer_->Backward(lm_top_vec_, loc_propagate_down,
                                         lm_bottom_vec_);
-                Dtype lm_weight = 0.1 * top[0]->cpu_diff()[0] / lm_normalizer;
+                Dtype lm_weight = top[0]->cpu_diff()[0] / lm_normalizer;
                 caffe_scal(lm_pred_.count(), lm_weight, lm_pred_.mutable_cpu_diff());
             }
             const Dtype* lm_pred_diff = lm_pred_.cpu_diff();
