@@ -187,15 +187,13 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
     bool use_difficult_gt_ = true;
     Dtype background_label_id_ = -1;
     all_gt_bboxes.clear();
-    LOG(INFO)<<"~~~~~~~~~~~~~";
     GetCenternetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
                     &all_gt_bboxes, has_lm_);
-    LOG(INFO)<<"@@@@@@@@@@@@@@@@@";
     int num_groundtruth = 0;
     for(int i = 0; i < all_gt_bboxes.size(); i++){
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_boxes = all_gt_bboxes[i];
         num_groundtruth += gt_boxes.size();
-        for(unsigned ii = 0;  gt_boxes.size(); ii++){
+        for(unsigned ii = 0;  ii < gt_boxes.size(); ii++){
             if(gt_boxes[ii].second.lefteye().x() > 0 && gt_boxes[ii].second.lefteye().y() > 0 &&
                    gt_boxes[ii].second.righteye().x() > 0 && gt_boxes[ii].second.righteye().y() > 0 && 
                    gt_boxes[ii].second.nose().x() > 0 && gt_boxes[ii].second.nose().y() > 0 &&
