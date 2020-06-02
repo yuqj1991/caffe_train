@@ -40,7 +40,7 @@ class LossLayer : public Layer<Dtype> {
         const int outer_num, const int inner_num, const int valid_count);
 
     virtual inline int MinBottomBlobs() const { return 2; }
-    virtual inline int MaxBottomBlobs() const { return 3; }
+    virtual inline int MaxBottomBlobs() const { return 10; }
 
     /**
      * @brief For convenience and backwards compatibility, instruct the Net to
