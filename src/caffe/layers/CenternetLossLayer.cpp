@@ -355,7 +355,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             Dtype loss_wh_weight = top[0]->cpu_diff()[0] / normalizer;
             caffe_scal(loc_wh_pred_.count(), loss_wh_weight, loc_wh_pred_.mutable_cpu_diff());
             const Dtype* loc_wh_pred_diff = loc_wh_pred_.cpu_diff();
-
+            // diff of landmarks
             if(has_lm_ && num_lm_ >0){
                 lm_loss_layer_->Backward(lm_top_vec_, loc_propagate_down,
                                         lm_bottom_vec_);

@@ -1132,7 +1132,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                             + 5* dimScale + h * output_width + w;
                 Dtype class_loss = SingleSoftmaxLoss(channel_pred_data[bg_index], channel_pred_data[face_index], Dtype(-1.));
                 batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
-                #if 1
                 int class_index = b * dimScale +  h * output_width + w;
                 for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
                     const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
@@ -1157,7 +1156,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         }
                     }
                 }
-                #endif
             }
         }
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -1181,22 +1179,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                             continue;
                         if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
-
-                        #if 1
-                        NormalizedBBox anchor_bbox;
-                        float an_xmin = GET_VALID_VALUE((float)(w - float(anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
-                        float an_ymin = GET_VALID_VALUE((float)(h - float(anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
-                        float an_xmax = GET_VALID_VALUE((float)(w + float(anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
-                        float an_ymax = GET_VALID_VALUE((float)(h + float(anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
-                        anchor_bbox.set_xmin(an_xmin);
-                        anchor_bbox.set_xmax(an_xmax);
-                        anchor_bbox.set_ymin(an_ymin);
-                        anchor_bbox.set_ymax(an_ymax);
-                        if(BBoxCoverage(gt_bboxes[ii].first, anchor_bbox) < 0.35){
-                            continue;
-                        }
-                        #endif
-                        
+                   
                         Dtype xmin_bias = (w - xmin) * downRatio * 2 / anchor_scale;
                         Dtype ymin_bias = (h - ymin) * downRatio * 2 / anchor_scale;
                         Dtype xmax_bias = (w - xmax) * downRatio * 2 / anchor_scale;
@@ -1210,6 +1193,21 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         int ymax_index = b * num_channels * dimScale 
                                                     + 3* dimScale + h * output_width + w;
                         int class_index = b * dimScale +  h * output_width + w;
+
+                        #if 1
+                        NormalizedBBox predict_bbox;
+                        float an_xmin = GET_VALID_VALUE((float)(w - float(channel_pred_data[xmin_index] * anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
+                        float an_ymin = GET_VALID_VALUE((float)(h - float(channel_pred_data[ymin_index] * anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
+                        float an_xmax = GET_VALID_VALUE((float)(w - float(channel_pred_data[xmax_index] * anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
+                        float an_ymax = GET_VALID_VALUE((float)(h - float(channel_pred_data[ymax_index] * anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
+                        predict_bbox.set_xmin(an_xmin);
+                        predict_bbox.set_xmax(an_xmax);
+                        predict_bbox.set_ymin(an_ymin);
+                        predict_bbox.set_ymax(an_ymax);
+                        if(BBoxCoverage(gt_bboxes[ii].first, predict_bbox) < 0.35){
+                            continue;
+                        }
+                        #endif
                         Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
                         Dtype xmin_loss, ymin_loss, xmax_loss, ymax_loss, single_total_loss;
                         xmin_loss = smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);

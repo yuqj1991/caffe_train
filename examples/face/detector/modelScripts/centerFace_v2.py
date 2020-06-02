@@ -295,7 +295,7 @@ Inverted_residual_setting = [[1, 16, 1, 1],
                              [6, 32, 3, 2],
                              [6, 64, 5, 2],
                              [6, 128, 3, 2]]
-use_branch= True
+use_branch= False
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
@@ -315,10 +315,15 @@ net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data'
                                                     use_branch= use_branch)
 
 from_layers = []
-from_layers.append(net[box_out])
+if use_branch:
+    from_layers.append(net[box_out[0]])
+    from_layers.append(net[box_out[1]])
+    from_layers.append(net[box_out[2]])
+else:
+    from_layers.append(net[box_out])
 from_layers.append(net[class_out])
 from_layers.append(net.label)
-CenterFaceObjectLoss(net= net, stageidx= 0, from_layers= from_layers, has_lm= True)
+CenterFaceObjectLoss(net= net, stageidx= 0, from_layers= from_layers, has_lm= True, use_branch= use_branch)
 
 with open(train_net_file, 'w') as f:
     print('name: "{}_train"'.format("CenterFace"), file=f)
@@ -340,8 +345,16 @@ net[Sigmoid_layer] = L.Sigmoid(net[class_out], in_place= False)
 
 
 DetectListLayer = []
-#DetectListLayer.append(net[Pooling_Layer])
-DetectListLayer.append(net[box_out])
+if use_branch:
+    out_detect = []
+    out_detect.append(net[box_out[0]])
+    out_detect.append(net[box_out[1]])
+    out_detect.append(net[box_out[2]])
+    Concat_out = "detect_concat_1x1"
+    net[Concat_out] = L.Concat(*out_detect, axis=1)
+    DetectListLayer.append(net[Concat_out])
+else:
+    DetectListLayer.append(net[box_out])
 DetectListLayer.append(net[Sigmoid_layer])
 CenterFaceObjectDetect(net, from_layers = DetectListLayer, has_lm= True)
 
