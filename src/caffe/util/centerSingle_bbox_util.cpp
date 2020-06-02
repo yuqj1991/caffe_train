@@ -35,7 +35,7 @@ void GetLocTruthAndPrediction(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest_
         CHECK_EQ(lm_channels, 10);
     }else{
         CHECK_EQ(loc_channels, 2);
-        CHECK_EQ(lm_channels, 0);
+        CHECK_EQ(lm_channels, 1);
     }
     for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
         int batch_id = iter->first;
@@ -163,7 +163,7 @@ void CopySingleDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_di
         CHECK_EQ(lm_channels, 10);
     }else{
         CHECK_EQ(loc_channels, 2);
-        CHECK_EQ(lm_channels, 0);
+        CHECK_EQ(lm_channels, 1);
     }
 
     for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
