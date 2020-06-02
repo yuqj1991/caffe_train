@@ -20,6 +20,7 @@
 
 #include "caffe/util/im_transforms.hpp"
 #include "caffe/util/math_functions.hpp"
+#define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
 namespace caffe {
 
@@ -99,7 +100,44 @@ void UpdateBBoxByResizePolicy(const ResizeParameter& param,
 void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
                               const int old_width, const int old_height,
                               AnnoFaceLandmarks* lface){
-  //
+    float new_height = param.height();
+    float new_width = param.width();
+
+    float le_x = lface->lefteye().x() * old_width;
+    float le_y = lface->lefteye().y() * old_height;
+    float re_x = lface->righteye().x() * old_width;
+    float re_y = lface->righteye().y() * old_height;
+    float no_x = lface->nose().x() * old_width;
+    float no_y = lface->nose().y() * old_height;
+
+    float lm_x = lface->leftmouth().x() * old_width;
+    float lm_y = lface->leftmouth().y() * old_height;
+    float rm_x = lface->rightmouth().x() * old_width;
+    float rm_y = lface->rightmouth().y() * old_height;
+
+    le_x = GET_VALID_VALUE(le_x * new_width / old_width, (0.), new_width);
+    le_y = GET_VALID_VALUE(le_y * new_height / old_width, (0.), new_height);
+    re_x = GET_VALID_VALUE(re_x * new_width / old_width, (0.), new_width);
+    re_y = GET_VALID_VALUE(re_y * new_height / old_width, (0.), new_height);
+    no_x = GET_VALID_VALUE(no_x * new_width / old_width, (0.), new_width);
+    no_y = GET_VALID_VALUE(no_y * new_height / old_width, (0.), new_height);
+
+    lm_x = GET_VALID_VALUE(lm_x * new_width / old_width, (0.), new_width);
+    lm_y = GET_VALID_VALUE(lm_y * new_height / old_width, (0.), new_height);
+    rm_x = GET_VALID_VALUE(rm_x * new_width / old_width, (0.), new_width);
+    rm_y = GET_VALID_VALUE(rm_y * new_height / old_width, (0.), new_height);
+
+    lface->mutable_lefteye()->set_x(le_x / new_width);
+    lface->mutable_lefteye()->set_y(le_y / new_height);
+    lface->mutable_righteye()->set_x(re_x / new_width);
+    lface->mutable_righteye()->set_y(re_y / new_height);
+    lface->mutable_nose()->set_x(no_x / new_width);
+    lface->mutable_nose()->set_y(no_y / new_height);
+
+    lface->mutable_leftmouth()->set_x(lm_x / new_width);
+    lface->mutable_leftmouth()->set_y(lm_y / new_height);
+    lface->mutable_rightmouth()->set_x(rm_x / new_width);
+    lface->mutable_rightmouth()->set_y(rm_y / new_height);
 }
 
 void InferNewSize(const ResizeParameter& resize_param,

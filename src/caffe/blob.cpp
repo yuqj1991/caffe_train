@@ -136,14 +136,14 @@ Dtype* Blob<Dtype>::mutable_gpu_diff() {
 
 template <typename Dtype>
 void Blob<Dtype>::ShareData(const Blob& other) {
-  CHECK_EQ(count_, other.count());
-  data_ = other.data();
+    CHECK_EQ(count_, other.count());
+    data_ = other.data();
 }
 
 template <typename Dtype>
 void Blob<Dtype>::ShareDiff(const Blob& other) {
-  CHECK_EQ(count_, other.count());
-  diff_ = other.diff();
+    CHECK_EQ(count_, other.count());
+    diff_ = other.diff();
 }
 
 // The "update" method is used for parameter blobs in a Net, which are stored

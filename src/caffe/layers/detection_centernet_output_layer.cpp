@@ -65,12 +65,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
     int loc_channels = bottom[0]->channels();
     const Dtype* conf_data = bottom[1]->cpu_data();
     const int classes = bottom[1]->channels();
-    
-    /*
-    Dtype* keep_max_data = bottom[2]->mutable_cpu_data();
-    _nms_heatmap(conf_data, keep_max_data, output_height, output_width, classes, num_);
-    const Dtype* keep_data = bottom[2]->cpu_data();
-    */
+
     results_.clear();
     get_topK(conf_data, loc_data, output_height, output_width, classes, num_, &results_, loc_channels,
                         has_lm_,

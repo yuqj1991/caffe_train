@@ -82,6 +82,7 @@ protected:
     Blob<Dtype> lm_gt_;
     // localization loss.
     Blob<Dtype> lm_loss_;
+    Blob<Dtype> lm_pred_temp_data_;
 
     // The internal confidence loss layer.
     shared_ptr<Layer<Dtype> > conf_loss_layer_;

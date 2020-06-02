@@ -32,15 +32,6 @@ void CopySingleDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_di
                                 const int loc_channels, const int lm_channels,
                                 std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes);
 
-template <typename Dtype>
-void get_single_topK(const Dtype* keep_max_data, const Dtype* loc_data
-                  , const Dtype* wh_data, const Dtype* lm_data,
-                  const int loc_channels, const int lm_channels, 
-                  , const int output_height
-                  , const int output_width, const int channels, const int num_batch
-                  , std::map<int, std::vector<CenterNetInfo > > * results
-                  , const int loc_channels, bool has_lm,  Dtype conf_thresh, Dtype nms_thresh);
-
 }  // namespace caffe
 
 #endif  // CAFFE_UTIL_BBOX_UTIL_H_

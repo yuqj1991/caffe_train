@@ -442,7 +442,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                 for(int w = 0; w < output_width; w++){
                     int index = i * dim + c * dimScale + h * output_width + w;
                     if(keep_max_data[index] > conf_thresh && keep_max_data[index] < 1){
-                        int x_index = i * loc_channels * dimScale + h * output_width + w;
+                        int x_index = i * loc_channels * dimScale + 0 * dimScale + h * output_width + w;
                         int y_index = i * loc_channels * dimScale + 1 * dimScale + h * output_width + w;
                         int w_index = i * loc_channels * dimScale + 2 * dimScale + h * output_width + w;
                         int h_index = i * loc_channels * dimScale + 3 * dimScale + h * output_width + w;
