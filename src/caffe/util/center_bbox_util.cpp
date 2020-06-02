@@ -1110,10 +1110,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     int dimScale = output_height * output_width;
     Dtype score_loss = Dtype(0.), loc_loss = Dtype(0.), lm_loss = Dtype(0.);
     if(has_lm)
-        CHECK_EQ(num_channels, (4 + num_classes)) 
+        CHECK_EQ(num_channels, (14 + num_classes)) 
             << "num_channels shoule be set to including bias_x, bias_y, width, height, classes";
     else
-        CHECK_EQ(num_channels, (14 + num_classes)) 
+        CHECK_EQ(num_channels, (4 + num_classes)) 
             << "num_channels shoule be set to including 4 points landmarks, &classes";
 
     int postive = 0;
