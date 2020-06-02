@@ -3871,25 +3871,25 @@ layer {
   }
 }
 layer {
-  name: "Box_out_1x1"
-  type: "Concat"
-  bottom: "Box_out_offset_1x1"
-  bottom: "Box_out_wh_1x1"
-  top: "Box_out_1x1"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
   name: "Class_out_1x1_Sigmoid"
   type: "Sigmoid"
   bottom: "Class_out_1x1"
   top: "Class_out_1x1_Sigmoid"
 }
 layer {
+  name: "detect_concat_1x1"
+  type: "Concat"
+  bottom: "Box_out_offset_1x1"
+  bottom: "Box_out_wh_1x1"
+  top: "detect_concat_1x1"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
   name: "detection_out"
   type: "CenternetDetectionOutput"
-  bottom: "Box_out_1x1"
+  bottom: "detect_concat_1x1"
   bottom: "Class_out_1x1_Sigmoid"
   top: "detection_out"
   include {

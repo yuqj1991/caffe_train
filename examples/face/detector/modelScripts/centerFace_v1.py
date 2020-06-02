@@ -295,7 +295,7 @@ Inverted_residual_setting = [[1, 16, 1, 1],
                              [6, 32, 3, 2],
                              [6, 64, 5, 2],
                              [6, 128, 3, 2]]
-
+use_branch= True
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
@@ -310,13 +310,19 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler)
 
-net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data', Inverted_residual_setting= Inverted_residual_setting)
+net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data', Inverted_residual_setting= Inverted_residual_setting,
+                                                    use_branch= use_branch)
 
 from_layers = []
-from_layers.append(net[box_out])
+if use_branch:
+    from_layers.append(net[box_out[0]])
+    from_layers.append(net[box_out[1]])
+else:
+    from_layers.append(net[box_out])
 from_layers.append(net[class_out])
 from_layers.append(net.label)
-CenterFaceObjectLoss(net= net, stageidx= 0, from_layers= from_layers)
+
+CenterFaceObjectLoss(net= net, stageidx= 0, from_layers= from_layers, use_branch= use_branch)
 
 with open(train_net_file, 'w') as f:
     print('name: "{}_train"'.format("CenterFace"), file=f)
@@ -328,15 +334,23 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
         train=False, output_label=True, label_map_file=labelmapPath,
         transform_param=test_transform_param)
 
-net, class_out, box_out = CenterFaceMobilenetV2Body(net, from_layer = 'data', Use_BN= True, use_global_stats= True, Inverted_residual_setting= Inverted_residual_setting)
+net, class_out, box_out = CenterFaceMobilenetV2Body(net, from_layer = 'data', Use_BN= True, use_global_stats= True, 
+                                                        Inverted_residual_setting= Inverted_residual_setting, use_branch= use_branch)
 
 Sigmoid_layer = "{}_Sigmoid".format(class_out)
 net[Sigmoid_layer] = L.Sigmoid(net[class_out], in_place= False)
 
 
 DetectListLayer = []
-#DetectListLayer.append(net[Pooling_Layer])
-DetectListLayer.append(net[box_out])
+if use_branch:
+    out_detect = []
+    out_detect.append(net[box_out[0]])
+    out_detect.append(net[box_out[1]])
+    Concat_out = "detect_concat_1x1"
+    net[Concat_out] = L.Concat(*out_detect, axis=1)
+    DetectListLayer.append(net[Concat_out])
+else:
+    DetectListLayer.append(net[box_out])
 DetectListLayer.append(net[Sigmoid_layer])
 CenterFaceObjectDetect(net, from_layers = DetectListLayer)
 

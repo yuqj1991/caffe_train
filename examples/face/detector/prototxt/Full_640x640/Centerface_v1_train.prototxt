@@ -4038,25 +4038,17 @@ layer {
   }
 }
 layer {
-  name: "Box_out_1x1"
-  type: "Concat"
+  name: "CenterSingleFaceLoss_0"
+  type: "CenterObjectSingleLoss"
   bottom: "Box_out_offset_1x1"
   bottom: "Box_out_wh_1x1"
-  top: "Box_out_1x1"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
-  name: "CenterFaceLoss_0"
-  type: "CenterObjectLoss"
-  bottom: "Box_out_1x1"
   bottom: "Class_out_1x1"
   bottom: "label"
-  top: "CenterFaceLoss_0"
+  top: "CenterSingleFaceLoss_0"
   include {
     phase: TRAIN
   }
+  propagate_down: true
   propagate_down: true
   propagate_down: true
   propagate_down: false

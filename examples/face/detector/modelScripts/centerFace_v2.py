@@ -295,7 +295,7 @@ Inverted_residual_setting = [[1, 16, 1, 1],
                              [6, 32, 3, 2],
                              [6, 64, 5, 2],
                              [6, 128, 3, 2]]
-
+use_branch= True
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
@@ -311,7 +311,8 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler, has_landmarks = True)
 
 net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data', detect_num = 14
-                                                    , Inverted_residual_setting= Inverted_residual_setting)
+                                                    , Inverted_residual_setting= Inverted_residual_setting,
+                                                    use_branch= use_branch)
 
 from_layers = []
 from_layers.append(net[box_out])
@@ -331,13 +332,12 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
 
 net, class_out, box_out = CenterFaceMobilenetV2Body(net, from_layer = 'data', Use_BN= True, 
                         Inverted_residual_setting= Inverted_residual_setting,
-                        use_global_stats= True, detect_num = 14)
+                        use_global_stats= True, detect_num = 14, 
+                        use_branch= use_branch)
 
 Sigmoid_layer = "{}_Sigmoid".format(class_out)
 net[Sigmoid_layer] = L.Sigmoid(net[class_out], in_place= False)
-#Pooling_Layer = "{}_Pooling".format(class_out)
-#net[Pooling_Layer] = L.Pooling(net[Sigmoid_layer], pool=P.Pooling.MAX, kernel_size = 3, stride= 1, pad = 1, 
-#                                    global_pooling=False, in_place = False)
+
 
 DetectListLayer = []
 #DetectListLayer.append(net[Pooling_Layer])

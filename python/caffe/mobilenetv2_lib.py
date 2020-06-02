@@ -228,7 +228,7 @@ def CenterFaceObjectDetect(net, from_layers = [],  num_classes = 2,
 def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.CenterObjectLoss.SMOOTH_L1,
                          normalization_mode = P.Loss.VALID, num_classes= 1, loc_weight = 1.0, 
                          share_location = True, class_type = P.CenterObjectLoss.FOCALSIGMOID, has_lm = False,
-                         lm_loss_type = P.CenterObjectLoss.SMOOTH_L1,):
+                         lm_loss_type = P.CenterObjectLoss.SMOOTH_L1, use_branch = False):
     center_object_loss_param = {
         'loc_weight': loc_weight,
         'num_class': num_classes,
@@ -241,10 +241,20 @@ def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.Cent
     loss_param = {
         'normalization': normalization_mode,
     }
-    name = 'CenterFaceLoss_{}'.format(stageidx)
-    net[name] = L.CenterObjectLoss(*from_layers, center_object_loss_param = center_object_loss_param,
-                                 loss_param=loss_param, include=dict(phase=caffe_pb2.Phase.Value('TRAIN')),
-                                 propagate_down=[True, True, False])
+    if use_branch:
+        if has_lm:
+            propagate_down = [True, True, True, True, False]
+        else:
+            propagate_down = [True, True, True, False]
+        name = 'CenterSingleFaceLoss_{}'.format(stageidx)
+        net[name] = L.CenterObjectSingleLoss(*from_layers, center_object_loss_param = center_object_loss_param,
+                                    loss_param=loss_param, include=dict(phase=caffe_pb2.Phase.Value('TRAIN')),
+                                    propagate_down=propagate_down)
+    else:
+        name = 'CenterFaceLoss_{}'.format(stageidx)
+        net[name] = L.CenterObjectLoss(*from_layers, center_object_loss_param = center_object_loss_param,
+                                    loss_param=loss_param, include=dict(phase=caffe_pb2.Phase.Value('TRAIN')),
+                                    propagate_down=[True, True, False])
 
 
 def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= False, 
@@ -255,7 +265,7 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                                  [6, 96, 3, 1],
                                  [6, 160, 3, 2],
                                  [6, 320, 1, 1]],
-								detect_num=4, num_class= 1, **bn_param):
+								detect_num=4, num_class= 1, use_branch = False, **bn_param):
     assert from_layer in net.keys()
     index = 0
     feature_stride = [4, 8, 16, 32]
@@ -302,21 +312,6 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                     pre_channels = c
         elif n == 1:
             assert s == 1
-            '''
-            Project_Layer = out_layer
-            out_layer= "DepethWiseConv_{}_{}".format(pre_channels, c)
-            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
-                        use_swish= False, group= pre_channels,
-                        num_output= pre_channels, kernel_size= 3, pad= 1, stride= 1,
-                        lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-            Project_Layer = out_layer
-            out_layer= "PointWiseConv_{}_{}".format(pre_channels, c)
-            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = False, 
-                        use_swish= False, 
-                        num_output= c, kernel_size= 1, pad= 0, stride= 1,
-                        lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-            pre_channels = c
-            '''
             layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels,  Use_BN = True, 
                                                         use_relu= True, use_swish= False,
                                                         Use_scale = True,use_global_stats= use_global_stats, **bn_param)
@@ -385,6 +380,7 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
     Box_out = []
     Box_out.append(net[Box_offset_out])
     Box_out.append(net[Box_wh_out])
+    lm_out = ''
     if (detect_num - 2 - 2) > 0:
         assert(detect_num == 14)
         lm_out = "landmarks_out_1x1"
@@ -394,6 +390,13 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                 lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
         Box_out.append(net[lm_out])
     Concat_out = "Box_out_1x1"
+    if use_branch:
+        Concat_out = []
+        Concat_out.append(Box_offset_out)
+        Concat_out.append(Box_wh_out)
+        if (detect_num - 2 - 2) > 0:
+            Concat_out.append(lm_out)
+        return net, Class_out, Concat_out
     net[Concat_out] = L.Concat(*Box_out, axis=1)
     return net, Class_out, Concat_out
 
