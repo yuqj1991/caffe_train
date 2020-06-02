@@ -247,7 +247,15 @@ def CenterFaceObjectLoss(net, stageidx, from_layers = [], loc_loss_type = P.Cent
                                  propagate_down=[True, True, False])
 
 
-def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= False, detect_num=4, num_class= 1, **bn_param):
+def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= False, 
+								Inverted_residual_setting = [[1, 16, 1, 1],
+                                 [6, 24, 2, 2],
+                                 [6, 32, 3, 2],
+                                 [6, 64, 4, 2],
+                                 [6, 96, 3, 1],
+                                 [6, 160, 3, 2],
+                                 [6, 320, 1, 1]],
+								detect_num=4, num_class= 1, **bn_param):
     assert from_layer in net.keys()
     index = 0
     feature_stride = [4, 8, 16, 32]
@@ -262,13 +270,6 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                 **bn_param)
     accum_stride *= 2
     pre_channels= 32
-    Inverted_residual_setting = [[1, 16, 1, 1],
-                                 [6, 24, 2, 2],
-                                 [6, 32, 3, 2],
-                                 [6, 64, 4, 2],
-                                 [6, 96, 3, 1],
-                                 [6, 160, 3, 2],
-                                 [6, 320, 1, 1]]
     for _, (t, c, n, s) in enumerate(Inverted_residual_setting):
         accum_stride *= s
         if n > 1:

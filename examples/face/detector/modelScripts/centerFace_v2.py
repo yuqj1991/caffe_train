@@ -290,6 +290,12 @@ solver_param = {
     'test_initialization': False,
 }
 
+Inverted_residual_setting = [[1, 16, 1, 1],
+                             [6, 24, 3, 2],
+                             [6, 32, 3, 2],
+                             [6, 64, 5, 2],
+                             [6, 128, 3, 2]]
+
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
@@ -304,7 +310,8 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler, has_landmarks = True)
 
-net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data', detect_num = 14)
+net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data', detect_num = 14
+                                                    , Inverted_residual_setting= Inverted_residual_setting)
 
 from_layers = []
 from_layers.append(net[box_out])
@@ -322,7 +329,9 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
         train=False, output_label=True, label_map_file=labelmapPath,
         transform_param=test_transform_param, has_landmarks = True)
 
-net, class_out, box_out = CenterFaceMobilenetV2Body(net, from_layer = 'data', Use_BN= True, use_global_stats= True, detect_num = 14)
+net, class_out, box_out = CenterFaceMobilenetV2Body(net, from_layer = 'data', Use_BN= True, 
+                        Inverted_residual_setting= Inverted_residual_setting,
+                        use_global_stats= True, detect_num = 14)
 
 Sigmoid_layer = "{}_Sigmoid".format(class_out)
 net[Sigmoid_layer] = L.Sigmoid(net[class_out], in_place= False)
