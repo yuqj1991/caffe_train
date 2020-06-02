@@ -1217,6 +1217,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         int class_index = b * dimScale +  h * output_width + w;
                         NormalizedBBox predict_bbox;
                         #if 0
+                        #if 0
                         
                         float an_xmin = GET_VALID_VALUE((float)(w - float(channel_pred_data[xmin_index] * anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
                         float an_ymin = GET_VALID_VALUE((float)(h - float(channel_pred_data[ymin_index] * anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
@@ -1235,7 +1236,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         if(BBoxCoverage(gt_bboxes[ii].first, predict_bbox) < 0.35){
                             continue;
                         }
-                        
+                        #endif
                         Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
                         Dtype xmin_loss, ymin_loss, xmax_loss, ymax_loss, single_total_loss;
                         xmin_loss = L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
