@@ -196,7 +196,7 @@ layer {
     has_landmarks: true
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
     batch_size: 8
     backend: LMDB
   }

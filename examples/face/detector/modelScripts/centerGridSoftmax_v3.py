@@ -299,6 +299,7 @@ check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
 make_if_not_exist(save_dir)
 
+Fpn = False
 
 # Create train.prototxt.
 net = caffe.NetSpec()
@@ -308,7 +309,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
         crop_type = P.AnnotatedData.CROP_JITTER, YoloForamte = True)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False,
+net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False, Fpn= Fpn,
                                                     Inverted_residual_setting= Inverted_residual_setting,
                                                     top_out_channels= Inverted_residual_setting[4][1])
 bias_scale = [438, 243, 96, 35]
@@ -334,7 +335,7 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
         transform_param=test_transform_param)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, 
-                                                    biFpn= False,
+                                                    biFpn= False, Fpn= Fpn,
                                                     use_global_stats= True,
                                                     Inverted_residual_setting= Inverted_residual_setting, 
                                                     top_out_channels= Inverted_residual_setting[4][1])
