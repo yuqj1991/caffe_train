@@ -1130,6 +1130,12 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                             + 4* dimScale + h * output_width + w;
                 int face_index = b * num_channels * dimScale 
                                             + 5* dimScale + h * output_width + w;
+                if(has_lm){
+                bg_index = b * num_channels * dimScale 
+                                        + 14* dimScale + h * output_width + w;
+                face_index = b * num_channels * dimScale 
+                                        + 15* dimScale + h * output_width + w;
+                }
                 Dtype class_loss = SingleSoftmaxLoss(channel_pred_data[bg_index], channel_pred_data[face_index], Dtype(-1.));
                 batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
                 int class_index = b * dimScale +  h * output_width + w;
@@ -1143,10 +1149,19 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                     int large_side = std::max(gt_bbox_height, gt_bbox_width);
                     if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
                         NormalizedBBox anchor_bbox;
-                        float an_xmin = GET_VALID_VALUE((float)(w - float(anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
-                        float an_ymin = GET_VALID_VALUE((float)(h - float(anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
-                        float an_xmax = GET_VALID_VALUE((float)(w + float(anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
-                        float an_ymax = GET_VALID_VALUE((float)(h + float(anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
+                        int xmin_index = b * num_channels * dimScale
+                                                    + 0* dimScale + h * output_width + w;
+                        int ymin_index = b * num_channels * dimScale 
+                                                    + 1* dimScale + h * output_width + w;
+                        int xmax_index = b * num_channels * dimScale
+                                                    + 2* dimScale + h * output_width + w;
+                        int ymax_index = b * num_channels * dimScale 
+                                                    + 3* dimScale + h * output_width + w;
+
+                        float an_xmin = GET_VALID_VALUE((float)(w - float(channel_pred_data[xmin_index] * anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
+                        float an_ymin = GET_VALID_VALUE((float)(h - float(channel_pred_data[ymin_index] * anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
+                        float an_xmax = GET_VALID_VALUE((float)(w - float(channel_pred_data[xmax_index] * anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
+                        float an_ymax = GET_VALID_VALUE((float)(h - float(channel_pred_data[ymax_index] * anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
                         anchor_bbox.set_xmin(an_xmin);
                         anchor_bbox.set_xmax(an_xmax);
                         anchor_bbox.set_ymin(an_ymin);
