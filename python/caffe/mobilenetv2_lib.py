@@ -371,12 +371,30 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                 lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
 
     ### Box loc prediction layer
-    Box_out = "Box_out_1x1"
-    ConvBNLayer(net, net_last_layer, Box_out, use_bn= False, 
+    Box_offset_out = "Box_out_offset_1x1"
+    ConvBNLayer(net, net_last_layer, Box_offset_out, use_bn= False, 
                 use_swish= False, use_relu = False, 
-                num_output= detect_num, kernel_size= 1, pad= 0, stride= 1,
+                num_output= 2, kernel_size= 1, pad= 0, stride= 1,
                 lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
-    return net, Class_out, Box_out
+    Box_wh_out = "Box_out_wh_1x1"
+    ConvBNLayer(net, net_last_layer, Box_wh_out, use_bn= False, 
+                use_swish= False, use_relu = False, 
+                num_output= 2, kernel_size= 1, pad= 0, stride= 1,
+                lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
+    Box_out = []
+    Box_out.append(net[Box_offset_out])
+    Box_out.append(net[Box_wh_out])
+    if (detect_num - 2 - 2) > 0:
+        assert(detect_num == 14)
+        lm_out = "landmarks_out_1x1"
+        ConvBNLayer(net, net_last_layer, lm_out, use_bn= False, 
+                use_swish= False, use_relu = False, 
+                num_output= detect_num - 4, kernel_size= 1, pad= 0, stride= 1,
+                lr_mult=1, use_scale= False, use_global_stats= use_global_stats)
+        Box_out.append(net[lm_out])
+    Concat_out = "Box_out_1x1"
+    net[Concat_out] = L.Concat(*Box_out, axis=1)
+    return net, Class_out, Concat_out
 
 def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True, 
 								use_global_stats= False, Inverted_residual_setting = [[1, 16, 1, 1],

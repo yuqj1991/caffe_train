@@ -4498,16 +4498,16 @@ layer {
   }
 }
 layer {
-  name: "Box_out_1x1"
+  name: "Box_out_offset_1x1"
   type: "Convolution"
   bottom: "last_conv_3x3_layer"
-  top: "Box_out_1x1"
+  top: "Box_out_offset_1x1"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 14
+    num_output: 2
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4515,6 +4515,57 @@ layer {
     weight_filler {
       type: "msra"
     }
+  }
+}
+layer {
+  name: "Box_out_wh_1x1"
+  type: "Convolution"
+  bottom: "last_conv_3x3_layer"
+  top: "Box_out_wh_1x1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 2
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "landmarks_out_1x1"
+  type: "Convolution"
+  bottom: "last_conv_3x3_layer"
+  top: "landmarks_out_1x1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 10
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Box_out_1x1"
+  type: "Concat"
+  bottom: "Box_out_offset_1x1"
+  bottom: "Box_out_wh_1x1"
+  bottom: "landmarks_out_1x1"
+  top: "Box_out_1x1"
+  concat_param {
+    axis: 1
   }
 }
 layer {
