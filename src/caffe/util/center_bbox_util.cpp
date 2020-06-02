@@ -1191,6 +1191,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+                        #if 0
                         if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
                             continue;
                         if(h + (anchor_scale/downRatio) / 2 >= output_height - 1)
@@ -1199,6 +1200,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                             continue;
                         if(h - (anchor_scale/downRatio) / 2 < 0)
                             continue;
+                        #endif
                         if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
                    
@@ -1217,18 +1219,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         int class_index = b * dimScale +  h * output_width + w;
                         NormalizedBBox predict_bbox;
                         #if 0
-                        #if 0
-                        
-                        float an_xmin = GET_VALID_VALUE((float)(w - float(channel_pred_data[xmin_index] * anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
-                        float an_ymin = GET_VALID_VALUE((float)(h - float(channel_pred_data[ymin_index] * anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
-                        float an_xmax = GET_VALID_VALUE((float)(w - float(channel_pred_data[xmax_index] * anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
-                        float an_ymax = GET_VALID_VALUE((float)(h - float(channel_pred_data[ymax_index] * anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
-                        #else
                         float an_xmin = GET_VALID_VALUE((float)(w - float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
                         float an_ymin = GET_VALID_VALUE((float)(h - float(anchor_scale/ downRatio / 2)) / output_height, 0.f, 1.f);
                         float an_xmax = GET_VALID_VALUE((float)(w + float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
                         float an_ymax = GET_VALID_VALUE((float)(h + float( anchor_scale/ downRatio / 2)) / output_height, 0.f, 1.f);
-                        #endif
                         predict_bbox.set_xmin(an_xmin);
                         predict_bbox.set_xmax(an_xmax);
                         predict_bbox.set_ymin(an_ymin);
