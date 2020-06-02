@@ -34,10 +34,6 @@ public:
         const vector<Blob<Dtype>*>& top);
 
     virtual inline const char* type() const { return "CenterObjectSingleLoss"; }
-    // bottom[0] stores the location predictions.
-    // bottom[1] stores the confidence predictions.
-    // bottom[2] stores the prior bounding boxes.
-    // bottom[3] stores the ground truth bounding boxes.
     virtual inline int MinNumBottomBlobs() const { return 4; }
     virtual inline int MaxNumBottomBlobs() const { return 5; }
     virtual inline int ExactNumTopBlobs() const { return 1; }

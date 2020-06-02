@@ -480,7 +480,7 @@ class InfogainLossLayer : public LossLayer<Dtype> {
   // file specified by LayerParameter.)
   virtual inline int ExactNumBottomBlobs() const { return -1; }
   virtual inline int MinBottomBlobs() const { return 2; }
-  virtual inline int MaxBottomBlobs() const { return 3; }
+  virtual inline int MaxBottomBlobs() const { return 10; }
 
   virtual inline const char* type() const { return "InfogainLoss"; }
 
