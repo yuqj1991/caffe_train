@@ -52,10 +52,10 @@ void CenterGridLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     num_classes_ = center_object_loss_param.num_class();
     CHECK_GE(num_classes_, 1) << "num_classes should not be less than 1.";
     if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SIGMOID){
-        CHECK_EQ((4 + 1 + num_classes_) *1, bottom[0]->channels()) 
-                << "num_classes must be equal to prediction classes";
+        CHECK_GE(bottom[1]->channels, 1)
+                << "num_classes must be more than equal to prediction classes";
     }else if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SOFTMAX){
-        CHECK_EQ((4  + num_classes_) *1, bottom[0]->channels()) 
+        CHECK_GT(bottom[1]->channels, 1)
                 << "softmax num_classes must be equal to contain background";
     }else{
         LOG(FATAL)<<"unknown class type";

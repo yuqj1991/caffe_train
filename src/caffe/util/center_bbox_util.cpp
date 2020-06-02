@@ -1225,10 +1225,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         #endif
                         Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
                         Dtype xmin_loss, ymin_loss, xmax_loss, ymax_loss, single_total_loss;
-                        xmin_loss = smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
-                        ymin_loss = smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
-                        xmax_loss = smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
-                        ymax_loss = smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
+                        xmin_loss = L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+                        ymin_loss = L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+                        xmax_loss = L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+                        ymax_loss = L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
                         single_total_loss = xmin_loss + ymin_loss + xmax_loss + ymax_loss;
                         loc_loss += single_total_loss;
 
@@ -1266,20 +1266,20 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                             Dtype le_x_diff, le_y_diff, re_x_diff, re_y_diff, no_x_diff, no_y_diff, lm_x_diff, lm_y_diff, rm_x_diff, rm_y_diff;
                             Dtype le_x_loss, le_y_loss, re_x_loss, re_y_loss, no_x_loss, no_y_loss, lm_x_loss, lm_y_loss, rm_x_loss, rm_y_loss;
 
-                            le_x_loss = smoothL1_Loss(Dtype(channel_pred_data[le_x_index] - le_x_bias), &le_x_diff);
-                            le_y_loss = smoothL1_Loss(Dtype(channel_pred_data[le_y_index] - le_y_bias), &le_y_diff);
+                            le_x_loss = L2_Loss(Dtype(channel_pred_data[le_x_index] - le_x_bias), &le_x_diff);
+                            le_y_loss = L2_Loss(Dtype(channel_pred_data[le_y_index] - le_y_bias), &le_y_diff);
 
-                            re_x_loss = smoothL1_Loss(Dtype(channel_pred_data[re_x_index] - re_x_bias), &re_x_diff);
-                            re_y_loss = smoothL1_Loss(Dtype(channel_pred_data[re_y_index] - re_y_bias), &re_y_diff);
+                            re_x_loss = L2_Loss(Dtype(channel_pred_data[re_x_index] - re_x_bias), &re_x_diff);
+                            re_y_loss = L2_Loss(Dtype(channel_pred_data[re_y_index] - re_y_bias), &re_y_diff);
 
-                            no_x_loss = smoothL1_Loss(Dtype(channel_pred_data[no_x_index] - no_x_bias), &no_x_diff);
-                            no_y_loss = smoothL1_Loss(Dtype(channel_pred_data[no_y_index] - no_y_bias), &no_y_diff);
+                            no_x_loss = L2_Loss(Dtype(channel_pred_data[no_x_index] - no_x_bias), &no_x_diff);
+                            no_y_loss = L2_Loss(Dtype(channel_pred_data[no_y_index] - no_y_bias), &no_y_diff);
 
-                            lm_x_loss = smoothL1_Loss(Dtype(channel_pred_data[lm_x_index] - lm_x_bias), &lm_x_diff);
-                            lm_y_loss = smoothL1_Loss(Dtype(channel_pred_data[lm_y_index] - lm_y_bias), &lm_y_diff);
+                            lm_x_loss = L2_Loss(Dtype(channel_pred_data[lm_x_index] - lm_x_bias), &lm_x_diff);
+                            lm_y_loss = L2_Loss(Dtype(channel_pred_data[lm_y_index] - lm_y_bias), &lm_y_diff);
 
-                            rm_x_loss = smoothL1_Loss(Dtype(channel_pred_data[rm_x_index] - rm_x_bias), &rm_x_diff);
-                            rm_y_loss = smoothL1_Loss(Dtype(channel_pred_data[rm_y_index] - rm_y_bias), &rm_y_diff);
+                            rm_x_loss = L2_Loss(Dtype(channel_pred_data[rm_x_index] - rm_x_bias), &rm_x_diff);
+                            rm_y_loss = L2_Loss(Dtype(channel_pred_data[rm_y_index] - rm_y_bias), &rm_y_diff);
 
                             lm_loss += (le_x_loss + le_y_loss + re_x_loss + re_y_loss
                                             + no_x_loss + no_y_loss + lm_x_loss + lm_y_loss
