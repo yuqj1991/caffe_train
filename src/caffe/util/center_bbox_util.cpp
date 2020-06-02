@@ -1131,10 +1131,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 int face_index = b * num_channels * dimScale 
                                             + 5* dimScale + h * output_width + w;
                 if(has_lm){
-                bg_index = b * num_channels * dimScale 
-                                        + 14* dimScale + h * output_width + w;
-                face_index = b * num_channels * dimScale 
-                                        + 15* dimScale + h * output_width + w;
+                    bg_index = b * num_channels * dimScale 
+                                            + 14* dimScale + h * output_width + w;
+                    face_index = b * num_channels * dimScale 
+                                            + 15* dimScale + h * output_width + w;
                 }
                 Dtype class_loss = SingleSoftmaxLoss(channel_pred_data[bg_index], channel_pred_data[face_index], Dtype(-1.));
                 batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
@@ -1189,8 +1189,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-                for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
-                    for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+                for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax + 1); h++){
+                    for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax + 1); w++){
                         #if 0
                         if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
                             continue;
