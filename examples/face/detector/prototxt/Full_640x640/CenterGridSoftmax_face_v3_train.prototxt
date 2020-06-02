@@ -3398,9 +3398,89 @@ layer {
   top: "Res_Sum_4_2"
 }
 layer {
+  name: "Dection_conv_out_128"
+  type: "Convolution"
+  bottom: "Res_Sum_1_2"
+  top: "Dection_conv_out_128"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Dection_conv_out_64"
+  type: "Convolution"
+  bottom: "Res_Sum_2_2"
+  top: "Dection_conv_out_64"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Dection_conv_out_32"
+  type: "Convolution"
+  bottom: "Res_Sum_3_4"
+  top: "Dection_conv_out_32"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Dection_conv_out_24"
+  type: "Convolution"
+  bottom: "Res_Sum_4_2"
+  top: "Dection_conv_out_24"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
   name: "CenterGridLoss_0"
   type: "CenterGridLoss"
-  bottom: "Res_Sum_1_2"
+  bottom: "Dection_conv_out_128"
   bottom: "label"
   top: "CenterGridLoss_0"
   include {
@@ -3428,7 +3508,7 @@ layer {
 layer {
   name: "CenterGridLoss_1"
   type: "CenterGridLoss"
-  bottom: "Res_Sum_2_2"
+  bottom: "Dection_conv_out_64"
   bottom: "label"
   top: "CenterGridLoss_1"
   include {
@@ -3456,7 +3536,7 @@ layer {
 layer {
   name: "CenterGridLoss_2"
   type: "CenterGridLoss"
-  bottom: "Res_Sum_3_4"
+  bottom: "Dection_conv_out_32"
   bottom: "label"
   top: "CenterGridLoss_2"
   include {
@@ -3484,7 +3564,7 @@ layer {
 layer {
   name: "CenterGridLoss_3"
   type: "CenterGridLoss"
-  bottom: "Res_Sum_4_2"
+  bottom: "Dection_conv_out_24"
   bottom: "label"
   top: "CenterGridLoss_3"
   include {

@@ -540,9 +540,17 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
                     num_output= detector_num, kernel_size= 1, pad= 0, stride= 1,
                     lr_mult=1, use_scale= False, use_global_stats= False)
             LayerList_Output.append(detection_conv_layer)
-        return net, LayerList_Output
     else:
-        return net, LayerList_Name
+
+        for index, detect_layer in enumerate(LayerList_Name):
+            ch_stage = LayerFilters[len(LayerFilters) - index - 1]
+            detection_conv_layer = "Dection_conv_out_{}".format(ch_stage)
+            ConvBNLayer(net, detect_layer, detection_conv_layer, use_bn= False, 
+                    use_swish= False, use_relu = False, 
+                    num_output= detector_num, kernel_size= 1, pad= 0, stride= 1,
+                    lr_mult=1, use_scale= False, use_global_stats= False)
+            LayerList_Output.append(detection_conv_layer)
+    return net, LayerList_Output
 
 
 def efficientNetBody(net, from_layer, width_coefficient, depth_coefficient, Use_BN = True, use_global_stats= False, 

@@ -3231,12 +3231,92 @@ layer {
   top: "Res_Sum_4_2"
 }
 layer {
+  name: "Dection_conv_out_128"
+  type: "Convolution"
+  bottom: "Res_Sum_1_2"
+  top: "Dection_conv_out_128"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Dection_conv_out_64"
+  type: "Convolution"
+  bottom: "Res_Sum_2_2"
+  top: "Dection_conv_out_64"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Dection_conv_out_32"
+  type: "Convolution"
+  bottom: "Res_Sum_3_4"
+  top: "Dection_conv_out_32"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Dection_conv_out_24"
+  type: "Convolution"
+  bottom: "Res_Sum_4_2"
+  top: "Dection_conv_out_24"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 6
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
   name: "detection_out"
   type: "CenterGridOutput"
-  bottom: "Res_Sum_1_2"
-  bottom: "Res_Sum_2_2"
-  bottom: "Res_Sum_3_4"
-  bottom: "Res_Sum_4_2"
+  bottom: "Dection_conv_out_128"
+  bottom: "Dection_conv_out_64"
+  bottom: "Dection_conv_out_32"
+  bottom: "Dection_conv_out_24"
   top: "detection_out"
   include {
     phase: TEST
