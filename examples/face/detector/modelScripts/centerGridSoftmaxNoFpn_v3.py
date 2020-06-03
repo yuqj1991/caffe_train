@@ -318,7 +318,12 @@ low_bbox_scale = [6, 35, 64, 128, 256, 480]
 up_bbox_scale = [35, 64,128, 256, 480, 630]
 from_layers = []
 for idx, detect_output in enumerate(LayerList_Output):
-    from_layers.append(net[detect_output])
+    Concat_List = []
+    Concat_List.append(net[detect_output[0]])
+    Concat_List.append(net[detect_output[1]])
+    Concat_name = "Detector_Result_{}".format(idx)
+    net[Concat_name] = L.Concat(*Concat_List, axis=1)
+    from_layers.append(net[Concat_name])
     from_layers.append(net.label)
     CenterGridObjectLoss(net=net, bias_scale= bias_scale[idx], 
                             low_bbox_scale= low_bbox_scale[idx], 
@@ -345,7 +350,12 @@ DetectListLayer = []
 DetectListScale = []
 DetectListDownRatio = []
 for idx, output in enumerate(LayerList_Output):
-    DetectListLayer.append(net[output])
+    Concat_List = []
+    Concat_List.append(net[output[0]])
+    Concat_List.append(net[output[1]])
+    Concat_name = "Detector_Result_{}".format(idx)
+    net[Concat_name] = L.Concat(*Concat_List, axis=1)
+    DetectListLayer.append(net[Concat_name])
     DetectListScale.append(bias_scale[idx])
     DetectListDownRatio.append(feature_stride[idx])
 CenterGridObjectDetect(net, from_layers= DetectListLayer, 
