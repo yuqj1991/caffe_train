@@ -411,10 +411,10 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
     assert from_layer in net.keys()
     index = 0
     accum_stride = 1
-    pre_stride = 1
     LayerList_Name = []
     LayerList_Output = []
     LayerFilters = []
+    moudle_output = []
     out_layer = "conv_{}".format(index)
     ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,
                 num_output= 32, kernel_size=3, pad=1, stride = 2, use_scale = True,
@@ -432,12 +432,14 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
                 out_layer = layer_name
                 pre_channels = c
                 strides = 1
+                moudle_output.append({"layer": out_layer, "stride": accum_stride})
                 for id in range(n - 1):
                     layer_name = MBottleConvBlock(net, out_layer, index, id + 1, c, strides, t, pre_channels, Use_BN = True, 
                                                         use_relu= True, use_swish= False,
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
                     pre_channels = c
+                    moudle_output.append({"layer": out_layer, "stride": accum_stride, "c": c})
             elif s == 1:
                 Project_Layer = out_layer
                 out_layer= "Conv_project_{}_{}".format(pre_channels, c)
@@ -452,100 +454,142 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
                                                         Use_scale = True, use_global_stats= use_global_stats, **bn_param)
                     out_layer = layer_name
                     pre_channels = c
+                    moudle_output.append({"layer": out_layer, "stride": accum_stride, "c": c})
         elif n == 1:
             assert s == 1
-            '''
-            Project_Layer = out_layer
-            out_layer= "Conv_project_{}_{}".format(pre_channels, c)
-            ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = False, 
-                        use_swish= False,
-                        num_output= c, kernel_size= 3, pad= 1, stride= 1,
-                        lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-            pre_channels = c
-            '''
             layer_name = MBottleConvBlock(net, out_layer, index, 0, c, s, t, pre_channels,  Use_BN = True, 
                                                         use_relu= True, use_swish= False,
                                                         Use_scale = True,use_global_stats= use_global_stats, **bn_param)
             pre_channels = c
             out_layer = layer_name
-        if accum_stride in feature_stride:
-            if accum_stride != pre_stride:
-                LayerList_Name.append(out_layer)
-                LayerFilters.append(c)
-            elif accum_stride == pre_stride:
-                LayerList_Name[len(LayerList_Name) - 1] = out_layer
-                LayerFilters[len(LayerFilters) - 1] = c
-            pre_stride = accum_stride
+            moudle_output.append({"layer": out_layer, "stride": accum_stride, "c": c})
         index += 1
+    parse_stride = []
+    num = 1
+    for id in range(1, len(feature_stride)):
+        if feature_stride[id - 1] != feature_stride[id]:
+            parse_stride.append({"stride": feature_stride[id - 1], "num": num})
+            num = 1
+            if(id == len(feature_stride) - 1):
+                parse_stride.append({"stride": feature_stride[id], "num": num})
+        else:
+            num += 1
+            if(id == len(feature_stride) - 1):
+                parse_stride.append({"stride": feature_stride[id], "num": num})
+    parse_out_stride = []
+    num = 1
+    for id in range(1, len(moudle_output)):
+        if moudle_output[id - 1]["stride"] != moudle_output[id]["stride"]:
+            parse_out_stride.append({"stride": moudle_output[id - 1]["stride"], "num": num, "idx": id - 1})
+            num = 1
+            if(id == len(moudle_output) - 1):
+                parse_out_stride.append({"stride": moudle_output[id]["stride"], "num": num, "idx": id})
+        else:
+            num += 1
+            if(id == len(moudle_output) - 1):
+                parse_out_stride.append({"stride": moudle_output[id]["stride"], "num": num, "idx": id})
+
+    for id in range(len(parse_stride)):
+        stride = parse_stride[id]['stride']
+        num = parse_stride[id]['num']
+        for _, out_stride in enumerate(parse_out_stride):
+            if stride == out_stride['stride']:
+                idx = out_stride['idx']
+                for index in range(idx + 1 - num,idx + 1):
+                    LayerList_Name.append(moudle_output[index]['layer'])
+                    LayerFilters.append(moudle_output[index]['c'])
+    print(LayerList_Name)
     assert len(LayerList_Name) == len(feature_stride)
     if Fpn:
         net_last_layer = net.keys()[-1]
-        out_layer = "conv_1_project/DepthWise"
-        ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
+        out_layer = "conv_1_project_{}/DepthWise".format(index)
+        ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True,
                     num_output= top_out_channels, kernel_size= 3, pad= 1, stride= 2, group= top_out_channels,
                     lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
         net_last_layer = out_layer
-        out_layer = "conv_1_project/linear"
-        ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True, 
+        out_layer = "conv_1_project_{}/linear".format(index)
+        ConvBNLayer(net, net_last_layer, out_layer, use_bn = True, use_relu = True,
                     num_output= 64, kernel_size= 1, pad= 0, stride= 1,
                     lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
-        
+        top_stride = feature_stride[len(feature_stride) - 1] * 2
         if biFpn:
             for idx, feature_layer in enumerate(LayerList_Name):
-                ConvLayer = "DepthWise_conv_{}_{}".format(idx, feature_layer)
+                ConvLayer = "DepthWise_biFpn_conv_{}_{}".format(idx, feature_layer)
                 channel_stage = LayerFilters[idx]
                 ConvBNLayer(net, feature_layer, ConvLayer, use_bn= True, use_relu = True, 
                     use_swish= False, group= channel_stage,
                     num_output= channel_stage, kernel_size= 3, pad= 1, stride= 1,
                     lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
-                PointLayer = "linear_conv_{}_{}".format(idx, feature_layer)
+                PointLayer = "linear_biFpn_conv_{}_{}".format(idx, feature_layer)
                 ConvBNLayer(net, ConvLayer, PointLayer, use_bn= True, use_relu = False, use_swish= False,
                     num_output= fpn_out_channels, kernel_size= 1, pad= 0, stride= 1,
                     lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
                 LayerList_Name[idx] = PointLayer
 
         for index in range(len(feature_stride)):
-            #Deconv_layer scale up 2x2_s2
-            channel_stage = LayerFilters[len(LayerFilters) - index - 1]
-            net_last_layer = out_layer
-            Reconnect_layer_one = "Deconv_Scale_Up_Stage_{}".format(channel_stage)
-            ConvBNLayer(net, net_last_layer, Reconnect_layer_one, use_bn= True, use_relu = False, 
-                num_output= fpn_out_channels, kernel_size= 2, pad= 0, stride= 2,
-                lr_mult=1, Use_DeConv= True, use_scale= True, use_global_stats= use_global_stats)
-            if biFpn:
-                if index != 3:
-                    Res_Layer_one = "FPN_con_{}".format(index)
-                    net_last_layer = LayerList_Name[len(feature_stride) - index - 2]
-                    ConvBNLayer(net, net_last_layer, Res_Layer_one, use_bn= True, 
-                        use_swish= False, use_relu = False, 
-                        num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 2,
-                        lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
-                    Res_Layer_two = LayerList_Name[len(feature_stride) - index - 1]
-                    _, Reconnect_layer_two = ResConnectBlock(net, Res_Layer_one, Res_Layer_two, index, use_relu=False, layerPrefix = "FPN_linear_".format(index))
-                else:
-                    Reconnect_layer_two= LayerList_Name[len(feature_stride) - index - 1]
-            else:
+            if index != (len(feature_stride) - 1) and top_stride == feature_stride[len(feature_stride) - index - 1]:
                 net_last_layer = LayerList_Name[len(feature_stride) - index - 1]
-                Reconnect_layer_two="conv_fpn_{}".format(channel_stage)
-                ConvBNLayer(net, net_last_layer, Reconnect_layer_two, use_bn= True, 
-                    use_swish= False, use_relu = False, 
-                    num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 1,
-                    lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
-                
-            # eltwise_sum layer
-            out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, channel_stage, use_relu=True, layerPrefix = "Resconnection")
-            detection_conv_layer = "Dection_conv_out_{}".format(channel_stage)
+                channel_stage = LayerFilters[len(LayerFilters) - index - 1]
+                Reconect_One = "ResOne_conv_3x3_out_{}_{}".format(channel_stage, index)
+                ConvBNLayer(net, net_last_layer, Reconect_One, use_bn= True, 
+                        use_swish= False, use_relu = False, 
+                        num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 1,
+                        lr_mult=1, use_scale= True, use_global_stats= False)
+                Reconect_Two = out_layer
+                out_layer, detect_layer = ResConnectBlock(net, Reconect_One, Reconect_Two, 
+                                                    channel_stage, use_relu=True, 
+                                                    layerPrefix = "ResNoFpn_{}_{}".format(channel_stage, index))
+            else: 
+                #Deconv_layer scale up 2x2_s2
+                channel_stage = LayerFilters[len(LayerFilters) - index - 1]
+                net_last_layer = out_layer
+                print("deconv layer: {}".format(net_last_layer))    
+                Reconnect_layer_one = "Deconv_Scale_Up_Stage_{}_{}".format(channel_stage, index)
+                ConvBNLayer(net, net_last_layer, Reconnect_layer_one, use_bn= True, use_relu = False,
+                        num_output= fpn_out_channels, kernel_size= 2, pad= 0, stride= 2,
+                        lr_mult=1, Use_DeConv= True, use_scale= True, use_global_stats= use_global_stats)
+                if biFpn:
+                    if index != len(feature_stride) - 1:
+                        Res_Layer_one = "biFpn_con_{}".format(index)
+                        net_last_layer = LayerList_Name[len(feature_stride) - index - 2]
+                        ConvBNLayer(net, net_last_layer, Res_Layer_one, use_bn= True, 
+                            use_swish= False, use_relu = False, 
+                            num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 2,
+                            lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
+                        Res_Layer_two = LayerList_Name[len(feature_stride) - index - 1]
+                        _, Reconnect_layer_two = ResConnectBlock(net, Res_Layer_one, Res_Layer_two, 
+                                    index, use_relu=False, layerPrefix = "biFpn_linear_{}".format(index))
+                    else:
+                        Reconnect_layer_two= LayerList_Name[len(feature_stride) - index - 1]
+                else:
+                    net_last_layer = LayerList_Name[len(feature_stride) - index - 1]
+                    Reconnect_layer_two="ConvFpn_{}_{}".format(channel_stage, index)
+                    ConvBNLayer(net, net_last_layer, Reconnect_layer_two, use_bn= True,
+                        use_swish= False, use_relu = False, 
+                        num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 1,
+                        lr_mult=1, use_scale= True, use_global_stats= use_global_stats)
+                print("Reconnect_layer_two: {}".format(net_last_layer))    
+                # eltwise_sum layer
+                out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, 
+                                                    channel_stage, use_relu=True, 
+                                                    layerPrefix = "Resconnection_{}_{}".format(channel_stage, index))
+            detection_conv_layer = "DetectionConv_out_{}_{}".format(channel_stage, index)
             ConvBNLayer(net, detect_layer, detection_conv_layer, use_bn= False, 
                     use_swish= False, use_relu = False, 
                     num_output= detector_num, kernel_size= 1, pad= 0, stride= 1,
                     lr_mult=1, use_scale= False, use_global_stats= False)
             LayerList_Output.append(detection_conv_layer)
+            top_stride = feature_stride[len(feature_stride) - index - 1]
     else:
-
         for index, detect_layer in enumerate(LayerList_Name):
-            ch_stage = LayerFilters[len(LayerFilters) - index - 1]
-            detection_conv_layer = "Dection_conv_out_{}".format(ch_stage)
-            ConvBNLayer(net, detect_layer, detection_conv_layer, use_bn= False, 
+            ch_stage = LayerFilters[index]
+            conv_out = "conv_3x3_out_{}_{}".format(ch_stage, index)
+            ConvBNLayer(net, detect_layer, conv_out, use_bn= True, 
+                    use_swish= False, use_relu = True, 
+                    num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 1,
+                    lr_mult=1, use_scale= True, use_global_stats= False)
+            detection_conv_layer = "detector_1x1_out_{}_{}".format(ch_stage, index)
+            ConvBNLayer(net, conv_out, detection_conv_layer, use_bn= False, 
                     use_swish= False, use_relu = False, 
                     num_output= detector_num, kernel_size= 1, pad= 0, stride= 1,
                     lr_mult=1, use_scale= False, use_global_stats= False)
