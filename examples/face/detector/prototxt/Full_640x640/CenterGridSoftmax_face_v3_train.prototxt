@@ -3961,12 +3961,12 @@ layer {
     num_class: 2
     share_location: true
     loc_weight: 1.0
-    bias_scale: 19.0
+    bias_scale: 512.0
     bias_num: 1
     net_width: 640
     net_height: 640
-    low_bbox_scale: 6
-    up_bbox_scale: 35
+    low_bbox_scale: 480
+    up_bbox_scale: 630
     class_type: SOFTMAX
     has_lm: false
   }
@@ -3977,90 +3977,6 @@ layer {
   bottom: "conv_1x1_out_128_1"
   bottom: "label"
   top: "CenterGridLoss_1"
-  include {
-    phase: TRAIN
-  }
-  propagate_down: true
-  propagate_down: false
-  loss_param {
-    normalization: BATCH_SIZE
-  }
-  center_object_loss_param {
-    num_class: 2
-    share_location: true
-    loc_weight: 1.0
-    bias_scale: 49.0
-    bias_num: 1
-    net_width: 640
-    net_height: 640
-    low_bbox_scale: 35
-    up_bbox_scale: 64
-    class_type: SOFTMAX
-    has_lm: false
-  }
-}
-layer {
-  name: "CenterGridLoss_2"
-  type: "CenterGridLoss"
-  bottom: "conv_1x1_out_64_2"
-  bottom: "label"
-  top: "CenterGridLoss_2"
-  include {
-    phase: TRAIN
-  }
-  propagate_down: true
-  propagate_down: false
-  loss_param {
-    normalization: BATCH_SIZE
-  }
-  center_object_loss_param {
-    num_class: 2
-    share_location: true
-    loc_weight: 1.0
-    bias_scale: 96.0
-    bias_num: 1
-    net_width: 640
-    net_height: 640
-    low_bbox_scale: 64
-    up_bbox_scale: 128
-    class_type: SOFTMAX
-    has_lm: false
-  }
-}
-layer {
-  name: "CenterGridLoss_3"
-  type: "CenterGridLoss"
-  bottom: "conv_1x1_out_64_3"
-  bottom: "label"
-  top: "CenterGridLoss_3"
-  include {
-    phase: TRAIN
-  }
-  propagate_down: true
-  propagate_down: false
-  loss_param {
-    normalization: BATCH_SIZE
-  }
-  center_object_loss_param {
-    num_class: 2
-    share_location: true
-    loc_weight: 1.0
-    bias_scale: 192.0
-    bias_num: 1
-    net_width: 640
-    net_height: 640
-    low_bbox_scale: 128
-    up_bbox_scale: 256
-    class_type: SOFTMAX
-    has_lm: false
-  }
-}
-layer {
-  name: "CenterGridLoss_4"
-  type: "CenterGridLoss"
-  bottom: "conv_1x1_out_32_4"
-  bottom: "label"
-  top: "CenterGridLoss_4"
   include {
     phase: TRAIN
   }
@@ -4084,6 +4000,90 @@ layer {
   }
 }
 layer {
+  name: "CenterGridLoss_2"
+  type: "CenterGridLoss"
+  bottom: "conv_1x1_out_64_2"
+  bottom: "label"
+  top: "CenterGridLoss_2"
+  include {
+    phase: TRAIN
+  }
+  propagate_down: true
+  propagate_down: false
+  loss_param {
+    normalization: BATCH_SIZE
+  }
+  center_object_loss_param {
+    num_class: 2
+    share_location: true
+    loc_weight: 1.0
+    bias_scale: 192.0
+    bias_num: 1
+    net_width: 640
+    net_height: 640
+    low_bbox_scale: 128
+    up_bbox_scale: 256
+    class_type: SOFTMAX
+    has_lm: false
+  }
+}
+layer {
+  name: "CenterGridLoss_3"
+  type: "CenterGridLoss"
+  bottom: "conv_1x1_out_64_3"
+  bottom: "label"
+  top: "CenterGridLoss_3"
+  include {
+    phase: TRAIN
+  }
+  propagate_down: true
+  propagate_down: false
+  loss_param {
+    normalization: BATCH_SIZE
+  }
+  center_object_loss_param {
+    num_class: 2
+    share_location: true
+    loc_weight: 1.0
+    bias_scale: 96.0
+    bias_num: 1
+    net_width: 640
+    net_height: 640
+    low_bbox_scale: 64
+    up_bbox_scale: 128
+    class_type: SOFTMAX
+    has_lm: false
+  }
+}
+layer {
+  name: "CenterGridLoss_4"
+  type: "CenterGridLoss"
+  bottom: "conv_1x1_out_32_4"
+  bottom: "label"
+  top: "CenterGridLoss_4"
+  include {
+    phase: TRAIN
+  }
+  propagate_down: true
+  propagate_down: false
+  loss_param {
+    normalization: BATCH_SIZE
+  }
+  center_object_loss_param {
+    num_class: 2
+    share_location: true
+    loc_weight: 1.0
+    bias_scale: 49.0
+    bias_num: 1
+    net_width: 640
+    net_height: 640
+    low_bbox_scale: 35
+    up_bbox_scale: 64
+    class_type: SOFTMAX
+    has_lm: false
+  }
+}
+layer {
   name: "CenterGridLoss_5"
   type: "CenterGridLoss"
   bottom: "conv_1x1_out_24_5"
@@ -4101,12 +4101,12 @@ layer {
     num_class: 2
     share_location: true
     loc_weight: 1.0
-    bias_scale: 512.0
+    bias_scale: 19.0
     bias_num: 1
     net_width: 640
     net_height: 640
-    low_bbox_scale: 480
-    up_bbox_scale: 630
+    low_bbox_scale: 6
+    up_bbox_scale: 35
     class_type: SOFTMAX
     has_lm: false
   }
