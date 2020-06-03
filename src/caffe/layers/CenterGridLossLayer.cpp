@@ -106,7 +106,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     Dtype * bottom_diff = bottom[0]->mutable_cpu_diff();
 
     std::vector<int> postive_batch_(num_, 0);
-    //计算每个样本的总损失（loc loss + softmax loss
+    //计算每个样本的总损失（loc loss + softmax loss)
     std::vector<Dtype> batch_sample_loss_(num_ * output_height * output_width, Dtype(-1.));
     std::vector<int> mask_Rf_anchor_(output_height * output_width, 0);
 

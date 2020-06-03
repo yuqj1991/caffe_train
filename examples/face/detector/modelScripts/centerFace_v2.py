@@ -290,11 +290,20 @@ solver_param = {
     'test_initialization': False,
 }
 
+'''
 Inverted_residual_setting = [[1, 16, 1, 1],
                              [6, 24, 3, 2],
                              [6, 32, 3, 2],
                              [6, 64, 5, 2],
                              [6, 128, 3, 2]]
+'''
+Inverted_residual_setting = [[1, 16, 1, 1],
+                                 [6, 24, 2, 2],
+                                 [6, 32, 3, 2],
+                                 [6, 64, 4, 2],
+                                 [6, 96, 3, 1],
+                                 [6, 160, 3, 2],
+                                 [6, 320, 1, 1]]
 use_branch= False
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)

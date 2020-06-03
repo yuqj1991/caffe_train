@@ -211,7 +211,7 @@ def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = 
 
 def CenterFaceObjectDetect(net, from_layers = [],  num_classes = 2,
                            keep_top_k = 200, nms_thresh = 0.3,
-                           share_location = True, confidence_threshold = 0.15,
+                           share_location = True, confidence_threshold = 0.05,
                            has_lm = False):
     det_out_param = {
         'num_classes': num_classes,
