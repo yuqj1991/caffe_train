@@ -3961,7 +3961,7 @@ layer {
     num_class: 2
     share_location: true
     loc_weight: 1.0
-    bias_scale: 500.0
+    bias_scale: 512.0
     bias_num: 1
     net_width: 640
     net_height: 640
