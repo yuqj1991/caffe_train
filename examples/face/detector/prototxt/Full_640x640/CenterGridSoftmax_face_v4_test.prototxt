@@ -3520,16 +3520,36 @@ layer {
   top: "Resconnection_128_0_stage_128"
 }
 layer {
-  name: "DetectionConv_out_128_0"
+  name: "DetectionBoxConv_out_128_0"
   type: "Convolution"
   bottom: "Resconnection_128_0_stage_128"
-  top: "DetectionConv_out_128_0"
+  top: "DetectionBoxConv_out_128_0"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 14
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "DetectionClsConv_out_128_0"
+  type: "Convolution"
+  bottom: "Resconnection_128_0_stage_128"
+  top: "DetectionClsConv_out_128_0"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 2
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3621,16 +3641,36 @@ layer {
   top: "ResNoFpn_128_1_stage_128"
 }
 layer {
-  name: "DetectionConv_out_128_1"
+  name: "DetectionBoxConv_out_128_1"
   type: "Convolution"
   bottom: "ResNoFpn_128_1_stage_128"
-  top: "DetectionConv_out_128_1"
+  top: "DetectionBoxConv_out_128_1"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 14
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "DetectionClsConv_out_128_1"
+  type: "Convolution"
+  bottom: "ResNoFpn_128_1_stage_128"
+  top: "DetectionClsConv_out_128_1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 2
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3787,16 +3827,36 @@ layer {
   top: "Resconnection_64_2_stage_64"
 }
 layer {
-  name: "DetectionConv_out_64_2"
+  name: "DetectionBoxConv_out_64_2"
   type: "Convolution"
   bottom: "Resconnection_64_2_stage_64"
-  top: "DetectionConv_out_64_2"
+  top: "DetectionBoxConv_out_64_2"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 14
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "DetectionClsConv_out_64_2"
+  type: "Convolution"
+  bottom: "Resconnection_64_2_stage_64"
+  top: "DetectionClsConv_out_64_2"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 2
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3888,16 +3948,36 @@ layer {
   top: "ResNoFpn_64_3_stage_64"
 }
 layer {
-  name: "DetectionConv_out_64_3"
+  name: "DetectionBoxConv_out_64_3"
   type: "Convolution"
   bottom: "ResNoFpn_64_3_stage_64"
-  top: "DetectionConv_out_64_3"
+  top: "DetectionBoxConv_out_64_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 14
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "DetectionClsConv_out_64_3"
+  type: "Convolution"
+  bottom: "ResNoFpn_64_3_stage_64"
+  top: "DetectionClsConv_out_64_3"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 2
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4054,16 +4134,36 @@ layer {
   top: "Resconnection_32_4_stage_32"
 }
 layer {
-  name: "DetectionConv_out_32_4"
+  name: "DetectionBoxConv_out_32_4"
   type: "Convolution"
   bottom: "Resconnection_32_4_stage_32"
-  top: "DetectionConv_out_32_4"
+  top: "DetectionBoxConv_out_32_4"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 14
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "DetectionClsConv_out_32_4"
+  type: "Convolution"
+  bottom: "Resconnection_32_4_stage_32"
+  top: "DetectionClsConv_out_32_4"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 2
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4220,16 +4320,16 @@ layer {
   top: "Resconnection_24_5_stage_24"
 }
 layer {
-  name: "DetectionConv_out_24_5"
+  name: "DetectionBoxConv_out_24_5"
   type: "Convolution"
   bottom: "Resconnection_24_5_stage_24"
-  top: "DetectionConv_out_24_5"
+  top: "DetectionBoxConv_out_24_5"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 14
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4240,14 +4340,94 @@ layer {
   }
 }
 layer {
+  name: "DetectionClsConv_out_24_5"
+  type: "Convolution"
+  bottom: "Resconnection_24_5_stage_24"
+  top: "DetectionClsConv_out_24_5"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 2
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Detector_Result_0"
+  type: "Concat"
+  bottom: "DetectionBoxConv_out_128_0"
+  bottom: "DetectionClsConv_out_128_0"
+  top: "Detector_Result_0"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "Detector_Result_1"
+  type: "Concat"
+  bottom: "DetectionBoxConv_out_128_1"
+  bottom: "DetectionClsConv_out_128_1"
+  top: "Detector_Result_1"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "Detector_Result_2"
+  type: "Concat"
+  bottom: "DetectionBoxConv_out_64_2"
+  bottom: "DetectionClsConv_out_64_2"
+  top: "Detector_Result_2"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "Detector_Result_3"
+  type: "Concat"
+  bottom: "DetectionBoxConv_out_64_3"
+  bottom: "DetectionClsConv_out_64_3"
+  top: "Detector_Result_3"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "Detector_Result_4"
+  type: "Concat"
+  bottom: "DetectionBoxConv_out_32_4"
+  bottom: "DetectionClsConv_out_32_4"
+  top: "Detector_Result_4"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "Detector_Result_5"
+  type: "Concat"
+  bottom: "DetectionBoxConv_out_24_5"
+  bottom: "DetectionClsConv_out_24_5"
+  top: "Detector_Result_5"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
   name: "detection_out"
   type: "CenterGridOutput"
-  bottom: "DetectionConv_out_128_0"
-  bottom: "DetectionConv_out_128_1"
-  bottom: "DetectionConv_out_64_2"
-  bottom: "DetectionConv_out_64_3"
-  bottom: "DetectionConv_out_32_4"
-  bottom: "DetectionConv_out_24_5"
+  bottom: "Detector_Result_0"
+  bottom: "Detector_Result_1"
+  bottom: "Detector_Result_2"
+  bottom: "Detector_Result_3"
+  bottom: "Detector_Result_4"
+  bottom: "Detector_Result_5"
   top: "detection_out"
   include {
     phase: TEST

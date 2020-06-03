@@ -407,7 +407,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
                                  feature_stride = [4, 8, 16, 32],
                                  Fpn= True, biFpn = True, fpn_out_channels = 24,
                                  top_out_channels = 320,
-                                 detector_num = 6, **bn_param):
+                                 detector_num = 6, num_class = 2, **bn_param):
     assert from_layer in net.keys()
     index = 0
     accum_stride = 1
@@ -573,12 +573,17 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
                 out_layer, detect_layer = ResConnectBlock(net, Reconnect_layer_one, Reconnect_layer_two, 
                                                     channel_stage, use_relu=True, 
                                                     layerPrefix = "Resconnection_{}_{}".format(channel_stage, index))
-            detection_conv_layer = "DetectionConv_out_{}_{}".format(channel_stage, index)
-            ConvBNLayer(net, detect_layer, detection_conv_layer, use_bn= False, 
+            detection_box_conv_layer = "DetectionBoxConv_out_{}_{}".format(channel_stage, index)
+            ConvBNLayer(net, detect_layer, detection_box_conv_layer, use_bn= False, 
                     use_swish= False, use_relu = False, 
-                    num_output= detector_num, kernel_size= 1, pad= 0, stride= 1,
+                    num_output= detector_num - num_class, kernel_size= 1, pad= 0, stride= 1,
                     lr_mult=1, use_scale= False, use_global_stats= False)
-            LayerList_Output.append(detection_conv_layer)
+            detection_cls_conv_layer = "DetectionClsConv_out_{}_{}".format(channel_stage, index)
+            ConvBNLayer(net, detect_layer, detection_cls_conv_layer, use_bn= False, 
+                    use_swish= False, use_relu = False, 
+                    num_output= num_class, kernel_size= 1, pad= 0, stride= 1,
+                    lr_mult=1, use_scale= False, use_global_stats= False)
+            LayerList_Output.append((detection_box_conv_layer, detection_cls_conv_layer))
             top_stride = feature_stride[len(feature_stride) - index - 1]
     else:
         for index, detect_layer in enumerate(LayerList_Name):
@@ -588,12 +593,17 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
                     use_swish= False, use_relu = True, 
                     num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 1,
                     lr_mult=1, use_scale= True, use_global_stats= False)
-            detection_conv_layer = "detector_1x1_out_{}_{}".format(ch_stage, index)
-            ConvBNLayer(net, conv_out, detection_conv_layer, use_bn= False, 
+            detectionBox_conv_layer = "Det_Box_1x1_out_{}_{}".format(ch_stage, index)
+            ConvBNLayer(net, conv_out, detectionBox_conv_layer, use_bn= False, 
                     use_swish= False, use_relu = False, 
-                    num_output= detector_num, kernel_size= 1, pad= 0, stride= 1,
+                    num_output= detector_num - num_class, kernel_size= 1, pad= 0, stride= 1,
                     lr_mult=1, use_scale= False, use_global_stats= False)
-            LayerList_Output.append(detection_conv_layer)
+            detection_cls_conv_layer = "Det_Cls_1x1_out_{}_{}".format(ch_stage, index)
+            ConvBNLayer(net, conv_out, detection_cls_conv_layer, use_bn= False, 
+                    use_swish= False, use_relu = False, 
+                    num_output= num_class, kernel_size= 1, pad= 0, stride= 1,
+                    lr_mult=1, use_scale= False, use_global_stats= False)
+            LayerList_Output.append((detectionBox_conv_layer, detection_cls_conv_layer))
     return net, LayerList_Output
 
 
