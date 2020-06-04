@@ -21,11 +21,9 @@ layer {
     }
   }
   annotated_data_param {
-    batch_sampler {
-    }
     label_map_file: "../labelmap.prototxt"
     yoloformat: false
-    crop_type: CROP_BATCH
+    crop_type: CROP_JITTER
     has_landmarks: true
   }
   data_param {
