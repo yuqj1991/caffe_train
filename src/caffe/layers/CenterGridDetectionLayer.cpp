@@ -58,8 +58,6 @@ void CenterGridOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
         top[0]->Reshape(top_shape);
     }else{
         CHECK_GE(bottom[0]->channels(), 4 + num_classes_);
-        // Each row is a 7 dimension vector, which stores
-        // [image_id, label, confidence, xmin, ymin, xmax, ymax]
         top_shape.push_back(7);
         top[0]->Reshape(top_shape);
     }
@@ -122,7 +120,10 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
     }
     vector<int> top_shape(2, 1);
     top_shape.push_back(num_kept);
-    top_shape.push_back(7);
+    if(has_lm_)
+        top_shape.push_back(17);
+    else
+        top_shape.push_back(7);
     Dtype* top_data;
     if (num_kept == 0) {
         top_shape[2] = num_;
@@ -132,7 +133,10 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
         // Generate fake results per image.
         for (int i = 0; i < num_; ++i) {
             top_data[0] = i;
-            top_data += 7;
+            if(has_lm_)
+                top_data += 17;
+            else
+                top_data += 7;
         }
     } else {
         top[0]->Reshape(top_shape);
