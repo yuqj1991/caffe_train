@@ -1245,64 +1245,70 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         bottom_diff[xmax_index] = xmax_diff;
                         bottom_diff[ymax_index] = ymax_diff;
                         if(has_lm){
-                            int le_x_index = b * num_channels * dimScale + 4* dimScale + h * output_width + w;
-                            int le_y_index = b * num_channels * dimScale + 5* dimScale + h * output_width + w;
-                            int re_x_index = b * num_channels * dimScale + 6* dimScale + h * output_width + w;
-                            int re_y_index = b * num_channels * dimScale + 7* dimScale + h * output_width + w;
-                            int no_x_index = b * num_channels * dimScale + 8* dimScale + h * output_width + w;
-                            int no_y_index = b * num_channels * dimScale + 9* dimScale + h * output_width + w;
-                            int lm_x_index = b * num_channels * dimScale + 10* dimScale + h * output_width + w;
-                            int lm_y_index = b * num_channels * dimScale + 11* dimScale + h * output_width + w;
-                            int rm_x_index = b * num_channels * dimScale + 12* dimScale + h * output_width + w;
-                            int rm_y_index = b * num_channels * dimScale + 13* dimScale + h * output_width + w;
+                            if(gt_bboxes[ii].second.lefteye().x() > 0 && gt_bboxes[ii].second.lefteye().y() > 0 &&
+                            gt_bboxes[ii].second.righteye().x() > 0 && gt_bboxes[ii].second.righteye().y() > 0 && 
+                            gt_bboxes[ii].second.nose().x() > 0 && gt_bboxes[ii].second.nose().y() > 0 &&
+                            gt_bboxes[ii].second.leftmouth().x() > 0 && gt_bboxes[ii].second.leftmouth().y() > 0 &&
+                            gt_bboxes[ii].second.rightmouth().x() > 0 && gt_bboxes[ii].second.rightmouth().y() > 0){
+                                int le_x_index = b * num_channels * dimScale + 4* dimScale + h * output_width + w;
+                                int le_y_index = b * num_channels * dimScale + 5* dimScale + h * output_width + w;
+                                int re_x_index = b * num_channels * dimScale + 6* dimScale + h * output_width + w;
+                                int re_y_index = b * num_channels * dimScale + 7* dimScale + h * output_width + w;
+                                int no_x_index = b * num_channels * dimScale + 8* dimScale + h * output_width + w;
+                                int no_y_index = b * num_channels * dimScale + 9* dimScale + h * output_width + w;
+                                int lm_x_index = b * num_channels * dimScale + 10* dimScale + h * output_width + w;
+                                int lm_y_index = b * num_channels * dimScale + 11* dimScale + h * output_width + w;
+                                int rm_x_index = b * num_channels * dimScale + 12* dimScale + h * output_width + w;
+                                int rm_y_index = b * num_channels * dimScale + 13* dimScale + h * output_width + w;
 
-                            Dtype le_x_bias = (w - gt_bboxes[ii].second.lefteye().x() * output_width) * downRatio * 2 / anchor_scale;
-                            Dtype le_y_bias = (h - gt_bboxes[ii].second.lefteye().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype le_x_bias = (w - gt_bboxes[ii].second.lefteye().x() * output_width) * downRatio * 2 / anchor_scale;
+                                Dtype le_y_bias = (h - gt_bboxes[ii].second.lefteye().y() * output_height) * downRatio * 2 / anchor_scale;
 
-                            Dtype re_x_bias = (w - gt_bboxes[ii].second.righteye().x() * output_width) * downRatio * 2 / anchor_scale;
-                            Dtype re_y_bias = (h - gt_bboxes[ii].second.righteye().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype re_x_bias = (w - gt_bboxes[ii].second.righteye().x() * output_width) * downRatio * 2 / anchor_scale;
+                                Dtype re_y_bias = (h - gt_bboxes[ii].second.righteye().y() * output_height) * downRatio * 2 / anchor_scale;
 
-                            Dtype no_x_bias = (w - gt_bboxes[ii].second.nose().x() * output_width) * downRatio * 2 / anchor_scale;
-                            Dtype no_y_bias = (h - gt_bboxes[ii].second.nose().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype no_x_bias = (w - gt_bboxes[ii].second.nose().x() * output_width) * downRatio * 2 / anchor_scale;
+                                Dtype no_y_bias = (h - gt_bboxes[ii].second.nose().y() * output_height) * downRatio * 2 / anchor_scale;
 
-                            Dtype lm_x_bias = (w - gt_bboxes[ii].second.leftmouth().x() * output_width) * downRatio * 2 / anchor_scale;
-                            Dtype lm_y_bias = (h - gt_bboxes[ii].second.leftmouth().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype lm_x_bias = (w - gt_bboxes[ii].second.leftmouth().x() * output_width) * downRatio * 2 / anchor_scale;
+                                Dtype lm_y_bias = (h - gt_bboxes[ii].second.leftmouth().y() * output_height) * downRatio * 2 / anchor_scale;
 
-                            Dtype rm_x_bias = (w - gt_bboxes[ii].second.rightmouth().x() * output_width) * downRatio * 2 / anchor_scale;
-                            Dtype rm_y_bias = (h - gt_bboxes[ii].second.rightmouth().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype rm_x_bias = (w - gt_bboxes[ii].second.rightmouth().x() * output_width) * downRatio * 2 / anchor_scale;
+                                Dtype rm_y_bias = (h - gt_bboxes[ii].second.rightmouth().y() * output_height) * downRatio * 2 / anchor_scale;
 
-                            Dtype le_x_diff, le_y_diff, re_x_diff, re_y_diff, no_x_diff, no_y_diff, lm_x_diff, lm_y_diff, rm_x_diff, rm_y_diff;
-                            Dtype le_x_loss, le_y_loss, re_x_loss, re_y_loss, no_x_loss, no_y_loss, lm_x_loss, lm_y_loss, rm_x_loss, rm_y_loss;
+                                Dtype le_x_diff, le_y_diff, re_x_diff, re_y_diff, no_x_diff, no_y_diff, lm_x_diff, lm_y_diff, rm_x_diff, rm_y_diff;
+                                Dtype le_x_loss, le_y_loss, re_x_loss, re_y_loss, no_x_loss, no_y_loss, lm_x_loss, lm_y_loss, rm_x_loss, rm_y_loss;
 
-                            le_x_loss = L2_Loss(Dtype(channel_pred_data[le_x_index] - le_x_bias), &le_x_diff);
-                            le_y_loss = L2_Loss(Dtype(channel_pred_data[le_y_index] - le_y_bias), &le_y_diff);
+                                le_x_loss = L2_Loss(Dtype(channel_pred_data[le_x_index] - le_x_bias), &le_x_diff);
+                                le_y_loss = L2_Loss(Dtype(channel_pred_data[le_y_index] - le_y_bias), &le_y_diff);
 
-                            re_x_loss = L2_Loss(Dtype(channel_pred_data[re_x_index] - re_x_bias), &re_x_diff);
-                            re_y_loss = L2_Loss(Dtype(channel_pred_data[re_y_index] - re_y_bias), &re_y_diff);
+                                re_x_loss = L2_Loss(Dtype(channel_pred_data[re_x_index] - re_x_bias), &re_x_diff);
+                                re_y_loss = L2_Loss(Dtype(channel_pred_data[re_y_index] - re_y_bias), &re_y_diff);
 
-                            no_x_loss = L2_Loss(Dtype(channel_pred_data[no_x_index] - no_x_bias), &no_x_diff);
-                            no_y_loss = L2_Loss(Dtype(channel_pred_data[no_y_index] - no_y_bias), &no_y_diff);
+                                no_x_loss = L2_Loss(Dtype(channel_pred_data[no_x_index] - no_x_bias), &no_x_diff);
+                                no_y_loss = L2_Loss(Dtype(channel_pred_data[no_y_index] - no_y_bias), &no_y_diff);
 
-                            lm_x_loss = L2_Loss(Dtype(channel_pred_data[lm_x_index] - lm_x_bias), &lm_x_diff);
-                            lm_y_loss = L2_Loss(Dtype(channel_pred_data[lm_y_index] - lm_y_bias), &lm_y_diff);
+                                lm_x_loss = L2_Loss(Dtype(channel_pred_data[lm_x_index] - lm_x_bias), &lm_x_diff);
+                                lm_y_loss = L2_Loss(Dtype(channel_pred_data[lm_y_index] - lm_y_bias), &lm_y_diff);
 
-                            rm_x_loss = L2_Loss(Dtype(channel_pred_data[rm_x_index] - rm_x_bias), &rm_x_diff);
-                            rm_y_loss = L2_Loss(Dtype(channel_pred_data[rm_y_index] - rm_y_bias), &rm_y_diff);
+                                rm_x_loss = L2_Loss(Dtype(channel_pred_data[rm_x_index] - rm_x_bias), &rm_x_diff);
+                                rm_y_loss = L2_Loss(Dtype(channel_pred_data[rm_y_index] - rm_y_bias), &rm_y_diff);
 
-                            lm_loss += (le_x_loss + le_y_loss + re_x_loss + re_y_loss
-                                            + no_x_loss + no_y_loss + lm_x_loss + lm_y_loss
-                                            + rm_x_loss + rm_y_loss);
+                                lm_loss += (le_x_loss + le_y_loss + re_x_loss + re_y_loss
+                                                + no_x_loss + no_y_loss + lm_x_loss + lm_y_loss
+                                                + rm_x_loss + rm_y_loss);
 
-                            bottom_diff[le_x_index] = le_x_diff;
-                            bottom_diff[le_y_index] = le_y_diff;
-                            bottom_diff[re_x_index] = re_x_diff;
-                            bottom_diff[re_y_index] = re_y_diff;
-                            bottom_diff[no_x_index] = no_x_diff;
-                            bottom_diff[no_y_index] = no_y_diff;
-                            bottom_diff[lm_x_index] = lm_x_diff;
-                            bottom_diff[lm_y_index] = lm_y_diff;
-                            bottom_diff[rm_x_index] = rm_x_diff;
-                            bottom_diff[rm_y_index] = rm_y_diff;
+                                bottom_diff[le_x_index] = le_x_diff;
+                                bottom_diff[le_y_index] = le_y_diff;
+                                bottom_diff[re_x_index] = re_x_diff;
+                                bottom_diff[re_y_index] = re_y_diff;
+                                bottom_diff[no_x_index] = no_x_diff;
+                                bottom_diff[no_y_index] = no_y_diff;
+                                bottom_diff[lm_x_index] = lm_x_diff;
+                                bottom_diff[lm_y_index] = lm_y_diff;
+                                bottom_diff[rm_x_index] = rm_x_diff;
+                                bottom_diff[rm_y_index] = rm_y_diff;
+                            }
                         }
                         class_label[class_index] = 1;
                         mask_Rf_anchor[h * output_width + w] = 1;
