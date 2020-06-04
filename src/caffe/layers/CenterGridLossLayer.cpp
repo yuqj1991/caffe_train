@@ -85,6 +85,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_, has_lm_,
                     &all_gt_bboxes, num_);
     num_groundtruth_ = 0;
+    num_lm_ = 0;
     for(int i = 0; i < all_gt_bboxes.size(); i++){
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_boxes = all_gt_bboxes[i];
         num_groundtruth_ += gt_boxes.size();

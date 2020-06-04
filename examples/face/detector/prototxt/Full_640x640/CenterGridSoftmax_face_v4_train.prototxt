@@ -3687,36 +3687,16 @@ layer {
   top: "Resconnection_128_0_stage_128"
 }
 layer {
-  name: "DetectionBoxConv_out_128_0"
+  name: "Det_1x1_out_128_0"
   type: "Convolution"
   bottom: "Resconnection_128_0_stage_128"
-  top: "DetectionBoxConv_out_128_0"
+  top: "Det_1x1_out_128_0"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 14
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "DetectionClsConv_out_128_0"
-  type: "Convolution"
-  bottom: "Resconnection_128_0_stage_128"
-  top: "DetectionClsConv_out_128_0"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 2
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3808,36 +3788,16 @@ layer {
   top: "ResNoFpn_128_1_stage_128"
 }
 layer {
-  name: "DetectionBoxConv_out_128_1"
+  name: "Det_1x1_out_128_1"
   type: "Convolution"
   bottom: "ResNoFpn_128_1_stage_128"
-  top: "DetectionBoxConv_out_128_1"
+  top: "Det_1x1_out_128_1"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 14
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "DetectionClsConv_out_128_1"
-  type: "Convolution"
-  bottom: "ResNoFpn_128_1_stage_128"
-  top: "DetectionClsConv_out_128_1"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 2
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3994,36 +3954,16 @@ layer {
   top: "Resconnection_64_2_stage_64"
 }
 layer {
-  name: "DetectionBoxConv_out_64_2"
+  name: "Det_1x1_out_64_2"
   type: "Convolution"
   bottom: "Resconnection_64_2_stage_64"
-  top: "DetectionBoxConv_out_64_2"
+  top: "Det_1x1_out_64_2"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 14
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "DetectionClsConv_out_64_2"
-  type: "Convolution"
-  bottom: "Resconnection_64_2_stage_64"
-  top: "DetectionClsConv_out_64_2"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 2
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4115,36 +4055,16 @@ layer {
   top: "ResNoFpn_64_3_stage_64"
 }
 layer {
-  name: "DetectionBoxConv_out_64_3"
+  name: "Det_1x1_out_64_3"
   type: "Convolution"
   bottom: "ResNoFpn_64_3_stage_64"
-  top: "DetectionBoxConv_out_64_3"
+  top: "Det_1x1_out_64_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 14
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "DetectionClsConv_out_64_3"
-  type: "Convolution"
-  bottom: "ResNoFpn_64_3_stage_64"
-  top: "DetectionClsConv_out_64_3"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 2
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4301,36 +4221,16 @@ layer {
   top: "Resconnection_32_4_stage_32"
 }
 layer {
-  name: "DetectionBoxConv_out_32_4"
+  name: "Det_1x1_out_32_4"
   type: "Convolution"
   bottom: "Resconnection_32_4_stage_32"
-  top: "DetectionBoxConv_out_32_4"
+  top: "Det_1x1_out_32_4"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 14
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "DetectionClsConv_out_32_4"
-  type: "Convolution"
-  bottom: "Resconnection_32_4_stage_32"
-  top: "DetectionClsConv_out_32_4"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 2
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4487,16 +4387,16 @@ layer {
   top: "Resconnection_24_5_stage_24"
 }
 layer {
-  name: "DetectionBoxConv_out_24_5"
+  name: "Det_1x1_out_24_5"
   type: "Convolution"
   bottom: "Resconnection_24_5_stage_24"
-  top: "DetectionBoxConv_out_24_5"
+  top: "Det_1x1_out_24_5"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 14
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4504,42 +4404,12 @@ layer {
     weight_filler {
       type: "msra"
     }
-  }
-}
-layer {
-  name: "DetectionClsConv_out_24_5"
-  type: "Convolution"
-  bottom: "Resconnection_24_5_stage_24"
-  top: "DetectionClsConv_out_24_5"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 2
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "Detector_Result_0"
-  type: "Concat"
-  bottom: "DetectionBoxConv_out_128_0"
-  bottom: "DetectionClsConv_out_128_0"
-  top: "Detector_Result_0"
-  concat_param {
-    axis: 1
   }
 }
 layer {
   name: "CenterGridLoss_0"
   type: "CenterGridLoss"
-  bottom: "Detector_Result_0"
+  bottom: "Det_1x1_out_128_0"
   bottom: "label"
   top: "CenterGridLoss_0"
   include {
@@ -4548,7 +4418,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2
@@ -4565,19 +4435,9 @@ layer {
   }
 }
 layer {
-  name: "Detector_Result_1"
-  type: "Concat"
-  bottom: "DetectionBoxConv_out_128_1"
-  bottom: "DetectionClsConv_out_128_1"
-  top: "Detector_Result_1"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
   name: "CenterGridLoss_1"
   type: "CenterGridLoss"
-  bottom: "Detector_Result_1"
+  bottom: "Det_1x1_out_128_1"
   bottom: "label"
   top: "CenterGridLoss_1"
   include {
@@ -4586,7 +4446,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2
@@ -4603,19 +4463,9 @@ layer {
   }
 }
 layer {
-  name: "Detector_Result_2"
-  type: "Concat"
-  bottom: "DetectionBoxConv_out_64_2"
-  bottom: "DetectionClsConv_out_64_2"
-  top: "Detector_Result_2"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
   name: "CenterGridLoss_2"
   type: "CenterGridLoss"
-  bottom: "Detector_Result_2"
+  bottom: "Det_1x1_out_64_2"
   bottom: "label"
   top: "CenterGridLoss_2"
   include {
@@ -4624,7 +4474,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2
@@ -4641,19 +4491,9 @@ layer {
   }
 }
 layer {
-  name: "Detector_Result_3"
-  type: "Concat"
-  bottom: "DetectionBoxConv_out_64_3"
-  bottom: "DetectionClsConv_out_64_3"
-  top: "Detector_Result_3"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
   name: "CenterGridLoss_3"
   type: "CenterGridLoss"
-  bottom: "Detector_Result_3"
+  bottom: "Det_1x1_out_64_3"
   bottom: "label"
   top: "CenterGridLoss_3"
   include {
@@ -4662,7 +4502,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2
@@ -4679,19 +4519,9 @@ layer {
   }
 }
 layer {
-  name: "Detector_Result_4"
-  type: "Concat"
-  bottom: "DetectionBoxConv_out_32_4"
-  bottom: "DetectionClsConv_out_32_4"
-  top: "Detector_Result_4"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
   name: "CenterGridLoss_4"
   type: "CenterGridLoss"
-  bottom: "Detector_Result_4"
+  bottom: "Det_1x1_out_32_4"
   bottom: "label"
   top: "CenterGridLoss_4"
   include {
@@ -4700,7 +4530,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2
@@ -4717,19 +4547,9 @@ layer {
   }
 }
 layer {
-  name: "Detector_Result_5"
-  type: "Concat"
-  bottom: "DetectionBoxConv_out_24_5"
-  bottom: "DetectionClsConv_out_24_5"
-  top: "Detector_Result_5"
-  concat_param {
-    axis: 1
-  }
-}
-layer {
   name: "CenterGridLoss_5"
   type: "CenterGridLoss"
-  bottom: "Detector_Result_5"
+  bottom: "Det_1x1_out_24_5"
   bottom: "label"
   top: "CenterGridLoss_5"
   include {
@@ -4738,7 +4558,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: BATCH_SIZE
+    normalization: VALID
   }
   center_object_loss_param {
     num_class: 2
