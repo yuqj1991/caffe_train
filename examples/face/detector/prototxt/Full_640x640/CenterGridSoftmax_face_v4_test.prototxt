@@ -4286,7 +4286,7 @@ layer {
     background_label_id: 0
     overlap_threshold: 0.15000000596046448
     evaluate_difficult_gt: false
-    has_lm: true
+    has_lm: false
   }
 }
 
