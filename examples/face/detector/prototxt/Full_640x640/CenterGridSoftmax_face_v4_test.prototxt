@@ -24,10 +24,10 @@ layer {
     label_map_file: "../labelmap.prototxt"
     yoloformat: false
     crop_type: CROP_JITTER
-    has_landmarks: true
+    has_landmarks: false
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lm_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
     batch_size: 1
     backend: LMDB
   }
@@ -4269,7 +4269,7 @@ layer {
     down_ratio: 4
     nms_thresh: 0.30000001192092896
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {

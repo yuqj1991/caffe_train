@@ -4243,7 +4243,7 @@ layer {
     down_ratio: 4
     nms_thresh: 0.30000001192092896
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 

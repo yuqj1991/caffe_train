@@ -193,10 +193,10 @@ layer {
     }
     yoloformat: true
     crop_type: CROP_JITTER
-    has_landmarks: true
+    has_landmarks: false
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
     batch_size: 8
     backend: LMDB
   }
@@ -4418,7 +4418,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4431,7 +4431,7 @@ layer {
     low_bbox_scale: 480
     up_bbox_scale: 630
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {
@@ -4446,7 +4446,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4459,7 +4459,7 @@ layer {
     low_bbox_scale: 256
     up_bbox_scale: 480
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {
@@ -4474,7 +4474,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4487,7 +4487,7 @@ layer {
     low_bbox_scale: 128
     up_bbox_scale: 256
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {
@@ -4502,7 +4502,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4515,7 +4515,7 @@ layer {
     low_bbox_scale: 64
     up_bbox_scale: 128
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {
@@ -4530,7 +4530,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4543,7 +4543,7 @@ layer {
     low_bbox_scale: 35
     up_bbox_scale: 64
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {
@@ -4558,7 +4558,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4571,7 +4571,7 @@ layer {
     low_bbox_scale: 6
     up_bbox_scale: 35
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 
