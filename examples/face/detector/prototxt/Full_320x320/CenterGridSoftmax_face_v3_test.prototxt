@@ -27,7 +27,7 @@ layer {
     has_landmarks: false
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face_32/lmdb/wider_face_wider_val_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
     batch_size: 1
     backend: LMDB
   }
@@ -117,7 +117,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 32
     stride: 1
     weight_filler {
       type: "msra"
@@ -331,7 +330,6 @@ layer {
     bias_term: false
     pad: 0
     kernel_size: 3
-    group: 48
     stride: 2
     weight_filler {
       type: "msra"
@@ -539,7 +537,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 72
     stride: 1
     weight_filler {
       type: "msra"
@@ -754,7 +751,6 @@ layer {
     bias_term: false
     pad: 0
     kernel_size: 3
-    group: 72
     stride: 2
     weight_filler {
       type: "msra"
@@ -962,7 +958,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 96
     stride: 1
     weight_filler {
       type: "msra"
@@ -1177,7 +1172,6 @@ layer {
     bias_term: false
     pad: 0
     kernel_size: 3
-    group: 96
     stride: 2
     weight_filler {
       type: "msra"
@@ -1385,7 +1379,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 192
     stride: 1
     weight_filler {
       type: "msra"
@@ -1600,7 +1593,6 @@ layer {
     bias_term: false
     pad: 0
     kernel_size: 3
-    group: 192
     stride: 2
     weight_filler {
       type: "msra"
@@ -1808,7 +1800,6 @@ layer {
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 384
     stride: 1
     weight_filler {
       type: "msra"
