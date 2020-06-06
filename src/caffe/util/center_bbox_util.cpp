@@ -1191,7 +1191,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
-                        #if 1
+                        #if 0
                         if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
                             continue;
                         if(h + (anchor_scale/downRatio) / 2 >= output_height - 1)
@@ -1218,7 +1218,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                                     + 3* dimScale + h * output_width + w;
                         int class_index = b * dimScale +  h * output_width + w;
                         NormalizedBBox predict_bbox;
-                        #if 1
+                        #if 0
                         float an_xmin = GET_VALID_VALUE((float)(w - float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
                         float an_ymin = GET_VALID_VALUE((float)(h - float(anchor_scale/ downRatio / 2)) / output_height, 0.f, 1.f);
                         float an_xmax = GET_VALID_VALUE((float)(w + float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
