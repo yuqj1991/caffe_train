@@ -213,7 +213,7 @@ layer {
   convolution_param {
     num_output: 32
     bias_term: false
-    pad: 1
+    pad: 0
     kernel_size: 3
     stride: 2
     weight_filler {
