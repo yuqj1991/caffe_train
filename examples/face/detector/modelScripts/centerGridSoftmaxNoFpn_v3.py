@@ -22,8 +22,8 @@ import subprocess
 trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
 valDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
 labelmapPath = "../labelmap.prototxt"
-resize_width = 640
-resize_height = 640
+resize_width = 320
+resize_height = 320
 resize = "{}x{}".format(resize_width, resize_height)
 batch_sampler = [
     {
@@ -234,8 +234,8 @@ pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"
 gpus = "0"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
-batch_size = 8
-accum_batch_size = 16
+batch_size = 32
+accum_batch_size = 64
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
 device_id = 0
@@ -289,11 +289,11 @@ solver_param = {
 }
 
 Inverted_residual_setting = [[1, 16, 1, 1],
-                             [6, 24, 3, 2],
-                             [6, 32, 3, 2],
-                             [6, 64, 5, 2],
-                             [6, 128, 3, 2]]
-feature_stride= [4, 8, 16, 16, 32, 32]
+                             [3, 24, 2, 2],
+                             [3, 32, 2, 2],
+                             [3, 64, 2, 2],
+                             [3, 128, 2, 2]]
+feature_stride= [4, 8, 16, 32]
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
@@ -312,22 +312,23 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False, Fpn= Fpn,
                                                     Inverted_residual_setting= Inverted_residual_setting,
                                                     top_out_channels= Inverted_residual_setting[4][1],
-                                                    feature_stride= feature_stride)
-bias_scale = [19, 49, 96, 192, 368, 512]
-low_bbox_scale = [6, 35, 64, 128, 256, 480]
-up_bbox_scale = [35, 64,128, 256, 480, 630]
+                                                    feature_stride= feature_stride, Use_BN=True)
+#bias_scale = [35, 96, 192, 438]
+#low_bbox_scale = [6, 64, 128, 256]
+#up_bbox_scale = [64,128, 256, 630]
+
+bias_scale = [35, 96, 192, 438]
+low_bbox_scale = [16, 64, 128, 256]
+up_bbox_scale = [64,128, 256, 630]
 from_layers = []
 for idx, detect_output in enumerate(LayerList_Output):
-    Concat_List = []
-    Concat_List.append(net[detect_output[0]])
-    Concat_List.append(net[detect_output[1]])
-    Concat_name = "Detector_Result_{}".format(idx)
-    net[Concat_name] = L.Concat(*Concat_List, axis=1)
-    from_layers.append(net[Concat_name])
+    from_layers.append(net[detect_output])
     from_layers.append(net.label)
-    CenterGridObjectLoss(net=net, bias_scale= bias_scale[idx], 
-                            low_bbox_scale= low_bbox_scale[idx], 
-                            up_bbox_scale= up_bbox_scale[idx], 
+    CenterGridObjectLoss(net=net, bias_scale= int(bias_scale[idx] / 2), 
+                            low_bbox_scale= int(low_bbox_scale[idx] / 2), 
+                            up_bbox_scale= int(up_bbox_scale[idx] / 2),
+                            normalization_mode = P.Loss.BATCH_SIZE,
+                            net_height = resize_height, net_width = resize_width,
                             stageidx= idx, from_layers= from_layers)
     from_layers = []
 with open(train_net_file, 'w') as f:
@@ -350,13 +351,8 @@ DetectListLayer = []
 DetectListScale = []
 DetectListDownRatio = []
 for idx, output in enumerate(LayerList_Output):
-    Concat_List = []
-    Concat_List.append(net[output[0]])
-    Concat_List.append(net[output[1]])
-    Concat_name = "Detector_Result_{}".format(idx)
-    net[Concat_name] = L.Concat(*Concat_List, axis=1)
-    DetectListLayer.append(net[Concat_name])
-    DetectListScale.append(bias_scale[idx])
+    DetectListLayer.append(net[output])
+    DetectListScale.append(int(bias_scale[idx] / 2))
     DetectListDownRatio.append(feature_stride[idx])
 CenterGridObjectDetect(net, from_layers= DetectListLayer, 
                             bias_scale= DetectListScale, down_ratio= DetectListDownRatio)
