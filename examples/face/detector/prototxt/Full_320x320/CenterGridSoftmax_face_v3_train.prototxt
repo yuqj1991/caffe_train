@@ -2476,6 +2476,7 @@ layer {
   loss_param {
     normalization: BATCH_SIZE
   }
+  loss_weight: 0.5
   center_object_loss_param {
     num_class: 2
     share_location: true
@@ -2504,6 +2505,7 @@ layer {
   loss_param {
     normalization: BATCH_SIZE
   }
+  loss_weight: 0.5
   center_object_loss_param {
     num_class: 2
     share_location: true
