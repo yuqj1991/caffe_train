@@ -1119,8 +1119,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     int postive = 0;
     int gt_match_box = 0;
     // 将所有值设置为 -2 的原因为，排除掉iou>0.35的一些样本，也就是说
-    // 只采集那些iou<0.35的负样本
-    caffe_set(batch_size * dimScale, Dtype(-2.), class_label); 
+    // 只采集那些iou<0.35的负样本20200611,舍弃之
+    caffe_set(batch_size * dimScale, Dtype(-1.), class_label); 
     for(int b = 0; b < batch_size; b++){
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = all_gt_bboxes.find(b)->second;
         int count = 0;
@@ -1138,6 +1138,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 }
                 Dtype class_loss = SingleSoftmaxLoss(channel_pred_data[bg_index], channel_pred_data[face_index], Dtype(-1.));
                 batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
+                #if 0
                 int class_index = b * dimScale +  h * output_width + w;
                 for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
                     const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
@@ -1162,6 +1163,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         }
                     }
                 }
+                #endif
             }
         }
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -1201,20 +1203,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         int ymax_index = b * num_channels * dimScale 
                                                     + 3* dimScale + h * output_width + w;
                         int class_index = b * dimScale +  h * output_width + w;
-                        NormalizedBBox predict_bbox;
-                        #if 0
-                        float an_xmin = GET_VALID_VALUE((float)(w - float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
-                        float an_ymin = GET_VALID_VALUE((float)(h - float(anchor_scale/ downRatio / 2)) / output_height, 0.f, 1.f);
-                        float an_xmax = GET_VALID_VALUE((float)(w + float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
-                        float an_ymax = GET_VALID_VALUE((float)(h + float( anchor_scale/ downRatio / 2)) / output_height, 0.f, 1.f);
-                        predict_bbox.set_xmin(an_xmin);
-                        predict_bbox.set_xmax(an_xmax);
-                        predict_bbox.set_ymin(an_ymin);
-                        predict_bbox.set_ymax(an_ymax);
-                        if(BBoxCoverage(gt_bboxes[ii].first, predict_bbox) < 0.35){
-                            continue;
-                        }
-                        #endif
+    
                         Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
                         Dtype xmin_loss, ymin_loss, xmax_loss, ymax_loss, single_total_loss;
                         xmin_loss = L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
