@@ -1149,26 +1149,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                     int large_side = std::max(gt_bbox_height, gt_bbox_width);
                     if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
                         NormalizedBBox anchor_bbox;
-                        #if 0
-                        int xmin_index = b * num_channels * dimScale
-                                                    + 0* dimScale + h * output_width + w;
-                        int ymin_index = b * num_channels * dimScale 
-                                                    + 1* dimScale + h * output_width + w;
-                        int xmax_index = b * num_channels * dimScale
-                                                    + 2* dimScale + h * output_width + w;
-                        int ymax_index = b * num_channels * dimScale 
-                                                    + 3* dimScale + h * output_width + w;
-
-                        float an_xmin = GET_VALID_VALUE((float)(w - float(channel_pred_data[xmin_index] * anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
-                        float an_ymin = GET_VALID_VALUE((float)(h - float(channel_pred_data[ymin_index] * anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
-                        float an_xmax = GET_VALID_VALUE((float)(w - float(channel_pred_data[xmax_index] * anchor_scale/downRatio) / 2) / output_width, 0.f, 1.f);
-                        float an_ymax = GET_VALID_VALUE((float)(h - float(channel_pred_data[ymax_index] * anchor_scale/downRatio) / 2) / output_height, 0.f, 1.f);
-                        #else
                         float an_xmin = GET_VALID_VALUE((float)(w - float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
                         float an_ymin = GET_VALID_VALUE((float)(h - float(anchor_scale/ downRatio / 2)) / output_height, 0.f, 1.f);
                         float an_xmax = GET_VALID_VALUE((float)(w + float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
                         float an_ymax = GET_VALID_VALUE((float)(h + float( anchor_scale/ downRatio / 2)) / output_height, 0.f, 1.f);
-                        #endif
                         anchor_bbox.set_xmin(an_xmin);
                         anchor_bbox.set_xmax(an_xmax);
                         anchor_bbox.set_ymin(an_ymin);
@@ -1185,8 +1169,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
             const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
             const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
-            const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
-            const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+            const int gt_bbox_width = static_cast<int>((xmax - xmin + 1) * downRatio);
+            const int gt_bbox_height = static_cast<int>((ymax - ymin + 1) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){

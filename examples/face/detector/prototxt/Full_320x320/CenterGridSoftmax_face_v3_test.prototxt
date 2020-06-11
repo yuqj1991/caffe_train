@@ -104,10 +104,10 @@ layer {
   top: "conv_0"
 }
 layer {
-  name: "conv_0_0/depthwise"
+  name: "conv_0_0/conv_3_3"
   type: "Convolution"
   bottom: "conv_0"
-  top: "conv_0_0/depthwise"
+  top: "conv_0_0/conv_3_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -124,10 +124,10 @@ layer {
   }
 }
 layer {
-  name: "conv_0_0/depthwise_bn"
+  name: "conv_0_0/conv_3_3_bn"
   type: "BatchNorm"
-  bottom: "conv_0_0/depthwise"
-  top: "conv_0_0/depthwise"
+  bottom: "conv_0_0/conv_3_3"
+  top: "conv_0_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -146,10 +146,10 @@ layer {
   }
 }
 layer {
-  name: "conv_0_0/depthwise_scale"
+  name: "conv_0_0/conv_3_3_scale"
   type: "Scale"
-  bottom: "conv_0_0/depthwise"
-  top: "conv_0_0/depthwise"
+  bottom: "conv_0_0/conv_3_3"
+  top: "conv_0_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -169,15 +169,15 @@ layer {
   }
 }
 layer {
-  name: "conv_0_0/depthwise_relu6"
+  name: "conv_0_0/conv_3_3_relu6"
   type: "ReLU6"
-  bottom: "conv_0_0/depthwise"
-  top: "conv_0_0/depthwise"
+  bottom: "conv_0_0/conv_3_3"
+  top: "conv_0_0/conv_3_3"
 }
 layer {
   name: "conv_0_0/linear"
   type: "Convolution"
-  bottom: "conv_0_0/depthwise"
+  bottom: "conv_0_0/conv_3_3"
   top: "conv_0_0/linear"
   param {
     lr_mult: 1.0
@@ -317,10 +317,10 @@ layer {
   top: "conv_1_0/expand"
 }
 layer {
-  name: "conv_1_0/depthwise"
+  name: "conv_1_0/conv_3_3"
   type: "Convolution"
   bottom: "conv_1_0/expand"
-  top: "conv_1_0/depthwise"
+  top: "conv_1_0/conv_3_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -337,10 +337,10 @@ layer {
   }
 }
 layer {
-  name: "conv_1_0/depthwise_bn"
+  name: "conv_1_0/conv_3_3_bn"
   type: "BatchNorm"
-  bottom: "conv_1_0/depthwise"
-  top: "conv_1_0/depthwise"
+  bottom: "conv_1_0/conv_3_3"
+  top: "conv_1_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -359,10 +359,10 @@ layer {
   }
 }
 layer {
-  name: "conv_1_0/depthwise_scale"
+  name: "conv_1_0/conv_3_3_scale"
   type: "Scale"
-  bottom: "conv_1_0/depthwise"
-  top: "conv_1_0/depthwise"
+  bottom: "conv_1_0/conv_3_3"
+  top: "conv_1_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -382,15 +382,15 @@ layer {
   }
 }
 layer {
-  name: "conv_1_0/depthwise_relu6"
+  name: "conv_1_0/conv_3_3_relu6"
   type: "ReLU6"
-  bottom: "conv_1_0/depthwise"
-  top: "conv_1_0/depthwise"
+  bottom: "conv_1_0/conv_3_3"
+  top: "conv_1_0/conv_3_3"
 }
 layer {
   name: "conv_1_0/linear"
   type: "Convolution"
-  bottom: "conv_1_0/depthwise"
+  bottom: "conv_1_0/conv_3_3"
   top: "conv_1_0/linear"
   param {
     lr_mult: 1.0
@@ -524,10 +524,10 @@ layer {
   top: "conv_1_1/expand"
 }
 layer {
-  name: "conv_1_1/depthwise"
+  name: "conv_1_1/conv_3_3"
   type: "Convolution"
   bottom: "conv_1_1/expand"
-  top: "conv_1_1/depthwise"
+  top: "conv_1_1/conv_3_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -544,10 +544,10 @@ layer {
   }
 }
 layer {
-  name: "conv_1_1/depthwise_bn"
+  name: "conv_1_1/conv_3_3_bn"
   type: "BatchNorm"
-  bottom: "conv_1_1/depthwise"
-  top: "conv_1_1/depthwise"
+  bottom: "conv_1_1/conv_3_3"
+  top: "conv_1_1/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -566,10 +566,10 @@ layer {
   }
 }
 layer {
-  name: "conv_1_1/depthwise_scale"
+  name: "conv_1_1/conv_3_3_scale"
   type: "Scale"
-  bottom: "conv_1_1/depthwise"
-  top: "conv_1_1/depthwise"
+  bottom: "conv_1_1/conv_3_3"
+  top: "conv_1_1/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -589,15 +589,15 @@ layer {
   }
 }
 layer {
-  name: "conv_1_1/depthwise_relu6"
+  name: "conv_1_1/conv_3_3_relu6"
   type: "ReLU6"
-  bottom: "conv_1_1/depthwise"
-  top: "conv_1_1/depthwise"
+  bottom: "conv_1_1/conv_3_3"
+  top: "conv_1_1/conv_3_3"
 }
 layer {
   name: "conv_1_1/linear"
   type: "Convolution"
-  bottom: "conv_1_1/depthwise"
+  bottom: "conv_1_1/conv_3_3"
   top: "conv_1_1/linear"
   param {
     lr_mult: 1.0
@@ -738,10 +738,10 @@ layer {
   top: "conv_2_0/expand"
 }
 layer {
-  name: "conv_2_0/depthwise"
+  name: "conv_2_0/conv_3_3"
   type: "Convolution"
   bottom: "conv_2_0/expand"
-  top: "conv_2_0/depthwise"
+  top: "conv_2_0/conv_3_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -758,10 +758,10 @@ layer {
   }
 }
 layer {
-  name: "conv_2_0/depthwise_bn"
+  name: "conv_2_0/conv_3_3_bn"
   type: "BatchNorm"
-  bottom: "conv_2_0/depthwise"
-  top: "conv_2_0/depthwise"
+  bottom: "conv_2_0/conv_3_3"
+  top: "conv_2_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -780,10 +780,10 @@ layer {
   }
 }
 layer {
-  name: "conv_2_0/depthwise_scale"
+  name: "conv_2_0/conv_3_3_scale"
   type: "Scale"
-  bottom: "conv_2_0/depthwise"
-  top: "conv_2_0/depthwise"
+  bottom: "conv_2_0/conv_3_3"
+  top: "conv_2_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -803,15 +803,15 @@ layer {
   }
 }
 layer {
-  name: "conv_2_0/depthwise_relu6"
+  name: "conv_2_0/conv_3_3_relu6"
   type: "ReLU6"
-  bottom: "conv_2_0/depthwise"
-  top: "conv_2_0/depthwise"
+  bottom: "conv_2_0/conv_3_3"
+  top: "conv_2_0/conv_3_3"
 }
 layer {
   name: "conv_2_0/linear"
   type: "Convolution"
-  bottom: "conv_2_0/depthwise"
+  bottom: "conv_2_0/conv_3_3"
   top: "conv_2_0/linear"
   param {
     lr_mult: 1.0
@@ -945,10 +945,10 @@ layer {
   top: "conv_2_1/expand"
 }
 layer {
-  name: "conv_2_1/depthwise"
+  name: "conv_2_1/conv_3_3"
   type: "Convolution"
   bottom: "conv_2_1/expand"
-  top: "conv_2_1/depthwise"
+  top: "conv_2_1/conv_3_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -965,10 +965,10 @@ layer {
   }
 }
 layer {
-  name: "conv_2_1/depthwise_bn"
+  name: "conv_2_1/conv_3_3_bn"
   type: "BatchNorm"
-  bottom: "conv_2_1/depthwise"
-  top: "conv_2_1/depthwise"
+  bottom: "conv_2_1/conv_3_3"
+  top: "conv_2_1/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -987,10 +987,10 @@ layer {
   }
 }
 layer {
-  name: "conv_2_1/depthwise_scale"
+  name: "conv_2_1/conv_3_3_scale"
   type: "Scale"
-  bottom: "conv_2_1/depthwise"
-  top: "conv_2_1/depthwise"
+  bottom: "conv_2_1/conv_3_3"
+  top: "conv_2_1/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -1010,15 +1010,15 @@ layer {
   }
 }
 layer {
-  name: "conv_2_1/depthwise_relu6"
+  name: "conv_2_1/conv_3_3_relu6"
   type: "ReLU6"
-  bottom: "conv_2_1/depthwise"
-  top: "conv_2_1/depthwise"
+  bottom: "conv_2_1/conv_3_3"
+  top: "conv_2_1/conv_3_3"
 }
 layer {
   name: "conv_2_1/linear"
   type: "Convolution"
-  bottom: "conv_2_1/depthwise"
+  bottom: "conv_2_1/conv_3_3"
   top: "conv_2_1/linear"
   param {
     lr_mult: 1.0
@@ -1159,10 +1159,10 @@ layer {
   top: "conv_3_0/expand"
 }
 layer {
-  name: "conv_3_0/depthwise"
+  name: "conv_3_0/conv_3_3"
   type: "Convolution"
   bottom: "conv_3_0/expand"
-  top: "conv_3_0/depthwise"
+  top: "conv_3_0/conv_3_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -1179,10 +1179,10 @@ layer {
   }
 }
 layer {
-  name: "conv_3_0/depthwise_bn"
+  name: "conv_3_0/conv_3_3_bn"
   type: "BatchNorm"
-  bottom: "conv_3_0/depthwise"
-  top: "conv_3_0/depthwise"
+  bottom: "conv_3_0/conv_3_3"
+  top: "conv_3_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -1201,10 +1201,10 @@ layer {
   }
 }
 layer {
-  name: "conv_3_0/depthwise_scale"
+  name: "conv_3_0/conv_3_3_scale"
   type: "Scale"
-  bottom: "conv_3_0/depthwise"
-  top: "conv_3_0/depthwise"
+  bottom: "conv_3_0/conv_3_3"
+  top: "conv_3_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -1224,15 +1224,15 @@ layer {
   }
 }
 layer {
-  name: "conv_3_0/depthwise_relu6"
+  name: "conv_3_0/conv_3_3_relu6"
   type: "ReLU6"
-  bottom: "conv_3_0/depthwise"
-  top: "conv_3_0/depthwise"
+  bottom: "conv_3_0/conv_3_3"
+  top: "conv_3_0/conv_3_3"
 }
 layer {
   name: "conv_3_0/linear"
   type: "Convolution"
-  bottom: "conv_3_0/depthwise"
+  bottom: "conv_3_0/conv_3_3"
   top: "conv_3_0/linear"
   param {
     lr_mult: 1.0
@@ -1366,10 +1366,10 @@ layer {
   top: "conv_3_1/expand"
 }
 layer {
-  name: "conv_3_1/depthwise"
+  name: "conv_3_1/conv_3_3"
   type: "Convolution"
   bottom: "conv_3_1/expand"
-  top: "conv_3_1/depthwise"
+  top: "conv_3_1/conv_3_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -1386,10 +1386,10 @@ layer {
   }
 }
 layer {
-  name: "conv_3_1/depthwise_bn"
+  name: "conv_3_1/conv_3_3_bn"
   type: "BatchNorm"
-  bottom: "conv_3_1/depthwise"
-  top: "conv_3_1/depthwise"
+  bottom: "conv_3_1/conv_3_3"
+  top: "conv_3_1/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -1408,10 +1408,10 @@ layer {
   }
 }
 layer {
-  name: "conv_3_1/depthwise_scale"
+  name: "conv_3_1/conv_3_3_scale"
   type: "Scale"
-  bottom: "conv_3_1/depthwise"
-  top: "conv_3_1/depthwise"
+  bottom: "conv_3_1/conv_3_3"
+  top: "conv_3_1/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -1431,15 +1431,15 @@ layer {
   }
 }
 layer {
-  name: "conv_3_1/depthwise_relu6"
+  name: "conv_3_1/conv_3_3_relu6"
   type: "ReLU6"
-  bottom: "conv_3_1/depthwise"
-  top: "conv_3_1/depthwise"
+  bottom: "conv_3_1/conv_3_3"
+  top: "conv_3_1/conv_3_3"
 }
 layer {
   name: "conv_3_1/linear"
   type: "Convolution"
-  bottom: "conv_3_1/depthwise"
+  bottom: "conv_3_1/conv_3_3"
   top: "conv_3_1/linear"
   param {
     lr_mult: 1.0
@@ -1580,10 +1580,10 @@ layer {
   top: "conv_4_0/expand"
 }
 layer {
-  name: "conv_4_0/depthwise"
+  name: "conv_4_0/conv_3_3"
   type: "Convolution"
   bottom: "conv_4_0/expand"
-  top: "conv_4_0/depthwise"
+  top: "conv_4_0/conv_3_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -1600,10 +1600,10 @@ layer {
   }
 }
 layer {
-  name: "conv_4_0/depthwise_bn"
+  name: "conv_4_0/conv_3_3_bn"
   type: "BatchNorm"
-  bottom: "conv_4_0/depthwise"
-  top: "conv_4_0/depthwise"
+  bottom: "conv_4_0/conv_3_3"
+  top: "conv_4_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -1622,10 +1622,10 @@ layer {
   }
 }
 layer {
-  name: "conv_4_0/depthwise_scale"
+  name: "conv_4_0/conv_3_3_scale"
   type: "Scale"
-  bottom: "conv_4_0/depthwise"
-  top: "conv_4_0/depthwise"
+  bottom: "conv_4_0/conv_3_3"
+  top: "conv_4_0/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -1645,15 +1645,15 @@ layer {
   }
 }
 layer {
-  name: "conv_4_0/depthwise_relu6"
+  name: "conv_4_0/conv_3_3_relu6"
   type: "ReLU6"
-  bottom: "conv_4_0/depthwise"
-  top: "conv_4_0/depthwise"
+  bottom: "conv_4_0/conv_3_3"
+  top: "conv_4_0/conv_3_3"
 }
 layer {
   name: "conv_4_0/linear"
   type: "Convolution"
-  bottom: "conv_4_0/depthwise"
+  bottom: "conv_4_0/conv_3_3"
   top: "conv_4_0/linear"
   param {
     lr_mult: 1.0
@@ -1787,10 +1787,10 @@ layer {
   top: "conv_4_1/expand"
 }
 layer {
-  name: "conv_4_1/depthwise"
+  name: "conv_4_1/conv_3_3"
   type: "Convolution"
   bottom: "conv_4_1/expand"
-  top: "conv_4_1/depthwise"
+  top: "conv_4_1/conv_3_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -1807,10 +1807,10 @@ layer {
   }
 }
 layer {
-  name: "conv_4_1/depthwise_bn"
+  name: "conv_4_1/conv_3_3_bn"
   type: "BatchNorm"
-  bottom: "conv_4_1/depthwise"
-  top: "conv_4_1/depthwise"
+  bottom: "conv_4_1/conv_3_3"
+  top: "conv_4_1/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -1829,10 +1829,10 @@ layer {
   }
 }
 layer {
-  name: "conv_4_1/depthwise_scale"
+  name: "conv_4_1/conv_3_3_scale"
   type: "Scale"
-  bottom: "conv_4_1/depthwise"
-  top: "conv_4_1/depthwise"
+  bottom: "conv_4_1/conv_3_3"
+  top: "conv_4_1/conv_3_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -1852,15 +1852,15 @@ layer {
   }
 }
 layer {
-  name: "conv_4_1/depthwise_relu6"
+  name: "conv_4_1/conv_3_3_relu6"
   type: "ReLU6"
-  bottom: "conv_4_1/depthwise"
-  top: "conv_4_1/depthwise"
+  bottom: "conv_4_1/conv_3_3"
+  top: "conv_4_1/conv_3_3"
 }
 layer {
   name: "conv_4_1/linear"
   type: "Convolution"
-  bottom: "conv_4_1/depthwise"
+  bottom: "conv_4_1/conv_3_3"
   top: "conv_4_1/linear"
   param {
     lr_mult: 1.0
