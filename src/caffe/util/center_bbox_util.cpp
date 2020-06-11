@@ -1099,7 +1099,7 @@ template void GetCenterGridObjectResultSigmoid(const int batch_size, const int n
 template <typename Dtype> 
 Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio, std::vector<int>postive_batch,
+                          const float downRatio, std::vector<int>postive_batch,
                           std::vector<Dtype> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
@@ -1321,7 +1321,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
 
 template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio, std::vector<int>postive_batch,
+                          const float downRatio, std::vector<int>postive_batch,
                           std::vector<float> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
@@ -1331,7 +1331,7 @@ template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int
 
 template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio, std::vector<int>postive_batch,
+                          const float downRatio, std::vector<int>postive_batch,
                           std::vector<double> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
@@ -1342,7 +1342,7 @@ template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const in
 template <typename Dtype>
 void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio,
+                          const float downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results, bool has_lm){
     // face class 人脸类型 包括背景 + face人脸，两类
@@ -1369,7 +1369,7 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                                             + 3* dimScale + h * output_width + w;        
                 
 
-                float bb_xmin = (w - channel_pred_data[x_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                float bb_xmin = ((w - channel_pred_data[x_index] * anchor_scale /(2 * downRatio)) / output_width);
                 float bb_ymin = (h - channel_pred_data[y_index] * anchor_scale /(2 * downRatio)) *downRatio;
                 float bb_xmax = (w - channel_pred_data[width_index] * anchor_scale /(2 * downRatio)) *downRatio;
                 float bb_ymax = (h - channel_pred_data[height_index] * anchor_scale /(2 * downRatio)) *downRatio;
@@ -1458,13 +1458,13 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
 
 template void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio,
+                          const float downRatio,
                           float* channel_pred_data, const int anchor_scale, float conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results, bool has_lm);
 
 template void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio,
+                          const float downRatio,
                           double* channel_pred_data, const int anchor_scale, double conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results, bool has_lm);
 

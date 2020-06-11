@@ -106,7 +106,7 @@ void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channe
 template <typename Dtype> 
 Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio, std::vector<int>postive_batch,
+                          const float downRatio, std::vector<int>postive_batch,
                           std::vector<Dtype> batch_sample_loss, std::vector<int> mask_Rf_anchor,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
@@ -117,7 +117,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
 template <typename Dtype> 
 void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio,
+                          const float downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results, bool has_lm);
 

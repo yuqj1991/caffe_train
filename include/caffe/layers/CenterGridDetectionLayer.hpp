@@ -75,10 +75,11 @@ protected:
     int num_;
     std::map<int, std::vector<CenterNetInfo> > results_;
     int bottom_size_;
-    std::vector<int> downRatio_;
     float nms_thresh_ ;
     DetectionOutputParameter_CLASS_TYPE class_type_;
     bool has_lm_;
+    int net_width_;
+    int net_height_;
 };
 
 }  // namespace caffe

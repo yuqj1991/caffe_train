@@ -347,13 +347,13 @@ net, LayerList_Output = CenterGridfaceBody(net, from_layer = 'data', Use_BN= Tru
                                                     feature_stride= feature_stride)
 DetectListLayer = []
 DetectListScale = []
-DetectListDownRatio = []
 for idx, output in enumerate(LayerList_Output):
     DetectListLayer.append(net[output])
     DetectListScale.append(int(bias_scale[idx] / 2))
-    DetectListDownRatio.append(feature_stride[idx])
 CenterGridObjectDetect(net, from_layers= DetectListLayer, 
-                            bias_scale= DetectListScale, down_ratio= DetectListDownRatio)
+                            bias_scale= DetectListScale,
+                            net_width = resize_width,
+                            net_height = resize_height)
 
 det_eval_param = {
     'num_classes': 2,

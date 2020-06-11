@@ -193,11 +193,11 @@ def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale,
                                  propagate_down=[True, False], loss_weight = loss_weight)
 
 
-def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = [], num_classes = 2,
+def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], num_classes = 2,
                            nms_thresh = 0.3,  keep_top_k = 200,
                            class_type = P.DetectionOutput.SOFTMAX, 
                            share_location = True, confidence_threshold = 0.15,
-							has_lm = False):
+							has_lm = False, net_width=640, net_height = 640):
     det_out_param = {
         'num_classes': num_classes,
         'share_location': share_location,
@@ -205,9 +205,10 @@ def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = 
         'confidence_threshold': confidence_threshold,
         'class_type': class_type,
         'bias_scale': bias_scale,
-        'down_ratio': down_ratio,
         'nms_thresh': nms_thresh,
 		'has_lm': has_lm,
+        'net_width': net_width,
+        'net_height': net_height,
     }
     net.detection_out = L.CenterGridOutput(*from_layers, detection_output_param=det_out_param, 
                                                 include=dict(phase=caffe_pb2.Phase.Value('TEST')))

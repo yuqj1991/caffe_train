@@ -26,10 +26,8 @@ void CenterGridOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     num_classes_ = detection_output_param.num_classes();
     if(detection_output_param.bias_scale_size() > 0){
         CHECK_EQ(bottom_size_, detection_output_param.bias_scale_size());
-        CHECK_EQ(bottom_size_, detection_output_param.down_ratio_size());
         for(int i = 0; i < detection_output_param.bias_scale_size(); i++){
             anchor_scale_.push_back(detection_output_param.bias_scale(i));
-            downRatio_.push_back(detection_output_param.down_ratio(i));
         }
     }
     keep_top_k_ = detection_output_param.keep_top_k();
@@ -38,6 +36,8 @@ void CenterGridOutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     nms_thresh_ = detection_output_param.nms_thresh();
     class_type_ = detection_output_param.class_type();
     has_lm_ = detection_output_param.has_lm();
+    net_height_ = detection_output_param.net_height();
+    net_width_ = detection_output_param.net_width();
 }
 
 template <typename Dtype>
@@ -67,36 +67,31 @@ void CenterGridOutputLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void CenterGridOutputLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-
     bottom_size_ = bottom.size();
-    int output_height_ = bottom[0]->height();
-    int output_width_ = bottom[0]->width();
-    int net_height_ = output_height_ * downRatio_[0];
-    int net_width_ = output_width_ * downRatio_[0];
     results_.clear();
     for(int t = 0; t < bottom_size_; t++){
         Dtype *channel_pred_data = bottom[t]->mutable_cpu_data();
         const int output_height = bottom[t]->height();
         const int output_width = bottom[t]->width();
+        assert(output_height == output_width);
+        const float downratio = (float)net_width_ / output_width;
         num_ = bottom[t]->num();
         int num_channels = bottom[t]->channels();
         if(class_type_ == DetectionOutputParameter_CLASS_TYPE_SIGMOID){
             GetCenterGridObjectResultSigmoid(num_, num_channels, num_classes_,
                             output_width, output_height, 
-                            downRatio_[t],
+                            downratio,
                             channel_pred_data, anchor_scale_[t], confidence_threshold_, &results_);
         }else if(class_type_ == DetectionOutputParameter_CLASS_TYPE_SOFTMAX){
             GetCenterGridObjectResultSoftMax(num_, num_channels, num_classes_,
                             output_width, output_height, 
-                            downRatio_[t],
+                            downratio,
                             channel_pred_data, anchor_scale_[t], confidence_threshold_, &results_, has_lm_);
         }else {
             LOG(FATAL)<<"unknown class type";
         }
     }
-  
     int num_kept = 0;
-
     // nms 去除多余的框
     std::map<int, vector<CenterNetInfo > > ::iterator iter;
     for(iter = results_.begin(); iter != results_.end(); iter++){

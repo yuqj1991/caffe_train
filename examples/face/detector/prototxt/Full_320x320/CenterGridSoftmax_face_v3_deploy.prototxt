@@ -2003,13 +2003,11 @@ layer {
     bias_scale: 48
     bias_scale: 96
     bias_scale: 219
-    down_ratio: 4
-    down_ratio: 8
-    down_ratio: 16
-    down_ratio: 32
     nms_thresh: 0.30000001192092896
     class_type: SOFTMAX
     has_lm: false
+    net_height: 320
+    net_width: 320
   }
 }
 

@@ -124,7 +124,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.), normalizer = Dtype(0.), lm_loss = Dtype(0.);
     int num_gt_match = 0;
     if (num_groundtruth_ >= 1) {
-        const int downRatio = net_height_ / output_height;
+        const float downRatio = (float)net_height_ / output_height;
         if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SIGMOID){
             class_score = EncodeCenterGridObjectSigmoidLoss(num_, num_channels, num_classes_, output_width, output_height, 
                             downRatio,
@@ -132,7 +132,6 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                             bbox_range_scale_,
                             all_gt_bboxes, label_muti_data, bottom_diff, 
                             ignore_thresh_, &count_postive_, &sum_squre);
-        
         }else if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SOFTMAX){
             class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
                             downRatio, postive_batch_, batch_sample_loss_, mask_Rf_anchor_,
@@ -142,7 +141,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                             &count_postive_, &sum_squre, &num_gt_match, has_lm_, &lm_loss_origin);
         }
         normalizer = LossLayer<Dtype>::GetNormalizer(
-            normalization_, num_, 1, count_postive_);
+                                        normalization_, num_, 1, count_postive_);
         loc_loss = sum_squre / normalizer;
         score_loss = class_score / normalizer;
         top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
