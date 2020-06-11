@@ -317,6 +317,7 @@ net, LayerList_Output = CenterGridfaceBody(net= net, from_layer= 'data', biFpn= 
 bias_scale = [35, 96, 192, 438]
 low_bbox_scale = [16, 64, 128, 256]
 up_bbox_scale = [64,128, 256, 630]
+loss_weight = [0.5, 0.5, 1., 1.]
 from_layers = []
 for idx, detect_output in enumerate(LayerList_Output):
     from_layers.append(net[detect_output])
@@ -326,7 +327,7 @@ for idx, detect_output in enumerate(LayerList_Output):
                             up_bbox_scale= int(up_bbox_scale[idx] / 2),
                             normalization_mode = P.Loss.BATCH_SIZE,
                             net_height = resize_height, net_width = resize_width,
-                            stageidx= idx, from_layers= from_layers)
+                            stageidx= idx, from_layers= from_layers, loss_weight= loss_weight[idx])
     from_layers = []
 with open(train_net_file, 'w') as f:
     print('name: "{}_train"'.format("CenterGridFace"), file=f)

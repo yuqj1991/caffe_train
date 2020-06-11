@@ -169,7 +169,8 @@ def ResConnectBlock(net, from_layer_one, from_layer_two, stage_idx,  use_relu, l
 def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale, 
                          stageidx, from_layers = [], net_height = 640, net_width = 640,
                          normalization_mode = P.Loss.VALID, num_classes= 2, loc_weight = 1.0, 
-                         share_location = True, has_lm = False, class_type = P.CenterObjectLoss.SOFTMAX):
+                         share_location = True, has_lm = False, class_type = P.CenterObjectLoss.SOFTMAX, 
+                         loss_weight = 1.0):
     center_object_loss_param = {
         'loc_weight': loc_weight,
         'num_class': num_classes,
@@ -189,7 +190,7 @@ def CenterGridObjectLoss(net, bias_scale, low_bbox_scale, up_bbox_scale,
     name = 'CenterGridLoss_{}'.format(stageidx)
     net[name] = L.CenterGridLoss(*from_layers, center_object_loss_param = center_object_loss_param,
                                  loss_param=loss_param, include=dict(phase=caffe_pb2.Phase.Value('TRAIN')),
-                                 propagate_down=[True, False])
+                                 propagate_down=[True, False], loss_weight = loss_weight)
 
 
 def CenterGridObjectDetect(net, from_layers = [], bias_scale = [], down_ratio = [], num_classes = 2,
