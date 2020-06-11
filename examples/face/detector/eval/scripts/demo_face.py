@@ -21,6 +21,14 @@ net_file= args.model
 caffe_model= args.weights
 
 
+
+def L2_Norm(feature, alpha = 0.000000001):
+    square = feature**2
+    sum = np.sqrt(square.sum() + alpha)
+    norm = np.float32(feature / sum)
+    return norm
+
+
 if not os.path.exists(caffe_model):
     print(caffe_model + " does not exist")
     exit()
@@ -90,15 +98,20 @@ def detect(imgfile):
    h = frame.shape[0]
    w = frame.shape[1]
    inputSize = (net.blobs['data'].data.shape[3], net.blobs['data'].data.shape[2])
-   img = preprocessdet(frame, inputSize)
+   img = preprocess(frame, inputSize)
    img = img.astype(np.float32)
    
    img = img.transpose((2, 0, 1))
    net.blobs['data'].data[...] = img
-   net.forward()
-   print(net.blobs['Det_1x1_out_24_0'].data.shape)
-   print(net.blobs['Det_1x1_out_24_0'].data)
-   #print(net.forward())
+   [(k,v[0].data.shape) for k,v in net.params.items()] #查看各层参数规模
+   #w1=net.params['Convolution1'][0].data #提取参数w
+   #b1=net.params['Convolution1'][1].data #提取参数b
+
+   [(k,v.data.shape) for k,v in net.blobs.items()] #查看各层数据规模
+   #fea=net.blobs['InnerProduct1'].data #提取某层数据（特征）
+   #print(net.blobs['Det_1x1_out_24_0'].data)
+   print(net.params['conv_1/depthwise'][0].data.shape)
+   print(L2_Norm(np.array(net.forward()['fc5'])))
 
 if __name__=="__main__":
     imgfile = "../images/grace_hopper.jpg"

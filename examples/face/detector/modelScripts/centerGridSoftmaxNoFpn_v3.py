@@ -10,6 +10,7 @@ except ImportError:
     logging.fatal("Cannot find caffe!")
 from caffe.model_libs import *
 from caffe.mobilenetv2_lib import *
+from caffe.block_lib import *
 from google.protobuf import text_format
 
 import math
@@ -229,13 +230,12 @@ test_net_file = "{}/{}_test.prototxt".format(save_dir, Job_Name)
 deploy_net_file = "{}/{}_deploy.prototxt".format(save_dir, Job_Name)
 solver_file = "{}/{}_solver.prototxt".format(save_dir, Job_Name)
 
-pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"
 
 gpus = "0"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 batch_size = 32
-accum_batch_size = 64
+accum_batch_size = 32
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
 device_id = 0
@@ -309,13 +309,10 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
         crop_type = P.AnnotatedData.CROP_JITTER, YoloForamte = True)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False, Fpn= Fpn,
+net, LayerList_Output = CenterGridfaceBody(net= net, from_layer= 'data', biFpn= False, Fpn= Fpn,
                                                     Inverted_residual_setting= Inverted_residual_setting,
                                                     top_out_channels= Inverted_residual_setting[4][1],
                                                     feature_stride= feature_stride, Use_BN=True)
-#bias_scale = [35, 96, 192, 438]
-#low_bbox_scale = [6, 64, 128, 256]
-#up_bbox_scale = [64,128, 256, 630]
 
 bias_scale = [35, 96, 192, 438]
 low_bbox_scale = [16, 64, 128, 256]
@@ -341,7 +338,7 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
         train=False, output_label=True, label_map_file=labelmapPath,
         transform_param=test_transform_param)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, 
+net, LayerList_Output = CenterGridfaceBody(net, from_layer = 'data', Use_BN= True, 
                                                     biFpn= False, Fpn= Fpn,
                                                     use_global_stats= True,
                                                     Inverted_residual_setting= Inverted_residual_setting, 

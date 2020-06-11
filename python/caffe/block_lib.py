@@ -21,7 +21,7 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
     elif kernel_size == 5:
         pad = 2
     if strides == 1:
-        out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "conv")
+        out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "conv_s1")
         ConvBNLayer(net, from_layer, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
                     num_output = input_channels * expansion_factor, kernel_size=kernel_size, pad=pad,
                     stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
@@ -38,13 +38,8 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
             Relu_layer = "conv_{}_{}/{}_relu6".format(id, repeated_num, "linear")
             net[Relu_layer] = L.ReLU6(net[out_layer_projects], in_place = True)
             return Relu_layer
-    elif strides == 2:
-        out_layer_expand = "conv_{}_{}/{}".format(id, repeated_num, "expand")
-        ConvBNLayer(net, from_layer, out_layer_expand, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
-                    num_output = input_channels * expansion_factor, kernel_size=1, pad=0, stride = 1, 
-                    use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
-        
-        out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
+    elif strides == 2:   
+        out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "conv_s2")
         ConvBNLayer(net, from_layer, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
                     num_output = input_channels * expansion_factor, kernel_size=kernel_size, pad=0, stride = strides,
                     use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
@@ -313,8 +308,13 @@ def CenterGridfaceBody(net, from_layer, Use_BN = True,
     assert len(LayerList_Name) == len(feature_stride)
     for index, detect_layer in enumerate(LayerList_Name):
         ch_stage = LayerFilters[index]
+        conv_ch_out = "conv_3x3_{}_{}".format(ch_stage, index)
+        ConvBNLayer(net, detect_layer, conv_ch_out, use_bn= Use_BN, 
+                use_swish= False, use_relu = True, 
+                num_output= ch_stage, kernel_size= 3, pad= 1, stride= 1,
+                lr_mult=1, use_scale= Use_BN, use_global_stats= False)
         conv_out = "conv_3x3_out_{}_{}".format(ch_stage, index)
-        ConvBNLayer(net, detect_layer, conv_out, use_bn= Use_BN, 
+        ConvBNLayer(net, conv_ch_out, conv_out, use_bn= Use_BN, 
                 use_swish= False, use_relu = True, 
                 num_output= fpn_out_channels, kernel_size= 3, pad= 1, stride= 1,
                 lr_mult=1, use_scale= Use_BN, use_global_stats= False)
