@@ -152,19 +152,20 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     } else {
         top[0]->mutable_cpu_data()[0] = 0;
     }
-    #if 1 
+    #if 1
     if(iterations_ % 100 == 0){
         LOG(INFO)<<"Region "<<output_width
-                <<": total loss: "<<top[0]->mutable_cpu_data()[0]
+                <<": anchor scale: "<<anchor_scale_
+                <<", total loss: "<<top[0]->mutable_cpu_data()[0]
                 <<", loc loss: "<< loc_loss
-                <<", lm_loss: "<<lm_loss
                 <<", class loss: "<< score_loss
                 <<", normalizer: "<<normalizer
                 <<", count_postive: "<< count_postive_
-                <<", num_landmarks: "<<num_lm_
                 <<", all gt_boxes: "<<num_groundtruth_
-                <<", this layer match nums: "<<num_gt_match
-                <<", anchor scale: "<<anchor_scale_;
+                <<", lm_loss: "<<lm_loss
+                <<", num_landmarks: "<<num_lm_
+                <<", this layer match nums: "<<num_gt_match;
+                
     }
     iterations_++;
     #endif
@@ -183,22 +184,6 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, 1, count_postive_);
         loss_weight = top[0]->cpu_diff()[0] / normalizer;
-        if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SIGMOID){
-            const int output_height = bottom[0]->height();
-            const int output_width = bottom[0]->width();
-            const int num_channels = bottom[0]->channels();
-            Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
-            const Dtype* bottom_data = bottom[0]->cpu_data();
-            num_ = bottom[0]->num();
-            int dimScale = output_height * output_width;
-            for(int b = 0; b < num_; b++){
-                int object_index = b * num_channels * dimScale + 4 * dimScale;
-                for(int i = 0; i < 1 * dimScale; i++){
-                    bottom_diff[object_index + i] = bottom_diff[object_index + i] * 
-                                                            logistic_gradient(bottom_data[object_index + i]);
-                }
-            }
-        }
         caffe_scal(bottom[0]->count(), loss_weight, bottom[0]->mutable_cpu_diff());
     }
 }

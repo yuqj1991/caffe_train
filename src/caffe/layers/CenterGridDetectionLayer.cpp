@@ -74,18 +74,18 @@ void CenterGridOutputLayer<Dtype>::Forward_cpu(
         const int output_height = bottom[t]->height();
         const int output_width = bottom[t]->width();
         assert(output_height == output_width);
-        const float downratio = (float)net_width_ / output_width;
+        const float downRatio = (float)net_width_ / output_width;
         num_ = bottom[t]->num();
         int num_channels = bottom[t]->channels();
         if(class_type_ == DetectionOutputParameter_CLASS_TYPE_SIGMOID){
             GetCenterGridObjectResultSigmoid(num_, num_channels, num_classes_,
                             output_width, output_height, 
-                            downratio,
+                            downRatio,
                             channel_pred_data, anchor_scale_[t], confidence_threshold_, &results_);
         }else if(class_type_ == DetectionOutputParameter_CLASS_TYPE_SOFTMAX){
             GetCenterGridObjectResultSoftMax(num_, num_channels, num_classes_,
                             output_width, output_height, 
-                            downratio,
+                            downRatio,
                             channel_pred_data, anchor_scale_[t], confidence_threshold_, &results_, has_lm_);
         }else {
             LOG(FATAL)<<"unknown class type";

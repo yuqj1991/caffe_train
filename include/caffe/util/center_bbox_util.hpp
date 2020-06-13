@@ -34,7 +34,10 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
                                 Dtype* gt_lm_data, Dtype* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const Dtype* channel_loc_data,
-                                const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, bool has_lm);
+                                const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, 
+                                bool has_lm);
+
+
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, const int output_width, 
                                 const int output_height, bool has_lm, const Dtype* lm_pre_diff,
@@ -89,7 +92,7 @@ void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
 template <typename Dtype>
 Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio,
+                          const float downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
@@ -99,7 +102,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
 template <typename Dtype>
 void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
-                          const int downRatio,
+                          const float downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, Dtype conf_thresh, 
                           std::map<int, std::vector<CenterNetInfo > >* results);
 
