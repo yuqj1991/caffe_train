@@ -1436,7 +1436,7 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                     temp_result.set_xmax(xmax);
                     temp_result.set_ymin(ymin);
                     temp_result.set_ymax(ymax);
-                    temp_result.set_area((xmax - xmin) * (ymax - ymin));
+                    temp_result.set_area((xmax - xmin + 1) * (ymax - ymin + 1));
                     if(has_lm){
                         temp_result.mutable_marks()->mutable_lefteye()->set_x(le_x);
                         temp_result.mutable_marks()->mutable_lefteye()->set_y(le_y);
