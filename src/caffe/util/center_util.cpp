@@ -403,8 +403,8 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
         for(int h = 0; h < output_height; h ++){
             for(int w = 0; w < output_width; w ++){
                 int select_index = h * output_width + w + b * dimScale;
-                if(label_data[b * dimScale + select_index] == -1.){
-                    loss_value_indices.push_back(std::make_pair(select_index, batch_sample_loss[b * dimScale + select_index]));
+                if(label_data[select_index] == -1.){
+                    loss_value_indices.push_back(std::make_pair(select_index, batch_sample_loss[select_index]));
                 }
             }
         }
