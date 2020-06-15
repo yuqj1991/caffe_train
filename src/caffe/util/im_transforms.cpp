@@ -116,16 +116,16 @@ void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
     float rm_y = lface->rightmouth().y() * old_height;
 
     le_x = GET_VALID_VALUE(le_x * new_width / old_width, (0.), new_width);
-    le_y = GET_VALID_VALUE(le_y * new_height / old_width, (0.), new_height);
+    le_y = GET_VALID_VALUE(le_y * new_height / old_height, (0.), new_height);
     re_x = GET_VALID_VALUE(re_x * new_width / old_width, (0.), new_width);
-    re_y = GET_VALID_VALUE(re_y * new_height / old_width, (0.), new_height);
+    re_y = GET_VALID_VALUE(re_y * new_height / old_height, (0.), new_height);
     no_x = GET_VALID_VALUE(no_x * new_width / old_width, (0.), new_width);
-    no_y = GET_VALID_VALUE(no_y * new_height / old_width, (0.), new_height);
+    no_y = GET_VALID_VALUE(no_y * new_height / old_height, (0.), new_height);
 
     lm_x = GET_VALID_VALUE(lm_x * new_width / old_width, (0.), new_width);
-    lm_y = GET_VALID_VALUE(lm_y * new_height / old_width, (0.), new_height);
+    lm_y = GET_VALID_VALUE(lm_y * new_height / old_height, (0.), new_height);
     rm_x = GET_VALID_VALUE(rm_x * new_width / old_width, (0.), new_width);
-    rm_y = GET_VALID_VALUE(rm_y * new_height / old_width, (0.), new_height);
+    rm_y = GET_VALID_VALUE(rm_y * new_height / old_height, (0.), new_height);
 
     lface->mutable_lefteye()->set_x(le_x / new_width);
     lface->mutable_lefteye()->set_y(le_y / new_height);

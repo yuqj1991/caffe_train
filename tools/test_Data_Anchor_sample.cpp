@@ -180,7 +180,7 @@ int main(int argc, char** argv){
             AnnotatedDatum* resized_anno_datum = NULL;
             bool do_resize = true;
             if(do_resize)
-            resized_anno_datum = new AnnotatedDatum();
+                resized_anno_datum = new AnnotatedDatum();
             vector<NormalizedBBox> sampled_bboxes;
             #if TEST_CROP_ANCHOR
             GenerateBatchDataAnchorSamples(anno_datum, data_anchor_samplers_, &sampled_bboxes);
@@ -228,9 +228,6 @@ int main(int argc, char** argv){
             transformed_anno_vec.clear();
             Blob<float> transformed_blob;
             vector<int> shape = data_transformer_.InferBlobShape(sampled_datum->datum());
-            for(unsigned int ii = 0; ii < shape.size(); ii++){
-            std::cout <<shape[ii]<<std::endl;
-            }
             transformed_blob.Reshape(shape);
             data_transformer_.Transform(*sampled_datum, &transformed_blob, &transformed_anno_vec);
             LOG(INFO)<<"SAMPEL SUCCESSFULLY";
@@ -240,51 +237,68 @@ int main(int argc, char** argv){
             int Trans_Height = transformed_blob.height();
             int Trans_Width = transformed_blob.width();
             for(int row = 0; row < Trans_Height; row++){
-            unsigned char *ImgData = cropImage.ptr<uchar>(row);
-            for(int col = 0; col < Trans_Width; col++){
-                ImgData[3 * col + 0] = static_cast<uchar>(data[0 * Trans_Height * Trans_Width + row * Trans_Width + col]);
-                ImgData[3 * col + 1] = static_cast<uchar>(data[1 * Trans_Height * Trans_Width + row * Trans_Width + col]);
-                ImgData[3 * col + 2] = static_cast<uchar>(data[2 * Trans_Height * Trans_Width + row * Trans_Width + col]);
+                unsigned char *ImgData = cropImage.ptr<uchar>(row);
+                for(int col = 0; col < Trans_Width; col++){
+                    ImgData[3 * col + 0] = static_cast<uchar>(data[0 * Trans_Height * Trans_Width + row * Trans_Width + col]);
+                    ImgData[3 * col + 1] = static_cast<uchar>(data[1 * Trans_Height * Trans_Width + row * Trans_Width + col]);
+                    ImgData[3 * col + 2] = static_cast<uchar>(data[2 * Trans_Height * Trans_Width + row * Trans_Width + col]);
+                }
             }
-        }
-        int Crop_Height = cropImage.rows;
-        int Crop_Width = cropImage.cols;
-        for (int g = 0; g < transformed_anno_vec.size(); ++g) {
-            const AnnotationGroup& anno_group = transformed_anno_vec[g];
-            for (int a = 0; a < anno_group.annotation_size(); ++a) {
-                const Annotation& anno = anno_group.annotation(a);
-                const NormalizedBBox& bbox = anno.bbox();
-                int xmin = int(bbox.xmin() * Crop_Width);
-                int ymin = int(bbox.ymin() * Crop_Height);
-                int xmax = int(bbox.xmax() * Crop_Width);
-                int ymax = int(bbox.ymax() * Crop_Height);
-                cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
+            int Crop_Height = cropImage.rows;
+            int Crop_Width = cropImage.cols;
+            for (int g = 0; g < transformed_anno_vec.size(); ++g) {
+                const AnnotationGroup& anno_group = transformed_anno_vec[g];
+                for (int a = 0; a < anno_group.annotation_size(); ++a) {
+                    const Annotation& anno = anno_group.annotation(a);
+                    const NormalizedBBox& bbox = anno.bbox();
+                    int xmin = int(bbox.xmin() * Crop_Width);
+                    int ymin = int(bbox.ymin() * Crop_Height);
+                    int xmax = int(bbox.xmax() * Crop_Width);
+                    int ymax = int(bbox.ymax() * Crop_Height);
+                    cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
+                    const int has_lm = anno.has_lm();
+                    if(has_lm){
+                        const AnnoFaceLandmarks& project_facemark = anno.face_lm();
+                        point lefteye = project_facemark.lefteye();
+                        point righteye = project_facemark.righteye();
+                        point nose = project_facemark.nose();
+                        point leftmouth = project_facemark.leftmouth();
+                        point rightmouth = project_facemark.rightmouth();
+                        vector<cv::Point2i> lm(5);
+                        lm[0] = cv::Point2i(int(lefteye.x() * Crop_Width), int(lefteye.y() * Crop_Height));
+                        lm[1] = cv::Point2i(int(righteye.x() * Crop_Width), int(righteye.y() * Crop_Height));
+                        lm[2] = cv::Point2i(int(nose.x() * Crop_Width), int(nose.y() * Crop_Height));
+                        lm[3] = cv::Point2i(int(leftmouth.x() * Crop_Width), int(leftmouth.y() * Crop_Height));
+                        lm[4] = cv::Point2i(int(rightmouth.x() * Crop_Width), int(rightmouth.y() * Crop_Height));
+                        for(unsigned ii = 0; ii < 5; ii++)
+                            cv::circle(cropImage, lm[ii], 1,  cv::Scalar(0,255,0), 1, 1, 0);
+                    }
+                }
             }
-        }
-        #else
-        cropImage= DecodeDatumToCVMatNative(sampled_datum->datum());
-        int Crop_Height = cropImage.rows;
-        int Crop_Width = cropImage.cols;
-        for (int g = 0; g < sampled_datum->annotation_group_size(); ++g) {
-                const AnnotationGroup& anno_group = sampled_datum->annotation_group(g);
-            for (int a = 0; a < anno_group.annotation_size(); ++a) {
-                const Annotation& anno = anno_group.annotation(a);
-                const NormalizedBBox& bbox = anno.bbox();
-                int xmin = int(bbox.xmin() * Crop_Width);
-                int ymin = int(bbox.ymin() * Crop_Height);
-                int xmax = int(bbox.xmax() * Crop_Width);
-                int ymax = int(bbox.ymax() * Crop_Height);
-                cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
+            #else
+            cropImage= DecodeDatumToCVMatNative(sampled_datum->datum());
+            int Crop_Height = cropImage.rows;
+            int Crop_Width = cropImage.cols;
+            for (int g = 0; g < sampled_datum->annotation_group_size(); ++g) {
+                    const AnnotationGroup& anno_group = sampled_datum->annotation_group(g);
+                for (int a = 0; a < anno_group.annotation_size(); ++a) {
+                    const Annotation& anno = anno_group.annotation(a);
+                    const NormalizedBBox& bbox = anno.bbox();
+                    int xmin = int(bbox.xmin() * Crop_Width);
+                    int ymin = int(bbox.ymin() * Crop_Height);
+                    int xmax = int(bbox.xmax() * Crop_Width);
+                    int ymax = int(bbox.ymax() * Crop_Height);
+                    cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
+                }
             }
-        }
-        #endif
+            #endif
         
-        cv::imwrite(saved_img_name, cropImage);
-        LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
-        delete sampled_datum;
-        if(do_resize)
-        delete resized_anno_datum;
-    }
+            cv::imwrite(saved_img_name, cropImage);
+            LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
+            delete sampled_datum;
+            if(do_resize)
+                delete resized_anno_datum;
+        }
     }
 	return 1;
 }
