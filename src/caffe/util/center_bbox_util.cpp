@@ -300,7 +300,7 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
                     pred_lm_data[lm_count * 10 + 8] = channel_loc_data[rm_x_index];
                     pred_lm_data[lm_count * 10 + 9] = channel_loc_data[rm_y_index];
 
-                    lm_count++;
+                    ++lm_count;
                 }
             }
         }
@@ -401,7 +401,7 @@ void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, co
                     bottom_diff[lm_y_index] = lm_pre_diff[lm_count * 10 + 7];
                     bottom_diff[rm_x_index] = lm_pre_diff[lm_count * 10 + 8];
                     bottom_diff[rm_y_index] = lm_pre_diff[lm_count * 10 + 9];
-                    lm_count++;
+                    ++lm_count;
                 }
             }
         }
@@ -543,13 +543,13 @@ void GenerateBatchHeatmap(std::map<int, vector<std::pair<NormalizedBBox, AnnoFac
             std::vector<Dtype> heatmap((output_width *output_height), Dtype(0.));
             const int class_id = gt_bboxes[ii].first.label();
             Dtype *classid_heap = gt_heatmap + (batch_id * num_classes_ + (class_id - 1)) * output_width * output_height;
-            const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width * 4;
-            const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height * 4;
-            const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width * 4;
-            const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height * 4;
+            const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
+            const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
+            const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
+            const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
             const Dtype width = Dtype(xmax - xmin);
             const Dtype height = Dtype(ymax - ymin);
-            Dtype radius = gaussian_radius(height, width, Dtype(0.3));
+            Dtype radius = gaussian_radius(height, width, Dtype(0.7));
             radius = std::max(0, int(radius));
             int center_x = static_cast<int>(Dtype((xmin + xmax) / 2));
             int center_y = static_cast<int>(Dtype((ymin + ymax) / 2));
