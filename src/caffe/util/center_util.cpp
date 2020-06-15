@@ -410,7 +410,7 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
         }
     }
     int num_postive = 0;
-    for(unsigned ii = 0; ii < posstive.size(); ii++)
+    for(unsigned ii = 0; ii < postive.size(); ii++)
         num_postive += postive[ii];
     std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
     int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
