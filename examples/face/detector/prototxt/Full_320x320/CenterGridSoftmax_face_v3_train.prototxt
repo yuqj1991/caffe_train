@@ -2194,7 +2194,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 1
+    num_class: 2
     share_location: true
     loc_weight: 1.0
     bias_scale: 17.0
@@ -2223,7 +2223,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 1
+    num_class: 2
     share_location: true
     loc_weight: 1.0
     bias_scale: 48.0
@@ -2252,7 +2252,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 1
+    num_class: 2
     share_location: true
     loc_weight: 1.0
     bias_scale: 96.0
@@ -2281,7 +2281,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 1
+    num_class: 2
     share_location: true
     loc_weight: 1.0
     bias_scale: 219.0
