@@ -1058,7 +1058,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     int postive = 0;
     int gt_match_box = 0;
     // 将所有值设置为 -2 的原因为，排除掉iou>0.35的一些样本，也就是说
-    // 只采集那些iou<0.35的负样本20200611,舍弃之
+    // 只采集那些iou<0.35的负样本.20200611,舍弃之
     caffe_set(batch_size * dimScale, Dtype(-1.), class_label); 
     for(int b = 0; b < batch_size; b++){
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = all_gt_bboxes.find(b)->second;
@@ -1077,32 +1077,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 }
                 Dtype class_loss = SingleSoftmaxLoss(channel_pred_data[bg_index], channel_pred_data[face_index], Dtype(-1.));
                 batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
-                #if 0
-                int class_index = b * dimScale +  h * output_width + w;
-                for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-                    const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
-                    const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
-                    const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
-                    const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
-                    const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
-                    const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
-                    int large_side = std::max(gt_bbox_height, gt_bbox_width);
-                    if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-                        NormalizedBBox anchor_bbox;
-                        float an_xmin = GET_VALID_VALUE((float)(w - float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
-                        float an_ymin = GET_VALID_VALUE((float)(h - float(anchor_scale/ downRatio / 2)) / output_height, 0.f, 1.f);
-                        float an_xmax = GET_VALID_VALUE((float)(w + float(anchor_scale/ downRatio / 2)) / output_width, 0.f, 1.f);
-                        float an_ymax = GET_VALID_VALUE((float)(h + float( anchor_scale/ downRatio / 2)) / output_height, 0.f, 1.f);
-                        anchor_bbox.set_xmin(an_xmin);
-                        anchor_bbox.set_xmax(an_xmax);
-                        anchor_bbox.set_ymin(an_ymin);
-                        anchor_bbox.set_ymax(an_ymax);
-                        if(YoloBBoxIou(anchor_bbox, gt_bboxes[ii].first) < 0.35){
-                            class_label[class_index] = -1;
-                        }
-                    }
-                }
-                #endif
             }
         }
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
