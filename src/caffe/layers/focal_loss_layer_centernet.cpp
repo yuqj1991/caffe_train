@@ -58,7 +58,6 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Reshape(
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-    // The forward pass computes the sigmoid prob values.
     sigmoid_layer_->Forward(sigmoid_bottom_vec_, sigmoid_top_vec_);
     const Dtype* prob_data = prob_.cpu_data();
     const Dtype* label = bottom[1]->cpu_data();
