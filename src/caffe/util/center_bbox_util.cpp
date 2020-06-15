@@ -229,26 +229,26 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
             Dtype width = xmax - xmin;
             Dtype height = ymax - ymin;
 
-            int x_loc_index = batch_id * num_channels * dimScale
+            int x_index = batch_id * num_channels * dimScale
                                     + 0 * dimScale
                                     + inter_center_y * output_width + inter_center_x;
-            int y_loc_index = batch_id * num_channels * dimScale 
+            int y_index = batch_id * num_channels * dimScale 
                                     + 1 * dimScale
                                     + inter_center_y * output_width + inter_center_x;
-            int width_loc_index = batch_id * num_channels * dimScale
+            int width_index = batch_id * num_channels * dimScale
                                     + 2 * dimScale
                                     + inter_center_y * output_width + inter_center_x;
-            int height_loc_index = batch_id * num_channels * dimScale 
+            int height_index = batch_id * num_channels * dimScale 
                                     + 3 * dimScale
                                     + inter_center_y * output_width + inter_center_x;
             gt_loc_offest_data[count * 2 + 0] = diff_x;
             gt_loc_offest_data[count * 2 + 1] = diff_y;
             gt_loc_wh_data[count * 2 + 0] = std::log(width);
             gt_loc_wh_data[count * 2 + 1] = std::log(height);
-            pred_loc_offest_data[count * 2 + 0] = channel_loc_data[x_loc_index];
-            pred_loc_offest_data[count * 2 + 1] = channel_loc_data[y_loc_index];
-            pred_loc_wh_data[count * 2 + 0] = channel_loc_data[width_loc_index];
-            pred_loc_wh_data[count * 2 + 1] = channel_loc_data[height_loc_index];
+            pred_loc_offest_data[count * 2 + 0] = channel_loc_data[x_index];
+            pred_loc_offest_data[count * 2 + 1] = channel_loc_data[y_index];
+            pred_loc_wh_data[count * 2 + 0] = channel_loc_data[width_index];
+            pred_loc_wh_data[count * 2 + 1] = channel_loc_data[height_index];
             ++count;
             if(has_lm){
                 //lm_gt_datas, & lm_pred_datas
@@ -349,18 +349,18 @@ void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, co
             Dtype center_y = Dtype((ymin + ymax) / 2);
             int inter_center_x = static_cast<int> (center_x);
             int inter_center_y = static_cast<int> (center_y);
-            int x_loc_index = batch_id * num_channels * dimScale
+            int x_index = batch_id * num_channels * dimScale
                                     + 0 * dimScale + inter_center_y * output_width + inter_center_x;
-            int y_loc_index = batch_id * num_channels * dimScale 
+            int y_index = batch_id * num_channels * dimScale 
                                     + 1 * dimScale + inter_center_y * output_width + inter_center_x;
-            int width_loc_index = batch_id * num_channels * dimScale
+            int width_index = batch_id * num_channels * dimScale
                                     + 2 * dimScale + inter_center_y * output_width + inter_center_x;
-            int height_loc_index = batch_id * num_channels * dimScale 
+            int height_index = batch_id * num_channels * dimScale 
                                     + 3 * dimScale + inter_center_y * output_width + inter_center_x;
-            bottom_diff[x_loc_index] = pre_offset_diff[count * 2 + 0];
-            bottom_diff[y_loc_index] = pre_offset_diff[count * 2 + 1];
-            bottom_diff[width_loc_index] = pre_wh_diff[count * 2 + 0];
-            bottom_diff[height_loc_index] = pre_wh_diff[count * 2 + 1];
+            bottom_diff[x_index] = pre_offset_diff[count * 2 + 0];
+            bottom_diff[y_index] = pre_offset_diff[count * 2 + 1];
+            bottom_diff[width_index] = pre_wh_diff[count * 2 + 0];
+            bottom_diff[height_index] = pre_wh_diff[count * 2 + 1];
             ++count;
             if(has_lm){
                 //lm_gt_datas, & lm_pred_datas
@@ -1342,7 +1342,7 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                     temp_result.set_xmax(xmax);
                     temp_result.set_ymin(ymin);
                     temp_result.set_ymax(ymax);
-                    temp_result.set_area((xmax - xmin + 1) * (ymax - ymin + 1));
+                    temp_result.set_area((xmax - xmin) * (ymax - ymin));
                     if(has_lm){
                         temp_result.mutable_marks()->mutable_lefteye()->set_x(le_x);
                         temp_result.mutable_marks()->mutable_lefteye()->set_y(le_y);

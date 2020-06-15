@@ -58,7 +58,6 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Reshape(
 template <typename Dtype>
 void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-    // The forward pass computes the sigmoid prob values.
     sigmoid_layer_->Forward(sigmoid_bottom_vec_, sigmoid_top_vec_);
     const Dtype* prob_data = prob_.cpu_data();
     const Dtype* label = bottom[1]->cpu_data();
@@ -67,28 +66,20 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
     num_class_ = bottom[0]->channels();
     width_ = bottom[0]->width();
     height_ = bottom[0]->height();
+    int count = bottom[0]->count();
     
     postive_count = 0;
     Dtype postive_loss = Dtype(0.), negitive_loss = Dtype(0.);
-    int dim = num_class_ * height_ * width_;
-    int dimScale = height_ * width_; 
-
-    for(int b = 0; b < batch_; ++b){
-        for(int c = 0; c < num_class_; ++c) {
-        for (int h = 0; h < height_; ++h) {
-            for (int w = 0; w < width_; ++w) {
-            int index = dim * b + c * dimScale + h * width_ + w;
-            Dtype prob_a = prob_data[index];
-            Dtype label_a = label[index];
-            if(label_a == Dtype(1.0)){
-                postive_loss -= log(std::max(prob_a, Dtype(FLT_MIN))) * std::pow(1 -prob_a, alpha_);
-                postive_count++;
-            }else if(label_a < Dtype(1.0)){
-                negitive_loss -= log(std::max(1 - prob_a, Dtype(FLT_MIN))) * std::pow(prob_a, alpha_) *
-                            std::pow(1 - label_a, gamma_);
-            }
-            }
-        }
+    
+    for(int index = 0; index < count; ++index){
+        Dtype prob_a = prob_data[index];
+        Dtype label_a = label[index];
+        if(label_a == Dtype(1.0)){
+            postive_loss -= log(std::max(prob_a, Dtype(FLT_MIN))) * std::pow(1 -prob_a, alpha_);
+            postive_count++;
+        }else if(label_a < Dtype(1.0)){
+            negitive_loss -= log(std::max(1 - prob_a, Dtype(FLT_MIN))) * std::pow(prob_a, alpha_) *
+                        std::pow(1 - label_a, gamma_);
         }
     }
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
@@ -122,23 +113,15 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<D
         const Dtype* prob_data = prob_.cpu_data();
         const Dtype* label = bottom[1]->cpu_data();
 
-        int dim = num_class_ * height_ * width_;
-        int dimScale = height_ * width_;
-        for(int b = 0; b < batch_; ++b){
-            for(int c = 0; c < num_class_; ++c) {
-                for (int h = 0; h < height_; ++h) {
-                    for (int w = 0; w < width_; ++w) {
-                        int index = dim * b + c * dimScale + h * width_ + w;
-                        Dtype prob_a = prob_data[index];
-                        Dtype label_a = label[index];
-                        if(label_a == Dtype(1.0)){
-                            bottom_diff[index] = std::pow(1 - prob_a, alpha_) * (alpha_ * prob_a *log(std::max(prob_a, Dtype(FLT_MIN))) - (1 - prob_a));
-                        }else if(label_a < Dtype(1.0))
-                            bottom_diff[index] = std::pow(1 - label_a, gamma_) * std::pow(prob_a, alpha_) * 
-                                                            ( prob_a - alpha_ * (1 - prob_a) * log(std::max(1 - prob_a, Dtype(FLT_MIN))));
-                    }
-                }
-            }
+        int count = bottom[0]->count();
+        for(int index = 0; index < count; ++index){
+            Dtype prob_a = prob_data[index];
+            Dtype label_a = label[index];
+            if(label_a == Dtype(1.0)){
+                bottom_diff[index] = std::pow(1 - prob_a, alpha_) * (alpha_ * prob_a *log(std::max(prob_a, Dtype(FLT_MIN))) - (1 - prob_a));
+            }else if(label_a < Dtype(1.0))
+                bottom_diff[index] = std::pow(1 - label_a, gamma_) * std::pow(prob_a, alpha_) * 
+                                                ( prob_a - alpha_ * (1 - prob_a) * log(std::max(1 - prob_a, Dtype(FLT_MIN))));
         }
         caffe_scal(bottom[0]->count(), postive_loss_weight, bottom_diff);
     }

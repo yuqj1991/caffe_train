@@ -13,6 +13,7 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
           const int batch, const int channels, const int height,
           const int width, Dtype* counts, float gamma, float alpha) {
   CUDA_KERNEL_LOOP(index, nthreads) {
+    /*
     const int fw = index % width;
     const int fh = (index / width) % height;
     const int fc = (index / width / height) % channels;
@@ -20,8 +21,9 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
     const int dim = (fn * channels + fc) * height * width;
     const Dtype* label_slice = label + dim;
     const Dtype* prob_slice = prob_data + dim;
-    const Dtype label_a = label_slice[fh * width + fw];
-    const Dtype prob_a = prob_slice[fh * width + fw];
+    */
+    const Dtype label_a = label[index];
+    const Dtype prob_a = prob_data[index];
     if( label_a == Dtype(1)){
       loss[index] -= log(max(prob_a, Dtype(FLT_MIN))) * powf(1 -prob_a, alpha);
       counts[index] = 1;
@@ -69,6 +71,7 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
           const int batch, const int channels, const int height,
           const int width, Dtype* counts, float gamma, float alpha) {
     CUDA_KERNEL_LOOP(index, nthreads) {
+        /*
         const int fw = index % width;
         const int fh = (index / width) % height;
         const int fc = (index / width / height) % channels;
@@ -76,8 +79,9 @@ __global__ void focalSigmoidLossBackwardGPU(const int nthreads,
         const int dim = (fn * channels + fc) * height * width;
         const Dtype* label_slice = label + dim;
         const Dtype* prob_slice = prob_data + dim;
-        const Dtype label_a = label_slice[fh * width + fw];
-        const Dtype prob_a = prob_slice[fh * width + fw];
+        */
+        const Dtype label_a = label[index];
+        const Dtype prob_a = prob_data[index];
         if(label_a == Dtype(1)){
             bottom_diff[index] = powf(1 - prob_a, alpha) * 
                                             (alpha * prob_a * log(max(prob_a, Dtype(FLT_MIN))) - (1 - prob_a));
