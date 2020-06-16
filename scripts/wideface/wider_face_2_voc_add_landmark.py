@@ -13,8 +13,7 @@ retinaface_gt_file_path = "../../../dataset/facedata/retinaface_labels/"
 convet2yoloformat = False
 convert2vocformat = True
 
-minsize2select = 10  # min face size
-usepadding = True
+minsize2select = 32  # min face size
 
 datasetprefix = "../../../dataset/facedata/wider_face/JPEGImages"
 
@@ -109,7 +108,7 @@ def convertimgset(img_set="train"):
                             lms.append(lm)
                     cv2.rectangle(showimg, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0))
                 else:
-                    saveimg[y1:y2, x1:x2, :] = (104, 117, 123)
+                    #saveimg[y1:y2, x1:x2, :] = (104, 117, 123)
                     cv2.rectangle(showimg, (x1, y1), (x2, y2), (0, 0, 255))
                 filename = filename.replace("/", "_")
 
