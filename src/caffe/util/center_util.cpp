@@ -323,6 +323,7 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
                         sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
                     }
                     Dtype pred_data_value = std::exp(pred_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
+                    LOG(INFO)<<"probablity: "<<pred_data_value<<", label: "<<label_idx;
                     Dtype pred_another_data_value = std::exp(pred_data[bg_index + (1 - label_idx) * dimScale] - MaxVaule) / sumValue;
                     loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
                     bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
