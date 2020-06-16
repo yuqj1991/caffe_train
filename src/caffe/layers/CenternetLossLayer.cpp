@@ -298,7 +298,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         top[0]->mutable_cpu_data()[0] = cls_loss + loc_offset_loss + loc_wh_loss;
     }
 
-    #if 1 
+    #if 1
     if(iterations_ % 100 == 0){
         LOG(INFO)<<"total loss: "<<top[0]->mutable_cpu_data()[0]
                 <<", loc offset loss: "<<loc_offset_loss

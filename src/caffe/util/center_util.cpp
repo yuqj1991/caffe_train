@@ -223,8 +223,8 @@ template void transferCVMatToBlobData(std::vector<double> heatmap, double* buffe
 
 template <typename Dtype> 
 Dtype FocalLossSigmoid(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype *bottom_diff){
-    Dtype alpha_ = 0.25;
-    Dtype gamma_ = 2.f;
+    Dtype alpha_ = 2.0f;
+    Dtype gamma_ = 4.0f;
     Dtype loss = Dtype(0.);
     for(int i = 0; i < dimScale; i++){
         if(label_data[i] == 0.5){ // gt_boxes周围的小格子，因为离gt_box较近，所以计算这里的负样本
@@ -397,8 +397,8 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
     }
     int dimScale = output_height * output_width;
     std::vector<std::pair<int, float> > loss_value_indices;
+    loss_value_indices.clear();
     for(int b = 0; b < batch_size; b ++){
-        loss_value_indices.clear();
         //int num_postive = postive[b];
         for(int h = 0; h < output_height; h ++){
             for(int w = 0; w < output_width; w ++){

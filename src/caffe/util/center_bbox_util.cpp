@@ -894,23 +894,23 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                         #endif
                         if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
-                        Dtype xmin_bias = (w - xmin) * downRatio *2 / anchor_scale;
-                        Dtype ymin_bias = (h - ymin) * downRatio *2 / anchor_scale;
-                        Dtype xmax_bias = (w - xmax) * downRatio *2 / anchor_scale;
-                        Dtype ymax_bias = (h - ymax) * downRatio *2 / anchor_scale;
+                        Dtype xmin_bias = (w - xmin) * downRatio * 2 / anchor_scale;
+                        Dtype ymin_bias = (h - ymin) * downRatio * 2 / anchor_scale;
+                        Dtype xmax_bias = (w - xmax) * downRatio * 2 / anchor_scale;
+                        Dtype ymax_bias = (h - ymax) * downRatio * 2 / anchor_scale;
                         int xmin_index = b * num_channels * dimScale
-                                                    + 0* dimScale + h * output_width + w;
+                                                    + 0 * dimScale + h * output_width + w;
                         int ymin_index = b * num_channels * dimScale 
-                                                    + 1* dimScale + h * output_width + w;
+                                                    + 1 * dimScale + h * output_width + w;
                         int xmax_index = b * num_channels * dimScale
-                                                    + 2* dimScale + h * output_width + w;
+                                                    + 2 * dimScale + h * output_width + w;
                         int ymax_index = b * num_channels * dimScale 
-                                                    + 3* dimScale + h * output_width + w;
+                                                    + 3 * dimScale + h * output_width + w;
                         Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
-                        loc_loss += L2_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
-                        loc_loss += L2_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
-                        loc_loss += L2_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
-                        loc_loss += L2_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
+                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
 
                         bottom_diff[xmin_index] = xmin_diff;
                         bottom_diff[ymin_index] = ymin_diff;
@@ -927,14 +927,10 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                 }
             }
         }
-        if(count > 0){
-            int gt_class_index =  b * dimScale;
-            int pred_class_index = b * num_channels * dimScale + 4* dimScale;
-            score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
-                                            dimScale, bottom_diff + pred_class_index);
-        }else{
-            score_loss += 0;
-        }
+        int gt_class_index =  b * dimScale;
+        int pred_class_index = b * num_channels * dimScale + 4* dimScale;
+        score_loss += FocalLossSigmoid(class_label + gt_class_index, channel_pred_data + pred_class_index, 
+                                        dimScale, bottom_diff + pred_class_index);
         postive += count;
     }
     *count_postive = postive;
