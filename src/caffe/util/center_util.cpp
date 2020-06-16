@@ -438,6 +438,7 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
             LOG(INFO)<<"bg loss: "<<loss_value_indices[ii].second<<", label: "<<0;
         }
     }
+    LOG(INFO)<<"%%%%%%%%%%%%%%%%";
     #endif
 }
 
