@@ -1068,28 +1068,24 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         }
         std::vector<int> mask_Rf_anchor_already(dimScale, 0);
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
-            const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
-            const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
-            const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
-            const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
-            const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
-            const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+            Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
+            Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
+            Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
+            Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
+            int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+            int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-                int xmin_range = static_cast<int>(xmin);
-                int ymin_range = static_cast<int>(ymin);
-                int xmax_range = static_cast<int>(xmax);
-                int ymax_range = static_cast<int>(ymax);
-                if(loc_truth_scale.second <= 64){
+                if(loc_truth_scale.second <= 35){
                     Dtype BboxWidth = xmax - xmin;
                     Dtype Bboxheight = ymax - ymin;
-                    xmin_range = GET_VALID_VALUE(int(xmin_range - BboxWidth * 0.05), 0, output_width);
-                    xmax_range = GET_VALID_VALUE(int(xmax_range + BboxWidth * 0.05), 0, output_width);
-                    ymin_range = GET_VALID_VALUE(int(ymin_range - Bboxheight * 0.05), 0, output_height);
-                    ymax_range = GET_VALID_VALUE(int(ymax_range + Bboxheight * 0.05), 0, output_height);
+                    xmin = GET_VALID_VALUE(xmin - BboxWidth * 0.05, Dtype(0.), Dtype(output_width));
+                    xmax = GET_VALID_VALUE(xmax + BboxWidth * 0.05, Dtype(0.), Dtype(output_width));
+                    ymin = GET_VALID_VALUE(ymin - Bboxheight * 0.05, Dtype(0.), Dtype(output_height));
+                    ymax = GET_VALID_VALUE(ymax + Bboxheight * 0.05, Dtype(0.), Dtype(output_height));
                 }
-                for(int h = ymin_range; h < ymax_range; h++){
-                    for(int w = xmin_range; w < xmax_range; w++){
+                for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
+                    for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
