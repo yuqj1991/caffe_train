@@ -120,7 +120,7 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
             out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
             ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
                         num_output = input_channels * expansion_factor, kernel_size=kernel_size, pad=pad, 
-                        #group= input_channels * expansion_factor,
+                        group= input_channels * expansion_factor,
                         stride = strides, use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
             out_layer = out_layer_depthswise
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
@@ -142,9 +142,9 @@ def MBottleConvBlock(net, from_layer, id, repeated_num, fileter_channels, stride
                     use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         
         out_layer_depthswise = "conv_{}_{}/{}".format(id, repeated_num, "depthwise")
-        ConvBNLayer(net, from_layer, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
-                    num_output = input_channels * expansion_factor, kernel_size=kernel_size, pad=0, stride = strides, 
-                    #group= input_channels * expansion_factor,
+        ConvBNLayer(net, out_layer_expand, out_layer_depthswise, use_bn=Use_BN, use_relu = use_relu, use_swish= use_swish,
+                    num_output = input_channels * expansion_factor, kernel_size=kernel_size, pad=pad, stride = strides, 
+                    group= input_channels * expansion_factor,
                     use_scale = Use_scale, use_global_stats= use_global_stats, **bn_param)
         out_layer_projects = "conv_{}_{}/{}".format(id, repeated_num, "linear")
         ConvBNLayer(net, out_layer_depthswise, out_layer_projects, use_bn=Use_BN, use_relu = False, use_swish= False,
@@ -421,7 +421,7 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
     moudle_output = []
     out_layer = "conv_{}".format(index)
     ConvBNLayer(net, from_layer, out_layer, use_bn=Use_BN, use_relu=True,
-                num_output= 32, kernel_size=3, pad=0, stride = 2, use_scale = True,
+                num_output= 32, kernel_size=3, pad=1, stride = 2, use_scale = True,
                 use_global_stats= use_global_stats,
                 **bn_param)
     accum_stride *= 2
@@ -567,6 +567,14 @@ def CenterGridMobilenetV2Body(net, from_layer, Use_BN = True,
                         Reconnect_layer_two= LayerList_Name[len(feature_stride) - index - 1]
                 else:
                     net_last_layer = LayerList_Name[len(feature_stride) - index - 1]
+                    '''
+                    interLayer_Name="Conv3_3_{}_{}".format(channel_stage, index)
+                    ConvBNLayer(net, net_last_layer, interLayer_Name, use_bn= Use_BN,
+                        use_swish= False, use_relu = True, 
+                        num_output= channel_stage, kernel_size= 3, pad= 1, stride= 1,
+                        lr_mult=1, use_scale= Use_BN, use_global_stats= use_global_stats)
+                    net_last_layer = interLayer_Name
+                    '''
                     Reconnect_layer_two="ConvFpn_{}_{}".format(channel_stage, index)
                     ConvBNLayer(net, net_last_layer, Reconnect_layer_two, use_bn= Use_BN,
                         use_swish= False, use_relu = False, 

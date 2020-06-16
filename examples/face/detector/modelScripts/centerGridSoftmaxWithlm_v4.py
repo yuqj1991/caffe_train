@@ -267,11 +267,11 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 20000, 30000, 40000, 50000],
+    'stepvalue': [10000, 20000, 30000, 50000, 70000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 60000,
+    'max_iter': 80000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
@@ -299,19 +299,24 @@ check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
 make_if_not_exist(save_dir)
 
-
+has_landmarks = False
+detect_channels = 6
 # Create train.prototxt.
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
         train=True, output_label=True, label_map_file=labelmapPath,
-        transform_param=train_transform_param, batch_sampler=batch_sampler, 
-        data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler,
-        crop_type = P.AnnotatedData.CROP_JITTER, YoloForamte = True, has_landmarks= False)
+        transform_param=train_transform_param, 
+        batch_sampler=batch_sampler, 
+        data_anchor_sampler= data_anchor_sampler,
+        bbox_sampler=bbox_sampler,
+        crop_type = P.AnnotatedData.CROP_JITTER, 
+        YoloForamte = True, has_landmarks= has_landmarks)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False,
                                                     Inverted_residual_setting= Inverted_residual_setting,
                                                     top_out_channels= Inverted_residual_setting[4][1], 
-                                                    detector_num = 6, feature_stride= feature_stride)
+                                                    detector_num = detect_channels,
+                                                    feature_stride= feature_stride)
 bias_scale = [512, 368, 192, 96, 49, 19]
 low_bbox_scale = [480, 256, 128, 64, 35, 6]
 up_bbox_scale = [630, 480, 256, 128, 64, 35]
@@ -322,9 +327,9 @@ for idx, detect_output in enumerate(LayerList_Output):
     CenterGridObjectLoss(net=net, bias_scale= bias_scale[idx], 
                             low_bbox_scale= low_bbox_scale[idx], 
                             up_bbox_scale= up_bbox_scale[idx],
-                            normalization_mode = P.Loss.VALID,
+                            normalization_mode = P.Loss.BATCH_SIZE,
                             net_height = resize_height, net_width = resize_width,
-                            stageidx= idx, from_layers= from_layers, has_lm= False)
+                            stageidx= idx, from_layers= from_layers, has_lm= has_landmarks)
     from_layers = []
 with open(train_net_file, 'w') as f:
     print('name: "{}_train"'.format("CenterGridFace"), file=f)
@@ -334,14 +339,15 @@ with open(train_net_file, 'w') as f:
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batch_size,
         train=False, output_label=True, label_map_file=labelmapPath,
-        transform_param=test_transform_param, has_landmarks = False)
+        transform_param=test_transform_param, has_landmarks = has_landmarks)
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, 
                                                     biFpn= False,
                                                     use_global_stats= True,
                                                     Inverted_residual_setting= Inverted_residual_setting, 
                                                     top_out_channels= Inverted_residual_setting[4][1], 
-                                                    detector_num = 6, feature_stride= feature_stride)
+                                                    detector_num = detect_channels,
+                                                    feature_stride= feature_stride)
 DetectListLayer = []
 DetectListScale = []
 DetectListDownRatio = []
@@ -350,14 +356,17 @@ for idx, output in enumerate(LayerList_Output):
     DetectListScale.append(bias_scale[idx])
     DetectListDownRatio.append(feature_stride[len(feature_stride) - idx - 1])
 CenterGridObjectDetect(net, from_layers= DetectListLayer, 
-                            bias_scale= DetectListScale, down_ratio= DetectListDownRatio, has_lm=False)
+                            bias_scale= DetectListScale, 
+                            net_width = resize_width,
+                            net_height = resize_height,
+                            has_lm=has_landmarks)
 
 det_eval_param = {
     'num_classes': 2,
     'background_label_id': 0,
     'overlap_threshold': 0.15,
     'evaluate_difficult_gt': False,
-    'has_lm': False,
+    'has_lm': has_landmarks,
 }
 net.detection_eval = L.DetectionEvaluate(net.detection_out, net.label,
     detection_evaluate_param=det_eval_param,

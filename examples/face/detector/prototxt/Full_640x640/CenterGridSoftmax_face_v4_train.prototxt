@@ -4412,13 +4412,14 @@ layer {
   bottom: "Det_1x1_out_128_0"
   bottom: "label"
   top: "CenterGridLoss_0"
+  loss_weight: 1.0
   include {
     phase: TRAIN
   }
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4440,13 +4441,14 @@ layer {
   bottom: "Det_1x1_out_128_1"
   bottom: "label"
   top: "CenterGridLoss_1"
+  loss_weight: 1.0
   include {
     phase: TRAIN
   }
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4468,13 +4470,14 @@ layer {
   bottom: "Det_1x1_out_64_2"
   bottom: "label"
   top: "CenterGridLoss_2"
+  loss_weight: 1.0
   include {
     phase: TRAIN
   }
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4496,13 +4499,14 @@ layer {
   bottom: "Det_1x1_out_64_3"
   bottom: "label"
   top: "CenterGridLoss_3"
+  loss_weight: 1.0
   include {
     phase: TRAIN
   }
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4524,13 +4528,14 @@ layer {
   bottom: "Det_1x1_out_32_4"
   bottom: "label"
   top: "CenterGridLoss_4"
+  loss_weight: 1.0
   include {
     phase: TRAIN
   }
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4552,13 +4557,14 @@ layer {
   bottom: "Det_1x1_out_24_5"
   bottom: "label"
   top: "CenterGridLoss_5"
+  loss_weight: 1.0
   include {
     phase: TRAIN
   }
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2

@@ -4,7 +4,7 @@ test_iter: 3219
 test_interval: 5000
 base_lr: 0.012500000186264515
 display: 100
-max_iter: 60000
+max_iter: 80000
 lr_policy: "multistep"
 gamma: 0.10000000149011612
 weight_decay: 0.0005000000237487257
@@ -19,8 +19,8 @@ average_loss: 10
 stepvalue: 10000
 stepvalue: 20000
 stepvalue: 30000
-stepvalue: 40000
 stepvalue: 50000
+stepvalue: 70000
 iter_size: 2
 type: "RMSProp"
 eval_type: "detection"
