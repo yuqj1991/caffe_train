@@ -1072,12 +1072,24 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
             const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
             const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
-            const int gt_bbox_width = static_cast<int>((xmax - xmin + 1) * downRatio);
-            const int gt_bbox_height = static_cast<int>((ymax - ymin + 1) * downRatio);
+            const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
+            const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-                for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
-                    for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+                int xmin_range = static_cast<int>(xmin);
+                int ymin_range = static_cast<int>(ymin);
+                int xmax_range = static_cast<int>(xmax);
+                int ymax_range = static_cast<int>(ymax);
+                if(loc_truth_scale.second <= 64){
+                    Dtype BboxWidth = xmax - xmin;
+                    Dtype Bboxheight = ymax - ymin;
+                    xmin_range = GET_VALID_VALUE(int(xmin_range - BboxWidth * 0.05), 0, output_width);
+                    xmax_range = GET_VALID_VALUE(int(xmax_range + BboxWidth * 0.05), 0, output_width);
+                    ymin_range = GET_VALID_VALUE(int(xmin_range - Bboxheight * 0.05), 0, output_height);
+                    ymax_range = GET_VALID_VALUE(int(ymax_range + Bboxheight * 0.05), 0, output_height);
+                }
+                for(int h = xmin_range; h < ymax_range; h++){
+                    for(int w = ymin_range; w < xmax_range; w++){
                         
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;

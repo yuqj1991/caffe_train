@@ -399,6 +399,7 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
     int num_postive = 0;
     int dimScale = output_height * output_width;
     std::vector<std::pair<int, float> > loss_value_indices;
+    #if 0
     loss_value_indices.clear();
     for(int b = 0; b < batch_size; b ++){
         num_postive += postive[b];
@@ -414,15 +415,29 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
     std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
     int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
     for(int ii = 0; ii < num_negative; ii++){
-        /*
-        int height = loss_value_indices[ii].first / output_width;
-        int w = loss_value_indices[ii].first % output_width;
-        int h = height % output_height;
-        int b = height / output_height;
-        */
         int select_index = loss_value_indices[ii].first;
         label_data[select_index] = 0.5;
     }
+    #else    
+    for(int b = 0; b < batch_size; b ++){
+        num_postive = postive[b];
+        loss_value_indices.clear();
+        for(int h = 0; h < output_height; h ++){
+            for(int w = 0; w < output_width; w ++){
+                int select_index = b * dimScale + h * output_width + w;
+                if(label_data[select_index] == -1.){
+                    loss_value_indices.push_back(std::make_pair(select_index, batch_sample_loss[select_index]));
+                }
+            }
+        }
+        std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
+        int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
+        for(int ii = 0; ii < num_negative; ii++){
+            int select_index = loss_value_indices[ii].first;
+            label_data[select_index] = 0.5;
+        }
+    }
+    #endif
 }
 
 template void SelectHardSampleSoftMax(float *label_data, std::vector<float> batch_sample_loss, 
