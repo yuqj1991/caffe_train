@@ -882,16 +882,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
-                        #if 0
-                        if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
-                            continue;
-                        if(h + (anchor_scale/downRatio) / 2 >= output_height - 1)
-                            continue;
-                        if(w - (anchor_scale/downRatio) / 2 < 0)
-                            continue;
-                        if(h - (anchor_scale/downRatio) / 2 < 0)
-                            continue;
-                        #endif
+                        
                         if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
                         Dtype xmin_bias = (w - xmin) * downRatio * 2 / anchor_scale;
@@ -1086,16 +1077,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
-                        #if 0
-                        if(w + (anchor_scale/downRatio) / 2 >= output_width - 1)
-                            continue;
-                        if(h + (anchor_scale/downRatio) / 2 >= output_height - 1)
-                            continue;
-                        if(w - (anchor_scale/downRatio) / 2 < 0)
-                            continue;
-                        if(h - (anchor_scale/downRatio) / 2 < 0)
-                            continue;
-                        #endif
+                        
                         if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
                    

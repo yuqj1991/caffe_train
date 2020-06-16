@@ -395,30 +395,34 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
     }else{
         CHECK_EQ(num_channels, 4 + 2) << "x, y, width, height + label classes containing background + face";
     }
+    CHECK_EQ(postive.size(), batch_size);
+    int num_postive = 0;
     int dimScale = output_height * output_width;
     std::vector<std::pair<int, float> > loss_value_indices;
     loss_value_indices.clear();
     for(int b = 0; b < batch_size; b ++){
+        num_postive += postive[ii];
         for(int h = 0; h < output_height; h ++){
             for(int w = 0; w < output_width; w ++){
-                int select_index = h * output_width + w + b * dimScale;
+                int select_index = b * dimScale + h * output_width + w;
                 if(label_data[select_index] == -1.){
                     loss_value_indices.push_back(std::make_pair(select_index, batch_sample_loss[select_index]));
                 }
             }
         }
     }
-    int num_postive = 0;
-    for(unsigned ii = 0; ii < postive.size(); ii++)
-        num_postive += postive[ii];
+            
     std::sort(loss_value_indices.begin(), loss_value_indices.end(), SortScorePairDescendCenter<int>);
     int num_negative = std::min(int(loss_value_indices.size()), num_postive * negative_ratio);
     for(int ii = 0; ii < num_negative; ii++){
+        /*
         int height = loss_value_indices[ii].first / output_width;
         int w = loss_value_indices[ii].first % output_width;
         int h = height % output_height;
         int b = height / output_height;
-        label_data[b * dimScale + h * output_width + w] = 0.5;
+        */
+        int select_index = loss_value_indices[ii].first;
+        label_data[select_index] = 0.5;
     }
 }
 

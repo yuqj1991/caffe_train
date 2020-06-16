@@ -77,14 +77,14 @@ int main(int argc, char** argv){
     // 设置采样参数 data_anchor
     vector<DataAnchorSampler> data_anchor_samplers_;
     for(int ii = 0; ii < 1; ii++){
-    DataAnchorSampler samplers;
-    for(int jj = 0; jj < 6; jj++){
-        samplers.add_scale(16 * int(std::pow(2, jj)));
-    }
-    samplers.mutable_sample_constraint()->set_min_object_coverage(0.5);
-    samplers.set_max_sample(1);
-    samplers.set_max_trials(10);
-    data_anchor_samplers_.push_back(samplers);
+        DataAnchorSampler samplers;
+        for(int jj = 0; jj < 6; jj++){
+            samplers.add_scale(16 * int(std::pow(2, jj)));
+        }
+        samplers.mutable_sample_constraint()->set_min_object_coverage(0.5);
+        samplers.set_max_sample(1);
+        samplers.set_max_trials(10);
+        data_anchor_samplers_.push_back(samplers);
     }
 
     // 设置CROP BATCH 采样参数
@@ -136,15 +136,15 @@ int main(int argc, char** argv){
     AnnotatedDatum_AnnotationType type = AnnotatedDatum_AnnotationType_BBOX;
     std::string encode_type = "jpg";
     for(int ii = 0; ii < numSamples; ii++){
-    std::string filename = img_filenames[ii].first;
-    std::string labelname = img_filenames[ii].second;
+        std::string filename = img_filenames[ii].first;
+        std::string labelname = img_filenames[ii].second;
 
-    AnnotatedDatum anno_datum;
-    ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
-        resize_width, min_dim, max_dim, is_color, encode_type, type, label_type,
-        name_to_label, &anno_datum);
-    anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
-    source_datum.push_back(anno_datum);
+        AnnotatedDatum anno_datum;
+        ReadRichImageToAnnotatedDatum(filename, labelname, resize_height,
+            resize_width, min_dim, max_dim, is_color, encode_type, type, label_type,
+            name_to_label, &anno_datum);
+        anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
+        source_datum.push_back(anno_datum);
     }
     LOG(INFO)<<"=====SOURCE DATUM SUCCESSFULLY!=====";
 
