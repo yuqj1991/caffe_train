@@ -1085,7 +1085,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                     Dtype Bboxheight = ymax - ymin;
                     xmin_range = GET_VALID_VALUE(int(xmin_range - BboxWidth * 0.05), 0, output_width);
                     xmax_range = GET_VALID_VALUE(int(xmax_range + BboxWidth * 0.05), 0, output_width);
-                    ymin_range = GET_VALID_VALUE(int(xmin_range - Bboxheight * 0.05), 0, output_height);
+                    ymin_range = GET_VALID_VALUE(int(ymin_range - Bboxheight * 0.05), 0, output_height);
                     ymax_range = GET_VALID_VALUE(int(ymax_range + Bboxheight * 0.05), 0, output_height);
                 }
                 for(int h = ymin_range; h < ymax_range; h++){
