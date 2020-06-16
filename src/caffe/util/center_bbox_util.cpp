@@ -1066,6 +1066,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
             }
         }
+        std::vector<int> mask_Rf_anchor_already(dimScale, 0);
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
             const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
             const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
@@ -1078,7 +1079,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         
-                        if(mask_Rf_anchor[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
+                        if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
                    
                         Dtype xmin_bias = (w - xmin) * downRatio * 2 / anchor_scale;
@@ -1168,7 +1169,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                             }
                         }
                         class_label[class_index] = 1;
-                        mask_Rf_anchor[h * output_width + w] = 1;
+                        mask_Rf_anchor_already[h * output_width + w] = 1;
                         count++;
 
                         int bg_index = b * num_channels * dimScale 
@@ -1188,6 +1189,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 gt_match_box ++;
             }
         }
+        mask_Rf_anchor_already.clear();
         postive_batch[b] = count;
         postive += count;
     }
