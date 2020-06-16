@@ -1088,8 +1088,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                     ymin_range = GET_VALID_VALUE(int(xmin_range - Bboxheight * 0.05), 0, output_height);
                     ymax_range = GET_VALID_VALUE(int(ymax_range + Bboxheight * 0.05), 0, output_height);
                 }
-                for(int h = xmin_range; h < ymax_range; h++){
-                    for(int w = ymin_range; w < xmax_range; w++){
+                for(int h = ymin_range; h < ymax_range; h++){
+                    for(int w = xmin_range; w < xmax_range; w++){
                         
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
