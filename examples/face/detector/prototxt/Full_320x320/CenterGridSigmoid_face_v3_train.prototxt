@@ -1682,7 +1682,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -1844,7 +1844,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -2006,7 +2006,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -2168,7 +2168,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
