@@ -109,8 +109,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     std::vector<int> postive_batch_(num_, 0);
     //计算每个样本的总损失（loc loss + softmax loss)
     std::vector<Dtype> batch_sample_loss_(num_ * output_height * output_width, Dtype(-1.));
-    std::vector<int> mask_Rf_anchor_(output_height * output_width, 0);
-
+    
     vector<int> label_shape(2, 1);
     label_shape.push_back(num_);
     label_shape.push_back(output_height*output_width);
@@ -134,7 +133,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                             ignore_thresh_, &count_postive_, &sum_squre);
         }else if(class_type_ == CenterObjectLossParameter_CLASS_TYPE_SOFTMAX){
             class_score = EncodeCenterGridObjectSoftMaxLoss(num_, num_channels, num_classes_, output_width, output_height, 
-                            downRatio, postive_batch_, batch_sample_loss_, mask_Rf_anchor_,
+                            downRatio, postive_batch_, batch_sample_loss_,
                             channel_pred_data,  anchor_scale_, 
                             bbox_range_scale_,
                             all_gt_bboxes, label_muti_data, bottom_diff, 

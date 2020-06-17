@@ -16,6 +16,9 @@
 
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
+
+#define USE_ONE_MATCH_MUCH true
+
 int count_gt = 0;
 int count_one = 0;
 namespace caffe {
@@ -880,6 +883,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+                #if USE_ONE_MATCH_MUCH
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         
@@ -916,6 +920,45 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                         count++;
                     }
                 }
+                #else
+                Dtype center_x = Dtype((xmin + xmax) / 2);
+                Dtype center_y = Dtype((ymin + ymax) / 2);
+                int center_x_interger = static_cast<int>center_x;
+                int center_y_interger = static_cast<int>center_y;
+
+                Dtype BboxWidth = xmax - xmin;
+                Dtype BboxHeight = ymax - ymin;
+
+                int xmin_index = b * num_channels * dimScale
+                                            + 0 * dimScale + center_y_interger * output_width + center_x_interger;
+                int ymin_index = b * num_channels * dimScale 
+                                            + 1 * dimScale + center_y_interger * output_width + center_x_interger;
+                int xmax_index = b * num_channels * dimScale
+                                            + 2 * dimScale + center_y_interger * output_width + center_x_interger;
+                int ymax_index = b * num_channels * dimScale 
+                                            + 3 * dimScale + center_y_interger * output_width + center_x_interger;
+
+                Dtype xmin_bias = (center_x - center_x_interger) * downRatio / anchor_scale;
+                Dtype ymin_bias = (center_y - center_y_interger) * downRatio / anchor_scale;
+                Dtype xmax_bias = std::log(BboxWidth * downRatio / anchor_scale);
+                Dtype ymax_bias = std::log(BboxHeight * downRatio / anchor_scale);
+                Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
+
+                bottom_diff[xmin_index] = xmin_diff;
+                bottom_diff[ymin_index] = ymin_diff;
+                bottom_diff[xmax_index] = xmax_diff;
+                bottom_diff[ymax_index] = ymax_diff;
+                // class score 
+                // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
+                int class_index = b * dimScale
+                                        +  center_y_interger * output_width + center_x_interger;
+                class_label[class_index] = 1;
+                count++;
+                #endif
             }
         }
         int gt_class_index =  b * dimScale;
@@ -977,17 +1020,33 @@ void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channe
                                             + 3* dimScale + h * output_width + w;
                 int class_index = b * num_channels * dimScale
                                             + 4* dimScale + h * output_width + w;
+                float xmin = 0.f, ymin = 0.f, xmax = 0.f, ymax = 0.f;
+                #if USE_ONE_MATCH_MUCH
 
                 float bb_xmin = (w + 0.5 - channel_pred_data[x_index] * anchor_scale /(2*downRatio)) *downRatio;
                 float bb_ymin = (h + 0.5 - channel_pred_data[y_index] * anchor_scale /(2*downRatio)) *downRatio;
                 float bb_xmax = (w + 0.5 - channel_pred_data[width_index] * anchor_scale /(2*downRatio)) *downRatio;
                 float bb_ymax = (h + 0.5 - channel_pred_data[height_index] * anchor_scale /(2*downRatio)) *downRatio;
                 
-                float xmin = GET_VALID_VALUE(bb_xmin, (0.f), float(downRatio * output_width));
-                float ymin = GET_VALID_VALUE(bb_ymin, (0.f), float(downRatio * output_height));
-                float xmax = GET_VALID_VALUE(bb_xmax, (0.f), float(downRatio * output_width));
-                float ymax = GET_VALID_VALUE(bb_ymax, (0.f), float(downRatio * output_height));
+                xmin = GET_VALID_VALUE(bb_xmin, (0.f), float(downRatio * output_width));
+                ymin = GET_VALID_VALUE(bb_ymin, (0.f), float(downRatio * output_height));
+                xmax = GET_VALID_VALUE(bb_xmax, (0.f), float(downRatio * output_width));
+                ymax = GET_VALID_VALUE(bb_ymax, (0.f), float(downRatio * output_height));
+                #else
+                Dtype xmin_bias = (center_x_interger - center_x) * downRatio / anchor_scale;
+                Dtype ymin_bias = (center_y_interger - center_y) * downRatio / anchor_scale;
+                Dtype xmax_bias = std::log(BboxWidth * downRatio / anchor_scale);
+                Dtype ymax_bias = std::log(BboxHeight * downRatio / anchor_scale);
+                float center_x = (channel_pred_data[x_index] * anchor_scale / downRatio + w) * downRatio;
+                float center_y = (channel_pred_data[y_index] * anchor_scale / downRatio + h) * downRatio;
+                float width = std::exp(channel_pred_data[width_index]) * anchor_scale;
+                float height = std::exp(channel_pred_data[height_index]) * anchor_scale;
 
+                xmin = GET_VALID_VALUE(center_x - float(width / 2), (0.f), float(downRatio * output_width));
+                ymin = GET_VALID_VALUE(center_y - float(height / 2), (0.f), float(downRatio * output_height));
+                xmax = GET_VALID_VALUE(center_x + float(width / 2), (0.f), float(downRatio * output_width));
+                ymax = GET_VALID_VALUE(center_y + float(height / 2), (0.f), float(downRatio * output_height));
+                #endif
                 if((xmax - xmin) <= 0 || (ymax - ymin) <= 0)
                     continue;                                     
                 
@@ -1001,7 +1060,7 @@ void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channe
                     temp_result.set_xmax(xmax);
                     temp_result.set_ymin(ymin);
                     temp_result.set_ymax(ymax);
-                    temp_result.set_area((xmax - xmin + 1) * (ymax - ymin + 1));
+                    temp_result.set_area((xmax - xmin) * (ymax - ymin));
                     (*results)[b].push_back(temp_result);
                 }
             }
@@ -1026,7 +1085,7 @@ template <typename Dtype>
 Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const float downRatio, std::vector<int>postive_batch,
-                          std::vector<Dtype> batch_sample_loss, std::vector<int> mask_Rf_anchor,
+                          std::vector<Dtype> batch_sample_loss,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
@@ -1076,6 +1135,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
+                #if USE_ONE_MATCH_MUCH
                 #if 0
                 if(loc_truth_scale.second <= 35){
                     Dtype BboxWidth = xmax - xmin;
@@ -1196,6 +1256,45 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
                     }
                 }
+                #else
+                Dtype center_x = Dtype((xmin + xmax) / 2);
+                Dtype center_y = Dtype((ymin + ymax) / 2);
+                int center_x_interger = static_cast<int>center_x;
+                int center_y_interger = static_cast<int>center_y;
+
+                Dtype BboxWidth = xmax - xmin;
+                Dtype BboxHeight = ymax - ymin;
+
+                int xmin_index = b * num_channels * dimScale
+                                            + 0 * dimScale + center_y_interger * output_width + center_x_interger;
+                int ymin_index = b * num_channels * dimScale 
+                                            + 1 * dimScale + center_y_interger * output_width + center_x_interger;
+                int xmax_index = b * num_channels * dimScale
+                                            + 2 * dimScale + center_y_interger * output_width + center_x_interger;
+                int ymax_index = b * num_channels * dimScale 
+                                            + 3 * dimScale + center_y_interger * output_width + center_x_interger;
+
+                Dtype xmin_bias = (center_x - center_x_interger) * downRatio / anchor_scale;
+                Dtype ymin_bias = (center_y - center_y_interger) * downRatio / anchor_scale;
+                Dtype xmax_bias = std::log(BboxWidth * downRatio / anchor_scale);
+                Dtype ymax_bias = std::log(BboxHeight * downRatio / anchor_scale);
+                Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
+                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
+
+                bottom_diff[xmin_index] = xmin_diff;
+                bottom_diff[ymin_index] = ymin_diff;
+                bottom_diff[xmax_index] = xmax_diff;
+                bottom_diff[ymax_index] = ymax_diff;
+                // class score 
+                // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
+                int class_index = b * dimScale
+                                        +  center_y_interger * output_width + center_x_interger;
+                class_label[class_index] = 1;
+                count++;
+                #endif
                 gt_match_box ++;
             }
         }
@@ -1218,7 +1317,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
 template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const float downRatio, std::vector<int>postive_batch,
-                          std::vector<float> batch_sample_loss, std::vector<int> mask_Rf_anchor,
+                          std::vector<float> batch_sample_loss,
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
@@ -1228,7 +1327,7 @@ template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int
 template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
                           const float downRatio, std::vector<int>postive_batch,
-                          std::vector<double> batch_sample_loss, std::vector<int> mask_Rf_anchor,
+                          std::vector<double> batch_sample_loss,
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
@@ -1265,15 +1364,28 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                                             + 3* dimScale + h * output_width + w;        
                 
 
-                float bb_xmin = (w + 0.5 - channel_pred_data[x_index] * anchor_scale /(2 * downRatio)) *downRatio;
-                float bb_ymin = (h + 0.5 - channel_pred_data[y_index] * anchor_scale /(2 * downRatio)) *downRatio;
-                float bb_xmax = (w + 0.5 - channel_pred_data[width_index] * anchor_scale /(2 * downRatio)) *downRatio;
-                float bb_ymax = (h + 0.5 - channel_pred_data[height_index] * anchor_scale /(2 * downRatio)) *downRatio;
-                
-                float xmin = GET_VALID_VALUE(bb_xmin, (0.f), float(downRatio * output_width));
-                float ymin = GET_VALID_VALUE(bb_ymin, (0.f), float(downRatio * output_height));
-                float xmax = GET_VALID_VALUE(bb_xmax, (0.f), float(downRatio * output_width));
-                float ymax = GET_VALID_VALUE(bb_ymax, (0.f), float(downRatio * output_height));
+                float xmin = 0.f, ymin = 0.f, xmax = 0.f, ymax = 0.f;
+                #if USE_ONE_MATCH_MUCH
+
+                float bb_xmin = (w + 0.5 - channel_pred_data[x_index] * anchor_scale / (2 * downRatio)) *downRatio;
+                float bb_ymin = (h + 0.5 - channel_pred_data[y_index] * anchor_scale / (2 * downRatio)) *downRatio;
+                float bb_xmax = (w + 0.5 - channel_pred_data[width_index] * anchor_scale / (2 * downRatio)) *downRatio;
+                float bb_ymax = (h + 0.5 - channel_pred_data[height_index] * anchor_scale / (2 * downRatio)) *downRatio;
+                xmin = GET_VALID_VALUE(bb_xmin, (0.f), float(downRatio * output_width));
+                ymin = GET_VALID_VALUE(bb_ymin, (0.f), float(downRatio * output_height));
+                xmax = GET_VALID_VALUE(bb_xmax, (0.f), float(downRatio * output_width));
+                ymax = GET_VALID_VALUE(bb_ymax, (0.f), float(downRatio * output_height));
+                #else
+                float center_x = (channel_pred_data[x_index] * anchor_scale / downRatio + w) * downRatio;
+                float center_y = (channel_pred_data[y_index] * anchor_scale / downRatio + h) * downRatio;
+                float width = std::exp(channel_pred_data[width_index]) * anchor_scale;
+                float height = std::exp(channel_pred_data[height_index]) * anchor_scale;
+
+                xmin = GET_VALID_VALUE(center_x - float(width / 2), (0.f), float(downRatio * output_width));
+                ymin = GET_VALID_VALUE(center_y - float(height / 2), (0.f), float(downRatio * output_height));
+                xmax = GET_VALID_VALUE(center_x + float(width / 2), (0.f), float(downRatio * output_width));
+                ymax = GET_VALID_VALUE(center_y + float(height / 2), (0.f), float(downRatio * output_height));
+                #endif
 
                 float le_x = 0.f, le_y = 0.f, re_x = 0.f, re_y = 0.f, no_x = 0.f, no_y = 0.f, lm_x = 0.f, lm_y = 0.f, rm_x = 0.f, rm_y = 0.f;
                 if(has_lm){
