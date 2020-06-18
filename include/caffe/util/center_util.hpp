@@ -63,8 +63,15 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
             const int label_channel, const int num_channels,
             const int outheight, const int outwidth, bool has_lm);
 
+template<typename Dtype>
+Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, Dtype *bottom_diff, 
+                            const int num_channels, bool has_lm);
+
+
 template <typename Dtype>
-Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data, 
+Dtype SoftmaxWithLoss(Dtype* label_data, Dtype* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, Dtype *bottom_diff, 
                             const int num_channels, bool has_lm);
