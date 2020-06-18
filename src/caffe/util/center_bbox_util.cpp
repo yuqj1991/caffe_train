@@ -17,7 +17,8 @@
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
 
-#define USE_ONE_MATCH_MUCH true
+#define SOFTMAX_USE_ONE_MATCH_MUCH false
+#define SIGMOID_USE_ONE_MATCH_MUCH true
 
 int count_gt = 0;
 int count_one = 0;
@@ -883,7 +884,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-                #if USE_ONE_MATCH_MUCH
+                #if SIGMOID_USE_ONE_MATCH_MUCH
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         
@@ -1021,7 +1022,7 @@ void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channe
                 int class_index = b * num_channels * dimScale
                                             + 4* dimScale + h * output_width + w;
                 float xmin = 0.f, ymin = 0.f, xmax = 0.f, ymax = 0.f;
-                #if USE_ONE_MATCH_MUCH
+                #if SIGMOID_USE_ONE_MATCH_MUCH
 
                 float bb_xmin = (w + 0.5 - channel_pred_data[x_index] * anchor_scale /(2*downRatio)) *downRatio;
                 float bb_ymin = (h + 0.5 - channel_pred_data[y_index] * anchor_scale /(2*downRatio)) *downRatio;
@@ -1135,7 +1136,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-                #if USE_ONE_MATCH_MUCH
+                #if SOFTMAX_USE_ONE_MATCH_MUCH
                 #if 0
                 if(loc_truth_scale.second <= 35){
                     Dtype BboxWidth = xmax - xmin;
@@ -1365,7 +1366,7 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                 
 
                 float xmin = 0.f, ymin = 0.f, xmax = 0.f, ymax = 0.f;
-                #if USE_ONE_MATCH_MUCH
+                #if SOFTMAX_USE_ONE_MATCH_MUCH
 
                 float bb_xmin = (w + 0.5 - channel_pred_data[x_index] * anchor_scale / (2 * downRatio)) *downRatio;
                 float bb_ymin = (h + 0.5 - channel_pred_data[y_index] * anchor_scale / (2 * downRatio)) *downRatio;
