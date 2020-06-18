@@ -292,8 +292,9 @@ Inverted_residual_setting = [[1, 16, 1, 1],
                              [6, 24, 3, 2],
                              [6, 32, 3, 2],
                              [6, 64, 5, 2],
-                             [6, 128, 3, 2]]
-feature_stride= [4, 8, 16, 16, 32, 32]
+                             [6, 128, 3, 2],
+                             [6, 128, 2, 2]]
+feature_stride= [4, 8, 16, 32, 64]
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
@@ -315,12 +316,12 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
 
 net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False,
                                                     Inverted_residual_setting= Inverted_residual_setting,
-                                                    top_out_channels= Inverted_residual_setting[4][1], 
+                                                    top_out_channels= Inverted_residual_setting[len(Inverted_residual_setting) - 1][1], 
                                                     detector_num = detect_channels,
                                                     feature_stride= feature_stride)
-bias_scale = [512, 368, 192, 96, 49, 19]
-low_bbox_scale = [480, 256, 128, 64, 35, 6]
-up_bbox_scale = [630, 480, 256, 128, 64, 35]
+bias_scale = [475, 240, 120, 60, 23]
+low_bbox_scale = [320, 160, 80, 40, 6]
+up_bbox_scale = [630, 320, 160, 80, 40]
 from_layers = []
 for idx, detect_output in enumerate(LayerList_Output):
     from_layers.append(net[detect_output])
@@ -348,16 +349,14 @@ net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_
                                                     biFpn= False,
                                                     use_global_stats= True,
                                                     Inverted_residual_setting= Inverted_residual_setting, 
-                                                    top_out_channels= Inverted_residual_setting[4][1], 
+                                                    top_out_channels= Inverted_residual_setting[len(Inverted_residual_setting) - 1][1], 
                                                     detector_num = detect_channels,
                                                     feature_stride= feature_stride)
 DetectListLayer = []
 DetectListScale = []
-DetectListDownRatio = []
 for idx, output in enumerate(LayerList_Output):
     DetectListLayer.append(net[output])
     DetectListScale.append(bias_scale[idx])
-    DetectListDownRatio.append(feature_stride[len(feature_stride) - idx - 1])
 CenterGridObjectDetect(net, from_layers= DetectListLayer, 
                             bias_scale= DetectListScale,
                             class_type = P.DetectionOutput.SIGMOID,

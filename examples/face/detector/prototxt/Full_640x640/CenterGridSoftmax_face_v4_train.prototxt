@@ -3398,10 +3398,433 @@ layer {
   top: "Res_Sum_4_2"
 }
 layer {
-  name: "conv_1_project_14/DepthWise"
+  name: "conv_5_0/expand"
   type: "Convolution"
   bottom: "Res_Sum_4_2"
-  top: "conv_1_project_14/DepthWise"
+  top: "conv_5_0/expand"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 768
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv_5_0/expand_bn"
+  type: "BatchNorm"
+  bottom: "conv_5_0/expand"
+  top: "conv_5_0/expand"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "conv_5_0/expand_scale"
+  type: "Scale"
+  bottom: "conv_5_0/expand"
+  top: "conv_5_0/expand"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "conv_5_0/expand_relu6"
+  type: "ReLU6"
+  bottom: "conv_5_0/expand"
+  top: "conv_5_0/expand"
+}
+layer {
+  name: "conv_5_0/depthwise"
+  type: "Convolution"
+  bottom: "conv_5_0/expand"
+  top: "conv_5_0/depthwise"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 768
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 768
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv_5_0/depthwise_bn"
+  type: "BatchNorm"
+  bottom: "conv_5_0/depthwise"
+  top: "conv_5_0/depthwise"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "conv_5_0/depthwise_scale"
+  type: "Scale"
+  bottom: "conv_5_0/depthwise"
+  top: "conv_5_0/depthwise"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "conv_5_0/depthwise_relu6"
+  type: "ReLU6"
+  bottom: "conv_5_0/depthwise"
+  top: "conv_5_0/depthwise"
+}
+layer {
+  name: "conv_5_0/linear"
+  type: "Convolution"
+  bottom: "conv_5_0/depthwise"
+  top: "conv_5_0/linear"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 128
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv_5_0/linear_bn"
+  type: "BatchNorm"
+  bottom: "conv_5_0/linear"
+  top: "conv_5_0/linear"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "conv_5_0/linear_scale"
+  type: "Scale"
+  bottom: "conv_5_0/linear"
+  top: "conv_5_0/linear"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "conv_5_1/expand"
+  type: "Convolution"
+  bottom: "conv_5_0/linear"
+  top: "conv_5_1/expand"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 768
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv_5_1/expand_bn"
+  type: "BatchNorm"
+  bottom: "conv_5_1/expand"
+  top: "conv_5_1/expand"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "conv_5_1/expand_scale"
+  type: "Scale"
+  bottom: "conv_5_1/expand"
+  top: "conv_5_1/expand"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "conv_5_1/expand_relu6"
+  type: "ReLU6"
+  bottom: "conv_5_1/expand"
+  top: "conv_5_1/expand"
+}
+layer {
+  name: "conv_5_1/depthwise"
+  type: "Convolution"
+  bottom: "conv_5_1/expand"
+  top: "conv_5_1/depthwise"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 768
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 768
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv_5_1/depthwise_bn"
+  type: "BatchNorm"
+  bottom: "conv_5_1/depthwise"
+  top: "conv_5_1/depthwise"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "conv_5_1/depthwise_scale"
+  type: "Scale"
+  bottom: "conv_5_1/depthwise"
+  top: "conv_5_1/depthwise"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "conv_5_1/depthwise_relu6"
+  type: "ReLU6"
+  bottom: "conv_5_1/depthwise"
+  top: "conv_5_1/depthwise"
+}
+layer {
+  name: "conv_5_1/linear"
+  type: "Convolution"
+  bottom: "conv_5_1/depthwise"
+  top: "conv_5_1/linear"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 128
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv_5_1/linear_bn"
+  type: "BatchNorm"
+  bottom: "conv_5_1/linear"
+  top: "conv_5_1/linear"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "conv_5_1/linear_scale"
+  type: "Scale"
+  bottom: "conv_5_1/linear"
+  top: "conv_5_1/linear"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "Res_Sum_5_1"
+  type: "Eltwise"
+  bottom: "conv_5_0/linear"
+  bottom: "conv_5_1/linear"
+  top: "Res_Sum_5_1"
+}
+layer {
+  name: "conv_1_project_16/DepthWise"
+  type: "Convolution"
+  bottom: "Res_Sum_5_1"
+  top: "conv_1_project_16/DepthWise"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -3419,10 +3842,10 @@ layer {
   }
 }
 layer {
-  name: "conv_1_project_14/DepthWise_bn"
+  name: "conv_1_project_16/DepthWise_bn"
   type: "BatchNorm"
-  bottom: "conv_1_project_14/DepthWise"
-  top: "conv_1_project_14/DepthWise"
+  bottom: "conv_1_project_16/DepthWise"
+  top: "conv_1_project_16/DepthWise"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -3441,10 +3864,10 @@ layer {
   }
 }
 layer {
-  name: "conv_1_project_14/DepthWise_scale"
+  name: "conv_1_project_16/DepthWise_scale"
   type: "Scale"
-  bottom: "conv_1_project_14/DepthWise"
-  top: "conv_1_project_14/DepthWise"
+  bottom: "conv_1_project_16/DepthWise"
+  top: "conv_1_project_16/DepthWise"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -3464,16 +3887,16 @@ layer {
   }
 }
 layer {
-  name: "conv_1_project_14/DepthWise_relu6"
+  name: "conv_1_project_16/DepthWise_relu6"
   type: "ReLU6"
-  bottom: "conv_1_project_14/DepthWise"
-  top: "conv_1_project_14/DepthWise"
+  bottom: "conv_1_project_16/DepthWise"
+  top: "conv_1_project_16/DepthWise"
 }
 layer {
-  name: "conv_1_project_14/linear"
+  name: "conv_1_project_16/linear"
   type: "Convolution"
-  bottom: "conv_1_project_14/DepthWise"
-  top: "conv_1_project_14/linear"
+  bottom: "conv_1_project_16/DepthWise"
+  top: "conv_1_project_16/linear"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -3490,10 +3913,10 @@ layer {
   }
 }
 layer {
-  name: "conv_1_project_14/linear_bn"
+  name: "conv_1_project_16/linear_bn"
   type: "BatchNorm"
-  bottom: "conv_1_project_14/linear"
-  top: "conv_1_project_14/linear"
+  bottom: "conv_1_project_16/linear"
+  top: "conv_1_project_16/linear"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -3512,10 +3935,10 @@ layer {
   }
 }
 layer {
-  name: "conv_1_project_14/linear_scale"
+  name: "conv_1_project_16/linear_scale"
   type: "Scale"
-  bottom: "conv_1_project_14/linear"
-  top: "conv_1_project_14/linear"
+  bottom: "conv_1_project_16/linear"
+  top: "conv_1_project_16/linear"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -3535,15 +3958,15 @@ layer {
   }
 }
 layer {
-  name: "conv_1_project_14/linear_relu6"
+  name: "conv_1_project_16/linear_relu6"
   type: "ReLU6"
-  bottom: "conv_1_project_14/linear"
-  top: "conv_1_project_14/linear"
+  bottom: "conv_1_project_16/linear"
+  top: "conv_1_project_16/linear"
 }
 layer {
   name: "Deconv_Scale_Up_Stage_128_0"
   type: "Deconvolution"
-  bottom: "conv_1_project_14/linear"
+  bottom: "conv_1_project_16/linear"
   top: "Deconv_Scale_Up_Stage_128_0"
   param {
     lr_mult: 1.0
@@ -3608,7 +4031,7 @@ layer {
 layer {
   name: "ConvFpn_128_0"
   type: "Convolution"
-  bottom: "Res_Sum_4_2"
+  bottom: "Res_Sum_5_1"
   top: "ConvFpn_128_0"
   param {
     lr_mult: 1.0
@@ -3707,10 +4130,10 @@ layer {
   }
 }
 layer {
-  name: "ResOne_conv_3x3_out_128_1"
-  type: "Convolution"
-  bottom: "Res_Sum_4_1"
-  top: "ResOne_conv_3x3_out_128_1"
+  name: "Deconv_Scale_Up_Stage_128_1"
+  type: "Deconvolution"
+  bottom: "Resconnection_128_0_stage_128"
+  top: "Deconv_Scale_Up_Stage_128_1"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -3718,19 +4141,19 @@ layer {
   convolution_param {
     num_output: 24
     bias_term: false
-    pad: 1
-    kernel_size: 3
-    stride: 1
+    pad: 0
+    kernel_size: 2
+    stride: 2
     weight_filler {
       type: "msra"
     }
   }
 }
 layer {
-  name: "ResOne_conv_3x3_out_128_1_bn"
+  name: "Deconv_Scale_Up_Stage_128_1_bn"
   type: "BatchNorm"
-  bottom: "ResOne_conv_3x3_out_128_1"
-  top: "ResOne_conv_3x3_out_128_1"
+  bottom: "Deconv_Scale_Up_Stage_128_1"
+  top: "Deconv_Scale_Up_Stage_128_1"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -3749,10 +4172,10 @@ layer {
   }
 }
 layer {
-  name: "ResOne_conv_3x3_out_128_1_scale"
+  name: "Deconv_Scale_Up_Stage_128_1_scale"
   type: "Scale"
-  bottom: "ResOne_conv_3x3_out_128_1"
-  top: "ResOne_conv_3x3_out_128_1"
+  bottom: "Deconv_Scale_Up_Stage_128_1"
+  top: "Deconv_Scale_Up_Stage_128_1"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -3772,25 +4195,90 @@ layer {
   }
 }
 layer {
-  name: "ResNoFpn_128_1_stage_128"
+  name: "ConvFpn_128_1"
+  type: "Convolution"
+  bottom: "Res_Sum_4_2"
+  top: "ConvFpn_128_1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 24
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "ConvFpn_128_1_bn"
+  type: "BatchNorm"
+  bottom: "ConvFpn_128_1"
+  top: "ConvFpn_128_1"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "ConvFpn_128_1_scale"
+  type: "Scale"
+  bottom: "ConvFpn_128_1"
+  top: "ConvFpn_128_1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "Resconnection_128_1_stage_128"
   type: "Eltwise"
-  bottom: "ResOne_conv_3x3_out_128_1"
-  bottom: "Resconnection_128_0_stage_128"
-  top: "ResNoFpn_128_1_stage_128"
+  bottom: "Deconv_Scale_Up_Stage_128_1"
+  bottom: "ConvFpn_128_1"
+  top: "Resconnection_128_1_stage_128"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "ResNoFpn_128_1_stage_128/Relu6"
+  name: "Resconnection_128_1_stage_128/Relu6"
   type: "ReLU6"
-  bottom: "ResNoFpn_128_1_stage_128"
-  top: "ResNoFpn_128_1_stage_128"
+  bottom: "Resconnection_128_1_stage_128"
+  top: "Resconnection_128_1_stage_128"
 }
 layer {
   name: "Det_1x1_out_128_1"
   type: "Convolution"
-  bottom: "ResNoFpn_128_1_stage_128"
+  bottom: "Resconnection_128_1_stage_128"
   top: "Det_1x1_out_128_1"
   param {
     lr_mult: 1.0
@@ -3810,7 +4298,7 @@ layer {
 layer {
   name: "Deconv_Scale_Up_Stage_64_2"
   type: "Deconvolution"
-  bottom: "ResNoFpn_128_1_stage_128"
+  bottom: "Resconnection_128_1_stage_128"
   top: "Deconv_Scale_Up_Stage_64_2"
   param {
     lr_mult: 1.0
@@ -3974,111 +4462,10 @@ layer {
   }
 }
 layer {
-  name: "ResOne_conv_3x3_out_64_3"
-  type: "Convolution"
-  bottom: "Res_Sum_3_3"
-  top: "ResOne_conv_3x3_out_64_3"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 24
-    bias_term: false
-    pad: 1
-    kernel_size: 3
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "ResOne_conv_3x3_out_64_3_bn"
-  type: "BatchNorm"
-  bottom: "ResOne_conv_3x3_out_64_3"
-  top: "ResOne_conv_3x3_out_64_3"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  batch_norm_param {
-    moving_average_fraction: 0.9990000128746033
-    eps: 0.0010000000474974513
-  }
-}
-layer {
-  name: "ResOne_conv_3x3_out_64_3_scale"
-  type: "Scale"
-  bottom: "ResOne_conv_3x3_out_64_3"
-  top: "ResOne_conv_3x3_out_64_3"
-  param {
-    lr_mult: 1.0
-    decay_mult: 0.0
-  }
-  param {
-    lr_mult: 2.0
-    decay_mult: 0.0
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
-}
-layer {
-  name: "ResNoFpn_64_3_stage_64"
-  type: "Eltwise"
-  bottom: "ResOne_conv_3x3_out_64_3"
-  bottom: "Resconnection_64_2_stage_64"
-  top: "ResNoFpn_64_3_stage_64"
-  eltwise_param {
-    operation: SUM
-  }
-}
-layer {
-  name: "ResNoFpn_64_3_stage_64/Relu6"
-  type: "ReLU6"
-  bottom: "ResNoFpn_64_3_stage_64"
-  top: "ResNoFpn_64_3_stage_64"
-}
-layer {
-  name: "Det_1x1_out_64_3"
-  type: "Convolution"
-  bottom: "ResNoFpn_64_3_stage_64"
-  top: "Det_1x1_out_64_3"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 5
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-  }
-}
-layer {
-  name: "Deconv_Scale_Up_Stage_32_4"
+  name: "Deconv_Scale_Up_Stage_32_3"
   type: "Deconvolution"
-  bottom: "ResNoFpn_64_3_stage_64"
-  top: "Deconv_Scale_Up_Stage_32_4"
+  bottom: "Resconnection_64_2_stage_64"
+  top: "Deconv_Scale_Up_Stage_32_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -4095,10 +4482,10 @@ layer {
   }
 }
 layer {
-  name: "Deconv_Scale_Up_Stage_32_4_bn"
+  name: "Deconv_Scale_Up_Stage_32_3_bn"
   type: "BatchNorm"
-  bottom: "Deconv_Scale_Up_Stage_32_4"
-  top: "Deconv_Scale_Up_Stage_32_4"
+  bottom: "Deconv_Scale_Up_Stage_32_3"
+  top: "Deconv_Scale_Up_Stage_32_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -4117,10 +4504,10 @@ layer {
   }
 }
 layer {
-  name: "Deconv_Scale_Up_Stage_32_4_scale"
+  name: "Deconv_Scale_Up_Stage_32_3_scale"
   type: "Scale"
-  bottom: "Deconv_Scale_Up_Stage_32_4"
-  top: "Deconv_Scale_Up_Stage_32_4"
+  bottom: "Deconv_Scale_Up_Stage_32_3"
+  top: "Deconv_Scale_Up_Stage_32_3"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -4140,10 +4527,10 @@ layer {
   }
 }
 layer {
-  name: "ConvFpn_32_4"
+  name: "ConvFpn_32_3"
   type: "Convolution"
   bottom: "Res_Sum_2_2"
-  top: "ConvFpn_32_4"
+  top: "ConvFpn_32_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -4160,10 +4547,10 @@ layer {
   }
 }
 layer {
-  name: "ConvFpn_32_4_bn"
+  name: "ConvFpn_32_3_bn"
   type: "BatchNorm"
-  bottom: "ConvFpn_32_4"
-  top: "ConvFpn_32_4"
+  bottom: "ConvFpn_32_3"
+  top: "ConvFpn_32_3"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -4182,10 +4569,10 @@ layer {
   }
 }
 layer {
-  name: "ConvFpn_32_4_scale"
+  name: "ConvFpn_32_3_scale"
   type: "Scale"
-  bottom: "ConvFpn_32_4"
-  top: "ConvFpn_32_4"
+  bottom: "ConvFpn_32_3"
+  top: "ConvFpn_32_3"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -4205,26 +4592,26 @@ layer {
   }
 }
 layer {
-  name: "Resconnection_32_4_stage_32"
+  name: "Resconnection_32_3_stage_32"
   type: "Eltwise"
-  bottom: "Deconv_Scale_Up_Stage_32_4"
-  bottom: "ConvFpn_32_4"
-  top: "Resconnection_32_4_stage_32"
+  bottom: "Deconv_Scale_Up_Stage_32_3"
+  bottom: "ConvFpn_32_3"
+  top: "Resconnection_32_3_stage_32"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "Resconnection_32_4_stage_32/Relu6"
+  name: "Resconnection_32_3_stage_32/Relu6"
   type: "ReLU6"
-  bottom: "Resconnection_32_4_stage_32"
-  top: "Resconnection_32_4_stage_32"
+  bottom: "Resconnection_32_3_stage_32"
+  top: "Resconnection_32_3_stage_32"
 }
 layer {
-  name: "Det_1x1_out_32_4"
+  name: "Det_1x1_out_32_3"
   type: "Convolution"
-  bottom: "Resconnection_32_4_stage_32"
-  top: "Det_1x1_out_32_4"
+  bottom: "Resconnection_32_3_stage_32"
+  top: "Det_1x1_out_32_3"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -4241,10 +4628,10 @@ layer {
   }
 }
 layer {
-  name: "Deconv_Scale_Up_Stage_24_5"
+  name: "Deconv_Scale_Up_Stage_24_4"
   type: "Deconvolution"
-  bottom: "Resconnection_32_4_stage_32"
-  top: "Deconv_Scale_Up_Stage_24_5"
+  bottom: "Resconnection_32_3_stage_32"
+  top: "Deconv_Scale_Up_Stage_24_4"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -4261,10 +4648,10 @@ layer {
   }
 }
 layer {
-  name: "Deconv_Scale_Up_Stage_24_5_bn"
+  name: "Deconv_Scale_Up_Stage_24_4_bn"
   type: "BatchNorm"
-  bottom: "Deconv_Scale_Up_Stage_24_5"
-  top: "Deconv_Scale_Up_Stage_24_5"
+  bottom: "Deconv_Scale_Up_Stage_24_4"
+  top: "Deconv_Scale_Up_Stage_24_4"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -4283,10 +4670,10 @@ layer {
   }
 }
 layer {
-  name: "Deconv_Scale_Up_Stage_24_5_scale"
+  name: "Deconv_Scale_Up_Stage_24_4_scale"
   type: "Scale"
-  bottom: "Deconv_Scale_Up_Stage_24_5"
-  top: "Deconv_Scale_Up_Stage_24_5"
+  bottom: "Deconv_Scale_Up_Stage_24_4"
+  top: "Deconv_Scale_Up_Stage_24_4"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -4306,10 +4693,10 @@ layer {
   }
 }
 layer {
-  name: "ConvFpn_24_5"
+  name: "ConvFpn_24_4"
   type: "Convolution"
   bottom: "Res_Sum_1_2"
-  top: "ConvFpn_24_5"
+  top: "ConvFpn_24_4"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -4326,10 +4713,10 @@ layer {
   }
 }
 layer {
-  name: "ConvFpn_24_5_bn"
+  name: "ConvFpn_24_4_bn"
   type: "BatchNorm"
-  bottom: "ConvFpn_24_5"
-  top: "ConvFpn_24_5"
+  bottom: "ConvFpn_24_4"
+  top: "ConvFpn_24_4"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -4348,10 +4735,10 @@ layer {
   }
 }
 layer {
-  name: "ConvFpn_24_5_scale"
+  name: "ConvFpn_24_4_scale"
   type: "Scale"
-  bottom: "ConvFpn_24_5"
-  top: "ConvFpn_24_5"
+  bottom: "ConvFpn_24_4"
+  top: "ConvFpn_24_4"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -4371,26 +4758,26 @@ layer {
   }
 }
 layer {
-  name: "Resconnection_24_5_stage_24"
+  name: "Resconnection_24_4_stage_24"
   type: "Eltwise"
-  bottom: "Deconv_Scale_Up_Stage_24_5"
-  bottom: "ConvFpn_24_5"
-  top: "Resconnection_24_5_stage_24"
+  bottom: "Deconv_Scale_Up_Stage_24_4"
+  bottom: "ConvFpn_24_4"
+  top: "Resconnection_24_4_stage_24"
   eltwise_param {
     operation: SUM
   }
 }
 layer {
-  name: "Resconnection_24_5_stage_24/Relu6"
+  name: "Resconnection_24_4_stage_24/Relu6"
   type: "ReLU6"
-  bottom: "Resconnection_24_5_stage_24"
-  top: "Resconnection_24_5_stage_24"
+  bottom: "Resconnection_24_4_stage_24"
+  top: "Resconnection_24_4_stage_24"
 }
 layer {
-  name: "Det_1x1_out_24_5"
+  name: "Det_1x1_out_24_4"
   type: "Convolution"
-  bottom: "Resconnection_24_5_stage_24"
-  top: "Det_1x1_out_24_5"
+  bottom: "Resconnection_24_4_stage_24"
+  top: "Det_1x1_out_24_4"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
@@ -4425,11 +4812,11 @@ layer {
     num_class: 1
     share_location: true
     loc_weight: 1.0
-    bias_scale: 512.0
+    bias_scale: 475.0
     bias_num: 1
     net_width: 640
     net_height: 640
-    low_bbox_scale: 480
+    low_bbox_scale: 320
     up_bbox_scale: 630
     class_type: SIGMOID
     has_lm: false
@@ -4454,12 +4841,12 @@ layer {
     num_class: 1
     share_location: true
     loc_weight: 1.0
-    bias_scale: 368.0
+    bias_scale: 240.0
     bias_num: 1
     net_width: 640
     net_height: 640
-    low_bbox_scale: 256
-    up_bbox_scale: 480
+    low_bbox_scale: 160
+    up_bbox_scale: 320
     class_type: SIGMOID
     has_lm: false
   }
@@ -4483,12 +4870,12 @@ layer {
     num_class: 1
     share_location: true
     loc_weight: 1.0
-    bias_scale: 192.0
+    bias_scale: 120.0
     bias_num: 1
     net_width: 640
     net_height: 640
-    low_bbox_scale: 128
-    up_bbox_scale: 256
+    low_bbox_scale: 80
+    up_bbox_scale: 160
     class_type: SIGMOID
     has_lm: false
   }
@@ -4496,7 +4883,7 @@ layer {
 layer {
   name: "CenterGridLoss_3"
   type: "CenterGridLoss"
-  bottom: "Det_1x1_out_64_3"
+  bottom: "Det_1x1_out_32_3"
   bottom: "label"
   top: "CenterGridLoss_3"
   loss_weight: 1.0
@@ -4512,12 +4899,12 @@ layer {
     num_class: 1
     share_location: true
     loc_weight: 1.0
-    bias_scale: 96.0
+    bias_scale: 60.0
     bias_num: 1
     net_width: 640
     net_height: 640
-    low_bbox_scale: 64
-    up_bbox_scale: 128
+    low_bbox_scale: 40
+    up_bbox_scale: 80
     class_type: SIGMOID
     has_lm: false
   }
@@ -4525,7 +4912,7 @@ layer {
 layer {
   name: "CenterGridLoss_4"
   type: "CenterGridLoss"
-  bottom: "Det_1x1_out_32_4"
+  bottom: "Det_1x1_out_24_4"
   bottom: "label"
   top: "CenterGridLoss_4"
   loss_weight: 1.0
@@ -4541,41 +4928,12 @@ layer {
     num_class: 1
     share_location: true
     loc_weight: 1.0
-    bias_scale: 49.0
-    bias_num: 1
-    net_width: 640
-    net_height: 640
-    low_bbox_scale: 35
-    up_bbox_scale: 64
-    class_type: SIGMOID
-    has_lm: false
-  }
-}
-layer {
-  name: "CenterGridLoss_5"
-  type: "CenterGridLoss"
-  bottom: "Det_1x1_out_24_5"
-  bottom: "label"
-  top: "CenterGridLoss_5"
-  loss_weight: 1.0
-  include {
-    phase: TRAIN
-  }
-  propagate_down: true
-  propagate_down: false
-  loss_param {
-    normalization: BATCH_SIZE
-  }
-  center_object_loss_param {
-    num_class: 1
-    share_location: true
-    loc_weight: 1.0
-    bias_scale: 19.0
+    bias_scale: 23.0
     bias_num: 1
     net_width: 640
     net_height: 640
     low_bbox_scale: 6
-    up_bbox_scale: 35
+    up_bbox_scale: 40
     class_type: SIGMOID
     has_lm: false
   }
