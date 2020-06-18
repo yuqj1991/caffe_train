@@ -300,7 +300,8 @@ check_if_exist(labelmapPath)
 make_if_not_exist(save_dir)
 
 has_landmarks = False
-detect_channels = 6
+detect_channels = 5
+num_classes = 1
 # Create train.prototxt.
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
@@ -328,6 +329,8 @@ for idx, detect_output in enumerate(LayerList_Output):
                             low_bbox_scale= low_bbox_scale[idx], 
                             up_bbox_scale= up_bbox_scale[idx],
                             normalization_mode = P.Loss.BATCH_SIZE,
+                            class_type = P.CenterObjectLoss.SIGMOID,
+                            num_classes= num_classes,
                             net_height = resize_height, net_width = resize_width,
                             stageidx= idx, from_layers= from_layers, has_lm= has_landmarks)
     from_layers = []
@@ -356,7 +359,10 @@ for idx, output in enumerate(LayerList_Output):
     DetectListScale.append(bias_scale[idx])
     DetectListDownRatio.append(feature_stride[len(feature_stride) - idx - 1])
 CenterGridObjectDetect(net, from_layers= DetectListLayer, 
-                            bias_scale= DetectListScale, 
+                            bias_scale= DetectListScale,
+                            class_type = P.DetectionOutput.SIGMOID,
+                            num_classes=num_classes,
+                            keep_top_k= 500, confidence_threshold= 0.10,
                             net_width = resize_width,
                             net_height = resize_height,
                             has_lm=has_landmarks)

@@ -3696,7 +3696,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3797,7 +3797,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3963,7 +3963,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4064,7 +4064,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4230,7 +4230,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4396,7 +4396,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 5
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4422,7 +4422,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 2
+    num_class: 1
     share_location: true
     loc_weight: 1.0
     bias_scale: 512.0
@@ -4431,7 +4431,7 @@ layer {
     net_height: 640
     low_bbox_scale: 480
     up_bbox_scale: 630
-    class_type: SOFTMAX
+    class_type: SIGMOID
     has_lm: false
   }
 }
@@ -4451,7 +4451,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 2
+    num_class: 1
     share_location: true
     loc_weight: 1.0
     bias_scale: 368.0
@@ -4460,7 +4460,7 @@ layer {
     net_height: 640
     low_bbox_scale: 256
     up_bbox_scale: 480
-    class_type: SOFTMAX
+    class_type: SIGMOID
     has_lm: false
   }
 }
@@ -4480,7 +4480,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 2
+    num_class: 1
     share_location: true
     loc_weight: 1.0
     bias_scale: 192.0
@@ -4489,7 +4489,7 @@ layer {
     net_height: 640
     low_bbox_scale: 128
     up_bbox_scale: 256
-    class_type: SOFTMAX
+    class_type: SIGMOID
     has_lm: false
   }
 }
@@ -4509,7 +4509,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 2
+    num_class: 1
     share_location: true
     loc_weight: 1.0
     bias_scale: 96.0
@@ -4518,7 +4518,7 @@ layer {
     net_height: 640
     low_bbox_scale: 64
     up_bbox_scale: 128
-    class_type: SOFTMAX
+    class_type: SIGMOID
     has_lm: false
   }
 }
@@ -4538,7 +4538,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 2
+    num_class: 1
     share_location: true
     loc_weight: 1.0
     bias_scale: 49.0
@@ -4547,7 +4547,7 @@ layer {
     net_height: 640
     low_bbox_scale: 35
     up_bbox_scale: 64
-    class_type: SOFTMAX
+    class_type: SIGMOID
     has_lm: false
   }
 }
@@ -4567,7 +4567,7 @@ layer {
     normalization: BATCH_SIZE
   }
   center_object_loss_param {
-    num_class: 2
+    num_class: 1
     share_location: true
     loc_weight: 1.0
     bias_scale: 19.0
@@ -4576,7 +4576,7 @@ layer {
     net_height: 640
     low_bbox_scale: 6
     up_bbox_scale: 35
-    class_type: SOFTMAX
+    class_type: SIGMOID
     has_lm: false
   }
 }
