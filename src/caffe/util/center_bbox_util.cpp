@@ -16,8 +16,6 @@
 
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
-
-#define SOFTMAX_USE_ONE_MATCH_MUCH false
 #define SIGMOID_USE_ONE_MATCH_MUCH true
 
 int count_gt = 0;
@@ -1104,6 +1102,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
 
     int postive = 0;
     int gt_match_box = 0;
+    SoftmaxCenterGrid(channel_pred_data, batch_size, num_classes, num_channels, output_height, output_width, has_lm);
     // 将所有值设置为 -2 的原因为，排除掉iou>0.35的一些样本，也就是说
     // 只采集那些iou<0.35的负样本.20200611,舍弃之
     caffe_set(batch_size * dimScale, Dtype(-1.), class_label); 
@@ -1136,7 +1135,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-                #if SOFTMAX_USE_ONE_MATCH_MUCH
                 #if 0
                 if(loc_truth_scale.second <= 35){
                     Dtype BboxWidth = xmax - xmin;
@@ -1149,7 +1147,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 #endif
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
-                        
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
                    
@@ -1257,45 +1254,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
                     }
                 }
-                #else
-                Dtype center_x = Dtype((xmin + xmax) / 2);
-                Dtype center_y = Dtype((ymin + ymax) / 2);
-                int center_x_interger = static_cast<int>(center_x);
-                int center_y_interger = static_cast<int>(center_y);
-
-                Dtype BboxWidth = xmax - xmin;
-                Dtype BboxHeight = ymax - ymin;
-
-                int xmin_index = b * num_channels * dimScale
-                                            + 0 * dimScale + center_y_interger * output_width + center_x_interger;
-                int ymin_index = b * num_channels * dimScale 
-                                            + 1 * dimScale + center_y_interger * output_width + center_x_interger;
-                int xmax_index = b * num_channels * dimScale
-                                            + 2 * dimScale + center_y_interger * output_width + center_x_interger;
-                int ymax_index = b * num_channels * dimScale 
-                                            + 3 * dimScale + center_y_interger * output_width + center_x_interger;
-
-                Dtype xmin_bias = (center_x - center_x_interger) * downRatio / anchor_scale;
-                Dtype ymin_bias = (center_y - center_y_interger) * downRatio / anchor_scale;
-                Dtype xmax_bias = std::log(BboxWidth * downRatio / anchor_scale);
-                Dtype ymax_bias = std::log(BboxHeight * downRatio / anchor_scale);
-                Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
-
-                bottom_diff[xmin_index] = xmin_diff;
-                bottom_diff[ymin_index] = ymin_diff;
-                bottom_diff[xmax_index] = xmax_diff;
-                bottom_diff[ymax_index] = ymax_diff;
-                // class score 
-                // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
-                int class_index = b * dimScale
-                                        +  center_y_interger * output_width + center_x_interger;
-                class_label[class_index] = 1;
-                count++;
-                #endif
                 gt_match_box ++;
             }
         }
@@ -1366,7 +1324,6 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                 
 
                 float xmin = 0.f, ymin = 0.f, xmax = 0.f, ymax = 0.f;
-                #if SOFTMAX_USE_ONE_MATCH_MUCH
 
                 float bb_xmin = (w + 0.5 - channel_pred_data[x_index] * anchor_scale / (2 * downRatio)) *downRatio;
                 float bb_ymin = (h + 0.5 - channel_pred_data[y_index] * anchor_scale / (2 * downRatio)) *downRatio;
@@ -1376,17 +1333,6 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                 ymin = GET_VALID_VALUE(bb_ymin, (0.f), float(downRatio * output_height));
                 xmax = GET_VALID_VALUE(bb_xmax, (0.f), float(downRatio * output_width));
                 ymax = GET_VALID_VALUE(bb_ymax, (0.f), float(downRatio * output_height));
-                #else
-                float center_x = (channel_pred_data[x_index] * anchor_scale / downRatio + w) * downRatio;
-                float center_y = (channel_pred_data[y_index] * anchor_scale / downRatio + h) * downRatio;
-                float width = std::exp(channel_pred_data[width_index]) * anchor_scale;
-                float height = std::exp(channel_pred_data[height_index]) * anchor_scale;
-
-                xmin = GET_VALID_VALUE(center_x - float(width / 2), (0.f), float(downRatio * output_width));
-                ymin = GET_VALID_VALUE(center_y - float(height / 2), (0.f), float(downRatio * output_height));
-                xmax = GET_VALID_VALUE(center_x + float(width / 2), (0.f), float(downRatio * output_width));
-                ymax = GET_VALID_VALUE(center_y + float(height / 2), (0.f), float(downRatio * output_height));
-                #endif
 
                 float le_x = 0.f, le_y = 0.f, re_x = 0.f, re_y = 0.f, no_x = 0.f, no_y = 0.f, lm_x = 0.f, lm_y = 0.f, rm_x = 0.f, rm_y = 0.f;
                 if(has_lm){

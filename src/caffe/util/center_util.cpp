@@ -77,16 +77,11 @@ template float CenterSigmoid(float x);
 
 template <typename Dtype>
 Dtype SingleSoftmaxLoss(Dtype bg_score, Dtype face_score, Dtype lable_value){
-    Dtype MaxVaule = bg_score;
-    Dtype sumValue = Dtype(0.f);
     Dtype pred_data_value = Dtype(0.f);
-    // 求出每组的最大值, 计算出概率值
-    MaxVaule = std::max(MaxVaule, face_score);
-    sumValue = std::exp(bg_score - MaxVaule) + std::exp(face_score - MaxVaule);
     if(lable_value == 1.){
-        pred_data_value = std::exp(face_score - MaxVaule) / sumValue;
+        pred_data_value = bg_score;
     }else{
-        pred_data_value = std::exp(bg_score - MaxVaule) / sumValue;
+        pred_data_value = face_score;
     }
     Dtype loss = (-1) * log(std::max(pred_data_value,  Dtype(FLT_MIN)));
     return loss;
@@ -313,17 +308,8 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
                     if(has_lm){
                         bg_index = b * num_channels * dimScale + 14 * dimScale + h * output_width + w;
                     }
-                    Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
-                    Dtype sumValue = Dtype(0.f);
-                    // 求出每组的最大值, 计算出概率值
-                    for(int c = 0; c < 2; c++){
-                        MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
-                    }
-                    for(int c = 0; c< 2; c++){
-                        sumValue += std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
-                    }
-                    Dtype pred_data_value = std::exp(pred_data[bg_index + label_idx * dimScale] - MaxVaule) / sumValue;
-                    Dtype pred_another_data_value = std::exp(pred_data[bg_index + (1 - label_idx) * dimScale] - MaxVaule) / sumValue;
+                    Dtype pred_data_value = pred_data[bg_index + label_idx * dimScale];
+                    Dtype pred_another_data_value = pred_data[bg_index + (1 - label_idx) * dimScale];
                     loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
                     bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
                     bottom_diff[bg_index + (1 - label_idx) * dimScale] = pred_another_data_value;
@@ -351,25 +337,25 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
     for(int b = 0; b < batch_size; b ++){
         for(int h = 0; h < outheight; h++){
             for(int w = 0; w < outwidth; w++){
-                int class_index = b * num_channels * dimScale + 4 * dimScale +  h * outwidth + w;
+                int bg_index = b * num_channels * dimScale + 4 * dimScale +  h * outwidth + w;
                 if(has_lm)
                 {
-                    class_index = b * num_channels * dimScale + 14 * dimScale +  h * outwidth + w;
+                    bg_index = b * num_channels * dimScale + 14 * dimScale +  h * outwidth + w;
                 }
-                Dtype MaxVaule = pred_data[class_index + 0 * dimScale];
+                Dtype MaxVaule = pred_data[bg_index + 0 * dimScale];
                 Dtype sumValue = Dtype(0.f);
                 // 求出每组的最大值
                 for(int c = 0; c< label_channel; c++){
-                    MaxVaule = std::max(MaxVaule, pred_data[class_index + c * dimScale]);
+                    MaxVaule = std::max(MaxVaule, pred_data[bg_index + c * dimScale]);
                 }
                 // 每个样本组减去最大值， 计算exp，求和
                 for(int c = 0; c< label_channel; c++){
-                    pred_data[class_index + c * dimScale] = std::exp(pred_data[class_index + c * dimScale] - MaxVaule);
-                    sumValue += pred_data[class_index + c * dimScale];
+                    pred_data[bg_index + c * dimScale] = std::exp(pred_data[bg_index + c * dimScale] - MaxVaule);
+                    sumValue += pred_data[bg_index + c * dimScale];
                 }
                 // 计算softMax
                 for(int c = 0; c< label_channel; c++){
-                    pred_data[class_index + c * dimScale] = pred_data[class_index + c * dimScale] / sumValue;
+                    pred_data[bg_index + c * dimScale] = pred_data[bg_index + c * dimScale] / sumValue;
                 }
             }
         }
