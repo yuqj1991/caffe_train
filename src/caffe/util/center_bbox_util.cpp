@@ -1260,8 +1260,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 #else
                 Dtype center_x = Dtype((xmin + xmax) / 2);
                 Dtype center_y = Dtype((ymin + ymax) / 2);
-                int center_x_interger = static_cast<int>center_x;
-                int center_y_interger = static_cast<int>center_y;
+                int center_x_interger = static_cast<int>(center_x);
+                int center_y_interger = static_cast<int>(center_y);
 
                 Dtype BboxWidth = xmax - xmin;
                 Dtype BboxHeight = ymax - ymin;
