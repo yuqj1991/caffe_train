@@ -222,7 +222,7 @@ Dtype FocalLossSigmoid(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype
     Dtype gamma_ = 4.0f;
     Dtype loss = Dtype(0.);
     for(int i = 0; i < dimScale; i++){
-        if(label_data[i] == 0.5){ // gt_boxes周围的小格子，因为离gt_box较近，所以计算这里的负样本
+        if(label_data[i] == 0.5){ // gt_boxes之外的负样本
             loss -= alpha_ * std::pow(pred_data[i], gamma_) * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN)));
             Dtype diff_elem_ = alpha_ * std::pow(pred_data[i], gamma_);
             Dtype diff_next_ = pred_data[i] - gamma_ * (1 - pred_data[i]) * std::log(std::max(1 - pred_data[i], Dtype(FLT_MIN)));
@@ -285,6 +285,8 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                             const int output_width, Dtype *bottom_diff, 
                             const int num_channels, bool has_lm){
     Dtype loss = Dtype(0.f);
+    float alpha = 0.25f;
+    float gamma = 2.f;
     int dimScale = output_height * output_width;
     for(int b = 0; b < batch_size; b++){
         for(int h = 0; h < output_height; h++){
@@ -306,11 +308,26 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                         bg_index = b * num_channels * dimScale + 14 * dimScale + h * output_width + w;
                     }
                     Dtype Probability_value = pred_data[bg_index + label_idx * dimScale];
-                    Dtype pred_another_data_value = pred_data[bg_index + (1 - label_idx) * dimScale];
+                    Dtype pred_another_data_value = 1 - Probability_value;
+                    if(label_idx == 1){
+                        Dtype p0 = pred_another_data_value;
+                        Dtype p1 = Probability_value;
+                        loss -= alpha * std::pow(p0, gamma) * std::log(std::max(p1,  Dtype(FLT_MIN)));
 
-                    loss -= log(std::max(Probability_value,  Dtype(FLT_MIN)));
-                    bottom_diff[bg_index + label_idx * dimScale] = Probability_value - 1;
-                    bottom_diff[bg_index + (1 - label_idx) * dimScale] = pred_another_data_value;
+                        bottom_diff[bg_index + (1 - label_idx) * dimScale] = (alpha) * std::pow(p0, gamma) * (
+                                            p0 - gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * p1 );
+                        bottom_diff[bg_index + label_idx * dimScale] = (alpha) * std::pow(p0, gamma) * (
+                                            gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * p1 - p0);
+                    }else if(label_idx == 0){
+                        Dtype p0 = Probability_value;
+                        Dtype p1 = pred_another_data_value;
+                        loss -= alpha * std::pow(p1, gamma) * std::log(std::max(p0,  Dtype(FLT_MIN)));
+                        
+                        bottom_diff[bg_index + label_idx * dimScale] = (alpha) * std::pow(p1, gamma) * (
+                                            gamma * std::log(std::max(p0,  Dtype(FLT_MIN))) * p0 - p1);
+                        bottom_diff[bg_index + (1 - label_idx) * dimScale] = (alpha) * std::pow(p1, gamma) * (
+                                            p1 - gamma * std::log(std::max(p0,  Dtype(FLT_MIN))) * p0 ); 
+                    }
                 }
             }
         }

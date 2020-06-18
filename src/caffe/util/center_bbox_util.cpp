@@ -16,7 +16,7 @@
 
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
-#define SIGMOID_USE_ONE_MATCH_MUCH true
+#define FOCAL_LOSS_SOFTMAX true 
 
 int count_gt = 0;
 int count_one = 0;
@@ -882,7 +882,6 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-                #if SIGMOID_USE_ONE_MATCH_MUCH
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         
@@ -919,45 +918,6 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                         count++;
                     }
                 }
-                #else
-                Dtype center_x = Dtype((xmin + xmax) / 2);
-                Dtype center_y = Dtype((ymin + ymax) / 2);
-                int center_x_interger = static_cast<int>center_x;
-                int center_y_interger = static_cast<int>center_y;
-
-                Dtype BboxWidth = xmax - xmin;
-                Dtype BboxHeight = ymax - ymin;
-
-                int xmin_index = b * num_channels * dimScale
-                                            + 0 * dimScale + center_y_interger * output_width + center_x_interger;
-                int ymin_index = b * num_channels * dimScale 
-                                            + 1 * dimScale + center_y_interger * output_width + center_x_interger;
-                int xmax_index = b * num_channels * dimScale
-                                            + 2 * dimScale + center_y_interger * output_width + center_x_interger;
-                int ymax_index = b * num_channels * dimScale 
-                                            + 3 * dimScale + center_y_interger * output_width + center_x_interger;
-
-                Dtype xmin_bias = (center_x - center_x_interger) * downRatio / anchor_scale;
-                Dtype ymin_bias = (center_y - center_y_interger) * downRatio / anchor_scale;
-                Dtype xmax_bias = std::log(BboxWidth * downRatio / anchor_scale);
-                Dtype ymax_bias = std::log(BboxHeight * downRatio / anchor_scale);
-                Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
-                loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
-
-                bottom_diff[xmin_index] = xmin_diff;
-                bottom_diff[ymin_index] = ymin_diff;
-                bottom_diff[xmax_index] = xmax_diff;
-                bottom_diff[ymax_index] = ymax_diff;
-                // class score 
-                // 特殊情况,face数据集,包含了背景目标,而实际上不需要背景目标
-                int class_index = b * dimScale
-                                        +  center_y_interger * output_width + center_x_interger;
-                class_label[class_index] = 1;
-                count++;
-                #endif
             }
         }
         int gt_class_index =  b * dimScale;
@@ -1020,8 +980,7 @@ void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channe
                 int class_index = b * num_channels * dimScale
                                             + 4* dimScale + h * output_width + w;
                 float xmin = 0.f, ymin = 0.f, xmax = 0.f, ymax = 0.f;
-                #if SIGMOID_USE_ONE_MATCH_MUCH
-
+                
                 float bb_xmin = (w + 0.5 - channel_pred_data[x_index] * anchor_scale /(2*downRatio)) *downRatio;
                 float bb_ymin = (h + 0.5 - channel_pred_data[y_index] * anchor_scale /(2*downRatio)) *downRatio;
                 float bb_xmax = (w + 0.5 - channel_pred_data[width_index] * anchor_scale /(2*downRatio)) *downRatio;
@@ -1031,21 +990,6 @@ void GetCenterGridObjectResultSigmoid(const int batch_size, const int num_channe
                 ymin = GET_VALID_VALUE(bb_ymin, (0.f), float(downRatio * output_height));
                 xmax = GET_VALID_VALUE(bb_xmax, (0.f), float(downRatio * output_width));
                 ymax = GET_VALID_VALUE(bb_ymax, (0.f), float(downRatio * output_height));
-                #else
-                Dtype xmin_bias = (center_x_interger - center_x) * downRatio / anchor_scale;
-                Dtype ymin_bias = (center_y_interger - center_y) * downRatio / anchor_scale;
-                Dtype xmax_bias = std::log(BboxWidth * downRatio / anchor_scale);
-                Dtype ymax_bias = std::log(BboxHeight * downRatio / anchor_scale);
-                float center_x = (channel_pred_data[x_index] * anchor_scale / downRatio + w) * downRatio;
-                float center_y = (channel_pred_data[y_index] * anchor_scale / downRatio + h) * downRatio;
-                float width = std::exp(channel_pred_data[width_index]) * anchor_scale;
-                float height = std::exp(channel_pred_data[height_index]) * anchor_scale;
-
-                xmin = GET_VALID_VALUE(center_x - float(width / 2), (0.f), float(downRatio * output_width));
-                ymin = GET_VALID_VALUE(center_y - float(height / 2), (0.f), float(downRatio * output_height));
-                xmax = GET_VALID_VALUE(center_x + float(width / 2), (0.f), float(downRatio * output_width));
-                ymax = GET_VALID_VALUE(center_y + float(height / 2), (0.f), float(downRatio * output_height));
-                #endif
                 if((xmax - xmin) <= 0 || (ymax - ymin) <= 0)
                     continue;                                     
                 
@@ -1105,7 +1049,11 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     SoftmaxCenterGrid(channel_pred_data, batch_size, num_classes, num_channels, output_height, output_width, has_lm);
     // 将所有值设置为 -2 的原因为，排除掉iou>0.35的一些样本，也就是说
     // 只采集那些iou<0.35的负样本.20200611,舍弃之
-    caffe_set(batch_size * dimScale, Dtype(-1.), class_label); 
+    #if FOCAL_LOSS_SOFTMAX
+    caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
+    #else
+    caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
+    #endif
     for(int b = 0; b < batch_size; b++){
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = all_gt_bboxes.find(b)->second;
         int count = 0;
@@ -1261,11 +1209,16 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         postive_batch[b] = count;
         postive += count;
     }
+    #if FOCAL_LOSS_SOFTMAX
+    score_loss = FocalLossSoftmax(class_label, channel_pred_data, batch_size, output_height,
+                                    output_width, bottom_diff, num_channels, has_lm);
+    #else
     // 计算softMax loss value 
     SelectHardSampleSoftMax(class_label, batch_sample_loss, 2, postive_batch, 
                                         output_height, output_width, num_channels, batch_size, has_lm);
     score_loss = SoftmaxWithLoss(class_label, channel_pred_data, batch_size, output_height,
                                     output_width, bottom_diff, num_channels, has_lm);
+    #endif
     *count_postive = postive;
     *loc_loss_value = loc_loss;
     *lm_loss_value = lm_loss;
