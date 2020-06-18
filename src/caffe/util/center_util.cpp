@@ -77,13 +77,13 @@ template float CenterSigmoid(float x);
 
 template <typename Dtype>
 Dtype SingleSoftmaxLoss(Dtype bg_score, Dtype face_score, Dtype lable_value){
-    Dtype pred_data_value = Dtype(0.f);
+    Dtype Probability_value = Dtype(0.f);
     if(lable_value == 1.){
-        pred_data_value = bg_score;
+        Probability_value = face_score;
     }else{
-        pred_data_value = face_score;
+        Probability_value = bg_score;
     }
-    Dtype loss = (-1) * log(std::max(pred_data_value,  Dtype(FLT_MIN)));
+    Dtype loss = (-1) * log(std::max(Probability_value,  Dtype(FLT_MIN)));
     return loss;
 }
 
@@ -279,11 +279,8 @@ template void SelectHardSampleSigmoid(double *label_data, double *pred_data, con
 
 
 
-// label_data shape N : 1
-// pred_data shape N : k (object classes)
-// dimScale is the number of what ?? N * K ??
-template <typename Dtype>
-Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data, 
+template<typename Dtype>
+Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, Dtype *bottom_diff, 
                             const int num_channels, bool has_lm){
@@ -308,10 +305,61 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
                     if(has_lm){
                         bg_index = b * num_channels * dimScale + 14 * dimScale + h * output_width + w;
                     }
-                    Dtype pred_data_value = pred_data[bg_index + label_idx * dimScale];
+                    Dtype Probability_value = pred_data[bg_index + label_idx * dimScale];
                     Dtype pred_another_data_value = pred_data[bg_index + (1 - label_idx) * dimScale];
-                    loss -= log(std::max(pred_data_value,  Dtype(FLT_MIN)));
-                    bottom_diff[bg_index + label_idx * dimScale] = pred_data_value - 1;
+
+                    loss -= log(std::max(Probability_value,  Dtype(FLT_MIN)));
+                    bottom_diff[bg_index + label_idx * dimScale] = Probability_value - 1;
+                    bottom_diff[bg_index + (1 - label_idx) * dimScale] = pred_another_data_value;
+                }
+            }
+        }
+    }
+    return loss;
+}
+template float FocalLossSoftmax(float* label_data, float* pred_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, float *bottom_diff, 
+                            const int num_channels, bool has_lm);
+template double FocalLossSoftmax(double* label_data, double* pred_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, double *bottom_diff, 
+                            const int num_channels, bool has_lm);
+
+// label_data shape N : 1
+// pred_data shape N : k (object classes)
+// dimScale is the number of what ?? N * K ??
+template <typename Dtype>
+Dtype SoftmaxWithLoss(Dtype* label_data, Dtype* pred_data, 
+                            const int batch_size, const int output_height, 
+                            const int output_width, Dtype *bottom_diff, 
+                            const int num_channels, bool has_lm){
+    Dtype loss = Dtype(0.f);
+    int dimScale = output_height * output_width;
+    for(int b = 0; b < batch_size; b++){
+        for(int h = 0; h < output_height; h++){
+            for(int w = 0; w < output_width; w++){
+                Dtype label_value = Dtype(label_data[b * dimScale + h * output_width + w]);
+                if(label_value < 0.f){
+                    continue;
+                }else{
+                    int label_idx = 0;
+                    if(label_value == 0.5)
+                        label_idx = 0;
+                    else if(label_value == 1.)
+                        label_idx = 1;
+                    else{
+                        LOG(FATAL)<<"no valid label value";
+                    }
+                    int bg_index = b * num_channels * dimScale + 4 * dimScale + h * output_width + w;
+                    if(has_lm){
+                        bg_index = b * num_channels * dimScale + 14 * dimScale + h * output_width + w;
+                    }
+
+                    Dtype Probability_value = pred_data[bg_index + label_idx * dimScale];
+                    Dtype pred_another_data_value = pred_data[bg_index + (1 - label_idx) * dimScale];
+                    loss -= log(std::max(Probability_value,  Dtype(FLT_MIN)));
+                    bottom_diff[bg_index + label_idx * dimScale] = Probability_value - 1;
                     bottom_diff[bg_index + (1 - label_idx) * dimScale] = pred_another_data_value;
                 }
             }
@@ -320,11 +368,11 @@ Dtype SoftmaxLossEntropy(Dtype* label_data, Dtype* pred_data,
     return loss;
 }
 
-template float SoftmaxLossEntropy(float* label_data, float* pred_data, 
+template float SoftmaxWithLoss(float* label_data, float* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, float *bottom_diff, 
                             const int num_channels, bool has_lm);
-template double SoftmaxLossEntropy(double* label_data, double* pred_data, 
+template double SoftmaxWithLoss(double* label_data, double* pred_data, 
                             const int batch_size, const int output_height, 
                             const int output_width, double *bottom_diff, 
                             const int num_channels, bool has_lm);
@@ -355,7 +403,7 @@ void SoftmaxCenterGrid(Dtype * pred_data, const int batch_size,
                 }
                 // 计算softMax
                 for(int c = 0; c< label_channel; c++){
-                    pred_data[bg_index + c * dimScale] = pred_data[bg_index + c * dimScale] / sumValue;
+                    pred_data[bg_index + c * dimScale] = Dtype(pred_data[bg_index + c * dimScale] / sumValue);
                 }
             }
         }
