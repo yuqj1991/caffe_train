@@ -23,7 +23,7 @@ layer {
   annotated_data_param {
     label_map_file: "../labelmap.prototxt"
     yoloformat: false
-    crop_type: CROP_BATCH
+    crop_type: CROP_JITTER
     has_landmarks: true
   }
   data_param {
@@ -4417,7 +4417,7 @@ layer {
   detection_output_param {
     num_classes: 2
     share_location: true
-    keep_top_k: 200
+    keep_top_k: 1000
     confidence_threshold: 0.05000000074505806
     nms_thresh: 0.30000001192092896
     has_lm: true
@@ -4435,7 +4435,7 @@ layer {
   detection_evaluate_param {
     num_classes: 2
     background_label_id: 0
-    overlap_threshold: 0.15000000596046448
+    overlap_threshold: 0.5
     evaluate_difficult_gt: false
     has_lm: true
   }

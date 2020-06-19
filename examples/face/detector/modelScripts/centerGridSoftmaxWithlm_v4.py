@@ -361,7 +361,7 @@ CenterGridObjectDetect(net, from_layers= DetectListLayer,
                             bias_scale= DetectListScale,
                             class_type = P.DetectionOutput.SIGMOID,
                             num_classes=num_classes,
-                            keep_top_k= 500, confidence_threshold= 0.10,
+                            keep_top_k= 500, confidence_threshold= 0.05,
                             net_width = resize_width,
                             net_height = resize_height,
                             has_lm=has_landmarks)
@@ -369,7 +369,7 @@ CenterGridObjectDetect(net, from_layers= DetectListLayer,
 det_eval_param = {
     'num_classes': 2,
     'background_label_id': 0,
-    'overlap_threshold': 0.15,
+    'overlap_threshold': 0.5,
     'evaluate_difficult_gt': False,
     'has_lm': has_landmarks,
 }

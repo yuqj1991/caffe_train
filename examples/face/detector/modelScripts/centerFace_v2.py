@@ -365,12 +365,12 @@ if use_branch:
 else:
     DetectListLayer.append(net[box_out])
 DetectListLayer.append(net[Sigmoid_layer])
-CenterFaceObjectDetect(net, from_layers = DetectListLayer, has_lm= True)
+CenterFaceObjectDetect(net, from_layers = DetectListLayer, has_lm= True, keep_top_k = 1000)
 
 det_eval_param = {
     'num_classes': 2,
     'background_label_id': 0,
-    'overlap_threshold': 0.15,
+    'overlap_threshold': 0.5,
     'evaluate_difficult_gt': False,
 	'has_lm': True
 }

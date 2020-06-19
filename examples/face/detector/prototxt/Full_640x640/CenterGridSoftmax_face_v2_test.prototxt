@@ -4925,8 +4925,8 @@ layer {
   detection_output_param {
     num_classes: 1
     share_location: true
-    keep_top_k: 500
-    confidence_threshold: 0.10000000149011612
+    keep_top_k: 1000
+    confidence_threshold: 0.05000000074505806
     bias_scale: 480
     bias_scale: 240
     bias_scale: 120
@@ -4951,7 +4951,7 @@ layer {
   detection_evaluate_param {
     num_classes: 2
     background_label_id: 0
-    overlap_threshold: 0.15000000596046448
+    overlap_threshold: 0.5
     evaluate_difficult_gt: false
     has_lm: false
   }

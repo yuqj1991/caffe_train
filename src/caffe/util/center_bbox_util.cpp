@@ -1079,6 +1079,12 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
             Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
             Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
+            for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
+                for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+                    int class_index = b * dimScale +  h * output_width + w;
+                    class_label[class_index] = -10;
+                }
+            }
             int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
             int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
