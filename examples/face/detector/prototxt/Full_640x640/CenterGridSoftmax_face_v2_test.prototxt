@@ -256,7 +256,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 96
+    num_output: 48
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -327,11 +327,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 96
+    num_output: 48
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 96
+    group: 48
     stride: 2
     weight_filler {
       type: "msra"
@@ -464,7 +464,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 144
+    num_output: 72
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -535,11 +535,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 144
+    num_output: 72
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 144
+    group: 72
     stride: 1
     weight_filler {
       type: "msra"
@@ -679,7 +679,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 144
+    num_output: 72
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -750,11 +750,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 144
+    num_output: 72
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 144
+    group: 72
     stride: 2
     weight_filler {
       type: "msra"
@@ -887,7 +887,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 192
+    num_output: 96
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -958,11 +958,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 192
+    num_output: 96
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 192
+    group: 96
     stride: 1
     weight_filler {
       type: "msra"
@@ -1102,7 +1102,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 192
+    num_output: 96
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -1173,11 +1173,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 192
+    num_output: 96
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 192
+    group: 96
     stride: 1
     weight_filler {
       type: "msra"
@@ -1317,7 +1317,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 192
+    num_output: 96
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -1388,11 +1388,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 192
+    num_output: 96
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 192
+    group: 96
     stride: 2
     weight_filler {
       type: "msra"
@@ -1525,7 +1525,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 384
+    num_output: 192
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -1596,11 +1596,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 384
+    num_output: 192
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 384
+    group: 192
     stride: 1
     weight_filler {
       type: "msra"
@@ -1740,7 +1740,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 384
+    num_output: 192
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -1811,11 +1811,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 384
+    num_output: 192
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 384
+    group: 192
     stride: 1
     weight_filler {
       type: "msra"
@@ -1955,7 +1955,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 384
+    num_output: 192
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -2026,11 +2026,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 384
+    num_output: 192
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 384
+    group: 192
     stride: 1
     weight_filler {
       type: "msra"
@@ -2241,7 +2241,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 576
+    num_output: 288
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -2312,11 +2312,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 576
+    num_output: 288
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 576
+    group: 288
     stride: 1
     weight_filler {
       type: "msra"
@@ -2456,7 +2456,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 576
+    num_output: 288
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -2527,11 +2527,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 576
+    num_output: 288
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 576
+    group: 288
     stride: 1
     weight_filler {
       type: "msra"
@@ -2671,7 +2671,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 576
+    num_output: 288
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -2742,11 +2742,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 576
+    num_output: 288
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 576
+    group: 288
     stride: 1
     weight_filler {
       type: "msra"
@@ -2886,7 +2886,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 576
+    num_output: 288
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -2957,11 +2957,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 576
+    num_output: 288
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 576
+    group: 288
     stride: 2
     weight_filler {
       type: "msra"
@@ -3094,7 +3094,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 768
+    num_output: 384
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3165,11 +3165,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 768
+    num_output: 384
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 768
+    group: 384
     stride: 1
     weight_filler {
       type: "msra"
@@ -3309,7 +3309,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 768
+    num_output: 384
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3380,11 +3380,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 768
+    num_output: 384
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 768
+    group: 384
     stride: 1
     weight_filler {
       type: "msra"
@@ -3524,7 +3524,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 768
+    num_output: 384
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3595,11 +3595,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 768
+    num_output: 384
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 768
+    group: 384
     stride: 2
     weight_filler {
       type: "msra"
@@ -3732,7 +3732,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 768
+    num_output: 384
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -3803,11 +3803,11 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 768
+    num_output: 384
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 768
+    group: 384
     stride: 1
     weight_filler {
       type: "msra"
