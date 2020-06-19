@@ -4569,7 +4569,7 @@ layer {
     loc_loss_type: SMOOTH_L1
     conf_loss_type: FOCALSIGMOID
     loc_weight: 1.0
-    has_lm: true
+    has_lm: false
     lm_loss_type: SMOOTH_L1
   }
 }
