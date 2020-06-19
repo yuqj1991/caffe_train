@@ -3924,7 +3924,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 5
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4090,7 +4090,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 5
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4256,7 +4256,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 5
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4422,7 +4422,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 5
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4588,7 +4588,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 5
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4611,9 +4611,9 @@ layer {
     phase: TEST
   }
   detection_output_param {
-    num_classes: 1
+    num_classes: 6
     share_location: true
-    keep_top_k: 500
+    keep_top_k: 1000
     confidence_threshold: 0.05000000074505806
     bias_scale: 475
     bias_scale: 240
@@ -4621,7 +4621,7 @@ layer {
     bias_scale: 60
     bias_scale: 23
     nms_thresh: 0.30000001192092896
-    class_type: SIGMOID
+    class_type: SOFTMAX
     has_lm: false
     net_height: 640
     net_width: 640
