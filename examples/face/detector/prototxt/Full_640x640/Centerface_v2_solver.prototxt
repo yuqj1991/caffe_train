@@ -21,7 +21,7 @@ stepvalue: 20000
 stepvalue: 30000
 stepvalue: 40000
 stepvalue: 50000
-iter_size: 2
+iter_size: 1
 type: "RMSProp"
 eval_type: "detection"
 ap_version: "11point"
