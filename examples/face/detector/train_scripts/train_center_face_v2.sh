@@ -10,5 +10,4 @@ if ! test -f ../prototxt/Full_640x640/Centerface_v2_test.prototxt ;then
    exit 1 
 fi
 ../../../../build/tools/caffe train --solver=../prototxt/Full_640x640/Centerface_v2_solver.prototxt --gpu 0 \
---weights= ../mobilenet_v2.caffemodel
 # --snapshot=../snapshot/Centerface_v2_0_iter_5000.solverstate 
