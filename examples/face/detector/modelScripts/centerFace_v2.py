@@ -235,7 +235,7 @@ gpus = "0"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 batch_size = 8
-accum_batch_size = 16
+accum_batch_size = 8
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
 device_id = 0
@@ -290,13 +290,6 @@ solver_param = {
     'test_initialization': False,
 }
 
-'''
-Inverted_residual_setting = [[1, 16, 1, 1],
-                             [6, 24, 3, 2],
-                             [6, 32, 3, 2],
-                             [6, 64, 5, 2],
-                             [6, 128, 3, 2]]
-'''
 Inverted_residual_setting = [[1, 16, 1, 1],
                                  [6, 24, 2, 2],
                                  [6, 32, 3, 2],
@@ -305,6 +298,10 @@ Inverted_residual_setting = [[1, 16, 1, 1],
                                  [6, 160, 3, 2],
                                  [6, 320, 1, 1]]
 use_branch= False
+
+has_landmarks = False
+detect_num_channels = 4
+
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
 check_if_exist(labelmapPath)
@@ -317,9 +314,9 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         train=True, output_label=True, label_map_file=labelmapPath,
         crop_type = P.AnnotatedData.CROP_JITTER,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
-        data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler, has_landmarks = True)
+        data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler, has_landmarks = has_landmarks)
 
-net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data', detect_num = 14
+net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data', detect_num = detect_num_channels
                                                     , Inverted_residual_setting= Inverted_residual_setting,
                                                     use_branch= use_branch)
 
@@ -332,7 +329,7 @@ else:
     from_layers.append(net[box_out])
 from_layers.append(net[class_out])
 from_layers.append(net.label)
-CenterFaceObjectLoss(net= net, stageidx= 0, from_layers= from_layers, has_lm= True, use_branch= use_branch)
+CenterFaceObjectLoss(net= net, stageidx= 0, from_layers= from_layers, has_lm= has_landmarks, use_branch= use_branch)
 
 with open(train_net_file, 'w') as f:
     print('name: "{}_train"'.format("CenterFace"), file=f)
@@ -342,11 +339,11 @@ with open(train_net_file, 'w') as f:
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batch_size,
         train=False, output_label=True, label_map_file=labelmapPath,
-        transform_param=test_transform_param, has_landmarks = True)
+        transform_param=test_transform_param, has_landmarks = has_landmarks)
 
 net, class_out, box_out = CenterFaceMobilenetV2Body(net, from_layer = 'data', Use_BN= True, 
                         Inverted_residual_setting= Inverted_residual_setting,
-                        use_global_stats= True, detect_num = 14, 
+                        use_global_stats= True, detect_num = detect_num_channels, 
                         use_branch= use_branch)
 
 Sigmoid_layer = "{}_Sigmoid".format(class_out)
@@ -365,14 +362,14 @@ if use_branch:
 else:
     DetectListLayer.append(net[box_out])
 DetectListLayer.append(net[Sigmoid_layer])
-CenterFaceObjectDetect(net, from_layers = DetectListLayer, has_lm= True, keep_top_k = 1000)
+CenterFaceObjectDetect(net, from_layers = DetectListLayer, has_lm= has_landmarks, keep_top_k = 1000)
 
 det_eval_param = {
     'num_classes': 2,
     'background_label_id': 0,
     'overlap_threshold': 0.5,
     'evaluate_difficult_gt': False,
-	'has_lm': True
+	'has_lm': has_landmarks
 }
 net.detection_eval = L.DetectionEvaluate(net.detection_out, net.label,
     detection_evaluate_param=det_eval_param,

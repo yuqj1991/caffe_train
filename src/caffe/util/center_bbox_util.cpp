@@ -880,6 +880,12 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
             const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
             const int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
             const int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+            for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
+                for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
+                    int class_index = b * dimScale +  h * output_width + w;
+                    class_label[class_index] = -10;
+                }
+            }
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
