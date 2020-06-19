@@ -235,7 +235,7 @@ gpus = "0"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 batch_size = 8
-accum_batch_size = 16
+accum_batch_size = 8
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
 device_id = 0
@@ -267,11 +267,11 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 20000, 30000, 40000, 50000],
+    'stepvalue': [10000, 20000, 30000, 50000, 70000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 60000,
+    'max_iter': 80000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
