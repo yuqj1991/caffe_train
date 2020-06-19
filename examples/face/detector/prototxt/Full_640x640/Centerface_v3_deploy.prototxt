@@ -3375,7 +3375,7 @@ layer {
 }
 layer {
   name: "conv_1_project/linear_relu6"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "conv_1_project/linear"
   top: "conv_1_project/linear"
 }
@@ -3521,7 +3521,7 @@ layer {
 }
 layer {
   name: "Res_conv_linear_stage_320/Relu6"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "Res_conv_linear_stage_320"
   top: "Res_conv_linear_stage_320"
 }
@@ -3667,7 +3667,7 @@ layer {
 }
 layer {
   name: "Res_conv_linear_stage_96/Relu6"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "Res_conv_linear_stage_96"
   top: "Res_conv_linear_stage_96"
 }
@@ -3813,7 +3813,7 @@ layer {
 }
 layer {
   name: "Res_conv_linear_stage_32/Relu6"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "Res_conv_linear_stage_32"
   top: "Res_conv_linear_stage_32"
 }
@@ -3884,7 +3884,7 @@ layer {
 }
 layer {
   name: "last_conv_3x3_layer_relu6"
-  type: "ReLU6"
+  type: "ReLU"
   bottom: "last_conv_3x3_layer"
   top: "last_conv_3x3_layer"
 }
@@ -3997,7 +3997,7 @@ layer {
   detection_output_param {
     num_classes: 2
     share_location: true
-    keep_top_k: 200
+    keep_top_k: 1000
     confidence_threshold: 0.05000000074505806
     nms_thresh: 0.30000001192092896
     has_lm: true
