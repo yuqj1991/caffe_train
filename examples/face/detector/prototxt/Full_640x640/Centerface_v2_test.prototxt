@@ -23,7 +23,6 @@ layer {
   annotated_data_param {
     label_map_file: "../labelmap.prototxt"
     yoloformat: false
-    crop_type: CROP_JITTER
     has_landmarks: false
   }
   data_param {
