@@ -289,12 +289,12 @@ solver_param = {
 }
 
 Inverted_residual_setting = [[1, 16, 1, 1],
-                            [3, 24, 2, 2],
-                            [3, 32, 3, 2],
-                            [3, 64, 4, 2],
-                            [3, 96, 3, 1], 
-                            [3, 128, 3, 2],
-                            [3, 128, 2, 2]]
+                            [6, 24, 2, 2],
+                            [6, 32, 3, 2],
+                            [6, 64, 4, 2],
+                            [6, 96, 3, 1], 
+                            [6, 128, 3, 2],
+                            [6, 128, 2, 2]]
 feature_stride = [4, 8, 16, 32, 64]
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
