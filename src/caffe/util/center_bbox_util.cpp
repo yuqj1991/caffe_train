@@ -1095,16 +1095,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
-                #if 0
-                if(loc_truth_scale.second <= 35){
-                    Dtype BboxWidth = xmax - xmin;
-                    Dtype Bboxheight = ymax - ymin;
-                    xmin = GET_VALID_VALUE(xmin - BboxWidth * 0.05, Dtype(0.), Dtype(output_width));
-                    xmax = GET_VALID_VALUE(xmax + BboxWidth * 0.05, Dtype(0.), Dtype(output_width));
-                    ymin = GET_VALID_VALUE(ymin - Bboxheight * 0.05, Dtype(0.), Dtype(output_height));
-                    ymax = GET_VALID_VALUE(ymax + Bboxheight * 0.05, Dtype(0.), Dtype(output_height));
-                }
-                #endif
+                
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面

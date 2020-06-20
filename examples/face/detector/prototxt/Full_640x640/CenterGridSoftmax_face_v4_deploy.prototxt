@@ -4611,7 +4611,7 @@ layer {
     phase: TEST
   }
   detection_output_param {
-    num_classes: 6
+    num_classes: 2
     share_location: true
     keep_top_k: 1000
     confidence_threshold: 0.05000000074505806
