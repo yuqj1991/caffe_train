@@ -1089,7 +1089,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
             Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
             Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
-            if ((xmin - xmax) <= 0 || (ymin - ymax) <=0){
+            if ((xmax - xmin) <= 0 || (ymax - ymin) <=0){
                 LOG(INFO)<<"xmin: "<<xmin<<
                             ", xmax: "<<xmax<<
                             ", ymin: "<<ymin<<
