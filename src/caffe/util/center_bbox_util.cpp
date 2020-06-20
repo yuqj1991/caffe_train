@@ -869,8 +869,10 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     }
     int postive = 0;
     caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
-    for(int b = 0; b < batch_size; b++){
-        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = all_gt_bboxes.find(b)->second;
+    std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >::iterator iter;
+    for(iter =all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+        int b = iter->first;
+        std::vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         std::vector<int> mask_Rf_anchor(dimScale, 0);
         int count = 0;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -1060,13 +1062,12 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     #else
     caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
     #endif
-    for(int b = 0; b < batch_size; b++){
-        std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >::iterator it = all_gt_bboxes.find(b);
-        if(it == all_gt_bboxes.end()){
-            continue;
-        }
-        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = it->second;
+    std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >::iterator iter;
+    for(iter =all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+        int b = iter->first;
+        std::vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         int count = 0;
+        std::vector<int> mask_Rf_anchor_already(dimScale, 0);
         for(int h = 0; h < output_height; h++){
             for(int w = 0; w < output_width; w++){
                 int bg_index = b * num_channels * dimScale 
@@ -1083,17 +1084,13 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 batch_sample_loss[b * dimScale + h * output_width + w] = class_loss;
             }
         }
-        std::vector<int> mask_Rf_anchor_already(dimScale, 0);
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
             Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
             Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
             Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
             Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
             if ((xmax - xmin) <= 0 || (ymax - ymin) <=0){
-                LOG(INFO)<<"xmin: "<<xmin<<
-                            ", xmax: "<<xmax<<
-                            ", ymin: "<<ymin<<
-                            ", ymax: "<<ymax;
+                LOG(INFO) << "xmin: " << xmin << ", xmax: " << xmax << ", ymin: " << ymin << ", ymax: " << ymax;
                 continue;
             }
             for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
@@ -1438,7 +1435,11 @@ Dtype EncodeOverlapObjectSigmoidLoss(const int batch_size, const int num_channel
     // 采用focal loss 使用所有的负样本，作为训练
     caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
     for(int b = 0; b < batch_size; b++){
-        vector<NormalizedBBox> gt_bboxes = all_gt_bboxes.find(b)->second;
+        std::map<int, vector<NormalizedBBox> >::iterator it = all_gt_bboxes.find(b);
+        if(it == all_gt_bboxes.end()){
+            continue;
+        }
+        std::vector<NormalizedBBox> gt_bboxes = it->second;
         std::vector<int> mask_Rf_anchor(dimScale, 0);
         std::vector<Dtype> object_loss_temp(dimScale, Dtype(0.));
         int count = 0;
