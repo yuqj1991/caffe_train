@@ -1061,7 +1061,11 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
     #endif
     for(int b = 0; b < batch_size; b++){
-        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = all_gt_bboxes.find(b)->second;
+        std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >::iterator it = all_gt_bboxes.find(b);
+        if(it == all_gt_bboxes.end()){
+            continue;
+        }
+        vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = it->second;
         int count = 0;
         for(int h = 0; h < output_height; h++){
             for(int w = 0; w < output_width; w++){
@@ -1085,6 +1089,9 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
             Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
             Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
+            if ((xmin - xmax) <= 0 || (ymin - ymax) <=0){
+                continue;
+            }
             for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                 for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                     int class_index = b * dimScale +  h * output_width + w;
