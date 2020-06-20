@@ -285,10 +285,10 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                             const int output_width, Dtype *bottom_diff, 
                             const int num_channels, bool has_lm){
     Dtype loss = Dtype(0.f);
-    //float alpha = 0.25f;
-    //float gamma = 2.f;
-    float alpha = 2.f;
-    float gamma = 4.f;
+    float alpha = 0.25f;
+    float gamma = 2.f;
+    //float alpha = 2.f;
+    //float gamma = 4.f;
     int dimScale = output_height * output_width;
     for(int b = 0; b < batch_size; b++){
         for(int h = 0; h < output_height; h++){
