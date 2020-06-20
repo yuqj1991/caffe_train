@@ -10,4 +10,4 @@ if ! test -f ../prototxt/Full_320x320/CenterGridSigmoid_face_v3_test.prototxt ;t
    exit 1
 fi
 ../../../../build/tools/caffe train --solver=../prototxt/Full_320x320/CenterGridSigmoid_face_v3_solver.prototxt --gpu 1 \
-# --snapshot=../snapshot/CenterGridSigmoid_face_v3_0_iter_5000.solverstate 
+#--snapshot=../snapshot/CenterGridSigmoid_face_v3_0_iter_5000.solverstate 

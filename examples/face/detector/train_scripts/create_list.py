@@ -4,7 +4,6 @@ import os
 import random
 wider_directory = ['wider_train', 'wider_val']
 root_dir ='../../../../../caffe_train/examples/face/detector/train_scripts/'
-#root_dataset = '../../../../../dataset/facedata/wider_face/Annotations/'
 root_dataset = '../../../../../dataset/facedata/wider_face/Annotations/'
 ROOT_IMAGE_DIR = "../../../../../dataset/facedata/wider_face/JPEGImages/"
 def shuffle_file(filename):
@@ -38,7 +37,6 @@ def generate_list(imageSetDir):
 
 def main():
 	generate_list("../../../../../dataset/facedata/wider_face/ImageSets/Main")
-	#generate_list("../../../../../dataset/facedata/wider_face_add_lm_10_10/ImageSets/Main")
 
 if __name__=='__main__':
 	main()

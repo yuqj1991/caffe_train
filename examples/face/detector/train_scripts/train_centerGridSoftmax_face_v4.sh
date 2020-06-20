@@ -10,4 +10,4 @@ if ! test -f ../prototxt/Full_640x640/CenterGridSoftmax_face_v4_test.prototxt ;t
    exit 1
 fi
 ../../../../build/tools/caffe train --solver=../prototxt/Full_640x640/CenterGridSoftmax_face_v4_solver.prototxt --gpu 0 \
-# --snapshot=../snapshot/CenterGridSoftmax_face_v4_0_iter_5000.solverstate 
+#--snapshot=../snapshot/CenterGridSoftmax_face_v4_0_iter_5000.solverstate 
