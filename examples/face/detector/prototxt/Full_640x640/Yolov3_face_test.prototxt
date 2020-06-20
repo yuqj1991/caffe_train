@@ -4707,8 +4707,8 @@ layer {
  	bottom: "dectction_moudle_four_out"
 	top: "detection_out"
 	yolov3_detection_output_param {
-		confidence_threshold: 0.11
-		nms_threshold: 0.4
+		confidence_threshold: 0.05
+		nms_threshold: 0.3
 		num_classes: 1
 		biases: 7.8
 		biases: 12.7
@@ -4764,7 +4764,7 @@ layer {
 	detection_evaluate_param {
 		num_classes: 2
 		background_label_id: 0
-		overlap_threshold: 0.11
+		overlap_threshold: 0.5
 		evaluate_difficult_gt: false
 	}
 }
