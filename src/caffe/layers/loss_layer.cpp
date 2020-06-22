@@ -35,7 +35,7 @@ Dtype LossLayer<Dtype>::GetNormalizer(
             normalizer = Dtype(outer_num * inner_num);
             break;
         case LossParameter_NormalizationMode_VALID:
-            if (valid_count == -1) {
+            if (valid_count == -1 || valid_count == 0) {
                 normalizer = Dtype(outer_num * inner_num);
             } else {
                 normalizer = Dtype(valid_count);
