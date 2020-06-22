@@ -16,7 +16,7 @@
 
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
-#define FOCAL_LOSS_SOFTMAX false 
+#define FOCAL_LOSS_SOFTMAX true 
 
 int count_gt = 0;
 int count_one = 0;

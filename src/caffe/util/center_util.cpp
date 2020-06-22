@@ -287,6 +287,7 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
     Dtype loss = Dtype(0.f);
     float alpha = 0.25f;
     float gamma = 2.f;
+    float transfer = 0.25f;
     //float alpha = 2.f;
     //float gamma = 4.f;
     int dimScale = output_height * output_width;
@@ -312,16 +313,16 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                     Dtype p1 = pred_data[bg_index + label_idx * dimScale];
                     Dtype p0 = 1 - p1;
 
-                    #if 1
+                    #if 0
                     loss -= alpha * std::pow(p0, gamma) * std::log(std::max(p1,  Dtype(FLT_MIN)));
                     bottom_diff[bg_index + label_idx * dimScale] = (alpha) * std::pow(p0, gamma) * 
                                                                 (gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * p1 - p0);
                     bottom_diff[bg_index + (1 - label_idx) * dimScale] = (alpha) * std::pow(p0, gamma) * 
                                                                 (p0 - gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * p1 );
                     #else
-                    Dtype assist_value = Dtype((p0 + 1.) / (p1 + 1.));
-                    Dtype p0_temp = Dtype(1. / (p0 + 1.));
-                    Dtype p1_temp = Dtype(1. / (p1 + 1.));
+                    Dtype assist_value = Dtype((p0 + transfer.) / (p1 + transfer));
+                    Dtype p0_temp = Dtype(1. / (p0 + transfer));
+                    Dtype p1_temp = Dtype(1. / (p1 + transfer));
                     loss -= alpha * std::pow(assist_value, gamma) * std::log(std::max(p1,  Dtype(FLT_MIN)));
                     bottom_diff[bg_index + label_idx * dimScale] = alpha * std::pow(assist_value, gamma) * p0 *
                                 (p1 * gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * (p0_temp + p1_temp) - 1);
