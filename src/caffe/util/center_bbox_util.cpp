@@ -16,7 +16,7 @@
 
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
-#define FOCAL_LOSS_SOFTMAX true 
+#define FOCAL_LOSS_SOFTMAX false 
 
 int count_gt = 0;
 int count_one = 0;
@@ -1040,7 +1040,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                           std::pair<int, int> loc_truth_scale,
                           std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
-                          int *count_postive, Dtype *loc_loss_value, int *match_num_gt_box, bool has_lm, Dtype* lm_loss_value){
+                          int *count_postive, Dtype *loc_loss_value, int *match_num_gt_box, 
+                          bool has_lm, Dtype* lm_loss_value){
     CHECK_EQ(num_classes, 2) << "the current version is just classfly bg_0 and face_1, two class";
     int dimScale = output_height * output_width;
     Dtype score_loss = Dtype(0.), loc_loss = Dtype(0.), lm_loss = Dtype(0.);

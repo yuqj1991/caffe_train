@@ -312,7 +312,7 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                     Dtype p1 = pred_data[bg_index + label_idx * dimScale];
                     Dtype p0 = 1 - p1;
 
-                    #if 0
+                    #if 1
                     loss -= alpha * std::pow(p0, gamma) * std::log(std::max(p1,  Dtype(FLT_MIN)));
                     bottom_diff[bg_index + label_idx * dimScale] = (alpha) * std::pow(p0, gamma) * 
                                                                 (gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * p1 - p0);
@@ -323,10 +323,11 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                     Dtype p0_temp = Dtype(1. / (p0 + 1.));
                     Dtype p1_temp = Dtype(1. / (p1 + 1.));
                     loss -= alpha * std::pow(assist_value, gamma) * std::log(std::max(p1,  Dtype(FLT_MIN)));
-                    bottom_diff[bg_index + label_idx * dimScale] = (alpha) * std::pow(assist_value, gamma) *
-                                (p0 * p1 * gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * (p0_temp + p1_temp) - p0);
-                    bottom_diff[bg_index + (1 - label_idx) * dimScale] = (alpha) * std::pow(assist_value, gamma) *
-                                (p0 - p0 * p1 * gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * (p0_temp + p1_temp));
+                    bottom_diff[bg_index + label_idx * dimScale] = alpha * std::pow(assist_value, gamma) * p0 *
+                                (p1 * gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * (p0_temp + p1_temp) - 1);
+                                
+                    bottom_diff[bg_index + (1 - label_idx) * dimScale] = alpha * std::pow(assist_value, gamma) * p0 * 
+                                (1 - p1 * gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * (p0_temp + p1_temp));
                     #endif
                 }
             }
@@ -450,7 +451,7 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
     int num_postive = 0;
     int dimScale = output_height * output_width;
     std::vector<std::pair<int, float> > loss_value_indices;
-    #if 0
+    #if 1
     loss_value_indices.clear();
     for(int b = 0; b < batch_size; b ++){
         num_postive += postive[b];
