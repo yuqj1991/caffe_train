@@ -17,7 +17,7 @@
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
 #define FOCAL_LOSS_SOFTMAX true 
-#define USE_LOG false
+#define USE_LOG true
 int count_gt = 0;
 int count_one = 0;
 namespace caffe {
@@ -1130,10 +1130,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         int class_index = b * dimScale +  h * output_width + w;
     
                         Dtype center_x_diff, center_y_diff, width_diff, height_diff;
-                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[center_x_index] - center_x_bias), &center_x_diff);
-                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[center_y_index] - center_y_bias), &center_y_diff);
-                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[width_index] - width_bias), &width_diff);
-                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[height_index] - height_bias), &height_diff);
+                        loc_loss += L2_Loss(Dtype(channel_pred_data[center_x_index] - center_x_bias), &center_x_diff);
+                        loc_loss += L2_Loss(Dtype(channel_pred_data[center_y_index] - center_y_bias), &center_y_diff);
+                        loc_loss += L2_Loss(Dtype(channel_pred_data[width_index] - width_bias), &width_diff);
+                        loc_loss += L2_Loss(Dtype(channel_pred_data[height_index] - height_bias), &height_diff);
                         
                         bottom_diff[center_x_index] = center_x_diff;
                         bottom_diff[center_y_index] = center_y_diff;
