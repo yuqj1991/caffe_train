@@ -1063,11 +1063,13 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     #else
     caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
     #endif
-    LOG(INFO)<<"&&&&&&&&&&&&&&&&&&&&";
+    int previous_id = -1;
     std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >::iterator iter;
     for(iter =all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
         int b = iter->first;
-        LOG(INFO)<<b;
+        if(previous_id == b)
+            LOG(FATAL)<<"preivous_id: "<<previous_id<<", batch_id: "<<b;
+        previous_id = b;
         std::vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         int count = 0;
         std::vector<int> mask_Rf_anchor_already(dimScale, 0);
