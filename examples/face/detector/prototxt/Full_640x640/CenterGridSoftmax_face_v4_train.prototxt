@@ -4806,7 +4806,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4835,7 +4835,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4864,7 +4864,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4893,7 +4893,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -4922,7 +4922,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
