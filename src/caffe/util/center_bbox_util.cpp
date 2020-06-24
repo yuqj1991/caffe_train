@@ -1252,38 +1252,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                 gt_match_box ++;
             }
         }
-        #define USE_NON_OBJECT false
-        #if USE_NON_OBJECT
-        for(int h = 0; h < output_height; h++){
-            for(int w = 0; w < output_width; w++){
-                if(mask_Rf_anchor_already[h * output_width + w] != 1){
-                        Dtype xmin_bias = (w + 0.5 - 0) * downRatio * 2 / anchor_scale;
-                        Dtype ymin_bias = (h + 0.5 - 0) * downRatio * 2 / anchor_scale;
-                        Dtype xmax_bias = (w + 0.5 - 0) * downRatio * 2 / anchor_scale;
-                        Dtype ymax_bias = (h + 0.5 - 0) * downRatio * 2 / anchor_scale;
-                        int xmin_index = b * num_channels * dimScale
-                                                    + 0* dimScale + h * output_width + w;
-                        int ymin_index = b * num_channels * dimScale 
-                                                    + 1* dimScale + h * output_width + w;
-                        int xmax_index = b * num_channels * dimScale
-                                                    + 2* dimScale + h * output_width + w;
-                        int ymax_index = b * num_channels * dimScale 
-                                                    + 3* dimScale + h * output_width + w;
-    
-                        Dtype xmin_diff, ymin_diff, xmax_diff, ymax_diff;
-                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmin_index] - xmin_bias), &xmin_diff);
-                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymin_index] - ymin_bias), &ymin_diff);
-                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[xmax_index] - xmax_bias), &xmax_diff);
-                        loc_loss += smoothL1_Loss(Dtype(channel_pred_data[ymax_index] - ymax_bias), &ymax_diff);
-                        
-                        bottom_diff[xmin_index] = xmin_diff;
-                        bottom_diff[ymin_index] = ymin_diff;
-                        bottom_diff[xmax_index] = xmax_diff;
-                        bottom_diff[ymax_index] = ymax_diff;
-                }
-            }
-        }
-        #endif
         mask_Rf_anchor_already.clear();
         postive_batch[b] = count;
         postive += count;

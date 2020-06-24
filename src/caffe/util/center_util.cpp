@@ -286,7 +286,7 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                             const int num_channels, bool has_lm){
     Dtype loss = Dtype(0.f);
     float alpha = 0.25f;
-    float gamma = 2.f;
+    float gamma = 4.f;
     float transfer = 0.25f;
     //float alpha = 2.f;
     //float gamma = 4.f;
