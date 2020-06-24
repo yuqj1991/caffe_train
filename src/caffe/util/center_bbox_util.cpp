@@ -1058,8 +1058,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     // 将所有值设置为 -2 的原因为，排除掉iou>0.35的一些样本，也就是说
     // 只采集那些iou<0.35的负样本.20200611,舍弃之
     #if FOCAL_LOSS_SOFTMAX
-    //caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
-    caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
+    caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
+    //caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
     #else
     caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
     #endif
@@ -1257,8 +1257,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         postive += count;
     }
     #if FOCAL_LOSS_SOFTMAX
-    SelectHardSampleSoftMax(class_label, batch_sample_loss, 3, postive_batch, 
-                                        output_height, output_width, num_channels, batch_size, has_lm);
+    //SelectHardSampleSoftMax(class_label, batch_sample_loss, 3, postive_batch, 
+    //                                    output_height, output_width, num_channels, batch_size, has_lm);
     score_loss = FocalLossSoftmax(class_label, channel_pred_data, batch_size, output_height,
                                     output_width, bottom_diff, num_channels, has_lm);
     #else
