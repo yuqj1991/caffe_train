@@ -1256,7 +1256,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         #if USE_NON_OBJECT
         for(int h = 0; h < output_height; h++){
             for(int w = 0; w < output_width; w++){
-                if(mask_Rf_anchor_already[h * output_width + w] == 1){
+                if(mask_Rf_anchor_already[h * output_width + w] != 1){
                         Dtype xmin_bias = (w + 0.5 - 0) * downRatio * 2 / anchor_scale;
                         Dtype ymin_bias = (h + 0.5 - 0) * downRatio * 2 / anchor_scale;
                         Dtype xmax_bias = (w + 0.5 - 0) * downRatio * 2 / anchor_scale;
