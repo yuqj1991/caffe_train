@@ -312,8 +312,8 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                     }
                     Dtype p1 = pred_data[bg_index + label_idx * dimScale];
                     Dtype p0 = 1 - p1;
-
-                    #if 1
+                    #define USE_FOCAL_LOSS true
+                    #if USE_FOCAL_LOSS
                     loss -= alpha * std::pow(p0, gamma) * std::log(std::max(p1,  Dtype(FLT_MIN)));
                     bottom_diff[bg_index + label_idx * dimScale] = alpha * std::pow(p0, gamma) * 
                                                                 (gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * p1 - p0);
