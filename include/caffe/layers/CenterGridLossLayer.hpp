@@ -64,6 +64,7 @@ class CenterGridLossLayer : public LossLayer<Dtype> {
   CenterObjectLossParameter_CLASS_TYPE class_type_;
   bool has_lm_;
   int num_lm_;
+  bool normalized_changed_;
 };
 
 }  // namespace caffe
