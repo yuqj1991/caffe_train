@@ -286,8 +286,7 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                             const int num_channels, bool has_lm){
     Dtype loss = Dtype(0.f);
     float alpha = 0.25f;
-    float gamma = 4.f;
-    float transfer = 0.25f;
+    float gamma = 2.f;
     //float alpha = 2.f;
     //float gamma = 4.f;
     int dimScale = output_height * output_width;
@@ -320,6 +319,7 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                     bottom_diff[bg_index + (1 - label_idx) * dimScale] = alpha * std::pow(p0, gamma) * 
                                                                 (p0 - gamma * std::log(std::max(p1,  Dtype(FLT_MIN))) * p1 );
                     #else
+                    float transfer = 0.25f;
                     Dtype assist_value = Dtype((p0 + transfer) / (p1 + transfer));
                     Dtype p0_temp = Dtype(1. / (p0 + transfer));
                     Dtype p1_temp = Dtype(1. / (p1 + transfer));

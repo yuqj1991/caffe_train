@@ -74,11 +74,6 @@ void CenterGridLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-
-    if(iterations_ > 30000 && !normalized_changed_){
-        normalization_ =  LossParameter_NormalizationMode_VALID;
-        normalized_changed_ = true;
-    }
   
     // gt_boxes
     const Dtype* gt_data = bottom[1]->cpu_data();
