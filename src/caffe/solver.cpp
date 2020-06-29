@@ -807,6 +807,7 @@ void Solver<Dtype>::UpdateSmoothedLoss(Dtype loss, int start_iter,
     }
     #else
     smoothed_loss_ = loss;
+    #endif
 }
 
 INSTANTIATE_CLASS(Solver);
