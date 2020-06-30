@@ -1,10 +1,16 @@
-caffe train face licenseplate reID action ocr  
+## caffe train face licenseplate reID action ocr
+
+---
+
 focal loss layer implemented by caffe  
 cosin face loss layer implemented by caffe  
 data augement for pymraidBox implemented by caffe  
-yolo layer & reorg layer for darknet implemented by caffe  
+yolov3 layer  implemented by caffe  
 centernet implemented by caffe  
-facenet tripletloss by caffe  
+facenet tripletloss by caffe
+
+---
+
 centernet face + nms version  
 widerface val set  
 hard mid easy  
@@ -14,19 +20,22 @@ mobilenet-v2 face vggface val accuray
 face landmarks + face attributes gender (99.4%)+ bool glasses(99.5%)  
 face head angle(not evaluated)  
 car license plate detect(mAP91%) + recognition(96%, only support anhui car + blue car style)  
-New proposed method CenterGridSoftmax + nms method by using anchor  
+## New proposed method CenterGridSoftmax + nms method by using anchor  
 widerface val set  
 hard mid easy  
 74% 84% 86%  
 
-will add caffe version efficientDet  
-to be continued
+---
+
+## will add caffe version efficientDet, to be continued
 
 import caffe
 from caffe import layers as L
 from caffe import params as P
 
-python Caffe API
+---
+
+## python Caffe API
 Data层定义
 lmdb/leveldb Data层定义
 
