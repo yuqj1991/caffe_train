@@ -17,7 +17,7 @@
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
 #define FOCAL_LOSS_SOFTMAX true 
-#define USE_LOG false
+#define USE_LOG true
 int count_gt = 0;
 int count_one = 0;
 namespace caffe {
@@ -1119,8 +1119,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
                         #if USE_LOG
-                        Dtype center_x_bias = (w + 0.5 - center_x) * downRatio * 2 / anchor_scale;
-                        Dtype center_y_bias = (h + 0.5 - center_y) * downRatio * 2 / anchor_scale;
+                        Dtype center_x_bias = (w + 0.5 - center_x) * downRatio / anchor_scale;
+                        Dtype center_y_bias = (h + 0.5 - center_y) * downRatio / anchor_scale;
                         Dtype width_bias = std::log(bbox_width * downRatio / anchor_scale);
                         Dtype height_bias = std::log(bbox_height * downRatio / anchor_scale);
                         int center_x_index = b * num_channels * dimScale
@@ -1326,8 +1326,8 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                 float xmin = 0.f, ymin = 0.f, xmax = 0.f, ymax = 0.f;
                 #if USE_LOG
 
-                float bb_center_x = (w + 0.5 - channel_pred_data[x_index] * anchor_scale / (2 * downRatio)) *downRatio;
-                float bb_center_y = (h + 0.5 - channel_pred_data[y_index] * anchor_scale / (2 * downRatio)) *downRatio;
+                float bb_center_x = (w + 0.5 - channel_pred_data[x_index] * anchor_scale / (downRatio)) *downRatio;
+                float bb_center_y = (h + 0.5 - channel_pred_data[y_index] * anchor_scale / (downRatio)) *downRatio;
                 float bb_width = std::exp(channel_pred_data[width_index]) * anchor_scale;
                 float bb_height = std::exp(channel_pred_data[height_index]) * anchor_scale;
                 
