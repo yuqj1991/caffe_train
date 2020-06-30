@@ -11,11 +11,14 @@ facenet tripletloss by caffe
 
 ---
 
-centernet face + nms version  
+## centernet face + nms version  
 widerface val set  
 hard mid easy  
 73% 81% 79%  
-mobilenet-v2 face vggface val accuray  
+
+---
+
+## mobilenet-v2 face vggface val accuray  
 99.42%  
 face landmarks + face attributes gender (99.4%)+ bool glasses(99.5%)  
 face head angle(not evaluated)  
@@ -36,87 +39,22 @@ from caffe import params as P
 ---
 
 ## python Caffe API
-Data层定义
-lmdb/leveldb Data层定义
-
-L.Data( 
-        source=lmdb,
-        backend=P.Data.LMDB,
-        batch_size=batch_size, ntop=2,
-        transform_param=dict(
-                              crop_size=227,
-                              mean_value=[104, 117, 123],
-                              mirror=True
-                              )
-        )
-
-HDF5 Data层定义
-L.HDF5Data(
-            hdf5_data_param={
-                            'source': './training_data_paths.txt',  
-                            'batch_size': 64
-                            },
-            include={
-                    'phase': caffe.TRAIN
-                    }
-            )
-
-mageData Data层定义
-L.ImageData(
-                source=list_path,
-                batch_size=batch_size,
-                new_width=48,
-                new_height=48,
-                ntop=2,
-                ransform_param=dict(crop_size=40,mirror=True)
-                )
-
-Convloution层定义
-L.Convolution(  
-                bottom, 
-                kernel_size=ks, 
-                stride=stride,
-                num_output=nout, 
-                pad=pad, 
-                group=group
-                )
-LRN层定义
-L.LRN(
-        bottom, 
-        local_size=5, 
-        alpha=1e-4, 
-        beta=0.75
-        )
-Activation层定义
-L.ReLU(
-        bottom, 
-        in_place=True
-        )
-L.Pooling(
-            bottom,
-            pool=P.Pooling.MAX, 
-            kernel_size=ks, 
-            stride=stride
-            )
-FullConnect层定义
-L.InnerProduct(
-                bottom, 
-                num_output=nout
-                )
-Dropout层定义
-L.Dropout(
-            bottom, 
-            in_place=True
-            )
-Loss层定义
-L.SoftmaxWithLoss(
-                    bottom, 
-                    label
-                    )
+L.Data( source=lmdb,backend=P.Data.LMDB,batch_size=batch_size, ntop=2,transform_param=dict(crop_size=227,mean_value=[104, 117, 123],mirror=True))  
+L.HDF5Data(hdf5_data_param={'source': './training_data_paths.txt','batch_size': 64},include={'phase': caffe.TRAIN})  
+L.ImageData(source=list_path,batch_size=batch_size,new_width=48,new_height=48,ntop=2,ransform_param=dict(crop_size=40,mirror=True))  
+L.Convolution(bottom, kernel_size=ks, stride=stride,num_output=nout, pad=pad, group=group)  
+L.LRN(bottom,local_size=5, alpha=1e-4, beta=0.75)  
+L.ReLU(bottom, in_place=True)  
+L.Pooling(bottom, pool=P.Pooling.MAX, kernel_size=ks, stride=stride)  
+L.InnerProduct(bottom, num_output=nout)  
+L.Dropout(bottom, in_place=True)  
+L.SoftmaxWithLoss(bottom, label)  
 
 查看某一层的宽，高，shape，可以用net['layer_name'].blobs[].data.shape[]
 
-数据增强效果图
+---
+
+## 数据增强方法
 
 假设原图输入是一张640*480的图片，这里由于版面问题我放缩了图片尺寸并且没做mean subtract，由于最后会有resize参数导致输出的图片都会resize到300x300，但是主要看的是增强的效果，SSD中的数据增强的顺序是：
 
@@ -130,5 +68,4 @@ Resize：放缩到300x300，最后将图片放缩到300x300，标签框也是线
 
 Crop：原本data_transformer还会crop的，这个参数是配在prototxt中，默认是原图 所以就和没crop一样。如果要crop的话标签也是会和之前BatchSampler那样处理。
 
-数据增强，data_anchor_sampler
-在一张图像中随机抽取一张sface
+data_anchor_sampler: 在一张图像中随机抽取一张sface
