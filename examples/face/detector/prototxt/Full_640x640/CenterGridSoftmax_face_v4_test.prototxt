@@ -4645,7 +4645,7 @@ layer {
     bias_scale: 120
     bias_scale: 60
     bias_scale: 23
-    nms_thresh: 0.30000001192092896
+    nms_thresh: 0.40000001192092896
     class_type: SOFTMAX
     has_lm: false
     net_height: 640
