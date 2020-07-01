@@ -15,6 +15,10 @@ facenet tripletloss by caffe
 widerface val set  
 hard mid easy  
 73% 81% 79%  
+| Method | Easy | Medium | Hard|
+|:--------:| :--------:| :---------:| :------:|
+| ours(one scale)| 0.7906 | 0.8089   | 0.7346 |
+| original | 0.922 | 0.911 | 0.782 |
 
 ---
 
@@ -23,22 +27,22 @@ hard mid easy
 face landmarks + face attributes gender (99.4%)+ bool glasses(99.5%)  
 face head angle(not evaluated)  
 car license plate detect(mAP91%) + recognition(96%, only support anhui car + blue car style)  
+
 ## New proposed method CenterGridSoftmax + nms method by using anchor  
-widerface val set  
-hard mid easy  
-74% 84% 86%  
+| Method | Easy | Medium | Hard|
+|:--------:| :--------:| :---------:| :------:|
+| ours(one scale)| 0.8636 | 0.8489   | 0.7364 |
 
 ---
 
 ## will add caffe version efficientDet, to be continued
+we had add the net prototxt, not training
 
-import caffe
-from caffe import layers as L
-from caffe import params as P
-
----
 
 ## python Caffe API
+import caffe  
+from caffe import layers as L  
+from caffe import params as P  
 L.Data( source=lmdb,backend=P.Data.LMDB,batch_size=batch_size, ntop=2,transform_param=dict(crop_size=227,mean_value=[104, 117, 123],mirror=True))  
 L.HDF5Data(hdf5_data_param={'source': './training_data_paths.txt','batch_size': 64},include={'phase': caffe.TRAIN})  
 L.ImageData(source=list_path,batch_size=batch_size,new_width=48,new_height=48,ntop=2,ransform_param=dict(crop_size=40,mirror=True))  

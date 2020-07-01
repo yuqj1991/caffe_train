@@ -795,7 +795,6 @@ void Solver<Dtype>::Restore(const char* state_file) {
 template <typename Dtype>
 void Solver<Dtype>::UpdateSmoothedLoss(Dtype loss, int start_iter,
     int average_loss) {
-    #if 1
     if (losses_.size() < average_loss) {
         losses_.push_back(loss);
         int size = losses_.size();
@@ -805,9 +804,6 @@ void Solver<Dtype>::UpdateSmoothedLoss(Dtype loss, int start_iter,
         smoothed_loss_ += (loss - losses_[idx]) / average_loss;
         losses_[idx] = loss;
     }
-    #else
-    smoothed_loss_ = loss;
-    #endif
 }
 
 INSTANTIATE_CLASS(Solver);
