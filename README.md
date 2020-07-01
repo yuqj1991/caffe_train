@@ -22,11 +22,14 @@
 
 ---
 
-## mobilenet-v2 face vggface val accuray  
-99.42%  
-face landmarks + face attributes gender (99.4%)+ bool glasses(99.5%)  
-face head angle(not evaluated)  
-car license plate detect(mAP91%) + recognition(96%, only support anhui car + blue car style)  
+## example val accuray  
+| Method | accuray performance|  
+|:--------:| :--------:|  
+|mobilenet-v2 face recognition|99.42%  |
+|face landmarks + face attributes gender |(99.4%)+ bool glasses(99.5%)|  
+|face head angle|(not evaluated)|  
+|car license plate detect|(mAP91%)|  
+|car recognition| (96%, only support anhui car + blue car style)|  
 
 ## New proposed method CenterGridSoftmax + nms method by using anchor  
 | Method | Easy | Medium | Hard|
