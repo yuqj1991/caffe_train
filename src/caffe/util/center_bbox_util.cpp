@@ -17,7 +17,7 @@
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
 #define FOCAL_LOSS_SOFTMAX true 
-#define USE_LOG true
+#define USE_LOG false
 int count_gt = 0;
 int count_one = 0;
 namespace caffe {
@@ -1141,7 +1141,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         gt_bbox.set_xmax(xmax * downRatio);
                         gt_bbox.set_ymin(ymin * downRatio);
                         gt_bbox.set_ymax(ymax * downRatio);
-                        loc_loss = GIoULoss(pred_bbox, gt_bbox, &center_x_diff, &center_y_diff, &width_diff, &height_diff, anchor_scale, downRatio);
+                        loc_loss = GIoULoss(pred_bbox, gt_bbox, &center_x_diff, &center_y_diff, 
+                                                &width_diff, &height_diff, anchor_scale, downRatio);
                         bottom_diff[x_index] = center_x_diff;
                         bottom_diff[y_index] = center_y_diff;
                         bottom_diff[width_index] = width_diff;
