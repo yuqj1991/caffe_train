@@ -2,19 +2,19 @@
 
 ---
 
-focal loss layer implemented by caffe  
-cosin face loss layer implemented by caffe  
-data augement for pymraidBox implemented by caffe  
-yolov3 layer  implemented by caffe  
-centernet implemented by caffe  
-facenet tripletloss by caffe
+## caffe implement method
+| Method | orginal performance| caffe performance | 
+|:--------:| :--------:| :---------:| 
+|focal loss|            |            | 
+|data_anchor_sample|        |        |
+|cos_loss|              |            |
+|Yolov3  |              |            |
+|triplet_loss|          |            |
 
 ---
 
 ## centernet face + nms version  
-widerface val set  
-hard mid easy  
-73% 81% 79%  
+
 | Method | Easy | Medium | Hard|
 |:--------:| :--------:| :---------:| :------:|
 | ours(one scale)| 0.7906 | 0.8089   | 0.7346 |
