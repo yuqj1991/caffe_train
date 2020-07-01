@@ -85,7 +85,7 @@ Dtype FocalLossSigmoid(Dtype* label_data, Dtype * pred_data, int dimScale, Dtype
 template <typename Dtype>
 Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 
                 Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2, const int anchor_scale,
-                const int downRatio, const int layer_scale);
+                const int downRatio);
 
 template <typename Dtype>
 Dtype DIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 

@@ -795,7 +795,7 @@ void Solver<Dtype>::Restore(const char* state_file) {
 template <typename Dtype>
 void Solver<Dtype>::UpdateSmoothedLoss(Dtype loss, int start_iter,
     int average_loss) {
-    #if 0
+    #if 1
     if (losses_.size() < average_loss) {
         losses_.push_back(loss);
         int size = losses_.size();

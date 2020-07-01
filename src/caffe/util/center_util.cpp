@@ -508,7 +508,7 @@ template void SelectHardSampleSoftMax(double *label_data, std::vector<double> ba
 template <typename Dtype>
 Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 
                 Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2, const int anchor_scale,
-                const int downRatio, const int layer_scale){
+                const int downRatio){
 
     Dtype p_xmin = predict_box.xmin();
     Dtype p_xmax = predict_box.xmax();
@@ -583,19 +583,19 @@ Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x
     Dtype di_x1 = p_xmin < p_xmax ? p_dl : p_dr;
     Dtype di_x2 = p_xmin < p_xmax ? p_dr : p_dl;
 
-    *diff_x1 = di_x1 * (-1) * Dtype(anchor_scale / (2 * downRatio * layer_scale));
-    *diff_y1 = di_y1 * (-1) * Dtype(anchor_scale / (2 * downRatio * layer_scale));
-    *diff_x2 = di_x2 * (-1) * Dtype(anchor_scale / (2 * downRatio * layer_scale));
-    *diff_y2 = di_y2 * (-1) * Dtype(anchor_scale / (2 * downRatio * layer_scale));
+    *diff_x1 = di_x1 * (-1) * Dtype(anchor_scale / (downRatio));
+    *diff_y1 = di_y1 * (-1) * Dtype(anchor_scale / (downRatio));
+    *diff_x2 = di_x2 * (-1) * Dtype(anchor_scale / (downRatio));
+    *diff_y2 = di_y2 * (-1) * Dtype(anchor_scale / (downRatio));
     return (1 - GIou);
 }
 
 template float GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, float* diff_x1, 
                 float* diff_x2, float* diff_y1, float* diff_y2, const int anchor_scale,
-                const int downRatio, const int layer_scale);
+                const int downRatio);
 template double GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, double* diff_x1, 
                 double* diff_x2, double* diff_y1, double* diff_y2, const int anchor_scale,
-                const int downRatio, const int layer_scale);
+                const int downRatio);
 
 
 template <typename Dtype>
