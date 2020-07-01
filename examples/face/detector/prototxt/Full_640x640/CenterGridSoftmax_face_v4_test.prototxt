@@ -4638,7 +4638,7 @@ layer {
   detection_output_param {
     num_classes: 2
     share_location: true
-    keep_top_k: 1000
+    keep_top_k: 10000
     confidence_threshold: 0.05000000074505806
     bias_scale: 475
     bias_scale: 240
