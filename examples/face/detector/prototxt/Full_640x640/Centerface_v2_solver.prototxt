@@ -18,9 +18,8 @@ test_initialization: false
 average_loss: 10
 stepvalue: 10000
 stepvalue: 20000
-stepvalue: 30000
-stepvalue: 50000
-stepvalue: 70000
+stepvalue: 40000
+stepvalue: 60000
 iter_size: 1
 type: "Adam"
 eval_type: "detection"
