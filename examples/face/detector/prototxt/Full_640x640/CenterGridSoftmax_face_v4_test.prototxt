@@ -4638,14 +4638,14 @@ layer {
   detection_output_param {
     num_classes: 2
     share_location: true
-    keep_top_k: 5000
+    keep_top_k: 1000
     confidence_threshold: 0.05000000074505806
     bias_scale: 475
     bias_scale: 240
     bias_scale: 120
     bias_scale: 60
     bias_scale: 23
-    nms_thresh: 0.40000001192092896
+    nms_thresh: 0.30000001192092896
     class_type: SOFTMAX
     has_lm: false
     net_height: 640
