@@ -802,7 +802,6 @@ void GetYoloGroundTruth(const Dtype* gt_data, int num_gt,
             AnnoFaceLandmarks lmarks;
             if(has_lm){
                 Dtype bbox_has_lm = gt_data[start_idx + 8];
-                LOG(INFO)<<"HAS_LM: "<<bbox_has_lm;
                 if(bbox_has_lm > 0){
                     lmarks.mutable_lefteye()->set_x(gt_data[start_idx + 9]);
                     lmarks.mutable_lefteye()->set_y(gt_data[start_idx + 10]);
