@@ -1112,8 +1112,8 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
-                        #define USE_LOG true
-                        #if USE_LOG
+                        #define USE_GIOU_LOSS false
+                        #if USE_GIOU_LOSS
                         int x_index = b * num_channels * dimScale
                                                     + 0* dimScale + h * output_width + w;
                         int y_index = b * num_channels * dimScale 
@@ -1191,37 +1191,37 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                 int rm_x_index = b * num_channels * dimScale + 12* dimScale + h * output_width + w;
                                 int rm_y_index = b * num_channels * dimScale + 13* dimScale + h * output_width + w;
 
-                                Dtype le_x_bias = (w - gt_bboxes[ii].second.lefteye().x() * output_width) * downRatio * 2 / anchor_scale;
-                                Dtype le_y_bias = (h - gt_bboxes[ii].second.lefteye().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype le_x_bias = (w + 0.5 - gt_bboxes[ii].second.lefteye().x() * output_width) * downRatio / anchor_scale;
+                                Dtype le_y_bias = (h + 0.5 - gt_bboxes[ii].second.lefteye().y() * output_height) * downRatio / anchor_scale;
 
-                                Dtype re_x_bias = (w - gt_bboxes[ii].second.righteye().x() * output_width) * downRatio * 2 / anchor_scale;
-                                Dtype re_y_bias = (h - gt_bboxes[ii].second.righteye().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype re_x_bias = (w + 0.5 - gt_bboxes[ii].second.righteye().x() * output_width) * downRatio / anchor_scale;
+                                Dtype re_y_bias = (h + 0.5 - gt_bboxes[ii].second.righteye().y() * output_height) * downRatio / anchor_scale;
 
-                                Dtype no_x_bias = (w - gt_bboxes[ii].second.nose().x() * output_width) * downRatio * 2 / anchor_scale;
-                                Dtype no_y_bias = (h - gt_bboxes[ii].second.nose().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype no_x_bias = (w + 0.5 - gt_bboxes[ii].second.nose().x() * output_width) * downRatio / anchor_scale;
+                                Dtype no_y_bias = (h + 0.5 - gt_bboxes[ii].second.nose().y() * output_height) * downRatio / anchor_scale;
 
-                                Dtype lm_x_bias = (w - gt_bboxes[ii].second.leftmouth().x() * output_width) * downRatio * 2 / anchor_scale;
-                                Dtype lm_y_bias = (h - gt_bboxes[ii].second.leftmouth().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype lm_x_bias = (w + 0.5 - gt_bboxes[ii].second.leftmouth().x() * output_width) * downRatio / anchor_scale;
+                                Dtype lm_y_bias = (h + 0.5 - gt_bboxes[ii].second.leftmouth().y() * output_height) * downRatio / anchor_scale;
 
-                                Dtype rm_x_bias = (w - gt_bboxes[ii].second.rightmouth().x() * output_width) * downRatio * 2 / anchor_scale;
-                                Dtype rm_y_bias = (h - gt_bboxes[ii].second.rightmouth().y() * output_height) * downRatio * 2 / anchor_scale;
+                                Dtype rm_x_bias = (w + 0.5 - gt_bboxes[ii].second.rightmouth().x() * output_width) * downRatio / anchor_scale;
+                                Dtype rm_y_bias = (h + 0.5 - gt_bboxes[ii].second.rightmouth().y() * output_height) * downRatio / anchor_scale;
 
                                 Dtype le_x_diff, le_y_diff, re_x_diff, re_y_diff, no_x_diff, no_y_diff, lm_x_diff, lm_y_diff, rm_x_diff, rm_y_diff;
 
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[le_x_index] - le_x_bias), &le_x_diff);
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[le_y_index] - le_y_bias), &le_y_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[le_x_index] - le_x_bias), &le_x_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[le_y_index] - le_y_bias), &le_y_diff);
 
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[re_x_index] - re_x_bias), &re_x_diff);
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[re_y_index] - re_y_bias), &re_y_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[re_x_index] - re_x_bias), &re_x_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[re_y_index] - re_y_bias), &re_y_diff);
 
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[no_x_index] - no_x_bias), &no_x_diff);
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[no_y_index] - no_y_bias), &no_y_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[no_x_index] - no_x_bias), &no_x_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[no_y_index] - no_y_bias), &no_y_diff);
 
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[lm_x_index] - lm_x_bias), &lm_x_diff);
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[lm_y_index] - lm_y_bias), &lm_y_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[lm_x_index] - lm_x_bias), &lm_x_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[lm_y_index] - lm_y_bias), &lm_y_diff);
 
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[rm_x_index] - rm_x_bias), &rm_x_diff);
-                                lm_loss += L2_Loss(Dtype(channel_pred_data[rm_y_index] - rm_y_bias), &rm_y_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[rm_x_index] - rm_x_bias), &rm_x_diff);
+                                lm_loss += smoothL1_Loss(Dtype(channel_pred_data[rm_y_index] - rm_y_bias), &rm_y_diff);
 
 
                                 bottom_diff[le_x_index] = le_x_diff;
@@ -1350,28 +1350,28 @@ void GetCenterGridObjectResultSoftMax(const int batch_size, const int num_channe
                     int lm_y_index = b * num_channels * dimScale + 11* dimScale + h * output_width + w;
                     int rm_x_index = b * num_channels * dimScale + 12* dimScale + h * output_width + w;
                     int rm_y_index = b * num_channels * dimScale + 13* dimScale + h * output_width + w;
-                    le_x = (w - channel_pred_data[le_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
-                    le_y = (w - channel_pred_data[le_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    le_x = (w + 0.5 - channel_pred_data[le_x_index] * anchor_scale /(downRatio)) *downRatio;
+                    le_y = (w + 0.5 - channel_pred_data[le_y_index] * anchor_scale /(downRatio)) *downRatio;
                     le_x = GET_VALID_VALUE(le_x, (0.f), float(downRatio * output_width));
                     le_y = GET_VALID_VALUE(le_y, (0.f), float(downRatio * output_height));
 
-                    re_x = (w - channel_pred_data[re_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
-                    re_y = (w - channel_pred_data[re_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    re_x = (w + 0.5 - channel_pred_data[re_x_index] * anchor_scale /(downRatio)) *downRatio;
+                    re_y = (w + 0.5 - channel_pred_data[re_y_index] * anchor_scale /(downRatio)) *downRatio;
                     re_x = GET_VALID_VALUE(re_x, (0.f), float(downRatio * output_width));
                     re_y = GET_VALID_VALUE(re_y, (0.f), float(downRatio * output_height));
 
-                    no_x = (w - channel_pred_data[no_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
-                    no_y = (w - channel_pred_data[no_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    no_x = (w + 0.5 - channel_pred_data[no_x_index] * anchor_scale /(downRatio)) *downRatio;
+                    no_y = (w + 0.5 - channel_pred_data[no_y_index] * anchor_scale /(downRatio)) *downRatio;
                     no_x = GET_VALID_VALUE(no_x, (0.f), float(downRatio * output_width));
                     no_y = GET_VALID_VALUE(no_y, (0.f), float(downRatio * output_height));
 
-                    lm_x = (w - channel_pred_data[lm_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
-                    lm_y = (w - channel_pred_data[lm_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    lm_x = (w + 0.5 - channel_pred_data[lm_x_index] * anchor_scale /(downRatio)) *downRatio;
+                    lm_y = (w + 0.5 - channel_pred_data[lm_y_index] * anchor_scale /(downRatio)) *downRatio;
                     lm_x = GET_VALID_VALUE(lm_x, (0.f), float(downRatio * output_width));
                     lm_y = GET_VALID_VALUE(lm_y, (0.f), float(downRatio * output_height));
 
-                    rm_x = (w - channel_pred_data[rm_x_index] * anchor_scale /(2 * downRatio)) *downRatio;
-                    rm_y = (w - channel_pred_data[rm_y_index] * anchor_scale /(2 * downRatio)) *downRatio;
+                    rm_x = (w + 0.5 - channel_pred_data[rm_x_index] * anchor_scale /(downRatio)) *downRatio;
+                    rm_y = (w + 0.5 - channel_pred_data[rm_y_index] * anchor_scale /(downRatio)) *downRatio;
                     rm_x = GET_VALID_VALUE(rm_x, (0.f), float(downRatio * output_width));
                     rm_y = GET_VALID_VALUE(rm_y, (0.f), float(downRatio * output_height));
                 }

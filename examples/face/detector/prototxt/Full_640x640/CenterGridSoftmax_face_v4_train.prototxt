@@ -193,7 +193,7 @@ layer {
     }
     yoloformat: true
     crop_type: CROP_JITTER
-    has_landmarks: false
+    has_landmarks: true
   }
   data_param {
     source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
@@ -4119,7 +4119,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4285,7 +4285,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4451,7 +4451,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4617,7 +4617,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4783,7 +4783,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4819,7 +4819,7 @@ layer {
     low_bbox_scale: 320
     up_bbox_scale: 630
     class_type: SOFTMAX
-    has_lm: false
+    has_lm: true
   }
 }
 layer {
@@ -4848,7 +4848,7 @@ layer {
     low_bbox_scale: 160
     up_bbox_scale: 320
     class_type: SOFTMAX
-    has_lm: false
+    has_lm: true
   }
 }
 layer {
@@ -4877,7 +4877,7 @@ layer {
     low_bbox_scale: 80
     up_bbox_scale: 160
     class_type: SOFTMAX
-    has_lm: false
+    has_lm: true
   }
 }
 layer {
@@ -4906,7 +4906,7 @@ layer {
     low_bbox_scale: 40
     up_bbox_scale: 80
     class_type: SOFTMAX
-    has_lm: false
+    has_lm: true
   }
 }
 layer {
@@ -4935,7 +4935,7 @@ layer {
     low_bbox_scale: 6
     up_bbox_scale: 40
     class_type: SOFTMAX
-    has_lm: false
+    has_lm: true
   }
 }
 
