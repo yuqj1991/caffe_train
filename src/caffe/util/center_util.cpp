@@ -454,7 +454,8 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
     int num_postive = 0;
     int dimScale = output_height * output_width;
     std::vector<std::pair<int, float> > loss_value_indices;
-    #if 0
+    #define USE_Full_Batch false
+    #if USE_Full_Batch
     loss_value_indices.clear();
     for(int b = 0; b < batch_size; b ++){
         num_postive += postive[b];
@@ -490,10 +491,8 @@ void SelectHardSampleSoftMax(Dtype *label_data, std::vector<Dtype> batch_sample_
         for(int ii = 0; ii < num_negative; ii++){
             int select_index = loss_value_indices[ii].first;
             label_data[select_index] = 0.5;
-            //LOG(INFO)<<"bg loss: "<<loss_value_indices[ii].second<<", label: "<<0;
         }
     }
-    //LOG(INFO)<<"%%%%%%%%%%%%%%%%";
     #endif
 }
 
@@ -509,13 +508,12 @@ template void SelectHardSampleSoftMax(double *label_data, std::vector<double> ba
 
 template <typename Dtype>
 Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 
-                Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2, const int anchor_scale,
-                const int downRatio){
+                Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2){
 
-    Dtype p_xmin = predict_box.xmin();
-    Dtype p_xmax = predict_box.xmax();
-    Dtype p_ymin = predict_box.ymin();
-    Dtype p_ymax = predict_box.ymax();
+    Dtype p_xmin = std::min(predict_box.xmin(), predict_box.xmax());
+    Dtype p_xmax = std::max(predict_box.xmin(), predict_box.xmax());
+    Dtype p_ymin = std::min(predict_box.ymin(), predict_box.ymax());
+    Dtype p_ymax = std::max(predict_box.ymin(), predict_box.ymax());
     Dtype p_area = (p_xmax - p_xmin) *(p_ymax - p_ymin);
 
     Dtype gt_xmin = gt_bbox.xmin();
@@ -539,7 +537,7 @@ Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x
     Dtype GIou = Iou - Dtype((C - Union) / C);
 
     // cal diff float IoU = I / U;
-    // Partial Derivatives, derivatives
+    // derivative of p_aera regard xmin,ymin,xmax,ymax
     Dtype dp_aera_wrt_xmin = -1 * (p_ymax - p_ymin);
     Dtype dp_aera_wrt_xmax = (p_ymax - p_ymin);
     Dtype dp_aera_wrt_ymin = -1 * (p_xmax - p_xmin);
@@ -551,7 +549,7 @@ Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x
     Dtype dI_wrt_ymin = p_ymin > gt_ymin ? (-1 * iou_width) : 0;
     Dtype dI_wrt_ymax = p_ymax < gt_ymax ? iou_width : 0;
 
-    // derivative of U with regard to x
+    // derivative of U with regard to xmin, ymin, xmax, ymax
     Dtype dU_wrt_ymin = dp_aera_wrt_ymin - dI_wrt_ymin;
     Dtype dU_wrt_ymax = dp_aera_wrt_ymax - dI_wrt_ymax;
     Dtype dU_wrt_xmin = dp_aera_wrt_xmin - dI_wrt_xmin;
@@ -562,42 +560,37 @@ Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x
     Dtype dC_wrt_xmin = p_xmin < gt_xmin ? (-1 * (c_ymax - c_ymin)) : 0;
     Dtype dC_wrt_xmax = p_xmax > gt_ymax ? (c_ymax - c_ymin) : 0;
 
-    Dtype p_dt = Dtype(0.);
-    Dtype p_db = Dtype(0.);
-    Dtype p_dl = Dtype(0.);
-    Dtype p_dr = Dtype(0.);
+    Dtype dp_ymin = Dtype(0.);
+    Dtype dp_ymax = Dtype(0.);
+    Dtype dp_xmin = Dtype(0.);
+    Dtype dp_xmax = Dtype(0.);
     if (Union > 0) {
-      p_dt = ((Union * dI_wrt_ymin) - (iou_area * dU_wrt_ymin)) / (Union * Union);
-      p_db = ((Union * dI_wrt_ymax) - (iou_area * dU_wrt_ymax)) / (Union * Union);
-      p_dl = ((Union * dI_wrt_xmin) - (iou_area * dU_wrt_xmin)) / (Union * Union);
-      p_dr = ((Union * dI_wrt_xmax) - (iou_area * dU_wrt_xmax)) / (Union * Union);
+        // gradient of IOU regard to I / U
+        dp_ymin = ((Union * dI_wrt_ymin) - (iou_area * dU_wrt_ymin)) / (Union * Union);
+        dp_ymax = ((Union * dI_wrt_ymax) - (iou_area * dU_wrt_ymax)) / (Union * Union);
+        dp_xmin = ((Union * dI_wrt_xmin) - (iou_area * dU_wrt_xmin)) / (Union * Union);
+        dp_xmax = ((Union * dI_wrt_xmax) - (iou_area * dU_wrt_xmax)) / (Union * Union);
     }
     if (C > 0) {
-        // apply "C" term from gIOU
-        p_dt += ((C * dU_wrt_ymin) - (Union * dC_wrt_ymin)) / (C * C);
-        p_db += ((C * dU_wrt_ymax) - (Union * dC_wrt_ymax)) / (C * C);
-        p_dl += ((C * dU_wrt_xmin) - (Union * dC_wrt_xmin)) / (C * C);
-        p_dr += ((C * dU_wrt_xmax) - (Union * dC_wrt_xmax)) / (C * C);
+        // gradient of GIou regard Iou , C
+        dp_ymin += ((C * dU_wrt_ymin) - (Union * dC_wrt_ymin)) / (C * C);
+        dp_ymax += ((C * dU_wrt_ymax) - (Union * dC_wrt_ymax)) / (C * C);
+        dp_xmin += ((C * dU_wrt_xmin) - (Union * dC_wrt_xmin)) / (C * C);
+        dp_xmax += ((C * dU_wrt_xmax) - (Union * dC_wrt_xmax)) / (C * C);
     }
 
-    Dtype di_y1 = p_ymin < p_ymax ? p_dt : p_db;
-    Dtype di_y2 = p_ymin < p_ymax ? p_db : p_dt;
-    Dtype di_x1 = p_xmin < p_xmax ? p_dl : p_dr;
-    Dtype di_x2 = p_xmin < p_xmax ? p_dr : p_dl;
+    *diff_y1 = (predict_box.ymin() < predict_box.ymax()) ? dp_ymin : dp_ymax;
+    *diff_y2 = (predict_box.ymin() < predict_box.ymax()) ? dp_ymax : dp_ymin;
+    *diff_x1 = (predict_box.xmin() < predict_box.xmax()) ? dp_xmin : dp_xmax;
+    *diff_x2 = (predict_box.xmin() < predict_box.xmax()) ? dp_xmax : dp_xmin;
 
-    *diff_x1 = di_x1 * (-1) * Dtype(anchor_scale / (downRatio));
-    *diff_y1 = di_y1 * (-1) * Dtype(anchor_scale / (downRatio));
-    *diff_x2 = di_x2 * (-1) * Dtype(anchor_scale / (downRatio));
-    *diff_y2 = di_y2 * (-1) * Dtype(anchor_scale / (downRatio));
     return (1 - GIou);
 }
 
 template float GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, float* diff_x1, 
-                float* diff_x2, float* diff_y1, float* diff_y2, const int anchor_scale,
-                const int downRatio);
+                float* diff_x2, float* diff_y1, float* diff_y2);
 template double GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, double* diff_x1, 
-                double* diff_x2, double* diff_y1, double* diff_y2, const int anchor_scale,
-                const int downRatio);
+                double* diff_x2, double* diff_y1, double* diff_y2);
 
 
 template <typename Dtype>

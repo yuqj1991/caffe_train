@@ -16,8 +16,7 @@
 
 #define GET_VALID_VALUE(value, min, max) ((((value) >= (min) ? (value) : (min)) < (max) ? ((value) >= (min) ? (value) : (min)): (max)))
 
-#define FOCAL_LOSS_SOFTMAX true 
-#define USE_LOG false
+
 int count_gt = 0;
 int count_one = 0;
 namespace caffe {
@@ -1058,6 +1057,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     // 将所有值设置为 -2 的原因为，排除掉iou>0.35的一些样本，
     // 也就是说只采集那些iou<0.35的负样本.
     // 20200611,舍弃之
+    #define FOCAL_LOSS_SOFTMAX true 
     #if FOCAL_LOSS_SOFTMAX
     caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
     #else
@@ -1112,6 +1112,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
+                        #define USE_LOG true
                         #if USE_LOG
                         int x_index = b * num_channels * dimScale
                                                     + 0* dimScale + h * output_width + w;
@@ -1143,10 +1144,10 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                         gt_bbox.set_ymax(ymax * downRatio);
                         loc_loss = GIoULoss(pred_bbox, gt_bbox, &center_x_diff, &center_y_diff, 
                                                 &width_diff, &height_diff, anchor_scale, downRatio);
-                        bottom_diff[x_index] = center_x_diff;
-                        bottom_diff[y_index] = center_y_diff;
-                        bottom_diff[width_index] = width_diff;
-                        bottom_diff[height_index] = height_diff;
+                        bottom_diff[x_index] = center_x_diff * (-1) * Dtype(anchor_scale);
+                        bottom_diff[y_index] = center_y_diff * (-1) * Dtype(anchor_scale);
+                        bottom_diff[width_index] = width_diff * (-1) * Dtype(anchor_scale);
+                        bottom_diff[height_index] = height_diff * (-1) * Dtype(anchor_scale);
                         #else
                         Dtype xmin_bias = (w + 0.5 - xmin) * downRatio / anchor_scale;
                         Dtype ymin_bias = (h + 0.5 - ymin) * downRatio / anchor_scale;
