@@ -377,12 +377,15 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // Store "rich" annotation if needed.
     if (this->output_labels_ && has_anno_type_) {
         vector<int> label_shape(4);
-        if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) {
-            if(YoloFormat_){ 
+        if (anno_type_ == AnnotatedDatum_AnnotationType_BBOX) 
+        {
+            if(YoloFormat_)
+            { 
                 // Yolo 格式的label数据
                 label_shape[0] = batch_size;
                 label_shape[1] = 1;
-                if(has_landmarks_){
+                if(has_landmarks_)
+                {
                     label_shape[3] = 8 + 10 + 1;
                     if (num_bboxes == 0) {
                         label_shape[2] = 1;
