@@ -13,7 +13,7 @@ retinaface_gt_file_path = "../../../dataset/facedata/retinaface_labels/"
 convet2yoloformat = False
 convert2vocformat = True
 
-minsize2select = 32  # min face size
+minsize2select = 10  # min face size
 
 datasetprefix = "../../../dataset/facedata/wider_face/JPEGImages"
 

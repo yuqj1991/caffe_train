@@ -40,8 +40,8 @@ using namespace std;
 
 #define TEST_CROP_BATCH 0
 #define TEST_CROP_BOX 0
-#define TEST_CROP_ANCHOR 1
-#define TEST_CROP_JITTER 0
+#define TEST_CROP_ANCHOR 0
+#define TEST_CROP_JITTER 1
 
 
 int main(int argc, char** argv){
@@ -150,7 +150,7 @@ int main(int argc, char** argv){
 
     // 生成Datatransfrm的参数
     TransformationParameter transform_param;
-    transform_param.set_mirror(false);
+    transform_param.set_mirror(true);
     ResizeParameter* resized_param = transform_param.mutable_resize_param();
     resized_param->set_height(Resized_Height);
     resized_param->set_width(Resized_Width);
@@ -166,6 +166,7 @@ int main(int argc, char** argv){
     emit_constranit_->set_emit_type(EmitConstraint_EmitType_CENTER);
 
     DataTransformer<float> data_transformer_(transform_param, TEST);
+    data_transformer_.InitRand();
     // 循环操作
     for(int ii = 0; ii < loop_time; ii++){
         for(int jj = 0; jj < batch_size; jj++){
