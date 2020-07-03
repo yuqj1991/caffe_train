@@ -307,7 +307,7 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                     }
                     Dtype p1 = pred_data[bg_index + label_idx * dimScale];
                     Dtype p0 = 1 - p1;
-                    #define USE_FOCAL_LOSS false
+                    #define USE_FOCAL_LOSS true
                     #if USE_FOCAL_LOSS
                     float alpha = 0.25f;
                     float gamma = 2.f;
