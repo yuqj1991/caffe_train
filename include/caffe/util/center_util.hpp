@@ -90,6 +90,10 @@ template <typename Dtype>
 Dtype DIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 
                 Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2);
 
+void correct_detector_bbox(int net_input_width, int net_input_height, int relative,
+                            std::map<int, std::vector<CenterNetInfo > > results,
+                            std::map<int, std::pair<int, int > > image_scale);
+
 }  // namespace caffe
 
 #endif  

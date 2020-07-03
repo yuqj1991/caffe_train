@@ -593,6 +593,51 @@ template double GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, dou
                 double* diff_x2, double* diff_y1, double* diff_y2);
 
 
+void correct_detector_bbox(int net_input_width, int net_input_height, int relative,
+                            std::map<int, std::vector<CenterNetInfo > > results,
+                            std::map<int, std::pair<int, int > > image_scale){
+    int i = 0, new_w = 0, new_h = 0;                            
+    std::map<int, std::vector<CenterNetInfo > > iterator iter;
+    for(iter =results.begin(); iter != results.end(); iter++){
+        int image_id = iter->first;
+        std::pair<int, int> image_size = image_scale.find(image_id)->second;
+        int image_width = image_size.first;
+        int image_height = image_size.second;
+        std::vector<CenterNetInfo > det_bboxes = iter->second;
+        if(((float) net_input_width / image_width) < ((float) net_input_height / image_height)){
+            new_w = net_input_width;
+            new_h = (image_height * net_input_width) / image_width;
+        }else{
+            new_w = (image_width * net_input_height) / image_height;
+            new_h = net_input_height;
+        }
+        for(i = 0; i < det_bboxes.size(); i++){
+            CenterNetInfo det_box = det_bboxes[i];
+            float center_x = float((det_box.xmin() + det_box.xmax()) / 2.);
+            float center_y = float((det_box.ymin() + det_box.ymax()) / 2.);
+            float box_width = det_box.xmax() - det_box.xmin();
+            float box_height = det_box.ymax() - det_box.ymin();
+            center_x = (center_x - (float)(net_input_width - new_w) / 2.) / ((float) new_w / net_input_width);
+            center_y = (center_y - (float)(net_input_height - new_h) / 2.) / ((float) new_h / net_input_height);
+            box_width *= (float)net_input_width / new_w;
+            box_height *= (float) net_input_height / new_h; 
+            if(!relative){
+                center_x *= image_width;
+                box_width *= image_width;
+                center_y *= image_height;
+                box_height *= image_height;
+            }
+            det_bbox.set_xmin(center_x - (float)box_width / 2);
+            det_bbox.set_xmax(center_x + (float)box_width / 2);
+            det_bbox.set_ymin(center_y - (float)box_height / 2);
+            det_bbox.set_ymax(center_y + (float)box_height / 2);
+            det_box.set_area(box_height * box_width);
+            det_bboxes[i] = det_box;
+        }
+    }    
+}
+
+
 template <typename Dtype>
 Dtype DIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x1, 
                 Dtype* diff_x2, Dtype* diff_y1, Dtype* diff_y2){
