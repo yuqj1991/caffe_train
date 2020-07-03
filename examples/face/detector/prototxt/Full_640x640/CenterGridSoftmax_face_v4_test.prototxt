@@ -4640,11 +4640,11 @@ layer {
     share_location: true
     keep_top_k: 1000
     confidence_threshold: 0.05000000074505806
-    bias_scale: 475
-    bias_scale: 240
-    bias_scale: 120
-    bias_scale: 60
-    bias_scale: 23
+    bias_scale: 630
+    bias_scale: 320
+    bias_scale: 160
+    bias_scale: 80
+    bias_scale: 40
     nms_thresh: 0.30000001192092896
     class_type: SOFTMAX
     has_lm: false
