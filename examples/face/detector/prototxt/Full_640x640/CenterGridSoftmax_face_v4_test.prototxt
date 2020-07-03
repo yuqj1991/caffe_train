@@ -23,7 +23,7 @@ layer {
   annotated_data_param {
     label_map_file: "../labelmap.prototxt"
     yoloformat: false
-    has_landmarks: false
+    has_landmarks: true
   }
   data_param {
     source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
