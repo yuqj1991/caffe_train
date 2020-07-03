@@ -154,7 +154,7 @@ int main(int argc, char** argv){
     ResizeParameter* resized_param = transform_param.mutable_resize_param();
     resized_param->set_height(Resized_Height);
     resized_param->set_width(Resized_Width);
-    resized_param->set_resize_mode(ResizeParameter_Resize_mode_WARP);
+    resized_param->set_resize_mode(ResizeParameter_Resize_mode_FIT_LARGE_SIZE_AND_PAD);
     resized_param->set_prob(1.0);
     resized_param->add_interp_mode(ResizeParameter_Interp_mode_LINEAR);
     resized_param->add_interp_mode(ResizeParameter_Interp_mode_AREA);

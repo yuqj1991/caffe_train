@@ -103,6 +103,9 @@ void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
     float new_height = param.height();
     float new_width = param.width();
 
+    float orig_aspect = static_cast<float>(old_width) / old_height;
+    float new_aspect = new_width / new_height;
+
     float le_x = lface->lefteye().x() * old_width;
     float le_y = lface->lefteye().y() * old_height;
     float re_x = lface->righteye().x() * old_width;
@@ -114,18 +117,56 @@ void UpdateLandmarkFacePoseByResizePolicy(const ResizeParameter& param,
     float lm_y = lface->leftmouth().y() * old_height;
     float rm_x = lface->rightmouth().x() * old_width;
     float rm_y = lface->rightmouth().y() * old_height;
+    float padding;
+    switch (param.resize_mode()) {
+        case ResizeParameter_Resize_mode_WARP:
 
-    le_x = GET_VALID_VALUE(le_x * new_width / old_width, (0.), new_width);
-    le_y = GET_VALID_VALUE(le_y * new_height / old_height, (0.), new_height);
-    re_x = GET_VALID_VALUE(re_x * new_width / old_width, (0.), new_width);
-    re_y = GET_VALID_VALUE(re_y * new_height / old_height, (0.), new_height);
-    no_x = GET_VALID_VALUE(no_x * new_width / old_width, (0.), new_width);
-    no_y = GET_VALID_VALUE(no_y * new_height / old_height, (0.), new_height);
+            le_x = GET_VALID_VALUE(le_x * new_width / old_width, (0.), new_width);
+            le_y = GET_VALID_VALUE(le_y * new_height / old_height, (0.), new_height);
+            re_x = GET_VALID_VALUE(re_x * new_width / old_width, (0.), new_width);
+            re_y = GET_VALID_VALUE(re_y * new_height / old_height, (0.), new_height);
+            no_x = GET_VALID_VALUE(no_x * new_width / old_width, (0.), new_width);
+            no_y = GET_VALID_VALUE(no_y * new_height / old_height, (0.), new_height);
 
-    lm_x = GET_VALID_VALUE(lm_x * new_width / old_width, (0.), new_width);
-    lm_y = GET_VALID_VALUE(lm_y * new_height / old_height, (0.), new_height);
-    rm_x = GET_VALID_VALUE(rm_x * new_width / old_width, (0.), new_width);
-    rm_y = GET_VALID_VALUE(rm_y * new_height / old_height, (0.), new_height);
+            lm_x = GET_VALID_VALUE(lm_x * new_width / old_width, (0.), new_width);
+            lm_y = GET_VALID_VALUE(lm_y * new_height / old_height, (0.), new_height);
+            rm_x = GET_VALID_VALUE(rm_x * new_width / old_width, (0.), new_width);
+            rm_y = GET_VALID_VALUE(rm_y * new_height / old_height, (0.), new_height);
+            break;
+        case ResizeParameter_Resize_mode_FIT_LARGE_SIZE_AND_PAD:
+            if (orig_aspect > new_aspect) {
+                padding = (new_height - new_width / orig_aspect) / 2;
+                
+                le_x = GET_VALID_VALUE(le_x * new_width / old_width, (0.), new_width);
+                le_y = GET_VALID_VALUE((padding + le_y * (new_height - 2 * padding) / old_height), (0.), new_height);
+                re_x = GET_VALID_VALUE(re_x * new_width / old_width, (0.), new_width);
+                re_y = GET_VALID_VALUE((padding + re_y * (new_height - 2 * padding) / old_height), (0.), new_height);
+                no_x = GET_VALID_VALUE(no_x * new_width / old_width, (0.), new_width);
+                no_y = GET_VALID_VALUE((padding + no_y * (new_height - 2 * padding) / old_height), (0.), new_height);
+
+                lm_x = GET_VALID_VALUE(lm_x * new_width / old_width, (0.), new_width);
+                lm_y = GET_VALID_VALUE((padding + lm_y * (new_height - 2 * padding) / old_height), (0.), new_height);
+                rm_x = GET_VALID_VALUE(rm_x * new_width / old_width, (0.), new_width);
+                rm_y = GET_VALID_VALUE((padding + rm_y * (new_height - 2 * padding) / old_height), (0.), new_height);
+            } else {
+                padding = (new_width - orig_aspect * new_height) / 2;
+                
+                le_x = GET_VALID_VALUE((padding + le_x * (new_width - 2 * padding) / old_width), (0.), new_width);
+                le_y = GET_VALID_VALUE(le_y * new_height / old_height, (0.), new_height);
+                re_x = GET_VALID_VALUE((padding + re_x * (new_width - 2 * padding) / old_width), (0.), new_width);
+                re_y = GET_VALID_VALUE(re_y * new_height / old_height, (0.), new_height);
+                no_x = GET_VALID_VALUE((padding + no_x * (new_width - 2 * padding) / old_width), (0.), new_width);
+                no_y = GET_VALID_VALUE(no_y * new_height / old_height, (0.), new_height);
+
+                lm_x = GET_VALID_VALUE((padding + lm_x * (new_width - 2 * padding) / old_width), (0.), new_width);
+                lm_y = GET_VALID_VALUE(lm_y * new_height / old_height, (0.), new_height);
+                rm_x = GET_VALID_VALUE((padding + rm_x * (new_width - 2 * padding) / old_width), (0.), new_width);
+                rm_y = GET_VALID_VALUE(rm_y * new_height / old_height, (0.), new_height);
+            }
+            break;
+        default:
+            LOG(FATAL) << "Unknown resize mode.";
+    }
 
     lface->mutable_lefteye()->set_x(le_x / new_width);
     lface->mutable_lefteye()->set_y(le_y / new_height);
