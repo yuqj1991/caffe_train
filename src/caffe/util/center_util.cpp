@@ -325,12 +325,12 @@ Dtype FocalLossSoftmax(Dtype* label_data, Dtype* pred_data,
                     Dtype p0_temp = Dtype(1. / (p0 + transfer));
                     Dtype p1_temp = Dtype(1. / (p1 + transfer));
                     Dtype log_value = Dtype(std::log(std::max(p1,  Dtype(FLT_MIN))));
-                    loss -= alpha * std::pow(p0, gamma) * std::pow(assist_value, gamma) * log_value;
-                    bottom_diff[bg_index + label_idx * dimScale] = alpha * std::pow(assist_value, gamma) * p0 *
-                                (p1 * gamma * log_value * (p0_temp + p1_temp) - 1);
+                    loss -= alpha * std::pow(assist_value * p0, gamma) * log_value;
+                    bottom_diff[bg_index + label_idx * dimScale] = alpha * std::pow(assist_value * p0, gamma) * 
+                                (p0 - p1 * gamma * log_value * (p0 * p1_temp + (2 * p0 + transfer) * p0_temp)) * (-1);
                                 
-                    bottom_diff[bg_index + (1 - label_idx) * dimScale] = alpha * std::pow(assist_value, gamma) * p0 * 
-                                (1 - p1 * gamma * log_value * (p0_temp + p1_temp));
+                    bottom_diff[bg_index + (1 - label_idx) * dimScale] = alpha * std::pow(assist_value * p0, gamma) * 
+                                (p0 - p1 * gamma * log_value * (p0 * p1_temp + (2 * p0 + transfer) * p0_temp));
                     #endif
                 }
             }
@@ -526,8 +526,8 @@ Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x
 
     Dtype iou_xmin = std::max(p_xmin, gt_xmin), iou_xmax = std::min(p_xmax, gt_xmax);
     Dtype iou_ymin = std::max(p_ymin, gt_ymin), iou_ymax = std::min(p_ymax, gt_ymax);
-    Dtype iou_height = (iou_ymax - iou_ymin);
-    Dtype iou_width = (iou_xmax - iou_xmin);
+    Dtype iou_height = iou_ymax >= iou_ymin ? (iou_ymax - iou_ymin) : 0;
+    Dtype iou_width = iou_xmax >= iou_xmin ? (iou_xmax - iou_xmin) : 0;
     Dtype iou_area = iou_height * iou_width;
     Dtype Union = p_area + gt_area - iou_area;
     Dtype Iou = Dtype(iou_area / Union);
