@@ -527,12 +527,12 @@ Dtype GIoULoss(NormalizedBBox predict_box, NormalizedBBox gt_bbox, Dtype* diff_x
     Dtype iou_height = iou_ymax >= iou_ymin ? (iou_ymax - iou_ymin) : 0;
     Dtype iou_width = iou_xmax >= iou_xmin ? (iou_xmax - iou_xmin) : 0;
     Dtype iou_area = iou_height * iou_width;
-    Dtype Union = p_area + gt_area - iou_area;
+    Dtype Union = p_area + gt_area - iou_area + 1e-7;
     Dtype Iou = Dtype(iou_area / Union);
 
     Dtype c_xmin = std::min(p_xmin, gt_xmin), c_xmax = std::max(p_xmax, gt_xmax);
     Dtype c_ymin = std::min(p_ymin, gt_ymin), c_ymax = std::max(p_ymax, gt_ymax);
-    Dtype C = (c_xmax - c_xmin) * (c_ymax - c_ymin);
+    Dtype C = (c_xmax - c_xmin) * (c_ymax - c_ymin) + 1e-7;
 
     Dtype GIou = Iou - Dtype((C - Union) / C);
 
