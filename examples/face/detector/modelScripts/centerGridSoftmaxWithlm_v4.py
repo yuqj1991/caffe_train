@@ -293,10 +293,6 @@ Inverted_residual_setting = [[1, 16, 1, 1],
                              [6, 128, 3, 2],
                              [6, 128, 2, 2]]
 feature_stride= [4, 8, 16, 32, 64]
-check_if_exist(trainDataPath)
-check_if_exist(valDataPath)
-check_if_exist(labelmapPath)
-make_if_not_exist(save_dir)
 
 has_landmarks = False
 if has_landmarks:
@@ -308,6 +304,13 @@ else:
     trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
     valDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
 num_classes = 2
+
+check_if_exist(trainDataPath)
+check_if_exist(valDataPath)
+check_if_exist(labelmapPath)
+make_if_not_exist(save_dir)
+
+
 # Create train.prototxt.
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
