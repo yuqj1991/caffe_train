@@ -195,7 +195,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         sampled_bboxes.clear();
         if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_BATCH){
             if (batch_samplers_.size() > 0) {
-                GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
+                GenerateBatchSamples_Square(*expand_datum, batch_samplers_, &sampled_bboxes);
                 CropSample = true;
             } else {
                 sampled_datum = expand_datum;
