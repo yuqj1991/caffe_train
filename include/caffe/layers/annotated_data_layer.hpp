@@ -30,6 +30,10 @@ public:
 
 protected:
     virtual void load_batch(Batch<Dtype>* batch);
+    void fill_label(Dtype* top_label, int batch_size, 
+                std::map<int, vector<AnnotationGroup> > all_anno, 
+                int num_bboxes, 
+                int label_last_channels);
 
     DataReader<AnnotatedDatum> reader_;
     bool has_anno_type_;
