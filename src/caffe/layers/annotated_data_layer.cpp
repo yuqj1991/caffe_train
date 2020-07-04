@@ -273,12 +273,12 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         if (transform_param.has_resize_param()) {
             if (transform_param.resize_param().resize_mode() ==
                 ResizeParameter_Resize_mode_FIT_SMALL_SIZE) {
-            this->transformed_data_.Reshape(shape);
-            batch->data_.Reshape(shape);
-            top_data = batch->data_.mutable_cpu_data();
+                this->transformed_data_.Reshape(shape);
+                batch->data_.Reshape(shape);
+                top_data = batch->data_.mutable_cpu_data();
             } else {
-            CHECK(std::equal(top_shape.begin() + 1, top_shape.begin() + 4,
-                    shape.begin() + 1));
+                CHECK(std::equal(top_shape.begin() + 1, top_shape.begin() + 4,
+                        shape.begin() + 1));
             }
         } else {
             CHECK(std::equal(top_shape.begin() + 1, top_shape.begin() + 4,

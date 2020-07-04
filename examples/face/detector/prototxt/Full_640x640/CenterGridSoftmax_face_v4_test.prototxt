@@ -14,7 +14,7 @@ layer {
     mean_value: 123.68000030517578
     resize_param {
       prob: 1.0
-      resize_mode: FIT_LARGE_SIZE_AND_PAD
+      resize_mode: WARP
       height: 640
       width: 640
       interp_mode: LINEAR
@@ -23,10 +23,10 @@ layer {
   annotated_data_param {
     label_map_file: "../labelmap.prototxt"
     yoloformat: false
-    has_landmarks: false
+    has_landmarks: true
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lm_lmdb/"
     batch_size: 1
     backend: LMDB
   }
@@ -3949,7 +3949,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4115,7 +4115,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4281,7 +4281,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4447,7 +4447,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4613,7 +4613,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 6
+    num_output: 16
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4647,7 +4647,7 @@ layer {
     bias_scale: 40
     nms_thresh: 0.30000001192092896
     class_type: SOFTMAX
-    has_lm: false
+    has_lm: true
     net_height: 640
     net_width: 640
   }
@@ -4666,7 +4666,7 @@ layer {
     background_label_id: 0
     overlap_threshold: 0.5
     evaluate_difficult_gt: false
-    has_lm: false
+    has_lm: true
   }
 }
 
