@@ -330,7 +330,7 @@ net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', 
 bias_scale = [630, 320, 160, 80, 40]
 low_bbox_scale = [320, 160, 80, 40, 6]
 up_bbox_scale = [630, 320, 160, 80, 40]
-loss_weight = [0.5, 0.5, 0.8, 0.8, 0.8]
+loss_weight = [1., 1.0, 0.8, 0.8, 0.5]
 from_layers = []
 for idx, detect_output in enumerate(LayerList_Output):
     from_layers.append(net[detect_output])
