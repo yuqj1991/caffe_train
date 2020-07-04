@@ -5,7 +5,7 @@
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
-
+#if 0
 template <typename Dtype>
 __global__ void ScaleForward(const int n, const Dtype* in,
     const Dtype* scale, const int scale_dim, const int inner_dim,
@@ -43,6 +43,7 @@ __global__ void TruncationUpperBounded(const int n, Dtype* in_out, Dtype upper_b
 template <typename Dtype>
 void ScaleLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
+        
   const int count = top[0]->count();
   const Dtype* bottom_data = bottom[0]->gpu_data();
   if (bottom[0] == top[0]) {
@@ -156,6 +157,7 @@ void ScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   }
 }
 
-INSTANTIATE_LAYER_GPU_FUNCS(ScaleLayer);
 
+INSTANTIATE_LAYER_GPU_FUNCS(ScaleLayer);
+#endif
 }  // namespace caffe

@@ -5,7 +5,7 @@
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
-
+#if 0
 template <typename Dtype>
 void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
@@ -167,5 +167,5 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 
 INSTANTIATE_LAYER_GPU_FUNCS(BatchNormLayer);
 
-
+#endif
 }  // namespace caffe
