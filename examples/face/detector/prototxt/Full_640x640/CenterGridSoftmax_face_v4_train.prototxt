@@ -193,10 +193,10 @@ layer {
     }
     yoloformat: true
     crop_type: CROP_JITTER
-    has_landmarks: true
+    has_landmarks: false
   }
   data_param {
-    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
     batch_size: 8
     backend: LMDB
   }
@@ -4119,7 +4119,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4285,7 +4285,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4451,7 +4451,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4617,7 +4617,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4783,7 +4783,7 @@ layer {
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 16
+    num_output: 6
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -4819,7 +4819,7 @@ layer {
     low_bbox_scale: 320
     up_bbox_scale: 630
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {
@@ -4848,7 +4848,7 @@ layer {
     low_bbox_scale: 160
     up_bbox_scale: 320
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {
@@ -4877,7 +4877,7 @@ layer {
     low_bbox_scale: 80
     up_bbox_scale: 160
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {
@@ -4886,7 +4886,7 @@ layer {
   bottom: "Det_1x1_out_32_3"
   bottom: "label"
   top: "CenterGridLoss_3"
-  loss_weight: 0.1
+  loss_weight: 0.5
   include {
     phase: TRAIN
   }
@@ -4906,7 +4906,7 @@ layer {
     low_bbox_scale: 40
     up_bbox_scale: 80
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 layer {
@@ -4915,7 +4915,7 @@ layer {
   bottom: "Det_1x1_out_24_4"
   bottom: "label"
   top: "CenterGridLoss_4"
-  loss_weight: 0.1
+  loss_weight: 0.10000000149011612
   include {
     phase: TRAIN
   }
@@ -4935,7 +4935,7 @@ layer {
     low_bbox_scale: 6
     up_bbox_scale: 40
     class_type: SOFTMAX
-    has_lm: true
+    has_lm: false
   }
 }
 

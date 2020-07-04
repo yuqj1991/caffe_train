@@ -19,8 +19,6 @@ import stat
 import subprocess
 
 
-trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
-valDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
 labelmapPath = "../labelmap.prototxt"
 resize_width = 640
 resize_height = 640
@@ -180,7 +178,7 @@ train_transform_param = {
     'scale': 0.007843,
     'resize_param': {
         'prob': 1,
-        'resize_mode': P.Resize.WARP,
+        'resize_mode': P.Resize.FIT_LARGE_SIZE_AND_PAD,
         'height': resize_height,
         'width': resize_width,
         'interp_mode': [
@@ -213,7 +211,7 @@ test_transform_param = {
     'scale': 0.007843,
     'resize_param': {
         'prob': 1,
-        'resize_mode': P.Resize.WARP,
+        'resize_mode': P.Resize.FIT_LARGE_SIZE_AND_PAD,
         'height': resize_height,
         'width': resize_width,
         'interp_mode': [P.Resize.LINEAR],
@@ -267,7 +265,7 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 20000, 30000, 50000, 70000],
+    'stepvalue': [20000, 40000, 60000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
@@ -301,8 +299,15 @@ check_if_exist(labelmapPath)
 make_if_not_exist(save_dir)
 
 has_landmarks = False
-detect_channels = 5
-num_classes = 1
+if has_landmarks:
+    detect_channels = 16
+    trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
+    valDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lm_lmdb/"
+else:
+    detect_channels = 6
+    trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lmdb/"
+    valDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_val_lmdb/"
+num_classes = 2
 # Create train.prototxt.
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
@@ -319,9 +324,10 @@ net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', 
                                                     top_out_channels= Inverted_residual_setting[len(Inverted_residual_setting) - 1][1], 
                                                     detector_num = detect_channels,
                                                     feature_stride= feature_stride)
-bias_scale = [475, 240, 120, 60, 23]
+bias_scale = [630, 320, 160, 80, 40]
 low_bbox_scale = [320, 160, 80, 40, 6]
 up_bbox_scale = [630, 320, 160, 80, 40]
+loss_weight = [1., 1., 0.5, 0.5, 0.1]
 from_layers = []
 for idx, detect_output in enumerate(LayerList_Output):
     from_layers.append(net[detect_output])
@@ -330,10 +336,10 @@ for idx, detect_output in enumerate(LayerList_Output):
                             low_bbox_scale= low_bbox_scale[idx], 
                             up_bbox_scale= up_bbox_scale[idx],
                             normalization_mode = P.Loss.BATCH_SIZE,
-                            class_type = P.CenterObjectLoss.SIGMOID,
+                            class_type = P.CenterObjectLoss.SOFTMAX,
                             num_classes= num_classes,
                             net_height = resize_height, net_width = resize_width,
-                            stageidx= idx, from_layers= from_layers, has_lm= has_landmarks)
+                            stageidx= idx, from_layers= from_layers, has_lm= has_landmarks, loss_weight = loss_weight[idx])
     from_layers = []
 with open(train_net_file, 'w') as f:
     print('name: "{}_train"'.format("CenterGridFace"), file=f)
@@ -359,9 +365,9 @@ for idx, output in enumerate(LayerList_Output):
     DetectListScale.append(bias_scale[idx])
 CenterGridObjectDetect(net, from_layers= DetectListLayer, 
                             bias_scale= DetectListScale,
-                            class_type = P.DetectionOutput.SIGMOID,
+                            class_type = P.DetectionOutput.SOFTMAX,
                             num_classes=num_classes,
-                            keep_top_k= 500, confidence_threshold= 0.05,
+                            keep_top_k= 1000, confidence_threshold= 0.05,
                             net_width = resize_width,
                             net_height = resize_height,
                             has_lm=has_landmarks)

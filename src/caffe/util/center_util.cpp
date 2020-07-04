@@ -597,7 +597,7 @@ void correct_detector_bbox(int net_input_width, int net_input_height, int relati
                             std::map<int, std::vector<CenterNetInfo > > results,
                             std::map<int, std::pair<int, int > > image_scale){
     int i = 0, new_w = 0, new_h = 0;                            
-    std::map<int, std::vector<CenterNetInfo > > iterator iter;
+    std::map<int, std::vector<CenterNetInfo > >::iterator iter;
     for(iter =results.begin(); iter != results.end(); iter++){
         int image_id = iter->first;
         std::pair<int, int> image_size = image_scale.find(image_id)->second;
@@ -627,10 +627,10 @@ void correct_detector_bbox(int net_input_width, int net_input_height, int relati
                 center_y *= image_height;
                 box_height *= image_height;
             }
-            det_bbox.set_xmin(center_x - (float)box_width / 2);
-            det_bbox.set_xmax(center_x + (float)box_width / 2);
-            det_bbox.set_ymin(center_y - (float)box_height / 2);
-            det_bbox.set_ymax(center_y + (float)box_height / 2);
+            det_box.set_xmin(center_x - (float)box_width / 2);
+            det_box.set_xmax(center_x + (float)box_width / 2);
+            det_box.set_ymin(center_y - (float)box_height / 2);
+            det_box.set_ymax(center_y + (float)box_height / 2);
             det_box.set_area(box_height * box_width);
             det_bboxes[i] = det_box;
         }

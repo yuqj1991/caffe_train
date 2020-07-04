@@ -12,7 +12,7 @@
 #include "caffe/util/benchmark.hpp"
 #include "caffe/util/sampler.hpp"
 
-#define BOOL_TEST_DATA 0 
+
 
 namespace caffe {
 
@@ -322,6 +322,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             this->data_transformer_->Transform(sampled_datum->datum(),
                                             &(this->transformed_data_));
         }
+        #define BOOL_TEST_DATA false
         # if BOOL_TEST_DATA
         cv::Mat cropImage;
         std::string save_folder = "../../anchorTestImage";
