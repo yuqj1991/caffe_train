@@ -43,7 +43,6 @@ __global__ void TruncationUpperBounded(const int n, Dtype* in_out, Dtype upper_b
 template <typename Dtype>
 void ScaleLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
-#if 0
   const int count = top[0]->count();
   const Dtype* bottom_data = bottom[0]->gpu_data();
   if (bottom[0] == top[0]) {
@@ -80,15 +79,11 @@ void ScaleLayer<Dtype>::Forward_gpu(
         <<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
         count, bottom_data, scale_data, scale_dim_, inner_dim_, top_data);
   }
-  #else
-  this->Forward_cpu(bottom, top);
-  #endif
 }
 
 template <typename Dtype>
 void ScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-    #if 0
   if (bias_layer_ &&
       this->param_propagate_down_[this->param_propagate_down_.size() - 1]) {
     bias_layer_->Backward(top, bias_propagate_down_, bias_bottom_vec_);
@@ -159,10 +154,6 @@ void ScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         <<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
         count, top_diff, scale_data, scale_dim_, inner_dim_, bottom_diff);
   }
-
-  #else
-this->Backward_cpu(top, propagate_down, bottom);
-#endif
 }
 
 

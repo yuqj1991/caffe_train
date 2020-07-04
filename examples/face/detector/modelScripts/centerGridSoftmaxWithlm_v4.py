@@ -294,7 +294,7 @@ Inverted_residual_setting = [[1, 16, 1, 1],
                              [6, 128, 2, 2]]
 feature_stride= [4, 8, 16, 32, 64]
 
-has_landmarks = True
+has_landmarks = False
 if has_landmarks:
     detect_channels = 16
     trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"

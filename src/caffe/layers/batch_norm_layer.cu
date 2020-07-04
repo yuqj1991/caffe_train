@@ -8,7 +8,6 @@ namespace caffe {
 template <typename Dtype>
 void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-#if 0
   const Dtype* bottom_data = bottom[0]->gpu_data();
   Dtype* top_data = top[0]->mutable_gpu_data();
   int num = bottom[0]->shape(0);
@@ -87,16 +86,12 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   //                 might clobber the data.  Can we skip this if they won't?
   caffe_copy(x_norm_.count(), top_data,
       x_norm_.mutable_gpu_data());
-#else
-this->Forward_cpu(bottom, top);
-#endif
 }
 
 template <typename Dtype>
 void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
-#if 0
   const Dtype* top_diff;
   if (bottom[0] != top[0]) {
     top_diff = top[0]->gpu_diff();
@@ -167,9 +162,6 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   // note: temp_ still contains sqrt(var(X)+eps), computed during the forward
   // pass.
   caffe_gpu_div(temp_.count(), bottom_diff, temp_.gpu_data(), bottom_diff);
-#else
-this->Backward_cpu(top, propagate_down, bottom);
-#endif
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(BatchNormLayer);
