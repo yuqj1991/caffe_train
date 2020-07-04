@@ -95,7 +95,7 @@ def InceptionTower(net, from_layer, tower_name, layer_params, **bn_param):
 def CreateAnnotatedDataLayer(source, batch_size=32, backend=P.Data.LMDB,
         output_label=True, train=True, label_map_file='', anno_type=None,
         transform_param={}, batch_sampler=[{}], data_anchor_sampler = {}, 
-        bbox_sampler = {}, crop_type = P.AnnotatedData.CROP_JITTER, YoloForamte = False, has_landmarks = False):
+        bbox_sampler = {}, crop_type = None, YoloForamte = False, has_landmarks = False):
     if train:
         kwargs = {
                 'include': dict(phase=caffe_pb2.Phase.Value('TRAIN')),
@@ -113,7 +113,6 @@ def CreateAnnotatedDataLayer(source, batch_size=32, backend=P.Data.LMDB,
         'label_map_file': label_map_file,
         'data_anchor_sampler': data_anchor_sampler,
         'bbox_sampler': bbox_sampler,
-        'crop_type': crop_type,
         'yoloformat': YoloForamte,
         'has_landmarks': has_landmarks,
     }
@@ -121,6 +120,8 @@ def CreateAnnotatedDataLayer(source, batch_size=32, backend=P.Data.LMDB,
             annotated_data_param['batch_sampler']= batch_sampler
     if anno_type is not None:
         annotated_data_param.update({'anno_type': anno_type})
+    if crop_type is not None:
+        annotated_data_param.update({'crop_type': crop_type})
     return L.AnnotatedData(name="data", annotated_data_param=annotated_data_param,
         data_param=dict(batch_size=batch_size, backend=backend, source=source),
         ntop=ntop, **kwargs)
