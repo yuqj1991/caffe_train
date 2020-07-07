@@ -4812,7 +4812,7 @@ layer {
     num_class: 2
     share_location: true
     loc_weight: 1.0
-    bias_scale: 630.0
+    bias_scale: 475.0
     bias_num: 1
     net_width: 640
     net_height: 640
@@ -4841,7 +4841,7 @@ layer {
     num_class: 2
     share_location: true
     loc_weight: 1.0
-    bias_scale: 320.0
+    bias_scale: 240.0
     bias_num: 1
     net_width: 640
     net_height: 640
@@ -4870,7 +4870,7 @@ layer {
     num_class: 2
     share_location: true
     loc_weight: 1.0
-    bias_scale: 160.0
+    bias_scale: 120.0
     bias_num: 1
     net_width: 640
     net_height: 640
@@ -4899,7 +4899,7 @@ layer {
     num_class: 2
     share_location: true
     loc_weight: 1.0
-    bias_scale: 80.0
+    bias_scale: 60.0
     bias_num: 1
     net_width: 640
     net_height: 640
@@ -4928,7 +4928,7 @@ layer {
     num_class: 2
     share_location: true
     loc_weight: 1.0
-    bias_scale: 40.0
+    bias_scale: 23.0
     bias_num: 1
     net_width: 640
     net_height: 640
