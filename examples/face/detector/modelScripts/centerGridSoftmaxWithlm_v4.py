@@ -265,11 +265,11 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [20000, 40000, 60000],
+    'stepvalue': [20000, 40000, 60000, 80000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 80000,
+    'max_iter': 100000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
@@ -294,7 +294,7 @@ Inverted_residual_setting = [[1, 16, 1, 1],
                              [6, 128, 2, 2]]
 feature_stride= [4, 8, 16, 32, 64]
 
-has_landmarks = False
+has_landmarks = True
 if has_landmarks:
     detect_channels = 16
     trainDataPath = "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
@@ -327,7 +327,7 @@ net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', 
                                                     top_out_channels= Inverted_residual_setting[len(Inverted_residual_setting) - 1][1], 
                                                     detector_num = detect_channels,
                                                     feature_stride= feature_stride)
-bias_scale = [630, 320, 160, 80, 40]
+bias_scale = [475, 240, 120, 60, 23]
 low_bbox_scale = [320, 160, 80, 40, 6]
 up_bbox_scale = [630, 320, 160, 80, 40]
 loss_weight = [1., 1.0, 0.8, 0.8, 0.5]
