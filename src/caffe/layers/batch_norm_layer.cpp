@@ -195,13 +195,11 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     caffe_copy(bottom[0]->count(), bottom_data, top_data);
     for(int b = 0; b < num; b ++){
         for(int c = 0; c < channels_; c++){
-            printf("batch_index: %d, c: %d\n", b, c);
             caffe_add_scalar(spatial_dim, (-1) * mean_data[c], top_data + b * channels_ * spatial_dim + c * spatial_dim);
             caffe_cpu_scale(spatial_dim, Dtype(1 / var_data[c]), top_data + b * channels_ * spatial_dim + c * spatial_dim,
                                 top_data + b * channels_ * spatial_dim + c * spatial_dim);
         }
     }
-    printf("&&&&&&&&&&&&&&&&&&&&&&\n");
     /*
     caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
         batch_sum_multiplier_.cpu_data(), variance_.cpu_data(), 0.,
