@@ -78,6 +78,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             printf("batch_index: %d, c: %d\n", b, c);
             const Dtype mean = (-1) * mean_data[c];
             const Dtype var = Dtype(1 / var_data[c]);
+            printf("mean: %f, var: %f\n", mean, var);
             caffe_gpu_add_scalar(spatial_dim, mean, top_data + b * channels_ * spatial_dim + c * spatial_dim);
             printf("substract mean[%d]\n", c);
             caffe_gpu_scale(spatial_dim, var, top_data + b * channels_ * spatial_dim + c * spatial_dim,
