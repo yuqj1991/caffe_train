@@ -200,6 +200,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                                 top_data + b * channels_ * spatial_dim + c * spatial_dim);
         }
     }
+    printf("&&&&&&&&&&&&&&&&&&&&&&\n");
     /*
     caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
         batch_sum_multiplier_.cpu_data(), variance_.cpu_data(), 0.,

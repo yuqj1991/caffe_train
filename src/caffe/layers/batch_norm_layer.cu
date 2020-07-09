@@ -35,7 +35,6 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             num_by_chans_.gpu_data(), batch_sum_multiplier_.gpu_data(), 0.,
             mean_.mutable_gpu_data());
     }
-    printf("@@@@@@@@@@@@@@@@@@\n");
     // subtract mean, top_data = x - mean(x)
     caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
         batch_sum_multiplier_.gpu_data(), mean_.gpu_data(), 0.,
@@ -65,7 +64,6 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             variance_.gpu_data(), moving_average_fraction_,
             this->blobs_[1]->mutable_gpu_data());
     }
-    printf("&&&&&&&&&&&&&&&&&&&&\n");
     // normalize variance
     caffe_gpu_add_scalar(variance_.count(), eps_, variance_.mutable_gpu_data());
     caffe_gpu_powx(variance_.count(), variance_.gpu_data(), Dtype(0.5),
@@ -78,6 +76,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     for(int b = 0; b < num; b ++){
         for(int c = 0; c < channels_; c++){
             caffe_gpu_add_scalar(spatial_dim, (-1) * mean_data[c], top_data + b * channels_ * spatial_dim + c * spatial_dim);
+
             caffe_gpu_scale(spatial_dim, Dtype(1 / var_data[c]), top_data + b * channels_ * spatial_dim + c * spatial_dim,
                                 top_data + b * channels_ * spatial_dim + c * spatial_dim);
         }
@@ -96,9 +95,8 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     caffe_gpu_div(temp_.count(), top_data, temp_.gpu_data(), top_data);
     */
     // TODO(cdoersch): The caching is only needed because later in-place layers
-    //                 might clobber the data.  Can we skip this if they won't?
-    // caffe_copy(x_norm_.count(), top_data,
-    //    x_norm_.mutable_gpu_data());
+    // might clobber the data.  Can we skip this if they won't?
+    // caffe_copy(x_norm_.count(), top_data, x_norm_.mutable_gpu_data());
 }
 
 template <typename Dtype>
