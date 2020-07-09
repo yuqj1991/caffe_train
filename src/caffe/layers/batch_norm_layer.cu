@@ -5,7 +5,7 @@
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
-#if 0
+#if 1
 template <typename Dtype>
 __global__ void batchNorm_forward(int nthreads, int width, int height, int channels, 
                                   Dtype* top_data, const Dtype* mean_data, const Dtype* var_data){
@@ -56,7 +56,8 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 
     if (!use_global_stats_) {
         // compute variance using var(X) = E((X-EX)^2)
-        caffe_gpu_powx(top[0]->count(), top_data, Dtype(2), top_data);  // (X-EX)^2, 第二个top_data->temp_.mutable_gpu_data()
+        // (X-EX)^2, 第二个top_data->temp_.mutable_gpu_data()
+        caffe_gpu_powx(top[0]->count(), top_data, Dtype(2), top_data);
         caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
             1. / (num * spatial_dim), top_data, spatial_sum_multiplier_.gpu_data(), 
             0., num_by_chans_.mutable_gpu_data()); //top_data ->temp_.gpu_data()
@@ -196,10 +197,6 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 
     // dE/dY - mean(dE/dY)-mean(dE/dY \cdot Y) \cdot Y
     caffe_gpu_axpby(top[0]->count(), Dtype(1), top_diff, Dtype(-1. / (num * spatial_dim)), bottom_diff); // top[0]-> temp_
-
-    // note: temp_ still contains sqrt(var(X)+eps), computed during the forward
-    // pass.
-    // caffe_gpu_div(temp_.count(), bottom_diff, temp_.gpu_data(), bottom_diff);
 
     // new add
     batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 

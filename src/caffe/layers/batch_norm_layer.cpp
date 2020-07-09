@@ -5,7 +5,7 @@
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
-#if 0
+#if 1
 template <typename Dtype>
 void BatchNormLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
@@ -154,7 +154,8 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 
     if (!use_global_stats_) { 
         // compute variance using var(X) = E((X-EX)^2) 训练时，计算方差， 此处的top已经为x-mean_x了
-        caffe_powx(top[0]->count(), top_data, Dtype(2), top_data);  // 此时，temp_里面保存的是(X-EX)^2, 修改为 top_data->temp_.mutable_cpu_data()
+        // 此时，temp_里面保存的是(X-EX)^2, 修改为 top_data->temp_.mutable_cpu_data()
+        caffe_powx(top[0]->count(), top_data, Dtype(2), top_data); 
         // 同均值一样，此处先计算spatial_dim的值
         caffe_cpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
             1. / (num * spatial_dim), top_data,
@@ -309,10 +310,6 @@ void BatchNormLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                                 bottom_diff + b * channels_ * spatial_dim + c * spatial_dim);
         }
     }
-
-    // note: temp_ still contains sqrt(var(X)+eps), computed during the forward
-    // pass.
-    //caffe_div(top[0]->count(), bottom_diff, temp_.cpu_data(), bottom_diff); // top[0]-> temp_.
 }
 
 #else
