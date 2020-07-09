@@ -5,7 +5,7 @@
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
-#if 1
+#if 0
 template <typename Dtype>
 __global__ void batchNorm_forward(int nthreads, int width, int height, int channels, 
                                   Dtype* top_data, const Dtype * bottom_data, 

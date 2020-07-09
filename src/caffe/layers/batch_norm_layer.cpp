@@ -140,9 +140,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
 
     // subtract mean
-    // 此处的均值已经保存在mean_中了
     // 进行 x - mean_x 操作，需要注意按照通道，即先确定x属于哪个通道.
-    // 因此也是进行两种，先进行H*W的减少均值
     // caffe_cpu_gemm 实现alpha * A*B + beta* C
     // 输入是num*1 * 1* channels_,输出是num*channels_
     caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
