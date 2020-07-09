@@ -153,9 +153,8 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         spatial_sum_multiplier_.cpu_data(), 1., top_data);
 
     if (!use_global_stats_) { 
-        // compute variance using var(X) = E((X-EX)^2)
-        // 训练时，计算方差， 此处的top已经为x-mean_x了
-        caffe_powx(top[0]->count(), top_data, Dtype(2), top_data);  // 此时，temp_里面保存的是(X-EX)^2 top_data->temp_.mutable_cpu_data()
+        // compute variance using var(X) = E((X-EX)^2) 训练时，计算方差， 此处的top已经为x-mean_x了
+        caffe_powx(top[0]->count(), top_data, Dtype(2), top_data);  // 此时，temp_里面保存的是(X-EX)^2, 修改为 top_data->temp_.mutable_cpu_data()
         // 同均值一样，此处先计算spatial_dim的值
         caffe_cpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
             1. / (num * spatial_dim), top_data,
@@ -193,9 +192,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     // new added
     const Dtype* var_data = variance_.cpu_data();
     const Dtype* mean_data = mean_.cpu_data();
-    if (bottom[0] != top[0]) {
-        caffe_copy(bottom[0]->count(), bottom_data, top_data);
-    }
+    caffe_copy(bottom[0]->count(), bottom_data, top_data);
     for(int b = 0; b < num; b ++){
         for(int c = 0; c < channels_; c++){
             caffe_add_scalar(spatial_dim, (-1) * mean_data[c], top_data + b * channels_ * spatial_dim + c * spatial_dim);
