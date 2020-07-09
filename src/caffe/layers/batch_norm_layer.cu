@@ -5,7 +5,7 @@
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
-#if 0
+#if 1
 template <typename Dtype>
 __global__ void batchNorm_forward(int nthreads, int width, int height, int channels, 
                                   Dtype* top_data, const Dtype * bottom_data, 
@@ -89,7 +89,8 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     int height = bottom[0]->height();
     batchNorm_forward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                                 width, height, channels_, 
-                                top_data, bottom_data, mean_data, var_data);
+                                top_data, bottom_data, 
+                                mean_data, var_data);
 }
 
 template <typename Dtype>
