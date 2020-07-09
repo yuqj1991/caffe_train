@@ -8,6 +8,7 @@ namespace caffe {
 template <typename Dtype>
 void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
+    #if 0
     const Dtype* bottom_data = bottom[0]->gpu_data();
     Dtype* top_data = top[0]->mutable_gpu_data();
     int num = bottom[0]->shape(0);
@@ -83,6 +84,9 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
                                 top_data + b * channels_ * spatial_dim + c * spatial_dim);
         }
     }
+    #else
+    this->Forward_cpu(bottom, top);
+    #endif
     /*
     // replicate variance to input size
     caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
