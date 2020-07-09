@@ -14,7 +14,7 @@ __global__ void batchNorm_forward(int nthreads, int width, int height, int chann
         const int fc = (index / width / height) % channels;
         const Dtype mean = mean_data[fc];
         const Dtype var = var_data[fc];
-        top_data[index] = Dtype((bottom_data[index] - mean) / var);
+        top_data[index] = (bottom_data[index] - mean) / var;
     }
 }
 
