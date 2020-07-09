@@ -65,7 +65,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             variance_.gpu_data(), moving_average_fraction_,
             this->blobs_[1]->mutable_gpu_data());
     }
-
+    printf("&&&&&&&&&&&&&&&&&&&&&");
     // normalize variance
     caffe_gpu_add_scalar(variance_.count(), eps_, variance_.mutable_gpu_data());
     caffe_gpu_powx(variance_.count(), variance_.gpu_data(), Dtype(0.5),
