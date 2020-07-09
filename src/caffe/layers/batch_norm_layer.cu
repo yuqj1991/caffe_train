@@ -35,7 +35,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             num_by_chans_.gpu_data(), batch_sum_multiplier_.gpu_data(), 0.,
             mean_.mutable_gpu_data());
     }
-
+    printf("@@@@@@@@@@@@@@@@@@\n");
     // subtract mean, top_data = x - mean(x)
     caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
         batch_sum_multiplier_.gpu_data(), mean_.gpu_data(), 0.,
@@ -65,7 +65,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             variance_.gpu_data(), moving_average_fraction_,
             this->blobs_[1]->mutable_gpu_data());
     }
-    printf("&&&&&&&&&&&&&&&&&&&&&");
+    printf("&&&&&&&&&&&&&&&&&&&&\n");
     // normalize variance
     caffe_gpu_add_scalar(variance_.count(), eps_, variance_.mutable_gpu_data());
     caffe_gpu_powx(variance_.count(), variance_.gpu_data(), Dtype(0.5),
