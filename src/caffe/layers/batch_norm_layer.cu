@@ -13,8 +13,8 @@ __global__ void batchNorm_forward(int nthreads, int width, int height, int chann
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
         const Dtype mean = mean_data[fc];
-        const Dtype var = Dtype(1 / var_data[fc]);
-        top_data[index] = Dtype((bottom_data[index] - mean) * var);
+        const Dtype var = var_data[fc];
+        top_data[index] = Dtype((bottom_data[index] - mean) / var);
     }
 }
 
