@@ -91,7 +91,6 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     batchNorm_forward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                                 width, height, channels_, 
                                 top_data, mean_data, var_data);
-    printf("&&&&&&&&&&&&&&&&&&&&&&\n");
     #else
     this->Forward_cpu(bottom, top);
     #endif
