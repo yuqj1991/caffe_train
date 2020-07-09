@@ -76,7 +76,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     caffe_copy(bottom[0]->count(), bottom_data, top_data);
     for(int b = 0; b < num; b ++){
         for(int c = 0; c < channels_; c++){
-            caffe_add_scalar(spatial_dim, (-1) * mean_data[c], top_data + b * channels_ * spatial_dim + c * spatial_dim);
+            caffe_gpu_add_scalar(spatial_dim, (-1) * mean_data[c], top_data + b * channels_ * spatial_dim + c * spatial_dim);
             caffe_gpu_scale(spatial_dim, Dtype(1 / var_data[c]), top_data + b * channels_ * spatial_dim + c * spatial_dim,
                                 top_data + b * channels_ * spatial_dim + c * spatial_dim);
         }
@@ -104,7 +104,7 @@ template <typename Dtype>
 void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
-    #if 0
+    #if 1
     const Dtype* top_diff;
     if (bottom[0] != top[0]) {
         top_diff = top[0]->gpu_diff();
