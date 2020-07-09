@@ -98,8 +98,7 @@ __global__ void batchNorm_backward(int nthreads, int width, int height, int chan
                                   Dtype* top_data, const Dtype* var_data){
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
-        const Dtype var = Dtype(1 / var_data[fc]);
-        top_data[index] = Dtype(top_data[index] * var);
+        top_data[index] = top_data[index] / var_data[fc];
     }
 }
 
