@@ -107,6 +107,7 @@ template <typename Dtype>
 void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
+    #if 0
     const Dtype* top_diff;
     if (bottom[0] != top[0]) {
         top_diff = top[0]->gpu_diff();
@@ -196,6 +197,9 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
                                 bottom_diff + b * channels_ * spatial_dim + c * spatial_dim);
         }
     }
+    #else
+    this->Backward_cpu(top, propagate_down, bottom);
+    #endif
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(BatchNormLayer);
