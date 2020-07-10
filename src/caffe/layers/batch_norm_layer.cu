@@ -7,20 +7,19 @@
 namespace caffe {
 
 template <typename Dtype>
-__global__ void batchNorm_variance(int nthreads, int width, int height, int channels, const Dtype* bottom_data, Dtype* top_data,Dtype* var_data){
+__global__ void batchNorm_variance(int nthreads, int width, int height, int channels, const Dtype* top_data, Dtype* var_data){
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
-        printf("width: %d, height: %d, index: %d, fc: %d, bottom_data: %lf, top_data: %lf\n", width, height, index, fc, bottom_data[index], top_data[index]);
         var_data[fc] += pow(top_data[index], 2.);
     }
 }
 
 template <typename Dtype>
 __global__ void batchNorm_forward(int nthreads, int width, int height, int channels, 
-                                  Dtype* top_data, const Dtype* var_data){
+                                  Dtype* top_data, const Dtype* bottom_data, const Dtype* var_data){
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
-        top_data[index] = top_data[index] / var_data[fc];
+        top_data[index] = bottom_data[index] / var_data[fc];
     }
 }
 
@@ -67,8 +66,8 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     if (!use_global_stats_) {
         // compute variance using var(X) = E((X-EX)^2)
         batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
-            width, height, channels_, bottom_data,
-            top_data, variance_.mutable_gpu_data());
+            width, height, channels_,
+            top[0]->gpu_data(), variance_.mutable_gpu_data());
 
         caffe_gpu_scale(variance_.count(), Dtype(1. / (num * spatial_dim)),
             variance_.gpu_data(), variance_.mutable_gpu_data());
@@ -92,7 +91,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     
     batchNorm_forward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                                 width, height, channels_, 
-                                top_data, variance_.gpu_data());  
+                                top_data, bottom_data, variance_.gpu_data());  
 }
 
 template <typename Dtype>
