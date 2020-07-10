@@ -74,11 +74,22 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     int height = bottom[0]->height();
     if (!use_global_stats_) {
         // compute variance using var(X) = E((X-EX)^2)
-        #if not USE_TEMP_
+        #if USE_TEMP_
+        /*
         caffe_gpu_set(variance_.count(), Dtype(0.), variance_.mutable_gpu_data());
         batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, top[0]->gpu_data(), 
             variance_.mutable_gpu_data());
+        */
+        caffe_gpu_powx(top[0]->count(), top_data, Dtype(2),
+            temp_.mutable_gpu_data());  // (X-EX)^2
+        caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
+            1., temp_.gpu_data(),
+            spatial_sum_multiplier_.gpu_data(), 0.,
+            num_by_chans_.mutable_gpu_data());
+        caffe_gpu_gemv<Dtype>(CblasTrans, num, channels_, 1.,
+            num_by_chans_.gpu_data(), batch_sum_multiplier_.gpu_data(), 0.,
+            variance_.mutable_gpu_data());  // E((X_EX)^2)
         batchNorm_scale<Dtype><<<CAFFE_GET_BLOCKS(variance_.count()), CAFFE_CUDA_NUM_THREADS>>>( 
             variance_.count(), num * spatial_dim, variance_.gpu_data(), 
             variance_.mutable_gpu_data());
