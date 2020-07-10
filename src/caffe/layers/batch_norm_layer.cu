@@ -83,7 +83,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             variance_.mutable_gpu_data());
         batchNorm_scale<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, variance_.gpu_data(), 
-            variance_.mutable_gpu_data())
+            variance_.mutable_gpu_data());
         #else
         caffe_gpu_powx(top[0]->count(), top_data, Dtype(2),
             temp_.mutable_gpu_data());  // (X-EX)^2
