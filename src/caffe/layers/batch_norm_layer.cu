@@ -5,6 +5,14 @@
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
+
+template <typename Dtype>
+__global__ void PRINTF_mean_variance(int channels, const Dtype* mean_data, const Dtype* var_data){
+    CUDA_KERNEL_LOOP(index, channels){
+        printf("mean[%d]: %lf, variance[%d]: %lf", index, mean_data[index], index, var_data[index]);
+    }
+}
+
 #if 1
 template <typename Dtype>
 __global__ void batchNorm_forward(int nthreads, int width, int height, int channels, 
@@ -91,6 +99,9 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
                                 width, height, channels_, 
                                 top_data, bottom_data, 
                                 mean_data, var_data);
+    PRINTF_mean_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(channels_,
+                                mean_data, var_data);
+                                LOG(FATAL)<<"teminated!";
 }
 
 template <typename Dtype>
@@ -273,6 +284,9 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   //                 might clobber the data.  Can we skip this if they won't?
   caffe_copy(x_norm_.count(), top_data,
       x_norm_.mutable_gpu_data());
+      PRINTF_mean_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(channels_,
+        mean_data, var_data);
+        LOG(FATAL)<<"teminated!";
 }
 
 template <typename Dtype>
