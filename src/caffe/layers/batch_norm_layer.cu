@@ -7,10 +7,11 @@
 namespace caffe {
 
 template <typename Dtype>
-__global__ void batchNorm_variance(int nthreads, int width, int height, int channels, Dtype* top_data, Dtype* var_data){
+__global__ void batchNorm_variance(int nthreads, int width, int height, int channels, const Dtype* bottom_data, Dtype* top_data,Dtype* var_data){
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
-        var_data[fc] += top_data[index] * top_data[index];
+        printf("bottom_data: %lf, top_data: %lf", bottom_data[index], top_data[index]);
+        var_data[fc] += pow(top_data[index], 2.);
     }
 }
 
@@ -66,7 +67,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     if (!use_global_stats_) {
         // compute variance using var(X) = E((X-EX)^2)
         batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
-            width, height, channels_, 
+            width, height, channels_, bottom_data,
             top_data, variance_.mutable_gpu_data());
 
         caffe_gpu_scale(variance_.count(), Dtype(1. / (num * spatial_dim)),
