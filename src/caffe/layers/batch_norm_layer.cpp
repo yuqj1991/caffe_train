@@ -225,8 +225,7 @@ void BatchNormLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         }
         return;
     }
-    
-    
+        
     // if Y = (X-mean(X))/(sqrt(var(X)+eps)), then
     //
     // dE(Y)/dX =
@@ -240,7 +239,7 @@ void BatchNormLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     // dimensions except the channels dimension where required.
 
     // sum(dE/dY \cdot Y)
-    caffe_mul(top[0]->count(), top_data, top_diff, bottom_diff); // top[0]-> temp_.
+    caffe_mul(top[0]->count(), top_data, top_diff, bottom_diff);
     caffe_cpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim, 1.,
         bottom_diff, spatial_sum_multiplier_.cpu_data(), 0.,
         num_by_chans_.mutable_cpu_data());
@@ -257,7 +256,7 @@ void BatchNormLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         spatial_sum_multiplier_.cpu_data(), 0., bottom_diff);
 
     // sum(dE/dY \cdot Y) \cdot Y
-    caffe_mul(top[0]->count(), top_data, bottom_diff, bottom_diff); // top[0]-> temp_.
+    caffe_mul(top[0]->count(), top_data, bottom_diff, bottom_diff);
 
     // sum(dE/dY)-sum(dE/dY \cdot Y) \cdot Y
     caffe_cpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim, 1.,
@@ -277,7 +276,7 @@ void BatchNormLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 
     // dE/dY - mean(dE/dY)-mean(dE/dY \cdot Y) \cdot Y
     caffe_cpu_axpby(top[0]->count(), Dtype(1), top_diff,
-        Dtype(-1. / (num * spatial_dim)), bottom_diff); // top[0]-> temp_.
+        Dtype(-1. / (num * spatial_dim)), bottom_diff);
 
     // new added
     for(int b = 0; b < num; b ++){
