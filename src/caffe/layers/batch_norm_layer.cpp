@@ -207,6 +207,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     // new added
     const Dtype* var_data = variance_.cpu_data();
     const Dtype* mean_data = mean_.cpu_data();
+    LOG(INFO)<<bottom_data[25]<<", "<<top_data[25];
     caffe_copy(bottom[0]->count(), bottom_data, top_data);
 
     for(int ii = 0; ii < channels_; ii++){
