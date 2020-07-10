@@ -101,7 +101,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
                                 mean_data, var_data);
     PRINTF_mean_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(channels_,
                                 mean_data, var_data);
-                                LOG(FATAL)<<"teminated!";
+    
 }
 
 template <typename Dtype>
@@ -198,6 +198,7 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // new add
     batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                     width, height, channels_, bottom_diff, var_data);
+                    LOG(FATAL)<<"teminated!";
 }
 
 
