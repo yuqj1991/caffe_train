@@ -12,7 +12,7 @@ __global__ void batchNorm_variance(int nthreads, int width, int height, int chan
     const int  num = nthreads / width / height / channels;
     const int spatial_dim = width * height;
     CUDA_KERNEL_LOOP(index, channels){
-        var_data[fc] = 0;
+        var_data[index] = 0;
     }
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
