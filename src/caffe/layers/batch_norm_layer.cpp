@@ -208,7 +208,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     caffe_copy(bottom[0]->count(), bottom_data, top_data);
 
     for(int ii = 0; ii < channels_; ii++){
-        LOG(INFO)<<"mean["<<ii<<"]: "<<mean_data[ii]<<", variance_data{"<<ii<<"]: "<<var_data[ii];
+        LOG(INFO)<<"mean["<<ii<<"]: "<<mean_data[ii]<<", variance_data["<<ii<<"]: "<<var_data[ii];
     }
 
     LOG(FATAL)<<"@@@@@@@@";
@@ -400,6 +400,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     int spatial_dim = bottom[0]->count()/(bottom[0]->shape(0)*channels_);
 
     if (bottom[0] != top[0]) {
+        LOG(INFO)<<"&&&&&&&&&&&&&&&&&&&&&&";
         caffe_copy(bottom[0]->count(), bottom_data, top_data);
     }
 
@@ -508,7 +509,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         spatial_dim, 1, 1., num_by_chans_.cpu_data(),
         spatial_sum_multiplier_.cpu_data(), 0., temp_.mutable_cpu_data());
     // temp最终保存的是sqrt（方差+eps)
-    caffe_div(temp_.count(), top_data, temp_.cpu_data(), top_data);
+    // caffe_div(temp_.count(), top_data, temp_.cpu_data(), top_data);
     // TODO(cdoersch): The caching is only needed because later in-place layers
     //                 might clobber the data.  Can we skip this if they won't?
     caffe_copy(x_norm_.count(), top_data,
@@ -518,7 +519,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const Dtype* mean_data = mean_.cpu_data();
     
     for(int ii = 0; ii < channels_; ii++){
-        LOG(INFO)<<"mean["<<ii<<"]: "<<mean_data[ii]<<", variance_data{"<<ii<<"]: "<<var_data[ii];
+        LOG(INFO)<<"mean["<<ii<<"]: "<<mean_data[ii]<<", variance_data["<<ii<<"]: "<<var_data[ii];
     }
 
     LOG(FATAL)<<"@@@@@@@@";
