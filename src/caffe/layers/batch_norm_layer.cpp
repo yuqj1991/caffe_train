@@ -151,15 +151,16 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         // compute variance using var(X) = E((X-EX)^2) 训练时，计算方差， 此处的top已经为x-mean_x了   
         Dtype* var_data = variance_.mutable_cpu_data();
         for(int c = 0; c < channels_; c++){
+            Dtype sum_value = Dtype(0.);
             for(int b = 0; b < num; b++){
                 for(int i = 0; i < spatial_dim; i++){
                     Dtype squre_value = Dtype(0.);
                     caffe_powx(1, top_data + b * channels_ * spatial_dim + c * spatial_dim + i, 
                                                             Dtype(2.0), &squre_value);
-                    var_data[c] += squre_value;
+                    sum_value += squre_value;
                 }
             }
-            var_data[c] = var_data[c] / (num * spatial_dim);
+            var_data[c] = sum_value / (num * spatial_dim);
         }
         // compute and save moving average
         // 均值和方差计算完成后，需要更新batch的滑动系数
