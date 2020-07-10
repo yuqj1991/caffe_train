@@ -7,35 +7,18 @@
 namespace caffe {
 
 template <typename Dtype>
-__global__ void batchNorm_variance(int num, int width, int height, int channels, const Dtype* top_data, Dtype* var_data){
-    /*CUDA_KERNEL_LOOP(index, nthreads){
-        const int fc = (index / width / height) % channels;
+__global__ void batchNorm_variance(int nthreads, int fc, const Dtype* top_data, Dtype* var_data){
+    CUDA_KERNEL_LOOP(index, nthreads){
         var_data[fc] += pow(top_data[index], 2.);
-    }*/
-    for(int c = 0; c < channels; c++){
-        for(int b = 0; b < num; b ++){
-            for(int i = 0; i < height * width; i++){
-                var_data[c] += pow(top_data[b * channels * height * width + c * height * width + i], 2.);
-            }
-        }
-        var_data[c] = var_data[c] / (num * height * width);
     }
 }
 
 template <typename Dtype>
-__global__ void batchNorm_forward(int num, int width, int height, int channels, 
+__global__ void batchNorm_forward(int nthreads, int fc, 
                                   Dtype* top_data, const Dtype* bottom_data, const Dtype* var_data){
-    /*CUDA_KERNEL_LOOP(index, nthreads){
-        const int fc = (index / width / height) % channels;
+    CUDA_KERNEL_LOOP(index, nthreads){
         top_data[index] = bottom_data[index] / var_data[fc];
     }
-    for(int b = 0; b < num; b ++){
-        for(int c = 0; c < channels; c++){
-            caffe_gpu_scale<Dtype>(width*height, Dtype(1 / var_data[c]), 
-                                bottom_data + b * channels * width*height + c * width*height,
-                                top_data + b * channels * width*height + c * width*height);
-        }
-    }*/
 }
 
 template <typename Dtype>
@@ -81,12 +64,17 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     int height = bottom[0]->height();
     if (!use_global_stats_) {
         // compute variance using var(X) = E((X-EX)^2)
-        batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(num, 
-            width, height, channels_,
-            top[0]->gpu_data(), variance_.mutable_gpu_data());
+        
+        for(int c = 0; c < channels_; c++){
+            for(int b = 0; b < num; b++){
+                batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(spatial_dim), CAFFE_CUDA_NUM_THREADS>>>(spatial_dim, 
+                    c, top[0]->gpu_data() + b * channels_ * spatial_dim + c * spatial_dim, 
+                    variance_.mutable_gpu_data());
+            }
+        }
 
-        /*caffe_gpu_scale(variance_.count(), 1. / (num * spatial_dim),
-            variance_.gpu_data(), variance_.mutable_gpu_data());*/
+        caffe_gpu_scale(variance_.count(), Dtype(1. / (num * spatial_dim)),
+            variance_.gpu_data(), variance_.mutable_gpu_data());
         
         // compute and save moving average
         this->blobs_[2]->mutable_cpu_data()[0] *= moving_average_fraction_;
@@ -104,19 +92,15 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     caffe_gpu_powx(variance_.count(), variance_.gpu_data(), Dtype(0.5),
         variance_.mutable_gpu_data());
     // new added
-    /*
-    batchNorm_forward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(num, 
-                                width, height, channels_, 
-                                top_data, bottom_data, variance_.gpu_data()); 
-    */
-    const Dtype* var_data = variance_.cpu_data();
-    for(int b = 0; b < num; b ++){
+    for(int b = 0; b < num; b++){
         for(int c = 0; c < channels_; c++){
-            caffe_gpu_scale<Dtype>(width*height, var_data[c], 
-                                bottom_data + b * channels_ * width*height + c * width*height,
-                                top_data + b * channels_ * width*height + c * width*height);
+            batchNorm_forward<Dtype><<<CAFFE_GET_BLOCKS(spatial_dim), CAFFE_CUDA_NUM_THREADS>>>(spatial_dim, 
+                c, 
+                top_data + b * channels_ * spatial_dim + c * spatial_dim, 
+                bottom_data + b * channels_ * spatial_dim + c * spatial_dim, 
+                variance_.gpu_data()); 
         }
-    }
+    }    
     #else
     this->Forward_cpu(bottom, top);
     #endif
