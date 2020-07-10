@@ -68,7 +68,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         // compute variance using var(X) = E((X-EX)^2)
         
         
-        caffe_gpu_set(nthreads, Dtype(0.), variance_.mutable_gpu_data());
+        caffe_gpu_set(variance_.count(), Dtype(0.), variance_.mutable_gpu_data());
         batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, top[0]->gpu_data(), 
             variance_.mutable_gpu_data());
