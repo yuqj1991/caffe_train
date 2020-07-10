@@ -18,6 +18,9 @@ __global__ void batchNorm_variance(int nthreads, int width, int height, int chan
         const int fc = (index / width / height) % channels;
         var_data[fc] += (top_data[index] * top_data[index]) / (num * spatial_dim);
     }
+    CUDA_KERNEL_LOOP(index, channels){
+        printf("var_data[%d]: %d\n", index, var_data[index]);
+    }
 }
 
 template <typename Dtype>
