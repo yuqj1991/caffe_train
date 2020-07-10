@@ -60,7 +60,7 @@ void BatchNormLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     mean_.Reshape(sz);
     variance_.Reshape(sz);
     temp_.ReshapeLike(*bottom[0]);
-    //x_norm_.ReshapeLike(*bottom[0]);
+    x_norm_.ReshapeLike(*bottom[0]);
     sz[0] = bottom[0]->shape(0);
     batch_sum_multiplier_.Reshape(sz);
 
@@ -203,8 +203,8 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     caffe_div(temp_.count(), top_data, temp_.cpu_data(), top_data);
     // TODO(cdoersch): The caching is only needed because later in-place layers
     //                 might clobber the data.  Can we skip this if they won't?
-    //caffe_copy(x_norm_.count(), top_data,
-    //   x_norm_.mutable_cpu_data());
+    caffe_copy(x_norm_.count(), top_data,
+       x_norm_.mutable_cpu_data());
 }
 
 template <typename Dtype>
@@ -215,16 +215,16 @@ void BatchNormLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     if (bottom[0] != top[0]) {
         top_diff = top[0]->cpu_diff();
     } else {
-        //caffe_copy(x_norm_.count(), top[0]->cpu_diff(), x_norm_.mutable_cpu_diff());
-        //top_diff = x_norm_.cpu_diff();
-        top_diff = top[0]->cpu_diff();
+        caffe_copy(x_norm_.count(), top[0]->cpu_diff(), x_norm_.mutable_cpu_diff());
+        top_diff = x_norm_.cpu_diff();
+        //top_diff = top[0]->cpu_diff();
     }
     Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
     if (use_global_stats_) {
         caffe_div(temp_.count(), top_diff, temp_.cpu_data(), bottom_diff);
         return;
     }
-    const Dtype* top_data = top[0]->cpu_data();
+    const Dtype* top_data = x_norm_.cpu_data();
     int num = bottom[0]->shape()[0];
     int spatial_dim = bottom[0]->count()/(bottom[0]->shape(0)*channels_);
     // if Y = (X-mean(X))/(sqrt(var(X)+eps)), then
