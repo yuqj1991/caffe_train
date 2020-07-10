@@ -182,7 +182,6 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                 variance_.mutable_cpu_data());
 
     // top_data = x-mean_x/sqrt(variance_),此处的top_data已经转化为x-mean_x了
-    
     // temp最终保存的是sqrt（方差+eps)
     // new added
     const Dtype* var_data = variance_.cpu_data();
