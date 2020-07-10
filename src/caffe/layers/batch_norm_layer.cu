@@ -9,7 +9,7 @@ namespace caffe {
 template <typename Dtype>
 __global__ void PRINTF_mean_variance(int channels, const Dtype* mean_data, const Dtype* var_data){
     CUDA_KERNEL_LOOP(index, channels){
-        printf("mean[%d]: %lf, variance[%d]: %lf", index, mean_data[index], index, var_data[index]);
+        printf("mean[%d]: %lf, variance[%d]: %lf\n", index, mean_data[index], index, var_data[index]);
     }
 }
 
