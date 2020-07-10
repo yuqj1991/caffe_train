@@ -153,15 +153,29 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     if (!use_global_stats_) { 
         // compute variance using var(X) = E((X-EX)^2) 训练时，计算方差， 此处的top已经为x-mean_x了
         // 此时，temp_里面保存的是(X-EX)^2, 修改为 top_data->temp_.mutable_cpu_data()
-        caffe_powx(top[0]->count(), top_data, Dtype(2), top_data); 
         // 同均值一样，此处先计算spatial_dim的值
-        caffe_cpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
+        // caffe_powx(top[0]->count(), top_data, Dtype(2), top_data); 
+        /*caffe_cpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
             1. / (num * spatial_dim), top_data,
             spatial_sum_multiplier_.cpu_data(), 0.,
             num_by_chans_.mutable_cpu_data()); //top_data ->temp_.cpu_data()
         caffe_cpu_gemv<Dtype>(CblasTrans, num, channels_, 1.,
             num_by_chans_.cpu_data(), batch_sum_multiplier_.cpu_data(), 0.,
             variance_.mutable_cpu_data());  // 此时计算得到方差，E((X_EX)^2)
+        */
+
+        Dtype* var_data = variance_.mutable_cpu_data();
+        for(int c = 0; c < channels_; c++){
+            for(int b = 0; b < num; b++){
+                for(int i = 0; i < spatial_dim; i++){
+                    Dtype squre_value = Dtype(0.);
+                    caffe_powx(1, top_data + b * channels_ * spatial_dim + c * spatial_dim + i, Dtype(2.0), &squre_value);
+                    var_data[c] += squre_value;
+                }
+            }
+            var_data[c] = var_data[c] / (num * spatial_dim);
+        }
+
 
         // compute and save moving average
         // 均值和方差计算完成后，需要更新batch的滑动系数
@@ -207,18 +221,9 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     // new added
     const Dtype* var_data = variance_.cpu_data();
     const Dtype* mean_data = mean_.cpu_data();
-    LOG(INFO)<<bottom_data[25]<<", "<<top_data[25];
-    caffe_copy(bottom[0]->count(), bottom_data, top_data);
-
-    for(int ii = 0; ii < channels_; ii++){
-        LOG(INFO)<<"mean["<<ii<<"]: "<<mean_data[ii]<<", variance_data["<<ii<<"]: "<<var_data[ii];
-    }
-
-    LOG(FATAL)<<"@@@@@@@@";
-
+    
     for(int b = 0; b < num; b ++){
         for(int c = 0; c < channels_; c++){
-            caffe_add_scalar(spatial_dim, (-1) * mean_data[c], top_data + b * channels_ * spatial_dim + c * spatial_dim);
             caffe_cpu_scale(spatial_dim, Dtype(1 / var_data[c]), top_data + b * channels_ * spatial_dim + c * spatial_dim,
                                 top_data + b * channels_ * spatial_dim + c * spatial_dim);
         }
