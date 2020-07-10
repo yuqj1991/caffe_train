@@ -109,7 +109,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     caffe_gpu_add_scalar(variance_.count(), eps_, variance_.mutable_gpu_data());
     caffe_gpu_powx(variance_.count(), variance_.gpu_data(), Dtype(0.5),
         variance_.mutable_gpu_data());
-    #if not USE_TEMP_
+    #if USE_TEMP_
     batchNorm_forward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
         width, height, channels_, top_data, 
         top[0]->gpu_data(), variance_.gpu_data());
@@ -213,7 +213,7 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // dE/dY - mean(dE/dY)-mean(dE/dY \cdot Y) \cdot Y
     caffe_gpu_axpby(top[0]->count(), Dtype(1), top_diff, Dtype(-1. / (num * spatial_dim)), bottom_diff);
     // new added
-    #if not USE_TEMP_
+    #if USE_TEMP_
     batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                     width, height, channels_, bottom_diff, variance_.gpu_data(), bottom_diff);
     #else
