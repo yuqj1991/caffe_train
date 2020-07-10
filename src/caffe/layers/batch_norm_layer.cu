@@ -11,12 +11,25 @@ __global__ void batchNorm_variance(int nthreads, int width, int height, int chan
                                     const Dtype* top_data, Dtype* var_data){
 
     const int num_by_spatial_dim = nthreads / channels; 
+    const int num = nthreads / channels / width / height;
+    const int spatial_dim = width * height;
     CUDA_KERNEL_LOOP(index, channels){
         var_data[index] = 0;
     }
+    /*
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
         var_data[fc] += ((top_data[index] * top_data[index]) / num_by_spatial_dim);
+    }
+    */
+    CUDA_KERNEL_LOOP(c, channels){
+        Dtype sum_value = 0.;
+        CUDA_KERNEL_LOOP(b, num){
+            CUDA_KERNEL_LOOP(i, spatial_dim){
+                sum_value += pow(top_data[b * channels * spatial_dim + c * spatial_dim + i], 2.);
+            }
+        }
+        var_data[c] = sum_value / num_by_spatial_dim;
     }
 }
 
