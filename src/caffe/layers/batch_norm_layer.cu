@@ -80,7 +80,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
             width, height, channels_, top[0]->gpu_data(), 
             variance_.mutable_gpu_data());
         batchNorm_scale<Dtype><<<CAFFE_GET_BLOCKS(variance_.count()), CAFFE_CUDA_NUM_THREADS>>>( 
-            variance_.count(), spatial_dim, variance_.gpu_data(), 
+            variance_.count(), num * spatial_dim, variance_.gpu_data(), 
             variance_.mutable_gpu_data());
         #else
         caffe_gpu_powx(top[0]->count(), top_data, Dtype(2),
@@ -109,20 +109,11 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     caffe_gpu_add_scalar(variance_.count(), eps_, variance_.mutable_gpu_data());
     caffe_gpu_powx(variance_.count(), variance_.gpu_data(), Dtype(0.5),
         variance_.mutable_gpu_data());
-    #if USE_TEMP_
+
     batchNorm_forward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
         width, height, channels_, top_data, 
         top[0]->gpu_data(), variance_.gpu_data());
-    #else
-    // replicate variance to input size
-    caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
-        batch_sum_multiplier_.gpu_data(), variance_.gpu_data(), 0.,
-        num_by_chans_.mutable_gpu_data());
-    caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, channels_ * num,
-        spatial_dim, 1, 1., num_by_chans_.gpu_data(),
-        spatial_sum_multiplier_.gpu_data(), 0., temp_.mutable_gpu_data());
-    caffe_gpu_div(temp_.count(), top_data, temp_.gpu_data(), top_data);
-    #endif
+
     caffe_copy(x_norm_.count(), top_data,
         x_norm_.mutable_gpu_data());
 }
@@ -213,12 +204,8 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // dE/dY - mean(dE/dY)-mean(dE/dY \cdot Y) \cdot Y
     caffe_gpu_axpby(top[0]->count(), Dtype(1), top_diff, Dtype(-1. / (num * spatial_dim)), bottom_diff);
     // new added
-    #if USE_TEMP_
     batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                     width, height, channels_, bottom_diff, variance_.gpu_data(), bottom_diff);
-    #else
-    caffe_gpu_div(temp_.count(), bottom_diff, temp_.gpu_data(), bottom_diff);
-    #endif
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(BatchNormLayer);
