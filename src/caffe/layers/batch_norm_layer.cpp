@@ -90,8 +90,9 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     int spatial_dim = bottom[0]->count()/(bottom[0]->shape(0)*channels_);
 
     if (bottom[0] != top[0]) {
-        LOG(INFO)<<"&&&&&&&&&&&&&&&&&&&&&&";
         caffe_copy(bottom[0]->count(), bottom_data, top_data);
+    }else{
+        LOG(INFO)<<bottom_data[25]<<", "<<top_data[25];
     }
 
     if (use_global_stats_) {
