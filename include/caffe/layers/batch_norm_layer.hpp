@@ -60,7 +60,11 @@ class BatchNormLayer : public Layer<Dtype> {
     virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
         const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
-    Blob<Dtype> mean_, variance_, x_norm_;//, temp_;
+    Blob<Dtype> mean_, variance_, x_norm_;
+    #define USE_TEMP_ true
+    #if USE_TEMP_
+    Blob<Dtype> temp_;
+    #endif
     bool use_global_stats_;
     Dtype moving_average_fraction_;
     int channels_;
