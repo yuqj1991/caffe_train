@@ -5,7 +5,7 @@
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
-#if 1
+#if 0
 template <typename Dtype>
 void BatchNormLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
@@ -208,7 +208,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     caffe_copy(bottom[0]->count(), bottom_data, top_data);
 
     for(int ii = 0; ii < channels_; ii++){
-        LOG(INFO)<<"mean: "<<mean_data[ii]<<", variance_data: "<<var_data[ii];
+        LOG(INFO)<<"mean["<<ii<<"]: "<<mean_data[ii]<<", variance_data{"<<ii<<"]: "<<var_data[ii];
     }
 
     LOG(FATAL)<<"@@@@@@@@";
@@ -518,7 +518,7 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const Dtype* mean_data = mean_.cpu_data();
     
     for(int ii = 0; ii < channels_; ii++){
-        LOG(INFO)<<"mean: "<<mean_data[ii]<<", variance_data: "<<var_data[ii];
+        LOG(INFO)<<"mean["<<ii<<"]: "<<mean_data[ii]<<", variance_data{"<<ii<<"]: "<<var_data[ii];
     }
 
     LOG(FATAL)<<"@@@@@@@@";
