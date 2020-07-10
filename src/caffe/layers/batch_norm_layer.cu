@@ -13,10 +13,11 @@ __global__ void batchNorm_variance(int nthreads, int width, int height, int chan
         const int fc = (index / width / height) % channels;
         var_data[fc] += top_data[index] * top_data[index];
     }
+    /*
     const int num = nthreads / width / height / channels;
     CUDA_KERNEL_LOOP(index, channels){
         var_data[index] = var_data[index] / (num * width * height);
-    }
+    }*/
 }
 
 template <typename Dtype>
@@ -75,18 +76,10 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, top[0]->gpu_data(), 
             variance_.mutable_gpu_data());
-
-        #else
-        caffe_gpu_powx(top[0]->count(), top_data, Dtype(2),
-            temp_.mutable_gpu_data());  // (X-EX)^2
-        caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
-            1. / (num * spatial_dim), temp_.gpu_data(),
-            spatial_sum_multiplier_.gpu_data(), 0.,
-            num_by_chans_.mutable_gpu_data());
-        caffe_gpu_gemv<Dtype>(CblasTrans, num, channels_, 1.,
-            num_by_chans_.gpu_data(), batch_sum_multiplier_.gpu_data(), 0.,
-            variance_.mutable_gpu_data());  // E((X_EX)^2)
-        #endif
+        
+        caffe_gpu_scale(variance_.count(), Dtype(1./(num * width * height)),
+            variance_.gpu_data(), variance_.mutable_gpu_data());
+        
         
         // compute and save moving average
         this->blobs_[2]->mutable_cpu_data()[0] *= moving_average_fraction_;
