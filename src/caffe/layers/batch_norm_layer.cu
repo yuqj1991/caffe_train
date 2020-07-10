@@ -9,15 +9,14 @@ namespace caffe {
 template <typename Dtype>
 __global__ void batchNorm_variance(int nthreads, int width, int height, int channels, 
                                     const Dtype* top_data, Dtype* var_data){
-    const int  num = nthreads / width / height / channels;
-    const int spatial_dim = width * height;
+
+    const int num_by_spatial_dim = nthreads / channels; 
     CUDA_KERNEL_LOOP(index, channels){
         var_data[index] = 0;
     }
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
-        var_data[fc] += (top_data[index] * top_data[index]) / (num * spatial_dim);
-        printf("%lf\n", (top_data[index] * top_data[index]) / (num * spatial_dim));
+        var_data[fc] += ((top_data[index] * top_data[index]) / num_by_spatial_dim);
     }
 }
 
