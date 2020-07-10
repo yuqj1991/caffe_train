@@ -151,32 +151,19 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         spatial_sum_multiplier_.cpu_data(), 1., top_data);
 
     if (!use_global_stats_) { 
-        // compute variance using var(X) = E((X-EX)^2) 训练时，计算方差， 此处的top已经为x-mean_x了
-        // 此时，temp_里面保存的是(X-EX)^2, 修改为 top_data->temp_.mutable_cpu_data()
-        // 同均值一样，此处先计算spatial_dim的值
-        // caffe_powx(top[0]->count(), top_data, Dtype(2), top_data); 
-        /*caffe_cpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
-            1. / (num * spatial_dim), top_data,
-            spatial_sum_multiplier_.cpu_data(), 0.,
-            num_by_chans_.mutable_cpu_data()); //top_data ->temp_.cpu_data()
-        caffe_cpu_gemv<Dtype>(CblasTrans, num, channels_, 1.,
-            num_by_chans_.cpu_data(), batch_sum_multiplier_.cpu_data(), 0.,
-            variance_.mutable_cpu_data());  // 此时计算得到方差，E((X_EX)^2)
-        */
-
+        // compute variance using var(X) = E((X-EX)^2) 训练时，计算方差， 此处的top已经为x-mean_x了   
         Dtype* var_data = variance_.mutable_cpu_data();
         for(int c = 0; c < channels_; c++){
             for(int b = 0; b < num; b++){
                 for(int i = 0; i < spatial_dim; i++){
                     Dtype squre_value = Dtype(0.);
-                    caffe_powx(1, top_data + b * channels_ * spatial_dim + c * spatial_dim + i, Dtype(2.0), &squre_value);
+                    caffe_powx(1, top_data + b * channels_ * spatial_dim + c * spatial_dim + i, 
+                                                            Dtype(2.0), &squre_value);
                     var_data[c] += squre_value;
                 }
             }
             var_data[c] = var_data[c] / (num * spatial_dim);
         }
-
-
         // compute and save moving average
         // 均值和方差计算完成后，需要更新batch的滑动系数
         // y = alpha * x + beta * y
@@ -192,39 +179,20 @@ void BatchNormLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
             this->blobs_[1]->mutable_cpu_data());
     }
 
-    // normalize variance 
-    // 方差求个根号,加上eps为防止分母为0
+    // normalize variance, 方差求个根号,加上eps为防止分母为0
     caffe_add_scalar(variance_.count(), eps_, variance_.mutable_cpu_data());
     caffe_powx(variance_.count(), variance_.cpu_data(), Dtype(0.5),
                 variance_.mutable_cpu_data());
 
-    // replicate variance to input size
     // top_data = x-mean_x/sqrt(variance_),此处的top_data已经转化为x-mean_x了
-    // 同减均值，也要分C--N*C和  N*C --- N*C*H*W
-    // N*1 *  1*C == N*C
-    /*
-    caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
-        batch_sum_multiplier_.cpu_data(), variance_.cpu_data(), 0.,
-        num_by_chans_.mutable_cpu_data());
-    caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, channels_ * num,
-        spatial_dim, 1, 1., num_by_chans_.cpu_data(),
-        spatial_sum_multiplier_.cpu_data(), 0., temp_.mutable_cpu_data()); // top_data -> temp_.mutable_cpu_data()
-    */
+    
     // temp最终保存的是sqrt（方差+eps)
-    // caffe_div(temp_.count(), top_data, temp_.cpu_data(), top_data);
-    // TODO(cdoersch): The caching is only needed because later in-place layers
-    //                 might clobber the data.  Can we skip this if they won't?
-    /*
-    caffe_copy(x_norm_.count(), top_data,
-        x_norm_.mutable_cpu_data());
-    */
     // new added
     const Dtype* var_data = variance_.cpu_data();
-    const Dtype* mean_data = mean_.cpu_data();
-    
     for(int b = 0; b < num; b ++){
         for(int c = 0; c < channels_; c++){
-            caffe_cpu_scale(spatial_dim, Dtype(1 / var_data[c]), top_data + b * channels_ * spatial_dim + c * spatial_dim,
+            caffe_cpu_scale(spatial_dim, Dtype(1 / var_data[c]), 
+                                top_data + b * channels_ * spatial_dim + c * spatial_dim,
                                 top_data + b * channels_ * spatial_dim + c * spatial_dim);
         }
     }
