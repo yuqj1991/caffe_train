@@ -26,6 +26,7 @@ __global__ void batchNorm_forward(int nthreads, int width, int height, int chann
 template <typename Dtype>
 void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
+    #if 0
     const Dtype* bottom_data = bottom[0]->gpu_data();
     Dtype* top_data = top[0]->mutable_gpu_data();
     int num = bottom[0]->shape(0);
@@ -92,6 +93,9 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     batchNorm_forward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                                 width, height, channels_, 
                                 top_data, bottom_data, variance_.gpu_data());  
+    #else
+    this->Forward_cpu(bottom, top);
+    #endif
 }
 
 template <typename Dtype>
