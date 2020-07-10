@@ -16,10 +16,8 @@ __global__ void batchNorm_variance(int nthreads, int width, int height, int chan
 }
 
 template <typename Dtype>
-__global__ void batchNorm_scale(int nthreads, int width, int height, int channels, 
+__global__ void batchNorm_scale(int channels, int num_by_spatial_dim, 
     const Dtype* b, Dtype* a){
-    const int num = nthreads / width / height / channels;
-    const int num_by_spatial_dim = num * width * height;
     CUDA_KERNEL_LOOP(index, channels){
         a[index] = b[index] / num_by_spatial_dim;
     }
@@ -81,8 +79,8 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, top[0]->gpu_data(), 
             variance_.mutable_gpu_data());
-        batchNorm_scale<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
-            width, height, channels_, variance_.gpu_data(), 
+        batchNorm_scale<Dtype><<<CAFFE_GET_BLOCKS(variance_.count()), CAFFE_CUDA_NUM_THREADS>>>( 
+            variance_.count(), spatial_dim, variance_.gpu_data(), 
             variance_.mutable_gpu_data());
         #else
         caffe_gpu_powx(top[0]->count(), top_data, Dtype(2),
