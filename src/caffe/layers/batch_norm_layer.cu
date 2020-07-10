@@ -10,7 +10,7 @@ template <typename Dtype>
 __global__ void batchNorm_variance(int nthreads, int width, int height, int channels, const Dtype* bottom_data, Dtype* top_data,Dtype* var_data){
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
-        printf("bottom_data: %lf, top_data: %lf", bottom_data[index], top_data[index]);
+        printf("bottom_data: %lf, top_data: %lf\n", bottom_data[index], top_data[index]);
         var_data[fc] += pow(top_data[index], 2.);
     }
 }
