@@ -151,7 +151,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         bool accum = true;
         for (int n = 0; n < outer_dim_; ++n) {
             caffe_gpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
-                top_diff, bias_multiplier_.gpu_data(), Dtype(accum), bias_diff);
+                top_diff, spatial_sum_multiplier_.gpu_data(), Dtype(accum), bias_diff);
             top_diff += scale_dim_ * inner_dim_;
             accum = true;
         }
@@ -194,7 +194,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         Dtype* scale_diff = this->blobs_[3]->mutable_gpu_diff();
         for (int n = 0; n < outer_dim_; ++n) {
             caffe_gpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
-                bottom_diff, bias_multiplier_.gpu_data(), Dtype(1.), scale_diff);
+                bottom_diff, spatial_sum_multiplier_.gpu_data(), Dtype(1.), scale_diff);
             bottom_diff += scale_dim_ * inner_dim_;
         }
     }
