@@ -116,7 +116,7 @@ void BatchNormScaleLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const Dtype* bias_data = this->blobs_[4]->gpu_data();
     const int count = top[0]->count();
     BatchNormScaleBiasForward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
-        count, bottom_data, scale_data, bias_data, scale_dim_, inner_dim_,
+        count, bottom_data, scale_data, bias_data, channels_, inner_dim_,
         top_data);
     /*
     caffe_copy(x_norm_.count(), top_data,
@@ -153,9 +153,9 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         Dtype* bias_diff = this->blobs_[4]->mutable_gpu_diff();
         bool accum = true;
         for (int n = 0; n < outer_dim_; ++n) {
-            caffe_gpu_gemv(CblasNoTrans, scale_dim_, spatial_dim, Dtype(1),
+            caffe_gpu_gemv(CblasNoTrans, channels_, spatial_dim, Dtype(1),
                 top_diff, spatial_sum_multiplier_.gpu_data(), Dtype(accum), bias_diff);
-            top_diff += scale_dim_ * spatial_dim;
+            top_diff += channels_ * spatial_dim;
             accum = true;
         }
     }

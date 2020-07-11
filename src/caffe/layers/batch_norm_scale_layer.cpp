@@ -146,8 +146,8 @@ void BatchNormScaleLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
             << ") and scale->shape(" << i << ")";
     }
     outer_dim_ = bottom[0]->count(0, axis_);
-    scale_dim_ = scale->count();
     inner_dim_ = bottom[0]->count(axis_ + scale->num_axes());
+    CHECK_EQ(inner_dim_, spatial_dim);
     /***************scale-Reshape****************/
 }
 
@@ -268,7 +268,7 @@ void BatchNormScaleLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const Dtype* scale_data = this->blobs_[3]->cpu_data();
     const Dtype* bias_data = this->blobs_[4]->cpu_data();
     for (int n = 0; n < outer_dim_; ++n) {
-        for (int d = 0; d < scale_dim_; ++d) {
+        for (int d = 0; d < channels_; ++d) {
             const Dtype factor = scale_data[d];
             const Dtype bias = bias_data[d];
             caffe_cpu_scale(inner_dim_, factor, bottom_data, top_data);
@@ -300,9 +300,9 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         const bool bias_param = (bottom.size() == 1);
         bool accum = bias_param;
         for (int n = 0; n < outer_dim_; ++n) {
-            caffe_cpu_gemv(CblasNoTrans, scale_dim_, spatial_dim, Dtype(1),
+            caffe_cpu_gemv(CblasNoTrans, channels_, spatial_dim, Dtype(1),
                 top_diff, spatial_sum_multiplier_.cpu_data(), Dtype(accum), bias_diff);
-            top_diff += scale_dim_ * spatial_dim;
+            top_diff += channels_ * spatial_dim;
             accum = true;
         }
     }
@@ -343,9 +343,9 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     if(this->param_propagate_down_[3]){
         Dtype* scale_diff = this->blobs_[3]->mutable_cpu_diff();
         for (int n = 0; n < outer_dim_; ++n) {
-            caffe_cpu_gemv(CblasNoTrans, scale_dim_, spatial_dim, Dtype(1),
+            caffe_cpu_gemv(CblasNoTrans, channels_, spatial_dim, Dtype(1),
                 bottom_diff, spatial_sum_multiplier_.cpu_data(), Dtype(1.), scale_diff);
-            bottom_diff += scale_dim_ * spatial_dim;
+            bottom_diff += channels_ * spatial_dim;
         }
         
     }
@@ -398,7 +398,7 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     }
     const Dtype* scale_data = this->blobs_[3]->cpu_data();
     for (int n = 0; n < outer_dim_; ++n) {
-        for (int d = 0; d < scale_dim_; ++d) {
+        for (int d = 0; d < channels_; ++d) {
             const Dtype factor = scale_data[d];
             caffe_cpu_scale(inner_dim_, factor, bottom_diff, bottom_diff);
             bottom_diff += inner_dim_;
