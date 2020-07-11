@@ -124,6 +124,7 @@ void BatchNormScaleLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     caffe_copy(x_norm_.count(), top_data,
         x_norm_.mutable_gpu_data());// x_norm_.gpu_data stored normolized_top_data
     /********************scale-forward**************/
+    printf("@@@@@@@@@@@\n");
     const Dtype* scale_data = this->blobs_[3].get()->gpu_data();
     const Dtype* bias_data = this->blobs_[4].get()->gpu_data();
     for (int n = 0; n < outer_dim_; ++n) {
