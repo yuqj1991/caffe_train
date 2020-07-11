@@ -18,10 +18,10 @@ __global__ void batchNorm_variance(int nthreads, int width, int height, int chan
         Dtype sum_value = 0.;
         CUDA_KERNEL_LOOP(b, num){
             CUDA_KERNEL_LOOP(i, spatial_dim){
-
                 sum_value = sum_value +  pow(top_data[b * channels * spatial_dim + c * spatial_dim + i], 2.);
             }
         }
+        printf("sum value: %lf\n", sum_value);
         var_data[c] = sum_value / num_by_spatial_dim;
     }
 }
