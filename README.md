@@ -2,6 +2,10 @@
 
 ---
 
+2020.07.11. Updates: optimizing the CUDA memory to improve the batch_size in one batch at the limited Cuda memory of 16GitaBytes.
+
+---
+
 ## caffe implement method
 | Method | orginal performance| caffe performance | 
 |:--------:| :--------:| :---------:| 
