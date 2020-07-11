@@ -131,8 +131,8 @@ __global__ void batchNorm_backward(int nthreads, int width, int height, int chan
     CUDA_KERNEL_LOOP(index, nthreads){
         const int fc = (index / width / height) % channels;
         y[index] = x[index] / var_data[fc];
+        printf("!!!!!!!!!!!!!!!!%d: %lf\n",index, y[index]);
     }
-    printf("!!!!!!!!!!!!!!!!\n");
 }
 
 template <typename Dtype>
