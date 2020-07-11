@@ -31,9 +31,6 @@ void ScaleLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         const vector<int>::const_iterator& shape_end =
             (num_axes == -1) ? bottom[0]->shape().end() : (shape_start + num_axes);
         vector<int> scale_shape(shape_start, shape_end);
-        for(int i = 0; i < scale_shape.size(); i++){
-            LOG(INFO)<<i<<": "<<scale_shape[i];
-        }
         this->blobs_[0].reset(new Blob<Dtype>(scale_shape));
         FillerParameter filler_param(param.filler());
         if (!param.has_filler()) {

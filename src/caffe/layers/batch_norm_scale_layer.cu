@@ -149,7 +149,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         top_diff = top[0]->gpu_diff();
     } else {
         caffe_copy(x_norm_.count(), top[0]->gpu_diff(), x_norm_.mutable_gpu_diff());
-        top_diff = top[0]->gpu_diff();
+        top_diff = x_norm_.gpu_diff();
     }
 
     if(this->param_propagate_down_[4]){
@@ -163,7 +163,6 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 
-    //const Dtype* scale_data = this->blobs_[3]->gpu_data();
     if (use_global_stats_) {
         batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, bottom_diff, variance_.gpu_data(), bottom_diff
@@ -172,14 +171,14 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     }
     
       
-    // if Y = (X-mean(X))/(sqrt(var(X)+eps)), then
+    // if S = alpha*(X-mean(X))/(sqrt(var(X)+eps)) + bias, then
     //
-    // dE(Y)/dX =
-    //   (dE/dY - mean(dE/dY) - mean(dE/dY \cdot Y) \cdot Y)
+    // dE(S)/dX =
+    //   alpha * (dE/dS - mean(dE/dS) - mean(dE/dS \cdot S) \cdot S)
     //     ./ sqrt(var(X) + eps)
     //
     // where \cdot and ./ are hadamard product and elementwise division,
-    // respectively, dE/dY is the top diff, and mean/var/sum are all computed
+    // respectively, dE/dS is the top diff, and mean/var/sum are all computed
     // along all dimensions except the channels dimension.  In the above
     // equation, the operations allow for expansion (i.e. broadcast) along all
     // dimensions except the channels dimension where required.
@@ -196,7 +195,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
                 num_by_chans_.gpu_data(), batch_sum_multiplier_.gpu_data(), 0.,
                 scale_diff);
     }
-    // sum(dE/dY \cdot Y)
+    // sum(dE/dS \cdot S)
     caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim, 1.,
         bottom_diff, spatial_sum_multiplier_.gpu_data(), 0.,
         num_by_chans_.mutable_gpu_data());
@@ -212,10 +211,10 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         spatial_dim, 1, 1., num_by_chans_.gpu_data(),
         spatial_sum_multiplier_.gpu_data(), 0., bottom_diff);
 
-    // sum(dE/dY \cdot Y) \cdot Y
+    // sum(dE/dS \cdot Y) \cdot Y
     caffe_gpu_mul(top[0]->count(), norm_data, bottom_diff, bottom_diff);
 
-    // sum(dE/dY)-sum(dE/dY \cdot Y) \cdot Y
+    // sum(dE/dS)-sum(dE/dS \cdot Y) \cdot Y
     caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim, 1.,
         top_diff, spatial_sum_multiplier_.gpu_data(), 0.,
         num_by_chans_.mutable_gpu_data());
@@ -223,7 +222,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         num_by_chans_.gpu_data(), batch_sum_multiplier_.gpu_data(), 0.,
         mean_.mutable_gpu_data());
     // reshape (broadcast) the above to make
-    // sum(dE/dY)-sum(dE/dY \cdot Y) \cdot Y
+    // sum(dE/dS)-sum(dE/dS \cdot Y) \cdot Y
     caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, num, channels_, 1, 1,
         batch_sum_multiplier_.gpu_data(), mean_.gpu_data(), 0.,
         num_by_chans_.mutable_gpu_data());
@@ -231,7 +230,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         spatial_dim, 1, 1., num_by_chans_.gpu_data(),
         spatial_sum_multiplier_.gpu_data(), 1., bottom_diff);
 
-    // dE/dY - mean(dE/dY)-mean(dE/dY \cdot Y) \cdot Y
+    // dE/dS - mean(dE/dS)-mean(dE/dS \cdot Y) \cdot Y
     caffe_gpu_axpby(top[0]->count(), Dtype(1), top_diff, Dtype(-1. / (num * spatial_dim)), bottom_diff);
     // new added
     batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 

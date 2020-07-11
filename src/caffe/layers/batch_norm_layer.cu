@@ -139,7 +139,6 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     } else {
         caffe_copy(x_norm_.count(), top[0]->gpu_diff(), x_norm_.mutable_gpu_diff());
         top_diff = x_norm_.gpu_diff();
-        //top_diff = top[0]->gpu_diff();
     }
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 
