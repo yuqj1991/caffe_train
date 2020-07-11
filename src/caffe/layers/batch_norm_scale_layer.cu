@@ -189,7 +189,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // sum(dE/dY \cdot Y)
     caffe_gpu_mul(top[0]->count(), norm_data, top_diff, bottom_diff);
     //new_added
-    #if 1
+    #if 0
     /*****************scale-diff*************/
     if(this->param_propagate_down_[3]){
         Dtype* scale_diff = this->blobs_[3]->mutable_gpu_diff();
