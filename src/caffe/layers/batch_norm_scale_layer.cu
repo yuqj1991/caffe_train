@@ -152,7 +152,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         bool accum = bias_param;
         for (int n = 0; n < outer_dim_; ++n) {
             caffe_gpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
-                top_diff, bias_multiplier_.cpu_data(), Dtype(accum), bias_diff);
+                top_diff, bias_multiplier_.gpu_data(), Dtype(accum), bias_diff);
             top_diff += scale_dim_ * inner_dim_;
             accum = true;
         }
