@@ -61,10 +61,7 @@ class BatchNormLayer : public Layer<Dtype> {
         const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
     Blob<Dtype> mean_, variance_, x_norm_;
-    #define USE_TEMP_ false
-    #if USE_TEMP_
-    Blob<Dtype> temp_;
-    #endif
+    
     bool use_global_stats_;
     Dtype moving_average_fraction_;
     int channels_;
