@@ -207,7 +207,6 @@ void BatchNormLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     } else {
         caffe_copy(x_norm_.count(), top[0]->cpu_diff(), x_norm_.mutable_cpu_diff());
         top_diff = x_norm_.cpu_diff();
-        //top_diff = top[0]->cpu_diff();
     }
     Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
     int num = bottom[0]->shape()[0];
