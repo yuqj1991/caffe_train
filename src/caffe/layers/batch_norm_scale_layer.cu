@@ -138,6 +138,9 @@ template <typename Dtype>
 void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
+    const Dtype* norm_data = x_norm_.gpu_data();
+    int num = bottom[0]->shape()[0];
+    int spatial_dim = bottom[0]->count()/(channels_*bottom[0]->shape(0));
     const Dtype* top_diff;
     if (bottom[0] != top[0]) {
         top_diff = top[0]->gpu_diff();
@@ -150,9 +153,9 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         Dtype* bias_diff = this->blobs_[4]->mutable_gpu_diff();
         bool accum = true;
         for (int n = 0; n < outer_dim_; ++n) {
-            caffe_gpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
+            caffe_gpu_gemv(CblasNoTrans, scale_dim_, spatial_dim, Dtype(1),
                 top_diff, spatial_sum_multiplier_.gpu_data(), Dtype(accum), bias_diff);
-            top_diff += scale_dim_ * inner_dim_;
+            top_diff += scale_dim_ * spatial_dim;
             accum = true;
         }
     }
@@ -169,9 +172,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
             , this->blobs_[3]->gpu_data());
         return;
     }
-    const Dtype* norm_data = x_norm_.gpu_data();
-    int num = bottom[0]->shape()[0];
-    int spatial_dim = bottom[0]->count()/(channels_*bottom[0]->shape(0));
+    
       
     // if Y = (X-mean(X))/(sqrt(var(X)+eps)), then
     //
@@ -193,9 +194,9 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     if(this->param_propagate_down_[3]){
         Dtype* scale_diff = this->blobs_[3]->mutable_gpu_diff();
         for (int n = 0; n < outer_dim_; ++n) {
-            caffe_gpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
+            caffe_gpu_gemv(CblasNoTrans, channels_, spatial_dim, Dtype(1),
                 bottom_diff, spatial_sum_multiplier_.gpu_data(), Dtype(1.), scale_diff);
-            bottom_diff += scale_dim_ * inner_dim_;
+            bottom_diff += channels_ * spatial_dim;
         }
     }
     #endif

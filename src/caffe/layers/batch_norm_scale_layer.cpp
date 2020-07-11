@@ -299,9 +299,9 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         const bool bias_param = (bottom.size() == 1);
         bool accum = bias_param;
         for (int n = 0; n < outer_dim_; ++n) {
-            caffe_cpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
+            caffe_cpu_gemv(CblasNoTrans, scale_dim_, spatial_dim, Dtype(1),
                 top_diff, spatial_sum_multiplier_.cpu_data(), Dtype(accum), bias_diff);
-            top_diff += scale_dim_ * inner_dim_;
+            top_diff += scale_dim_ * spatial_dim;
             accum = true;
         }
     }
@@ -342,9 +342,9 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     if(this->param_propagate_down_[3]){
         Dtype* scale_diff = this->blobs_[3]->mutable_cpu_diff();
         for (int n = 0; n < outer_dim_; ++n) {
-            caffe_cpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
+            caffe_cpu_gemv(CblasNoTrans, scale_dim_, spatial_dim, Dtype(1),
                 bottom_diff, spatial_sum_multiplier_.cpu_data(), Dtype(1.), scale_diff);
-            bottom_diff += scale_dim_ * inner_dim_;
+            bottom_diff += scale_dim_ * spatial_dim;
         }
         
     }
