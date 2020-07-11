@@ -135,12 +135,24 @@ __global__ void batchNorm_backward(int nthreads, int width, int height, int chan
 }
 
 template <typename Dtype>
+__global__ void batchNorm_backward_param(int nthreads, int width, int height, int channels, 
+    const Dtype* x, Dtype *y){
+        CUDA_KERNEL_LOOP(index, nthreads){
+            const int fc = (index / width / height) % channels;
+            y[fc] += x[index];
+        }
+}
+
+template <typename Dtype>
 void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
     const Dtype* norm_data = x_norm_.gpu_data();
     int num = bottom[0]->shape()[0];
     int spatial_dim = bottom[0]->count()/(channels_*bottom[0]->shape(0));
+    int nthreads = bottom[0]->count();
+    int width = bottom[0]->width();
+    int height = bottom[0]->height();
     const Dtype* top_diff;
     if (bottom[0] != top[0]) {
         top_diff = top[0]->gpu_diff();
@@ -148,9 +160,10 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         caffe_copy(x_norm_.count(), top[0]->gpu_diff(), x_norm_.mutable_gpu_diff());
         top_diff = top[0]->gpu_diff();
     }
-    #if 0
+    #if 1
     if(this->param_propagate_down_[4]){
         Dtype* bias_diff = this->blobs_[4]->mutable_gpu_diff();
+        #if 0
         bool accum = true;
         for (int n = 0; n < outer_dim_; ++n) {
             caffe_gpu_gemv(CblasNoTrans, channels_, spatial_dim, Dtype(1),
@@ -158,13 +171,14 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
             top_diff += channels_ * spatial_dim;
             accum = true;
         }
+        #else
+        batchNorm_backward_param<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
+            width, height, channels_, top_diff, bias_diff);
+        #endif
     }
     #endif
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 
-    int nthreads = bottom[0]->count();
-    int width = bottom[0]->width();
-    int height = bottom[0]->height();
     //const Dtype* scale_data = this->blobs_[3]->gpu_data();
     if (use_global_stats_) {
         batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
@@ -189,15 +203,12 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // sum(dE/dY \cdot Y)
     caffe_gpu_mul(top[0]->count(), norm_data, top_diff, bottom_diff);
     //new_added
-    #if 0
+    #if 1
     /*****************scale-diff*************/
     if(this->param_propagate_down_[3]){
         Dtype* scale_diff = this->blobs_[3]->mutable_gpu_diff();
-        for (int n = 0; n < outer_dim_; ++n) {
-            caffe_gpu_gemv(CblasNoTrans, channels_, spatial_dim, Dtype(1),
-                bottom_diff, spatial_sum_multiplier_.gpu_data(), Dtype(1.), scale_diff);
-            bottom_diff += channels_ * spatial_dim;
-        }
+        batchNorm_backward_param<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
+            width, height, channels_, bottom_diff, scale_diff);
     }
     #endif
     /*****************scale-diff*************/
