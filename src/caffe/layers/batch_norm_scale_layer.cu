@@ -166,9 +166,19 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 
     if(this->param_propagate_down_[4]){
         Dtype* bias_diff = this->blobs_[4]->mutable_gpu_diff();
-        
+        /*
         batchNorm_backward_param<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, top_diff, bias_diff);
+        */
+        for (int n = 0; n < num; ++n) {
+            bool accum = false;
+            if(n != 0)
+                accum = true;
+            caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_, spatial_dim, Dtype(1),
+                top_diff, spatial_sum_multiplier_.gpu_data(), Dtype(accum), bias_diff);
+            top_diff += channels_ * spatial_dim;
+           
+          }
     }
 
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
