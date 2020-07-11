@@ -82,7 +82,6 @@ class BatchNormScaleLayer : public Layer<Dtype> {
         Blob<Dtype> spatial_sum_multiplier_;
         // scale-parameter
         Blob<Dtype> bias_multiplier_;
-        Blob<Dtype> sum_result_;
         int axis_, outer_dim_, scale_dim_, inner_dim_;
 };
 

@@ -152,6 +152,7 @@ void BatchNormScaleLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     outer_dim_ = bottom[0]->count(0, axis_);
     scale_dim_ = scale->count();
     inner_dim_ = bottom[0]->count(axis_ + scale->num_axes());
+    LOG(INFO)<<", "<<outer_dim_<<", "<<scale_dim_<<", "<<inner_dim_;
     bias_multiplier_.Reshape(vector<int>(1, inner_dim_));
     if (bias_multiplier_.cpu_data()[inner_dim_ - 1] != Dtype(1)) {
         caffe_set(inner_dim_, Dtype(1), bias_multiplier_.mutable_cpu_data());
