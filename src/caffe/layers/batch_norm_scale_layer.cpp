@@ -56,6 +56,7 @@ void BatchNormScaleLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         const vector<int>::const_iterator& shape_end =
             (num_axes == -1) ? bottom[0]->shape().end() : (shape_start + num_axes);
         vector<int> scale_shape(shape_start, shape_end);
+        this->blobs_[3].reset(new Blob<Dtype>(scale_shape));
         this->blobs_[4].reset(new Blob<Dtype>(scale_shape));
         FillerParameter filler_param(scale_param.filler());
         if (!scale_param.has_filler()) {
