@@ -137,6 +137,9 @@ __global__ void batchNorm_backward(int nthreads, int width, int height, int chan
 template <typename Dtype>
 __global__ void batchNorm_backward_param(int nthreads, int width, int height, int channels, 
     const Dtype* x, Dtype *y){
+        CUDA_KERNEL_LOOP(fc, channels){
+            y[fc] = Dtype(0.);
+        }
         CUDA_KERNEL_LOOP(index, nthreads){
             const int fc = (index / width / height) % channels;
             y[fc] += x[index];
@@ -160,23 +163,14 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         caffe_copy(x_norm_.count(), top[0]->gpu_diff(), x_norm_.mutable_gpu_diff());
         top_diff = top[0]->gpu_diff();
     }
-    #if 1
+
     if(this->param_propagate_down_[4]){
         Dtype* bias_diff = this->blobs_[4]->mutable_gpu_diff();
-        #if 0
-        bool accum = true;
-        for (int n = 0; n < outer_dim_; ++n) {
-            caffe_gpu_gemv(CblasNoTrans, channels_, spatial_dim, Dtype(1),
-                top_diff, spatial_sum_multiplier_.gpu_data(), Dtype(accum), bias_diff);
-            top_diff += channels_ * spatial_dim;
-            accum = true;
-        }
-        #else
+        
         batchNorm_backward_param<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, top_diff, bias_diff);
-        #endif
     }
-    #endif
+
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 
     //const Dtype* scale_data = this->blobs_[3]->gpu_data();
@@ -202,15 +196,14 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 
     // sum(dE/dY \cdot Y)
     caffe_gpu_mul(top[0]->count(), norm_data, top_diff, bottom_diff);
-    //new_added
-    #if 1
+    
     /*****************scale-diff*************/
     if(this->param_propagate_down_[3]){
         Dtype* scale_diff = this->blobs_[3]->mutable_gpu_diff();
         batchNorm_backward_param<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, bottom_diff, scale_diff);
     }
-    #endif
+
     /*****************scale-diff*************/
     caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim, 1.,
         bottom_diff, spatial_sum_multiplier_.gpu_data(), 0.,
