@@ -147,7 +147,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     }
     #if 0
     if(this->param_propagate_down_[4]){
-        Dtype* bias_diff = this->blobs_[4].get()->mutable_gpu_diff();
+        Dtype* bias_diff = this->blobs_[4]->mutable_gpu_diff();
         bool accum = true;
         for (int n = 0; n < outer_dim_; ++n) {
             caffe_gpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
@@ -162,11 +162,11 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     int nthreads = bottom[0]->count();
     int width = bottom[0]->width();
     int height = bottom[0]->height();
-    //const Dtype* scale_data = this->blobs_[3].get()->gpu_data();
+    //const Dtype* scale_data = this->blobs_[3]->gpu_data();
     if (use_global_stats_) {
         batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
             width, height, channels_, bottom_diff, variance_.gpu_data(), bottom_diff
-            , this->blobs_[3].get()->gpu_data());
+            , this->blobs_[3]->gpu_data());
         return;
     }
     const Dtype* norm_data = x_norm_.gpu_data();
@@ -188,10 +188,10 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // sum(dE/dY \cdot Y)
     caffe_gpu_mul(top[0]->count(), norm_data, top_diff, bottom_diff);
     //new_added
-    #if 0
+    #if 1
     /*****************scale-diff*************/
     if(this->param_propagate_down_[3]){
-        Dtype* scale_diff = this->blobs_[3].get()->mutable_gpu_diff();
+        Dtype* scale_diff = this->blobs_[3]->mutable_gpu_diff();
         for (int n = 0; n < outer_dim_; ++n) {
             caffe_gpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
                 bottom_diff, bias_multiplier_.gpu_data(), Dtype(1.), scale_diff);
@@ -239,7 +239,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // new added
     batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                     width, height, channels_, bottom_diff, variance_.gpu_data(), bottom_diff, 
-                    this->blobs_[3].get()->gpu_data());
+                    this->blobs_[3]->gpu_data());
     
 }
 
