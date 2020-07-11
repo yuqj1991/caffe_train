@@ -294,6 +294,7 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     } else {
         top_diff = top[0]->cpu_diff();
     }
+    int spatial_dim = bottom[0]->count()/(bottom[0]->shape(0)*channels_);
     if(this->param_propagate_down_[4]){
         Dtype* bias_diff = this->blobs_[4]->mutable_cpu_diff();
         const bool bias_param = (bottom.size() == 1);
@@ -307,7 +308,7 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     }
     Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
     int num = bottom[0]->shape()[0];
-    int spatial_dim = bottom[0]->count()/(bottom[0]->shape(0)*channels_);
+    
     const Dtype* norm_data = x_norm_.cpu_data();
     //const Dtype* top_data = x_norm_.cpu_diff();
     
