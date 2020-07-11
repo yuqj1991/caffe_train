@@ -234,6 +234,7 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // dE/dY - mean(dE/dY)-mean(dE/dY \cdot Y) \cdot Y
     caffe_gpu_axpby(top[0]->count(), Dtype(1), top_diff, Dtype(-1. / (num * spatial_dim)), bottom_diff);
     // new added
+    printf();
     batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                     width, height, channels_, bottom_diff, variance_.gpu_data(), bottom_diff, scale_data);
     
