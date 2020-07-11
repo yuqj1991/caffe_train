@@ -20,25 +20,10 @@ void BatchNormScaleLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         channels_ = bottom[0]->shape(1);
     eps_ = param.eps();
     
-    /***************scale-parameter****************/
-    // scale is a learned parameter; initialize it
-    const ScaleParameter& scale_param = this->layer_param_.scale_param();
-    axis_ = bottom[0]->CanonicalAxisIndex(scale_param.axis());
-    const int num_axes = scale_param.num_axes();
-    CHECK_GE(num_axes, -1) << "num_axes must be non-negative, "
-                        << "or -1 to extend to the end of bottom[0]";
-    if (num_axes >= 0) {
-        CHECK_GE(bottom[0]->num_axes(), axis_ + num_axes)
-            << "scale blob's shape extends past bottom[0]'s shape when applied "
-            << "starting with bottom[0] axis = " << axis_;
-    }
-    
-    /***************scale-parameter****************/
 
     if (this->blobs_.size() > 0) {
         LOG(INFO) << "Skipping parameter initialization";
     } else {
-        CHECK_EQ(scale_param.bias_term(), true);
         this->blobs_.resize(5);
         vector<int> sz;
         sz.push_back(channels_);
@@ -49,28 +34,14 @@ void BatchNormScaleLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         sz[0] = 1;
         this->blobs_[2].reset(new Blob<Dtype>(sz));
         for (int i = 0; i < 3; ++i) {
-        caffe_set(this->blobs_[i]->count(), Dtype(0),
+            if(i == 3){
+                caffe_set(this->blobs_[i]->count(), Dtype(1),
                     this->blobs_[i]->mutable_cpu_data());
+            }else{
+                caffe_set(this->blobs_[i]->count(), Dtype(0),
+                    this->blobs_[i]->mutable_cpu_data());
+            }
         }
-        /***************scale-parameter****************/
-        
-        FillerParameter filler_param(scale_param.filler());
-        if (!scale_param.has_filler()) {
-            // Default to unit (1) filler for identity operation.
-            filler_param.set_type("constant");
-            filler_param.set_value(1);
-        }
-        shared_ptr<Filler<Dtype> > filler(GetFiller<Dtype>(filler_param));
-        filler->Fill(this->blobs_[3].get());
-        FillerParameter bias_filler_param(scale_param.bias_filler());
-        if (!scale_param.has_bias_filler()) {
-            // Default to unit (0) filler for identity operation.
-            bias_filler_param.set_type("constant");
-            bias_filler_param.set_value(0);
-        }
-        shared_ptr<Filler<Dtype> > bias_filler(GetFiller<Dtype>(bias_filler_param));
-        bias_filler->Fill(this->blobs_[4].get());
-        /***************scale-parameter****************/
     }
     // the mean, variance, bias_correction can not be learned,but the scale-parameter shoule be set true
     this->param_propagate_down_.resize(this->blobs_.size(), false);
@@ -126,29 +97,6 @@ void BatchNormScaleLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
         caffe_set(batch_sum_multiplier_.count(), Dtype(1),
             batch_sum_multiplier_.mutable_cpu_data());
     }
-
-    /***************scale-Reshape****************/
-    Blob<Dtype>* scale = this->blobs_[3].get();
-    // Always set axis_ == 0 in special case where scale is a scalar
-    // (num_axes == 0). Mathematically equivalent for any choice of axis_, so the
-    // actual setting can be safely ignored; and computation is most efficient
-    // with axis_ == 0 and (therefore) outer_dim_ == 1. (Setting axis_ to
-    // bottom[0]->num_axes() - 1, giving inner_dim_ == 1, would be equally
-    // performant.)
-    axis_ = (scale->num_axes() == 0) ?
-        0 : bottom[0]->CanonicalAxisIndex(this->layer_param_.scale_param().axis());
-    CHECK_GE(bottom[0]->num_axes(), axis_ + scale->num_axes())
-        << "scale blob's shape extends past bottom[0]'s shape when applied "
-        << "starting with bottom[0] axis = " << axis_;
-    for (int i = 0; i < scale->num_axes(); ++i) {
-        CHECK_EQ(bottom[0]->shape(axis_ + i), scale->shape(i))
-            << "dimension mismatch between bottom[0]->shape(" << axis_ + i
-            << ") and scale->shape(" << i << ")";
-    }
-    outer_dim_ = bottom[0]->count(0, axis_);
-    inner_dim_ = bottom[0]->count(axis_ + scale->num_axes());
-    CHECK_EQ(inner_dim_, spatial_dim);
-    /***************scale-Reshape****************/
 }
 
 template <typename Dtype>
@@ -267,14 +215,14 @@ void BatchNormScaleLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     /********************scale-forward**************/
     const Dtype* scale_data = this->blobs_[3]->cpu_data();
     const Dtype* bias_data = this->blobs_[4]->cpu_data();
-    for (int n = 0; n < outer_dim_; ++n) {
+    for (int n = 0; n < num; ++n) {
         for (int d = 0; d < channels_; ++d) {
             const Dtype factor = scale_data[d];
             const Dtype bias = bias_data[d];
-            caffe_cpu_scale(inner_dim_, factor, bottom_data, top_data);
-            caffe_add_scalar(inner_dim_, bias, top_data);
-            bottom_data += inner_dim_;
-            top_data += inner_dim_;
+            caffe_cpu_scale(spatial_dim, factor, bottom_data, top_data);
+            caffe_add_scalar(spatial_dim, bias, top_data);
+            bottom_data += spatial_dim;
+            top_data += spatial_dim;
         }
     }
     /*
@@ -388,19 +336,13 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         Dtype(-1. / (num * spatial_dim)), bottom_diff);
 
     // new added
+    const Dtype* scale_data = this->blobs_[3]->cpu_data();
     for(int b = 0; b < num; b ++){
         for(int c = 0; c < channels_; c++){
-            caffe_cpu_scale(spatial_dim, Dtype(1 / var_data[c]), 
+            const Dtype factor = scale_data[c];
+            caffe_cpu_scale(spatial_dim, Dtype(factor / var_data[c]), 
                                 bottom_diff + b * channels_ * spatial_dim + c * spatial_dim,
                                 bottom_diff + b * channels_ * spatial_dim + c * spatial_dim);
-        }
-    }
-    const Dtype* scale_data = this->blobs_[3]->cpu_data();
-    for (int n = 0; n < outer_dim_; ++n) {
-        for (int d = 0; d < channels_; ++d) {
-            const Dtype factor = scale_data[d];
-            caffe_cpu_scale(inner_dim_, factor, bottom_diff, bottom_diff);
-            bottom_diff += inner_dim_;
         }
     }
 }

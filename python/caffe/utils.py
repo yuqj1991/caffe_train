@@ -211,9 +211,7 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, num_output,
                 dict(lr_mult=bn_lr_mult, decay_mult=0),
                 dict(lr_mult=bn_lr_mult * 2, decay_mult=0)], batch_norm_param =dict(eps = eps,
                 use_global_stats=use_global_stats,
-                moving_average_fraction = moving_average_fraction), scale_param=
-                dict(filler=dict(value=1.0), bias_term= True, bias_filler=dict(value=0.0))
-                )
+                moving_average_fraction = moving_average_fraction))
     if use_relu:
         relu_name = '{}_relu6'.format(conv_name)
         net[relu_name] = L.ReLU6(net[conv_name], in_place=True)

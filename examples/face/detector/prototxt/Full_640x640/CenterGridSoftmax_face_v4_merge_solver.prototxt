@@ -9,7 +9,7 @@ lr_policy: "multistep"
 gamma: 0.10000000149011612
 weight_decay: 0.0005000000237487257
 snapshot: 5000
-snapshot_prefix: "../snapshot/CenterGridSoftmax_face_v4_merge"
+snapshot_prefix: "../snapshot/CenterGridSoftmax_face_v4"
 solver_mode: GPU
 device_id: 0
 debug_info: false

@@ -251,15 +251,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_0_relu6"
@@ -318,15 +309,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_0_0/depthwise_relu6"
@@ -384,15 +366,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_0_0/linear_relu6"
@@ -449,15 +422,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -517,15 +481,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_1_0/depthwise_relu6"
@@ -583,15 +538,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_1_1/expand"
@@ -642,15 +588,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -710,15 +647,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_1_1/depthwise_relu6"
@@ -775,15 +703,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -843,15 +762,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_1_2/expand_relu6"
@@ -910,15 +820,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_1_2/depthwise_relu6"
@@ -975,15 +876,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -1043,15 +935,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_2_0/expand_relu6"
@@ -1110,15 +993,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_2_0/depthwise_relu6"
@@ -1176,15 +1050,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_2_1/expand"
@@ -1235,15 +1100,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -1303,15 +1159,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_2_1/depthwise_relu6"
@@ -1368,15 +1215,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -1436,15 +1274,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_2_2/expand_relu6"
@@ -1503,15 +1332,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_2_2/depthwise_relu6"
@@ -1568,15 +1388,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -1636,15 +1447,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_0/expand_relu6"
@@ -1703,15 +1505,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_0/depthwise_relu6"
@@ -1769,15 +1562,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_1/expand"
@@ -1828,15 +1612,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -1896,15 +1671,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_1/depthwise_relu6"
@@ -1961,15 +1727,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -2029,15 +1786,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_2/expand_relu6"
@@ -2096,15 +1844,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_2/depthwise_relu6"
@@ -2161,15 +1900,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -2229,15 +1959,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_3/expand_relu6"
@@ -2296,15 +2017,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_3/depthwise_relu6"
@@ -2361,15 +2073,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -2429,15 +2132,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_4/expand_relu6"
@@ -2496,15 +2190,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_3_4/depthwise_relu6"
@@ -2561,15 +2246,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -2629,15 +2305,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_4_0/expand_relu6"
@@ -2696,15 +2363,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_4_0/depthwise_relu6"
@@ -2762,15 +2420,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_4_1/expand"
@@ -2821,15 +2470,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -2889,15 +2529,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_4_1/depthwise_relu6"
@@ -2954,15 +2585,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -3022,15 +2644,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_4_2/expand_relu6"
@@ -3089,15 +2702,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_4_2/depthwise_relu6"
@@ -3154,15 +2758,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -3222,15 +2817,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_5_0/expand_relu6"
@@ -3289,15 +2875,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_5_0/depthwise_relu6"
@@ -3355,15 +2932,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_5_1/expand"
@@ -3414,15 +2982,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -3482,15 +3041,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_5_1/depthwise_relu6"
@@ -3547,15 +3097,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -3616,15 +3157,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "conv_1_project_16/DepthWise_relu6"
@@ -3681,15 +3213,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -3748,15 +3271,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "ConvFpn_128_0"
@@ -3807,15 +3321,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -3904,15 +3409,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "ConvFpn_128_1"
@@ -3963,15 +3459,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -4060,15 +3547,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "ConvFpn_64_2"
@@ -4119,15 +3597,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -4216,15 +3685,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "ConvFpn_32_3"
@@ -4275,15 +3735,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {
@@ -4372,15 +3823,6 @@ layer {
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
   }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
-  }
 }
 layer {
   name: "ConvFpn_24_4"
@@ -4431,15 +3873,6 @@ layer {
     use_global_stats: false
     moving_average_fraction: 0.9990000128746033
     eps: 0.0010000000474974513
-  }
-  scale_param {
-    filler {
-      value: 1.0
-    }
-    bias_term: true
-    bias_filler {
-      value: 0.0
-    }
   }
 }
 layer {

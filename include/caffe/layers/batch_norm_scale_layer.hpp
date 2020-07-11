@@ -80,8 +80,6 @@ class BatchNormScaleLayer : public Layer<Dtype> {
         Blob<Dtype> batch_sum_multiplier_;
         Blob<Dtype> num_by_chans_;
         Blob<Dtype> spatial_sum_multiplier_;
-        // scale-parameter
-        int axis_, outer_dim_, inner_dim_;
 };
 
 }  // namespace caffe
