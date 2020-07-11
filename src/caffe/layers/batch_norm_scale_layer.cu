@@ -115,8 +115,7 @@ void BatchNormScaleLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const Dtype* scale_data = this->blobs_[3]->gpu_data();
     const Dtype* bias_data = this->blobs_[4]->gpu_data();
     const int count = top[0]->count();
-    BatchNormScaleBiasForward<Dtype>  // NOLINT_NEXT_LINE(whitespace/operators)
-        <<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
+    BatchNormScaleBiasForward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
         count, bottom_data, scale_data, bias_data, scale_dim_, inner_dim_,
         top_data);
     /*
