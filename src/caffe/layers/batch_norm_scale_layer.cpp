@@ -33,7 +33,7 @@ void BatchNormScaleLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         this->blobs_[4].reset(new Blob<Dtype>(sz));
         sz[0] = 1;
         this->blobs_[2].reset(new Blob<Dtype>(sz));
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < this->blobs_.size(); ++i) {
             if(i == 3){
                 caffe_set(this->blobs_[i]->count(), Dtype(1),
                     this->blobs_[i]->mutable_cpu_data());
