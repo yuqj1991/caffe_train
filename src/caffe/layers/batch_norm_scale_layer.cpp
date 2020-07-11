@@ -301,7 +301,18 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         top_diff = top[0]->cpu_diff();
     } else {
         top_diff = top[0]->cpu_diff();
-    }  
+    }
+    if(this->param_propagate_down_[4]){
+        Dtype* bias_diff = this->blobs_[4].get()->mutable_cpu_diff();
+        const bool bias_param = (bottom.size() == 1);
+        bool accum = bias_param;
+        for (int n = 0; n < outer_dim_; ++n) {
+            caffe_cpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
+                top_diff, bias_multiplier_.cpu_data(), Dtype(accum), bias_diff);
+            top_diff += scale_dim_ * inner_dim_;
+            accum = true;
+        }
+    }
     Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
     int num = bottom[0]->shape()[0];
     int spatial_dim = bottom[0]->count()/(bottom[0]->shape(0)*channels_);
@@ -398,18 +409,6 @@ void BatchNormScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             const Dtype factor = scale_data[d];
             caffe_cpu_scale(inner_dim_, factor, bottom_diff, bottom_diff);
             bottom_diff += inner_dim_;
-        }
-    }
-
-    if(this->param_propagate_down_[4]){
-        Dtype* bias_diff = this->blobs_[4].get()->mutable_cpu_diff();
-        const bool bias_param = (bottom.size() == 1);
-        bool accum = bias_param;
-        for (int n = 0; n < outer_dim_; ++n) {
-            caffe_cpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
-                top_diff, bias_multiplier_.cpu_data(), Dtype(accum), bias_diff);
-            top_diff += scale_dim_ * inner_dim_;
-            accum = true;
         }
     }
 }

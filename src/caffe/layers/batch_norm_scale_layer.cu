@@ -7,32 +7,25 @@
 namespace caffe {
 
 template <typename Dtype>
-__global__ void batchNorm_variance(int nthreads, int width, int height, int channels, 
-                                    const Dtype* top_data, Dtype* var_data){
-
-    const int num_by_spatial_dim = nthreads / channels; 
-    const int num = nthreads / channels / width / height;
-    const int spatial_dim = width * height;
-    
-    CUDA_KERNEL_LOOP(c, channels){
-        Dtype sum_value = 0.;
-        CUDA_KERNEL_LOOP(b, num){
-            CUDA_KERNEL_LOOP(i, spatial_dim){
-                sum_value = sum_value +  pow(top_data[b * channels * spatial_dim + c * spatial_dim + i], 2.);
-            }
-        }
-        printf("sum value: %lf\n", sum_value);
-        var_data[c] = sum_value / num_by_spatial_dim;
+__global__ void BatchNormScaleForward(const int n, const Dtype* in,
+    const Dtype* scale, const int scale_dim, const int inner_dim,
+    Dtype* out) {
+    CUDA_KERNEL_LOOP(index, n) {
+    const int scale_index = (index / inner_dim) % scale_dim;
+    out[index] = in[index] * scale[scale_index];
     }
 }
 
 template <typename Dtype>
-__global__ void batchNorm_scale(int channels, int num_by_spatial_dim, 
-    const Dtype* b, Dtype* a){
-    CUDA_KERNEL_LOOP(index, channels){
-        a[index] = b[index] / num_by_spatial_dim;
+__global__ void BatchNormScaleBiasForward(const int n, const Dtype* in,
+    const Dtype* scale, const Dtype* bias,
+    const int scale_dim, const int inner_dim, Dtype* out) {
+    CUDA_KERNEL_LOOP(index, n) {
+    const int scale_index = (index / inner_dim) % scale_dim;
+    out[index] = in[index] * scale[scale_index] + bias[scale_index];
     }
 }
+
 
 template <typename Dtype>
 __global__ void batchNorm_forward(int nthreads, int width, int height, int channels, 
@@ -85,11 +78,7 @@ void BatchNormScaleLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     int height = bottom[0]->height();
     if (!use_global_stats_) {
         // compute variance using var(X) = E((X-EX)^2)
-        #if 0
-        batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
-            width, height, channels_, top_data, 
-            variance_.mutable_gpu_data());
-        #else
+        
         caffe_gpu_powx(top[0]->count(), top_data, Dtype(2),
             x_norm_.mutable_gpu_data());  // (X-EX)^2
         caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
@@ -99,8 +88,7 @@ void BatchNormScaleLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         caffe_gpu_gemv<Dtype>(CblasTrans, num, channels_, 1.,
             num_by_chans_.gpu_data(), batch_sum_multiplier_.gpu_data(), 0.,
             variance_.mutable_gpu_data());  // E((X_EX)^2)
-        #endif
-        
+                
         // compute and save moving average
         this->blobs_[2]->mutable_cpu_data()[0] *= moving_average_fraction_;
         this->blobs_[2]->mutable_cpu_data()[0] += 1;
@@ -124,19 +112,13 @@ void BatchNormScaleLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     caffe_copy(x_norm_.count(), top_data,
         x_norm_.mutable_gpu_data());// x_norm_.gpu_data stored normolized_top_data
     /********************scale-forward**************/
-    printf("@@@@@@@@@@@\n");
-    const Dtype* scale_data = this->blobs_[3].get()->gpu_data();
-    const Dtype* bias_data = this->blobs_[4].get()->gpu_data();
-    for (int n = 0; n < outer_dim_; ++n) {
-        for (int d = 0; d < scale_dim_; ++d) {
-            const Dtype factor = scale_data[d];
-            const Dtype bias = bias_data[d];
-            caffe_gpu_scale(inner_dim_, factor, bottom_data, top_data);
-            caffe_gpu_add_scalar(inner_dim_, bias, top_data);
-            bottom_data += inner_dim_;
-            top_data += inner_dim_;
-        }
-    }
+    const Dtype* scale_data = this->blobs_[3]->gpu_data();
+    const Dtype* bias_data = this->blobs_[4]->gpu_data();
+    const int count = top[0]->count();
+    BatchNormScaleBiasForward<Dtype>  // NOLINT_NEXT_LINE(whitespace/operators)
+        <<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
+        count, bottom_data, scale_data, bias_data, scale_dim_, inner_dim_,
+        top_data);
     /*
     caffe_copy(x_norm_.count(), top_data,
         x_norm_.mutable_gpu_diff()); // x_norm_.gpu_diff stored scaled_top_data
@@ -161,9 +143,19 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     if (bottom[0] != top[0]) {
         top_diff = top[0]->gpu_diff();
     } else {
-        caffe_copy(x_norm_.count(), top[0]->gpu_diff(), x_norm_.mutable_gpu_diff());
-        top_diff = x_norm_.gpu_diff();
-        //top_diff = top[0]->gpu_diff();
+        //caffe_copy(x_norm_.count(), top[0]->gpu_diff(), x_norm_.mutable_gpu_diff());
+        top_diff = top[0]->gpu_diff();
+    }
+    if(this->param_propagate_down_[4]){
+        Dtype* bias_diff = this->blobs_[4].get()->mutable_gpu_diff();
+        const bool bias_param = (bottom.size() == 1);
+        bool accum = bias_param;
+        for (int n = 0; n < outer_dim_; ++n) {
+            caffe_cpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
+                top_diff, bias_multiplier_.cpu_data(), Dtype(accum), bias_diff);
+            top_diff += scale_dim_ * inner_dim_;
+            accum = true;
+        }
     }
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 
@@ -245,25 +237,9 @@ void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                     width, height, channels_, bottom_diff, variance_.gpu_data(), bottom_diff);
     const Dtype* scale_data = this->blobs_[3].get()->gpu_data();
-    for (int n = 0; n < outer_dim_; ++n) {
-        for (int d = 0; d < scale_dim_; ++d) {
-            const Dtype factor = scale_data[d];
-            caffe_gpu_scale(inner_dim_, factor, bottom_diff, bottom_diff);
-            bottom_diff += inner_dim_;
-        }
-    }
-
-    if(this->param_propagate_down_[4]){
-        Dtype* bias_diff = this->blobs_[4].get()->mutable_gpu_diff();
-        const bool bias_param = (bottom.size() == 1);
-        bool accum = bias_param;
-        for (int n = 0; n < outer_dim_; ++n) {
-            caffe_cpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
-                top_diff, bias_multiplier_.cpu_data(), Dtype(accum), bias_diff);
-            top_diff += scale_dim_ * inner_dim_;
-            accum = true;
-        }
-    }
+    const int count = top[0]->count();
+    BatchNormScaleForward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
+        count, bottom_diff, scale_data, scale_dim_, inner_dim_, bottom_diff);
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(BatchNormScaleLayer);
