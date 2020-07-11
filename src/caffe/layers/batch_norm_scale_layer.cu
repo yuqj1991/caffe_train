@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "caffe/layers/batch_norm_layer.hpp"
+#include "caffe/layers/batch_norm_scale_layer.hpp"
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
@@ -44,7 +44,7 @@ __global__ void batchNorm_forward(int nthreads, int width, int height, int chann
 }
 
 template <typename Dtype>
-void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+void BatchNormScaleLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
     const Dtype* bottom_data = bottom[0]->gpu_data();
     Dtype* top_data = top[0]->mutable_gpu_data();
@@ -85,7 +85,11 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     int height = bottom[0]->height();
     if (!use_global_stats_) {
         // compute variance using var(X) = E((X-EX)^2)
-
+        #if 0
+        batchNorm_variance<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
+            width, height, channels_, top_data, 
+            variance_.mutable_gpu_data());
+        #else
         caffe_gpu_powx(top[0]->count(), top_data, Dtype(2),
             x_norm_.mutable_gpu_data());  // (X-EX)^2
         caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim,
@@ -95,6 +99,7 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         caffe_gpu_gemv<Dtype>(CblasTrans, num, channels_, 1.,
             num_by_chans_.gpu_data(), batch_sum_multiplier_.gpu_data(), 0.,
             variance_.mutable_gpu_data());  // E((X_EX)^2)
+        #endif
         
         // compute and save moving average
         this->blobs_[2]->mutable_cpu_data()[0] *= moving_average_fraction_;
@@ -117,7 +122,25 @@ void BatchNormLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         top[0]->gpu_data(), variance_.gpu_data());
 
     caffe_copy(x_norm_.count(), top_data,
-        x_norm_.mutable_gpu_data());
+        x_norm_.mutable_gpu_data());// x_norm_.gpu_data stored normolized_top_data
+    /********************scale-forward**************/
+    const Dtype* scale_data = this->blobs_[3].get()->gpu_data();
+    const Dtype* bias_data = this->blobs_[4].get()->gpu_data();
+    for (int n = 0; n < outer_dim_; ++n) {
+        for (int d = 0; d < scale_dim_; ++d) {
+            const Dtype factor = scale_data[d];
+            const Dtype bias = bias_data[d];
+            caffe_gpu_scale(inner_dim_, factor, bottom_data, top_data);
+            caffe_gpu_add_scalar(inner_dim_, bias, top_data);
+            bottom_data += inner_dim_;
+            top_data += inner_dim_;
+        }
+    }
+    /*
+    caffe_copy(x_norm_.count(), top_data,
+        x_norm_.mutable_gpu_diff()); // x_norm_.gpu_diff stored scaled_top_data
+    */
+    /********************scale-forward**************/
 }
 
 template <typename Dtype>
@@ -130,7 +153,7 @@ __global__ void batchNorm_backward(int nthreads, int width, int height, int chan
 }
 
 template <typename Dtype>
-void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
+void BatchNormScaleLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
     const Dtype* top_diff;
@@ -151,7 +174,7 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
             width, height, channels_, bottom_diff, variance_.gpu_data(), bottom_diff);
         return;
     }
-    const Dtype* top_data = x_norm_.gpu_data();
+    const Dtype* norm_data = x_norm_.gpu_data();
     int num = bottom[0]->shape()[0];
     int spatial_dim = bottom[0]->count()/(channels_*bottom[0]->shape(0));
       
@@ -168,7 +191,19 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // dimensions except the channels dimension where required.
 
     // sum(dE/dY \cdot Y)
-    caffe_gpu_mul(top[0]->count(), top_data, top_diff, bottom_diff);
+    caffe_gpu_mul(top[0]->count(), norm_data, top_diff, bottom_diff);
+    //new_added
+    /*****************scale-diff*************/
+    if(this->param_propagate_down_[3]){
+        Dtype* scale_diff = this->blobs_[3].get()->mutable_gpu_diff();
+        for (int n = 0; n < outer_dim_; ++n) {
+            caffe_gpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
+                bottom_diff, bias_multiplier_.gpu_data(), Dtype(1.), scale_diff);
+            bottom_diff += scale_dim_ * inner_dim_;
+        }
+        
+    }
+    /*****************scale-diff*************/
     caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim, 1.,
         bottom_diff, spatial_sum_multiplier_.gpu_data(), 0.,
         num_by_chans_.mutable_gpu_data());
@@ -185,7 +220,7 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         spatial_sum_multiplier_.gpu_data(), 0., bottom_diff);
 
     // sum(dE/dY \cdot Y) \cdot Y
-    caffe_gpu_mul(top[0]->count(), top_data, bottom_diff, bottom_diff);
+    caffe_gpu_mul(top[0]->count(), norm_data, bottom_diff, bottom_diff);
 
     // sum(dE/dY)-sum(dE/dY \cdot Y) \cdot Y
     caffe_gpu_gemv<Dtype>(CblasNoTrans, channels_ * num, spatial_dim, 1.,
@@ -208,8 +243,28 @@ void BatchNormLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     // new added
     batchNorm_backward<Dtype><<<CAFFE_GET_BLOCKS(nthreads), CAFFE_CUDA_NUM_THREADS>>>(nthreads, 
                     width, height, channels_, bottom_diff, variance_.gpu_data(), bottom_diff);
+    const Dtype* scale_data = this->blobs_[3].get()->gpu_data();
+    for (int n = 0; n < outer_dim_; ++n) {
+        for (int d = 0; d < scale_dim_; ++d) {
+            const Dtype factor = scale_data[d];
+            caffe_gpu_scale(inner_dim_, factor, bottom_diff, bottom_diff);
+            bottom_diff += inner_dim_;
+        }
+    }
+
+    if(this->param_propagate_down_[4]){
+        Dtype* bias_diff = this->blobs_[4].get()->mutable_gpu_diff();
+        const bool bias_param = (bottom.size() == 1);
+        bool accum = bias_param;
+        for (int n = 0; n < outer_dim_; ++n) {
+            caffe_cpu_gemv(CblasNoTrans, scale_dim_, inner_dim_, Dtype(1),
+                top_diff, bias_multiplier_.cpu_data(), Dtype(accum), bias_diff);
+            top_diff += scale_dim_ * inner_dim_;
+            accum = true;
+        }
+    }
 }
 
-INSTANTIATE_LAYER_GPU_FUNCS(BatchNormLayer);
+INSTANTIATE_LAYER_GPU_FUNCS(BatchNormScaleLayer);
 
 }  // namespace caffe

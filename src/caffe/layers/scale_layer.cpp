@@ -198,14 +198,14 @@ void ScaleLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
                 const Dtype* sum_mult = sum_multiplier_.cpu_data();
                 Dtype* scale_diff = scale->mutable_cpu_diff();
                 if (scale_dim_ == 1) {
-                if (scale_param) {
-                    Dtype result = caffe_cpu_dot(outer_dim_, sum_mult, sum_result);
-                    *scale_diff += result;
+                    if (scale_param) {
+                        Dtype result = caffe_cpu_dot(outer_dim_, sum_mult, sum_result);
+                        *scale_diff += result;
+                    } else {
+                        *scale_diff = caffe_cpu_dot(outer_dim_, sum_mult, sum_result);
+                    }
                 } else {
-                    *scale_diff = caffe_cpu_dot(outer_dim_, sum_mult, sum_result);
-                }
-                } else {
-                caffe_cpu_gemv(CblasTrans, outer_dim_, scale_dim_,
+                    caffe_cpu_gemv(CblasTrans, outer_dim_, scale_dim_,
                                 Dtype(1), sum_result, sum_mult, Dtype(scale_param),
                                 scale_diff);
                 }
