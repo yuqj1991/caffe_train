@@ -222,18 +222,18 @@ Job_Name = "CenterGrid{}_face_v4".format("Softmax")
 mdoel_name = "ResideoDeepFace"
 save_dir = "../prototxt/Full_{}".format(resize)
 snapshot_dir = "../snapshot/{}".format(Job_Name)
-train_net_file = "{}/{}_train.prototxt".format(save_dir, Job_Name)
-test_net_file = "{}/{}_test.prototxt".format(save_dir, Job_Name)
-deploy_net_file = "{}/{}_deploy.prototxt".format(save_dir, Job_Name)
-solver_file = "{}/{}_solver.prototxt".format(save_dir, Job_Name)
+train_net_file = "{}/{}_merge_train.prototxt".format(save_dir, Job_Name)
+test_net_file = "{}/{}_merge_test.prototxt".format(save_dir, Job_Name)
+deploy_net_file = "{}/{}_merge_deploy.prototxt".format(save_dir, Job_Name)
+solver_file = "{}/{}_merge_solver.prototxt".format(save_dir, Job_Name)
 
 pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"
 
 gpus = "0"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
-batch_size = 8
-accum_batch_size = 8
+batch_size = 12
+accum_batch_size = 1
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
 device_id = 0
@@ -322,7 +322,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         crop_type = P.AnnotatedData.CROP_JITTER, 
         YoloForamte = True, has_landmarks= has_landmarks)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False,
+net, LayerList_Output = CenterGridMobilenetV2Body(net= net, from_layer= 'data', biFpn= False, Use_BN = False, Use_merge_BN = True,
                                                     Inverted_residual_setting= Inverted_residual_setting,
                                                     top_out_channels= Inverted_residual_setting[len(Inverted_residual_setting) - 1][1], 
                                                     detector_num = detect_channels,
@@ -354,7 +354,7 @@ net.data, net.label = CreateAnnotatedDataLayer(valDataPath, batch_size=test_batc
         train=False, output_label=True, label_map_file=labelmapPath,
         transform_param=test_transform_param, has_landmarks = has_landmarks)
 
-net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN= True, 
+net, LayerList_Output = CenterGridMobilenetV2Body(net, from_layer = 'data', Use_BN = False, Use_merge_BN = True,
                                                     biFpn= False,
                                                     use_global_stats= True,
                                                     Inverted_residual_setting= Inverted_residual_setting, 
@@ -415,7 +415,7 @@ with open(solver_file, 'w') as f:
 
 # Create job file.
 train_src_param = '# --snapshot={}_0_iter_{}.solverstate '.format(snapshot_dir, 5000)
-job_file = "../train_scripts/train_{}.sh".format('centerGridSoftmax_face_v4')
+job_file = "../train_scripts/train_{}.sh".format('centerGridSoftmax_face_merge_v4')
 with open(job_file, 'w') as f:
     f.write('#!/bin/sh \n')
     f.write('if ! test -f {} ;then \n'.format(train_net_file))

@@ -49,8 +49,56 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, num_output,
     conv_prefix='', conv_postfix='', bn_prefix='', bn_postfix='_bn',
     scale_prefix='', scale_postfix='_scale', bias_prefix='', bias_postfix='_bias',
     bn_eps=0.001, bn_moving_avg_fraction=0.999, Use_DeConv = False, use_global_stats = False,
-    use_relu = False, use_swish= False, use_bias = False,
+    use_relu = False, use_swish= False, use_bias = False, use_merge_bn = False,
     **bn_params):
+    if use_merge_bn and use_bn:
+        raise("param use_merge_bn & use_bn should not be true at the sametime")
+    if use_merge_bn:
+        # parameters for convolution layer with batchnorm.
+        if use_bias:
+            kwargs = {
+                'param': [
+                    dict(lr_mult=lr_mult, decay_mult=1),
+                    dict(lr_mult=2 * lr_mult, decay_mult=0)],
+                'weight_filler': dict(type='msra'),
+                'bias_filler': dict(type='constant', value=0)
+            }
+        else:
+            kwargs = {
+                'param': [dict(lr_mult=lr_mult, decay_mult=1)],
+                'weight_filler': dict(type='msra'),
+                'bias_term': False,
+                }
+        eps = bn_params.get('eps', bn_eps)
+        moving_average_fraction = bn_params.get('moving_average_fraction', bn_moving_avg_fraction)
+        use_global_stats = bn_params.get('use_global_stats', use_global_stats)
+        # parameters for batchnorm layer.
+        bn_lr_mult = lr_mult
+
+        bn_kwargs = {
+            'param': [
+                dict(lr_mult=0, decay_mult=0),
+                dict(lr_mult=0, decay_mult=0),
+                dict(lr_mult=0, decay_mult=0),
+                dict(lr_mult=bn_lr_mult, decay_mult=0),
+                dict(lr_mult=bn_lr_mult * 2, decay_mult=0)],
+            'batch_norm_param':[dict(eps = eps, moving_average_fraction = moving_average_fraction)],
+            'scale_param':[dict(filler=dict(value=1.0), bias_term= True, bias_filler=dict(value=0.0))],
+        }
+        
+        if use_global_stats:
+            # only specify if use_global_stats is explicitly provided;
+            # otherwise, use_global_stats_ = this->phase_ == TEST;
+            bn_kwargs = {
+                'param': [
+                    dict(lr_mult=0, decay_mult=0),
+                    dict(lr_mult=0, decay_mult=0),
+                    dict(lr_mult=0, decay_mult=0),
+                    dict(lr_mult=bn_lr_mult, decay_mult=0),
+                    dict(lr_mult=bn_lr_mult * 2, decay_mult=0)],
+                'batch_norm_param':[dict(eps = eps, use_global_stats = use_global_stats)],
+                'scale_param':[dict(filler=dict(value=1.0), bias_term= True, bias_filler=dict(value=0.0))],
+            }       
     if use_bn:
         # parameters for convolution layer with batchnorm.
         if use_bias:
@@ -154,6 +202,18 @@ def ConvBNLayer(net, from_layer, out_layer, use_bn, num_output,
         else:
             bias_name = '{}{}{}'.format(bias_prefix, out_layer, bias_postfix)
             net[bias_name] = L.Bias(net[bn_name], in_place=True, **bias_kwargs)
+    if use_merge_bn:
+        bn_name = '{}{}{}'.format(bn_prefix, out_layer, bn_postfix)
+        net[bn_name] = L.BatchNormScale(net[conv_name], in_place=True, param = [
+                dict(lr_mult=0, decay_mult=0),
+                dict(lr_mult=0, decay_mult=0),
+                dict(lr_mult=0, decay_mult=0),
+                dict(lr_mult=bn_lr_mult, decay_mult=0),
+                dict(lr_mult=bn_lr_mult * 2, decay_mult=0)], batch_norm_param =dict(eps = eps,
+                use_global_stats=use_global_stats,
+                moving_average_fraction = moving_average_fraction), scale_param=
+                dict(filler=dict(value=1.0), bias_term= True, bias_filler=dict(value=0.0))
+                )
     if use_relu:
         relu_name = '{}_relu6'.format(conv_name)
         net[relu_name] = L.ReLU6(net[conv_name], in_place=True)
