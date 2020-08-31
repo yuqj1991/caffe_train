@@ -201,9 +201,9 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
                                 Dtype* gt_lm_data, Dtype* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const Dtype* channel_loc_data,
-                                const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                                const int num_channels, 
+                                const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
                                 bool has_lm){
-    std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > ::iterator iter;
     CHECK_EQ(share_location, true);
     int dimScale = output_height * output_width;
     int count = 0;
@@ -213,7 +213,7 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
     }else{
         CHECK_EQ(num_channels, 4);
     }
-    for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    for(auto iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
         int batch_id = iter->first;
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -312,22 +312,23 @@ template void EncodeTruthAndPredictions(float* gt_loc_offest_data, float* pred_l
                                 float* gt_lm_data, float* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const float* channel_loc_data,
-                                const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, 
+                                const int num_channels, 
+                                const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes, 
                                 bool has_lm);
 template void EncodeTruthAndPredictions(double* gt_loc_offest_data, double* pred_loc_offest_data,
                                 double* gt_loc_wh_data, double* pred_loc_wh_data,
                                 double* gt_lm_data, double* pred_lm_data,
                                 const int output_width, const int output_height, 
                                 bool share_location, const double* channel_loc_data,
-                                const int num_channels, std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                                const int num_channels, 
+                                const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
                                 bool has_lm);                              
 
 template <typename Dtype>
 void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, const int output_width, 
                                 const int output_height, bool has_lm, const Dtype* lm_pre_diff,
                                 bool share_location, Dtype* bottom_diff, const int num_channels,
-                                std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes){
-    std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > ::iterator iter;
+                                const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes){
     int count = 0;
     int lm_count = 0;
     CHECK_EQ(share_location, true);
@@ -338,7 +339,7 @@ void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, co
         CHECK_EQ(num_channels, 4);
     }
 
-    for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    for(auto iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
         int batch_id = iter->first;
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -411,11 +412,11 @@ void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, co
 template void CopyDiffToBottom(const float* pre_offset_diff, const float* pre_wh_diff, const int output_width, 
                                 const int output_height, bool has_lm, const float* lm_pre_diff,
                                 bool share_location, float* bottom_diff, const int num_channels,
-                                std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes);
+                                const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes);
 template void CopyDiffToBottom(const double* pre_offset_diff, const double* pre_wh_diff,const int output_width, 
                                 const int output_height, bool has_lm, const double* lm_pre_diff,
                                 bool share_location, double* bottom_diff, const int num_channels,
-                                std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes);
+                                const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes);
 
 
 template <typename Dtype>
@@ -531,13 +532,12 @@ template void get_topK(const double* keep_max_data, const double* loc_data, cons
 
 
 template <typename Dtype>
-void GenerateBatchHeatmap(std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, 
+void GenerateBatchHeatmap(const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes, 
                             Dtype* gt_heatmap, 
                             const int num_classes_, const int output_width, const int output_height){
-    std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > ::iterator iter;
     count_gt = 0;
 
-    for(iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    for(auto iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
         int batch_id = iter->first;
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
@@ -560,9 +560,9 @@ void GenerateBatchHeatmap(std::map<int, vector<std::pair<NormalizedBBox, AnnoFac
         }
     }
 }
-template void GenerateBatchHeatmap(std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, float* gt_heatmap, 
+template void GenerateBatchHeatmap(const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes, float* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);
-template void GenerateBatchHeatmap(std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes, double* gt_heatmap, 
+template void GenerateBatchHeatmap(const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes, double* gt_heatmap, 
                               const int num_classes_, const int output_width, const int output_height);
 
 // 置信度得分,用逻辑回归来做,loss_delta梯度值,既前向又后向
@@ -571,8 +571,8 @@ void EncodeYoloObject(const int batch_size, const int num_channels, const int nu
                           const int output_width, const int output_height, 
                           const int net_width, const int net_height,
                           Dtype* channel_pred_data,
-                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
-                          std::vector<int> mask_bias, std::vector<std::pair<Dtype, Dtype> >bias_scale, 
+                          const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
+                          const std::vector<int> mask_bias, std::vector<std::pair<Dtype, Dtype> >& bias_scale, 
                           Dtype* bottom_diff, Dtype ignore_thresh, YoloScoreShow *Score){
     CHECK_EQ(net_height, net_width);
     int stride_channel = 4 + 1 + num_classes;
@@ -753,15 +753,15 @@ template void EncodeYoloObject(const int batch_size, const int num_channels, con
                               const int output_width, const int output_height, 
                               const int net_width, const int net_height,
                               float* channel_pred_data,
-                              std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
-                              std::vector<int> mask_bias, std::vector<std::pair<float, float> >bias_scale, 
+                              const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
+                              const std::vector<int> mask_bias, std::vector<std::pair<float, float> >& bias_scale, 
                               float* bottom_diff, float ignore_thresh, YoloScoreShow *Score);
 template void EncodeYoloObject(const int batch_size, const int num_channels, const int num_classes,
                               const int output_width, const int output_height, 
                               const int net_width, const int net_height,
                               double* channel_pred_data,
-                              std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
-                              std::vector<int> mask_bias, std::vector<std::pair<double, double> >bias_scale, 
+                              const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
+                              const std::vector<int> mask_bias, std::vector<std::pair<double, double> >& bias_scale, 
                               double* bottom_diff, double ignore_thresh, YoloScoreShow *Score);
 
 
@@ -851,7 +851,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
                           const float downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                          const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
                           Dtype ignore_thresh, int *count_postive, Dtype *loc_loss_value){
     CHECK_EQ(num_classes, 1);
@@ -867,8 +867,7 @@ Dtype EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int num_chan
     }
     int postive = 0;
     caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
-    std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >::iterator iter;
-    for(iter =all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    for(auto iter =all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
         int b = iter->first;
         std::vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         std::vector<int> mask_Rf_anchor(dimScale, 0);
@@ -942,7 +941,7 @@ template float EncodeCenterGridObjectSigmoidLoss(const int batch_size, const int
                           const float downRatio,
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                          const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
                           float* class_label, float* bottom_diff, 
                           float ignore_thresh, int *count_postive, float *loc_loss_value);
 
@@ -951,7 +950,7 @@ template double EncodeCenterGridObjectSigmoidLoss(const int batch_size, const in
                           const float downRatio,
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                          const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
                           double* class_label, double* bottom_diff, 
                           double ignore_thresh, int *count_postive, double *loc_loss_value);
 
@@ -1037,7 +1036,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                           std::vector<Dtype> batch_sample_loss,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                          const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
                           int *count_postive, Dtype *loc_loss_value, int *match_num_gt_box, 
                           bool has_lm, Dtype* lm_loss_value){
@@ -1064,8 +1063,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
     caffe_set(batch_size * dimScale, Dtype(-1.), class_label);
     #endif
     int previous_id = -1;
-    std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >::iterator iter;
-    for(iter =all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
+    for(auto iter =all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
         int b = iter->first;
         if(previous_id == b)
             LOG(FATAL)<<"preivous_id: "<<previous_id<<", batch_id: "<<b;
@@ -1284,7 +1282,7 @@ template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int
                           std::vector<float> batch_sample_loss,
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                          const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
                           float* class_label, float* bottom_diff, 
                           int *count_postive, float *loc_loss_value, int *match_num_gt_box, bool has_lm, float * lm_loss_value);
 
@@ -1294,7 +1292,7 @@ template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const in
                           std::vector<double> batch_sample_loss,
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes,
+                          const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
                           double* class_label, double* bottom_diff, 
                           int *count_postive, double *loc_loss_value, int *match_num_gt_box, bool has_lm, double * lm_loss_value);
 
@@ -1457,7 +1455,7 @@ Dtype EncodeOverlapObjectSigmoidLoss(const int batch_size, const int num_channel
                           const int downRatio,
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          const std::map<int, vector<NormalizedBBox> >& all_gt_bboxes,
                           Dtype* class_label, Dtype* bottom_diff, 
                           Dtype ignore_thresh, int *count_postive, Dtype *loc_loss_value){
     CHECK_EQ(num_classes, 1);
@@ -1475,7 +1473,7 @@ Dtype EncodeOverlapObjectSigmoidLoss(const int batch_size, const int num_channel
     // 采用focal loss 使用所有的负样本，作为训练
     caffe_set(batch_size * dimScale, Dtype(0.5f), class_label);
     for(int b = 0; b < batch_size; b++){
-        std::map<int, vector<NormalizedBBox> >::iterator it = all_gt_bboxes.find(b);
+        auto it = all_gt_bboxes.find(b);
         if(it == all_gt_bboxes.end()){
             continue;
         }
@@ -1605,7 +1603,7 @@ template float EncodeOverlapObjectSigmoidLoss(const int batch_size, const int nu
                           const int downRatio,
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          const std::map<int, vector<NormalizedBBox> >& all_gt_bboxes,
                           float* class_label, float* bottom_diff, 
                           float ignore_thresh, int *count_postive, float *loc_loss_value);
 
@@ -1614,7 +1612,7 @@ template double EncodeOverlapObjectSigmoidLoss(const int batch_size, const int n
                           const int downRatio,
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
-                          std::map<int, vector<NormalizedBBox> > all_gt_bboxes,
+                          const std::map<int, vector<NormalizedBBox> >& all_gt_bboxes,
                           double* class_label, double* bottom_diff, 
                           double ignore_thresh, int *count_postive, double *loc_loss_value);
 
