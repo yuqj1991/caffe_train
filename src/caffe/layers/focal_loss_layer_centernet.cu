@@ -25,10 +25,10 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
     const Dtype label_a = label[index];
     const Dtype prob_a = prob_data[index];
     if( label_a == Dtype(1)){
-      loss[index] -= log(max(prob_a, Dtype(FLT_MIN))) * powf(1 -prob_a, alpha);
+      loss[index] = -log(max(prob_a, Dtype(FLT_MIN))) * powf(1 -prob_a, alpha);
       counts[index] = 1;
     }else if(label_a < Dtype(1)){
-      loss[index] -= log(max(1 - prob_a, Dtype(FLT_MIN))) * powf(prob_a, alpha) *
+      loss[index] = -log(max(1 - prob_a, Dtype(FLT_MIN))) * powf(prob_a, alpha) *
                      powf(1 - label_a, gamma);
       counts[index] = 0;
     }
@@ -58,16 +58,18 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, 1, 1, valid_count);
     top[0]->mutable_cpu_data()[0] = loss / normalizer;
+    #if 1
     if(iterations_%100 == 0){
         std::cout<<"forward batch_: "<<batch_<<", num_class: "<<num_class_
         <<", height: "<<height_ << ", width: " <<width_
         <<", normalizer: "<<normalizer
         <<", postive_count: "<< valid_count <<", class total_loss: "<<loss/ normalizer<<std::endl;
     }
+    iterations_++;
+    #endif
     if (top.size() == 2) {
       top[1]->ShareData(prob_);
     }
-    iterations_++;
 }
 
 template <typename Dtype>
