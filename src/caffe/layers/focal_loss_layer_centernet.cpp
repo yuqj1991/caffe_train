@@ -74,7 +74,6 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
     for(int index = 0; index < count; ++index){
         Dtype prob_a = prob_data[index];
         Dtype label_a = label[index];
-        LOG(INFO)<<"prob_a: "<<prob_a<<", label_a: "<<label_a;
         if(label_a == Dtype(1.0)){
             postive_loss -= log(std::max(prob_a, Dtype(FLT_MIN))) * std::pow(1 -prob_a, alpha_);
             postive_count++;
@@ -85,19 +84,19 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
     }
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
                             normalization_, 1, 1, postive_count);
-    top[0]->mutable_cpu_data()[0] = (Dtype(postive_loss) + Dtype(negitive_loss)) / normalizer;
+    top[0]->mutable_cpu_data()[0] = (postive_loss + negitive_loss) / normalizer;
     #if 1
-    if(iterations_%100 == 0){
+    if(iterations_%10 == 0){
         LOG(INFO)<<"forward batch_: "<<batch_<<", num_class: "<<num_class_
                 <<", height: "<<height_ << ", width: " <<width_
                 <<", normalizer: "<<normalizer
                 <<", postive_count: "<< postive_count <<", class total_loss: "<<top[0]->mutable_cpu_data()[0];
     }
+    iterations_++;
     #endif
     if (top.size() == 2) {
         top[1]->ShareData(prob_);
     }
-    iterations_++;
 }
 
 template <typename Dtype>
