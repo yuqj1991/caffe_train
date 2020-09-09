@@ -60,9 +60,15 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, 1, 1, valid_count);
     top[0]->mutable_cpu_data()[0] = loss / normalizer;
+    if(iterations_%100 == 0){
+        std::cout<<"forward batch_: "<<batch_<<", num_class: "<<num_class_
+        <<", height: "<<height_ << ", width: " <<width_
+        <<", postive_count: "<< valid_count <<", class total_loss: "<<loss/ normalizer<<std::endl;
+    }
     if (top.size() == 2) {
       top[1]->ShareData(prob_);
     }
+    iterations_++;
 }
 
 template <typename Dtype>
