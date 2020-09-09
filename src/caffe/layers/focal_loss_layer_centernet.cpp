@@ -74,6 +74,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
     for(int index = 0; index < count; ++index){
         Dtype prob_a = prob_data[index];
         Dtype label_a = label[index];
+        LOG(INFO)<<"prob_a: "<<prob_a<<", label_a: "<<label_a;
         if(label_a == Dtype(1.0)){
             postive_loss -= log(std::max(prob_a, Dtype(FLT_MIN))) * std::pow(1 -prob_a, alpha_);
             postive_count++;
