@@ -89,6 +89,7 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_cpu(
     if(iterations_%100 == 0){
         LOG(INFO)<<"forward batch_: "<<batch_<<", num_class: "<<num_class_
                 <<", height: "<<height_ << ", width: " <<width_
+                <<", normalizer: "<<normalizer
                 <<", postive_count: "<< postive_count <<", class total_loss: "<<top[0]->mutable_cpu_data()[0];
     }
     #endif
