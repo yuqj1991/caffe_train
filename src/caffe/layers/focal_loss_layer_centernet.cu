@@ -14,7 +14,6 @@ __global__ void focalSigmoidLossForwardGPU(const int nthreads,
           const int width, int *valid_count,float gamma, float alpha) {
     int postive_count = 0;
     Dtype valid_loss = 0.f;
-    printf("gamma: %f, alpha: %f\n", gamma, alpha);
     CUDA_KERNEL_LOOP(index, nthreads) {
         /*
         const int fw = index % width;
