@@ -11,28 +11,32 @@ template <typename Dtype>
 __global__ void focalSigmoidLossForwardGPU(const int nthreads,
           const Dtype* prob_data, const Dtype* label, Dtype* loss,
           const int batch, const int channels, const int height,
-          const int width, Dtype* counts, float gamma, float alpha) {
-  CUDA_KERNEL_LOOP(index, nthreads) {
-    /*
-    const int fw = index % width;
-    const int fh = (index / width) % height;
-    const int fc = (index / width / height) % channels;
-    const int fn = (index / width / height) / channels;
-    const int dim = (fn * channels + fc) * height * width;
-    const Dtype* label_slice = label + dim;
-    const Dtype* prob_slice = prob_data + dim;
-    */
-    const Dtype label_a = label[index];
-    const Dtype prob_a = prob_data[index];
-    if( label_a == Dtype(1)){
-      loss[index] = -log(max(prob_a, Dtype(FLT_MIN))) * powf(1 -prob_a, alpha);
-      counts[index] = 1;
-    }else if(label_a < Dtype(1)){
-      loss[index] = -log(max(1 - prob_a, Dtype(FLT_MIN))) * powf(prob_a, alpha) *
-                     powf(1 - label_a, gamma);
-      counts[index] = 0;
+          const int width, int *valid_count,float gamma, float alpha) {
+    int postive_count = 0;
+    Dtype valid_loss = 0.f;
+    printf("gamma: %f, alpha: %f\n", gamma, alpha);
+    CUDA_KERNEL_LOOP(index, nthreads) {
+        /*
+        const int fw = index % width;
+        const int fh = (index / width) % height;
+        const int fc = (index / width / height) % channels;
+        const int fn = (index / width / height) / channels;
+        const int dim = (fn * channels + fc) * height * width;
+        const Dtype* label_slice = label + dim;
+        const Dtype* prob_slice = prob_data + dim;
+        */
+        const Dtype label_a = label[index];
+        const Dtype prob_a = prob_data[index];
+        if( label_a == Dtype(1)){
+            valid_loss -= log(max(prob_a, Dtype(FLT_MIN))) * powf(1 -prob_a, alpha);
+            postive_count += 1;
+        }else if(label_a < Dtype(1)){
+            valid_loss -= log(max(1 - prob_a, Dtype(FLT_MIN))) * powf(prob_a, alpha) *
+                            powf(1 - label_a, gamma);
+        }
     }
-  }
+    *valid_count = postive_count;
+    *loss = valid_loss;
 }
 
 template <typename Dtype>
@@ -46,15 +50,17 @@ void CenterNetfocalSigmoidWithLossLayer<Dtype>::Forward_gpu(
     num_class_ = bottom[0]->channels();
     width_ = bottom[0]->width();
     height_ = bottom[0]->height();
-    Dtype* loss_data = bottom[0]->mutable_gpu_diff();
-    Dtype* counts = prob_.mutable_gpu_diff();
-    focalSigmoidLossForwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
-        CAFFE_CUDA_NUM_THREADS>>>(nthreads, prob_data, label, loss_data,
-        batch_, num_class_, height_, width_, counts, gamma_, alpha_);
+    //Dtype* loss_data = bottom[0]->mutable_gpu_diff();
+    //Dtype* counts = prob_.mutable_gpu_diff();
     Dtype loss;
-    caffe_gpu_asum(nthreads, loss_data, &loss);
-    Dtype valid_count = -1;
-    caffe_gpu_asum(nthreads, counts, &valid_count);
+    int valid_count = -1;
+    focalSigmoidLossForwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
+        CAFFE_CUDA_NUM_THREADS>>>(nthreads, prob_data, label, &loss,
+        batch_, num_class_, height_, width_, &valid_count, gamma_, alpha_);
+    
+    //caffe_gpu_asum(nthreads, loss_data, &loss);
+    
+    //caffe_gpu_asum(nthreads, counts, &valid_count);
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
         normalization_, 1, 1, valid_count);
     top[0]->mutable_cpu_data()[0] = loss / normalizer;
