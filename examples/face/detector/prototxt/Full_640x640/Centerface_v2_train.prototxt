@@ -2330,19 +2330,19 @@ layer {
   top: "Res_Sum_3_3"
 }
 layer {
-  name: "Conv_project_64_96"
+  name: "conv_4_project/expand"
   type: "Convolution"
   bottom: "Res_Sum_3_3"
-  top: "Conv_project_64_96"
+  top: "conv_4_project/expand"
   param {
     lr_mult: 1.0
     decay_mult: 1.0
   }
   convolution_param {
-    num_output: 96
+    num_output: 384
     bias_term: false
-    pad: 1
-    kernel_size: 3
+    pad: 0
+    kernel_size: 1
     stride: 1
     weight_filler {
       type: "msra"
@@ -2350,10 +2350,10 @@ layer {
   }
 }
 layer {
-  name: "Conv_project_64_96_bn"
+  name: "conv_4_project/expand_bn"
   type: "BatchNorm"
-  bottom: "Conv_project_64_96"
-  top: "Conv_project_64_96"
+  bottom: "conv_4_project/expand"
+  top: "conv_4_project/expand"
   param {
     lr_mult: 0.0
     decay_mult: 0.0
@@ -2372,10 +2372,10 @@ layer {
   }
 }
 layer {
-  name: "Conv_project_64_96_scale"
+  name: "conv_4_project/expand_scale"
   type: "Scale"
-  bottom: "Conv_project_64_96"
-  top: "Conv_project_64_96"
+  bottom: "conv_4_project/expand"
+  top: "conv_4_project/expand"
   param {
     lr_mult: 1.0
     decay_mult: 0.0
@@ -2395,15 +2395,158 @@ layer {
   }
 }
 layer {
-  name: "Conv_project_64_96_relu6"
+  name: "conv_4_project/expand_relu6"
   type: "ReLU6"
-  bottom: "Conv_project_64_96"
-  top: "Conv_project_64_96"
+  bottom: "conv_4_project/expand"
+  top: "conv_4_project/expand"
+}
+layer {
+  name: "conv_4_project/depthwise"
+  type: "Convolution"
+  bottom: "conv_4_project/expand"
+  top: "conv_4_project/depthwise"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 384
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 384
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv_4_project/depthwise_bn"
+  type: "BatchNorm"
+  bottom: "conv_4_project/depthwise"
+  top: "conv_4_project/depthwise"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "conv_4_project/depthwise_scale"
+  type: "Scale"
+  bottom: "conv_4_project/depthwise"
+  top: "conv_4_project/depthwise"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "conv_4_project/depthwise_relu6"
+  type: "ReLU6"
+  bottom: "conv_4_project/depthwise"
+  top: "conv_4_project/depthwise"
+}
+layer {
+  name: "conv_4_project/linear"
+  type: "Convolution"
+  bottom: "conv_4_project/depthwise"
+  top: "conv_4_project/linear"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 96
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv_4_project/linear_bn"
+  type: "BatchNorm"
+  bottom: "conv_4_project/linear"
+  top: "conv_4_project/linear"
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.9990000128746033
+    eps: 0.0010000000474974513
+  }
+}
+layer {
+  name: "conv_4_project/linear_scale"
+  type: "Scale"
+  bottom: "conv_4_project/linear"
+  top: "conv_4_project/linear"
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  scale_param {
+    filler {
+      value: 1.0
+    }
+    bias_term: true
+    bias_filler {
+      value: 0.0
+    }
+  }
+}
+layer {
+  name: "conv_4_project/linear_relu6"
+  type: "ReLU6"
+  bottom: "conv_4_project/linear"
+  top: "conv_4_project/linear"
 }
 layer {
   name: "conv_4_0/expand"
   type: "Convolution"
-  bottom: "Conv_project_64_96"
+  bottom: "conv_4_project/linear"
   top: "conv_4_0/expand"
   param {
     lr_mult: 1.0
@@ -2611,7 +2754,7 @@ layer {
 layer {
   name: "Res_Sum_4_0"
   type: "Eltwise"
-  bottom: "Conv_project_64_96"
+  bottom: "conv_4_project/linear"
   bottom: "conv_4_0/linear"
   top: "Res_Sum_4_0"
 }

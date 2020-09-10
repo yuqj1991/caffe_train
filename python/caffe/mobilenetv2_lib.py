@@ -304,6 +304,7 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                     out_layer = layer_name
                     pre_channels = c
             elif s == 1:
+                '''
                 Project_Layer = out_layer
                 out_layer= "Conv_project_{}_{}".format(pre_channels, c)
                 ConvBNLayer(net, Project_Layer, out_layer, use_bn = True, use_relu = True, 
@@ -311,6 +312,12 @@ def CenterFaceMobilenetV2Body(net, from_layer, Use_BN = True, use_global_stats= 
                             num_output= c, kernel_size= 3, pad= 1, stride= 1,
                             lr_mult=1, use_scale=True, use_global_stats= use_global_stats)
                 pre_channels = c
+                '''
+                layer_name = MBottleConvBlock(net, out_layer, index, "project", c, s, t, pre_channels,  Use_BN = True, 
+                                                        use_relu= True, use_swish= False,
+                                                        Use_scale = True,use_global_stats= use_global_stats, **bn_param)
+                pre_channels = c
+                out_layer = layer_name
                 for id in range(n):
                     layer_name = MBottleConvBlock(net, out_layer, index, id, c, s, t, pre_channels, Use_BN = True, 
                                                         use_relu= True, use_swish= False,

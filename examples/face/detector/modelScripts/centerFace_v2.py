@@ -299,8 +299,8 @@ Inverted_residual_setting = [[1, 16, 1, 1],
                                  [6, 320, 1, 1]]
 use_branch= False
 
-has_landmarks = False
-detect_num_channels = 4
+has_landmarks = True
+detect_num_channels = 14
 
 check_if_exist(trainDataPath)
 check_if_exist(valDataPath)
@@ -312,7 +312,7 @@ make_if_not_exist(save_dir)
 net = caffe.NetSpec()
 net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_size_per_device,
         train=True, output_label=True, label_map_file=labelmapPath,
-        crop_type = P.AnnotatedData.CROP_JITTER,
+        crop_type = P.AnnotatedData.CROP_BATCH,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
         data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler, has_landmarks = has_landmarks)
 
@@ -419,5 +419,5 @@ with open(job_file, 'w') as f:
     f.write('   echo "please generate your own model prototxt primarily." \n')
     f.write('   exit 1 \n')
     f.write('fi\n')
-    f.write('../../../../build/tools/caffe train --solver={} --gpu {} \\\n'.format(solver_file, 0))
+    f.write('../../../../build/tools/caffe train --solver={} --gpu {} \\\n'.format(solver_file, 1))
     f.write(train_src_param)
