@@ -194,6 +194,41 @@ void soft_nms(std::vector<CenterNetInfo>& input, std::vector<CenterNetInfo>* out
     }
 }
 
+void check_box_value(NormalizedBBox box){
+    CHECK_LE(box.xmin(), 1.);
+    CHECK_LE(box.xmax(), 1.);
+    CHECK_LE(box.ymin(), 1.);
+    CHECK_LE(box.ymax(), 1.);
+    CHECK_GE(box.xmin(), 0.);
+    CHECK_GE(box.xmax(), 0.);
+    CHECK_GE(box.ymin(), 0.);
+    CHECK_GE(box.ymax(), 0.);
+
+}
+
+void check_landmarks_value(AnnoFaceLandmarks lmarks){
+    CHECK_LE(lmarks.lefteye().x(), 1.);
+    CHECK_LE(lmarks.lefteye().y(), 1.);
+    CHECK_LE(lmarks.righteye().x(), 1.);
+    CHECK_LE(lmarks.righteye().y(), 1.);
+    CHECK_LE(lmarks.nose().x(), 1.);
+    CHECK_LE(lmarks.nose().y(), 1.);
+    CHECK_LE(lmarks.leftmouth().x(), 1.);
+    CHECK_LE(lmarks.leftmouth().y(), 1.);
+    CHECK_LE(lmarks.rightmouth().x(), 1.);
+    CHECK_LE(lmarks.rightmouth().y(), 1.);
+    CHECK_GE(lmarks.lefteye().x(), 0.);
+    CHECK_GE(lmarks.lefteye().y(), 0.);
+    CHECK_GE(lmarks.righteye().x(), 0.);
+    CHECK_GE(lmarks.righteye().y(), 0.);
+    CHECK_GE(lmarks.nose().x(), 0.);
+    CHECK_GE(lmarks.nose().y(), 0.);
+    CHECK_GE(lmarks.leftmouth().x(), 0.);
+    CHECK_GE(lmarks.leftmouth().y(), 0.);
+    CHECK_GE(lmarks.rightmouth().x(), 0.);
+    CHECK_GE(lmarks.rightmouth().y(), 0.);
+}
+
 
 template <typename Dtype>
 void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest_data,
@@ -217,6 +252,7 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
         int batch_id = iter->first;
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
+            check_box_value(gt_bboxes[ii].first);
             const Dtype xmin = gt_bboxes[ii].first.xmin() * output_width;
             const Dtype ymin = gt_bboxes[ii].first.ymin() * output_height;
             const Dtype xmax = gt_bboxes[ii].first.xmax() * output_width;
@@ -258,6 +294,7 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
                    gt_bboxes[ii].second.nose().x() > 0 && gt_bboxes[ii].second.nose().y() > 0 &&
                    gt_bboxes[ii].second.leftmouth().x() > 0 && gt_bboxes[ii].second.leftmouth().y() > 0 &&
                    gt_bboxes[ii].second.rightmouth().x() > 0 && gt_bboxes[ii].second.rightmouth().y() > 0){
+                    check_landmarks_value(gt_bboxes[ii].second);
                     gt_lm_data[lm_count * 10 + 0] = Dtype((gt_bboxes[ii].second.lefteye().x() * output_width - inter_center_x) / width);
                     gt_lm_data[lm_count * 10 + 1] = Dtype((gt_bboxes[ii].second.lefteye().y() * output_height - inter_center_y) / height);
                     gt_lm_data[lm_count * 10 + 2] = Dtype((gt_bboxes[ii].second.righteye().x() * output_width - inter_center_x) / width);
