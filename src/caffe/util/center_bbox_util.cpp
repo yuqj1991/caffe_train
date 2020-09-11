@@ -270,35 +270,25 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
                     gt_lm_data[lm_count * 10 + 9] = Dtype((gt_bboxes[ii].second.rightmouth().y() * output_height - inter_center_y) / height);
 
                     int le_x_index = batch_id * num_channels * dimScale
-                                        + 4 * dimScale + static_cast<int>(gt_bboxes[ii].second.lefteye().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.lefteye().x() * output_width);
+                                        + 4 * dimScale + inter_center_y * output_width + inter_center_x;
                     int le_y_index = batch_id * num_channels * dimScale 
-                                        + 5 * dimScale + static_cast<int>(gt_bboxes[ii].second.lefteye().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.lefteye().x() * output_width);
+                                        + 5 * dimScale + inter_center_y * output_width + inter_center_x;
                     int re_x_index = batch_id * num_channels * dimScale
-                                        + 6 * dimScale + static_cast<int>(gt_bboxes[ii].second.righteye().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.righteye().x() * output_width);
+                                        + 6 * dimScale + inter_center_y * output_width + inter_center_x;
                     int re_y_index = batch_id * num_channels * dimScale 
-                                        + 7 * dimScale + static_cast<int>(gt_bboxes[ii].second.righteye().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.righteye().x() * output_width);
+                                        + 7 * dimScale + inter_center_y * output_width + inter_center_x;
                     int no_x_index = batch_id * num_channels * dimScale
-                                        + 8 * dimScale + static_cast<int>(gt_bboxes[ii].second.nose().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.nose().x() * output_width);
+                                        + 8 * dimScale + inter_center_y * output_width + inter_center_x;
                     int no_y_index = batch_id * num_channels * dimScale 
-                                        + 9 * dimScale + static_cast<int>(gt_bboxes[ii].second.nose().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.nose().x() * output_width);
+                                        + 9 * dimScale + inter_center_y * output_width + inter_center_x;
                     int lm_x_index = batch_id * num_channels * dimScale
-                                        + 10 * dimScale + static_cast<int>(gt_bboxes[ii].second.leftmouth().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.leftmouth().x() * output_width);
+                                        + 10 * dimScale + inter_center_y * output_width + inter_center_x;
                     int lm_y_index = batch_id * num_channels * dimScale 
-                                        + 11 * dimScale + static_cast<int>(gt_bboxes[ii].second.leftmouth().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.leftmouth().x() * output_width);
+                                        + 11 * dimScale + inter_center_y * output_width + inter_center_x;
                     int rm_x_index = batch_id * num_channels * dimScale
-                                        + 12 * dimScale + static_cast<int>(gt_bboxes[ii].second.rightmouth().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.rightmouth().x() * output_width);
+                                        + 12 * dimScale + inter_center_y * output_width + inter_center_x;
                     int rm_y_index = batch_id * num_channels * dimScale 
-                                        + 13 * dimScale + static_cast<int>(gt_bboxes[ii].second.rightmouth().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.rightmouth().x() * output_width);
+                                        + 13 * dimScale + inter_center_y * output_width + inter_center_x;
 
                     pred_lm_data[lm_count * 10 + 0] = channel_loc_data[le_x_index];
                     pred_lm_data[lm_count * 10 + 1] = channel_loc_data[le_y_index];
@@ -383,35 +373,26 @@ void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, co
                    gt_bboxes[ii].second.rightmouth().x() > 0 && gt_bboxes[ii].second.rightmouth().y() > 0){
                     
                     int le_x_index = batch_id * num_channels * dimScale
-                                        + 4 * dimScale + static_cast<int>(gt_bboxes[ii].second.lefteye().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.lefteye().x() * output_width);
+                                        + 4 * dimScale + inter_center_y * output_width + inter_center_x;
                     int le_y_index = batch_id * num_channels * dimScale 
-                                        + 5 * dimScale + static_cast<int>(gt_bboxes[ii].second.lefteye().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.lefteye().x() * output_width);
+                                        + 5 * dimScale + inter_center_y * output_width + inter_center_x;
                     int re_x_index = batch_id * num_channels * dimScale
-                                        + 6 * dimScale + static_cast<int>(gt_bboxes[ii].second.righteye().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.righteye().x() * output_width);
+                                        + 6 * dimScale + inter_center_y * output_width + inter_center_x;
                     int re_y_index = batch_id * num_channels * dimScale 
-                                        + 7 * dimScale + static_cast<int>(gt_bboxes[ii].second.righteye().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.righteye().x() * output_width);
+                                        + 7 * dimScale + inter_center_y * output_width + inter_center_x;
                     int no_x_index = batch_id * num_channels * dimScale
-                                        + 8 * dimScale + static_cast<int>(gt_bboxes[ii].second.nose().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.nose().x() * output_width);
+                                        + 8 * dimScale + inter_center_y * output_width + inter_center_x;
                     int no_y_index = batch_id * num_channels * dimScale 
-                                        + 9 * dimScale + static_cast<int>(gt_bboxes[ii].second.nose().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.nose().x() * output_width);
+                                        + 9 * dimScale + inter_center_y * output_width + inter_center_x;
                     int lm_x_index = batch_id * num_channels * dimScale
-                                        + 10 * dimScale + static_cast<int>(gt_bboxes[ii].second.leftmouth().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.leftmouth().x() * output_width);
+                                        + 10 * dimScale + inter_center_y * output_width + inter_center_x;
                     int lm_y_index = batch_id * num_channels * dimScale 
-                                        + 11 * dimScale + static_cast<int>(gt_bboxes[ii].second.leftmouth().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.leftmouth().x() * output_width);
+                                        + 11 * dimScale + inter_center_y * output_width + inter_center_x;
                     int rm_x_index = batch_id * num_channels * dimScale
-                                        + 12 * dimScale + static_cast<int>(gt_bboxes[ii].second.rightmouth().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.rightmouth().x() * output_width);
+                                        + 12 * dimScale + inter_center_y * output_width + inter_center_x;
                     int rm_y_index = batch_id * num_channels * dimScale 
-                                        + 13 * dimScale + static_cast<int>(gt_bboxes[ii].second.rightmouth().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.rightmouth().x() * output_width);
+                                        + 13 * dimScale + inter_center_y * output_width + inter_center_x;
+
 
                     bottom_diff[le_x_index] = lm_pre_diff[lm_count * 10 + 0];
                     bottom_diff[le_y_index] = lm_pre_diff[lm_count * 10 + 1];
