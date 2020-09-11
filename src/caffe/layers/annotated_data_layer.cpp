@@ -12,8 +12,6 @@
 #include "caffe/util/benchmark.hpp"
 #include "caffe/util/sampler.hpp"
 
-
-
 namespace caffe {
 
 template <typename Dtype>
@@ -122,6 +120,8 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
             this->prefetch_[i].label_.Reshape(label_shape);
         }
     }
+    batch_id = 0;
+    jj = 0;
 }
 
 // This function is called on prefetch thread
@@ -159,7 +159,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // Store transformed annotation.
     map<int, vector<AnnotationGroup> > all_anno;
     int num_bboxes = 0;
-
     for (int item_id = 0; item_id < batch_size; ++item_id) {
         timer.Start();
         // get a anno_datum
@@ -195,7 +194,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         sampled_bboxes.clear();
         if(crop_type_ == AnnotatedDataParameter_CROP_TYPE_CROP_BATCH){
             if (batch_samplers_.size() > 0) {
-                GenerateBatchSamples_Square(*expand_datum, batch_samplers_, &sampled_bboxes);
+                GenerateBatchSamples(*expand_datum, batch_samplers_, &sampled_bboxes);
                 CropSample = true;
             } else {
                 sampled_datum = expand_datum;
@@ -303,16 +302,17 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         else {
             this->data_transformer_->Transform(sampled_datum->datum(), &(this->transformed_data_));
         }
-        #define BOOL_TEST_DATA false
-        # if BOOL_TEST_DATA
+        # ifdef BOOL_TEST_DATA
         cv::Mat cropImage;
-        std::string save_folder = "../../anchorTestImage";
+        std::string save_folder = "../anchorTestImage";
         std::string prefix_imgName = "crop_image";
-        int jj = 0;
-        std::string saved_img_name = save_folder + "/" + to_string(item_id) + "_" + to_string(jj) +".jpg";
-        const float* data = this->transformed_data_.cpu_data();
+        
+        std::string saved_img_name = save_folder + "/"+ prefix_imgName + "_"+ std::to_string(batch_id)+ "_"+ std::to_string(item_id) 
+                                        + "_" + std::to_string(jj) +".jpg";
+        const Dtype* data = this->transformed_data_.cpu_data();
         int Trans_Height = this->transformed_data_.height();
         int Trans_Width = this->transformed_data_.width();
+        cropImage = cv::Mat(Trans_Height, Trans_Width, CV_8UC3);
         for(int row = 0; row < Trans_Height; row++){
             unsigned char *ImgData = cropImage.ptr<uchar>(row);
             for(int col = 0; col < Trans_Width; col++){
@@ -323,6 +323,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         }
         int Crop_Height = cropImage.rows;
         int Crop_Width = cropImage.cols;
+        int num_gt_box = 0;
         for (int g = 0; g < transformed_anno_vec.size(); ++g) {
             const AnnotationGroup& anno_group = transformed_anno_vec[g];
             for (int a = 0; a < anno_group.annotation_size(); ++a) {
@@ -333,13 +334,34 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             int xmax = int(bbox.xmax() * Crop_Width);
             int ymax = int(bbox.ymax() * Crop_Height);
             cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
+            if(has_landmarks_){
+                if(anno.has_lm()){
+                    const AnnoFaceLandmarks& project_facemark = anno.face_lm();
+                    point lefteye = project_facemark.lefteye();
+                    point righteye = project_facemark.righteye();
+                    point nose = project_facemark.nose();
+                    point leftmouth = project_facemark.leftmouth();
+                    point rightmouth = project_facemark.rightmouth();
+                    vector<cv::Point2i> lm(5);
+                    lm[0] = cv::Point2i(int(lefteye.x() * Crop_Width), int(lefteye.y() * Crop_Height));
+                    lm[1] = cv::Point2i(int(righteye.x() * Crop_Width), int(righteye.y() * Crop_Height));
+                    lm[2] = cv::Point2i(int(nose.x() * Crop_Width), int(nose.y() * Crop_Height));
+                    lm[3] = cv::Point2i(int(leftmouth.x() * Crop_Width), int(leftmouth.y() * Crop_Height));
+                    lm[4] = cv::Point2i(int(rightmouth.x() * Crop_Width), int(rightmouth.y() * Crop_Height));
+                    for(unsigned ii = 0; ii < 5; ii++)
+                        cv::circle(cropImage, lm[ii], 1,  cv::Scalar(0,255,0), 1, 1, 0);
+                }
+            }
+            num_gt_box++;
             }
         }
+        if(num_gt_box==0)
+            LOG(INFO)<<"no gt boxes";
         cv::imwrite(saved_img_name, cropImage);
         LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
         jj ++ ;
-        if(jj == 1000){
-            LOG(FATAL)<<"We have completed 1000 times images crop testd!";
+        if(jj == 200){
+            LOG(FATAL)<<"We have completed 100 times images crop testd!";
         }
         #endif
         // clear memory
@@ -355,7 +377,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         trans_time += timer.MicroSeconds();
         reader_.free().push(const_cast<AnnotatedDatum*>(&anno_datum));
     }
-
+    batch_id++;
     // Store "rich" annotation if needed.
     if (this->output_labels_ && has_anno_type_) {
         vector<int> label_shape(4);
@@ -431,6 +453,30 @@ void AnnotatedDataLayer<Dtype>::fill_label(Dtype* top_label, int batch_size,
             }
         }
     }
+}
+
+template <typename Dtype>
+void AnnotatedDataLayer<Dtype>::check_landmarks_value(AnnoFaceLandmarks lmarks){
+    CHECK_LE(lmarks.lefteye().x(), 1.);
+    CHECK_LE(lmarks.lefteye().y(), 1.);
+    CHECK_LE(lmarks.righteye().x(), 1.);
+    CHECK_LE(lmarks.righteye().y(), 1.);
+    CHECK_LE(lmarks.nose().x(), 1.);
+    CHECK_LE(lmarks.nose().y(), 1.);
+    CHECK_LE(lmarks.leftmouth().x(), 1.);
+    CHECK_LE(lmarks.leftmouth().y(), 1.);
+    CHECK_LE(lmarks.rightmouth().x(), 1.);
+    CHECK_LE(lmarks.rightmouth().y(), 1.);
+    CHECK_GE(lmarks.lefteye().x(), 0.);
+    CHECK_GE(lmarks.lefteye().y(), 0.);
+    CHECK_GE(lmarks.righteye().x(), 0.);
+    CHECK_GE(lmarks.righteye().y(), 0.);
+    CHECK_GE(lmarks.nose().x(), 0.);
+    CHECK_GE(lmarks.nose().y(), 0.);
+    CHECK_GE(lmarks.leftmouth().x(), 0.);
+    CHECK_GE(lmarks.leftmouth().y(), 0.);
+    CHECK_GE(lmarks.rightmouth().x(), 0.);
+    CHECK_GE(lmarks.rightmouth().y(), 0.);
 }
 
 INSTANTIATE_CLASS(AnnotatedDataLayer);

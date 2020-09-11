@@ -34,6 +34,7 @@ protected:
                 std::map<int, vector<AnnotationGroup> > all_anno, 
                 int num_bboxes, 
                 int label_last_channels);
+    void check_landmarks_value(AnnoFaceLandmarks lmarks);
 
     DataReader<AnnotatedDatum> reader_;
     bool has_anno_type_;
@@ -47,6 +48,8 @@ protected:
     bool YoloFormat_;
     AnnotatedDataParameter_CROP_TYPE crop_type_;
     bool has_landmarks_;
+    int jj;
+    int batch_id;
 };
 
 }  // namespace caffe
