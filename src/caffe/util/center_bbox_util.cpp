@@ -577,9 +577,6 @@ void GenerateBatchHeatmap(const std::map<int, vector<std::pair<NormalizedBBox, A
 
     for(auto iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
         int batch_id = iter->first;
-        if(batch_id != 0){
-            LOG(INFO)<<"!!!!!!!!!!!!!!batch_id: "<<batch_id;
-        }
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
             std::vector<Dtype> heatmap((output_width *output_height), Dtype(0.));

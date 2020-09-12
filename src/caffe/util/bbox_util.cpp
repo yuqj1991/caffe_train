@@ -1371,9 +1371,6 @@ void GetCenternetGroundTruth(const Dtype* gt_data, const int num_gt,
             start_idx = i * 19;
         }
         int item_id = gt_data[start_idx];
-        if(item_id != 0){
-            LOG(INFO)<<"@@@@@@@@@@@@@@item_id: "<<item_id;
-        }
         if (item_id == -1) {
             continue;
         }

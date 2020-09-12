@@ -421,11 +421,10 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // Retrieve all ground truth.
     bool use_difficult_gt_ = true;
     Dtype background_label_id_ = -1;
-    all_gt_bboxes.clear();
     GetCenternetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
                     &all_gt_bboxes, has_landmarks_);
     Blob<Dtype> conf_gt_;
-    int output_size = 640;
+    int output_size = 160;
     vector<int>label_shape;
     label_shape.push_back(batch_size);
     label_shape.push_back(1);
@@ -441,8 +440,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         const Dtype* conf_gt_buffer = conf_gt_.cpu_data();
         for(unsigned ii = 0; ii < output_size*output_size; ii++){
             gt_heatmap_data[ii] = static_cast<unsigned char>(conf_gt_buffer[id * output_size * output_size + ii]*255);
-            if(id != 0)
-                CHECK_EQ(conf_gt_buffer[id * output_size * output_size + ii], 0);
         }
         std::string save_folder = "../anchorTestImage";
         std::string prefix_imgName = "crop_image_label";
