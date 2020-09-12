@@ -12,6 +12,10 @@
 #include "caffe/util/benchmark.hpp"
 #include "caffe/util/sampler.hpp"
 
+#include "caffe/util/center_bbox_util.hpp"
+#include "caffe/util/bbox_util.hpp"
+
+int mm = 0;
 namespace caffe {
 
 template <typename Dtype>
@@ -313,6 +317,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         int Trans_Height = this->transformed_data_.height();
         int Trans_Width = this->transformed_data_.width();
         cropImage = cv::Mat(Trans_Height, Trans_Width, CV_8UC3);
+        cv::Mat LabelMapimage = cv::Mat(Trans_Height, Trans_Width, CV_8UC1);
+
         for(int row = 0; row < Trans_Height; row++){
             unsigned char *ImgData = cropImage.ptr<uchar>(row);
             for(int col = 0; col < Trans_Width; col++){
@@ -352,6 +358,8 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                         cv::circle(cropImage, lm[ii], 1,  cv::Scalar(0,255,0), 1, 1, 0);
                 }
             }
+            cv::ellipse(cropImage, cv::Point((xmax + xmin) / 2, (ymax + ymin) / 2), 
+                cv::Size((xmax - xmin)/2, (ymax - ymin)/2), 0, 0, 360, cv::Scalar(255, 129, 0), 2,8);
             num_gt_box++;
             }
         }
@@ -360,9 +368,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         cv::imwrite(saved_img_name, cropImage);
         LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
         jj ++ ;
-        if(jj == 200){
-            LOG(FATAL)<<"We have completed 100 times images crop testd!";
-        }
+        
         #endif
         // clear memory
         if (has_sampled) {
@@ -377,7 +383,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         trans_time += timer.MicroSeconds();
         reader_.free().push(const_cast<AnnotatedDatum*>(&anno_datum));
     }
-    batch_id++;
+    
     // Store "rich" annotation if needed.
     if (this->output_labels_ && has_anno_type_) {
         vector<int> label_shape(4);
@@ -406,6 +412,50 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             LOG(FATAL) << "Unknown annotation type.";
         }
     }
+    #ifdef BOOL_TEST_DATA
+    std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > > all_gt_bboxes;
+    all_gt_bboxes.clear();
+    const Dtype* gt_data = batch->label_.cpu_data();
+    int num_gt_ = batch->label_.height();
+
+    // Retrieve all ground truth.
+    bool use_difficult_gt_ = true;
+    Dtype background_label_id_ = -1;
+    all_gt_bboxes.clear();
+    GetCenternetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
+                    &all_gt_bboxes, has_landmarks_);
+    Blob<Dtype> conf_gt_;
+    int output_size = 640;
+    vector<int>label_shape;
+    label_shape.push_back(batch_size);
+    label_shape.push_back(1);
+    label_shape.push_back(output_size);
+    label_shape.push_back(output_size); 
+    conf_gt_.Reshape(label_shape);
+    Dtype* conf_gt_data = conf_gt_.mutable_cpu_data();
+    caffe_set(conf_gt_.count(), Dtype(0), conf_gt_data);
+    GenerateBatchHeatmap(all_gt_bboxes, conf_gt_data, 1, output_size, output_size);
+    for(int id = 0; id < batch_size; id++){
+        cv::Mat gt_heatmap(cv::Size(output_size, output_size), CV_8UC1, cv::Scalar(0));
+	    unsigned char* gt_heatmap_data =  gt_heatmap.ptr<unsigned char>(0);
+        const Dtype* conf_gt_buffer = conf_gt_.cpu_data();
+        for(unsigned ii = 0; ii < output_size*output_size; ii++){
+            gt_heatmap_data[ii] = static_cast<unsigned char>(conf_gt_buffer[id * output_size * output_size + ii]*255);
+            if(id != 0)
+                CHECK_EQ(conf_gt_buffer[id * output_size * output_size + ii], 0);
+        }
+        std::string save_folder = "../anchorTestImage";
+        std::string prefix_imgName = "crop_image_label";
+        std::string saved_img_name = save_folder + "/"+ prefix_imgName + "_"+ std::to_string(batch_id)+ "_"+ std::to_string(id) 
+                                        + "_" + std::to_string(mm) +".jpg";
+        cv::imwrite(saved_img_name, gt_heatmap);
+        mm++;
+    }
+    if(jj == 200){
+            LOG(FATAL)<<"We have completed 100 times images crop testd!";
+    }
+    #endif
+    batch_id++;
     timer.Stop();
     batch_timer.Stop();
     DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";

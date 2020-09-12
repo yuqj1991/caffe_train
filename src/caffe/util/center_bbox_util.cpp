@@ -577,6 +577,9 @@ void GenerateBatchHeatmap(const std::map<int, vector<std::pair<NormalizedBBox, A
 
     for(auto iter = all_gt_bboxes.begin(); iter != all_gt_bboxes.end(); iter++){
         int batch_id = iter->first;
+        if(batch_id != 0){
+            LOG(INFO)<<"!!!!!!!!!!!!!!batch_id: "<<batch_id;
+        }
         vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         for(unsigned ii = 0; ii < gt_bboxes.size(); ii++){
             std::vector<Dtype> heatmap((output_width *output_height), Dtype(0.));
@@ -1216,7 +1219,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                             gt_bboxes[ii].second.nose().x() > 0 && gt_bboxes[ii].second.nose().y() > 0 &&
                             gt_bboxes[ii].second.leftmouth().x() > 0 && gt_bboxes[ii].second.leftmouth().y() > 0 &&
                             gt_bboxes[ii].second.rightmouth().x() > 0 && gt_bboxes[ii].second.rightmouth().y() > 0){
-                                /*
+                                
                                 int le_x_index = b * num_channels * dimScale + 4* dimScale + h * output_width + w;
                                 int le_y_index = b * num_channels * dimScale + 5* dimScale + h * output_width + w;
                                 int re_x_index = b * num_channels * dimScale + 6* dimScale + h * output_width + w;
@@ -1227,38 +1230,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                 int lm_y_index = b * num_channels * dimScale + 11* dimScale + h * output_width + w;
                                 int rm_x_index = b * num_channels * dimScale + 12* dimScale + h * output_width + w;
                                 int rm_y_index = b * num_channels * dimScale + 13* dimScale + h * output_width + w;
-                                */
-                                int le_x_index = b * num_channels * dimScale
-                                        + 4 * dimScale + static_cast<int>(gt_bboxes[ii].second.lefteye().y() * output_height) * output_width + 
-                                        static_cast<int>(gt_bboxes[ii].second.lefteye().x() * output_width);
-                                int le_y_index = b * num_channels * dimScale 
-                                                    + 5 * dimScale + static_cast<int>(gt_bboxes[ii].second.lefteye().y() * output_height) * output_width + 
-                                                    static_cast<int>(gt_bboxes[ii].second.lefteye().x() * output_width);
-                                int re_x_index = b * num_channels * dimScale
-                                                    + 6 * dimScale + static_cast<int>(gt_bboxes[ii].second.righteye().y() * output_height) * output_width + 
-                                                    static_cast<int>(gt_bboxes[ii].second.righteye().x() * output_width);
-                                int re_y_index = b * num_channels * dimScale 
-                                                    + 7 * dimScale + static_cast<int>(gt_bboxes[ii].second.righteye().y() * output_height) * output_width + 
-                                                    static_cast<int>(gt_bboxes[ii].second.righteye().x() * output_width);
-                                int no_x_index = b * num_channels * dimScale
-                                                    + 8 * dimScale + static_cast<int>(gt_bboxes[ii].second.nose().y() * output_height) * output_width + 
-                                                    static_cast<int>(gt_bboxes[ii].second.nose().x() * output_width);
-                                int no_y_index = b * num_channels * dimScale 
-                                                    + 9 * dimScale + static_cast<int>(gt_bboxes[ii].second.nose().y() * output_height) * output_width + 
-                                                    static_cast<int>(gt_bboxes[ii].second.nose().x() * output_width);
-                                int lm_x_index = b * num_channels * dimScale
-                                                    + 10 * dimScale + static_cast<int>(gt_bboxes[ii].second.leftmouth().y() * output_height) * output_width + 
-                                                    static_cast<int>(gt_bboxes[ii].second.leftmouth().x() * output_width);
-                                int lm_y_index = b * num_channels * dimScale 
-                                                    + 11 * dimScale + static_cast<int>(gt_bboxes[ii].second.leftmouth().y() * output_height) * output_width + 
-                                                    static_cast<int>(gt_bboxes[ii].second.leftmouth().x() * output_width);
-                                int rm_x_index = b * num_channels * dimScale
-                                                    + 12 * dimScale + static_cast<int>(gt_bboxes[ii].second.rightmouth().y() * output_height) * output_width + 
-                                                    static_cast<int>(gt_bboxes[ii].second.rightmouth().x() * output_width);
-                                int rm_y_index = b * num_channels * dimScale 
-                                                    + 13 * dimScale + static_cast<int>(gt_bboxes[ii].second.rightmouth().y() * output_height) * output_width + 
-                                                    static_cast<int>(gt_bboxes[ii].second.rightmouth().x() * output_width);
-
+                
                                 Dtype le_x_bias = (w + 0.5 - gt_bboxes[ii].second.lefteye().x() * output_width) * downRatio / anchor_scale;
                                 Dtype le_y_bias = (h + 0.5 - gt_bboxes[ii].second.lefteye().y() * output_height) * downRatio / anchor_scale;
 
