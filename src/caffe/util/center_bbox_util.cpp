@@ -1072,7 +1072,8 @@ bool bboxSatisfyEllipise(const int &x, const int &y, const NormalizedBBox & box)
     int center_y = static_cast<int>((box.ymin() + box.ymax())/2);
     int box_width = static_cast<int>(box.xmax() - box.xmin());
     int box_height = static_cast<int>(box.ymax() - box.ymin());
-    float judgeValue= std::pow(float((x - center_x) / box_width), 2.) + std::pow(float((y - center_y) / box_height), 2.) - 1;
+    float judgeValue= std::pow(float((x - center_x) / (box_width + 0.00000001)), 2.) 
+                            + std::pow(float((y - center_y) / (box_height + 0.00000001)), 2.) - 1;
     if(judgeValue <= 0)
         return true;
     else
