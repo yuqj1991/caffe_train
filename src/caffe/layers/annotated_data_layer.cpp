@@ -449,7 +449,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         mm++;
     }
     if(jj == 200){
-            LOG(FATAL)<<"We have completed 100 times images crop testd!";
+        LOG(FATAL)<<"We have completed 100 times images crop testd!";
     }
     #endif
     batch_id++;

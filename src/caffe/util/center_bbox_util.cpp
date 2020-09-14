@@ -1067,6 +1067,20 @@ template void GetCenterGridObjectResultSigmoid(const int batch_size, const int n
                           std::map<int, std::vector<CenterNetInfo > >* results);
 
 
+bool bboxSatisfyEllipise(const int &x, const int &y, const NormalizedBBox & box){
+    int center_x = static_cast<int>((box.xmin() + box.xmax())/2);
+    int center_y = static_cast<int>((box.ymin() + box.ymax())/2);
+    int box_width = static_cast<int>(box.xmax() - box.xmin());
+    int box_height = static_cast<int>(box.ymax() - box.ymin());
+    float judgeValue= std::pow(float((x - center_x) / box_width), 2.) + std::pow(float((y - center_y) / box_height), 2.) - 1;
+    if(judgeValue <= 0)
+        return true;
+    else
+        return false;
+    
+}
+
+
 template <typename Dtype> 
 Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
                           const int output_width, const int output_height, 
@@ -1142,11 +1156,18 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             }
             int gt_bbox_width = static_cast<int>((xmax - xmin) * downRatio);
             int gt_bbox_height = static_cast<int>((ymax - ymin) * downRatio);
+            NormalizedBBox temp_bbox;
+            temp_bbox.set_xmax(xmax);
+            temp_bbox.set_xmin(xmin);
+            temp_bbox.set_ymax(ymax);
+            temp_bbox.set_ymin(ymin);
             int large_side = std::max(gt_bbox_height, gt_bbox_width);
             if(large_side >= loc_truth_scale.first && large_side < loc_truth_scale.second){
                 for(int h = static_cast<int>(ymin); h < static_cast<int>(ymax); h++){
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
+                            continue;
+                        if(!bboxSatisfyEllipise(w, h, temp_bbox))
                             continue;
                         #define USE_GIOU_LOSS false
                         #if USE_GIOU_LOSS
