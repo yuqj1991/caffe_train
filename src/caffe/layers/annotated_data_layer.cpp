@@ -167,6 +167,15 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         timer.Start();
         // get a anno_datum
         AnnotatedDatum& anno_datum = *(reader_.full().pop("Waiting for data"));
+        #ifdef BOOL_TEST_DATA
+        cv::Mat sourceImage = DecodeDatumToCVMatNative(anno_datum.datum());
+        std::string src_save_folder = "../anchorTestImage";
+        std::string src_prefix_imgName = "source_image";
+        
+        std::string src_saved_img_name = src_save_folder + "/"+ src_prefix_imgName + "_"+ std::to_string(batch_id)+ "_"+ std::to_string(item_id) 
+                                        + "_" + std::to_string(jj) +".jpg";
+        cv::imwrite(src_saved_img_name, sourceImage);
+        #endif
         read_time += timer.MicroSeconds();
         timer.Start();
         AnnotatedDatum distort_datum;
@@ -317,8 +326,6 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         int Trans_Height = this->transformed_data_.height();
         int Trans_Width = this->transformed_data_.width();
         cropImage = cv::Mat(Trans_Height, Trans_Width, CV_8UC3);
-        cv::Mat LabelMapimage = cv::Mat(Trans_Height, Trans_Width, CV_8UC1);
-
         for(int row = 0; row < Trans_Height; row++){
             unsigned char *ImgData = cropImage.ptr<uchar>(row);
             for(int col = 0; col < Trans_Width; col++){
@@ -327,18 +334,16 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             ImgData[3 * col + 2] = static_cast<uchar>(data[2 * Trans_Height * Trans_Width + row * Trans_Width + col]);
             }
         }
-        int Crop_Height = cropImage.rows;
-        int Crop_Width = cropImage.cols;
         int num_gt_box = 0;
         for (int g = 0; g < transformed_anno_vec.size(); ++g) {
             const AnnotationGroup& anno_group = transformed_anno_vec[g];
             for (int a = 0; a < anno_group.annotation_size(); ++a) {
             const Annotation& anno = anno_group.annotation(a);
             const NormalizedBBox& bbox = anno.bbox();
-            int xmin = int(bbox.xmin() * Crop_Width);
-            int ymin = int(bbox.ymin() * Crop_Height);
-            int xmax = int(bbox.xmax() * Crop_Width);
-            int ymax = int(bbox.ymax() * Crop_Height);
+            int xmin = int(bbox.xmin() * Trans_Width);
+            int ymin = int(bbox.ymin() * Trans_Height);
+            int xmax = int(bbox.xmax() * Trans_Width);
+            int ymax = int(bbox.ymax() * Trans_Height);
             cv::rectangle(cropImage, cv::Point2i(xmin, ymin), cv::Point2i(xmax, ymax), cv::Scalar(255,0,0), 1, 1, 0);
             if(has_landmarks_){
                 if(anno.has_lm()){
@@ -349,11 +354,11 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
                     point leftmouth = project_facemark.leftmouth();
                     point rightmouth = project_facemark.rightmouth();
                     vector<cv::Point2i> lm(5);
-                    lm[0] = cv::Point2i(int(lefteye.x() * Crop_Width), int(lefteye.y() * Crop_Height));
-                    lm[1] = cv::Point2i(int(righteye.x() * Crop_Width), int(righteye.y() * Crop_Height));
-                    lm[2] = cv::Point2i(int(nose.x() * Crop_Width), int(nose.y() * Crop_Height));
-                    lm[3] = cv::Point2i(int(leftmouth.x() * Crop_Width), int(leftmouth.y() * Crop_Height));
-                    lm[4] = cv::Point2i(int(rightmouth.x() * Crop_Width), int(rightmouth.y() * Crop_Height));
+                    lm[0] = cv::Point2i(int(lefteye.x() * Trans_Width), int(lefteye.y() * Trans_Height));
+                    lm[1] = cv::Point2i(int(righteye.x() * Trans_Width), int(righteye.y() * Trans_Height));
+                    lm[2] = cv::Point2i(int(nose.x() * Trans_Width), int(nose.y() * Trans_Height));
+                    lm[3] = cv::Point2i(int(leftmouth.x() * Trans_Width), int(leftmouth.y() * Trans_Height));
+                    lm[4] = cv::Point2i(int(rightmouth.x() * Trans_Width), int(rightmouth.y() * Trans_Height));
                     for(unsigned ii = 0; ii < 5; ii++)
                         cv::circle(cropImage, lm[ii], 1,  cv::Scalar(0,255,0), 1, 1, 0);
                 }

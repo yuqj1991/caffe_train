@@ -344,20 +344,41 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     float w_off = 0.0f, h_off = 0.0f;
     int image_long_side = COMPAREMAX(img_height, img_width);
     float sample_bbox_size = std::sqrt(img_height *img_width * std::pow(scaleChoose, 2) / bbox_aera);
-    if(sample_bbox_size < image_long_side){
-        if(bbox_width <= sample_bbox_size){
-            caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
-        }else{
-            caffe_rng_uniform(1, xmin, xmin + bbox_width - sample_bbox_size, &w_off);
-        }
-        if(bbox_height <= sample_bbox_size){
-            caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
-        }else{
-            caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_bbox_size, &h_off);
-        }
-    }else{
+    if(sample_bbox_size >= image_long_side){
         caffe_rng_uniform(1, img_width - sample_bbox_size, 0.f, &w_off);
         caffe_rng_uniform(1, img_height - sample_bbox_size, 0.f, &h_off);
+    }else{
+        if(image_long_side == img_height){
+            if(bbox_height <= sample_bbox_size){
+                caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
+            }else{
+                caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_bbox_size, &h_off);
+            }
+            if(sample_bbox_size >= img_width){
+                caffe_rng_uniform(1, img_width - sample_bbox_size, 0.f, &w_off);
+            }else{
+                if(bbox_width <= sample_bbox_size){
+                    caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
+                }else{
+                    caffe_rng_uniform(1, xmin, xmin + bbox_width - sample_bbox_size, &w_off);
+                }
+            }
+        }else if(image_long_side == img_width){
+            if(bbox_width <= sample_bbox_size){
+                caffe_rng_uniform(1, xmin + bbox_width - sample_bbox_size, xmin, &w_off);
+            }else{
+                caffe_rng_uniform(1, xmin, xmin + bbox_width - sample_bbox_size, &w_off);
+            }
+            if(sample_bbox_size >= img_height){
+                caffe_rng_uniform(1, img_height - sample_bbox_size, 0.f, &h_off);
+            }else{
+                if(bbox_height <= sample_bbox_size){
+                    caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
+                }else{
+                    caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_bbox_size, &h_off);
+                }
+            }
+        }
     }
     sampled_bbox->set_xmin((float)w_off / img_width);
     sampled_bbox->set_ymin((float)h_off / img_height);
