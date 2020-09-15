@@ -542,6 +542,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
                 }
             }
         }
+        
         hard_nms(batch_temp, &batch_result, nms_thresh);
         for(unsigned j = 0 ; j < batch_result.size(); j++){
             batch_result[j].set_xmin(batch_result[j].xmin() / (4 * output_width));
@@ -549,6 +550,7 @@ void get_topK(const Dtype* keep_max_data, const Dtype* loc_data, const int outpu
             batch_result[j].set_ymin(batch_result[j].ymin() / (4 * output_height));
             batch_result[j].set_ymax(batch_result[j].ymax() / (4 * output_height));
         }
+        
         if(batch_result.size() > 0){
             if(results->find(i) == results->end()){
                 results->insert(std::make_pair(i, batch_result));

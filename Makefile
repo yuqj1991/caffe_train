@@ -319,6 +319,14 @@ ifeq ($(USE_CUDNN), 1)
 	COMMON_FLAGS += -DUSE_CUDNN
 endif
 
+ifeq ($(BOOL_TEST_DATA), 1)
+	COMMON_FLAGS += -DBOOL_TEST_DATA
+endif
+
+ifeq ($(USE_MAX_POOL), 1)
+	COMMON_FLAGS += -DUSE_MAX_POOL
+endif
+
 # NCCL acceleration configuration
 ifeq ($(USE_NCCL), 1)
 	LIBRARIES += nccl

@@ -21,7 +21,8 @@
 
 | Method | Easy | Medium | Hard|
 |:--------:| :--------:| :---------:| :------:|
-| ours(one scale)| 0.7906 | 0.8089   | 0.7346 |
+| ours(one scale + nms)| 0.8388 | 0.8223   | 0.7246 |
+| ours(one scale)| 0.8388 | 0.8147   | 0.6955 |
 | original | 0.922 | 0.911 | 0.782 |
 
 ---
@@ -38,7 +39,7 @@
 ## New proposed method CenterGridSoftmax + nms method by using anchor  
 | Method | Easy | Medium | Hard|
 |:--------:| :--------:| :---------:| :------:|
-| ours(one scale)| 0.8636 | 0.8489   | 0.7364 |
+| ours(one scale)| 0.8636 | 0.8489   | 0.7425 |
 
 ---
 

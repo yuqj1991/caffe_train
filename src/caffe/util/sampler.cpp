@@ -19,7 +19,7 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
     float img_w,img_h,off_x,off_y;
     vector<NormalizedBBox> object_bboxes;
     GroupObjectBBoxes(anno_datum, &object_bboxes);
-    #if 0
+
     float pleft, pright, ptop, pbottom;
     caffe_rng_uniform(1, -jitter, jitter, &pleft);
     caffe_rng_uniform(1, -jitter, jitter, &pright);
@@ -35,17 +35,7 @@ void GenerateJitterSamples(const AnnotatedDatum& anno_datum, float jitter, vecto
     sampled_bbox.set_ymin(off_y);
     sampled_bbox.set_xmax(off_x + img_w);
     sampled_bbox.set_ymax(off_y + img_h);
-    #else
-    caffe_rng_uniform(1, 1.0f - jitter, 1.0f, &img_w);
-    caffe_rng_uniform(1, 1.0f - jitter, 1.0f, &img_h);
-    caffe_rng_uniform(1, 0.0f, 1.0f - img_w, &off_x);
-    caffe_rng_uniform(1, 0.0f, 1.0f - img_h, &off_y);
-
-    sampled_bbox.set_xmin(0.f);
-    sampled_bbox.set_ymin(0.f);
-    sampled_bbox.set_xmax(1.f);
-    sampled_bbox.set_ymax(1.f);
-    #endif
+    
     SampleConstraint min_object_coverage_Constraint;
     min_object_coverage_Constraint.set_min_object_coverage(0.85);
     if(!SatisfySampleConstraint(sampled_bbox, object_bboxes, min_object_coverage_Constraint)){
@@ -243,7 +233,7 @@ void GenerateSamples_Square(const AnnotatedDatum& anno_datum,
     for (int i = 0; i < batch_sampler.max_trials(); ++i) {
         if (batch_sampler.has_max_sample() &&
             found >= batch_sampler.max_sample()) {
-        break;
+            break;
         }
         // Generate sampled_bbox in the normalized space [0, 1].
         NormalizedBBox sampled_bbox;

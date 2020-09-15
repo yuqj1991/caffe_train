@@ -65,7 +65,6 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
     int loc_channels = bottom[0]->channels();
     const Dtype* conf_data = bottom[1]->cpu_data();
     const int classes = bottom[1]->channels();
-
     results_.clear();
     get_topK(conf_data, loc_data, output_height, output_width, classes, num_, &results_, loc_channels,
                         has_lm_,
