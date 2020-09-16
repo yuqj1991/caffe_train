@@ -276,14 +276,14 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
             normalization_, num_, 1, num_gt_);
 
     Dtype lm_normalizer = LossLayer<Dtype>::GetNormalizer(
-            normalization_, num_, 1, num_lm_);
+            normalization_, num_, 1, num_lm_*10);
 
     normalizer = normalizer > 0 ? normalizer : num_;
     lm_normalizer = lm_normalizer > 0 ?  lm_normalizer : num_;
 
     if (this->layer_param_.propagate_down(0)) {
         loc_offset_loss = 1. * Dtype(loc_offset_loss_.cpu_data()[0] / normalizer);
-        loc_wh_loss = Dtype(loc_wh_loss_.cpu_data()[0] / normalizer);
+        loc_wh_loss = 0.1 * Dtype(loc_wh_loss_.cpu_data()[0] / normalizer);
         
         if(has_lm_ && num_lm_ >0){
             lm_loss = 0.1 * Dtype(lm_loss_.cpu_data()[0] / lm_normalizer);
@@ -333,7 +333,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, 1, num_gt_);
     Dtype lm_normalizer = LossLayer<Dtype>::GetNormalizer(
-            normalization_, num_, 1, num_lm_);
+            normalization_, num_, 1, num_lm_*10);
     normalizer = normalizer > 0 ? normalizer : num_;
     lm_normalizer = lm_normalizer > 0 ? lm_normalizer : num_;
     if (propagate_down[0]) {
@@ -352,7 +352,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
             // diff of wh
             loc_wh_loss_layer_->Backward(loc_wh_top_vec_, loc_propagate_down,
                                         loc_wh_bottom_vec_);
-            Dtype loss_wh_weight = top[0]->cpu_diff()[0] / normalizer;
+            Dtype loss_wh_weight = 0.1 * top[0]->cpu_diff()[0] / normalizer;
             caffe_scal(loc_wh_pred_.count(), loss_wh_weight, loc_wh_pred_.mutable_cpu_diff());
             const Dtype* loc_wh_pred_diff = loc_wh_pred_.cpu_diff();
             // diff of landmarks
