@@ -426,8 +426,13 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     // Retrieve all ground truth.
     bool use_difficult_gt_ = true;
     Dtype background_label_id_ = -1;
-    GetCenternetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
+    if(YoloFormat_){
+        GetYoloGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_, has_landmarks_,
+                    &all_gt_bboxes, batch_size);
+    }else{
+        GetCenternetGroundTruth(gt_data, num_gt_, background_label_id_, use_difficult_gt_,
                     &all_gt_bboxes, has_landmarks_);
+    }
     Blob<Dtype> conf_gt_;
     int output_size = 160;
     vector<int>label_shape;
@@ -453,7 +458,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
         cv::imwrite(saved_img_name, gt_heatmap);
         mm++;
     }
-    if(jj == 200){
+    if(jj == 990){
         LOG(FATAL)<<"We have completed 100 times images crop testd!";
     }
     #endif

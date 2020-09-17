@@ -229,7 +229,6 @@ void check_landmarks_value(AnnoFaceLandmarks lmarks){
     CHECK_GE(lmarks.rightmouth().y(), 0.);
 }
 
-
 template <typename Dtype>
 void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest_data,
                                 Dtype* gt_loc_wh_data, Dtype* pred_loc_wh_data,
@@ -265,6 +264,9 @@ void EncodeTruthAndPredictions(Dtype* gt_loc_offest_data, Dtype* pred_loc_offest
             Dtype diff_y = center_y - inter_center_y;
             Dtype width = xmax - xmin;
             Dtype height = ymax - ymin;
+
+            if(width * height * 4 * 4 <= 8 * 8)
+                continue;
 
             int x_index = batch_id * num_channels * dimScale
                                     + 0 * dimScale
@@ -386,6 +388,12 @@ void CopyDiffToBottom(const Dtype* pre_offset_diff, const Dtype* pre_wh_diff, co
             const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
             Dtype center_x = Dtype((xmin + xmax) / 2);
             Dtype center_y = Dtype((ymin + ymax) / 2);
+
+            Dtype width = xmax - xmin;
+            Dtype height = ymax - ymin;
+            if(width * height * 4 * 4 <= 8 * 8)
+                continue;
+
             int inter_center_x = static_cast<int> (center_x);
             int inter_center_y = static_cast<int> (center_y);
             int x_index = batch_id * num_channels * dimScale
@@ -590,6 +598,8 @@ void GenerateBatchHeatmap(const std::map<int, vector<std::pair<NormalizedBBox, A
             const Dtype ymax = gt_bboxes[ii].first.ymax() * output_height;
             const Dtype width = Dtype(xmax - xmin);
             const Dtype height = Dtype(ymax - ymin);
+            if(width * height * 4 * 4 <= 8 * 8)
+                continue;
             Dtype radius = gaussian_radius(height, width, Dtype(0.7));
             radius = std::max(0, int(radius));
             int center_x = static_cast<int>(Dtype((xmin + xmax) / 2));
