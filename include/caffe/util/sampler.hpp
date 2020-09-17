@@ -55,11 +55,13 @@ void GenerateBatchSamples_Square(const AnnotatedDatum& anno_datum,
 void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum, 
                                 const DataAnchorSampler& data_anchor_sampler,
                                 const vector<NormalizedBBox>& object_bboxes,
-                                NormalizedBBox* sampled_bbox);
+                                NormalizedBBox* sampled_bbox,
+                                const int & resized_scale);
 
 void GenerateBatchDataAnchorSamples(const AnnotatedDatum& anno_datum,
                                 const vector<DataAnchorSampler>& data_anchor_samplers,
-                                vector<NormalizedBBox>* sampled_bboxes);
+                                vector<NormalizedBBox>* sampled_bboxes,
+                                const int & resized_scale);
 
 void ResizedCropSample(const AnnotatedDatum& anno_datum, AnnotatedDatum* resized_anno_datum, 
                        float scale, const TransformationParameter& trans_param);
