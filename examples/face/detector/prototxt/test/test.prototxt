@@ -1,0 +1,343 @@
+name: "CenterFace_train"
+layer {
+  name: "data"
+  type: "AnnotatedData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    scale: 1
+    mirror: true
+    mean_value: 0
+    mean_value: 0
+    mean_value: 0
+    resize_param {
+      prob: 1.0
+      resize_mode: WARP
+      height: 640
+      width: 640
+      interp_mode: LINEAR
+      interp_mode: AREA
+      interp_mode: NEAREST
+      interp_mode: CUBIC
+      interp_mode: LANCZOS4
+    }
+    emit_constraint {
+      emit_type: CENTER
+    }
+    distort_param {
+      brightness_prob: 0.5
+      brightness_delta: 32.0
+      contrast_prob: 0.5
+      contrast_lower: 0.5
+      contrast_upper: 1.5
+      hue_prob: 0.5
+      hue_delta: 18.0
+      saturation_prob: 0.5
+      saturation_lower: 0.5
+      saturation_upper: 1.5
+      random_order_prob: 0.0
+    }
+  }
+  annotated_data_param {
+    batch_sampler {
+      sampler {
+        min_scale: 0.30000001192092896
+        max_scale: 1.0
+        min_aspect_ratio: 0.30000001192092896
+        max_aspect_ratio: 1.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 1.0
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.4000000059604645
+        max_scale: 1.0
+        min_aspect_ratio: 0.4000000059604645
+        max_aspect_ratio: 1.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 1.0
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.5
+        max_scale: 1.0
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 1.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 1.0
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.6000000238418579
+        max_scale: 1.0
+        min_aspect_ratio: 0.6000000238418579
+        max_aspect_ratio: 1.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 1.0
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.699999988079071
+        max_scale: 1.0
+        min_aspect_ratio: 0.699999988079071
+        max_aspect_ratio: 1.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 1.0
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.800000011920929
+        max_scale: 1.0
+        min_aspect_ratio: 0.800000011920929
+        max_aspect_ratio: 1.0
+      }
+      sample_constraint {
+        max_jaccard_overlap: 1.0
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.8999999761581421
+        max_scale: 1.0
+        min_aspect_ratio: 0.8999999761581421
+        max_aspect_ratio: 1.0
+      }
+      sample_constraint {
+        max_jaccard_overlap: 1.0
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    label_map_file: "../labelmap.prototxt"
+    data_anchor_sampler {
+      scale: 16
+      scale: 32
+      scale: 64
+      scale: 128
+      scale: 256
+      scale: 512
+      sample_constraint {
+        min_object_coverage: 0.75
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    bbox_sampler {
+      box {
+        bbox_small_scale: 10
+        bbox_large_scale: 15
+        ancher_stride: 4
+      }
+      box {
+        bbox_small_scale: 15
+        bbox_large_scale: 20
+        ancher_stride: 4
+      }
+      box {
+        bbox_small_scale: 20
+        bbox_large_scale: 40
+        ancher_stride: 8
+      }
+      box {
+        bbox_small_scale: 40
+        bbox_large_scale: 70
+        ancher_stride: 8
+      }
+      box {
+        bbox_small_scale: 70
+        bbox_large_scale: 110
+        ancher_stride: 16
+      }
+      box {
+        bbox_small_scale: 110
+        bbox_large_scale: 250
+        ancher_stride: 32
+      }
+      box {
+        bbox_small_scale: 250
+        bbox_large_scale: 400
+        ancher_stride: 32
+      }
+      box {
+        bbox_small_scale: 400
+        bbox_large_scale: 560
+        ancher_stride: 32
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    yoloformat: false
+    crop_type: CROP_ANCHOR
+    has_landmarks: true
+  }
+  data_param {
+    source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
+    batch_size: 2
+    backend: LMDB
+  }
+}
+
+layer {
+  name: "last_conv_3x3_layer"
+  type: "Convolution"
+  bottom: "data"
+  top: "last_conv_3x3_layer"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 24
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+
+layer {
+  name: "Class_out_1x1"
+  type: "Convolution"
+  bottom: "last_conv_3x3_layer"
+  top: "Class_out_1x1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 1
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+
+layer {
+  name: "Box_out_offset_1x1"
+  type: "Convolution"
+  bottom: "last_conv_3x3_layer"
+  top: "Box_out_offset_1x1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 2
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Box_out_wh_1x1"
+  type: "Convolution"
+  bottom: "last_conv_3x3_layer"
+  top: "Box_out_wh_1x1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 2
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "landmarks_out_1x1"
+  type: "Convolution"
+  bottom: "last_conv_3x3_layer"
+  top: "landmarks_out_1x1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 10
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "Box_out_1x1"
+  type: "Concat"
+  bottom: "Box_out_offset_1x1"
+  bottom: "Box_out_wh_1x1"
+  bottom: "landmarks_out_1x1"
+  top: "Box_out_1x1"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "CenterFaceLoss_0"
+  type: "CenterObjectLoss"
+  bottom: "Box_out_1x1"
+  bottom: "Class_out_1x1"
+  bottom: "label"
+  top: "CenterFaceLoss_0"
+  include {
+    phase: TRAIN
+  }
+  propagate_down: true
+  propagate_down: true
+  propagate_down: false
+  loss_param {
+    normalization: VALID
+  }
+  center_object_loss_param {
+    num_class: 1
+    share_location: true
+    loc_loss_type: SMOOTH_L1
+    conf_loss_type: FOCALSIGMOID
+    loc_weight: 1.0
+    has_lm: true
+    lm_loss_type: SMOOTH_L1
+  }
+}

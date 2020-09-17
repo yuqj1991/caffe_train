@@ -266,14 +266,14 @@ test_iter = int(math.ceil(float(num_test_image) / test_batch_size))
 
 solver_param = {
     # Train parameters
-    'base_lr': refine_learning_rate,
+    'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [60000, 120000],
+    'stepvalue': [20000, 40000, 60000, 80000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 220000,
+    'max_iter': 100000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
@@ -419,5 +419,5 @@ with open(job_file, 'w') as f:
     f.write('   echo "please generate your own model prototxt primarily." \n')
     f.write('   exit 1 \n')
     f.write('fi\n')
-    f.write('../../../../build/tools/caffe train --solver={} --gpu {} \\\n'.format(solver_file, 1))
+    f.write('../../../../build/tools/caffe train --solver={} --gpu {} \\\n'.format(solver_file, 0))
     f.write(train_src_param)
