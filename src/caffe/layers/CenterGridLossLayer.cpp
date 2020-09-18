@@ -121,7 +121,8 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     Dtype sum_squre = Dtype(0.);
     Dtype lm_loss_origin = Dtype(0.);
     caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
-    Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.), normalizer = Dtype(0.), lm_loss = Dtype(0.);
+    Dtype loc_loss = Dtype(0.), score_loss = Dtype(0.), normalizer = Dtype(0.), lm_loss = Dtype(0.), 
+                    lm_normalizer = Dtype(0.);
     int num_gt_match = 0;
     if (num_groundtruth_ >= 1) {
         const float downRatio = (float)net_height_ / output_height;
@@ -137,16 +138,18 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
                             downRatio, postive_batch_, batch_sample_loss_,
                             channel_pred_data,  anchor_scale_, 
                             bbox_range_scale_,
-                            all_gt_bboxes, label_muti_data, bottom_diff, 
+                            all_gt_bboxes, label_muti_data, bottom_diff, &count_postive_lm_,
                             &count_postive_, &sum_squre, &num_gt_match, has_lm_, &lm_loss_origin);
         }
         normalizer = LossLayer<Dtype>::GetNormalizer(
                                         normalization_, num_, 1, count_postive_);
+        lm_normalizer = LossLayer<Dtype>::GetNormalizer(
+                                        normalization_, num_, 1, count_postive_lm_*10);
         loc_loss = sum_squre / normalizer;
         score_loss = class_score / normalizer;
         top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
         if(has_lm_ && num_lm_ > 0){
-            lm_loss = 0.1 * lm_loss_origin / normalizer;
+            lm_loss = 0.1 * lm_loss_origin / lm_normalizer;
             top[0]->mutable_cpu_data()[0] += lm_loss;
         }
     } else {
@@ -183,17 +186,26 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     if (propagate_down[0]) {
         Dtype loss_weight = Dtype(0.);
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
-            normalization_, num_, 1, count_postive_);
+                                        normalization_, num_, 1, count_postive_);
+        Dtype lm_normalizer = LossLayer<Dtype>::GetNormalizer(
+                                        normalization_, num_, 1, count_postive_lm_*10);
+        
+        const int output_height = bottom[0]->height();
+        const int output_width = bottom[0]->width();
+        const int num_channels = bottom[0]->channels();
+        int spatial_dim = output_height * output_width;
+
         loss_weight = top[0]->cpu_diff()[0] / normalizer;
         Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
-        caffe_cpu_scale(bottom[0]->count(), loss_weight, bottom_diff, bottom_diff);
+        for(int i = 0; i < num_; i++){
+            caffe_cpu_scale(4 * spatial_dim, loss_weight, 
+                                bottom_diff + i * num_channels * spatial_dim, 
+                                bottom_diff + i * num_channels * spatial_dim);
+        }
         if(has_lm_){
-            const int output_height = bottom[0]->height();
-            const int output_width = bottom[0]->width();
-            const int num_channels = bottom[0]->channels();
-            int spatial_dim = output_height * output_width;
+            loss_weight = top[0]->cpu_diff()[0] / lm_normalizer;
             for(int i = 0; i < num_; i++)
-                caffe_cpu_scale(10 * spatial_dim, Dtype(0.1), 
+                caffe_cpu_scale(10 * spatial_dim, Dtype(0.1) * loss_weight, 
                     bottom_diff + i * num_channels * spatial_dim + 4 * spatial_dim, 
                     bottom_diff + i * num_channels * spatial_dim + 4 * spatial_dim);
         }

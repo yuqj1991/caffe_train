@@ -60,6 +60,7 @@ class CenterGridLossLayer : public LossLayer<Dtype> {
         Dtype ignore_thresh_;
         Blob<Dtype> label_data_;
         int count_postive_;
+        int count_postive_lm_;
         CenterObjectLossParameter_CLASS_TYPE class_type_;
         bool has_lm_;
         int num_lm_;

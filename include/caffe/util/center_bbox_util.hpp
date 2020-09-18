@@ -110,7 +110,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
-                          Dtype* class_label, Dtype* bottom_diff, 
+                          Dtype* class_label, Dtype* bottom_diff, int *count_postive_lm,
                           int *count_postive, Dtype *loc_loss_value, int *match_num_gt_box, bool has_lm, Dtype* lm_loss_value);
 
 template <typename Dtype> 

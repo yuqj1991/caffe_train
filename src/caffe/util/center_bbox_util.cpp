@@ -1102,7 +1102,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                           Dtype* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
-                          Dtype* class_label, Dtype* bottom_diff, 
+                          Dtype* class_label, Dtype* bottom_diff, int *count_postive_lm,
                           int *count_postive, Dtype *loc_loss_value, int *match_num_gt_box, 
                           bool has_lm, Dtype* lm_loss_value){
     CHECK_EQ(num_classes, 2) << "the current version is just classfly bg_0 and face_1, two class";
@@ -1116,6 +1116,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
             << "num_channels shoule be set to including 4 points landmarks, &classes";
 
     int postive = 0;
+    int lm_postive = 0;
     int gt_match_box = 0;
     SoftmaxCenterGrid(channel_pred_data, batch_size, num_classes, num_channels, output_height, output_width, has_lm);
     // 将所有值设置为 -2 的原因为，排除掉iou>0.35的一些样本，
@@ -1135,6 +1136,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         previous_id = b;
         std::vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > gt_bboxes = iter->second;
         int count = 0;
+        int lm_count = 0;
         std::vector<int> mask_Rf_anchor_already(dimScale, 0);
         for(int h = 0; h < output_height; h++){
             for(int w = 0; w < output_width; w++){
@@ -1248,7 +1250,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                             gt_bboxes[ii].second.nose().x() > 0 && gt_bboxes[ii].second.nose().y() > 0 &&
                             gt_bboxes[ii].second.leftmouth().x() > 0 && gt_bboxes[ii].second.leftmouth().y() > 0 &&
                             gt_bboxes[ii].second.rightmouth().x() > 0 && gt_bboxes[ii].second.rightmouth().y() > 0){
-                                
+                                check_landmarks_value(gt_bboxes[ii].second);
                                 int le_x_index = b * num_channels * dimScale + 4* dimScale + h * output_width + w;
                                 int le_y_index = b * num_channels * dimScale + 5* dimScale + h * output_width + w;
                                 int re_x_index = b * num_channels * dimScale + 6* dimScale + h * output_width + w;
@@ -1303,6 +1305,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                 bottom_diff[lm_y_index] = lm_y_diff;
                                 bottom_diff[rm_x_index] = rm_x_diff;
                                 bottom_diff[rm_y_index] = rm_y_diff;
+                                lm_count++;
                             }
                         }
                         class_label[class_index] = 1;
@@ -1329,6 +1332,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
         mask_Rf_anchor_already.clear();
         postive_batch[b] = count;
         postive += count;
+        lm_postive += lm_count;
     }
     #if FOCAL_LOSS_SOFTMAX
     score_loss = FocalLossSoftmax(class_label, channel_pred_data, batch_size, output_height,
@@ -1341,6 +1345,7 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                                     output_width, bottom_diff, num_channels, has_lm);
     #endif
     *count_postive = postive;
+    *count_postive_lm = lm_postive;
     *loc_loss_value = loc_loss;
     *lm_loss_value = lm_loss;
     *match_num_gt_box = gt_match_box;
@@ -1354,7 +1359,7 @@ template float EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int
                           float* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
-                          float* class_label, float* bottom_diff, 
+                          float* class_label, float* bottom_diff, int *count_postive_lm,
                           int *count_postive, float *loc_loss_value, int *match_num_gt_box, bool has_lm, float * lm_loss_value);
 
 template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_channels, const int num_classes,
@@ -1364,7 +1369,7 @@ template double EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const in
                           double* channel_pred_data, const int anchor_scale, 
                           std::pair<int, int> loc_truth_scale,
                           const std::map<int, vector<std::pair<NormalizedBBox, AnnoFaceLandmarks> > >& all_gt_bboxes,
-                          double* class_label, double* bottom_diff, 
+                          double* class_label, double* bottom_diff, int *count_postive_lm,
                           int *count_postive, double *loc_loss_value, int *match_num_gt_box, bool has_lm, double * lm_loss_value);
 
 template <typename Dtype>
