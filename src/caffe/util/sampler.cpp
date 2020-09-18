@@ -218,8 +218,8 @@ void GenerateSamples(const NormalizedBBox& source_bbox,
         // Determine if the sampled bbox is positive or negative by the constraint.
         if (SatisfySampleConstraint(sampled_bbox, object_bboxes,
                                     batch_sampler.sample_constraint())) {
-        ++found;
-        sampled_bboxes->push_back(sampled_bbox);
+            ++found;
+            sampled_bboxes->push_back(sampled_bbox);
         }
     }
 }
@@ -261,13 +261,13 @@ void GenerateBatchSamples(const AnnotatedDatum& anno_datum,
     float ratio = (float)img_height / img_width;
     for (int i = 0; i < batch_samplers.size(); ++i) {
         if (batch_samplers[i].use_original_image()) {
-        NormalizedBBox unit_bbox;
-        unit_bbox.set_xmin(0);
-        unit_bbox.set_ymin(0);
-        unit_bbox.set_xmax(1);
-        unit_bbox.set_ymax(1);
-        GenerateSamples(unit_bbox, object_bboxes, batch_samplers[i],
-                        sampled_bboxes, ratio);
+            NormalizedBBox unit_bbox;
+            unit_bbox.set_xmin(0);
+            unit_bbox.set_ymin(0);
+            unit_bbox.set_xmax(1);
+            unit_bbox.set_ymax(1);
+            GenerateSamples(unit_bbox, object_bboxes, batch_samplers[i],
+                            sampled_bboxes, ratio);
         }
     }
 }
@@ -280,13 +280,13 @@ void GenerateBatchSamples_Square(const AnnotatedDatum& anno_datum,
     GroupObjectBBoxes(anno_datum, &object_bboxes);
     for (int i = 0; i < batch_samplers.size(); ++i) {
         if (batch_samplers[i].use_original_image()) {
-        NormalizedBBox unit_bbox;
-        unit_bbox.set_xmin(0);
-        unit_bbox.set_ymin(0);
-        unit_bbox.set_xmax(1);
-        unit_bbox.set_ymax(1);
-        GenerateSamples_Square(anno_datum, unit_bbox, object_bboxes, batch_samplers[i],
-                        sampled_bboxes);
+            NormalizedBBox unit_bbox;
+            unit_bbox.set_xmin(0);
+            unit_bbox.set_ymin(0);
+            unit_bbox.set_xmax(1);
+            unit_bbox.set_ymax(1);
+            GenerateSamples_Square(anno_datum, unit_bbox, object_bboxes, batch_samplers[i],
+                            sampled_bboxes);
         }
     }
 }
@@ -350,7 +350,8 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
     if(sample_bbox_size >= image_long_side){
         caffe_rng_uniform(1, img_width - sample_bbox_size, 0.f, &w_off);
         caffe_rng_uniform(1, img_height - sample_bbox_size, 0.f, &h_off);
-    }else{/*
+    }else{
+        /*
         if(image_long_side == img_height){
             if(bbox_height <= sample_bbox_size){
                 caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
@@ -381,7 +382,8 @@ void GenerateDataAnchorSample(const AnnotatedDatum& anno_datum,
                     caffe_rng_uniform(1, ymin, ymin + bbox_height - sample_bbox_size, &h_off);
                 }
             }
-        }*/
+        }
+        */
         if(bbox_height <= sample_bbox_size){
             caffe_rng_uniform(1, ymin + bbox_height - sample_bbox_size, ymin, &h_off);
         }else{

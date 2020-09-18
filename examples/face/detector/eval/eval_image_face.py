@@ -11,6 +11,8 @@ from utils.timer import Timer
 from utils.get_config import get_output_dir
 import cv2
 
+import numpy as np
+
 def parser():
     parser = argparse.ArgumentParser('face Evaluate Module!',
                             description='You can use this file to evaluate face model capbilitaty!')
@@ -37,10 +39,16 @@ def preprocess(src, input):
     return img
 
 
-def postprocess(img, out):
+def transform(image_h, image_w):
+    img_h_new, img_w_new = int(np.ceil(image_h / 32) * 32), int(np.ceil(image_w / 32) * 32)
+    scale_h, scale_w = img_h_new / image_h, img_w_new / image_w
+    return img_h_new, img_w_new, scale_h, scale_w
+
+
+def postprocess(img, out, scale_h, scale_w):
     h = img.shape[0]
     w = img.shape[1]
-    box = out['detection_out'][0,0,:,3:7] * np.array([w, h, w, h])
+    box = out['detection_out'][0,0,:,3:7] * np.array([float(w/scale_w), float(h/scale_h), float(w/scale_w), float(h/scale_h)])
     cls = out['detection_out'][0,0,:,1]
     conf = out['detection_out'][0,0,:,2]
     return (box.astype(np.int32), conf, cls)
@@ -70,7 +78,7 @@ def detect(net, im_path, thresh=0.05, timers=None):
     img = img.transpose((2, 0, 1))
     net.blobs['data'].data[...] = img
     out = net.forward()
-    boxes, conf, cls = postprocess(im, out)
+    boxes, conf, cls = postprocess(im, out, 1, 1)
     timers['detect'].toc()
     timers['misc'].tic()
     inds = np.where(conf[:] > thresh)[0]

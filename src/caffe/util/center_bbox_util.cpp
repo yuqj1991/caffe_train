@@ -1180,8 +1180,6 @@ Dtype EncodeCenterGridObjectSoftMaxLoss(const int batch_size, const int num_chan
                     for(int w = static_cast<int>(xmin); w < static_cast<int>(xmax); w++){
                         if(mask_Rf_anchor_already[h * output_width + w] == 1) // 避免同一个anchor的中心落在多个gt里面
                             continue;
-                        if(!bboxSatisfyEllipise(w, h, temp_bbox))
-                            continue;
                         #define USE_GIOU_LOSS false
                         #if USE_GIOU_LOSS
                         int x_index = b * num_channels * dimScale

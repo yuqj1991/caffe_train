@@ -266,14 +266,14 @@ test_iter = int(math.ceil(float(num_test_image) / test_batch_size))
 
 solver_param = {
     # Train parameters
-    'base_lr': base_learning_rate,
+    'base_lr': refine_learning_rate,#base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [10000, 30000, 50000, 60000, 70000, 80000, 90000],
+    'stepvalue': [60000, 120000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 100000,
+    'max_iter': 150000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
@@ -314,7 +314,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         train=True, output_label=True, label_map_file=labelmapPath,
         crop_type = P.AnnotatedData.CROP_BATCH,
         transform_param=train_transform_param, batch_sampler=batch_sampler, 
-        data_anchor_sampler= data_anchor_sampler,bbox_sampler=bbox_sampler, has_landmarks = has_landmarks)
+        data_anchor_sampler= data_anchor_sampler,bbox_sampler=None, has_landmarks = has_landmarks)
 
 net, class_out, box_out = CenterFaceMobilenetV2Body(net= net, from_layer= 'data', detect_num = detect_num_channels
                                                     , Inverted_residual_setting= Inverted_residual_setting,

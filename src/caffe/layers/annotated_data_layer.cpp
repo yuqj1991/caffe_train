@@ -370,7 +370,7 @@ void AnnotatedDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
             }
         }
         if(num_gt_box==0)
-            LOG(INFO)<<"no gt boxes";
+            LOG(INFO)<<"*************no gt boxes";
         cv::imwrite(saved_img_name, cropImage);
         LOG(INFO)<<"*** Datum Write Into Jpg File Sucessfully! ***";
         jj ++ ;
