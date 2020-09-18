@@ -94,8 +94,8 @@ def InceptionTower(net, from_layer, tower_name, layer_params, **bn_param):
 
 def CreateAnnotatedDataLayer(source, batch_size=32, backend=P.Data.LMDB,
         output_label=True, train=True, label_map_file='', anno_type=None,
-        transform_param={}, batch_sampler=[{}], data_anchor_sampler = {}, 
-        bbox_sampler = {}, crop_type = None, YoloForamte = False, has_landmarks = False):
+        transform_param={}, batch_sampler=None, data_anchor_sampler = None, 
+        bbox_sampler = None, crop_type = None, YoloForamte = False, has_landmarks = False):
     if train:
         kwargs = {
                 'include': dict(phase=caffe_pb2.Phase.Value('TRAIN')),
@@ -111,13 +111,15 @@ def CreateAnnotatedDataLayer(source, batch_size=32, backend=P.Data.LMDB,
         ntop = 2
     annotated_data_param = {
         'label_map_file': label_map_file,
-        'data_anchor_sampler': data_anchor_sampler,
-        'bbox_sampler': bbox_sampler,
         'yoloformat': YoloForamte,
         'has_landmarks': has_landmarks,
     }
-    if len(batch_sampler) != 1:
-            annotated_data_param['batch_sampler']= batch_sampler
+    if batch_sampler is not None:
+            annotated_data_param.update({'batch_sampler': batch_sampler})
+    if bbox_sampler is not None:
+            annotated_data_param.update({'bbox_sampler': bbox_sampler})
+    if data_anchor_sampler is not None:
+            annotated_data_param.update({'data_anchor_sampler': data_anchor_sampler})
     if anno_type is not None:
         annotated_data_param.update({'anno_type': anno_type})
     if crop_type is not None:
