@@ -276,7 +276,7 @@ void CenterObjectLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
             normalization_, num_, 1, num_gt_);
 
     Dtype lm_normalizer = LossLayer<Dtype>::GetNormalizer(
-            normalization_, num_, 1, num_lm_*10);
+            normalization_, num_, 1, num_lm_);
 
     normalizer = normalizer > 0 ? normalizer : num_;
     lm_normalizer = lm_normalizer > 0 ?  lm_normalizer : num_;
@@ -333,7 +333,7 @@ void CenterObjectLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
             normalization_, num_, 1, num_gt_);
     Dtype lm_normalizer = LossLayer<Dtype>::GetNormalizer(
-            normalization_, num_, 1, num_lm_*10);
+            normalization_, num_, 1, num_lm_);
     normalizer = normalizer > 0 ? normalizer : num_;
     lm_normalizer = lm_normalizer > 0 ? lm_normalizer : num_;
     if (propagate_down[0]) {

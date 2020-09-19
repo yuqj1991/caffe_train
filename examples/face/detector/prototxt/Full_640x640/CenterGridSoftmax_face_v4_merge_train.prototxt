@@ -3931,7 +3931,7 @@ layer {
   bottom: "Det_1x1_out_64_2"
   bottom: "label"
   top: "CenterGridLoss_2"
-  loss_weight: 0.800000011920929
+  loss_weight: 1.0
   include {
     phase: TRAIN
   }
@@ -3960,7 +3960,7 @@ layer {
   bottom: "Det_1x1_out_32_3"
   bottom: "label"
   top: "CenterGridLoss_3"
-  loss_weight: 0.800000011920929
+  loss_weight: 1.0
   include {
     phase: TRAIN
   }
@@ -3989,7 +3989,7 @@ layer {
   bottom: "Det_1x1_out_24_4"
   bottom: "label"
   top: "CenterGridLoss_4"
-  loss_weight: 0.5
+  loss_weight: 1.0
   include {
     phase: TRAIN
   }

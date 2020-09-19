@@ -144,7 +144,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         normalizer = LossLayer<Dtype>::GetNormalizer(
                                         normalization_, num_, 1, count_postive_);
         lm_normalizer = LossLayer<Dtype>::GetNormalizer(
-                                        normalization_, num_, 1, count_postive_lm_*10);
+                                        normalization_, num_, 1, count_postive_lm_);
         loc_loss = sum_squre / normalizer;
         score_loss = class_score / normalizer;
         top[0]->mutable_cpu_data()[0] = loc_loss + score_loss;
@@ -189,7 +189,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         Dtype normalizer = LossLayer<Dtype>::GetNormalizer(
                                         normalization_, num_, 1, count_postive_);
         Dtype lm_normalizer = LossLayer<Dtype>::GetNormalizer(
-                                        normalization_, num_, 1, count_postive_lm_*10);
+                                        normalization_, num_, 1, count_postive_lm_);
         
         const int output_height = bottom[0]->height();
         const int output_width = bottom[0]->width();
@@ -198,15 +198,11 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 
         loss_weight = top[0]->cpu_diff()[0] / normalizer;
         Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
-        for(int i = 0; i < num_; i++){
-            caffe_cpu_scale(4 * spatial_dim, loss_weight, 
-                                bottom_diff + i * num_channels * spatial_dim, 
-                                bottom_diff + i * num_channels * spatial_dim);
-        }
-        if(has_lm_){
-            loss_weight = top[0]->cpu_diff()[0] / lm_normalizer;
+        caffe_cpu_scale(bottom[0]->count(), bottom_diff, bottom_diff);
+        loss_weight = 0.1 * loss_weight / lm_normalizer;
+        if(has_lm_ && num_lm_ >0){
             for(int i = 0; i < num_; i++)
-                caffe_cpu_scale(10 * spatial_dim, Dtype(0.1) * loss_weight, 
+                caffe_cpu_scale(10 * spatial_dim, loss_weight, 
                     bottom_diff + i * num_channels * spatial_dim + 4 * spatial_dim, 
                     bottom_diff + i * num_channels * spatial_dim + 4 * spatial_dim);
         }
