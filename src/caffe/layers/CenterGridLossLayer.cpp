@@ -199,7 +199,7 @@ void CenterGridLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         loss_weight = top[0]->cpu_diff()[0] / normalizer;
         Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
         caffe_cpu_scale(bottom[0]->count(), loss_weight, bottom_diff, bottom_diff);
-        loss_weight = 0.1 * top[0]->cpu_diff()[0] *  / lm_normalizer;
+        loss_weight = 0.1 * top[0]->cpu_diff()[0] / lm_normalizer;
         if(has_lm_ && num_lm_ >0){
             for(int i = 0; i < num_; i++)
                 caffe_cpu_scale(10 * spatial_dim, loss_weight, 
