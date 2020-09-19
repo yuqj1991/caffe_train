@@ -166,6 +166,7 @@ void CenterGridLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         LOG(INFO)<<"all_gt_boxes: "<<num_groundtruth_
                 <<", normalizer: "<<normalizer
                 <<", count_postive: "<< count_postive_
+                <<", count_postive_lm: "<< count_postive_lm_
                 <<", num_match: "<<num_gt_match
                 <<", num_landmarks: "<<num_lm_;
         LOG(INFO)<<"*****************";
