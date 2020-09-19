@@ -149,7 +149,7 @@ layer {
     }
     yoloformat: false
     crop_type: CROP_BATCH
-    has_landmarks: false
+    has_landmarks: true
   }
   data_param {
     source: "../../../../../dataset/facedata/wider_face/lmdb/wider_face_wider_train_lm_lmdb/"
@@ -4637,10 +4637,31 @@ layer {
   }
 }
 layer {
+  name: "landmarks_out_1x1"
+  type: "Convolution"
+  bottom: "last_conv_3x3_layer"
+  top: "landmarks_out_1x1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  convolution_param {
+    num_output: 10
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
   name: "Box_out_1x1"
   type: "Concat"
   bottom: "Box_out_offset_1x1"
   bottom: "Box_out_wh_1x1"
+  bottom: "landmarks_out_1x1"
   top: "Box_out_1x1"
   concat_param {
     axis: 1
@@ -4668,7 +4689,7 @@ layer {
     loc_loss_type: SMOOTH_L1
     conf_loss_type: FOCALSIGMOID
     loc_weight: 1.0
-    has_lm: false
+    has_lm: true
     lm_loss_type: SMOOTH_L1
   }
 }
