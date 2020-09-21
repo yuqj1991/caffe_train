@@ -74,7 +74,7 @@ void CenternetDetectionOutputLayer<Dtype>::Forward_cpu(
 
     std::map<int, vector<CenterNetInfo > > ::iterator iter;
     int count = 0;
-    #if 0
+    #if 1
     for(iter = results_.begin(); iter != results_.end(); iter++){
         int num_det = iter->second.size();
         if(keep_top_k_ > 0 && num_det > keep_top_k_){
