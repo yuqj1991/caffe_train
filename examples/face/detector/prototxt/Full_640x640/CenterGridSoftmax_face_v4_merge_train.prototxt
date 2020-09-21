@@ -148,7 +148,7 @@ layer {
       max_trials: 50
     }
     yoloformat: true
-    crop_type: CROP_BATCH
+    crop_type: CROP_JITTER
     has_landmarks: true
   }
   data_param {
@@ -3880,7 +3880,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -3909,7 +3909,7 @@ layer {
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -3931,14 +3931,14 @@ layer {
   bottom: "Det_1x1_out_64_2"
   bottom: "label"
   top: "CenterGridLoss_2"
-  loss_weight: 1.0
+  loss_weight: 0.800000011920929
   include {
     phase: TRAIN
   }
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -3960,14 +3960,14 @@ layer {
   bottom: "Det_1x1_out_32_3"
   bottom: "label"
   top: "CenterGridLoss_3"
-  loss_weight: 1.0
+  loss_weight: 0.800000011920929
   include {
     phase: TRAIN
   }
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
@@ -3989,14 +3989,14 @@ layer {
   bottom: "Det_1x1_out_24_4"
   bottom: "label"
   top: "CenterGridLoss_4"
-  loss_weight: 1.0
+  loss_weight: 0.5
   include {
     phase: TRAIN
   }
   propagate_down: true
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: BATCH_SIZE
   }
   center_object_loss_param {
     num_class: 2
