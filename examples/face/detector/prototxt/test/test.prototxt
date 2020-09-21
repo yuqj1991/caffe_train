@@ -192,7 +192,7 @@ layer {
       max_trials: 50
     }
     yoloformat: true
-    crop_type: CROP_BATCH
+    crop_type: CROP_ANCHOR
     has_landmarks: true
   }
   data_param {
