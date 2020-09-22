@@ -252,7 +252,7 @@ elif normalization_mode == P.Loss.VALID:
     base_learning_rate *= 25. / loc_weight
 elif normalization_mode == P.Loss.FULL:
     base_learning_rate *= 2000.
-
+refine_learning_rate = 1.25e-4
 # Evaluate on whole test set.
 num_test_image = 3219
 test_batch_size = 1
@@ -265,15 +265,15 @@ solver_param = {
     'base_lr': base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [20000, 40000, 60000, 80000],
+    'stepvalue': [100000, 160000, 220000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 100000,
+    'max_iter': 300000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
-    'type': "RMSProp",
+    'type': "Adam",
     'solver_mode': "GPU",
     'device_id': 0,
     'debug_info': False,
@@ -318,7 +318,7 @@ net.data, net.label = CreateAnnotatedDataLayer(trainDataPath, batch_size=batch_s
         transform_param=train_transform_param, 
         batch_sampler=batch_sampler, 
         data_anchor_sampler= data_anchor_sampler,
-        bbox_sampler=bbox_sampler,
+        bbox_sampler=None,
         crop_type = P.AnnotatedData.CROP_JITTER, 
         YoloForamte = True, has_landmarks= has_landmarks)
 

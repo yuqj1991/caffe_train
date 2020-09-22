@@ -40,7 +40,7 @@
 ## New proposed method CenterGridSoftmax + nms method by using anchor  
 | Method | Easy | Medium | Hard|
 |:--------:| :--------:| :---------:| :------:|
-| ours(one scale)| 0.8636 | 0.8489   | 0.7425 |
+| ours(one scale)640x640 + nms| 0.8636 | 0.8489   | 0.7425 |
 
 ---
 

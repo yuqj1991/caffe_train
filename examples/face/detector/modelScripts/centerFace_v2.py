@@ -255,7 +255,7 @@ elif normalization_mode == P.Loss.VALID:
 elif normalization_mode == P.Loss.FULL:
     base_learning_rate *= 2000.
 
-refine_learning_rate = 1.25e-4
+refine_learning_rate = 5e-4
 
 # Evaluate on whole test set.
 num_test_image = 3219
@@ -269,15 +269,15 @@ solver_param = {
     'base_lr': refine_learning_rate,#base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [60000, 120000],
+    'stepvalue': [140000, 190000],
     'gamma': 0.1,
     #'momentum': 0.9,
     'iter_size': iter_size,
-    'max_iter': 150000,
+    'max_iter': 220000,
     'snapshot': 5000,
     'display': 100,
     'average_loss': 10,
-    'type': "RMSProp",
+    'type': "Adam",
     'solver_mode': "GPU",
     'device_id': 0,
     'debug_info': False,

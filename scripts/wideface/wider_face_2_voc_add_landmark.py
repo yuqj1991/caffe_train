@@ -3,7 +3,7 @@
 import os
 import shutil
 from xml.dom.minidom import Document
-
+import numpy as np
 import cv2
 
 rootdir = "../../../dataset/facedata/wider_face"
@@ -44,13 +44,16 @@ def convertimgset(img_set="train"):
     previous_filename = ""
     bboxes = []
     lms = []
+    filename = ''
+    saveimg = ''
+    showimg = ''
     with open(gtfilepath, 'r') as gtfile:
         while True:
             line = gtfile.readline().strip()
             if line == "":
                 if len(bboxes) != 0:
                     method_name(bboxes, filename, saveimg, vocannotationdir, lms, img_set)
-                    cv2.imwrite(imagesdir + "/" + filename, saveimg)
+                    cv2.imwrite(imagesdir + "/" + filename, showimg)
                     imgfilepath = filename[:-4]
                     f_set.write(os.path.abspath(imagesdir + "/" + filename).split('.jpg')[0] + '\n')
                     print("end!")
@@ -58,10 +61,8 @@ def convertimgset(img_set="train"):
             if line.startswith("#"):
                 if index != 0 and convert2vocformat:
                     if len(bboxes) != 0:
-                        #cv2.imshow("img", showimg)
-                        #cv2.waitKey(0)
                         method_name(bboxes, filename, saveimg, vocannotationdir, lms, img_set)
-                        cv2.imwrite(imagesdir + "/" + filename, saveimg)
+                        cv2.imwrite(imagesdir + "/" + filename, showimg)
                         imgfilepath = filename[:-4]
                         f_set.write(os.path.abspath(imagesdir + "/" + filename).split('.jpg')[0] + '\n')
                     else:
@@ -106,6 +107,7 @@ def convertimgset(img_set="train"):
                             lm.append(int(line[4 + 3 * i + 2]))
                             lm.append(line[19])
                             lms.append(lm)
+                        landmarks = np.array(line[4:19]).reshape(5, 3)
                     cv2.rectangle(showimg, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0))
                 else:
                     #saveimg[y1:y2, x1:x2, :] = (104, 117, 123)
