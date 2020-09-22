@@ -252,7 +252,7 @@ elif normalization_mode == P.Loss.VALID:
     base_learning_rate *= 25. / loc_weight
 elif normalization_mode == P.Loss.FULL:
     base_learning_rate *= 2000.
-refine_learning_rate = 1.25e-4
+refine_learning_rate = 5e-4
 # Evaluate on whole test set.
 num_test_image = 3219
 test_batch_size = 1
@@ -262,7 +262,7 @@ test_iter = int(math.ceil(float(num_test_image) / test_batch_size))
 
 solver_param = {
     # Train parameters
-    'base_lr': base_learning_rate,
+    'base_lr': refine_learning_rate,#base_learning_rate,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
     'stepvalue': [100000, 160000, 220000],
@@ -338,7 +338,7 @@ for idx, detect_output in enumerate(LayerList_Output):
     CenterGridObjectLoss(net=net, bias_scale= bias_scale[idx], 
                             low_bbox_scale= low_bbox_scale[idx], 
                             up_bbox_scale= up_bbox_scale[idx],
-                            normalization_mode = P.Loss.BATCH_SIZE,
+                            normalization_mode = P.Loss.VALID,
                             class_type = P.CenterObjectLoss.SOFTMAX,
                             num_classes= num_classes,
                             net_height = resize_height, net_width = resize_width,
