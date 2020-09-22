@@ -8,12 +8,12 @@
 
 ## caffe implement method
 | Method | orginal performance| caffe performance | 
-|:--------:| :--------:| :---------:| 
-|focal loss|            |            | 
-|data_anchor_sample|        |        |
-|cos_loss|              |            |
-|Yolov3  |              |            |
-|triplet_loss|          |            |
+|:--------:| :--------:| :---------:|  
+|focal loss|SSD|SSD|  
+|data_anchor_sample|SSD + DAS +VOC Paddlepaddle 72.2%|SSD + DAS +VOC caffe 72.2%|  
+|cos_loss|NOT TESTED|NOT TESTED CAFFE|  
+|Yolov3  |Yolov3+darknet COCO 57.9%|Yolov3 Caffe COCO 53.2%|  
+|triplet_loss|facenet+tf 99.85%|mobilenet-face 99.4%|
 
 ---
 
