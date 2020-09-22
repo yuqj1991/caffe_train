@@ -10,7 +10,7 @@
 | Method | orginal performance| caffe performance | 
 |:--------:| :--------:| :---------:|  
 |focal loss|SSD|SSD|  
-|data_anchor_sample|SSD + DAS +VOC Paddlepaddle 72.2%|SSD + DAS +VOC caffe 72.2%|  
+|data_anchor_sample|SSD + DAS +VOC Paddlepaddle 72.2%|SSD + DAS +VOC caffe 74.1%|  
 |cos_loss|NOT TESTED|NOT TESTED CAFFE|  
 |Yolov3  |Yolov3+darknet COCO 57.9%|Yolov3 Caffe COCO 53.2%|  
 |triplet_loss|facenet+tf 99.85%|mobilenet-face 99.4%|
